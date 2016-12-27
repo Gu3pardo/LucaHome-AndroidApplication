@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Primary" >
+
+    <ProgressBar
+        android:id="@+id/progressBarListViewAbove"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/listViewDivider" />
+
+    <ListView
+        android:id="@+id/listViewAbove"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/listViewDivider"
+        android:visibility="invisible" />
+
+    <TextView
+        android:id="@+id/listViewDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="3dp"
+        android:background="@color/TextIcon" />
+
+    <ProgressBar
+        android:id="@+id/progressBarListViewBelow"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/listViewDivider" />
+
+    <ListView
+        android:id="@+id/listViewBelow"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/listViewDivider"
+        android:visibility="invisible" />
+
+</RelativeLayout>

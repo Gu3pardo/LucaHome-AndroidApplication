@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/farmListFrame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Primary" >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/soundBorder" >
+
+        <ProgressBar
+            android:id="@+id/progressBarSoundListView"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ListView
+            android:id="@+id/soundListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/soundBorder"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_above="@+id/soundInformation"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="5dp"
+        android:background="@color/TextIcon" />
+
+    <TextView
+        android:id="@+id/soundInformation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/soundButtonBar"
+        android:layout_margin="3dp"
+        android:gravity="center"
+        android:text="@string/example"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/TextIcon" />
+
+    <LinearLayout
+        android:id="@+id/soundButtonBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:gravity="center"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/soundButtonPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_blank"
+            android:contentDescription="@string/image"
+            android:src="@android:drawable/ic_media_play" />
+
+        <ImageButton
+            android:id="@+id/soundButtonStop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_blank"
+            android:contentDescription="@string/image"
+            android:src="@android:drawable/ic_media_pause" />
+
+        <TextView
+            android:id="@+id/soundVolumeView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/example"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/TextIcon" />
+
+        <ImageButton
+            android:id="@+id/soundButtonIncreaseVolume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_blank"
+            android:contentDescription="@string/image"
+            android:src="@android:drawable/arrow_up_float" />
+
+        <ImageButton
+            android:id="@+id/soundButtonDecreaseVolume"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_blank"
+            android:contentDescription="@string/image"
+            android:src="@android:drawable/arrow_down_float" />
+
+        <Button
+            android:id="@+id/soundSwitchRaspberry"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/button_blank"
+            android:text="@string/example"
+            android:textColor="@color/TextIcon" />
+    </LinearLayout>
+
+</RelativeLayout>

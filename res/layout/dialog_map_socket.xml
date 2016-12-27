@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/shape_rounded"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <TextView
+        android:id="@+id/dialog_map_socket_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sockets"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/TextIcon" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="10dp"
+        android:background="@color/TextIcon" />
+
+    <TextView
+        android:id="@+id/dialog_map_socket_area"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="@string/example"
+        android:textColor="@color/TextIcon" />
+
+    <TextView
+        android:id="@+id/dialog_map_socket_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="@string/example"
+        android:textColor="@color/TextIcon" />
+
+    <Switch
+        android:id="@+id/dialog_map_socket_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="10dp"
+        android:background="@color/TextIcon" />
+
+    <TextView
+        android:id="@+id/dialog_map_socket_schedules"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Schedules"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/TextIcon" />
+
+    <Spinner
+        android:id="@+id/dialog_map_socket_schedules_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="10dp"
+        android:background="@color/TextIcon" />
+
+    <TextView
+        android:id="@+id/dialog_map_socket_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Timer"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/TextIcon" />
+
+    <Spinner
+        android:id="@+id/dialog_map_socket_timer_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="10dp"
+        android:background="@color/TextIcon" />
+
+    <Button
+        android:id="@+id/dialog_map_socket_button_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_blank"
+        android:text="@string/close"
+        android:textColor="@color/TextIcon" />
+
+</LinearLayout>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/Primary" >
+
+    <ImageView
+        android:id="@+id/mapImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonBarMap"
+        android:layout_margin="5dp"
+        android:contentDescription="@string/contentDescription"
+        android:scaleType="fitXY"
+        android:src="@drawable/map" />
+
+    <RelativeLayout
+        android:id="@+id/mapPaintView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/buttonBarMap"
+        android:clickable="true"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:gravity="center_horizontal" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#80000000"
+            android:gravity="center_horizontal"
+            android:padding="5dp" >
+
+            <TextView
+                android:id="@+id/legende_raspberry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:drawableBottom="@drawable/drawing_raspberry"
+                android:text="Raspberry"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/legende_arduino"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:drawableBottom="@drawable/drawing_arduino"
+                android:text="Arduino"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/legende_socket"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:drawableBottom="@drawable/drawing_socket_off"
+                android:drawableTop="@drawable/drawing_socket_on"
+                android:text="Socket"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/legende_temperature"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:drawableBottom="@drawable/drawing_temperature"
+                android:text="Temperature"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/buttonBarMap"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="center"
+        android:padding="5dp" >
+
+        <Button
+            android:id="@+id/buttonAddRaspberry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/add_round"
+            android:text="R" />
+
+        <Button
+            android:id="@+id/buttonAddArduino"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/buttonAddRaspberry"
+            android:background="@drawable/add_round"
+            android:text="A" />
+
+        <Button
+            android:id="@+id/buttonAddSocket"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/buttonAddArduino"
+            android:background="@drawable/add_round"
+            android:text="S" />
+
+        <Button
+            android:id="@+id/buttonRemove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/buttonAddSocket"
+            android:background="@drawable/remove_round"
+            android:text="X" />
+    </RelativeLayout>
+
+</RelativeLayout>

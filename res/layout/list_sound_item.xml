@@ -1,0 +1,29 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/Background"
+    android:padding="2dp" >
+
+    <TextView
+        android:id="@+id/sound_item_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"
+        android:gravity="center_vertical|start"
+        android:text="@string/example"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@color/TextIcon" />
+
+    <ImageButton
+        android:id="@+id/sound_item_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="5dp"
+        android:background="@drawable/button_blank"
+        android:contentDescription="@string/image"
+        android:src="@android:drawable/ic_media_play" />
+
+</RelativeLayout>

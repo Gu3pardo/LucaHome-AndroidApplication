@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/shape_rounded"
+    android:padding="10dp" >
+
+    <WebView
+        android:id="@+id/temperature_dialog_webview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/temperature_dialog_button"
+        android:visibility="invisible" />
+
+    <ProgressBar
+        android:id="@+id/temperature_dialog_progressbar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/temperature_dialog_button" />
+
+    <Button
+        android:id="@+id/temperature_dialog_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button_blank"
+        android:text="@string/close"
+        android:textColor="@color/TextIcon" />
+
+</RelativeLayout>
