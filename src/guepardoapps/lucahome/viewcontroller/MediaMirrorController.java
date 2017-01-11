@@ -32,7 +32,7 @@ import guepardoapps.toolset.controller.ReceiverController;
 
 public class MediaMirrorController {
 
-	public static final List<String> SERVER_IPS = Arrays.asList("192.168.178.147");
+	public static final List<String> SERVER_IPS = Arrays.asList("192.168.178.147", "192.168.178.20");
 	public static final List<String> PLAYER = Arrays.asList("1", "2");
 
 	private static final String TAG = MediaMirrorController.class.getName();
@@ -208,12 +208,12 @@ public class MediaMirrorController {
 
 	public void SendEnableScreen() {
 		_logger.Warn("SendEnableScreen not yet implemented!");
-		Toast.makeText(_context, "SendEnableScreen not yet implemented!", Toast.LENGTH_SHORT).show();
+		sendServerCommand(ServerAction.SCREEN_ENABLE.toString(), "");
 	}
 
 	public void SendDisableScreen() {
 		_logger.Warn("SendDisableScreen not yet implemented!");
-		Toast.makeText(_context, "SendDisableScreen not yet implemented!", Toast.LENGTH_SHORT).show();
+		sendServerCommand(ServerAction.SCREEN_DISABLE.toString(), "");
 	}
 
 	public void LoadVideos(String searchValue, int results) {
@@ -305,6 +305,16 @@ public class MediaMirrorController {
 	public void SendGameCommandRotate() {
 		_logger.Debug("SendGameCommandRotate");
 		sendServerCommand(ServerAction.GAME_COMMAND.toString(), ROTATE);
+	}
+
+	public void SendRebootDevice() {
+		_logger.Debug("SendRebootDevice");
+		sendServerCommand(ServerAction.SYSTEM_REBOOT.toString(), "");
+	}
+
+	public void SendShutdownDevice() {
+		_logger.Debug("SendShutdownDevice");
+		sendServerCommand(ServerAction.SYSTEM_SHUTDOWN.toString(), "");
 	}
 
 	private void sendServerCommand(String command, String data) {

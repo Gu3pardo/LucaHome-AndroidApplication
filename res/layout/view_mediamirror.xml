@@ -682,14 +682,11 @@
                     android:text="Darker"
                     android:textColor="@color/TextIcon" />
 
-                <!-- TODO reactivate after settings are added to mediamirror -->
-
                 <TextView
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
-                    android:background="@color/TextIcon"
-                    android:visibility="gone" />
+                    android:background="@color/TextIcon" />
 
                 <Button
                     android:id="@+id/enableScreenButton"
@@ -700,15 +697,13 @@
                     android:layout_weight="1"
                     android:background="@drawable/button_blank"
                     android:text="Enable"
-                    android:textColor="@color/TextIcon"
-                    android:visibility="gone" />
+                    android:textColor="@color/TextIcon" />
 
                 <TextView
                     android:layout_width="1dp"
                     android:layout_height="match_parent"
                     android:layout_margin="5dp"
-                    android:background="@color/TextIcon"
-                    android:visibility="gone" />
+                    android:background="@color/TextIcon" />
 
                 <Button
                     android:id="@+id/disableScreenButton"
@@ -719,8 +714,67 @@
                     android:layout_weight="1"
                     android:background="@drawable/button_blank"
                     android:text="Disable"
-                    android:textColor="@color/TextIcon"
-                    android:visibility="gone" />
+                    android:textColor="@color/TextIcon" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/DarkPrimary"
+            android:orientation="vertical"
+            android:padding="5dp"
+            android:visibility="visible" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:gravity="start"
+                android:text="Device actions"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/TextIcon" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="5dp"
+                android:background="@color/TextIcon" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center" >
+
+                <Button
+                    android:id="@+id/rebootDeviceButton"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_blank"
+                    android:text="Reboot"
+                    android:textColor="@color/TextIcon" />
+
+                <TextView
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:background="@color/TextIcon" />
+
+                <Button
+                    android:id="@+id/shutdownDeviceButton"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_blank"
+                    android:text="Shutdown"
+                    android:textColor="@color/TextIcon" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

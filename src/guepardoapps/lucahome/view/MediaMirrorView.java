@@ -88,6 +88,9 @@ public class MediaMirrorView extends Activity {
 	private Button _decreaseScreenBrightnessButton;
 	private Button _enableScreenButton;
 	private Button _disableScreenButton;
+	
+	private Button _rebootDeviceButton;
+	private Button _shutdownDeviceButton;
 
 	private BroadcastReceiver _volumeReceiver = new BroadcastReceiver() {
 		@Override
@@ -387,6 +390,21 @@ public class MediaMirrorView extends Activity {
 			@Override
 			public void onClick(View view) {
 				_mediaMirrorController.SendDisableScreen();
+			}
+		});
+		
+		_rebootDeviceButton = (Button) findViewById(R.id.rebootDeviceButton);
+		_rebootDeviceButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_mediaMirrorController.SendRebootDevice();
+			}
+		});
+		_shutdownDeviceButton = (Button) findViewById(R.id.shutdownDeviceButton);
+		_shutdownDeviceButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_mediaMirrorController.SendShutdownDevice();
 			}
 		});
 	}
