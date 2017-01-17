@@ -31,7 +31,6 @@ public class HomeViewListButtonController {
 	private Context _context;
 	private NavigationService _navigationService;
 
-	private LinearLayout _linearLayoutButtonMain;
 	private Button _buttonControl;
 	private Button _buttonMedia;
 	private Button _buttonSensors;
@@ -57,7 +56,6 @@ public class HomeViewListButtonController {
 	private Button _buttonBirthdays;
 	private Button _buttonGames;
 
-	private int _mainVisibility = View.VISIBLE;
 	private int _controlVisibility = View.GONE;
 	private int _mediaVisibility = View.GONE;
 	private int _sensorVisibility = View.GONE;
@@ -96,76 +94,19 @@ public class HomeViewListButtonController {
 		_logger.Debug("onDestroy");
 	}
 
-	public boolean onBackKeyDown() {
-		if (_controlSelectionActive) {
-			_logger.Debug("_controlSelectionActive");
-
-			_mainVisibility = View.VISIBLE;
-			_controlVisibility = View.GONE;
-
-			_controlSelectionActive = _controlVisibility == View.VISIBLE;
-
-			_linearLayoutButtonMain.setVisibility(_mainVisibility);
-			_linearLayoutButtonControl.setVisibility(_controlVisibility);
-
-			return true;
-		} else if (_mediaSelectionActive) {
-			_logger.Debug("_mediaSelectionActive");
-
-			_mainVisibility = View.VISIBLE;
-			_mediaVisibility = View.GONE;
-
-			_mediaSelectionActive = _mediaVisibility == View.VISIBLE;
-
-			_linearLayoutButtonMain.setVisibility(_mainVisibility);
-			_linearLayoutButtonMedia.setVisibility(_mediaVisibility);
-
-			return true;
-		} else if (_sensorSelectionActive) {
-			_logger.Debug("_sensorSelectionActive");
-
-			_mainVisibility = View.VISIBLE;
-			_sensorVisibility = View.GONE;
-
-			_sensorSelectionActive = _sensorVisibility == View.VISIBLE;
-
-			_linearLayoutButtonMain.setVisibility(_mainVisibility);
-			_linearLayoutButtonSensors.setVisibility(_sensorVisibility);
-
-			return true;
-		} else if (_socialSelectionActive) {
-			_logger.Debug("_socialSelectionActive");
-
-			_mainVisibility = View.VISIBLE;
-			_socialVisibility = View.GONE;
-
-			_socialSelectionActive = _socialVisibility == View.VISIBLE;
-
-			_linearLayoutButtonMain.setVisibility(_mainVisibility);
-			_linearLayoutButtonSocial.setVisibility(_socialVisibility);
-
-			return true;
-		}
-
-		return false;
-	}
-
 	private void initializeButtonMain() {
 		_logger.Debug("initializeButtonMain");
-
-		_linearLayoutButtonMain = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutButtonMain);
-		_linearLayoutButtonMain.setVisibility(_mainVisibility);
 
 		_buttonControl = (Button) ((Activity) _context).findViewById(R.id.buttonControl);
 		_buttonControl.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mainVisibility = View.GONE;
-				_controlVisibility = View.VISIBLE;
-
+				if (_controlSelectionActive) {
+					_controlVisibility = View.GONE;
+				} else {
+					_controlVisibility = View.VISIBLE;
+				}
 				_controlSelectionActive = _controlVisibility == View.VISIBLE;
-
-				_linearLayoutButtonMain.setVisibility(_mainVisibility);
 				_linearLayoutButtonControl.setVisibility(_controlVisibility);
 			}
 		});
@@ -174,12 +115,12 @@ public class HomeViewListButtonController {
 		_buttonMedia.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mainVisibility = View.GONE;
-				_mediaVisibility = View.VISIBLE;
-
+				if (_mediaSelectionActive) {
+					_mediaVisibility = View.GONE;
+				} else {
+					_mediaVisibility = View.VISIBLE;
+				}
 				_mediaSelectionActive = _mediaVisibility == View.VISIBLE;
-
-				_linearLayoutButtonMain.setVisibility(_mainVisibility);
 				_linearLayoutButtonMedia.setVisibility(_mediaVisibility);
 			}
 		});
@@ -188,12 +129,12 @@ public class HomeViewListButtonController {
 		_buttonSensors.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mainVisibility = View.GONE;
-				_sensorVisibility = View.VISIBLE;
-
+				if (_sensorSelectionActive) {
+					_sensorVisibility = View.GONE;
+				} else {
+					_sensorVisibility = View.VISIBLE;
+				}
 				_sensorSelectionActive = _sensorVisibility == View.VISIBLE;
-
-				_linearLayoutButtonMain.setVisibility(_mainVisibility);
 				_linearLayoutButtonSensors.setVisibility(_sensorVisibility);
 			}
 		});
@@ -211,12 +152,12 @@ public class HomeViewListButtonController {
 		_buttonSocial.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mainVisibility = View.GONE;
-				_socialVisibility = View.VISIBLE;
-
+				if (_socialSelectionActive) {
+					_socialVisibility = View.GONE;
+				} else {
+					_socialVisibility = View.VISIBLE;
+				}
 				_socialSelectionActive = _socialVisibility == View.VISIBLE;
-
-				_linearLayoutButtonMain.setVisibility(_mainVisibility);
 				_linearLayoutButtonSocial.setVisibility(_socialVisibility);
 			}
 		});

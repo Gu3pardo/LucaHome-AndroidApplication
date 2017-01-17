@@ -86,6 +86,8 @@ public class MediaMirrorView extends Activity {
 
 	private Button _increaseScreenBrightnessButton;
 	private Button _decreaseScreenBrightnessButton;
+	private Button _screenNormalButton;
+	private Button _screenSaverButton;
 	private Button _enableScreenButton;
 	private Button _disableScreenButton;
 	
@@ -378,18 +380,32 @@ public class MediaMirrorView extends Activity {
 				_mediaMirrorController.SendDecreaseScreenBrightness();
 			}
 		});
+		_screenNormalButton = (Button) findViewById(R.id.screenNormalButton);
+		_screenNormalButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_mediaMirrorController.SendScreenNormal();
+			}
+		});
+		_screenSaverButton = (Button) findViewById(R.id.screenSaverButton);
+		_screenSaverButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_mediaMirrorController.SendScreenSaver();
+			}
+		});
 		_enableScreenButton = (Button) findViewById(R.id.enableScreenButton);
 		_enableScreenButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendEnableScreen();
+				_mediaMirrorController.SendScreenOn();
 			}
 		});
 		_disableScreenButton = (Button) findViewById(R.id.disableScreenButton);
 		_disableScreenButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendDisableScreen();
+				_mediaMirrorController.SendScreenOff();
 			}
 		});
 		

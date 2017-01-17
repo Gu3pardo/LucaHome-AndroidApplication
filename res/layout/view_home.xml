@@ -66,11 +66,9 @@
             android:orientation="vertical" >
 
             <LinearLayout
-                android:id="@+id/linearLayoutButtonMain"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" >
+                android:orientation="vertical" >
 
                 <Button
                     android:id="@+id/buttonControl"
@@ -84,6 +82,57 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutButtonControl"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" >
+
+                    <Button
+                        android:id="@+id/buttonSockets"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Sockets"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/buttonSchedules"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Schedules"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/buttonTimer"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Timer"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/buttonMedia"
@@ -99,6 +148,57 @@
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
 
+                <LinearLayout
+                    android:id="@+id/linearLayoutButtonMedia"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" >
+
+                    <Button
+                        android:id="@+id/buttonMovies"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Movies"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/buttonSound"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Sound"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/buttonMediaServer"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Media Server"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
                 <Button
                     android:id="@+id/buttonSensors"
                     style="?android:attr/buttonStyleSmall"
@@ -112,6 +212,57 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutButtonSensors"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="25dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    android:visibility="gone" >
+
+                    <Button
+                        android:id="@+id/buttonTemperature"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Temperature"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/buttonHumidity"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Humidity"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+
+                    <Button
+                        android:id="@+id/buttonAirPressure"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Air pressure"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/buttonSecurity"
@@ -132,7 +283,7 @@
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="5dp"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/button_primary"
                     android:gravity="end|center"
@@ -141,188 +292,42 @@
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
-            </LinearLayout>
 
-            <LinearLayout
-                android:id="@+id/linearLayoutButtonControl"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" >
-
-                <Button
-                    android:id="@+id/buttonSockets"
-                    style="?android:attr/buttonStyleSmall"
+                <LinearLayout
+                    android:id="@+id/linearLayoutButtonSocial"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Sockets"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
+                    android:layout_marginStart="25dp"
+                    android:orientation="vertical"
+                    android:visibility="visible" >
 
-                <Button
-                    android:id="@+id/buttonSchedules"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Schedules"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
+                    <Button
+                        android:id="@+id/buttonBirthdays"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Birthdays"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
 
-                <Button
-                    android:id="@+id/buttonTimer"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Timer"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayoutButtonMedia"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" >
-
-                <Button
-                    android:id="@+id/buttonMovies"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Movies"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/buttonSound"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Sound"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/buttonMediaServer"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Media Server"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayoutButtonSensors"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone" >
-
-                <Button
-                    android:id="@+id/buttonTemperature"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Temperature"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/buttonHumidity"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Humidity"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/buttonAirPressure"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Air pressure"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/linearLayoutButtonSocial"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="visible" >
-
-                <Button
-                    android:id="@+id/buttonBirthdays"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Birthdays"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-
-                <Button
-                    android:id="@+id/buttonGames"
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:background="@drawable/button_primary"
-                    android:gravity="end|center"
-                    android:paddingEnd="10dp"
-                    android:text="Games"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
+                    <Button
+                        android:id="@+id/buttonGames"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/button_primary"
+                        android:gravity="end|center"
+                        android:paddingEnd="10dp"
+                        android:text="Games"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

@@ -206,14 +206,24 @@ public class MediaMirrorController {
 		sendServerCommand(ServerAction.UPDATE_BIRTHDAY_ALARM.toString(), "");
 	}
 
-	public void SendEnableScreen() {
-		_logger.Warn("SendEnableScreen not yet implemented!");
-		sendServerCommand(ServerAction.SCREEN_ENABLE.toString(), "");
+	public void SendScreenOn() {
+		_logger.Debug("SendScreenOn");
+		sendServerCommand(ServerAction.SCREEN_ON.toString(), "");
 	}
 
-	public void SendDisableScreen() {
-		_logger.Warn("SendDisableScreen not yet implemented!");
-		sendServerCommand(ServerAction.SCREEN_DISABLE.toString(), "");
+	public void SendScreenOff() {
+		_logger.Debug("SendScreenOff");
+		sendServerCommand(ServerAction.SCREEN_OFF.toString(), "");
+	}
+
+	public void SendScreenNormal() {
+		_logger.Debug("SendScreenNormal");
+		sendServerCommand(ServerAction.SCREEN_NORMAL.toString(), "");
+	}
+
+	public void SendScreenSaver() {
+		_logger.Debug("SendScreenSaver");
+		sendServerCommand(ServerAction.SCREEN_SAVER.toString(), "");
 	}
 
 	public void LoadVideos(String searchValue, int results) {
