@@ -153,6 +153,12 @@ public class SocketController {
 			} else {
 				return R.drawable.mediamirror_off;
 			}
+		} else if (socket.GetName().contains("GameConsole")) {
+			if (socket.GetIsActivated()) {
+				return R.drawable.gameconsole_on;
+			} else {
+				return R.drawable.gameconsole_off;
+			}
 		}
 		return -1;
 	}

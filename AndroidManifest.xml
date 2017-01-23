@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="guepardoapps.lucahome"
-    android:versionCode="1912170117"
-    android:versionName="1.9.12.170117" >
+    android:versionCode="1913170123"
+    android:versionName="1.9.13.170123" >
 
     <uses-sdk
         android:minSdkVersion="21"
