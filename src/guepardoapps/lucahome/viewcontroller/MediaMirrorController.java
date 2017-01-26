@@ -21,6 +21,7 @@ import android.os.AsyncTask;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.common.Constants;
+import guepardoapps.lucahome.common.Keys;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
 
@@ -230,7 +231,7 @@ public class MediaMirrorController {
 		searchValue = searchValue.replace(" ", "+");
 
 		String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=" + String.valueOf(results)
-				+ "&q=" + searchValue + "&key=" + Constants.YOUTUBE_API_KEY;
+				+ "&q=" + searchValue + "&key=" + Keys.YOUTUBE_API;
 
 		_loadingVideosDialog = null;
 		_loadingVideosDialog = ProgressDialog.show(_context, "Loading Videos...", "");

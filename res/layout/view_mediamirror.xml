@@ -279,6 +279,46 @@
                 android:layout_marginEnd="5dp"
                 android:layout_marginStart="5dp"
                 android:gravity="start"
+                android:text="Already played youtube ids"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/TextIcon" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="5dp"
+                android:background="@color/TextIcon" />
+
+            <Spinner
+                android:id="@+id/playedYoutubeIdSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/playedYoutubeSendButton"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@drawable/button_blank"
+                android:text="@string/sendCommand"
+                android:textColor="@color/TextIcon" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/DarkPrimary"
+            android:orientation="vertical"
+            android:padding="5dp" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:gravity="start"
                 android:text="Search for youtube videos"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/TextIcon" />

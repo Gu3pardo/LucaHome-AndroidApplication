@@ -1,9 +1,9 @@
 package guepardoapps.mediamirror.client;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -72,20 +72,17 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 				_logger.Info("printWriter println");
 				printWriter.flush();
 				_logger.Info("printWriter flush");
+				
+				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
+				_logger.Debug("inputStreamReader: " + inputStreamReader.toString());
+				BufferedReader inputReader = new BufferedReader(inputStreamReader);
+				_logger.Debug("inputReader: " + inputReader.toString());
+				
+				_response= inputReader.readLine();
+				
+				inputReader.close();
+				inputStreamReader.close();
 				printWriter.close();
-				_logger.Info("printWriter close");
-
-				ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(1024);
-				byte[] buffer = new byte[1024];
-
-				int bytesRead;
-				InputStream inputStream = socket.getInputStream();
-
-				// notice: inputStream.read() will block if no data return
-				while ((bytesRead = inputStream.read(buffer)) != -1) {
-					byteArrayOutputStream.write(buffer, 0, bytesRead);
-					_response += byteArrayOutputStream.toString("UTF-8");
-				}
 			} else {
 				_logger.Warn("Communication not set!");
 				_response += "Communication not set!";
@@ -122,10 +119,15 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 					_logger.Info("ResponseAction: " + responseAction.toString());
 
 					switch (responseAction) {
+					case INCREASE_VOLUME:
+					case DECREASE_VOLUME:
 					case GET_CURRENT_VOLUME:
 						String currentVolume = responseData[responseData.length - 1];
 						_broadcastController.SendStringBroadcast(Constants.BROADCAST_MEDIAMIRROR_VOLUME,
 								Constants.BUNDLE_CURRENT_RECEIVED_VOLUME, currentVolume);
+						break;
+					case GET_SAVED_YOUTUBE_IDS:
+
 						break;
 					default:
 						break;

@@ -166,8 +166,8 @@ public final class R {
 		public static final int parentPanel = 0x7f100029;
 		public static final int right = 0x7f100003;
 		public static final int start = 0x7f100012;
-		public static final int text = 0x7f100169;
-		public static final int title = 0x7f100168;
+		public static final int text = 0x7f10016b;
+		public static final int title = 0x7f10016a;
 		public static final int top = 0x7f100004;
 		public static final int width = 0x7f100007;
 	}

@@ -2,7 +2,7 @@ package guepardoapps.lucahome.common;
 
 public class Constants {
 	// ========== LOGGER ==========
-	public static final boolean DEBUGGING_ENABLED = false;
+	public static final boolean DEBUGGING_ENABLED = true;
 	// ========== TESTING ==========
 	public static final boolean TESTING_ENABLED = false;
 	// ========== NOTIFICATION ==========
@@ -226,8 +226,6 @@ public class Constants {
 	public static final String REST_ACTION = "&action=";
 	public static final String STATE_ON = "&state=1";
 	public static final String STATE_OFF = "&state=0";
-	// YOUTUBE API
-	public static final String YOUTUBE_API_KEY = "ENTER_YOUTUBE_API_KEY";
 	// ========== FURTHER DATA ==========
 	public static final String CITY = "ENTER_HERE_YOUR_CITY";
 	public static final String LUCAHOME_SSID = "ENTER_HERE_YOUR_SSID";

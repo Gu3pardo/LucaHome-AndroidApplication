@@ -63,6 +63,11 @@ public class MediaMirrorView extends Activity {
 	private Spinner _selectYoutubeIdSpinner;
 	private Button _sendYoutubeIdButton;
 
+	private List<String> _playedoutubeIds = new ArrayList<String>();
+	private int _selectedPlayedYoutubeId;
+	private Spinner _playedYoutubeIdSpinner;
+	private Button _playedYoutubeIdButton;
+
 	private EditText _youtubeSearchInput;
 	private Button _youtubeSearchInputSendButton;
 
@@ -90,7 +95,7 @@ public class MediaMirrorView extends Activity {
 	private Button _screenSaverButton;
 	private Button _enableScreenButton;
 	private Button _disableScreenButton;
-	
+
 	private Button _rebootDeviceButton;
 	private Button _shutdownDeviceButton;
 
@@ -102,8 +107,16 @@ public class MediaMirrorView extends Activity {
 			String currentVolume = intent.getStringExtra(Constants.BUNDLE_CURRENT_RECEIVED_VOLUME);
 			if (currentVolume != null) {
 				_logger.Debug("currentVolume: " + currentVolume);
-				_currentVolumeTextView.setText(currentVolume);
+				_currentVolumeTextView.setText("Vol.:" + currentVolume);
 			}
+		}
+	};
+
+	private BroadcastReceiver _playedYoutubeIdsReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_playedYoutubeIdsReceiver onReceive");
+			// TODO: add receive intent!
 		}
 	};
 
@@ -246,6 +259,30 @@ public class MediaMirrorView extends Activity {
 						_logger.Warn("Youtube id is null!");
 					}
 				}
+			}
+		});
+
+		_playedYoutubeIdSpinner = (Spinner) findViewById(R.id.playedYoutubeIdSpinner);
+		ArrayAdapter<String> playedYoutubeIdDataAdapter = new ArrayAdapter<String>(_context,
+				android.R.layout.simple_spinner_item, _playedoutubeIds);
+		youtubeIdDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		_playedYoutubeIdSpinner.setAdapter(playedYoutubeIdDataAdapter);
+		_playedYoutubeIdSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> adapterView, View view, int position, long id) {
+				_selectedPlayedYoutubeId = position;
+				_logger.Debug("Selected played youtubeId " + String.valueOf(_selectedPlayedYoutubeId));
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> adapterView) {
+			}
+		});
+		_playedYoutubeIdButton = (Button) findViewById(R.id.playedYoutubeSendButton);
+		_playedYoutubeIdButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				// TODO: send command
 			}
 		});
 
@@ -408,7 +445,7 @@ public class MediaMirrorView extends Activity {
 				_mediaMirrorController.SendScreenOff();
 			}
 		});
-		
+
 		_rebootDeviceButton = (Button) findViewById(R.id.rebootDeviceButton);
 		_rebootDeviceButton.setOnClickListener(new OnClickListener() {
 			@Override
