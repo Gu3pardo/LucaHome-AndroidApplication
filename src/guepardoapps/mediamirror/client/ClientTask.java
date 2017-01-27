@@ -8,11 +8,13 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.mediamirror.common.dto.PlayedYoutubeVideoDto;
 import guepardoapps.mediamirror.common.enums.ServerAction;
 import guepardoapps.toolset.controller.BroadcastController;
 
@@ -72,17 +74,19 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 				_logger.Info("printWriter println");
 				printWriter.flush();
 				_logger.Info("printWriter flush");
-				
+
 				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 				_logger.Debug("inputStreamReader: " + inputStreamReader.toString());
 				BufferedReader inputReader = new BufferedReader(inputStreamReader);
 				_logger.Debug("inputReader: " + inputReader.toString());
-				
-				_response= inputReader.readLine();
-				
+
+				_response = inputReader.readLine();
+
 				inputReader.close();
 				inputStreamReader.close();
 				printWriter.close();
+				bufferedWriter.close();
+				outputStreamWriter.close();
 			} else {
 				_logger.Warn("Communication not set!");
 				_response += "Communication not set!";
@@ -111,6 +115,11 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 	protected void onPostExecute(Void result) {
 		_logger.Info("Response: " + _response);
 
+		if (_response == null) {
+			_logger.Error("Response is null!");
+			return;
+		}
+
 		String[] responseData = _response.split("\\:");
 		if (responseData != null) {
 			if (responseData.length > 1) {
@@ -127,7 +136,24 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 								Constants.BUNDLE_CURRENT_RECEIVED_VOLUME, currentVolume);
 						break;
 					case GET_SAVED_YOUTUBE_IDS:
+						String playedYoutubeData = responseData[responseData.length - 1];
+						String[] rawYoutubeIds = playedYoutubeData.split("\\;");
 
+						ArrayList<PlayedYoutubeVideoDto> playedYoutubeVideos = new ArrayList<PlayedYoutubeVideoDto>();
+						for (String entry : rawYoutubeIds) {
+							String[] data = entry.split("\\.");
+							if (data.length == 3) {
+								PlayedYoutubeVideoDto newData = new PlayedYoutubeVideoDto(Integer.parseInt(data[0]),
+										data[1], Integer.parseInt(data[2]));
+								_logger.Debug("Created new entry: " + newData.toString());
+								playedYoutubeVideos.add(newData);
+							} else {
+								_logger.Warn("Wrong Size (" + data.length + ") for " + entry);
+							}
+						}
+
+						_broadcastController.SendSerializableBroadcast(Constants.BROADCAST_PLAYED_YOUTUBE_VIDEOS,
+								Constants.BUNDLE_PLAYED_YOUTUBE_VIDEOS, playedYoutubeVideos);
 						break;
 					default:
 						break;

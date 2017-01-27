@@ -141,6 +141,11 @@ public class MediaMirrorController {
 		sendServerCommand(ServerAction.GET_CURRENT_VOLUME.toString(), "");
 	}
 
+	public void GetPlayedYoutubeVideos() {
+		_logger.Debug("GetPlayedYoutubeVideos");
+		sendServerCommand(ServerAction.GET_SAVED_YOUTUBE_IDS.toString(), "");
+	}
+
 	public void SendIncreaseScreenBrightness() {
 		_logger.Debug("SendIncreaseScreenBrightness");
 		sendServerCommand(ServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(), "");

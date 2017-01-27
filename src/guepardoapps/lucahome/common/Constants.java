@@ -129,8 +129,10 @@ public class Constants {
 	// Information
 	public static final String BROADCAST_UPDATE_INFORMATION = "guepardoapps.lucahome.broadcast.UPDATE_INFORMATION";
 	// Youtube
-	public static final String BROADCAST_YOUTUBE_ID = "guepardoapps.mediamirror.broadcast.selected.youtube.id";
+	public static final String BROADCAST_YOUTUBE_ID = "guepardoapps.mediamirror.broadcast.youtube.selected.id";
+	public static final String BROADCAST_PLAYED_YOUTUBE_VIDEOS = "guepardoapps.mediamirror.broadcast.youtube.played.videos";
 	public static final String BUNDLE_YOUTUBE_ID = "BUNDLE_YOUTUBE_ID";
+	public static final String BUNDLE_PLAYED_YOUTUBE_VIDEOS = "BUNDLE_PLAYED_YOUTUBE_VIDEOS";
 	// Get
 	public static final String BROADCAST_MEDIAMIRROR_VOLUME = "guepardoapps.mediamirror.broadcast.current.volume";
 	public static final String BUNDLE_CURRENT_RECEIVED_VOLUME = "BUNDLE_CURRENT_RECEIVED_VOLUME";

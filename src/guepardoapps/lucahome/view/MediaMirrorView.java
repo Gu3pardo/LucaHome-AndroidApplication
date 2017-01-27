@@ -25,7 +25,7 @@ import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.viewcontroller.MediaMirrorController;
-
+import guepardoapps.mediamirror.common.dto.PlayedYoutubeVideoDto;
 import guepardoapps.mediamirror.common.enums.*;
 
 import guepardoapps.toolset.controller.ReceiverController;
@@ -63,7 +63,7 @@ public class MediaMirrorView extends Activity {
 	private Spinner _selectYoutubeIdSpinner;
 	private Button _sendYoutubeIdButton;
 
-	private List<String> _playedoutubeIds = new ArrayList<String>();
+	private List<PlayedYoutubeVideoDto> _playedYoutubeIds = new ArrayList<PlayedYoutubeVideoDto>();
 	private int _selectedPlayedYoutubeId;
 	private Spinner _playedYoutubeIdSpinner;
 	private Button _playedYoutubeIdButton;
@@ -113,10 +113,23 @@ public class MediaMirrorView extends Activity {
 	};
 
 	private BroadcastReceiver _playedYoutubeIdsReceiver = new BroadcastReceiver() {
+		@SuppressWarnings("unchecked")
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_playedYoutubeIdsReceiver onReceive");
-			// TODO: add receive intent!
+
+			_playedYoutubeIds = (ArrayList<PlayedYoutubeVideoDto>) intent
+					.getSerializableExtra(Constants.BUNDLE_PLAYED_YOUTUBE_VIDEOS);
+			if (_playedYoutubeIds != null) {
+				ArrayList<String> youtubeIds = new ArrayList<String>();
+				for (PlayedYoutubeVideoDto entry : _playedYoutubeIds) {
+					youtubeIds.add(entry.GetYoutubeId());
+				}
+				ArrayAdapter<String> playedYoutubeIdDataAdapter = new ArrayAdapter<String>(_context,
+						android.R.layout.simple_spinner_item, youtubeIds);
+				playedYoutubeIdDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				_playedYoutubeIdSpinner.setAdapter(playedYoutubeIdDataAdapter);
+			}
 		}
 	};
 
@@ -264,8 +277,8 @@ public class MediaMirrorView extends Activity {
 
 		_playedYoutubeIdSpinner = (Spinner) findViewById(R.id.playedYoutubeIdSpinner);
 		ArrayAdapter<String> playedYoutubeIdDataAdapter = new ArrayAdapter<String>(_context,
-				android.R.layout.simple_spinner_item, _playedoutubeIds);
-		youtubeIdDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+				android.R.layout.simple_spinner_item, new String[] {});
+		playedYoutubeIdDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_playedYoutubeIdSpinner.setAdapter(playedYoutubeIdDataAdapter);
 		_playedYoutubeIdSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
@@ -282,9 +295,18 @@ public class MediaMirrorView extends Activity {
 		_playedYoutubeIdButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				// TODO: send command
+				if (_selectedPlayedYoutubeId != -1) {
+					PlayedYoutubeVideoDto youtubeId = _playedYoutubeIds.get(_selectedPlayedYoutubeId);
+					if (youtubeId != null) {
+						_logger.Debug("youtubeId is: " + youtubeId.toString());
+						_mediaMirrorController.SendYoutubeId(youtubeId.GetYoutubeId());
+					} else {
+						_logger.Warn("Youtube id is null!");
+					}
+				}
 			}
 		});
+		_mediaMirrorController.GetPlayedYoutubeVideos();
 
 		_youtubeSearchInput = (EditText) findViewById(R.id.youtubeSearchInput);
 		_youtubeSearchInputSendButton = (Button) findViewById(R.id.youtubeSearchInputSendButton);
@@ -469,6 +491,8 @@ public class MediaMirrorView extends Activity {
 			_logger.Debug("onResume");
 		}
 		if (!_isInitialized) {
+			_receiverController.RegisterReceiver(_playedYoutubeIdsReceiver,
+					new String[] { Constants.BROADCAST_PLAYED_YOUTUBE_VIDEOS });
 			_receiverController.RegisterReceiver(_volumeReceiver,
 					new String[] { Constants.BROADCAST_MEDIAMIRROR_VOLUME });
 			_isInitialized = true;
@@ -490,6 +514,7 @@ public class MediaMirrorView extends Activity {
 			_logger.Debug("onDestroy");
 		}
 		_mediaMirrorController.Dispose();
+		_receiverController.UnregisterReceiver(_playedYoutubeIdsReceiver);
 		_receiverController.UnregisterReceiver(_volumeReceiver);
 		_isInitialized = false;
 	}
