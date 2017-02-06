@@ -7,8 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-
-import guepardoapps.lucahome.common.Constants;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.dto.WirelessSocketDto;
 import guepardoapps.lucahome.receiver.sockets.SocketActionReceiver;
 

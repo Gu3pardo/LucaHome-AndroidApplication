@@ -15,9 +15,10 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.controller.*;
 import guepardoapps.lucahome.common.converter.json.*;
 import guepardoapps.lucahome.common.enums.*;
@@ -300,13 +301,12 @@ public class MainService extends Service {
 					break;
 				case SHOW_NOTIFICATION_SOCKET:
 					if (_wirelessSocketList != null) {
-						_serviceController.StartSocketNotificationService(Constants.ID_NOTIFICATION_WEAR,
-								_wirelessSocketList);
+						_serviceController.StartSocketNotificationService(IDs.NOTIFICATION_WEAR, _wirelessSocketList);
 					}
 					break;
 				case SHOW_NOTIFICATION_TEMPERATURE:
 					if (_temperatureList != null && _currentWeather != null) {
-						_serviceController.StartTemperatureNotificationService(Constants.ID_NOTIFICATION_TEMPERATURE,
+						_serviceController.StartTemperatureNotificationService(IDs.NOTIFICATION_TEMPERATURE,
 								_temperatureList, _currentWeather);
 					}
 					break;
@@ -550,8 +550,7 @@ public class MainService extends Service {
 
 					if (_sharedPrefController
 							.LoadBooleanValueFromSharedPreferences(Constants.DISPLAY_SOCKET_NOTIFICATION)) {
-						_serviceController.StartSocketNotificationService(Constants.ID_NOTIFICATION_WEAR,
-								_wirelessSocketList);
+						_serviceController.StartSocketNotificationService(IDs.NOTIFICATION_WEAR, _wirelessSocketList);
 					}
 				} else {
 					_logger.Warn("_wirelessSocketList is null");
@@ -580,7 +579,7 @@ public class MainService extends Service {
 							String playingFile = data[1].replace("{PlayingFile:", "").replace("};", "");
 							int raspberry = Integer.parseInt(data[3].replace("{Raspberry:", "").replace("};", ""));
 							_serviceController.StartNotificationService(RaspberrySelection.RASPBERRY_1.toString(),
-									playingFile, Constants.ID_NOTIFICATION_SONG + raspberry, LucaObject.SOUND);
+									playingFile, IDs.NOTIFICATION_SONG + raspberry, LucaObject.SOUND);
 						} else {
 							_logger.Warn("data has wrong size!");
 						}
@@ -598,7 +597,7 @@ public class MainService extends Service {
 								String playingFile = data[1].replace("{PlayingFile:", "").replace("};", "");
 								int raspberry = Integer.parseInt(data[3].replace("{Raspberry:", "").replace("};", ""));
 								_serviceController.StartNotificationService(RaspberrySelection.RASPBERRY_2.toString(),
-										playingFile, Constants.ID_NOTIFICATION_SONG + raspberry, LucaObject.SOUND);
+										playingFile, IDs.NOTIFICATION_SONG + raspberry, LucaObject.SOUND);
 							} else {
 								_logger.Warn("data has wrong size!");
 							}
@@ -654,7 +653,7 @@ public class MainService extends Service {
 							new String[] { Constants.BUNDLE_TEMPERATURE_LIST }, new Object[] { _temperatureList });
 					if (_sharedPrefController
 							.LoadBooleanValueFromSharedPreferences(Constants.DISPLAY_TEMPERATURE_NOTIFICATION)) {
-						_serviceController.StartTemperatureNotificationService(Constants.ID_NOTIFICATION_TEMPERATURE,
+						_serviceController.StartTemperatureNotificationService(IDs.NOTIFICATION_TEMPERATURE,
 								_temperatureList, _currentWeather);
 					}
 				}
@@ -680,7 +679,7 @@ public class MainService extends Service {
 			if (_temperatureList != null && _currentWeather != null) {
 				if (_sharedPrefController
 						.LoadBooleanValueFromSharedPreferences(Constants.DISPLAY_TEMPERATURE_NOTIFICATION)) {
-					_serviceController.StartTemperatureNotificationService(Constants.ID_NOTIFICATION_TEMPERATURE,
+					_serviceController.StartTemperatureNotificationService(IDs.NOTIFICATION_TEMPERATURE,
 							_temperatureList, _currentWeather);
 				}
 			}
@@ -1137,7 +1136,7 @@ public class MainService extends Service {
 				if (_lastUpdate != null) {
 					long difference = Calendar.getInstance().getTimeInMillis() - _lastUpdate.getTimeInMillis();
 
-					if (difference < 60000) {
+					if (difference < 60 * 1000) {
 						_logger.Warn("Just updated the data!");
 
 						_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_COMMAND,

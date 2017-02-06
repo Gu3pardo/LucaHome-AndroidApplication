@@ -12,8 +12,8 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.mediamirror.common.dto.PlayedYoutubeVideoDto;
 import guepardoapps.mediamirror.common.enums.ServerAction;
 import guepardoapps.toolset.controller.BroadcastController;

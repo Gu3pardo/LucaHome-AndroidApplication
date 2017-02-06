@@ -3,7 +3,7 @@ package guepardoapps.lucahome.dto;
 import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.lucahome.common.Constants;
+import guepardoapps.lucahome.common.constants.Constants;
 
 public class MovieDto implements Serializable {
 

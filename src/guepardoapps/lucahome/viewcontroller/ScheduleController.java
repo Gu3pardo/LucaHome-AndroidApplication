@@ -1,9 +1,8 @@
 package guepardoapps.lucahome.viewcontroller;
 
 import android.content.Context;
-
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.*;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.RaspberrySelection;

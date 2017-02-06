@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.sql.Time;
 import java.util.Locale;
 
-import guepardoapps.lucahome.common.Constants;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.converter.BooleanToScheduleStateConverter;
 import guepardoapps.lucahome.common.enums.RaspberrySelection;
 

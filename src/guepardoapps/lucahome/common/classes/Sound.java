@@ -2,7 +2,7 @@ package guepardoapps.lucahome.common.classes;
 
 import java.io.Serializable;
 
-import guepardoapps.lucahome.common.Constants;
+import guepardoapps.lucahome.common.constants.Constants;
 
 public class Sound implements Serializable {
 

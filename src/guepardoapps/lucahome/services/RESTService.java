@@ -17,8 +17,8 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 

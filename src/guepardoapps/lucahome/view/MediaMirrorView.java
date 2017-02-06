@@ -21,8 +21,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Color;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.viewcontroller.MediaMirrorController;
 import guepardoapps.mediamirror.common.dto.PlayedYoutubeVideoDto;
@@ -137,7 +138,7 @@ public class MediaMirrorView extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.view_mediamirror);
-		getActionBar().setBackgroundDrawable(new ColorDrawable(Constants.ACTION_BAR_COLOR));
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
 		_logger = new LucaHomeLogger(TAG);
 		_logger.Debug("onCreate");

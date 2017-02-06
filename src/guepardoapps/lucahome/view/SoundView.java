@@ -20,10 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.Sound;
+import guepardoapps.lucahome.common.constants.Color;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.converter.json.JsonDataToSocketConverter;
 import guepardoapps.lucahome.common.converter.json.JsonDataToSoundConverter;
@@ -344,8 +346,7 @@ public class SoundView extends Activity {
 				String[] socketStringArray = intent.getStringArrayExtra(Constants.SOCKET_DOWNLOAD);
 				if (socketStringArray != null) {
 					_wirelessSocketList = JsonDataToSocketConverter.GetList(socketStringArray);
-					_serviceController.StartSocketNotificationService(Constants.ID_NOTIFICATION_WEAR,
-							_wirelessSocketList);
+					_serviceController.StartSocketNotificationService(IDs.NOTIFICATION_WEAR, _wirelessSocketList);
 				}
 				break;
 			default:
@@ -399,7 +400,7 @@ public class SoundView extends Activity {
 		_soundController = new SoundController(_context);
 
 		setContentView(R.layout.view_sound);
-		getActionBar().setBackgroundDrawable(new ColorDrawable(Constants.ACTION_BAR_COLOR));
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
 		initializeViews();
 		loadValues();

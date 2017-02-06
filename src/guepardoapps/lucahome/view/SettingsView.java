@@ -15,16 +15,20 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Color;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.dto.WirelessSocketDto;
 import guepardoapps.lucahome.services.helper.NavigationService;
+
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
+import guepardoapps.toolset.openweather.common.OpenWeatherConstants;
 
 public class SettingsView extends Activity {
 
@@ -63,7 +67,7 @@ public class SettingsView extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.view_settings);
-		getActionBar().setBackgroundDrawable(new ColorDrawable(Constants.ACTION_BAR_COLOR));
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
 		_socketLayout = (LinearLayout) findViewById(R.id.notificationSocketLayout);
 
@@ -150,7 +154,7 @@ public class SettingsView extends Activity {
 							new Object[] { MainServiceAction.SHOW_NOTIFICATION_SOCKET });
 				} else {
 					_socketLayout.setVisibility(View.GONE);
-					_serviceController.CloseNotification(Constants.ID_NOTIFICATION_WEAR);
+					_serviceController.CloseNotification(IDs.NOTIFICATION_WEAR);
 				}
 			}
 		});
@@ -167,7 +171,7 @@ public class SettingsView extends Activity {
 							new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
 							new Object[] { MainServiceAction.SHOW_NOTIFICATION_WEATHER });
 				} else {
-					_serviceController.CloseNotification(Constants.ID_NOTIFICATION_WEAR);
+					_serviceController.CloseNotification(OpenWeatherConstants.FORECAST_NOTIFICATION_ID);
 				}
 			}
 		});
@@ -184,7 +188,7 @@ public class SettingsView extends Activity {
 							new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
 							new Object[] { MainServiceAction.SHOW_NOTIFICATION_TEMPERATURE });
 				} else {
-					_serviceController.CloseNotification(Constants.ID_NOTIFICATION_TEMPERATURE);
+					_serviceController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
 				}
 			}
 		});

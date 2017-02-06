@@ -1,15 +1,6 @@
-package guepardoapps.lucahome.common;
+package guepardoapps.lucahome.common.constants;
 
 public class Constants {
-	// ========== LOGGER ==========
-	public static final boolean DEBUGGING_ENABLED = true;
-	// ========== TESTING ==========
-	public static final boolean TESTING_ENABLED = false;
-	// ========== NOTIFICATION ==========
-	public static final int ID_NOTIFICATION_WEAR = 120288;
-	public static final int ID_NOTIFICATION_BIRTHDAY = 219000;
-	public static final int ID_NOTIFICATION_TEMPERATURE = 111293;
-	public static final int ID_NOTIFICATION_SONG = 234854;
 	// ========== BUNDLE KEYS ==========
 	public static final String BUNDLE_COMMAND = "BUNDLE_COMMAND";
 	public static final String BUNDLE_NAVIGATE_DATA = "BUNDLE_NAVIGATE_DATA";
@@ -60,9 +51,6 @@ public class Constants {
 	public static final String BUNDLE_AIR_PRESSURE_SINGLE = "AIR_PRESSURE_SINGLE";
 	public static final String BUNDLE_HUMIDITY_LIST = "HUMIDITY_LIST";
 	public static final String BUNDLE_HUMIDITY_SINGLE = "HUMIDITY_SINGLE";
-	// ========== COLORS ==========
-	public static final int ACTION_BAR_COLOR = 0xff0097A7;
-	public static final int BIRTHDAY_BACKGROUND_COLOR = 0xFFD32F2F;
 	// ========== BROADCASTS ==========
 	public static final String BROADCAST_COMMAND = "guepardoapps.lucahome.broadcast.command";
 	public static final String BROADCAST_MAIN_SERVICE_COMMAND = "guepardoapps.lucahome.broadcast.main_service.command";
@@ -222,15 +210,15 @@ public class Constants {
 	public static final String PACKAGE_KORE = "org.xbmc.kore";
 	public static final String PACKAGE_YATSE = "org.leetzone.android.yatsewidgetfree";
 	// ========== RASPBERRY CONNECTION ==========
-	public static final String[] SERVER_URLs = new String[] { /*ENTER_HERE_YOUR_IP*/ };
+	public static final String[] SERVER_URLs = new String[] { "http://192.168.178.22" };
 	public static final String ACTION_PATH = "/lib/lucahome.php?user=";
 	public static final String REST_PASSWORD = "&password=";
 	public static final String REST_ACTION = "&action=";
 	public static final String STATE_ON = "&state=1";
 	public static final String STATE_OFF = "&state=0";
 	// ========== FURTHER DATA ==========
-	public static final String CITY = "ENTER_HERE_YOUR_CITY";
-	public static final String LUCAHOME_SSID = "ENTER_HERE_YOUR_SSID";
+	public static final String CITY = "muenchen";
+	public static final String LUCAHOME_SSID = "BellaPeca";
 	public static final String ACTIVATED = "Activated";
 	public static final String DEACTIVATED = "Deactivated";
 	public static final String ACTIVE = "Active";

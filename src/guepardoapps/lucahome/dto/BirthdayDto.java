@@ -4,7 +4,8 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Locale;
 
-import guepardoapps.lucahome.common.Constants;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.IDs;
 
 public class BirthdayDto implements Serializable {
 
@@ -28,7 +29,7 @@ public class BirthdayDto implements Serializable {
 		_birthday = birthday;
 
 		_id = id;
-		_notificationId = Constants.ID_NOTIFICATION_BIRTHDAY + _id;
+		_notificationId = IDs.NOTIFICATION_BIRTHDAY + _id;
 		_notifyMe = true;
 
 		_deleteBroadcastReceiverString = Constants.BROADCAST_DELETE_BIRTHDAY + _name.toUpperCase(Locale.GERMAN).trim();

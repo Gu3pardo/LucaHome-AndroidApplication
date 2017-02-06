@@ -11,8 +11,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Color;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.Command;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.enums.NavigateData;
@@ -121,7 +122,7 @@ public class BootView extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.view_boot);
-		getActionBar().setBackgroundDrawable(new ColorDrawable(Constants.ACTION_BAR_COLOR));
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
 		_percentProgressBar = (ProgressBar) findViewById(R.id.percentProgressBar);
 		_percentProgressBar.setMax(_progressBarMax);

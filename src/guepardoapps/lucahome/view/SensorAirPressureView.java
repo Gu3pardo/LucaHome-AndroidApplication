@@ -22,9 +22,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Color;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.customadapter.*;
 import guepardoapps.lucahome.dto.sensor.AirPressureDto;
@@ -98,7 +99,7 @@ public class SensorAirPressureView extends Activity implements SensorEventListen
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.view_skeleton_list);
-		getActionBar().setBackgroundDrawable(new ColorDrawable(Constants.ACTION_BAR_COLOR));
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
 		_logger = new LucaHomeLogger(TAG);
 		_logger.Debug("onCreate");

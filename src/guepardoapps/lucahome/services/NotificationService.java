@@ -17,9 +17,10 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.TemperatureType;
 import guepardoapps.lucahome.dto.WirelessSocketDto;
@@ -179,15 +180,14 @@ public class NotificationService extends Service {
 		body = body.substring(0, body.length() - 3);
 
 		Intent intent = new Intent(this, SensorTemperatureView.class);
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, Constants.ID_NOTIFICATION_TEMPERATURE * 2, intent,
-				0);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, IDs.NOTIFICATION_TEMPERATURE * 2, intent, 0);
 
 		NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		Notification.Builder builder = new Notification.Builder(this);
 		builder.setSmallIcon(R.drawable.temperature).setContentIntent(pendingIntent).setContentTitle(title)
 				.setContentText(body).setTicker(body);
 		Notification notification = builder.build();
-		notificationManager.notify(Constants.ID_NOTIFICATION_TEMPERATURE, notification);
+		notificationManager.notify(IDs.NOTIFICATION_TEMPERATURE, notification);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -297,7 +297,7 @@ public class NotificationService extends Service {
 		notification.bigContentView = remoteViews;
 
 		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-		notificationManager.notify(Constants.ID_NOTIFICATION_WEAR, notification);
+		notificationManager.notify(IDs.NOTIFICATION_WEAR, notification);
 	}
 
 	private void CreateForecastWeatherNotification(int icon, String title, String body, int id) {

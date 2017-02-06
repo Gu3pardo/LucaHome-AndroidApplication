@@ -3,8 +3,6 @@ package guepardoapps.lucahome.receiver;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.net.wifi.SupplicantState;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
@@ -23,14 +21,14 @@ import guepardoapps.toolset.services.AndroidSystemService;
 
 import guepardoapps.toolset.controller.BroadcastController;
 
-public class WIFIReceiver extends BroadcastReceiver {
+public class BootReceiver extends BroadcastReceiver {
 
-	private static final String TAG = WIFIReceiver.class.getName();
+	private static final String TAG = BootReceiver.class.getName();
 	private LucaHomeLogger _logger;
 
 	private static final String WIFI = "Wifi:";
 
-	private static final int CHECK_CONNETION_TIMEOUT = 10 * 1000;
+	private static final int CHECK_CONNETION_TIMEOUT = 15 * 1000;
 
 	private Context _context;
 
@@ -57,16 +55,6 @@ public class WIFIReceiver extends BroadcastReceiver {
 		}
 		_logger.Debug("WIFIReceiver onReceive");
 		_logger.Info("Context is " + context.toString());
-
-		String action = intent.getAction();
-		if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)) {
-			SupplicantState state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
-			if (!(SupplicantState.isValidState(state) && state == SupplicantState.COMPLETED)) {
-				_logger.Warn("Not yet a valid connection!");
-				return;
-			}
-		}
-		_logger.Info("valid connection!");
 
 		_context = context;
 		_checkConnectionEnabled = true;

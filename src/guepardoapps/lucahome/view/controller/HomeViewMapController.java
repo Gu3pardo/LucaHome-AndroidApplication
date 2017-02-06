@@ -17,9 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.SerializableList;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.dto.MapContentDto;
 import guepardoapps.lucahome.dto.ScheduleDto;

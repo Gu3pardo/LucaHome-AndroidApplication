@@ -8,9 +8,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.RaspberrySelection;

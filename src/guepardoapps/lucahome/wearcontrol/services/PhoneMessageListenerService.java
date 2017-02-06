@@ -8,9 +8,8 @@ import com.google.android.gms.wearable.WearableListenerService;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.viewcontroller.ScheduleController;
 import guepardoapps.lucahome.viewcontroller.SocketController;

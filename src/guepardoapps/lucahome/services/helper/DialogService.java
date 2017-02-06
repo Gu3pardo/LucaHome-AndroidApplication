@@ -38,9 +38,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.enums.*;
 import guepardoapps.lucahome.customadapter.YoutubeVideoListAdapter;

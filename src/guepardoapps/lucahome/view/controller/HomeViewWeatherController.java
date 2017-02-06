@@ -10,8 +10,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.ForecastWeatherView;

@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
-
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.SerializableList;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.lucahome.dto.UserDto;
@@ -160,8 +160,8 @@ public class ServiceController {
 	public void StopSound() {
 		StartRestService(TAG, Constants.ACTION_STOP_SOUND, Constants.BROADCAST_STOP_SOUND, LucaObject.SOUND,
 				RaspberrySelection.BOTH);
-		CloseNotification(Constants.ID_NOTIFICATION_SONG + RaspberrySelection.RASPBERRY_1.GetInt());
-		CloseNotification(Constants.ID_NOTIFICATION_SONG + RaspberrySelection.RASPBERRY_2.GetInt());
+		CloseNotification(IDs.NOTIFICATION_SONG + RaspberrySelection.RASPBERRY_1.GetInt());
+		CloseNotification(IDs.NOTIFICATION_SONG + RaspberrySelection.RASPBERRY_2.GetInt());
 	}
 
 	public void SendMessageToWear(String message) {

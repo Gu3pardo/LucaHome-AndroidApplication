@@ -14,8 +14,8 @@ import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Color;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.viewcontroller.MediaMirrorController;
 
@@ -53,7 +53,7 @@ public class GameView extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.view_games);
-		getActionBar().setBackgroundDrawable(new ColorDrawable(Constants.ACTION_BAR_COLOR));
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
 		_logger = new LucaHomeLogger(TAG);
 		_logger.Debug("onCreate");

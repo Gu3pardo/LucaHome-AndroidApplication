@@ -6,9 +6,10 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Color;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.controller.HomeViewBottomBarController;
 import guepardoapps.lucahome.view.controller.HomeViewListButtonController;
@@ -33,7 +34,7 @@ public class HomeView extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.view_home);
-		getActionBar().setBackgroundDrawable(new ColorDrawable(Constants.ACTION_BAR_COLOR));
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
 		_logger = new LucaHomeLogger(TAG);
 		_logger.Debug("onCreate");

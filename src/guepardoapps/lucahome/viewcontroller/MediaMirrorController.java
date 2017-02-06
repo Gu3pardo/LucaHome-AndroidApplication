@@ -19,10 +19,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Toast;
-
-import guepardoapps.lucahome.common.Constants;
-import guepardoapps.lucahome.common.Keys;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.Keys;
 import guepardoapps.lucahome.services.helper.DialogService;
 
 import guepardoapps.mediamirror.client.ClientTask;

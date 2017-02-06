@@ -11,13 +11,15 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.SerializableList;
+import guepardoapps.lucahome.common.constants.Color;
 import guepardoapps.lucahome.dto.BirthdayDto;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.viewcontroller.BirthdayController;
+
 import guepardoapps.particles.ParticleSystem;
 
 public class BirthdayListAdapter extends BaseAdapter {
@@ -82,7 +84,7 @@ public class BirthdayListAdapter extends BaseAdapter {
 			holder._image = (ImageView) rowView.findViewById(R.id.birthday_item_image);
 			holder._image.setImageResource(R.drawable.birthday_hd);
 
-			rowView.setBackgroundColor(Constants.BIRTHDAY_BACKGROUND_COLOR);
+			rowView.setBackgroundColor(Color.BIRTHDAY_BACKGROUND);
 			new ParticleSystem((Activity) _context, 150, R.drawable.particle, 1250, (float) 1.5, 255)
 					.setSpeedRange(0.2f, 0.5f).oneShot(rowView, 150);
 		}

@@ -3,8 +3,8 @@ package guepardoapps.lucahome.dto;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.DrawingType;
 
 public class MapContentDto implements Serializable {

@@ -134,12 +134,12 @@ public final class R {
 		public static final int card_frame = 0x7f02001b;
 		public static final int card_frame_pressed = 0x7f02001c;
 		public static final int close_button = 0x7f02001d;
-		public static final int generic_confirmation = 0x7f020045;
-		public static final int generic_confirmation_animation = 0x7f020046;
-		public static final int ic_full_cancel = 0x7f02004a;
-		public static final int ic_full_sad = 0x7f02004b;
-		public static final int open_on_phone = 0x7f02005e;
-		public static final int open_on_phone_animation = 0x7f02005f;
+		public static final int generic_confirmation = 0x7f020046;
+		public static final int generic_confirmation_animation = 0x7f020047;
+		public static final int ic_full_cancel = 0x7f02004b;
+		public static final int ic_full_sad = 0x7f02004c;
+		public static final int open_on_phone = 0x7f02005f;
+		public static final int open_on_phone_animation = 0x7f020060;
 	}
 	public static final class id {
 		public static final int alertTitle = 0x7f10002b;

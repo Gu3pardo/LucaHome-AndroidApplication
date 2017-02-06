@@ -13,9 +13,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
-
+import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.mediamirror.common.dto.YoutubeVideoDto;
 import guepardoapps.toolset.controller.BroadcastController;
 

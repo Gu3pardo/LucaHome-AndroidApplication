@@ -1,7 +1,7 @@
 package guepardoapps.lucahome.common.converter;
 
-import guepardoapps.lucahome.common.Constants;
 import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Constants;
 
 public final class BooleanToScheduleStateConverter {
 
