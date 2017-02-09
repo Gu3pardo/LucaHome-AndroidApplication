@@ -4,11 +4,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.constants.Constants;
+
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
+import guepardoapps.lucahome.common.constants.ServerActions;
+import guepardoapps.lucahome.common.constants.SharedPrefConstants;
+import guepardoapps.lucahome.common.dto.UserDto;
 import guepardoapps.lucahome.common.enums.LucaObject;
-import guepardoapps.lucahome.dto.UserDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.RESTService;
+
 import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
 
@@ -30,7 +35,7 @@ public class UserService {
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("Received data...");
 
-			String[] answerArray = intent.getStringArrayExtra(Constants.BUNDLE_VALIDATE_USER);
+			String[] answerArray = intent.getStringArrayExtra(Bundles.VALIDATE_USER);
 
 			for (String answer : answerArray) {
 				if (answer != null) {
@@ -40,7 +45,7 @@ public class UserService {
 						_userValidated = false;
 						break;
 					} else {
-						answer = answer.replace(Constants.ACTION_VALIDATE_USER, "").replace(":", "");
+						answer = answer.replace(ServerActions.VALIDATE_USER, "").replace(":", "");
 						if (answer.length() == 1 && answer.contains("1")) {
 							_userValidated &= true;
 						} else {
@@ -65,12 +70,13 @@ public class UserService {
 		_context = context;
 
 		_receiverController = new ReceiverController(_context);
-		_sharedPrefController = new SharedPrefController(_context, Constants.SHARED_PREF_NAME);
+		_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
 	}
 
 	public UserDto LoadUser() {
-		String userName = _sharedPrefController.LoadStringValueFromSharedPreferences(Constants.USER_NAME);
-		String userPassword = _sharedPrefController.LoadStringValueFromSharedPreferences(Constants.USER_PASSPHRASE);
+		String userName = _sharedPrefController.LoadStringValueFromSharedPreferences(SharedPrefConstants.USER_NAME);
+		String userPassword = _sharedPrefController
+				.LoadStringValueFromSharedPreferences(SharedPrefConstants.USER_PASSPHRASE);
 		if (userName != null && userPassword != null) {
 			UserDto user = new UserDto(userName, userPassword);
 			return user;
@@ -79,7 +85,7 @@ public class UserService {
 	}
 
 	public void ValidateUser(UserDto user, Runnable callback) {
-		_receiverController.RegisterReceiver(_receiver, new String[] { Constants.BROADCAST_VALIDATE_USER });
+		_receiverController.RegisterReceiver(_receiver, new String[] { Broadcasts.VALIDATE_USER });
 
 		if (callback != null) {
 			_storedCallback = callback;
@@ -88,13 +94,13 @@ public class UserService {
 		Intent serviceIntent = new Intent(_context, RESTService.class);
 		Bundle serviceData = new Bundle();
 
-		serviceData.putString(Constants.BUNDLE_USER, user.GetUserName());
-		serviceData.putString(Constants.BUNDLE_PASSPHRASE, user.GetPassword());
+		serviceData.putString(Bundles.USER, user.GetUserName());
+		serviceData.putString(Bundles.PASSPHRASE, user.GetPassword());
 
-		serviceData.putString(Constants.BUNDLE_ACTION, Constants.ACTION_VALIDATE_USER);
-		serviceData.putString(Constants.BUNDLE_NAME, Constants.BUNDLE_VALIDATE_USER);
-		serviceData.putString(Constants.BUNDLE_BROADCAST, Constants.BROADCAST_VALIDATE_USER);
-		serviceData.putSerializable(Constants.BUNDLE_LUCA_OBJECT, LucaObject.USER);
+		serviceData.putString(Bundles.ACTION, ServerActions.VALIDATE_USER);
+		serviceData.putString(Bundles.NAME, Bundles.VALIDATE_USER);
+		serviceData.putString(Bundles.BROADCAST, Broadcasts.VALIDATE_USER);
+		serviceData.putSerializable(Bundles.LUCA_OBJECT, LucaObject.USER);
 
 		serviceIntent.putExtras(serviceData);
 

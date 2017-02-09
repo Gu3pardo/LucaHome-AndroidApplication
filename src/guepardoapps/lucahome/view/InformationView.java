@@ -13,15 +13,15 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.SerializableList;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.dto.*;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.customadapter.*;
-import guepardoapps.lucahome.dto.*;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
-
+import guepardoapps.lucahome.view.customadapter.*;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -49,11 +49,11 @@ public class InformationView extends Activity {
 
 	private Runnable _getDataRunnable = new Runnable() {
 		public void run() {
-			_broadcastController.SendSerializableBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-					Constants.BUNDLE_MAIN_SERVICE_ACTION, MainServiceAction.GET_INFORMATIONS);
+			_broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+					Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_INFORMATIONS);
 			_logger.Debug("Called for Informations!");
-			_broadcastController.SendSerializableBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-					Constants.BUNDLE_MAIN_SERVICE_ACTION, MainServiceAction.GET_CHANGES);
+			_broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+					Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_CHANGES);
 			_logger.Debug("Called for Changes!");
 		}
 	};
@@ -65,7 +65,7 @@ public class InformationView extends Activity {
 
 			@SuppressWarnings("unchecked")
 			SerializableList<ChangeDto> list = (SerializableList<ChangeDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_CHANGE_LIST);
+					.getSerializableExtra(Bundles.CHANGE_LIST);
 
 			if (list != null) {
 				_listAdapterBelow = new ChangeListAdapter(_context, list);
@@ -75,7 +75,7 @@ public class InformationView extends Activity {
 			} else {
 				_logger.Warn("list is null!");
 			}
-			
+
 			_progressBarBelow.setVisibility(View.GONE);
 		}
 	};
@@ -85,7 +85,7 @@ public class InformationView extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_updateInformationReceiver onReceive");
 
-			InformationDto entry = (InformationDto) intent.getSerializableExtra(Constants.BUNDLE_INFORMATION_SINGLE);
+			InformationDto entry = (InformationDto) intent.getSerializableExtra(Bundles.INFORMATION_SINGLE);
 
 			if (entry != null) {
 				_listAdapterAbove = new InformationListAdapter(_context, entry);
@@ -95,7 +95,7 @@ public class InformationView extends Activity {
 			} else {
 				_logger.Warn("InformationDto is null!");
 			}
-			
+
 			_progressBarAbove.setVisibility(View.GONE);
 		}
 	};
@@ -129,9 +129,9 @@ public class InformationView extends Activity {
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
 				_receiverController.RegisterReceiver(_updateChangeReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_CHANGE });
+						new String[] { Broadcasts.UPDATE_CHANGE });
 				_receiverController.RegisterReceiver(_updateInformationReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_INFORMATION });
+						new String[] { Broadcasts.UPDATE_INFORMATION });
 				_isInitialized = true;
 				_getDataRunnable.run();
 			}

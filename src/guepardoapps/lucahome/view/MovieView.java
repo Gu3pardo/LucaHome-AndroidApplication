@@ -15,15 +15,16 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.dto.*;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.customadapter.*;
-import guepardoapps.lucahome.dto.*;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.helper.NavigationService;
+import guepardoapps.lucahome.view.customadapter.*;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -49,9 +50,8 @@ public class MovieView extends Activity {
 
 	private Runnable _getDataRunnable = new Runnable() {
 		public void run() {
-			_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-					new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
-					new Object[] { MainServiceAction.GET_MOVIES });
+			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+					new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.GET_MOVIES });
 		}
 	};
 
@@ -62,7 +62,7 @@ public class MovieView extends Activity {
 
 			@SuppressWarnings("unchecked")
 			SerializableList<MovieDto> list = (SerializableList<MovieDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_MOVIE_LIST);
+					.getSerializableExtra(Bundles.MOVIE_LIST);
 
 			if (list != null) {
 				_listAdapter = new MovieListAdapter(_context, list);
@@ -110,8 +110,7 @@ public class MovieView extends Activity {
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
 				_isInitialized = true;
-				_receiverController.RegisterReceiver(_updateReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_MOVIE });
+				_receiverController.RegisterReceiver(_updateReceiver, new String[] { Broadcasts.UPDATE_MOVIE });
 				_getDataRunnable.run();
 			}
 		}

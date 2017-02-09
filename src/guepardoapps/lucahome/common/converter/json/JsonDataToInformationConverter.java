@@ -1,8 +1,8 @@
 package guepardoapps.lucahome.common.converter.json;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.Tools;
-import guepardoapps.lucahome.dto.InformationDto;
+import guepardoapps.lucahome.common.dto.InformationDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.StringHelper;
 
 public final class JsonDataToInformationConverter {
 
@@ -20,16 +20,16 @@ public final class JsonDataToInformationConverter {
 			}
 		}
 
-		if (Tools.StringsAreEqual(stringArray)) {
+		if (StringHelper.StringsAreEqual(stringArray)) {
 			return ParseStringToValue(stringArray[0]);
 		} else {
-			String usedEntry = Tools.SelectString(stringArray, _searchParameter);
+			String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
 			return ParseStringToValue(usedEntry);
 		}
 	}
 
 	private static InformationDto ParseStringToValue(String value) {
-		if (Tools.GetStringCount(value, _searchParameter) == 1) {
+		if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
 			if (value.contains(_searchParameter)) {
 				value = value.replace(_searchParameter, "").replace("};};", "");
 

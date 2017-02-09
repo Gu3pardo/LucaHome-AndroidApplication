@@ -7,8 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
-
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 
 public class ControlMainServiceState extends Service {
 

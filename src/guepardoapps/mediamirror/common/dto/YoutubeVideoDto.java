@@ -1,6 +1,6 @@
 package guepardoapps.mediamirror.common.dto;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 
 public class YoutubeVideoDto {
 

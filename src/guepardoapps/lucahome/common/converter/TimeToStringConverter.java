@@ -1,7 +1,6 @@
 package guepardoapps.lucahome.common.converter;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
-
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.toolset.common.classes.TimeString;
 
 public final class TimeToStringConverter {

@@ -5,15 +5,16 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.constants.Constants;
+
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.controller.ServiceController;
+import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.enums.RaspberrySelection;
-import guepardoapps.lucahome.dto.WirelessSocketDto;
-import guepardoapps.lucahome.viewcontroller.SocketController;
-
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.view.controller.SocketController;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -33,9 +34,8 @@ public class SocketActionService extends Service {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_notificationReceiver onReceive");
-			_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-					new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
-					new Object[] { MainServiceAction.DOWLOAD_SOCKETS });
+			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+					new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.DOWLOAD_SOCKETS });
 			stopSelf();
 		}
 	};
@@ -52,7 +52,7 @@ public class SocketActionService extends Service {
 		_serviceController = new ServiceController(_context);
 		_socketController = new SocketController(_context);
 
-		WirelessSocketDto socket = (WirelessSocketDto) intent.getExtras().getSerializable(Constants.BUNDLE_SOCKET_DATA);
+		WirelessSocketDto socket = (WirelessSocketDto) intent.getExtras().getSerializable(Bundles.SOCKET_DATA);
 		_logger.Debug("socket: " + socket.toString());
 
 		_receiverController.RegisterReceiver(_notificationReceiver, new String[] { socket.GetNotificationBroadcast() });

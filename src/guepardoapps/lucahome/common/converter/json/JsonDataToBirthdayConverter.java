@@ -2,10 +2,10 @@ package guepardoapps.lucahome.common.converter.json;
 
 import java.util.Calendar;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.Tools;
 import guepardoapps.lucahome.common.classes.SerializableList;
-import guepardoapps.lucahome.dto.BirthdayDto;
+import guepardoapps.lucahome.common.dto.BirthdayDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.StringHelper;
 
 public final class JsonDataToBirthdayConverter {
 
@@ -15,17 +15,17 @@ public final class JsonDataToBirthdayConverter {
 	private static String _searchParameter = "{birthday:";
 
 	public static SerializableList<BirthdayDto> GetList(String[] stringArray) {
-		if (Tools.StringsAreEqual(stringArray)) {
+		if (StringHelper.StringsAreEqual(stringArray)) {
 			return ParseStringToList(stringArray[0]);
 		} else {
-			String usedEntry = Tools.SelectString(stringArray, _searchParameter);
+			String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
 			return ParseStringToList(usedEntry);
 		}
 	}
 
 	public static BirthdayDto Get(String value) {
 		if (!value.contains("Error")) {
-			if (Tools.GetStringCount(value, _searchParameter) == 1) {
+			if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
 				if (value.contains(_searchParameter)) {
 					value = value.replace(_searchParameter, "").replace("};};", "");
 
@@ -48,7 +48,7 @@ public final class JsonDataToBirthdayConverter {
 
 	private static SerializableList<BirthdayDto> ParseStringToList(String value) {
 		if (!value.contains("Error")) {
-			if (Tools.GetStringCount(value, _searchParameter) > 1) {
+			if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
 				if (value.contains(_searchParameter)) {
 					SerializableList<BirthdayDto> list = new SerializableList<BirthdayDto>();
 

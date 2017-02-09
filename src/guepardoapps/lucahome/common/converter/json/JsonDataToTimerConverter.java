@@ -2,13 +2,12 @@ package guepardoapps.lucahome.common.converter.json;
 
 import java.sql.Time;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.Tools;
 import guepardoapps.lucahome.common.classes.SerializableList;
+import guepardoapps.lucahome.common.dto.TimerDto;
+import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.enums.RaspberrySelection;
-import guepardoapps.lucahome.dto.TimerDto;
-import guepardoapps.lucahome.dto.WirelessSocketDto;
-
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.StringHelper;
 import guepardoapps.toolset.common.enums.Weekday;
 
 public final class JsonDataToTimerConverter {
@@ -19,16 +18,16 @@ public final class JsonDataToTimerConverter {
 	private static String _searchParameter = "{schedule:";
 
 	public static SerializableList<TimerDto> GetList(String[] stringArray, SerializableList<WirelessSocketDto> socketList) {
-		if (Tools.StringsAreEqual(stringArray)) {
+		if (StringHelper.StringsAreEqual(stringArray)) {
 			return ParseStringToList(stringArray[0], socketList);
 		} else {
-			String usedEntry = Tools.SelectString(stringArray, _searchParameter);
+			String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
 			return ParseStringToList(usedEntry, socketList);
 		}
 	}
 
 	public static TimerDto Get(String value, SerializableList<WirelessSocketDto> socketList) {
-		if (Tools.GetStringCount(value, _searchParameter) == 1) {
+		if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
 			if (value.contains(_searchParameter)) {
 				value = value.replace(_searchParameter, "").replace("};};", "");
 
@@ -50,7 +49,7 @@ public final class JsonDataToTimerConverter {
 
 	private static SerializableList<TimerDto> ParseStringToList(String value,
 			SerializableList<WirelessSocketDto> socketList) {
-		if (Tools.GetStringCount(value, _searchParameter) > 1) {
+		if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
 			if (value.contains(_searchParameter)) {
 				SerializableList<TimerDto> list = new SerializableList<TimerDto>();
 

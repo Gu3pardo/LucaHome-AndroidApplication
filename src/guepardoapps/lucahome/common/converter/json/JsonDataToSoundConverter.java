@@ -2,9 +2,9 @@ package guepardoapps.lucahome.common.converter.json;
 
 import java.util.ArrayList;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.Tools;
 import guepardoapps.lucahome.common.classes.Sound;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.StringHelper;
 
 public final class JsonDataToSoundConverter {
 
@@ -14,7 +14,7 @@ public final class JsonDataToSoundConverter {
 	private static String _searchParameter = "{soundfile:";
 
 	public static ArrayList<Sound> GetList(String value) {
-		if (Tools.GetStringCount(value, _searchParameter) > 1) {
+		if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
 			if (value.contains(_searchParameter)) {
 				ArrayList<Sound> list = new ArrayList<Sound>();
 

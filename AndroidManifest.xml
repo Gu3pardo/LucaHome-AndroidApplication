@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="guepardoapps.lucahome"
-    android:versionCode="1914170206"
-    android:versionName="1.9.14.170206" >
+    android:versionCode="1916170209"
+    android:versionName="1.9.16.170209" >
 
     <uses-sdk
         android:minSdkVersion="21"
@@ -113,13 +113,13 @@
         <service
             android:name="guepardoapps.lucahome.services.sockets.SocketActionService"
             android:enabled="true" />
-        <service android:name="guepardoapps.lucahome.wearcontrol.services.PhoneMessageListenerService" >
+        <service android:name="guepardoapps.lucahome.services.wearcontrol.PhoneMessageListenerService" >
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </service>
         <service
-            android:name="guepardoapps.lucahome.wearcontrol.services.WearMessageService"
+            android:name="guepardoapps.lucahome.services.wearcontrol.WearMessageService"
             android:enabled="true" />
 
         <meta-data

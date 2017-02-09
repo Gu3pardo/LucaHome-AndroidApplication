@@ -23,15 +23,15 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.dto.sensor.HumidityDto;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.customadapter.*;
-import guepardoapps.lucahome.dto.sensor.HumidityDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
-
+import guepardoapps.lucahome.view.customadapter.*;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -65,9 +65,8 @@ public class SensorHumidityView extends Activity implements SensorEventListener 
 
 	private Runnable _getDataRunnable = new Runnable() {
 		public void run() {
-			_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-					new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
-					new Object[] { MainServiceAction.GET_HUMIDITY });
+			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+					new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.GET_HUMIDITY });
 		}
 	};
 
@@ -83,7 +82,7 @@ public class SensorHumidityView extends Activity implements SensorEventListener 
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_updateReceiver onReceive");
 
-			_humidityList = (SerializableList<HumidityDto>) intent.getSerializableExtra(Constants.BUNDLE_HUMIDITY_LIST);
+			_humidityList = (SerializableList<HumidityDto>) intent.getSerializableExtra(Bundles.HUMIDITY_LIST);
 
 			if (_humidityList != null) {
 				_listAdapter = new HumidityListAdapter(_context, _humidityList);
@@ -126,8 +125,7 @@ public class SensorHumidityView extends Activity implements SensorEventListener 
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
 				_isInitialized = true;
-				_receiverController.RegisterReceiver(_updateReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_HUMIDITY });
+				_receiverController.RegisterReceiver(_updateReceiver, new String[] { Broadcasts.UPDATE_HUMIDITY });
 				_hasHumiditySensor = checkSensorAvailability();
 				_getDataRunnable.run();
 			}
@@ -171,7 +169,7 @@ public class SensorHumidityView extends Activity implements SensorEventListener 
 
 			_humidityList = new SerializableList<HumidityDto>();
 			_humidityList.addValue(newEntry);
-			
+
 			_listAdapter = new HumidityListAdapter(_context, _humidityList);
 			_listView.setAdapter(_listAdapter);
 

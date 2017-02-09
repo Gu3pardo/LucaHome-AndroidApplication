@@ -21,16 +21,17 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.classes.*;
-import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.customadapter.*;
-import guepardoapps.lucahome.dto.sensor.AirPressureDto;
-import guepardoapps.lucahome.services.helper.NavigationService;
 
+import guepardoapps.lucahome.R;
+import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
+import guepardoapps.lucahome.common.constants.Color;
+import guepardoapps.lucahome.common.dto.sensor.AirPressureDto;
+import guepardoapps.lucahome.common.enums.MainServiceAction;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.services.helper.NavigationService;
+import guepardoapps.lucahome.view.customadapter.*;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -64,9 +65,8 @@ public class SensorAirPressureView extends Activity implements SensorEventListen
 
 	private Runnable _getDataRunnable = new Runnable() {
 		public void run() {
-			_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-					new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
-					new Object[] { MainServiceAction.GET_AIR_PRESSURE });
+			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+					new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.GET_AIR_PRESSURE });
 		}
 	};
 
@@ -83,7 +83,7 @@ public class SensorAirPressureView extends Activity implements SensorEventListen
 			_logger.Debug("_updateReceiver onReceive");
 
 			_airPressureList = (SerializableList<AirPressureDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_AIR_PRESSURE_LIST);
+					.getSerializableExtra(Bundles.AIR_PRESSURE_LIST);
 
 			if (_airPressureList != null) {
 				_listAdapter = new AirPressureListAdapter(_context, _airPressureList);
@@ -126,8 +126,7 @@ public class SensorAirPressureView extends Activity implements SensorEventListen
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
 				_isInitialized = true;
-				_receiverController.RegisterReceiver(_updateReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_AIR_PRESSURE });
+				_receiverController.RegisterReceiver(_updateReceiver, new String[] { Broadcasts.UPDATE_AIR_PRESSURE });
 				_hasAirPressureSensor = checkSensorAvailability();
 				_getDataRunnable.run();
 			}
@@ -171,7 +170,7 @@ public class SensorAirPressureView extends Activity implements SensorEventListen
 
 			_airPressureList = new SerializableList<AirPressureDto>();
 			_airPressureList.addValue(newEntry);
-			
+
 			_listAdapter = new AirPressureListAdapter(_context, _airPressureList);
 			_listView.setAdapter(_listAdapter);
 

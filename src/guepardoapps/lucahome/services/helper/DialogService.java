@@ -38,23 +38,26 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
+import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.lucahome.common.controller.ServiceController;
+import guepardoapps.lucahome.common.dto.BirthdayDto;
+import guepardoapps.lucahome.common.dto.MovieDto;
+import guepardoapps.lucahome.common.dto.ScheduleDto;
+import guepardoapps.lucahome.common.dto.TimerDto;
+import guepardoapps.lucahome.common.dto.UserDto;
+import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.enums.*;
-import guepardoapps.lucahome.customadapter.YoutubeVideoListAdapter;
-import guepardoapps.lucahome.dto.BirthdayDto;
-import guepardoapps.lucahome.dto.MovieDto;
-import guepardoapps.lucahome.dto.ScheduleDto;
-import guepardoapps.lucahome.dto.TimerDto;
-import guepardoapps.lucahome.dto.UserDto;
-import guepardoapps.lucahome.dto.WirelessSocketDto;
-import guepardoapps.lucahome.viewcontroller.ScheduleController;
-import guepardoapps.lucahome.viewcontroller.SocketController;
-import guepardoapps.lucahome.viewcontroller.SoundController;
-import guepardoapps.lucahome.viewcontroller.TimerController;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.view.controller.ScheduleController;
+import guepardoapps.lucahome.view.controller.SocketController;
+import guepardoapps.lucahome.view.controller.SoundController;
+import guepardoapps.lucahome.view.controller.TimerController;
+import guepardoapps.lucahome.view.customadapter.YoutubeVideoListAdapter;
 import guepardoapps.mediamirror.common.dto.YoutubeVideoDto;
+
 import guepardoapps.toolset.common.enums.Weekday;
 import guepardoapps.toolset.controller.*;
 import guepardoapps.toolset.services.*;
@@ -103,7 +106,7 @@ public class DialogService extends DialogController {
 		@Override
 		public void run() {
 			if (_userService.GetValidationResult()) {
-				_sharedPrefController.SaveBooleanValue(Constants.USER_DATA_ENTERED, true);
+				_sharedPrefController.SaveBooleanValue(SharedPrefConstants.USER_DATA_ENTERED, true);
 
 				CloseDialogCallback.run();
 				if (_storedRunnable != null) {
@@ -251,7 +254,7 @@ public class DialogService extends DialogController {
 					return;
 				}
 				_serviceController.StartRestService(_birthday.GetName(), _birthday.GetCommandDelete(),
-						Constants.BROADCAST_RELOAD_BIRTHDAY, _lucaObject, RaspberrySelection.BOTH);
+						Broadcasts.RELOAD_BIRTHDAY, _lucaObject, RaspberrySelection.BOTH);
 				break;
 			case MOVIE:
 				if (_movie == null) {
@@ -259,7 +262,7 @@ public class DialogService extends DialogController {
 					return;
 				}
 				_serviceController.StartRestService(_movie.GetTitle(), _movie.GetCommandDelete(),
-						Constants.BROADCAST_RELOAD_MOVIE, _lucaObject, RaspberrySelection.BOTH);
+						Broadcasts.RELOAD_MOVIE, _lucaObject, RaspberrySelection.BOTH);
 				break;
 			case WIRELESS_SOCKET:
 				if (_socket == null) {
@@ -274,7 +277,7 @@ public class DialogService extends DialogController {
 					return;
 				}
 				_serviceController.StartRestService(_schedule.GetName(), _schedule.GetCommandDelete(),
-						Constants.BROADCAST_RELOAD_SCHEDULE, _lucaObject, RaspberrySelection.BOTH);
+						Broadcasts.RELOAD_SCHEDULE, _lucaObject, RaspberrySelection.BOTH);
 				break;
 			case TIMER:
 				if (_timer == null) {
@@ -282,7 +285,7 @@ public class DialogService extends DialogController {
 					return;
 				}
 				_serviceController.StartRestService(_timer.GetName(), _timer.GetCommandDelete(),
-						Constants.BROADCAST_RELOAD_TIMER, _lucaObject, RaspberrySelection.BOTH);
+						Broadcasts.RELOAD_TIMER, _lucaObject, RaspberrySelection.BOTH);
 				break;
 			default:
 				_logger.Warn("Still not possible to delete object " + _lucaObject.toString());
@@ -310,7 +313,7 @@ public class DialogService extends DialogController {
 		_mailService = new MailService(_context);
 		_scheduleController = new ScheduleController(_context);
 		_serviceController = new ServiceController(_context);
-		_sharedPrefController = new SharedPrefController(_context, Constants.SHARED_PREF_NAME);
+		_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
 		_socketController = new SocketController(_context);
 		_timerController = new TimerController(_context);
 
@@ -402,8 +405,8 @@ public class DialogService extends DialogController {
 					return;
 				}
 
-				_sharedPrefController.SaveStringValue(Constants.USER_NAME, userName);
-				_sharedPrefController.SaveStringValue(Constants.USER_PASSPHRASE, password);
+				_sharedPrefController.SaveStringValue(SharedPrefConstants.USER_NAME, userName);
+				_sharedPrefController.SaveStringValue(SharedPrefConstants.USER_PASSPHRASE, password);
 
 				if (runnable != null) {
 					_storedRunnable = runnable;
@@ -500,10 +503,9 @@ public class DialogService extends DialogController {
 				}
 
 				if (add) {
-					sendBroadCast(Constants.BROADCAST_ADD_BIRTHDAY, LucaObject.BIRTHDAY, newBirthday.GetCommandAdd());
+					sendBroadCast(Broadcasts.ADD_BIRTHDAY, LucaObject.BIRTHDAY, newBirthday.GetCommandAdd());
 				} else {
-					sendBroadCast(Constants.BROADCAST_UPDATE_BIRTHDAY, LucaObject.BIRTHDAY,
-							newBirthday.GetCommandUpdate());
+					sendBroadCast(Broadcasts.UPDATE_BIRTHDAY, LucaObject.BIRTHDAY, newBirthday.GetCommandUpdate());
 				}
 
 				CloseDialogCallback.run();
@@ -555,9 +557,9 @@ public class DialogService extends DialogController {
 				}
 
 				if (add) {
-					sendBroadCast(Constants.BROADCAST_ADD_MOVIE, LucaObject.MOVIE, newMovie.GetCommandAdd());
+					sendBroadCast(Broadcasts.ADD_MOVIE, LucaObject.MOVIE, newMovie.GetCommandAdd());
 				} else {
-					sendBroadCast(Constants.BROADCAST_UPDATE_MOVIE, LucaObject.MOVIE, newMovie.GetCommandUpdate());
+					sendBroadCast(Broadcasts.UPDATE_MOVIE, LucaObject.MOVIE, newMovie.GetCommandUpdate());
 				}
 
 				CloseDialogCallback.run();
@@ -616,11 +618,9 @@ public class DialogService extends DialogController {
 				}
 
 				if (add) {
-					sendBroadCast(Constants.BROADCAST_ADD_SOCKET, LucaObject.WIRELESS_SOCKET,
-							newSocket.GetCommandAdd());
+					sendBroadCast(Broadcasts.ADD_SOCKET, LucaObject.WIRELESS_SOCKET, newSocket.GetCommandAdd());
 				} else {
-					sendBroadCast(Constants.BROADCAST_UPDATE_SOCKET, LucaObject.WIRELESS_SOCKET,
-							newSocket.GetCommandUpdate());
+					sendBroadCast(Broadcasts.UPDATE_SOCKET, LucaObject.WIRELESS_SOCKET, newSocket.GetCommandUpdate());
 				}
 
 				CloseDialogCallback.run();
@@ -838,10 +838,9 @@ public class DialogService extends DialogController {
 				}
 
 				if (add) {
-					sendBroadCast(Constants.BROADCAST_ADD_SCHEDULE, LucaObject.SCHEDULE, newSchedule.GetCommandAdd());
+					sendBroadCast(Broadcasts.ADD_SCHEDULE, LucaObject.SCHEDULE, newSchedule.GetCommandAdd());
 				} else {
-					sendBroadCast(Constants.BROADCAST_UPDATE_SCHEDULE, LucaObject.SCHEDULE,
-							newSchedule.GetCommandUpdate());
+					sendBroadCast(Broadcasts.UPDATE_SCHEDULE, LucaObject.SCHEDULE, newSchedule.GetCommandUpdate());
 				}
 
 				CloseDialogCallback.run();
@@ -990,7 +989,7 @@ public class DialogService extends DialogController {
 				Weekday weekday = Weekday.GetById(timerDay);
 
 				_serviceController.StartRestService(socket.GetName(), socket.GetCommandSet(true),
-						Constants.BROADCAST_RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+						Broadcasts.RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
 
 				if (_timerPlaySound && socket.GetName().contains("Sound")) {
 					SoundController soundController = new SoundController(_context);
@@ -1006,9 +1005,9 @@ public class DialogService extends DialogController {
 				}
 
 				if (add) {
-					sendBroadCast(Constants.BROADCAST_ADD_SCHEDULE, LucaObject.TIMER, newTimer.GetCommandAdd());
+					sendBroadCast(Broadcasts.ADD_SCHEDULE, LucaObject.TIMER, newTimer.GetCommandAdd());
 				} else {
-					sendBroadCast(Constants.BROADCAST_UPDATE_SCHEDULE, LucaObject.TIMER, newTimer.GetCommandUpdate());
+					sendBroadCast(Broadcasts.UPDATE_SCHEDULE, LucaObject.TIMER, newTimer.GetCommandUpdate());
 				}
 
 				CloseDialogCallback.run();
@@ -1351,8 +1350,8 @@ public class DialogService extends DialogController {
 		Intent broadcastIntent = new Intent(broadcast);
 
 		Bundle broadcastData = new Bundle();
-		broadcastData.putSerializable(Constants.BUNDLE_LUCA_OBJECT, lucaObject);
-		broadcastData.putString(Constants.BUNDLE_ACTION, action);
+		broadcastData.putSerializable(Bundles.LUCA_OBJECT, lucaObject);
+		broadcastData.putString(Bundles.ACTION, action);
 		broadcastIntent.putExtras(broadcastData);
 
 		_context.sendBroadcast(broadcastIntent);

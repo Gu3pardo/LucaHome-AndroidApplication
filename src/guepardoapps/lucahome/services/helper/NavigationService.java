@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 
 public class NavigationService {
 

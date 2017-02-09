@@ -14,10 +14,10 @@ import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.constants.Color;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.viewcontroller.MediaMirrorController;
+import guepardoapps.lucahome.view.controller.MediaMirrorController;
 
 public class GameView extends Activity {
 

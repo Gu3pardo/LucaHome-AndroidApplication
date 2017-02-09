@@ -7,8 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.dto.WirelessSocketDto;
+
+import guepardoapps.lucahome.common.constants.Bundles;
+import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.receiver.sockets.SocketActionReceiver;
 
 public class NotificationDetails implements Serializable {
@@ -95,7 +96,7 @@ public class NotificationDetails implements Serializable {
 		Intent intent = new Intent(_context, SocketActionReceiver.class);
 
 		Bundle data = new Bundle();
-		data.putSerializable(Constants.BUNDLE_SOCKET_DATA, _socket);
+		data.putSerializable(Bundles.SOCKET_DATA, _socket);
 		intent.putExtras(data);
 
 		return intent;

@@ -1,6 +1,6 @@
 package guepardoapps.lucahome.common.converter;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 
 public final class StringToBooleanConverter {
 

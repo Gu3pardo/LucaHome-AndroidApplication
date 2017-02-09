@@ -3,8 +3,8 @@ package guepardoapps.lucahome.receiver.sound;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.controller.ServiceController;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 
 public class StopSoundReceiver extends BroadcastReceiver {
 

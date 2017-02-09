@@ -23,17 +23,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.dto.*;
+import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
 import guepardoapps.lucahome.common.enums.*;
-import guepardoapps.lucahome.dto.*;
-import guepardoapps.lucahome.dto.sensor.TemperatureDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.viewcontroller.MapContentController;
-
+import guepardoapps.lucahome.view.controller.MapContentController;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -69,15 +69,15 @@ public class MapView extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			SerializableList<MapContentDto> mapContentList = (SerializableList<MapContentDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_MAP_CONTENT_LIST);
+					.getSerializableExtra(Bundles.MAP_CONTENT_LIST);
 			SerializableList<WirelessSocketDto> wirelessSocketList = (SerializableList<WirelessSocketDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_SOCKET_LIST);
+					.getSerializableExtra(Bundles.SOCKET_LIST);
 			SerializableList<ScheduleDto> scheduleAllList = (SerializableList<ScheduleDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_SCHEDULE_LIST);
+					.getSerializableExtra(Bundles.SCHEDULE_LIST);
 			SerializableList<TimerDto> timerAllList = (SerializableList<TimerDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_TIMER_LIST);
+					.getSerializableExtra(Bundles.TIMER_LIST);
 			SerializableList<TemperatureDto> temperatureList = (SerializableList<TemperatureDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_TEMPERATURE_LIST);
+					.getSerializableExtra(Bundles.TEMPERATURE_LIST);
 
 			if (mapContentList != null && wirelessSocketList != null && scheduleAllList != null && timerAllList != null
 					&& temperatureList != null) {
@@ -221,9 +221,9 @@ public class MapView extends Activity {
 		if (!_isInitialized) {
 			if (_receiverController != null) {
 				_receiverController.RegisterReceiver(_newDataReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_MAP_CONTENT_VIEW });
-				_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-						new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
+						new String[] { Broadcasts.UPDATE_MAP_CONTENT_VIEW });
+				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+						new String[] { Bundles.MAIN_SERVICE_ACTION },
 						new Object[] { MainServiceAction.GET_MAP_CONTENT });
 
 				_isInitialized = true;

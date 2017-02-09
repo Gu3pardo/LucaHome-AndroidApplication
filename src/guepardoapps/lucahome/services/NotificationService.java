@@ -17,20 +17,20 @@ import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.IDs;
+import guepardoapps.lucahome.common.constants.SharedPrefConstants;
+import guepardoapps.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.TemperatureType;
-import guepardoapps.lucahome.dto.WirelessSocketDto;
-import guepardoapps.lucahome.dto.sensor.TemperatureDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.receiver.sockets.SocketActionReceiver;
 import guepardoapps.lucahome.receiver.sound.StopSoundReceiver;
 import guepardoapps.lucahome.view.BirthdayView;
 import guepardoapps.lucahome.view.SensorTemperatureView;
-import guepardoapps.lucahome.viewcontroller.SocketController;
-
+import guepardoapps.lucahome.view.controller.SocketController;
 import guepardoapps.toolset.controller.SharedPrefController;
 import guepardoapps.toolset.openweather.model.WeatherModel;
 
@@ -47,40 +47,40 @@ public class NotificationService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startid) {
 		_logger = new LucaHomeLogger(TAG);
 
-		_sharedPrefController = new SharedPrefController(this, Constants.SHARED_PREF_NAME);
+		_sharedPrefController = new SharedPrefController(this, SharedPrefConstants.SHARED_PREF_NAME);
 		_socketController = new SocketController(this);
 
 		Bundle data = intent.getExtras();
 
-		LucaObject lucaObject = (LucaObject) data.getSerializable(Constants.BUNDLE_LUCA_OBJECT);
-		int id = data.getInt(Constants.BUNDLE_NOTIFICATION_ID);
+		LucaObject lucaObject = (LucaObject) data.getSerializable(Bundles.LUCA_OBJECT);
+		int id = data.getInt(Bundles.NOTIFICATION_ID);
 
 		switch (lucaObject) {
 		case BIRTHDAY:
-			String title = data.getString(Constants.BUNDLE_NOTIFICATION_TITLE);
-			String body = data.getString(Constants.BUNDLE_NOTIFICATION_BODY);
+			String title = data.getString(Bundles.NOTIFICATION_TITLE);
+			String body = data.getString(Bundles.NOTIFICATION_BODY);
 			CreateBirthdayNotification(R.drawable.birthday, title, body, true, id);
 			break;
 		case SOUND:
-			String soundFile = data.getString(Constants.BUNDLE_NOTIFICATION_BODY);
-			String raspberry = data.getString(Constants.BUNDLE_NOTIFICATION_TITLE);
+			String soundFile = data.getString(Bundles.NOTIFICATION_BODY);
+			String raspberry = data.getString(Bundles.NOTIFICATION_TITLE);
 			CreateSoundNotification(soundFile, raspberry, id);
 			break;
 		case TEMPERATURE:
 			SerializableList<TemperatureDto> temperatureList = (SerializableList<TemperatureDto>) data
-					.getSerializable(Constants.BUNDLE_TEMPERATURE_LIST);
-			WeatherModel currentWeather = (WeatherModel) intent.getSerializableExtra(Constants.BUNDLE_WEATHER_CURRENT);
+					.getSerializable(Bundles.TEMPERATURE_LIST);
+			WeatherModel currentWeather = (WeatherModel) intent.getSerializableExtra(Bundles.WEATHER_CURRENT);
 			CreateTemperatureNotification(temperatureList, currentWeather);
 			break;
 		case WIRELESS_SOCKET:
 			SerializableList<WirelessSocketDto> wirelessSocketList = (SerializableList<WirelessSocketDto>) data
-					.getSerializable(Constants.BUNDLE_SOCKET_LIST);
+					.getSerializable(Bundles.SOCKET_LIST);
 			CreateSocketNotification(wirelessSocketList);
 			break;
 		case WEATHER_FORECAST:
-			String forecastTitle = data.getString(Constants.BUNDLE_NOTIFICATION_TITLE);
-			String forecastBody = data.getString(Constants.BUNDLE_NOTIFICATION_BODY);
-			int forecastIcon = data.getInt(Constants.BUNDLE_NOTIFICATION_ICON);
+			String forecastTitle = data.getString(Bundles.NOTIFICATION_TITLE);
+			String forecastBody = data.getString(Bundles.NOTIFICATION_BODY);
+			int forecastIcon = data.getInt(Bundles.NOTIFICATION_ICON);
 			CreateForecastWeatherNotification(forecastIcon, forecastTitle, forecastBody, id);
 			break;
 		default:
@@ -144,7 +144,8 @@ public class NotificationService extends Service {
 
 	private void CreateTemperatureNotification(SerializableList<TemperatureDto> temperatureList,
 			WeatherModel currentWeather) {
-		if (!_sharedPrefController.LoadBooleanValueFromSharedPreferences(Constants.DISPLAY_WEATHER_NOTIFICATION)) {
+		if (!_sharedPrefController
+				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
 			_logger.Warn("Not allowed to display socket notification!");
 			return;
 		}
@@ -192,7 +193,8 @@ public class NotificationService extends Service {
 
 	@SuppressWarnings("deprecation")
 	private void CreateSocketNotification(SerializableList<WirelessSocketDto> wirelessSocketList) {
-		if (!_sharedPrefController.LoadBooleanValueFromSharedPreferences(Constants.DISPLAY_SOCKET_NOTIFICATION)) {
+		if (!_sharedPrefController
+				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
 			_logger.Warn("Not allowed to display socket notification!");
 			return;
 		}
@@ -230,8 +232,8 @@ public class NotificationService extends Service {
 			socketIntents[index] = new Intent(this, SocketActionReceiver.class);
 
 			socketIntentDatas[index] = new Bundle();
-			socketIntentDatas[index].putString(Constants.BUNDLE_ACTION, "SINGLE_SOCKET");
-			socketIntentDatas[index].putSerializable(Constants.BUNDLE_SOCKET_DATA, wirelessSocketList.getValue(index));
+			socketIntentDatas[index].putString(Bundles.ACTION, "SINGLE_SOCKET");
+			socketIntentDatas[index].putSerializable(Bundles.SOCKET_DATA, wirelessSocketList.getValue(index));
 			socketIntents[index].putExtras(socketIntentDatas[index]);
 
 			socketPendingIntents[index] = PendingIntent.getBroadcast(this, index * 1234, socketIntents[index],
@@ -280,7 +282,7 @@ public class NotificationService extends Service {
 
 		Intent allSocketsIntent = new Intent(this, SocketActionReceiver.class);
 		Bundle allSocketsData = new Bundle();
-		allSocketsData.putString(Constants.BUNDLE_ACTION, "ALL_SOCKETS");
+		allSocketsData.putString(Bundles.ACTION, "ALL_SOCKETS");
 		allSocketsIntent.putExtras(allSocketsData);
 		PendingIntent allSocketsPendingIntent;
 		allSocketsPendingIntent = PendingIntent.getBroadcast(this, 30, allSocketsIntent,

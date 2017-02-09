@@ -11,8 +11,8 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.dto.UserDto;
+import guepardoapps.lucahome.common.dto.UserDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.services.helper.UserService;

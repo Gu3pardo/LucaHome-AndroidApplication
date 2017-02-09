@@ -1,9 +1,9 @@
 package guepardoapps.lucahome.common.converter.json;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.Tools;
 import guepardoapps.lucahome.common.classes.SerializableList;
-import guepardoapps.lucahome.dto.WirelessSocketDto;
+import guepardoapps.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.StringHelper;
 
 public final class JsonDataToSocketConverter {
 
@@ -13,16 +13,16 @@ public final class JsonDataToSocketConverter {
 	private static String _searchParameter = "{socket:";
 
 	public static SerializableList<WirelessSocketDto> GetList(String[] stringArray) {
-		if (Tools.StringsAreEqual(stringArray)) {
+		if (StringHelper.StringsAreEqual(stringArray)) {
 			return ParseStringToList(stringArray[0]);
 		} else {
-			String usedEntry = Tools.SelectString(stringArray, _searchParameter);
+			String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
 			return ParseStringToList(usedEntry);
 		}
 	}
 
 	public static WirelessSocketDto Get(String value) {
-		if (Tools.GetStringCount(value, _searchParameter) == 1) {
+		if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
 			if (value.contains(_searchParameter)) {
 				value = value.replace(_searchParameter, "").replace("};};", "");
 
@@ -43,7 +43,7 @@ public final class JsonDataToSocketConverter {
 	}
 
 	private static SerializableList<WirelessSocketDto> ParseStringToList(String value) {
-		if (Tools.GetStringCount(value, _searchParameter) > 1) {
+		if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
 			if (value.contains(_searchParameter)) {
 				SerializableList<WirelessSocketDto> list = new SerializableList<WirelessSocketDto>();
 

@@ -10,9 +10,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.ForecastWeatherView;
 
@@ -41,7 +42,7 @@ public class HomeViewWeatherController {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_updateWeatherViewReceiver onReceive");
-			WeatherModel currentWeather = (WeatherModel) intent.getSerializableExtra(Constants.BUNDLE_WEATHER_CURRENT);
+			WeatherModel currentWeather = (WeatherModel) intent.getSerializableExtra(Bundles.WEATHER_CURRENT);
 			if (currentWeather != null) {
 				_logger.Debug(currentWeather.toString());
 
@@ -83,9 +84,9 @@ public class HomeViewWeatherController {
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
 				_receiverController.RegisterReceiver(_updateWeatherViewReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_WEATHER_VIEW });
-				_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-						new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
+						new String[] { Broadcasts.UPDATE_WEATHER_VIEW });
+				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+						new String[] { Bundles.MAIN_SERVICE_ACTION },
 						new Object[] { MainServiceAction.GET_WEATHER_CURRENT });
 				_isInitialized = true;
 			}

@@ -21,19 +21,20 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.controller.*;
+import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.enums.TemperatureType;
-import guepardoapps.lucahome.customadapter.*;
-import guepardoapps.lucahome.dto.sensor.TemperatureDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
-
+import guepardoapps.lucahome.view.customadapter.*;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -69,9 +70,8 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 
 	private Runnable _getDataRunnable = new Runnable() {
 		public void run() {
-			_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-					new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
-					new Object[] { MainServiceAction.GET_TEMPERATURE });
+			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+					new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.GET_TEMPERATURE });
 		}
 	};
 
@@ -87,8 +87,7 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_updateReceiver onReceive");
 
-			_temperatureList = (SerializableList<TemperatureDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_TEMPERATURE_LIST);
+			_temperatureList = (SerializableList<TemperatureDto>) intent.getSerializableExtra(Bundles.TEMPERATURE_LIST);
 
 			if (_temperatureList != null) {
 				_listAdapter = new TemperatureListAdapter(_context, _temperatureList);
@@ -105,21 +104,20 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_temperatureReceiver onReceive");
 
-			int id = intent.getIntExtra(Constants.BUNDLE_TEMPERATURE_ID, -1);
+			int id = intent.getIntExtra(Bundles.TEMPERATURE_ID, -1);
 			TemperatureDto updatedEntry;
-			TemperatureType temperatureType = (TemperatureType) intent
-					.getSerializableExtra(Constants.BUNDLE_TEMPERATURE_TYPE);
+			TemperatureType temperatureType = (TemperatureType) intent.getSerializableExtra(Bundles.TEMPERATURE_TYPE);
 
 			if (temperatureType != null) {
 				switch (temperatureType) {
 				case RASPBERRY:
-					updatedEntry = (TemperatureDto) intent.getSerializableExtra(Constants.BUNDLE_TEMPERATURE_SINGLE);
+					updatedEntry = (TemperatureDto) intent.getSerializableExtra(Bundles.TEMPERATURE_SINGLE);
 					if (updatedEntry != null) {
 						_temperatureList.setValue(id, updatedEntry);
 					}
 					break;
 				case CITY:
-					_currentWeather = (WeatherModel) intent.getSerializableExtra(Constants.BUNDLE_TEMPERATURE_SINGLE);
+					_currentWeather = (WeatherModel) intent.getSerializableExtra(Bundles.TEMPERATURE_SINGLE);
 					if (_currentWeather != null) {
 						updatedEntry = new TemperatureDto(_currentWeather.GetTemperature(), _currentWeather.GetCity(),
 								_currentWeather.GetLastUpdate(), "n.a.", TemperatureType.CITY, "n.a.");
@@ -176,11 +174,10 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
 				_isInitialized = true;
-				_receiverController.RegisterReceiver(_updateReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_TEMPERATURE });
+				_receiverController.RegisterReceiver(_updateReceiver, new String[] { Broadcasts.UPDATE_TEMPERATURE });
 				_hasTemperatureSensor = checkSensorAvailability();
 				_receiverController.RegisterReceiver(_temperatureReceiver,
-						new String[] { Constants.BROADCAST_UPDATE_TEMPERATURE });
+						new String[] { Broadcasts.UPDATE_TEMPERATURE });
 				_getDataRunnable.run();
 			}
 		}

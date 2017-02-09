@@ -17,11 +17,15 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.ServerActions;
+import guepardoapps.lucahome.common.controller.DatabaseController;
+import guepardoapps.lucahome.common.dto.ActionDto;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
-
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
@@ -34,6 +38,7 @@ public class RESTService extends Service {
 	private String[] _actions;
 
 	private Context _context;
+	private DatabaseController _databaseController;
 	private NetworkController _networkController;
 
 	@Override
@@ -53,16 +58,6 @@ public class RESTService extends Service {
 			}
 		}
 
-		if (!_networkController.IsNetworkAvailable()) {
-			_logger.Warn("No network available!");
-			return 0;
-		}
-
-		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-			_logger.Warn("No LucaHome network! ...");
-			return 0;
-		}
-
 		Bundle bundle = intent.getExtras();
 		if (bundle == null) {
 			_logger.Warn("Bundle is null!");
@@ -70,7 +65,7 @@ public class RESTService extends Service {
 			return -1;
 		}
 
-		String action = bundle.getString(Constants.BUNDLE_ACTION);
+		String action = bundle.getString(Bundles.ACTION);
 		if (action == null) {
 			_logger.Warn("Action is null!");
 			stopSelf();
@@ -78,8 +73,31 @@ public class RESTService extends Service {
 		}
 		_logger.Debug("Action: " + action);
 
-		String user = bundle.getString(Constants.BUNDLE_USER);
-		String password = bundle.getString(Constants.BUNDLE_PASSPHRASE);
+		String name = bundle.getString(Bundles.NAME);
+
+		if (_databaseController == null) {
+			_databaseController = DatabaseController.getInstance();
+			_databaseController.onCreate(_context);
+		}
+
+		if (!_networkController.IsNetworkAvailable()) {
+			_logger.Warn("No network available!");
+			if (action.contains(ServerActions.SET_SOCKET)) {
+				storeAction(name, action);
+			}
+			return 0;
+		}
+
+		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+			_logger.Warn("No LucaHome network! ...");
+			if (action.contains(ServerActions.SET_SOCKET)) {
+				storeAction(name, action);
+			}
+			return 0;
+		}
+
+		String user = bundle.getString(Bundles.USER);
+		String password = bundle.getString(Bundles.PASSPHRASE);
 		if (user == null) {
 			_logger.Warn("No user!");
 			return 101;
@@ -100,9 +118,8 @@ public class RESTService extends Service {
 		_logger.Debug("Url: " + url);
 		_actions = new String[] { url };
 
-		String name = bundle.getString(Constants.BUNDLE_NAME);
-		String broadcast = bundle.getString(Constants.BUNDLE_BROADCAST);
-		LucaObject lucaObject = (LucaObject) bundle.getSerializable(Constants.BUNDLE_LUCA_OBJECT);
+		String broadcast = bundle.getString(Bundles.BROADCAST);
+		LucaObject lucaObject = (LucaObject) bundle.getSerializable(Bundles.LUCA_OBJECT);
 
 		SendActionTask task = new SendActionTask();
 		task.setValues(name, broadcast, lucaObject, _actions.length);
@@ -114,6 +131,31 @@ public class RESTService extends Service {
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
+	}
+
+	private void storeAction(String socketName, String action) {
+		_logger.Debug("Store action: " + action);
+
+		int id = -1;
+		String socket = socketName;
+		String socketAction = "-1";
+
+		if (action.contains(Constants.STATE_ON)) {
+			socketAction = Constants.STATE_ON;
+		} else if (action.contains(Constants.STATE_OFF)) {
+			socketAction = Constants.STATE_OFF;
+		} else {
+			_logger.Error("Failed to get action for socket to store: " + action);
+			Toast.makeText(_context, "Couldnot save action!", Toast.LENGTH_SHORT).show();
+			return;
+		}
+
+		ActionDto storeAction = new ActionDto(id, socket, socketAction);
+		if (_databaseController.SaveAction(storeAction)) {
+			Toast.makeText(_context, "Saved action!", Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(_context, "Couldnot save action!", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	private class SendActionTask extends AsyncTask<String, Void, String> {
@@ -186,8 +228,8 @@ public class RESTService extends Service {
 			// Hack for deactivating all sockets
 			if (_name.contains("SHOW_NOTIFICATION_SOCKET")) {
 				BroadcastController broadcastController = new BroadcastController(RESTService.this);
-				broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-						new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
+				broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+						new String[] { Bundles.MAIN_SERVICE_ACTION },
 						new Object[] { MainServiceAction.DOWLOAD_SOCKETS });
 			}
 			// End hack
@@ -196,7 +238,7 @@ public class RESTService extends Service {
 					Intent broadcastIntent = new Intent(_broadcast);
 					Bundle broadcastData = new Bundle();
 					broadcastData.putStringArray(_name, _answer);
-					broadcastData.putSerializable(Constants.BUNDLE_LUCA_OBJECT, _lucaObject);
+					broadcastData.putSerializable(Bundles.LUCA_OBJECT, _lucaObject);
 					broadcastIntent.putExtras(broadcastData);
 					sendBroadcast(broadcastIntent);
 				}

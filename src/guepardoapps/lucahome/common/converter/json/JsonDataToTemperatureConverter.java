@@ -3,10 +3,10 @@ package guepardoapps.lucahome.common.converter.json;
 import java.sql.Time;
 import java.util.Calendar;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.SerializableList;
+import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
 import guepardoapps.lucahome.common.enums.TemperatureType;
-import guepardoapps.lucahome.dto.sensor.TemperatureDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 
 public final class JsonDataToTemperatureConverter {
 

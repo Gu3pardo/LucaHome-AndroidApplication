@@ -10,11 +10,18 @@ import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.classes.SerializableList;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.IDs;
+import guepardoapps.lucahome.common.controller.DatabaseController;
 import guepardoapps.lucahome.common.controller.ServiceController;
+import guepardoapps.lucahome.common.dto.ActionDto;
+import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
+import guepardoapps.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.MainService;
 
 import guepardoapps.toolset.controller.DialogController;
@@ -36,6 +43,7 @@ public class WIFIReceiver extends BroadcastReceiver {
 
 	private AndroidSystemService _androidSystemService;
 	private BroadcastController _broadcastController;
+	private DatabaseController _databaseController;
 	private DialogController _dialogController;
 	private NetworkController _networkController;
 	private ServiceController _serviceController;
@@ -80,6 +88,10 @@ public class WIFIReceiver extends BroadcastReceiver {
 		if (_broadcastController == null) {
 			_broadcastController = new BroadcastController(_context);
 		}
+		if (_databaseController == null) {
+			_databaseController = DatabaseController.getInstance();
+			_databaseController.onCreate(_context);
+		}
 		if (_dialogController == null) {
 			_dialogController = new DialogController(_context, textColor, backgroundColor);
 		}
@@ -98,17 +110,17 @@ public class WIFIReceiver extends BroadcastReceiver {
 		if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 			_logger.Debug("We are in the homenetwork!");
 			if (_androidSystemService.IsServiceRunning(MainService.class)) {
-				_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-						new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
-						new Object[] { MainServiceAction.DOWNLOAD_ALL });
+				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+						new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.DOWNLOAD_ALL });
 			} else {
 				Intent startMainService = new Intent(_context, MainService.class);
 				Bundle mainServiceBundle = new Bundle();
-				mainServiceBundle.putSerializable(Constants.BUNDLE_MAIN_SERVICE_ACTION, MainServiceAction.BOOT);
+				mainServiceBundle.putSerializable(Bundles.MAIN_SERVICE_ACTION, MainServiceAction.BOOT);
 				startMainService.putExtras(mainServiceBundle);
 				_context.startService(startMainService);
 			}
 			_serviceController.SendMessageToWear(WIFI + "HOME");
+			checkDatabase();
 		} else {
 			_logger.Warn("We are NOT in the homenetwork!");
 
@@ -120,6 +132,21 @@ public class WIFIReceiver extends BroadcastReceiver {
 				Handler checkConnectionHandler = new Handler();
 				checkConnectionHandler.postDelayed(_checkConnectionRunnable, CHECK_CONNETION_TIMEOUT);
 			}
+		}
+	}
+
+	private void checkDatabase() {
+		_logger.Debug("checkDatabase");
+		SerializableList<ActionDto> storedActions = _databaseController.GetActions();
+		if (storedActions.getSize() > 0) {
+			for (int index = 0; index < storedActions.getSize(); index++) {
+				ActionDto entry = storedActions.getValue(index);
+				_serviceController.StartRestService(entry.GetSocket(), entry.GetCommandSet(),
+						entry.GetNotificationBroadcast(), LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+				_databaseController.DeleteAction(entry);
+			}
+		} else {
+			_logger.Debug("No actions stored!");
 		}
 	}
 }

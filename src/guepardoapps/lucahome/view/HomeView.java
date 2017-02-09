@@ -8,8 +8,8 @@ import android.view.KeyEvent;
 import android.view.View;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.constants.Color;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.controller.HomeViewBottomBarController;
 import guepardoapps.lucahome.view.controller.HomeViewListButtonController;

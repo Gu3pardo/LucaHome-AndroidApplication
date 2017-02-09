@@ -20,23 +20,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
 import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.Sound;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.IDs;
+import guepardoapps.lucahome.common.constants.ServerActions;
+import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.converter.json.JsonDataToSocketConverter;
 import guepardoapps.lucahome.common.converter.json.JsonDataToSoundConverter;
+import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.RaspberrySelection;
-import guepardoapps.lucahome.customadapter.SoundListAdapter;
-import guepardoapps.lucahome.dto.WirelessSocketDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.viewcontroller.SoundController;
-
+import guepardoapps.lucahome.view.controller.SoundController;
+import guepardoapps.lucahome.view.customadapter.SoundListAdapter;
 import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
 
@@ -90,9 +92,9 @@ public class SoundView extends Activity {
 
 			if (_isPlaying) {
 				_receiverController.RegisterReceiver(_currentPlayingSoundReceiver,
-						new String[] { Constants.BROADCAST_PLAYING_FILE });
-				_serviceController.StartRestService(TAG, Constants.ACTION_GET_PLAYING_FILE,
-						Constants.BROADCAST_PLAYING_FILE, LucaObject.SOUND, _raspberrySelection);
+						new String[] { Broadcasts.PLAYING_FILE });
+				_serviceController.StartRestService(TAG, ServerActions.GET_PLAYING_FILE, Broadcasts.PLAYING_FILE,
+						LucaObject.SOUND, _raspberrySelection);
 			} else {
 				_informationText.setText("-/-");
 				startDownloadingSoundFiles();
@@ -135,7 +137,7 @@ public class SoundView extends Activity {
 
 				showList();
 
-				_serviceController.StartRestService(TAG, Constants.ACTION_GET_VOLUME, Constants.BROADCAST_GET_VOLUME,
+				_serviceController.StartRestService(TAG, ServerActions.GET_VOLUME, Broadcasts.GET_VOLUME,
 						LucaObject.SOUND, _raspberrySelection);
 			} else {
 				Toast.makeText(_context, "Failed to download sound list", Toast.LENGTH_LONG).show();
@@ -147,13 +149,13 @@ public class SoundView extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			RaspberrySelection newRaspberrySelection = (RaspberrySelection) intent
-					.getSerializableExtra(Constants.BUNDLE_RASPBERRY_SELECTION);
+					.getSerializableExtra(Bundles.RASPBERRY_SELECTION);
 			if (newRaspberrySelection != null) {
 				_raspberrySelection = newRaspberrySelection;
 				_activeSoundList = _soundLists.get(_raspberrySelection.GetInt() - 1);
 				_buttonSelectRaspberry.setText(String.valueOf(_raspberrySelection.GetInt()));
 
-				_serviceController.StartRestService(TAG, Constants.ACTION_GET_VOLUME, Constants.BROADCAST_GET_VOLUME,
+				_serviceController.StartRestService(TAG, ServerActions.GET_VOLUME, Broadcasts.GET_VOLUME,
 						LucaObject.SOUND, _raspberrySelection);
 
 				showList();
@@ -264,7 +266,7 @@ public class SoundView extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			RaspberrySelection raspberrySelection = (RaspberrySelection) intent
-					.getSerializableExtra(Constants.BUNDLE_RASPBERRY_SELECTION);
+					.getSerializableExtra(Bundles.RASPBERRY_SELECTION);
 
 			if (raspberrySelection != null) {
 				if (_wirelessSocketList != null) {
@@ -273,8 +275,7 @@ public class SoundView extends Activity {
 							if (_wirelessSocketList.getValue(index).GetArea().contains(raspberrySelection.GetArea())) {
 								_serviceController.StartRestService(TAG,
 										_wirelessSocketList.getValue(index).GetCommandSet(true),
-										Constants.BROADCAST_RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET,
-										RaspberrySelection.BOTH);
+										Broadcasts.RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
 							}
 						}
 					}
@@ -287,7 +288,7 @@ public class SoundView extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			RaspberrySelection raspberrySelection = (RaspberrySelection) intent
-					.getSerializableExtra(Constants.BUNDLE_RASPBERRY_SELECTION);
+					.getSerializableExtra(Bundles.RASPBERRY_SELECTION);
 
 			if (raspberrySelection != null) {
 				if (_wirelessSocketList != null) {
@@ -296,8 +297,7 @@ public class SoundView extends Activity {
 							if (_wirelessSocketList.getValue(index).GetArea().contains(raspberrySelection.GetArea())) {
 								_serviceController.StartRestService(TAG,
 										_wirelessSocketList.getValue(index).GetCommandSet(false),
-										Constants.BROADCAST_RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET,
-										RaspberrySelection.BOTH);
+										Broadcasts.RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
 							}
 						}
 					}
@@ -309,7 +309,7 @@ public class SoundView extends Activity {
 	private BroadcastReceiver _reloadReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Constants.BUNDLE_LUCA_OBJECT);
+			LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
 			if (lucaObject == null) {
 				_logger.Error("_downloadReceiver received data with null lucaobject!");
 				return;
@@ -318,10 +318,9 @@ public class SoundView extends Activity {
 			switch (lucaObject) {
 			case WIRELESS_SOCKET:
 				_receiverController.RegisterReceiver(_downloadReceiver,
-						new String[] { Constants.BROADCAST_DOWNLOAD_SOCKET_FINISHED });
-				_serviceController.StartRestService(Constants.SOCKET_DOWNLOAD, Constants.ACTION_GET_SOCKETS,
-						Constants.BROADCAST_DOWNLOAD_SOCKET_FINISHED, LucaObject.WIRELESS_SOCKET,
-						RaspberrySelection.BOTH);
+						new String[] { Broadcasts.DOWNLOAD_SOCKET_FINISHED });
+				_serviceController.StartRestService(Bundles.SOCKET_DOWNLOAD, ServerActions.GET_SOCKETS,
+						Broadcasts.DOWNLOAD_SOCKET_FINISHED, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
 				break;
 			default:
 				_logger.Debug("Nothing to do in _reloadReceiver for: " + lucaObject.toString());
@@ -335,7 +334,7 @@ public class SoundView extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			_receiverController.UnregisterReceiver(_downloadReceiver);
 
-			LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Constants.BUNDLE_LUCA_OBJECT);
+			LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
 			if (lucaObject == null) {
 				_logger.Error("_downloadReceiver received data with null lucaobject!");
 				return;
@@ -343,7 +342,7 @@ public class SoundView extends Activity {
 
 			switch (lucaObject) {
 			case WIRELESS_SOCKET:
-				String[] socketStringArray = intent.getStringArrayExtra(Constants.SOCKET_DOWNLOAD);
+				String[] socketStringArray = intent.getStringArrayExtra(Bundles.SOCKET_DOWNLOAD);
 				if (socketStringArray != null) {
 					_wirelessSocketList = JsonDataToSocketConverter.GetList(socketStringArray);
 					_serviceController.StartSocketNotificationService(IDs.NOTIFICATION_WEAR, _wirelessSocketList);
@@ -396,7 +395,7 @@ public class SoundView extends Activity {
 		_navigationService = new NavigationService(_context);
 		_receiverController = new ReceiverController(_context);
 		_serviceController = new ServiceController(_context);
-		_sharedPrefController = new SharedPrefController(_context, Constants.SHARED_PREF_NAME);
+		_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
 		_soundController = new SoundController(_context);
 
 		setContentView(R.layout.view_sound);
@@ -414,17 +413,15 @@ public class SoundView extends Activity {
 		_logger.Debug("onResume");
 
 		_receiverController.RegisterReceiver(_activateSoundSocketReceiver,
-				new String[] { Constants.BROADCAST_ACTIVATE_SOUND_SOCKET });
+				new String[] { Broadcasts.ACTIVATE_SOUND_SOCKET });
 		_receiverController.RegisterReceiver(_deactivateSoundSocketReceiver,
-				new String[] { Constants.BROADCAST_DEACTIVATE_SOUND_SOCKET });
-		_receiverController.RegisterReceiver(_isPlayingReceiver, new String[] { Constants.BROADCAST_IS_SOUND_PLAYING });
-		_receiverController.RegisterReceiver(_raspberryChangedReceiver,
-				new String[] { Constants.BROADCAST_SET_RASPBERRY });
-		_receiverController.RegisterReceiver(_reloadReceiver, new String[] { Constants.BROADCAST_RELOAD_SOCKETS });
-		_receiverController.RegisterReceiver(_startPlayingReceiver, new String[] { Constants.BROADCAST_START_SOUND });
-		_receiverController.RegisterReceiver(_stopPlayingReceiver, new String[] { Constants.BROADCAST_STOP_SOUND });
-		_receiverController.RegisterReceiver(_volumeDownloadedReceiver,
-				new String[] { Constants.BROADCAST_GET_VOLUME });
+				new String[] { Broadcasts.DEACTIVATE_SOUND_SOCKET });
+		_receiverController.RegisterReceiver(_isPlayingReceiver, new String[] { Broadcasts.IS_SOUND_PLAYING });
+		_receiverController.RegisterReceiver(_raspberryChangedReceiver, new String[] { Broadcasts.SET_RASPBERRY });
+		_receiverController.RegisterReceiver(_reloadReceiver, new String[] { Broadcasts.RELOAD_SOCKETS });
+		_receiverController.RegisterReceiver(_startPlayingReceiver, new String[] { Broadcasts.START_SOUND });
+		_receiverController.RegisterReceiver(_stopPlayingReceiver, new String[] { Broadcasts.STOP_SOUND });
+		_receiverController.RegisterReceiver(_volumeDownloadedReceiver, new String[] { Broadcasts.GET_VOLUME });
 	}
 
 	@Override
@@ -455,8 +452,8 @@ public class SoundView extends Activity {
 	}
 
 	private void loadValues() {
-		_raspberrySelection = RaspberrySelection.GetById(
-				_sharedPrefController.LoadIntegerValueFromSharedPreferences(Constants.SOUND_RASPBERRY_SELECTION));
+		_raspberrySelection = RaspberrySelection.GetById(_sharedPrefController
+				.LoadIntegerValueFromSharedPreferences(SharedPrefConstants.SOUND_RASPBERRY_SELECTION));
 		_soundController.CheckPlaying(_raspberrySelection);
 	}
 
@@ -541,9 +538,8 @@ public class SoundView extends Activity {
 	}
 
 	private void startDownloadingSoundFiles() {
-		_receiverController.RegisterReceiver(_soundsDownloadedReceiver,
-				new String[] { Constants.BROADCAST_GET_SOUNDS });
-		_serviceController.StartRestService(TAG, Constants.ACTION_GET_SOUNDS, Constants.BROADCAST_GET_SOUNDS,
-				LucaObject.SOUND, RaspberrySelection.BOTH);
+		_receiverController.RegisterReceiver(_soundsDownloadedReceiver, new String[] { Broadcasts.GET_SOUNDS });
+		_serviceController.StartRestService(TAG, ServerActions.GET_SOUNDS, Broadcasts.GET_SOUNDS, LucaObject.SOUND,
+				RaspberrySelection.BOTH);
 	}
 }

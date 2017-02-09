@@ -12,10 +12,13 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+
 import guepardoapps.mediamirror.common.dto.PlayedYoutubeVideoDto;
 import guepardoapps.mediamirror.common.enums.ServerAction;
+
 import guepardoapps.toolset.controller.BroadcastController;
 
 public class ClientTask extends AsyncTask<Void, Void, Void> {
@@ -132,8 +135,8 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 					case DECREASE_VOLUME:
 					case GET_CURRENT_VOLUME:
 						String currentVolume = responseData[responseData.length - 1];
-						_broadcastController.SendStringBroadcast(Constants.BROADCAST_MEDIAMIRROR_VOLUME,
-								Constants.BUNDLE_CURRENT_RECEIVED_VOLUME, currentVolume);
+						_broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_VOLUME,
+								Bundles.CURRENT_RECEIVED_VOLUME, currentVolume);
 						break;
 					case GET_SAVED_YOUTUBE_IDS:
 						String playedYoutubeData = responseData[responseData.length - 1];
@@ -152,8 +155,8 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 							}
 						}
 
-						_broadcastController.SendSerializableBroadcast(Constants.BROADCAST_PLAYED_YOUTUBE_VIDEOS,
-								Constants.BUNDLE_PLAYED_YOUTUBE_VIDEOS, playedYoutubeVideos);
+						_broadcastController.SendSerializableBroadcast(Broadcasts.PLAYED_YOUTUBE_VIDEOS,
+								Bundles.PLAYED_YOUTUBE_VIDEOS, playedYoutubeVideos);
 						break;
 					default:
 						break;

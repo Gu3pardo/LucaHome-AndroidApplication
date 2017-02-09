@@ -21,11 +21,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.viewcontroller.MediaMirrorController;
+import guepardoapps.lucahome.view.controller.MediaMirrorController;
 import guepardoapps.mediamirror.common.dto.PlayedYoutubeVideoDto;
 import guepardoapps.mediamirror.common.enums.*;
 
@@ -105,7 +106,7 @@ public class MediaMirrorView extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_volumeReceiver onReceive");
 
-			String currentVolume = intent.getStringExtra(Constants.BUNDLE_CURRENT_RECEIVED_VOLUME);
+			String currentVolume = intent.getStringExtra(Bundles.CURRENT_RECEIVED_VOLUME);
 			if (currentVolume != null) {
 				_logger.Debug("currentVolume: " + currentVolume);
 				_currentVolumeTextView.setText("Vol.:" + currentVolume);
@@ -120,7 +121,7 @@ public class MediaMirrorView extends Activity {
 			_logger.Debug("_playedYoutubeIdsReceiver onReceive");
 
 			_playedYoutubeIds = (ArrayList<PlayedYoutubeVideoDto>) intent
-					.getSerializableExtra(Constants.BUNDLE_PLAYED_YOUTUBE_VIDEOS);
+					.getSerializableExtra(Bundles.PLAYED_YOUTUBE_VIDEOS);
 			if (_playedYoutubeIds != null) {
 				ArrayList<String> youtubeIds = new ArrayList<String>();
 				for (PlayedYoutubeVideoDto entry : _playedYoutubeIds) {
@@ -493,9 +494,8 @@ public class MediaMirrorView extends Activity {
 		}
 		if (!_isInitialized) {
 			_receiverController.RegisterReceiver(_playedYoutubeIdsReceiver,
-					new String[] { Constants.BROADCAST_PLAYED_YOUTUBE_VIDEOS });
-			_receiverController.RegisterReceiver(_volumeReceiver,
-					new String[] { Constants.BROADCAST_MEDIAMIRROR_VOLUME });
+					new String[] { Broadcasts.PLAYED_YOUTUBE_VIDEOS });
+			_receiverController.RegisterReceiver(_volumeReceiver, new String[] { Broadcasts.MEDIAMIRROR_VOLUME });
 			_isInitialized = true;
 		}
 	}

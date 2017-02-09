@@ -2,11 +2,11 @@ package guepardoapps.lucahome.common.converter.json;
 
 import java.util.ArrayList;
 
-import guepardoapps.lucahome.common.LucaHomeLogger;
-import guepardoapps.lucahome.common.Tools;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.dto.MapContentDto;
 import guepardoapps.lucahome.common.enums.DrawingType;
-import guepardoapps.lucahome.dto.MapContentDto;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.common.tools.StringHelper;
 
 public final class JsonDataToMapContentConverter {
 
@@ -16,17 +16,17 @@ public final class JsonDataToMapContentConverter {
 	private static String _searchParameter = "{mapcontent";
 
 	public static SerializableList<MapContentDto> GetList(String[] stringArray) {
-		if (Tools.StringsAreEqual(stringArray)) {
+		if (StringHelper.StringsAreEqual(stringArray)) {
 			return ParseStringToList(stringArray[0]);
 		} else {
-			String usedEntry = Tools.SelectString(stringArray, _searchParameter);
+			String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
 			return ParseStringToList(usedEntry);
 		}
 	}
 
 	public static MapContentDto Get(String value) {
 		if (!value.contains("Error")) {
-			if (Tools.GetStringCount(value, _searchParameter) == 1) {
+			if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
 				if (value.contains(_searchParameter)) {
 					value = value.replace(_searchParameter, "").replace("};};", "");
 					String[] data = value.split("\\};");
@@ -48,7 +48,7 @@ public final class JsonDataToMapContentConverter {
 
 	private static SerializableList<MapContentDto> ParseStringToList(String value) {
 		if (!value.contains("Error")) {
-			if (Tools.GetStringCount(value, _searchParameter) > 1) {
+			if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
 				if (value.contains(_searchParameter)) {
 					SerializableList<MapContentDto> list = new SerializableList<MapContentDto>();
 

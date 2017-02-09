@@ -8,11 +8,13 @@ import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.MainService;
 
 import guepardoapps.toolset.controller.DialogController;
@@ -86,13 +88,12 @@ public class BootReceiver extends BroadcastReceiver {
 		if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 			_logger.Debug("We are in the homenetwork!");
 			if (_androidSystemService.IsServiceRunning(MainService.class)) {
-				_broadcastController.SendSerializableArrayBroadcast(Constants.BROADCAST_MAIN_SERVICE_COMMAND,
-						new String[] { Constants.BUNDLE_MAIN_SERVICE_ACTION },
-						new Object[] { MainServiceAction.DOWNLOAD_ALL });
+				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+						new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.DOWNLOAD_ALL });
 			} else {
 				Intent startMainService = new Intent(_context, MainService.class);
 				Bundle mainServiceBundle = new Bundle();
-				mainServiceBundle.putSerializable(Constants.BUNDLE_MAIN_SERVICE_ACTION, MainServiceAction.BOOT);
+				mainServiceBundle.putSerializable(Bundles.MAIN_SERVICE_ACTION, MainServiceAction.BOOT);
 				startMainService.putExtras(mainServiceBundle);
 				_context.startService(startMainService);
 			}

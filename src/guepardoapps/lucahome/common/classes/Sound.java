@@ -2,11 +2,11 @@ package guepardoapps.lucahome.common.classes;
 
 import java.io.Serializable;
 
-import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.ServerActions;
 
 public class Sound implements Serializable {
 
-	private static final long serialVersionUID = 2488436194258046774L;
+	private static final long serialVersionUID = -7308774152731079183L;
 
 	private String _fileName;
 	private boolean _isPlaying;
@@ -29,7 +29,7 @@ public class Sound implements Serializable {
 	}
 
 	public String GetCommandStart() {
-		return Constants.ACTION_PLAY_SOUND + _fileName;
+		return ServerActions.PLAY_SOUND + _fileName;
 	}
 
 	public String toString() {

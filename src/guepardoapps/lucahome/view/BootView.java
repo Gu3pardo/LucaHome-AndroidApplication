@@ -11,18 +11,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.LucaHomeLogger;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.Command;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.enums.NavigateData;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.ControlMainServiceState;
 import guepardoapps.lucahome.services.MainService;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.wearcontrol.services.PhoneMessageListenerService;
-
+import guepardoapps.lucahome.services.wearcontrol.PhoneMessageListenerService;
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -53,7 +54,7 @@ public class BootView extends Activity {
 
 			Intent startMainService = new Intent(_context, MainService.class);
 			Bundle mainServiceBundle = new Bundle();
-			mainServiceBundle.putSerializable(Constants.BUNDLE_MAIN_SERVICE_ACTION, MainServiceAction.BOOT);
+			mainServiceBundle.putSerializable(Bundles.MAIN_SERVICE_ACTION, MainServiceAction.BOOT);
 			startMainService.putExtras(mainServiceBundle);
 			_context.startService(startMainService);
 
@@ -67,14 +68,13 @@ public class BootView extends Activity {
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_commandReceiver");
 
-			Command command = (Command) intent.getSerializableExtra(Constants.BUNDLE_COMMAND);
+			Command command = (Command) intent.getSerializableExtra(Bundles.COMMAND);
 			if (command != null) {
 				_logger.Debug("Command: " + command.toString());
 
 				switch (command) {
 				case NAVIGATE:
-					NavigateData navigateData = (NavigateData) intent
-							.getSerializableExtra(Constants.BUNDLE_NAVIGATE_DATA);
+					NavigateData navigateData = (NavigateData) intent.getSerializableExtra(Bundles.NAVIGATE_DATA);
 
 					if (navigateData != null) {
 						switch (navigateData) {
@@ -110,7 +110,7 @@ public class BootView extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_updateProgressBarReceiver");
-			int progress = intent.getIntExtra(Constants.BUNDLE_VIEW_PROGRESS, -1);
+			int progress = intent.getIntExtra(Bundles.VIEW_PROGRESS, -1);
 			_logger.Debug("Progress is: " + String.valueOf(progress));
 
 			_percentProgressBar.setProgress((int) (progress * _progressBarMax / _progressBarSteps));
@@ -141,20 +141,19 @@ public class BootView extends Activity {
 		_networkController = new NetworkController(_context, _dialogService);
 		_receiverController = new ReceiverController(_context);
 
-		if (!_networkController.IsNetworkAvailable()) {
+		if (_networkController.IsNetworkAvailable()) {
+			if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+				_startDownloadRunnable.run();
+			} else {
+				_logger.Warn("No LucaHome network! ...");
+				Toast.makeText(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
+				_navigationService.NavigateTo(HomeView.class, null, true);
+			}
+		} else {
 			_logger.Warn("No network available!");
-			finish();
-			return;
+			Toast.makeText(_context, "No network available!", Toast.LENGTH_LONG).show();
+			_navigationService.NavigateTo(HomeView.class, null, true);
 		}
-
-		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-			_logger.Warn("No LucaHome network! ...");
-			Toast.makeText(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
-			finish();
-			return;
-		}
-
-		_startDownloadRunnable.run();
 	}
 
 	@Override
@@ -163,9 +162,9 @@ public class BootView extends Activity {
 		_logger.Debug("onResume");
 
 		if (!_isInitialized) {
-			_receiverController.RegisterReceiver(_commandReceiver, new String[] { Constants.BROADCAST_COMMAND });
+			_receiverController.RegisterReceiver(_commandReceiver, new String[] { Broadcasts.COMMAND });
 			_receiverController.RegisterReceiver(_updateProgressBarReceiver,
-					new String[] { Constants.BROADCAST_UPDATE_PROGRESSBAR });
+					new String[] { Broadcasts.UPDATE_PROGRESSBAR });
 			_isInitialized = true;
 		}
 	}
