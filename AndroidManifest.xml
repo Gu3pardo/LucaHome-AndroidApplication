@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="guepardoapps.lucahome"
-    android:versionCode="1916170209"
-    android:versionName="1.9.16.170209" >
+    android:versionCode="10917"
+    android:versionName="1.9.17.170213" >
 
     <uses-sdk
         android:minSdkVersion="21"
@@ -75,6 +75,13 @@
             </intent-filter>
         </receiver>
         <receiver
+            android:name="guepardoapps.lucahome.receiver.TimeChangedReceiver"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_TICK" />
+            </intent-filter>
+        </receiver>
+        <receiver
             android:name="guepardoapps.lucahome.receiver.WIFIReceiver"
             android:exported="false" >
             <intent-filter>
@@ -82,16 +89,20 @@
                 <!--
                 <action android:name="android.net.wifi.WIFI_STATE_CHANGE" />
                 <action android:name="android.net.wifi.STATE_CHANGE" />
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
                 -->
             </intent-filter>
         </receiver>
         <receiver
-            android:name="guepardoapps.lucahome.receiver.sockets.SocketActionReceiver"
+            android:name="guepardoapps.lucahome.receiver.notifications.HeatingReceiver"
             android:exported="false" >
         </receiver>
         <receiver
-            android:name="guepardoapps.lucahome.receiver.sound.StopSoundReceiver"
+            android:name="guepardoapps.lucahome.receiver.notifications.SocketActionReceiver"
+            android:exported="false" >
+        </receiver>
+        <receiver
+            android:name="guepardoapps.lucahome.receiver.notifications.StopSoundReceiver"
             android:exported="false" >
         </receiver>
 

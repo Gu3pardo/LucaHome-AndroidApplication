@@ -10,7 +10,7 @@ import android.support.v4.app.NotificationCompat;
 
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.lucahome.receiver.sockets.SocketActionReceiver;
+import guepardoapps.lucahome.receiver.notifications.SocketActionReceiver;
 
 public class NotificationDetails implements Serializable {
 

@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.receiver.sound;
+package guepardoapps.lucahome.receiver.notifications;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

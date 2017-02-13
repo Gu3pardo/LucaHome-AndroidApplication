@@ -36,11 +36,11 @@ public class MediaMirrorController {
 
 	public static final List<String> SERVER_IPS = Arrays.asList("192.168.178.147", "192.168.178.20");
 	public static final List<String> PLAYER = Arrays.asList("1", "2");
+	public static final int SLEEP_MEDIA_SERVER_INDEX = 1;
+	public static final int SERVERPORT = 8080;
 
 	private static final String TAG = MediaMirrorController.class.getName();
 	private LucaHomeLogger _logger;
-
-	private static final int SERVERPORT = 8080;
 
 	private static final String UP = "UP";
 	private static final String DOWN = "DOWN";

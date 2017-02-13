@@ -42,7 +42,9 @@ public enum MainServiceAction implements Serializable {
 	GET_HUMIDITY("Get_Humidity", 218),
 	SHOW_NOTIFICATION_SOCKET("Show_Notification_Socket", 300),
 	SHOW_NOTIFICATION_WEATHER("Show_Notification_Weather", 301),
-	SHOW_NOTIFICATION_TEMPERATURE("Show_Notification_Temperature", 302);
+	SHOW_NOTIFICATION_TEMPERATURE("Show_Notification_Temperature", 302),
+	ENABLE_HEATING("Enable_Heating", 400),
+	ENABLE_HEATING_AND_SOUND("Enable_Heating_And_Sound", 401);
 
 	private String _string;
 	private int _int;

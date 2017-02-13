@@ -26,8 +26,9 @@ import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.TemperatureType;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.receiver.sockets.SocketActionReceiver;
-import guepardoapps.lucahome.receiver.sound.StopSoundReceiver;
+import guepardoapps.lucahome.receiver.notifications.HeatingReceiver;
+import guepardoapps.lucahome.receiver.notifications.SocketActionReceiver;
+import guepardoapps.lucahome.receiver.notifications.StopSoundReceiver;
 import guepardoapps.lucahome.view.BirthdayView;
 import guepardoapps.lucahome.view.SensorTemperatureView;
 import guepardoapps.lucahome.view.controller.SocketController;
@@ -38,6 +39,12 @@ public class NotificationService extends Service {
 
 	private static final String TAG = NotificationService.class.getName();
 	private LucaHomeLogger _logger;
+
+	public static final String SOCKET_ALL = "All_Sockets";
+	public static final String SOCKET_SINGLE = "Single_Sockets";
+
+	public static final String HEATING_AND_SOUND = "Heating_And_Sound";
+	public static final String HEATING_SINGLE = "Single_Heating";
 
 	private SharedPrefController _sharedPrefController;
 	private SocketController _socketController;
@@ -83,6 +90,9 @@ public class NotificationService extends Service {
 			int forecastIcon = data.getInt(Bundles.NOTIFICATION_ICON);
 			CreateForecastWeatherNotification(forecastIcon, forecastTitle, forecastBody, id);
 			break;
+		case GO_TO_BED:
+			CreateSleepHeatingNotification();
+			break;
 		default:
 			_logger.Warn(lucaObject.toString() + " is not supported!");
 			break;
@@ -124,7 +134,7 @@ public class NotificationService extends Service {
 		NotificationCompat.Action wearAction = new NotificationCompat.Action.Builder(R.drawable.sound_on, "Stop",
 				stopSoundPendingIntent).build();
 
-		RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_playsound);
+		RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_play_sound);
 		remoteViews.setTextViewText(R.id.notification_playsound_title, soundFile);
 		remoteViews.setOnClickPendingIntent(R.id.notification_playsound_stop, stopSoundPendingIntent);
 
@@ -232,7 +242,7 @@ public class NotificationService extends Service {
 			socketIntents[index] = new Intent(this, SocketActionReceiver.class);
 
 			socketIntentDatas[index] = new Bundle();
-			socketIntentDatas[index].putString(Bundles.ACTION, "SINGLE_SOCKET");
+			socketIntentDatas[index].putString(Bundles.ACTION, SOCKET_SINGLE);
 			socketIntentDatas[index].putSerializable(Bundles.SOCKET_DATA, wirelessSocketList.getValue(index));
 			socketIntents[index].putExtras(socketIntentDatas[index]);
 
@@ -282,7 +292,7 @@ public class NotificationService extends Service {
 
 		Intent allSocketsIntent = new Intent(this, SocketActionReceiver.class);
 		Bundle allSocketsData = new Bundle();
-		allSocketsData.putString(Bundles.ACTION, "ALL_SOCKETS");
+		allSocketsData.putString(Bundles.ACTION, SOCKET_ALL);
 		allSocketsIntent.putExtras(allSocketsData);
 		PendingIntent allSocketsPendingIntent;
 		allSocketsPendingIntent = PendingIntent.getBroadcast(this, 30, allSocketsIntent,
@@ -308,5 +318,47 @@ public class NotificationService extends Service {
 		builder.setSmallIcon(icon).setContentTitle(title).setContentText(body).setTicker(body);
 		Notification notification = builder.build();
 		notificationManager.notify(id, notification);
+	}
+
+	@SuppressWarnings("deprecation")
+	private void CreateSleepHeatingNotification() {
+		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.heating);
+		NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender()
+				.setHintHideIcon(true).setBackground(bitmap);
+		RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.notification_sleep);
+
+		// Action for button enable heating only
+		Intent enableHeatingIntent = new Intent(this, HeatingReceiver.class);
+		Bundle enableHeatingBundle = new Bundle();
+		enableHeatingBundle.putString(Bundles.ACTION, HEATING_SINGLE);
+		enableHeatingIntent.putExtras(enableHeatingBundle);
+		PendingIntent enableHeatingPendingIntent = PendingIntent.getBroadcast(this, 34154338, enableHeatingIntent,
+				PendingIntent.FLAG_UPDATE_CURRENT);
+		NotificationCompat.Action enableHeatingWearAction = new NotificationCompat.Action.Builder(
+				R.drawable.compose_icon_socket, "Enable Heating", enableHeatingPendingIntent).build();
+		remoteViews.setOnClickPendingIntent(R.id.enableHeatingOnly, enableHeatingPendingIntent);
+
+		// Action for button enable heating and sound
+		Intent enableHeatingAndSoundIntent = new Intent(this, HeatingReceiver.class);
+		Bundle enableHeatingAndSoundBundle = new Bundle();
+		enableHeatingAndSoundBundle.putString(Bundles.ACTION, HEATING_AND_SOUND);
+		enableHeatingAndSoundIntent.putExtras(enableHeatingAndSoundBundle);
+		PendingIntent enableHeatingAndSoundPendingIntent = PendingIntent.getBroadcast(this, 34154235,
+				enableHeatingAndSoundIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		NotificationCompat.Action enableHeatingAndSoundWearAction = new NotificationCompat.Action.Builder(
+				R.drawable.compose_icon_socket, "Heating And Sound", enableHeatingAndSoundPendingIntent).build();
+		remoteViews.setOnClickPendingIntent(R.id.enableHeatingAndSound, enableHeatingAndSoundPendingIntent);
+
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+		builder.setSmallIcon(R.drawable.heating).setContentTitle("Relax in the bed!")
+				.setContentText("Enjoying a warm bed!").setTicker("").extend(wearableExtender)
+				.addAction(enableHeatingWearAction).addAction(enableHeatingAndSoundWearAction);
+
+		Notification notification = builder.build();
+		notification.contentView = remoteViews;
+		notification.bigContentView = remoteViews;
+
+		NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+		notificationManager.notify(IDs.NOTIFICATION_SLEEP, notification);
 	}
 }

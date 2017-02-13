@@ -30,6 +30,10 @@ import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
 import guepardoapps.lucahome.common.enums.*;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
+import guepardoapps.lucahome.services.sockets.SocketActionService;
+import guepardoapps.lucahome.view.controller.MediaMirrorController;
+import guepardoapps.mediamirror.client.ClientTask;
+import guepardoapps.mediamirror.common.enums.ServerAction;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.controller.SharedPrefController;
@@ -317,6 +321,12 @@ public class MainService extends Service {
 						_context.startService(new Intent(_context, OpenWeatherService.class));
 					}
 					break;
+				case ENABLE_HEATING:
+					enableHeatingSocket(false);
+					break;
+				case ENABLE_HEATING_AND_SOUND:
+					enableHeatingSocket(true);
+					break;
 				default:
 					_logger.Warn("action is not supported! " + action.toString());
 					break;
@@ -324,6 +334,79 @@ public class MainService extends Service {
 			} else {
 				_logger.Warn("action is null!");
 			}
+		}
+
+		private void enableHeatingSocket(boolean enableSound) {
+			_logger.Debug("enableHeatingSocket");
+			if (_wirelessSocketList == null) {
+				_logger.Warn("Socketlist is null!");
+				return;
+			}
+
+			for (int socketIndex = 0; socketIndex < _wirelessSocketList.getSize(); socketIndex++) {
+				if (_wirelessSocketList.getValue(socketIndex).GetName().contains("Heating")) {
+					Intent serviceIntent = new Intent(_context, SocketActionService.class);
+
+					Bundle serviceData = new Bundle();
+					serviceData.putSerializable(Bundles.SOCKET_DATA, _wirelessSocketList.getValue(socketIndex));
+					serviceIntent.putExtras(serviceData);
+
+					_context.startService(serviceIntent);
+
+					createDeactivatingSchedule(_wirelessSocketList.getValue(socketIndex).GetName(), enableSound);
+
+					return;
+				}
+			}
+
+			_logger.Warn("Found no socket for heating!");
+			Toast.makeText(_context, "Found no socket for heating!", Toast.LENGTH_LONG).show();
+		}
+
+		private void createDeactivatingSchedule(String socketName, boolean enableSound) {
+			_logger.Debug("createDeactivatingSchedule");
+
+			int timerMinute = _sharedPrefController
+					.LoadIntegerValueFromSharedPreferences(SharedPrefConstants.TIMER_MIN);
+			int timerHour = _sharedPrefController.LoadIntegerValueFromSharedPreferences(SharedPrefConstants.TIMER_HOUR);
+
+			Calendar currentTime = Calendar.getInstance();
+			int currentDay = currentTime.get(Calendar.DAY_OF_WEEK) - 1;
+
+			int scheduleMinute = currentTime.get(Calendar.MINUTE) + timerMinute;
+			int scheduleHour = currentTime.get(Calendar.HOUR_OF_DAY) + timerHour;
+
+			if (scheduleMinute > 59) {
+				scheduleMinute -= 60;
+				scheduleHour++;
+			}
+			if (scheduleHour > 23) {
+				scheduleHour -= 24;
+				currentDay++;
+			}
+			if (currentDay > 6) {
+				currentDay -= 7;
+			}
+
+			String addHeatingTimerAction = ServerActions.ADD_SCHEDULE + socketName + "_" + String.valueOf(scheduleHour)
+					+ "_" + String.valueOf(scheduleMinute) + "&socket=" + socketName + "&gpio=&weekday=" + currentDay
+					+ "&hour=" + scheduleHour + "&minute=" + scheduleMinute + "&onoff=0&deleteflag=1";
+
+			_serviceController.StartRestService("", addHeatingTimerAction, Broadcasts.RELOAD_TIMER, LucaObject.TIMER,
+					RaspberrySelection.BOTH);
+
+			if (enableSound) {
+				enableSoundSchedule(currentDay, scheduleHour, scheduleMinute);
+			}
+		}
+
+		private void enableSoundSchedule(int currentDay, int scheduleHour, int scheduleMinute) {
+			_logger.Debug("enableSoundSchedule");
+			ClientTask clientTask = new ClientTask(_context,
+					MediaMirrorController.SERVER_IPS.get(MediaMirrorController.SLEEP_MEDIA_SERVER_INDEX),
+					MediaMirrorController.SERVERPORT);
+			clientTask.SetCommunication(ServerAction.PLAY_SEA_SOUND.toString());
+			clientTask.execute();
 		}
 	};
 
