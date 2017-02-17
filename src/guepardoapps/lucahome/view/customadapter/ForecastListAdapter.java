@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+
 import guepardoapps.toolset.openweather.model.ForecastWeatherModel;
 
 public class ForecastListAdapter extends BaseAdapter {

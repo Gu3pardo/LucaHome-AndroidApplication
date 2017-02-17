@@ -37,6 +37,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.constants.Broadcasts;
@@ -56,6 +58,7 @@ import guepardoapps.lucahome.view.controller.SocketController;
 import guepardoapps.lucahome.view.controller.SoundController;
 import guepardoapps.lucahome.view.controller.TimerController;
 import guepardoapps.lucahome.view.customadapter.YoutubeVideoListAdapter;
+
 import guepardoapps.mediamirror.common.dto.YoutubeVideoDto;
 
 import guepardoapps.toolset.common.enums.Weekday;
@@ -139,7 +142,7 @@ public class DialogService extends DialogController {
 				if (_birthday != null) {
 					ShowAddBirthdayDialog(_birthday.GetId(), null, _birthday, false);
 				} else {
-					Toast.makeText(_context, "_birthday is null!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "_birthday is null!", Toast.LENGTH_LONG).show();
 					_logger.Warn("_birthday is null!");
 				}
 				break;
@@ -147,7 +150,7 @@ public class DialogService extends DialogController {
 				if (_movie != null) {
 					ShowAddMovieDialog(null, _movie, false);
 				} else {
-					Toast.makeText(_context, "_movie is null!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "_movie is null!", Toast.LENGTH_LONG).show();
 					_logger.Warn("_movie is null!");
 				}
 				break;
@@ -155,7 +158,7 @@ public class DialogService extends DialogController {
 				if (_socket != null) {
 					ShowAddSocketDialog(null, _socket, false);
 				} else {
-					Toast.makeText(_context, "_socket is null!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "_socket is null!", Toast.LENGTH_LONG).show();
 					_logger.Warn("_socket is null!");
 				}
 				break;
@@ -164,11 +167,11 @@ public class DialogService extends DialogController {
 					if (_socketList != null) {
 						ShowAddScheduleDialog(null, _socketList, _schedule, false);
 					} else {
-						Toast.makeText(_context, "_socketList is null!", Toast.LENGTH_LONG).show();
+						Toasty.error(_context, "_socketList is null!", Toast.LENGTH_LONG).show();
 						_logger.Warn("_socketList is null!");
 					}
 				} else {
-					Toast.makeText(_context, "_schedule is null!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "_schedule is null!", Toast.LENGTH_LONG).show();
 					_logger.Warn("_schedule is null!");
 				}
 				break;
@@ -177,11 +180,11 @@ public class DialogService extends DialogController {
 					if (_socketList != null) {
 						ShowAddTimerDialog(null, _socketList, _timer, false);
 					} else {
-						Toast.makeText(_context, "_socketList is null!", Toast.LENGTH_LONG).show();
+						Toasty.error(_context, "_socketList is null!", Toast.LENGTH_LONG).show();
 						_logger.Warn("_socketList is null!");
 					}
 				} else {
-					Toast.makeText(_context, "_timer is null!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "_timer is null!", Toast.LENGTH_LONG).show();
 					_logger.Warn("_timer is null!");
 				}
 				break;
@@ -447,7 +450,7 @@ public class DialogService extends DialogController {
 				resetValues();
 
 				// ShowUserCredentialsDialog(user, updateUserRunnable, true);
-				Toast.makeText(_context, "Not yet implemented!", Toast.LENGTH_SHORT).show();
+				Toasty.error(_context, "Not yet implemented!", Toast.LENGTH_SHORT).show();
 				_logger.Warn("Update user not yet implemented!");
 			}
 		});
@@ -483,7 +486,7 @@ public class DialogService extends DialogController {
 			public void onClick(View v) {
 				String name = birthdayNameEdit.getText().toString();
 				if (name.length() < 3) {
-					Toast.makeText(_context, "Name too short!", Toast.LENGTH_LONG).show();
+					Toasty.warning(_context, "Name too short!", Toast.LENGTH_LONG).show();
 					return;
 				}
 
@@ -540,7 +543,7 @@ public class DialogService extends DialogController {
 			public void onClick(View v) {
 				String title = movieTitleEdit.getText().toString();
 				if (title.length() < 3) {
-					Toast.makeText(_context, "Title too short!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Title too short!", Toast.LENGTH_LONG).show();
 					return;
 				}
 
@@ -591,17 +594,17 @@ public class DialogService extends DialogController {
 			public void onClick(View v) {
 				String name = socketNameEdit.getText().toString();
 				if (name.length() < 3) {
-					Toast.makeText(_context, "Name too short!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Name too short!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				String area = socketAreaEdit.getText().toString();
 				if (area.length() < 3) {
-					Toast.makeText(_context, "Area too short!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Area too short!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				String code = socketCodeEdit.getText().toString();
 				if (!_socketController.ValidateSocketCode(code)) {
-					Toast.makeText(_context, "Code invalid!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Code invalid!", Toast.LENGTH_LONG).show();
 					return;
 				}
 
@@ -772,23 +775,23 @@ public class DialogService extends DialogController {
 			public void onClick(View v) {
 				_scheduleName = scheduleNameEdit.getText().toString();
 				if (_scheduleName.length() < 3) {
-					Toast.makeText(_context, "Name too short!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Name too short!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				if (_scheduleSocketString == null || _scheduleSocketString == "") {
-					Toast.makeText(_context, "Please select a socket!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select a socket!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				if (_scheduleWeekdayString == null || _scheduleWeekdayString == "") {
-					Toast.makeText(_context, "Please select a weekday!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select a weekday!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				if (_scheduleActionString == null || _scheduleActionString == "") {
-					Toast.makeText(_context, "Please select an action!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select an action!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				if (_schedulePlayRaspberry == null || _schedulePlayRaspberry == RaspberrySelection.DUMMY) {
-					Toast.makeText(_context, "Please select a valid raspberry!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select a valid raspberry!", Toast.LENGTH_LONG).show();
 					return;
 				}
 
@@ -800,13 +803,13 @@ public class DialogService extends DialogController {
 					}
 				}
 				if (socket == null) {
-					Toast.makeText(_context, "Please select a valid socket!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select a valid socket!", Toast.LENGTH_LONG).show();
 					return;
 				}
 
 				Weekday weekday = Weekday.GetByEnglishString(_scheduleWeekdayString);
 				if (weekday == Weekday.NULL || weekday == null) {
-					Toast.makeText(_context, "Please select a valid weekday!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select a valid weekday!", Toast.LENGTH_LONG).show();
 					return;
 				}
 
@@ -945,15 +948,15 @@ public class DialogService extends DialogController {
 			public void onClick(View v) {
 				_timerName = timerNameEdit.getText().toString();
 				if (_timerName.length() < 3) {
-					Toast.makeText(_context, "Name too short!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Name too short!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				if (_timerSocketString == null || _timerSocketString == "") {
-					Toast.makeText(_context, "Please select a socket!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select a socket!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				if (_timerPlayRaspberry == null || _timerPlayRaspberry == RaspberrySelection.DUMMY) {
-					Toast.makeText(_context, "Please select a valid raspberry!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select a valid raspberry!", Toast.LENGTH_LONG).show();
 					return;
 				}
 
@@ -965,7 +968,7 @@ public class DialogService extends DialogController {
 					}
 				}
 				if (socket == null) {
-					Toast.makeText(_context, "Please select a valid socket!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Please select a valid socket!", Toast.LENGTH_LONG).show();
 					return;
 				}
 
@@ -1046,7 +1049,7 @@ public class DialogService extends DialogController {
 
 	public void ShowUpdateScheduleDialog(ScheduleDto value) {
 		if (!_socketListInitialized) {
-			Toast.makeText(_context, "SocketList not initialized!", Toast.LENGTH_SHORT).show();
+			Toasty.warning(_context, "SocketList not initialized!", Toast.LENGTH_SHORT).show();
 			_logger.Warn("SocketList not initialized!");
 			return;
 		}
@@ -1058,7 +1061,7 @@ public class DialogService extends DialogController {
 
 	public void ShowUpdateTimerDialog(TimerDto value) {
 		if (!_socketListInitialized) {
-			Toast.makeText(_context, "SocketList not initialized!", Toast.LENGTH_SHORT).show();
+			Toasty.warning(_context, "SocketList not initialized!", Toast.LENGTH_SHORT).show();
 			_logger.Warn("SocketList not initialized!");
 			return;
 		}

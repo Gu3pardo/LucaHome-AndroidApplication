@@ -1,12 +1,5 @@
 package guepardoapps.lucahome.view.customadapter;
 
-import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.classes.SerializableList;
-import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
-import guepardoapps.lucahome.common.enums.TemperatureType;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.DialogService;
-import guepardoapps.lucahome.view.controller.TemperatureController;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -16,6 +9,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
+import guepardoapps.lucahome.R;
+import guepardoapps.lucahome.common.classes.SerializableList;
+import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
+import guepardoapps.lucahome.common.enums.TemperatureType;
+import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.services.helper.DialogService;
+import guepardoapps.lucahome.view.controller.TemperatureController;
 
 public class TemperatureListAdapter extends BaseAdapter {
 

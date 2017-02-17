@@ -7,17 +7,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.widget.Toast;
+
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 
-public class ControlMainServiceState extends Service {
+public class ControlServiceStateService extends Service {
 
 	private static final int CHECK_TIMEOUT = 5 * 60 * 1000;
 
-	private static final String TAG = ControlMainServiceState.class.getName();
+	private static final String TAG = ControlServiceStateService.class.getName();
 	private LucaHomeLogger _logger;
 
 	private boolean _isInitialized;
-	private int _errorCount;
 
 	private Context _context;
 
@@ -27,19 +30,18 @@ public class ControlMainServiceState extends Service {
 		public void run() {
 			_logger.Debug("_checkMainService");
 
-			if (!isMainServiceRunning(MainService.class)) {
+			if (!isServiceRunning(MainService.class)) {
 				_logger.Warn("MainService not running! Restarting!");
-				_errorCount++;
-				_logger.Warn("_errorCount: " + String.valueOf(_errorCount));
-				if (_errorCount >= 5) {
-					// TODO: send warning mail to me!
-					_logger.Info("TODO: send warning mail to me!");
-				} else {
-					Intent serviceIntent = new Intent(_context, MainService.class);
-					startService(serviceIntent);
-				}
-			} else {
-				_errorCount = 0;
+				Toasty.warning(_context, "Restarting MainService!", Toast.LENGTH_LONG).show();
+				Intent serviceIntent = new Intent(_context, MainService.class);
+				startService(serviceIntent);
+			}
+
+			if (!isServiceRunning(ReceiverService.class)) {
+				_logger.Warn("ReceiverService not running! Restarting!");
+				Toasty.warning(_context, "Restarting ReceiverService!", Toast.LENGTH_LONG).show();
+				Intent serviceIntent = new Intent(_context, ReceiverService.class);
+				startService(serviceIntent);
 			}
 
 			_checkMainServiceHandler.postDelayed(_checkMainService, CHECK_TIMEOUT);
@@ -52,7 +54,6 @@ public class ControlMainServiceState extends Service {
 			_logger = new LucaHomeLogger(TAG);
 
 			_isInitialized = true;
-			_errorCount = 0;
 
 			_context = this;
 
@@ -70,7 +71,7 @@ public class ControlMainServiceState extends Service {
 		return null;
 	}
 
-	private boolean isMainServiceRunning(Class<?> serviceClass) {
+	private boolean isServiceRunning(Class<?> serviceClass) {
 		ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
 		for (RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
 			if (serviceClass.getName().equals(service.service.getClassName())) {

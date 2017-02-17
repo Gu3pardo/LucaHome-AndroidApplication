@@ -22,6 +22,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.constants.Broadcasts;
@@ -35,6 +37,7 @@ import guepardoapps.lucahome.common.enums.TemperatureType;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.customadapter.*;
+
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -263,7 +266,7 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 			_sensorManager.registerListener(this, _sensor, SensorManager.SENSOR_DELAY_NORMAL);
 			return true;
 		} else {
-			Toast.makeText(_context, "Sensor is not available", Toast.LENGTH_SHORT).show();
+			Toasty.warning(_context, "Sensor is not available", Toast.LENGTH_SHORT).show();
 			_logger.Debug("Sensor is not available");
 			return false;
 		}

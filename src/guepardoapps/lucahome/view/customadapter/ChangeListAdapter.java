@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.dto.ChangeDto;

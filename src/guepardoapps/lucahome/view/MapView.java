@@ -22,6 +22,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.constants.Broadcasts;
@@ -34,6 +36,7 @@ import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.controller.MapContentController;
+
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -131,7 +134,7 @@ public class MapView extends Activity {
 					// TODO create add raspberry dialog
 					// addView(newMapContent, clickPosition, true);
 					_logger.Warn("Reactivate addView while adding new raspberry via dialog!");
-					Toast.makeText(_context, "Reactivate addView while adding new raspberry via dialog!",
+					Toasty.info(_context, "Reactivate addView while adding new raspberry via dialog!",
 							Toast.LENGTH_SHORT).show();
 
 					_addRaspberry = false;
@@ -148,8 +151,8 @@ public class MapView extends Activity {
 					// TODO create add arduino dialog
 					// addView(newMapContent, clickPosition, true);
 					_logger.Warn("Reactivate addView while adding new arduino via dialog!");
-					Toast.makeText(_context, "Reactivate addView while adding new arduino via dialog!",
-							Toast.LENGTH_SHORT).show();
+					Toasty.info(_context, "Reactivate addView while adding new arduino via dialog!", Toast.LENGTH_SHORT)
+							.show();
 
 					_addArduino = false;
 					_buttonAddArduino.setBackgroundResource(R.drawable.add_round);
@@ -165,8 +168,8 @@ public class MapView extends Activity {
 					// TODO create add socket dialog
 					// addView(newMapContent, clickPosition, true);
 					_logger.Warn("Reactivate addView while adding new socket via dialog!");
-					Toast.makeText(_context, "Reactivate addView while adding new socket via dialog!",
-							Toast.LENGTH_SHORT).show();
+					Toasty.info(_context, "Reactivate addView while adding new socket via dialog!", Toast.LENGTH_SHORT)
+							.show();
 
 					_addSocket = false;
 					_buttonAddSocket.setBackgroundResource(R.drawable.add_round);
@@ -386,7 +389,7 @@ public class MapView extends Activity {
 						// TODO implement delete socket
 
 						_logger.Warn("Reactivate delete!");
-						Toast.makeText(_context, "Reactivate delete!", Toast.LENGTH_SHORT).show();
+						Toasty.info(_context, "Reactivate delete!", Toast.LENGTH_SHORT).show();
 
 						_dialogService.CloseDialogCallback.run();
 					}
@@ -402,11 +405,11 @@ public class MapView extends Activity {
 
 				switch (newMapContent.GetDrawingType()) {
 				case RASPBERRY:
-					Toast.makeText(_context, "Here is a raspberry!", Toast.LENGTH_SHORT).show();
+					Toasty.info(_context, "Here is a raspberry!", Toast.LENGTH_SHORT).show();
 					// TODO show details
 					break;
 				case ARDUINO:
-					Toast.makeText(_context, "Here is an arduino!", Toast.LENGTH_SHORT).show();
+					Toasty.info(_context, "Here is an arduino!", Toast.LENGTH_SHORT).show();
 					// TODO show details
 					break;
 				case SOCKET:

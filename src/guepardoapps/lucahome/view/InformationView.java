@@ -22,6 +22,7 @@ import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.customadapter.*;
+
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -49,11 +50,11 @@ public class InformationView extends Activity {
 
 	private Runnable _getDataRunnable = new Runnable() {
 		public void run() {
-			_broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-					Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_INFORMATIONS);
+			_broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND, Bundles.MAIN_SERVICE_ACTION,
+					MainServiceAction.GET_INFORMATIONS);
 			_logger.Debug("Called for Informations!");
-			_broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-					Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_CHANGES);
+			_broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND, Bundles.MAIN_SERVICE_ACTION,
+					MainServiceAction.GET_CHANGES);
 			_logger.Debug("Called for Changes!");
 		}
 	};
@@ -128,8 +129,7 @@ public class InformationView extends Activity {
 		_logger.Debug("onResume");
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
-				_receiverController.RegisterReceiver(_updateChangeReceiver,
-						new String[] { Broadcasts.UPDATE_CHANGE });
+				_receiverController.RegisterReceiver(_updateChangeReceiver, new String[] { Broadcasts.UPDATE_CHANGE });
 				_receiverController.RegisterReceiver(_updateInformationReceiver,
 						new String[] { Broadcasts.UPDATE_INFORMATION });
 				_isInitialized = true;

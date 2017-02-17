@@ -8,11 +8,16 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.Toast;
+
+import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.*;
@@ -21,6 +26,7 @@ import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Color;
 import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
+import guepardoapps.lucahome.common.controller.DatabaseController;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
@@ -45,6 +51,7 @@ public class SettingsView extends Activity {
 	private Context _context;
 
 	private BroadcastController _broadcastController;
+	private DatabaseController _databaseController;
 	private NavigationService _navigationService;
 	private ReceiverController _receiverController;
 	private ServiceController _serviceController;
@@ -78,6 +85,7 @@ public class SettingsView extends Activity {
 		_context = this;
 
 		_broadcastController = new BroadcastController(_context);
+		_databaseController = DatabaseController.getInstance();
 		_navigationService = new NavigationService(_context);
 		_receiverController = new ReceiverController(_context);
 		_serviceController = new ServiceController(_context);
@@ -85,6 +93,7 @@ public class SettingsView extends Activity {
 
 		initializeSwitches();
 		initializeAppCheckboxes();
+		initializeButtons();
 		initializeSocketNotificationCheckboxes();
 	}
 
@@ -216,6 +225,17 @@ public class SettingsView extends Activity {
 		});
 	}
 
+	private void initializeButtons() {
+		Button deleteDatabase = (Button) findViewById(R.id.btnDeleteDatabaseEntries);
+		deleteDatabase.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				_databaseController.ClearDatabaseActions();
+				Toasty.info(_context, "Cleared actions!", Toast.LENGTH_LONG).show();
+			}
+		});
+	}
+
 	private void initializeSocketNotificationCheckboxes() {
 		if (!_sharedPrefController
 				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
@@ -237,6 +257,7 @@ public class SettingsView extends Activity {
 
 			CheckBox socketCheckbox = new CheckBox(getApplicationContext());
 			socketCheckbox.setText(socket.GetName());
+			socketCheckbox.setTextColor(0xffffffff);
 			socketCheckbox.setChecked(notificationVisibility);
 			socketCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 				@Override

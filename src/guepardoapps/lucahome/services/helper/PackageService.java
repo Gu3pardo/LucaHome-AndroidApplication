@@ -8,6 +8,9 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.widget.Toast;
+
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 
 public class PackageService implements Serializable {
@@ -71,11 +74,11 @@ public class PackageService implements Serializable {
 		int appVersionCode = packageInfo.versionCode;
 
 		if (appVersionCode > latestAppVersionInt) {
-			Toast.makeText(_context, "Please contact the LucaHome server admin to update the server!",
-					Toast.LENGTH_SHORT).show();
+			Toasty.info(_context, "Please contact the LucaHome server admin to update the server!", Toast.LENGTH_SHORT)
+					.show();
 			return false;
 		} else if (appVersionCode < latestAppVersionInt) {
-			Toast.makeText(_context, "There is a new version of LucaHome! Your version is " + appVersion
+			Toasty.info(_context, "There is a new version of LucaHome! Your version is " + appVersion
 					+ ", but latest version is " + latestAppVersionString, Toast.LENGTH_LONG).show();
 			return false;
 		}

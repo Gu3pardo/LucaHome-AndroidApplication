@@ -19,6 +19,7 @@ import guepardoapps.lucahome.common.dto.BirthdayDto;
 import guepardoapps.lucahome.common.dto.helper.BirthdayDtoHelper;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
+
 import guepardoapps.particles.ParticleSystem;
 
 public class BirthdayListAdapter extends BaseAdapter {

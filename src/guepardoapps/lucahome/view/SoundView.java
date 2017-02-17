@@ -19,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.Sound;
@@ -39,6 +41,7 @@ import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.controller.SoundController;
 import guepardoapps.lucahome.view.customadapter.SoundListAdapter;
+
 import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
 
@@ -140,7 +143,7 @@ public class SoundView extends Activity {
 				_serviceController.StartRestService(TAG, ServerActions.GET_VOLUME, Broadcasts.GET_VOLUME,
 						LucaObject.SOUND, _raspberrySelection);
 			} else {
-				Toast.makeText(_context, "Failed to download sound list", Toast.LENGTH_LONG).show();
+				Toasty.error(_context, "Failed to download sound list", Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -170,7 +173,7 @@ public class SoundView extends Activity {
 			if (soundFileArray == null) {
 				soundFileArray = intent.getStringArrayExtra("SoundController");
 				if (soundFileArray == null) {
-					Toast.makeText(_context, "Failed to start sound!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Failed to start sound!", Toast.LENGTH_LONG).show();
 					return;
 				} else {
 					handleSendStartIntent(soundFileArray);
@@ -207,7 +210,7 @@ public class SoundView extends Activity {
 					}
 				}
 			} else {
-				Toast.makeText(_context, "Failed to start sound!", Toast.LENGTH_LONG).show();
+				Toasty.error(_context, "Failed to start sound!", Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -228,7 +231,7 @@ public class SoundView extends Activity {
 
 			if (_isPlaying) {
 				_logger.Error(stopStringArray[0]);
-				Toast.makeText(_context, "Failed to stop sound!", Toast.LENGTH_LONG).show();
+				Toasty.error(_context, "Failed to stop sound!", Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -251,11 +254,11 @@ public class SoundView extends Activity {
 						} catch (Exception ex) {
 							_logger.Error(volumeStringArray[0]);
 							_logger.Error(ex.toString());
-							Toast.makeText(_context, "Failed to set volume!", Toast.LENGTH_SHORT).show();
+							Toasty.error(_context, "Failed to set volume!", Toast.LENGTH_SHORT).show();
 						}
 					} else {
 						_logger.Error(volumeStringArray[0]);
-						Toast.makeText(_context, "Failed to set volume!", Toast.LENGTH_SHORT).show();
+						Toasty.error(_context, "Failed to set volume!", Toast.LENGTH_SHORT).show();
 					}
 				}
 			}
@@ -361,7 +364,7 @@ public class SoundView extends Activity {
 			if (checkFileInList(_soundPlaying, _soundLists.get(0))) {
 				_soundController.SelectRaspberry(_raspberrySelection, RaspberrySelection.RASPBERRY_1, _soundPlaying);
 			} else {
-				Toast.makeText(_context,
+				Toasty.error(_context,
 						"Cannot change raspberry! Raspberry 1 has not file " + _soundPlaying.GetFileName(),
 						Toast.LENGTH_LONG).show();
 			}
@@ -375,7 +378,7 @@ public class SoundView extends Activity {
 			if (checkFileInList(_soundPlaying, _soundLists.get(1))) {
 				_soundController.SelectRaspberry(_raspberrySelection, RaspberrySelection.RASPBERRY_2, _soundPlaying);
 			} else {
-				Toast.makeText(_context,
+				Toasty.error(_context,
 						"Cannot change raspberry! Raspberry 2 has not file " + _soundPlaying.GetFileName(),
 						Toast.LENGTH_LONG).show();
 			}

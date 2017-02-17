@@ -24,11 +24,10 @@ import guepardoapps.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.MainService;
 
+import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.services.AndroidSystemService;
-
-import guepardoapps.toolset.controller.BroadcastController;
 
 public class WIFIReceiver extends BroadcastReceiver {
 

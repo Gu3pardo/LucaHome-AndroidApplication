@@ -74,7 +74,6 @@ public class DatabaseActionStore {
 	public long CreateEntry(ActionDto newEntry) {
 		ContentValues contentValues = new ContentValues();
 
-		contentValues.put(KEY_ROWID, newEntry.GetId());
 		contentValues.put(KEY_SOCKET_NAME, newEntry.GetSocket());
 		contentValues.put(KEY_ACTION, newEntry.GetAction());
 

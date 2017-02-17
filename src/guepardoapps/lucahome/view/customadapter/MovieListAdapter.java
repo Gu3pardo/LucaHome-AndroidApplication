@@ -10,6 +10,7 @@ import android.view.View.OnLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.dto.MovieDto;

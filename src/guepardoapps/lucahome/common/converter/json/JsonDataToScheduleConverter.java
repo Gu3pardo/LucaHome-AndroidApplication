@@ -8,6 +8,7 @@ import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.common.tools.StringHelper;
+
 import guepardoapps.toolset.common.enums.Weekday;
 
 public final class JsonDataToScheduleConverter {

@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.NavigationService;
@@ -144,7 +146,7 @@ public class HomeViewListButtonController {
 			@Override
 			public void onClick(View view) {
 				_logger.Warn("Security not yet implemented!");
-				Toast.makeText(_context, "Security not yet implemented!", Toast.LENGTH_SHORT).show();
+				Toasty.error(_context, "Security not yet implemented!", Toast.LENGTH_SHORT).show();
 			}
 		});
 

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.os.AsyncTask;
+
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;

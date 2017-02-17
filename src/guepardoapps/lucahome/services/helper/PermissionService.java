@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
+
 import guepardoapps.lucahome.common.enums.Permissions;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 

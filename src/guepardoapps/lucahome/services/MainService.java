@@ -14,6 +14,8 @@ import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.constants.Broadcasts;
@@ -193,12 +195,13 @@ public class MainService extends Service {
 				return;
 			}
 
+			startDownloadCurrentWeather();
+
 			if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 				_logger.Warn("No LucaHome network! ...");
 				return;
 			}
 
-			startDownloadCurrentWeather();
 			startDownloadTemperature();
 		}
 	};
@@ -360,7 +363,7 @@ public class MainService extends Service {
 			}
 
 			_logger.Warn("Found no socket for heating!");
-			Toast.makeText(_context, "Found no socket for heating!", Toast.LENGTH_LONG).show();
+			Toasty.warning(_context, "Found no socket for heating!", Toast.LENGTH_LONG).show();
 		}
 
 		private void createDeactivatingSchedule(String socketName, boolean enableSound) {
@@ -885,7 +888,7 @@ public class MainService extends Service {
 					startDownloadBirthday();
 				} else {
 					_logger.Warn("Add of birthday failed!");
-					Toast.makeText(_context, "Add of birthday failed!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Add of birthday failed!", Toast.LENGTH_LONG).show();
 				}
 				break;
 			case MOVIE:
@@ -902,7 +905,7 @@ public class MainService extends Service {
 					startDownloadMovie();
 				} else {
 					_logger.Warn("Add of movie failed!");
-					Toast.makeText(_context, "Add of movie failed!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Add of movie failed!", Toast.LENGTH_LONG).show();
 				}
 				break;
 			case SCHEDULE:
@@ -920,7 +923,7 @@ public class MainService extends Service {
 					startDownloadSchedule();
 				} else {
 					_logger.Warn("Add of schedule failed!");
-					Toast.makeText(_context, "Add of schedule failed!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Add of schedule failed!", Toast.LENGTH_LONG).show();
 				}
 				break;
 			case WIRELESS_SOCKET:
@@ -937,7 +940,7 @@ public class MainService extends Service {
 					startDownloadSocket();
 				} else {
 					_logger.Warn("Add of socket failed!");
-					Toast.makeText(_context, "Add of socket failed!", Toast.LENGTH_LONG).show();
+					Toasty.error(_context, "Add of socket failed!", Toast.LENGTH_LONG).show();
 				}
 				break;
 			default:
@@ -1199,7 +1202,7 @@ public class MainService extends Service {
 
 		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 			_logger.Warn("No LucaHome network! ...");
-			Toast.makeText(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
+			Toasty.warning(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
 			return;
 		}
 

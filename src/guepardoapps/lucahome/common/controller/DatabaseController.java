@@ -82,11 +82,16 @@ public class DatabaseController {
 			_logger.Error("Not initialized!");
 			return false;
 		}
-		_databaseActionStore.Open();
-		_databaseActionStore.CreateEntry(newEntry);
-		_databaseActionStore.Close();
+		
+		if (!socketActionAlreadyExisting(newEntry)) {
+			_databaseActionStore.Open();
+			_databaseActionStore.CreateEntry(newEntry);
+			_databaseActionStore.Close();
 
-		return true;
+			return true;
+		}
+
+		return false;
 	}
 
 	public void DeleteAction(ActionDto deleteEntry) {
@@ -107,5 +112,23 @@ public class DatabaseController {
 		_databaseActionStore.Open();
 		_databaseActionStore.Close();
 		_databaseActionStore.Remove();
+	}
+
+	private boolean socketActionAlreadyExisting(ActionDto newEntry) {
+		SerializableList<ActionDto> savedActions = GetActions();
+
+		if (savedActions != null) {
+			for (int index = 0; index < savedActions.getSize(); index++) {
+				ActionDto entry = savedActions.getValue(index);
+				if (entry != null) {
+					if (entry.GetSocket().contains(newEntry.GetSocket())) {
+						_logger.Info(String.format("Socket %s already exists!", entry.GetSocket()));
+						return true;
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 }

@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.ServerActions;
 import guepardoapps.lucahome.common.controller.ServiceController;
@@ -30,7 +32,7 @@ public class SocketActionReceiver extends BroadcastReceiver {
 
 		Bundle details = intent.getExtras();
 		String action = details.getString(Bundles.ACTION);
-		
+
 		if (action.contains(NotificationService.SOCKET_ALL)) {
 			if (_serviceController == null) {
 				_serviceController = new ServiceController(context);
@@ -50,7 +52,7 @@ public class SocketActionReceiver extends BroadcastReceiver {
 			context.startService(serviceIntent);
 		} else {
 			_logger.Error("Action contains errors: " + action);
-			Toast.makeText(context, "Action contains errors: " + action, Toast.LENGTH_LONG).show();
+			Toasty.error(context, "Action contains errors: " + action, Toast.LENGTH_LONG).show();
 		}
 	}
 }

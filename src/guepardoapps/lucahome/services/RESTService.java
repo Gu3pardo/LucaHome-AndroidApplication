@@ -16,6 +16,8 @@ import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
@@ -26,6 +28,7 @@ import guepardoapps.lucahome.common.dto.ActionDto;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
@@ -109,7 +112,7 @@ public class RESTService extends Service {
 
 		if (Constants.SERVER_URLs.length == 0) {
 			_logger.Error("You did not enter server ips!");
-			Toast.makeText(_context, "You did not enter server ips!", Toast.LENGTH_LONG).show();
+			Toasty.error(_context, "You did not enter server ips!", Toast.LENGTH_LONG).show();
 			return 103;
 		}
 
@@ -146,15 +149,15 @@ public class RESTService extends Service {
 			socketAction = Constants.STATE_OFF;
 		} else {
 			_logger.Error("Failed to get action for socket to store: " + action);
-			Toast.makeText(_context, "Couldnot save action!", Toast.LENGTH_SHORT).show();
+			Toasty.error(_context, "Couldnot save action!", Toast.LENGTH_SHORT).show();
 			return;
 		}
 
 		ActionDto storeAction = new ActionDto(id, socket, socketAction);
 		if (_databaseController.SaveAction(storeAction)) {
-			Toast.makeText(_context, "Saved action!", Toast.LENGTH_SHORT).show();
+			Toasty.success(_context, "Saved action!", Toast.LENGTH_SHORT).show();
 		} else {
-			Toast.makeText(_context, "Couldnot save action!", Toast.LENGTH_SHORT).show();
+			Toasty.error(_context, "Couldnot save action!", Toast.LENGTH_SHORT).show();
 		}
 	}
 

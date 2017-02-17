@@ -10,6 +10,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
@@ -19,11 +21,12 @@ import guepardoapps.lucahome.common.enums.Command;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.enums.NavigateData;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.ControlMainServiceState;
+import guepardoapps.lucahome.services.ControlServiceStateService;
 import guepardoapps.lucahome.services.MainService;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.services.wearcontrol.PhoneMessageListenerService;
+
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -59,7 +62,7 @@ public class BootView extends Activity {
 			_context.startService(startMainService);
 
 			_context.startService(new Intent(_context, PhoneMessageListenerService.class));
-			_context.startService(new Intent(_context, ControlMainServiceState.class));
+			_context.startService(new Intent(_context, ControlServiceStateService.class));
 		}
 	};
 
@@ -146,12 +149,12 @@ public class BootView extends Activity {
 				_startDownloadRunnable.run();
 			} else {
 				_logger.Warn("No LucaHome network! ...");
-				Toast.makeText(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
+				Toasty.warning(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
 				_navigationService.NavigateTo(HomeView.class, null, true);
 			}
 		} else {
 			_logger.Warn("No network available!");
-			Toast.makeText(_context, "No network available!", Toast.LENGTH_LONG).show();
+			Toasty.warning(_context, "No network available!", Toast.LENGTH_LONG).show();
 			_navigationService.NavigateTo(HomeView.class, null, true);
 		}
 	}

@@ -16,6 +16,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.constants.Broadcasts;
@@ -28,6 +30,7 @@ import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
+
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -175,11 +178,11 @@ public class HomeViewMapController {
 
 				switch (newMapContent.GetDrawingType()) {
 				case RASPBERRY:
-					Toast.makeText(_context, "Here is a raspberry!", Toast.LENGTH_SHORT).show();
+					Toasty.info(_context, "Here is a raspberry!", Toast.LENGTH_SHORT).show();
 					// TODO show details
 					break;
 				case ARDUINO:
-					Toast.makeText(_context, "Here is an arduino!", Toast.LENGTH_SHORT).show();
+					Toasty.info(_context, "Here is an arduino!", Toast.LENGTH_SHORT).show();
 					// TODO show details
 					break;
 				case SOCKET:

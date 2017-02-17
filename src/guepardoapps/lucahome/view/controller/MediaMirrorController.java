@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Keys;
@@ -101,7 +103,7 @@ public class MediaMirrorController {
 		_logger.Debug("SendCenterText");
 		if (data.length() < 5) {
 			_logger.Warn("Data is too short!");
-			Toast.makeText(_context, "Data is too short!", Toast.LENGTH_SHORT).show();
+			Toasty.error(_context, "Data is too short!", Toast.LENGTH_SHORT).show();
 			return;
 		}
 		sendServerCommand(ServerAction.SHOW_CENTER_TEXT.toString(), data);
@@ -161,8 +163,7 @@ public class MediaMirrorController {
 		_logger.Debug("SendYoutubeId");
 		if (id.length() < 0 || id.length() > 3 && id.length() < 11 || id.length() > 11) {
 			_logger.Warn("ID is invalid! Length: " + String.valueOf(id.length()));
-			Toast.makeText(_context, "ID is invalid! Length: " + String.valueOf(id.length()), Toast.LENGTH_SHORT)
-					.show();
+			Toasty.error(_context, "ID is invalid! Length: " + String.valueOf(id.length()), Toast.LENGTH_SHORT).show();
 			return;
 		}
 		sendServerCommand(ServerAction.SHOW_YOUTUBE_VIDEO.toString(), String.valueOf(id));
@@ -172,7 +173,7 @@ public class MediaMirrorController {
 		_logger.Debug("SendRssFeedId");
 		if (id < 0) {
 			_logger.Warn("Id is invalid!");
-			Toast.makeText(_context, "ID is invalid!", Toast.LENGTH_SHORT).show();
+			Toasty.error(_context, "ID is invalid!", Toast.LENGTH_SHORT).show();
 			return;
 		}
 		sendServerCommand(ServerAction.SET_RSS_FEED.toString(), String.valueOf(id));
@@ -182,7 +183,7 @@ public class MediaMirrorController {
 		_logger.Debug("SendWebviewUrl");
 		if (data.length() < 5) {
 			_logger.Warn("Data is too short!");
-			Toast.makeText(_context, "Data is too short!", Toast.LENGTH_SHORT).show();
+			Toasty.error(_context, "Data is too short!", Toast.LENGTH_SHORT).show();
 			return;
 		}
 		sendServerCommand(ServerAction.SHOW_WEBVIEW.toString(), data);
@@ -342,7 +343,7 @@ public class MediaMirrorController {
 				data = _selectedPongPlayer + ":" + data;
 			} else {
 				_logger.Warn("Pong is running, but selectedplayer is null!");
-				Toast.makeText(_context, "Pong is running, but selectedplayer is null!", Toast.LENGTH_SHORT).show();
+				Toasty.error(_context, "Pong is running, but selectedplayer is null!", Toast.LENGTH_SHORT).show();
 				return;
 			}
 		}

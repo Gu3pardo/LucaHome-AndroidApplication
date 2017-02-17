@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
+
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
@@ -20,6 +23,7 @@ import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.*;
 import guepardoapps.lucahome.services.helper.UserService;
 import guepardoapps.lucahome.services.wearcontrol.WearMessageService;
+
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.openweather.model.ForecastModel;
 import guepardoapps.toolset.openweather.model.WeatherModel;
@@ -93,7 +97,7 @@ public class ServiceController {
 
 	public void StartSocketNotificationService(int notificationId, SerializableList<WirelessSocketDto> socketList) {
 		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-			Toast.makeText(_context, "No LucaHome network!", Toast.LENGTH_SHORT).show();
+			Toasty.warning(_context, "No LucaHome network!", Toast.LENGTH_SHORT).show();
 			return;
 		}
 
@@ -120,7 +124,7 @@ public class ServiceController {
 		}
 
 		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-			Toast.makeText(_context, "No LucaHome network!", Toast.LENGTH_SHORT).show();
+			Toasty.warning(_context, "No LucaHome network!", Toast.LENGTH_SHORT).show();
 			return;
 		}
 

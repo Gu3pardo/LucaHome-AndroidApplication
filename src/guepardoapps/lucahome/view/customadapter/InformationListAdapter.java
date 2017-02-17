@@ -8,6 +8,7 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.dto.InformationDto;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
@@ -28,7 +29,7 @@ public class InformationListAdapter extends BaseAdapter {
 
 		_information = information;
 		_logger.Debug(_information.toString());
-		
+
 		_context = context;
 		_dialogService = new DialogService(_context);
 		_inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

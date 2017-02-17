@@ -6,11 +6,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
+import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
+import guepardoapps.lucahome.common.constants.IDs;
+import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.enums.MainServiceAction;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.MainService;
 import guepardoapps.lucahome.services.NotificationService;
+
+import guepardoapps.toolset.controller.BroadcastController;
 
 public class HeatingReceiver extends BroadcastReceiver {
 
@@ -25,21 +31,22 @@ public class HeatingReceiver extends BroadcastReceiver {
 		Bundle details = intent.getExtras();
 		String action = details.getString(Bundles.ACTION);
 
+		ServiceController serviceController = new ServiceController(context);
+		serviceController.CloseNotification(IDs.NOTIFICATION_SLEEP);
+
+		MainServiceAction mainServiceAction = MainServiceAction.NULL;
+
 		if (action.contains(NotificationService.HEATING_AND_SOUND)) {
-			Intent startMainService = new Intent(context, MainService.class);
-			Bundle mainServiceBundle = new Bundle();
-			mainServiceBundle.putSerializable(Bundles.MAIN_SERVICE_ACTION, MainServiceAction.ENABLE_HEATING_AND_SOUND);
-			startMainService.putExtras(mainServiceBundle);
-			context.startService(startMainService);
+			mainServiceAction = MainServiceAction.ENABLE_HEATING_AND_SOUND;
 		} else if (action.contains(NotificationService.HEATING_SINGLE)) {
-			Intent startMainService = new Intent(context, MainService.class);
-			Bundle mainServiceBundle = new Bundle();
-			mainServiceBundle.putSerializable(Bundles.MAIN_SERVICE_ACTION, MainServiceAction.ENABLE_HEATING);
-			startMainService.putExtras(mainServiceBundle);
-			context.startService(startMainService);
+			mainServiceAction = MainServiceAction.ENABLE_HEATING;
 		} else {
 			_logger.Error("Action contains errors: " + action);
-			Toast.makeText(context, "Action contains errors: " + action, Toast.LENGTH_LONG).show();
+			Toasty.error(context, "Action contains errors: " + action, Toast.LENGTH_LONG).show();
 		}
+
+		BroadcastController broadcastController = new BroadcastController(context);
+		broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+				new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { mainServiceAction });
 	}
 }

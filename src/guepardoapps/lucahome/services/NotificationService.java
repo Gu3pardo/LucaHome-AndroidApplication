@@ -16,6 +16,8 @@ import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.constants.Bundles;
@@ -211,7 +213,7 @@ public class NotificationService extends Service {
 
 		if (wirelessSocketList.getSize() > 10) {
 			_logger.Warn("Too many sockets! Cannot display notification!");
-			Toast.makeText(this, "Too many sockets! Cannot display notification!", Toast.LENGTH_SHORT).show();
+			Toasty.error(this, "Too many sockets! Cannot display notification!", Toast.LENGTH_SHORT).show();
 			return;
 		}
 

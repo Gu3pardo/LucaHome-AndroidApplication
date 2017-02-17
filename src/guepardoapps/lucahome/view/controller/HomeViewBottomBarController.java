@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.dto.UserDto;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
@@ -37,7 +39,7 @@ public class HomeViewBottomBarController {
 	private Runnable _updateUser = new Runnable() {
 		@Override
 		public void run() {
-			Toast.makeText(_context, "Not yet implemented!", Toast.LENGTH_SHORT).show();
+			Toasty.error(_context, "Not yet implemented!", Toast.LENGTH_SHORT).show();
 			_logger.Warn("Save updated user to raspberry not yet implemented!");
 		}
 	};

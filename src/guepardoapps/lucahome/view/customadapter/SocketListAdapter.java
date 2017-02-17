@@ -12,6 +12,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 import android.widget.TextView;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
