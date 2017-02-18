@@ -15,6 +15,7 @@ import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.IDs;
+import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.lucahome.common.controller.DatabaseController;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.dto.ActionDto;
@@ -27,6 +28,7 @@ import guepardoapps.lucahome.services.MainService;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
+import guepardoapps.toolset.controller.SharedPrefController;
 import guepardoapps.toolset.services.AndroidSystemService;
 
 public class WIFIReceiver extends BroadcastReceiver {
@@ -46,6 +48,7 @@ public class WIFIReceiver extends BroadcastReceiver {
 	private DialogController _dialogController;
 	private NetworkController _networkController;
 	private ServiceController _serviceController;
+	private SharedPrefController _sharedPrefController;
 
 	private boolean _checkConnectionEnabled;
 	private Runnable _checkConnectionRunnable = new Runnable() {
@@ -73,13 +76,11 @@ public class WIFIReceiver extends BroadcastReceiver {
 				return;
 			}
 		}
+
 		_logger.Info("valid connection!");
 
 		_context = context;
 		_checkConnectionEnabled = true;
-
-		int textColor = ContextCompat.getColor(_context, R.color.TextIcon);
-		int backgroundColor = ContextCompat.getColor(_context, R.color.Background);
 
 		if (_androidSystemService == null) {
 			_androidSystemService = new AndroidSystemService(_context);
@@ -92,6 +93,8 @@ public class WIFIReceiver extends BroadcastReceiver {
 			_databaseController.onCreate(_context);
 		}
 		if (_dialogController == null) {
+			int textColor = ContextCompat.getColor(_context, R.color.TextIcon);
+			int backgroundColor = ContextCompat.getColor(_context, R.color.Background);
 			_dialogController = new DialogController(_context, textColor, backgroundColor);
 		}
 		if (_networkController == null) {
@@ -100,14 +103,19 @@ public class WIFIReceiver extends BroadcastReceiver {
 		if (_serviceController == null) {
 			_serviceController = new ServiceController(_context);
 		}
+		if (_sharedPrefController == null) {
+			_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
+		}
 
 		checkConnection();
 	}
 
 	private void checkConnection() {
 		_logger.Debug("checkConnection");
+
 		if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 			_logger.Debug("We are in the homenetwork!");
+
 			if (_androidSystemService.IsServiceRunning(MainService.class)) {
 				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
 						new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.DOWNLOAD_ALL });
@@ -118,8 +126,14 @@ public class WIFIReceiver extends BroadcastReceiver {
 				startMainService.putExtras(mainServiceBundle);
 				_context.startService(startMainService);
 			}
+
 			_serviceController.SendMessageToWear(WIFI + "HOME");
+
+			// check if actions are stored to perform after entering home wifi
 			checkDatabase();
+
+			// check if flag is enabled to display the sleep notification
+			checkSleepNotificationFlag();
 		} else {
 			_logger.Warn("We are NOT in the homenetwork!");
 
@@ -146,6 +160,14 @@ public class WIFIReceiver extends BroadcastReceiver {
 			}
 		} else {
 			_logger.Debug("No actions stored!");
+		}
+	}
+
+	private void checkSleepNotificationFlag() {
+		if (_sharedPrefController
+				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
+			_serviceController.StartNotificationService("", "", -1, LucaObject.GO_TO_BED);
+			_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
 		}
 	}
 }
