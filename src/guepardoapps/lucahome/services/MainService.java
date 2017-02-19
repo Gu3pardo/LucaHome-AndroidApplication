@@ -6,8 +6,6 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -34,10 +32,14 @@ import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.helper.DialogService;
 import guepardoapps.lucahome.services.sockets.SocketActionService;
 import guepardoapps.lucahome.view.controller.MediaMirrorController;
+
 import guepardoapps.mediamirror.client.ClientTask;
 import guepardoapps.mediamirror.common.enums.ServerAction;
+
+import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
+import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
 
 import guepardoapps.toolset.openweather.OpenWeatherController;
@@ -46,9 +48,6 @@ import guepardoapps.toolset.openweather.model.ForecastModel;
 import guepardoapps.toolset.openweather.model.WeatherModel;
 
 import guepardoapps.toolset.scheduler.ScheduleService;
-
-import guepardoapps.toolset.controller.BroadcastController;
-import guepardoapps.toolset.controller.ReceiverController;
 
 public class MainService extends Service {
 
@@ -990,20 +989,6 @@ public class MainService extends Service {
 		}
 	};
 
-	private BroadcastReceiver _batteryChangedReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			_logger.Debug("_batteryChangedReceiver onReceive");
-
-			int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-			if (level != -1) {
-				_logger.Debug("new battery level: " + String.valueOf(level));
-				String message = "PhoneBattery:" + String.valueOf(level) + "%";
-				_serviceController.SendMessageToWear(message);
-			}
-		}
-	};
-
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -1144,8 +1129,6 @@ public class MainService extends Service {
 		_receiverController.RegisterReceiver(_reloadChangeReceiver,
 				new String[] { Broadcasts.RELOAD_BIRTHDAY, Broadcasts.RELOAD_MOVIE, Broadcasts.RELOAD_SCHEDULE,
 						Broadcasts.RELOAD_TIMER, Broadcasts.RELOAD_SOCKETS });
-
-		_context.registerReceiver(_batteryChangedReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 	}
 
 	private void unregisterReceiver() {
@@ -1172,8 +1155,6 @@ public class MainService extends Service {
 		_receiverController.UnregisterReceiver(_reloadSocketReceiver);
 
 		_receiverController.UnregisterReceiver(_reloadChangeReceiver);
-
-		_context.unregisterReceiver(_batteryChangedReceiver);
 	}
 
 	private void addSchedules() {

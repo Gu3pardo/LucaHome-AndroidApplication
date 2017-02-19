@@ -6,14 +6,17 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.os.BatteryManager;
 import android.os.IBinder;
+
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.lucahome.common.controller.ServiceController;
 import guepardoapps.lucahome.common.enums.LucaObject;
 import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+
 import guepardoapps.toolset.controller.NetworkController;
+import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
 
 public class ReceiverService extends Service {
@@ -30,10 +33,27 @@ public class ReceiverService extends Service {
 	private Context _context;
 
 	private NetworkController _networkController;
+	private ReceiverController _receiverController;
 	private SharedPrefController _sharedPrefController;
 	private ServiceController _serviceController;
 
 	private boolean _isInitialized;
+
+	// Receiver used for receiving the current battery state of the phone and
+	// sending the state to the watch
+	private BroadcastReceiver _batteryChangedReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_batteryChangedReceiver onReceive");
+
+			int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+			if (level != -1) {
+				_logger.Debug("new battery level: " + String.valueOf(level));
+				String message = "PhoneBattery:" + String.valueOf(level) + "%";
+				_serviceController.SendMessageToWear(message);
+			}
+		}
+	};
 
 	// Receiver used for receiving the current time and check if time is ready
 	// to display sleep notification or set a flag if not or to delete this flag
@@ -85,11 +105,13 @@ public class ReceiverService extends Service {
 			_context = this;
 
 			_networkController = new NetworkController(_context, null);
+			_receiverController = new ReceiverController(_context);
 			_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
 			_serviceController = new ServiceController(_context);
 
-			IntentFilter intentFilterTime = new IntentFilter(Intent.ACTION_TIME_TICK);
-			registerReceiver(_timeTickReceiver, intentFilterTime);
+			_receiverController.RegisterReceiver(_batteryChangedReceiver,
+					new String[] { Intent.ACTION_BATTERY_CHANGED });
+			_receiverController.RegisterReceiver(_timeTickReceiver, new String[] { Intent.ACTION_TIME_TICK });
 
 			_isInitialized = true;
 		}
@@ -106,7 +128,8 @@ public class ReceiverService extends Service {
 
 	@Override
 	public void onDestroy() {
-		unregisterReceiver(_timeTickReceiver);
+		_receiverController.UnregisterReceiver(_batteryChangedReceiver);
+		_receiverController.UnregisterReceiver(_timeTickReceiver);
 		_isInitialized = false;
 	}
 }
