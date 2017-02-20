@@ -11,19 +11,10 @@ import android.widget.Toast;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.view.BirthdayView;
-import guepardoapps.lucahome.view.GameView;
-import guepardoapps.lucahome.view.MediaMirrorView;
-import guepardoapps.lucahome.view.MovieView;
-import guepardoapps.lucahome.view.ScheduleView;
-import guepardoapps.lucahome.view.SensorAirPressureView;
-import guepardoapps.lucahome.view.SensorHumidityView;
-import guepardoapps.lucahome.view.SocketView;
-import guepardoapps.lucahome.view.SoundView;
-import guepardoapps.lucahome.view.SensorTemperatureView;
-import guepardoapps.lucahome.view.TimerView;
+import guepardoapps.lucahome.view.*;
+
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 
 public class HomeViewListButtonController {
 

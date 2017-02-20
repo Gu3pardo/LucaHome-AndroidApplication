@@ -7,17 +7,16 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.controller.ServiceController;
-import guepardoapps.lucahome.common.enums.LucaObject;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+
+import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
 import guepardoapps.toolset.common.classes.NotificationContent;
+import guepardoapps.toolset.controller.ReceiverController;
 
 import guepardoapps.toolset.openweather.OpenWeatherController;
 import guepardoapps.toolset.openweather.common.OpenWeatherConstants;
 import guepardoapps.toolset.openweather.model.ForecastModel;
-
-import guepardoapps.toolset.controller.ReceiverController;
 
 public class OpenWeatherService extends Service {
 
@@ -28,11 +27,9 @@ public class OpenWeatherService extends Service {
 
 	private Context _context;
 
-	private NotificationService _notificationService;
-
+	private LucaNotificationController _notificationController;
 	private OpenWeatherController _openWeatherController;
 	private ReceiverController _receiverController;
-	private ServiceController _serviceController;
 
 	private BroadcastReceiver _forecastReceiver = new BroadcastReceiver() {
 		@Override
@@ -48,9 +45,8 @@ public class OpenWeatherService extends Service {
 				NotificationContent _message = _forecastModel.TellTodaysWeather();
 
 				if (_message != null) {
-					_serviceController.StartNotificationWithIconService(_message.GetTitle(), _message.GetText(),
-							OpenWeatherConstants.FORECAST_NOTIFICATION_ID, _message.GetIcon(),
-							LucaObject.WEATHER_FORECAST);
+					_notificationController.CreateForecastWeatherNotification(_message.GetIcon(), _message.GetTitle(),
+							_message.GetText(), OpenWeatherConstants.FORECAST_NOTIFICATION_ID);
 				} else {
 					_logger.Error("_message is null!");
 				}
@@ -68,17 +64,14 @@ public class OpenWeatherService extends Service {
 
 		_logger = new LucaHomeLogger(TAG);
 
-		if (_notificationService == null) {
-			_notificationService = new NotificationService();
+		if (_notificationController == null) {
+			_notificationController = new LucaNotificationController(_context);
 		}
 		if (_openWeatherController == null) {
 			_openWeatherController = new OpenWeatherController(_context, Constants.CITY);
 		}
 		if (_receiverController == null) {
 			_receiverController = new ReceiverController(_context);
-		}
-		if (_serviceController == null) {
-			_serviceController = new ServiceController(_context);
 		}
 
 		_receiverController.RegisterReceiver(_forecastReceiver,

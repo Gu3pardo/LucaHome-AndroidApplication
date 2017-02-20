@@ -10,20 +10,22 @@ import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-import guepardoapps.lucahome.common.controller.DatabaseController;
-import guepardoapps.lucahome.common.controller.ServiceController;
-import guepardoapps.lucahome.common.dto.ActionDto;
-import guepardoapps.lucahome.common.enums.LucaObject;
-import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.common.enums.RaspberrySelection;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.MainService;
+
+import guepardoapps.lucahomelibrary.common.classes.SerializableList;
+import guepardoapps.lucahomelibrary.common.constants.IDs;
+import guepardoapps.lucahomelibrary.common.controller.DatabaseController;
+import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
+import guepardoapps.lucahomelibrary.common.controller.ServiceController;
+import guepardoapps.lucahomelibrary.common.dto.ActionDto;
+import guepardoapps.lucahomelibrary.common.enums.LucaObject;
+import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
+import guepardoapps.lucahomelibrary.common.enums.RaspberrySelection;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
@@ -46,6 +48,7 @@ public class WIFIReceiver extends BroadcastReceiver {
 	private BroadcastController _broadcastController;
 	private DatabaseController _databaseController;
 	private DialogController _dialogController;
+	private LucaNotificationController _notificationController;
 	private NetworkController _networkController;
 	private ServiceController _serviceController;
 	private SharedPrefController _sharedPrefController;
@@ -100,6 +103,9 @@ public class WIFIReceiver extends BroadcastReceiver {
 		if (_networkController == null) {
 			_networkController = new NetworkController(_context, _dialogController);
 		}
+		if (_notificationController == null) {
+			_notificationController = new LucaNotificationController(_context);
+		}
 		if (_serviceController == null) {
 			_serviceController = new ServiceController(_context);
 		}
@@ -137,8 +143,8 @@ public class WIFIReceiver extends BroadcastReceiver {
 		} else {
 			_logger.Warn("We are NOT in the homenetwork!");
 
-			_serviceController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
-			_serviceController.CloseNotification(IDs.NOTIFICATION_WEAR);
+			_notificationController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
+			_notificationController.CloseNotification(IDs.NOTIFICATION_WEAR);
 			_serviceController.SendMessageToWear(WIFI + "NO");
 
 			if (_checkConnectionEnabled) {
@@ -166,7 +172,7 @@ public class WIFIReceiver extends BroadcastReceiver {
 	private void checkSleepNotificationFlag() {
 		if (_sharedPrefController
 				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
-			_serviceController.StartNotificationService("", "", -1, LucaObject.GO_TO_BED);
+			_notificationController.CreateSleepHeatingNotification();
 			_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
 		}
 	}

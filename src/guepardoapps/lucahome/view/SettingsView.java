@@ -20,18 +20,19 @@ import android.widget.Toast;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.IDs;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-import guepardoapps.lucahome.common.controller.DatabaseController;
-import guepardoapps.lucahome.common.controller.ServiceController;
-import guepardoapps.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.NavigationService;
+
+import guepardoapps.lucahomelibrary.common.classes.*;
+import guepardoapps.lucahomelibrary.common.constants.Color;
+import guepardoapps.lucahomelibrary.common.constants.IDs;
+import guepardoapps.lucahomelibrary.common.controller.DatabaseController;
+import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
+import guepardoapps.lucahomelibrary.common.dto.WirelessSocketDto;
+import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
@@ -52,9 +53,9 @@ public class SettingsView extends Activity {
 
 	private BroadcastController _broadcastController;
 	private DatabaseController _databaseController;
+	private LucaNotificationController _notificationController;
 	private NavigationService _navigationService;
 	private ReceiverController _receiverController;
-	private ServiceController _serviceController;
 	private SharedPrefController _sharedPrefController;
 
 	private BroadcastReceiver _updateSocketListCheckBoxViewReceiver = new BroadcastReceiver() {
@@ -87,8 +88,8 @@ public class SettingsView extends Activity {
 		_broadcastController = new BroadcastController(_context);
 		_databaseController = DatabaseController.getInstance();
 		_navigationService = new NavigationService(_context);
+		_notificationController = new LucaNotificationController(_context);
 		_receiverController = new ReceiverController(_context);
-		_serviceController = new ServiceController(_context);
 		_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
 
 		initializeSwitches();
@@ -163,7 +164,7 @@ public class SettingsView extends Activity {
 							new Object[] { MainServiceAction.SHOW_NOTIFICATION_SOCKET });
 				} else {
 					_socketLayout.setVisibility(View.GONE);
-					_serviceController.CloseNotification(IDs.NOTIFICATION_WEAR);
+					_notificationController.CloseNotification(IDs.NOTIFICATION_WEAR);
 				}
 			}
 		});
@@ -180,7 +181,7 @@ public class SettingsView extends Activity {
 							new String[] { Bundles.MAIN_SERVICE_ACTION },
 							new Object[] { MainServiceAction.SHOW_NOTIFICATION_WEATHER });
 				} else {
-					_serviceController.CloseNotification(OpenWeatherConstants.FORECAST_NOTIFICATION_ID);
+					_notificationController.CloseNotification(OpenWeatherConstants.FORECAST_NOTIFICATION_ID);
 				}
 			}
 		});
@@ -197,7 +198,7 @@ public class SettingsView extends Activity {
 							new String[] { Bundles.MAIN_SERVICE_ACTION },
 							new Object[] { MainServiceAction.SHOW_NOTIFICATION_TEMPERATURE });
 				} else {
-					_serviceController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
+					_notificationController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
 				}
 			}
 		});
@@ -253,6 +254,7 @@ public class SettingsView extends Activity {
 		for (int index = 0; index < _socketList.getSize(); index++) {
 			WirelessSocketDto socket = _socketList.getValue(index);
 			final String key = socket.GetNotificationVisibilitySharedPrefKey();
+			_logger.Info(String.format("Key of socket %s is %s", socket.GetName(), key));
 			boolean notificationVisibility = _sharedPrefController.LoadBooleanValueFromSharedPreferences(key);
 
 			CheckBox socketCheckbox = new CheckBox(getApplicationContext());
@@ -262,6 +264,7 @@ public class SettingsView extends Activity {
 			socketCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+					_logger.Info(String.format("Saving key %s with value %s", key, isChecked));
 					_sharedPrefController.SaveBooleanValue(key, isChecked);
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
 							new String[] { Bundles.MAIN_SERVICE_ACTION },

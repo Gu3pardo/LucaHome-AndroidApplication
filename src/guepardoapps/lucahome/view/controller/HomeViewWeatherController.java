@@ -12,10 +12,11 @@ import android.widget.Button;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.NavigationService;
 import guepardoapps.lucahome.view.ForecastWeatherView;
+
+import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;

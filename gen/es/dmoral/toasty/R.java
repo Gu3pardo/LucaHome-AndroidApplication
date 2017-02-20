@@ -8,13 +8,13 @@ package es.dmoral.toasty;
 
 public final class R {
 	public static final class drawable {
-		public static final int ic_check_white_48dp = 0x7f02004b;
-		public static final int ic_clear_white_48dp = 0x7f02004c;
-		public static final int ic_error_outline_white_48dp = 0x7f02004d;
-		public static final int ic_info_outline_white_48dp = 0x7f020050;
-		public static final int ic_warning_outline_white = 0x7f020056;
-		public static final int ic_warning_white_48dp = 0x7f020057;
-		public static final int toast_frame = 0x7f020081;
+		public static final int ic_check_white_48dp = 0x7f020051;
+		public static final int ic_clear_white_48dp = 0x7f020052;
+		public static final int ic_error_outline_white_48dp = 0x7f020053;
+		public static final int ic_info_outline_white_48dp = 0x7f020056;
+		public static final int ic_warning_outline_white = 0x7f02005c;
+		public static final int ic_warning_white_48dp = 0x7f02005d;
+		public static final int toast_frame = 0x7f020087;
 	}
 	public static final class id {
 		public static final int toast_icon = 0x7f1000ed;

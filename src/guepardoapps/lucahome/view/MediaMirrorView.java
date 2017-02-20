@@ -23,13 +23,13 @@ import android.widget.TextView;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.view.controller.MediaMirrorController;
 
-import guepardoapps.mediamirror.common.dto.PlayedYoutubeVideoDto;
-import guepardoapps.mediamirror.common.enums.*;
+import guepardoapps.lucahomelibrary.common.constants.Color;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.mediamirror.common.dto.PlayedYoutubeVideoDto;
+import guepardoapps.lucahomelibrary.mediamirror.common.enums.*;
+import guepardoapps.lucahomelibrary.services.helper.NavigationService;
+import guepardoapps.lucahomelibrary.view.controller.MediaMirrorController;
 
 import guepardoapps.toolset.controller.ReceiverController;
 

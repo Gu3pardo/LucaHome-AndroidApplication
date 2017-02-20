@@ -11,11 +11,13 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.constants.IDs;
-import guepardoapps.lucahome.common.controller.ServiceController;
-import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.lucahome.services.MainService;
+
+import guepardoapps.lucahomelibrary.common.constants.IDs;
+import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
+import guepardoapps.lucahomelibrary.common.controller.ServiceController;
+import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
@@ -37,6 +39,7 @@ public class BootReceiver extends BroadcastReceiver {
 	private AndroidSystemService _androidSystemService;
 	private BroadcastController _broadcastController;
 	private DialogController _dialogController;
+	private LucaNotificationController _notificationController;
 	private NetworkController _networkController;
 	private ServiceController _serviceController;
 
@@ -76,6 +79,9 @@ public class BootReceiver extends BroadcastReceiver {
 		if (_networkController == null) {
 			_networkController = new NetworkController(_context, _dialogController);
 		}
+		if (_notificationController == null) {
+			_notificationController = new LucaNotificationController(_context);
+		}
 		if (_serviceController == null) {
 			_serviceController = new ServiceController(_context);
 		}
@@ -101,8 +107,8 @@ public class BootReceiver extends BroadcastReceiver {
 		} else {
 			_logger.Warn("We are NOT in the homenetwork!");
 
-			_serviceController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
-			_serviceController.CloseNotification(IDs.NOTIFICATION_WEAR);
+			_notificationController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
+			_notificationController.CloseNotification(IDs.NOTIFICATION_WEAR);
 			_serviceController.SendMessageToWear(WIFI + "NO");
 
 			if (_checkConnectionEnabled) {

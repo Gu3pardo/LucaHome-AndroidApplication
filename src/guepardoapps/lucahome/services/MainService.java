@@ -15,26 +15,23 @@ import android.widget.Toast;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.classes.*;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.constants.IDs;
-import guepardoapps.lucahome.common.constants.ServerActions;
-import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-import guepardoapps.lucahome.common.controller.*;
-import guepardoapps.lucahome.common.converter.json.*;
-import guepardoapps.lucahome.common.dto.*;
-import guepardoapps.lucahome.common.dto.helper.BirthdayDtoHelper;
-import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
-import guepardoapps.lucahome.common.enums.*;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.DialogService;
-import guepardoapps.lucahome.services.sockets.SocketActionService;
-import guepardoapps.lucahome.view.controller.MediaMirrorController;
-
-import guepardoapps.mediamirror.client.ClientTask;
-import guepardoapps.mediamirror.common.enums.ServerAction;
+import guepardoapps.lucahome.common.constants.*;
+import guepardoapps.lucahome.view.BirthdayView;
+import guepardoapps.lucahome.view.SensorTemperatureView;
+import guepardoapps.lucahomelibrary.common.classes.*;
+import guepardoapps.lucahomelibrary.common.constants.IDs;
+import guepardoapps.lucahomelibrary.common.constants.ServerActions;
+import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
+import guepardoapps.lucahomelibrary.common.controller.ServiceController;
+import guepardoapps.lucahomelibrary.common.converter.json.*;
+import guepardoapps.lucahomelibrary.common.dto.*;
+import guepardoapps.lucahomelibrary.common.enums.*;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.mediamirror.client.ClientTask;
+import guepardoapps.lucahomelibrary.mediamirror.common.enums.ServerAction;
+import guepardoapps.lucahomelibrary.services.helper.DialogService;
+import guepardoapps.lucahomelibrary.services.sockets.SocketActionService;
+import guepardoapps.lucahomelibrary.view.controller.MediaMirrorController;
 
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
@@ -81,9 +78,9 @@ public class MainService extends Service {
 
 	private Context _context;
 
-	private BirthdayDtoHelper _birthdayHelper;
 	private BroadcastController _broadcastController;
 	private DialogService _dialogService;
+	private LucaNotificationController _notificationController;
 	private NetworkController _networkController;
 	private OpenWeatherController _openWeatherController;
 	private ReceiverController _receiverController;
@@ -308,12 +305,12 @@ public class MainService extends Service {
 					break;
 				case SHOW_NOTIFICATION_SOCKET:
 					if (_wirelessSocketList != null) {
-						_serviceController.StartSocketNotificationService(IDs.NOTIFICATION_WEAR, _wirelessSocketList);
+						_notificationController.CreateSocketNotification(_wirelessSocketList);
 					}
 					break;
 				case SHOW_NOTIFICATION_TEMPERATURE:
 					if (_temperatureList != null && _currentWeather != null) {
-						_serviceController.StartTemperatureNotificationService(IDs.NOTIFICATION_TEMPERATURE,
+						_notificationController.CreateTemperatureNotification(SensorTemperatureView.class,
 								_temperatureList, _currentWeather);
 					}
 					break;
@@ -442,11 +439,11 @@ public class MainService extends Service {
 		private void checkForBirthday() {
 			for (int index = 0; index < _birthdayList.getSize(); index++) {
 				BirthdayDto birthday = _birthdayList.getValue(index);
-				if (_birthdayHelper.HasBirthday(birthday)) {
-					int age = _birthdayHelper.GetAge(birthday);
+				if (birthday.HasBirthday()) {
+					int age = birthday.GetAge();
 					_logger.Debug("It is " + birthday.GetName() + "'s " + String.valueOf(age) + "th birthday!");
-					_serviceController.StartNotificationService(birthday.GetName(), birthday.GetNotificationBody(age),
-							birthday.GetNotificationId(), LucaObject.BIRTHDAY);
+					_notificationController.CreateBirthdayNotification(BirthdayView.class, birthday.GetNotificationId(),
+							birthday.GetName(), birthday.GetNotificationBody(age), true);
 				}
 			}
 		}
@@ -635,7 +632,7 @@ public class MainService extends Service {
 
 					if (_sharedPrefController
 							.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
-						_serviceController.StartSocketNotificationService(IDs.NOTIFICATION_WEAR, _wirelessSocketList);
+						_notificationController.CreateSocketNotification(_wirelessSocketList);
 					}
 				} else {
 					_logger.Warn("_wirelessSocketList is null");
@@ -663,8 +660,9 @@ public class MainService extends Service {
 						if (data.length == 4) {
 							String playingFile = data[1].replace("{PlayingFile:", "").replace("};", "");
 							int raspberry = Integer.parseInt(data[3].replace("{Raspberry:", "").replace("};", ""));
-							_serviceController.StartNotificationService(RaspberrySelection.RASPBERRY_1.toString(),
-									playingFile, IDs.NOTIFICATION_SONG + raspberry, LucaObject.SOUND);
+							_notificationController.CreateSoundNotification(playingFile,
+									RaspberrySelection.GetById(raspberry).toString(),
+									IDs.NOTIFICATION_SONG + raspberry);
 						} else {
 							_logger.Warn("data has wrong size!");
 						}
@@ -681,8 +679,9 @@ public class MainService extends Service {
 							if (data.length == 4) {
 								String playingFile = data[1].replace("{PlayingFile:", "").replace("};", "");
 								int raspberry = Integer.parseInt(data[3].replace("{Raspberry:", "").replace("};", ""));
-								_serviceController.StartNotificationService(RaspberrySelection.RASPBERRY_2.toString(),
-										playingFile, IDs.NOTIFICATION_SONG + raspberry, LucaObject.SOUND);
+								_notificationController.CreateSoundNotification(playingFile,
+										RaspberrySelection.GetById(raspberry).toString(),
+										IDs.NOTIFICATION_SONG + raspberry);
 							} else {
 								_logger.Warn("data has wrong size!");
 							}
@@ -740,8 +739,8 @@ public class MainService extends Service {
 
 				if (_sharedPrefController
 						.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION)) {
-					_serviceController.StartTemperatureNotificationService(IDs.NOTIFICATION_TEMPERATURE,
-							_temperatureList, _currentWeather);
+					_notificationController.CreateTemperatureNotification(SensorTemperatureView.class, _temperatureList,
+							_currentWeather);
 				}
 			}
 			updateDownloadCount();
@@ -764,7 +763,7 @@ public class MainService extends Service {
 
 			if (_sharedPrefController
 					.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION)) {
-				_serviceController.StartTemperatureNotificationService(IDs.NOTIFICATION_TEMPERATURE, _temperatureList,
+				_notificationController.CreateTemperatureNotification(SensorTemperatureView.class, _temperatureList,
 						_currentWeather);
 			}
 			updateDownloadCount();
@@ -1010,12 +1009,12 @@ public class MainService extends Service {
 
 			_context = this;
 
-			_birthdayHelper = new BirthdayDtoHelper();
 			_broadcastController = new BroadcastController(_context);
 			_dialogService = new DialogService(_context);
 			_networkController = new NetworkController(_context,
 					new DialogController(_context, ContextCompat.getColor(_context, R.color.TextIcon),
 							ContextCompat.getColor(_context, R.color.Background)));
+			_notificationController = new LucaNotificationController(_context);
 			_openWeatherController = new OpenWeatherController(_context, Constants.CITY);
 			_receiverController = new ReceiverController(_context);
 			_scheduleService = new ScheduleService();
@@ -1273,7 +1272,11 @@ public class MainService extends Service {
 		for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
 			String key = _wirelessSocketList.getValue(index).GetNotificationVisibilitySharedPrefKey();
 			if (!_sharedPrefController.Contains(key)) {
+				_logger.Info(String.format("Installing key %s", key));
 				_sharedPrefController.SaveBooleanValue(key, true);
+			} else {
+				_logger.Info(String.format("Key %s already exists and is %s", key,
+						_sharedPrefController.LoadBooleanValueFromSharedPreferences(key)));
 			}
 		}
 	}

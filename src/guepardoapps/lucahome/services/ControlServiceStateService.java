@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import es.dmoral.toasty.Toasty;
 
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
 public class ControlServiceStateService extends Service {
 

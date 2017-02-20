@@ -53,20 +53,20 @@ public final class R {
 		public static final int button = 0x7f020012;
 		public static final int button_default = 0x7f020016;
 		public static final int button_selected = 0x7f020019;
-		public static final int ic_check_white_48dp = 0x7f02004b;
-		public static final int ic_clear_white_48dp = 0x7f02004c;
-		public static final int ic_error_outline_white_48dp = 0x7f02004d;
-		public static final int ic_info_outline_white_48dp = 0x7f020050;
-		public static final int ic_warning_outline_white = 0x7f020056;
-		public static final int ic_warning_white_48dp = 0x7f020057;
-		public static final int toast_frame = 0x7f020081;
-		public static final int weather_clear = 0x7f020086;
-		public static final int weather_cloud = 0x7f020087;
-		public static final int weather_dummy = 0x7f020088;
-		public static final int weather_fog = 0x7f020089;
-		public static final int weather_haze = 0x7f02008a;
-		public static final int weather_rain = 0x7f02008b;
-		public static final int weather_snow = 0x7f02008c;
+		public static final int ic_check_white_48dp = 0x7f020051;
+		public static final int ic_clear_white_48dp = 0x7f020052;
+		public static final int ic_error_outline_white_48dp = 0x7f020053;
+		public static final int ic_info_outline_white_48dp = 0x7f020056;
+		public static final int ic_warning_outline_white = 0x7f02005c;
+		public static final int ic_warning_white_48dp = 0x7f02005d;
+		public static final int toast_frame = 0x7f020087;
+		public static final int weather_clear = 0x7f02008c;
+		public static final int weather_cloud = 0x7f02008d;
+		public static final int weather_dummy = 0x7f02008e;
+		public static final int weather_fog = 0x7f02008f;
+		public static final int weather_haze = 0x7f020090;
+		public static final int weather_rain = 0x7f020091;
+		public static final int weather_snow = 0x7f020092;
 	}
 	public static final class id {
 		public static final int custom_alert_dialog_background = 0x7f10002d;

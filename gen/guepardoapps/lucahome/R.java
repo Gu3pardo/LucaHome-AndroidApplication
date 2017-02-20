@@ -959,6 +959,11 @@ containing a value of this type.
          Customize dimensions originally defined in res/values/dimens.xml (such as
          screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
     
+ Default screen margins, per the Android Design guidelines. 
+
+         Customize dimensions originally defined in res/values/dimens.xml (such as
+         screen margins) for sw720dp devices (e.g. 10" tablets) in landscape here.
+    
          */
         public static final int activity_horizontal_margin=0x7f0c0017;
         public static final int activity_vertical_margin=0x7f0c0018;
@@ -1028,121 +1033,127 @@ containing a value of this type.
         public static final int card_background=0x7f02001a;
         public static final int card_frame=0x7f02001b;
         public static final int card_frame_pressed=0x7f02001c;
-        public static final int close_button=0x7f02001d;
-        public static final int common_full_open_on_phone=0x7f02001e;
-        public static final int common_ic_googleplayservices=0x7f02001f;
-        public static final int common_signin_btn_icon_dark=0x7f020020;
-        public static final int common_signin_btn_icon_disabled_dark=0x7f020021;
-        public static final int common_signin_btn_icon_disabled_focus_dark=0x7f020022;
-        public static final int common_signin_btn_icon_disabled_focus_light=0x7f020023;
-        public static final int common_signin_btn_icon_disabled_light=0x7f020024;
-        public static final int common_signin_btn_icon_focus_dark=0x7f020025;
-        public static final int common_signin_btn_icon_focus_light=0x7f020026;
-        public static final int common_signin_btn_icon_light=0x7f020027;
-        public static final int common_signin_btn_icon_normal_dark=0x7f020028;
-        public static final int common_signin_btn_icon_normal_light=0x7f020029;
-        public static final int common_signin_btn_icon_pressed_dark=0x7f02002a;
-        public static final int common_signin_btn_icon_pressed_light=0x7f02002b;
-        public static final int common_signin_btn_text_dark=0x7f02002c;
-        public static final int common_signin_btn_text_disabled_dark=0x7f02002d;
-        public static final int common_signin_btn_text_disabled_focus_dark=0x7f02002e;
-        public static final int common_signin_btn_text_disabled_focus_light=0x7f02002f;
-        public static final int common_signin_btn_text_disabled_light=0x7f020030;
-        public static final int common_signin_btn_text_focus_dark=0x7f020031;
-        public static final int common_signin_btn_text_focus_light=0x7f020032;
-        public static final int common_signin_btn_text_light=0x7f020033;
-        public static final int common_signin_btn_text_normal_dark=0x7f020034;
-        public static final int common_signin_btn_text_normal_light=0x7f020035;
-        public static final int common_signin_btn_text_pressed_dark=0x7f020036;
-        public static final int common_signin_btn_text_pressed_light=0x7f020037;
-        public static final int compose_icon_socket=0x7f020038;
-        public static final int delete=0x7f020039;
-        public static final int delete_default=0x7f02003a;
-        public static final int delete_selected=0x7f02003b;
-        public static final int draw_round=0x7f02003c;
-        public static final int draw_round_default=0x7f02003d;
-        public static final int draw_round_selected=0x7f02003e;
-        public static final int drawing_arduino=0x7f02003f;
-        public static final int drawing_raspberry=0x7f020040;
-        public static final int drawing_socket_off=0x7f020041;
-        public static final int drawing_socket_on=0x7f020042;
-        public static final int drawing_temperature=0x7f020043;
-        public static final int gameconsole_off=0x7f020044;
-        public static final int gameconsole_on=0x7f020045;
-        public static final int generic_confirmation=0x7f020046;
-        public static final int generic_confirmation_animation=0x7f020047;
-        public static final int heating=0x7f020048;
-        public static final int heating_hd=0x7f020049;
-        public static final int humidity=0x7f02004a;
-        public static final int ic_check_white_48dp=0x7f02004b;
-        public static final int ic_clear_white_48dp=0x7f02004c;
-        public static final int ic_error_outline_white_48dp=0x7f02004d;
-        public static final int ic_full_cancel=0x7f02004e;
-        public static final int ic_full_sad=0x7f02004f;
-        public static final int ic_info_outline_white_48dp=0x7f020050;
-        public static final int ic_launcher=0x7f020051;
-        public static final int ic_plusone_medium_off_client=0x7f020052;
-        public static final int ic_plusone_small_off_client=0x7f020053;
-        public static final int ic_plusone_standard_off_client=0x7f020054;
-        public static final int ic_plusone_tall_off_client=0x7f020055;
-        public static final int ic_warning_outline_white=0x7f020056;
-        public static final int ic_warning_white_48dp=0x7f020057;
-        public static final int laptop_off=0x7f020058;
-        public static final int laptop_on=0x7f020059;
-        public static final int light_off=0x7f02005a;
-        public static final int light_on=0x7f02005b;
-        public static final int map=0x7f02005c;
-        public static final int map_minimized=0x7f02005d;
-        public static final int map_overview_black=0x7f02005e;
-        public static final int map_overview_white=0x7f02005f;
-        public static final int mediamirror_off=0x7f020060;
-        public static final int mediamirror_on=0x7f020061;
-        public static final int menu_icon_actionbar=0x7f020062;
-        public static final int movie=0x7f020063;
-        public static final int movie_hd=0x7f020064;
-        public static final int open_on_phone=0x7f020065;
-        public static final int open_on_phone_animation=0x7f020066;
-        public static final int particle=0x7f020067;
-        public static final int powered_by_google_dark=0x7f020068;
-        public static final int powered_by_google_light=0x7f020069;
-        public static final int printer_off=0x7f02006a;
-        public static final int printer_on=0x7f02006b;
-        public static final int remove_round=0x7f02006c;
-        public static final int remove_round_default=0x7f02006d;
-        public static final int remove_round_selected=0x7f02006e;
-        public static final int scheduler=0x7f02006f;
-        public static final int scheduler_hd=0x7f020070;
-        public static final int selector_state=0x7f020071;
-        public static final int selector_state_default=0x7f020072;
-        public static final int selector_state_selected=0x7f020073;
-        public static final int settings=0x7f020074;
-        public static final int settings_hd=0x7f020075;
-        public static final int shape_rounded=0x7f020076;
-        public static final int socket=0x7f020077;
-        public static final int socket_hd=0x7f020078;
-        public static final int sound_off=0x7f020079;
-        public static final int sound_on=0x7f02007a;
-        public static final int storage_off=0x7f02007b;
-        public static final int storage_on=0x7f02007c;
-        public static final int temperature=0x7f02007d;
-        public static final int temperature_hd=0x7f02007e;
-        public static final int timer=0x7f02007f;
-        public static final int timer_hd=0x7f020080;
-        public static final int toast_frame=0x7f020081;
-        public static final int tv_off=0x7f020082;
-        public static final int tv_on=0x7f020083;
-        public static final int watering_off=0x7f020084;
-        public static final int watering_on=0x7f020085;
-        public static final int weather_clear=0x7f020086;
-        public static final int weather_cloud=0x7f020087;
-        public static final int weather_dummy=0x7f020088;
-        public static final int weather_fog=0x7f020089;
-        public static final int weather_haze=0x7f02008a;
-        public static final int weather_rain=0x7f02008b;
-        public static final int weather_snow=0x7f02008c;
-        public static final int yellow_round=0x7f02008d;
-        public static final int yellow_round_default=0x7f02008e;
-        public static final int yellow_round_selected=0x7f02008f;
+        public static final int circle_blue=0x7f02001d;
+        public static final int circle_green=0x7f02001e;
+        public static final int circle_red=0x7f02001f;
+        public static final int circle_yellow=0x7f020020;
+        public static final int close_button=0x7f020021;
+        public static final int common_full_open_on_phone=0x7f020022;
+        public static final int common_ic_googleplayservices=0x7f020023;
+        public static final int common_signin_btn_icon_dark=0x7f020024;
+        public static final int common_signin_btn_icon_disabled_dark=0x7f020025;
+        public static final int common_signin_btn_icon_disabled_focus_dark=0x7f020026;
+        public static final int common_signin_btn_icon_disabled_focus_light=0x7f020027;
+        public static final int common_signin_btn_icon_disabled_light=0x7f020028;
+        public static final int common_signin_btn_icon_focus_dark=0x7f020029;
+        public static final int common_signin_btn_icon_focus_light=0x7f02002a;
+        public static final int common_signin_btn_icon_light=0x7f02002b;
+        public static final int common_signin_btn_icon_normal_dark=0x7f02002c;
+        public static final int common_signin_btn_icon_normal_light=0x7f02002d;
+        public static final int common_signin_btn_icon_pressed_dark=0x7f02002e;
+        public static final int common_signin_btn_icon_pressed_light=0x7f02002f;
+        public static final int common_signin_btn_text_dark=0x7f020030;
+        public static final int common_signin_btn_text_disabled_dark=0x7f020031;
+        public static final int common_signin_btn_text_disabled_focus_dark=0x7f020032;
+        public static final int common_signin_btn_text_disabled_focus_light=0x7f020033;
+        public static final int common_signin_btn_text_disabled_light=0x7f020034;
+        public static final int common_signin_btn_text_focus_dark=0x7f020035;
+        public static final int common_signin_btn_text_focus_light=0x7f020036;
+        public static final int common_signin_btn_text_light=0x7f020037;
+        public static final int common_signin_btn_text_normal_dark=0x7f020038;
+        public static final int common_signin_btn_text_normal_light=0x7f020039;
+        public static final int common_signin_btn_text_pressed_dark=0x7f02003a;
+        public static final int common_signin_btn_text_pressed_light=0x7f02003b;
+        public static final int compose_icon_socket=0x7f02003c;
+        public static final int custom_track=0x7f02003d;
+        public static final int customswitchselector=0x7f02003e;
+        public static final int delete=0x7f02003f;
+        public static final int delete_default=0x7f020040;
+        public static final int delete_selected=0x7f020041;
+        public static final int draw_round=0x7f020042;
+        public static final int draw_round_default=0x7f020043;
+        public static final int draw_round_selected=0x7f020044;
+        public static final int drawing_arduino=0x7f020045;
+        public static final int drawing_raspberry=0x7f020046;
+        public static final int drawing_socket_off=0x7f020047;
+        public static final int drawing_socket_on=0x7f020048;
+        public static final int drawing_temperature=0x7f020049;
+        public static final int gameconsole_off=0x7f02004a;
+        public static final int gameconsole_on=0x7f02004b;
+        public static final int generic_confirmation=0x7f02004c;
+        public static final int generic_confirmation_animation=0x7f02004d;
+        public static final int heating=0x7f02004e;
+        public static final int heating_hd=0x7f02004f;
+        public static final int humidity=0x7f020050;
+        public static final int ic_check_white_48dp=0x7f020051;
+        public static final int ic_clear_white_48dp=0x7f020052;
+        public static final int ic_error_outline_white_48dp=0x7f020053;
+        public static final int ic_full_cancel=0x7f020054;
+        public static final int ic_full_sad=0x7f020055;
+        public static final int ic_info_outline_white_48dp=0x7f020056;
+        public static final int ic_launcher=0x7f020057;
+        public static final int ic_plusone_medium_off_client=0x7f020058;
+        public static final int ic_plusone_small_off_client=0x7f020059;
+        public static final int ic_plusone_standard_off_client=0x7f02005a;
+        public static final int ic_plusone_tall_off_client=0x7f02005b;
+        public static final int ic_warning_outline_white=0x7f02005c;
+        public static final int ic_warning_white_48dp=0x7f02005d;
+        public static final int laptop_off=0x7f02005e;
+        public static final int laptop_on=0x7f02005f;
+        public static final int light_off=0x7f020060;
+        public static final int light_on=0x7f020061;
+        public static final int map=0x7f020062;
+        public static final int map_minimized=0x7f020063;
+        public static final int map_overview_black=0x7f020064;
+        public static final int map_overview_white=0x7f020065;
+        public static final int mediamirror_off=0x7f020066;
+        public static final int mediamirror_on=0x7f020067;
+        public static final int menu_icon_actionbar=0x7f020068;
+        public static final int movie=0x7f020069;
+        public static final int movie_hd=0x7f02006a;
+        public static final int open_on_phone=0x7f02006b;
+        public static final int open_on_phone_animation=0x7f02006c;
+        public static final int particle=0x7f02006d;
+        public static final int powered_by_google_dark=0x7f02006e;
+        public static final int powered_by_google_light=0x7f02006f;
+        public static final int printer_off=0x7f020070;
+        public static final int printer_on=0x7f020071;
+        public static final int remove_round=0x7f020072;
+        public static final int remove_round_default=0x7f020073;
+        public static final int remove_round_selected=0x7f020074;
+        public static final int scheduler=0x7f020075;
+        public static final int scheduler_hd=0x7f020076;
+        public static final int selector_state=0x7f020077;
+        public static final int selector_state_default=0x7f020078;
+        public static final int selector_state_selected=0x7f020079;
+        public static final int settings=0x7f02007a;
+        public static final int settings_hd=0x7f02007b;
+        public static final int shape_rounded=0x7f02007c;
+        public static final int socket=0x7f02007d;
+        public static final int socket_hd=0x7f02007e;
+        public static final int sound_off=0x7f02007f;
+        public static final int sound_on=0x7f020080;
+        public static final int storage_off=0x7f020081;
+        public static final int storage_on=0x7f020082;
+        public static final int temperature=0x7f020083;
+        public static final int temperature_hd=0x7f020084;
+        public static final int timer=0x7f020085;
+        public static final int timer_hd=0x7f020086;
+        public static final int toast_frame=0x7f020087;
+        public static final int tv_off=0x7f020088;
+        public static final int tv_on=0x7f020089;
+        public static final int watering_off=0x7f02008a;
+        public static final int watering_on=0x7f02008b;
+        public static final int weather_clear=0x7f02008c;
+        public static final int weather_cloud=0x7f02008d;
+        public static final int weather_dummy=0x7f02008e;
+        public static final int weather_fog=0x7f02008f;
+        public static final int weather_haze=0x7f020090;
+        public static final int weather_rain=0x7f020091;
+        public static final int weather_snow=0x7f020092;
+        public static final int yellow_round=0x7f020093;
+        public static final int yellow_round_default=0x7f020094;
+        public static final int yellow_round_selected=0x7f020095;
     }
     public static final class id {
         public static final int adjust_height=0x7f100013;
@@ -2226,9 +2237,32 @@ Detail page strings
         res/values-v11/styles.xml on API 14+ devices.
     
  API 14 theme customizations can go here. 
+
+        Base application theme, dependent on API level. This theme is replaced
+        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
+    
+
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        
+
+        Base application theme for API 14+. This theme completely replaces
+        AppBaseTheme from BOTH res/values/styles.xml and
+        res/values-v11/styles.xml on API 14+ devices.
+    
+ API 14 theme customizations can go here. 
+
+        Base application theme for API 14+. This theme completely replaces
+        AppBaseTheme from BOTH res/values/styles.xml and
+        res/values-v11/styles.xml on API 14+ devices.
+    
+ API 14 theme customizations can go here. 
          */
         public static final int AppBaseTheme=0x7f0f0020;
         /**  Application theme. 
+ All customizations that are NOT specific to a particular API-level can go here. 
+ Application theme. 
  All customizations that are NOT specific to a particular API-level can go here. 
          */
         public static final int AppTheme=0x7f0f0021;

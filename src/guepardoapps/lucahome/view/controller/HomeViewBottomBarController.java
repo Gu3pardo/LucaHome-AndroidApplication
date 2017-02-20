@@ -13,13 +13,14 @@ import android.widget.Toast;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.dto.UserDto;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.DialogService;
-import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.services.helper.UserService;
 import guepardoapps.lucahome.view.InformationView;
 import guepardoapps.lucahome.view.SettingsView;
+
+import guepardoapps.lucahomelibrary.common.dto.UserDto;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.services.helper.DialogService;
+import guepardoapps.lucahomelibrary.services.helper.NavigationService;
+import guepardoapps.lucahomelibrary.services.helper.UserService;
 
 public class HomeViewBottomBarController {
 

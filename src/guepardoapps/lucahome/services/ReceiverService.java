@@ -11,9 +11,10 @@ import android.os.IBinder;
 
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-import guepardoapps.lucahome.common.controller.ServiceController;
-import guepardoapps.lucahome.common.enums.LucaObject;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
+
+import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
+import guepardoapps.lucahomelibrary.common.controller.ServiceController;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.controller.ReceiverController;
@@ -32,6 +33,7 @@ public class ReceiverService extends Service {
 
 	private Context _context;
 
+	private LucaNotificationController _notificationController;
 	private NetworkController _networkController;
 	private ReceiverController _receiverController;
 	private SharedPrefController _sharedPrefController;
@@ -76,7 +78,7 @@ public class ReceiverService extends Service {
 						// set a flag to display notification later
 						if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 							_logger.Debug("Showing notification go to sleep!");
-							_serviceController.StartNotificationService("", "", -1, LucaObject.GO_TO_BED);
+							_notificationController.CreateSleepHeatingNotification();
 						} else {
 							_sharedPrefController
 									.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, true);
@@ -105,6 +107,7 @@ public class ReceiverService extends Service {
 			_context = this;
 
 			_networkController = new NetworkController(_context, null);
+			_notificationController = new LucaNotificationController(_context);
 			_receiverController = new ReceiverController(_context);
 			_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
 			_serviceController = new ServiceController(_context);

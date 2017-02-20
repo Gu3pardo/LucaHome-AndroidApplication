@@ -19,17 +19,15 @@ import android.widget.Toast;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.classes.SerializableList;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.dto.MapContentDto;
-import guepardoapps.lucahome.common.dto.ScheduleDto;
-import guepardoapps.lucahome.common.dto.TimerDto;
-import guepardoapps.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
-import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.DialogService;
+
+import guepardoapps.lucahomelibrary.common.classes.SerializableList;
+import guepardoapps.lucahomelibrary.common.dto.*;
+import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.services.helper.DialogService;
+import guepardoapps.lucahomelibrary.view.controller.MapContentController;
 
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;

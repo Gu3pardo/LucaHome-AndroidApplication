@@ -40,7 +40,11 @@
                 android:text="@string/set_display_socket_notification"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/TextIcon"
-                android:textStyle="bold" />
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@drawable/customswitchselector"
+                android:track="@drawable/custom_track" />
 
             <Switch
                 android:id="@+id/switch_display_weather_notification"
@@ -51,7 +55,11 @@
                 android:text="@string/set_display_weather_notification"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/TextIcon"
-                android:textStyle="bold" />
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@drawable/customswitchselector"
+                android:track="@drawable/custom_track" />
 
             <Switch
                 android:id="@+id/switch_display_temperature_notification"
@@ -62,7 +70,11 @@
                 android:text="@string/set_display_temperature_notification"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:textColor="@color/TextIcon"
-                android:textStyle="bold" />
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@drawable/customswitchselector"
+                android:track="@drawable/custom_track" />
         </LinearLayout>
 
         <LinearLayout

@@ -1,5 +1,5 @@
 <wearableApp package="guepardoapps.lucahome">
-	<versionCode>120170209</versionCode>
-	<versionName>1.2.0.170209</versionName>
+	<versionCode>20000</versionCode>
+	<versionName>2.0.0.170219</versionName>
 	<rawPathResId>wearable_app</rawPathResId>
 </wearableApp>

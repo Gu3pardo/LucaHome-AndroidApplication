@@ -25,18 +25,18 @@ import android.widget.Toast;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.IDs;
-import guepardoapps.lucahome.common.controller.*;
-import guepardoapps.lucahome.common.dto.sensor.TemperatureDto;
-import guepardoapps.lucahome.common.enums.MainServiceAction;
-import guepardoapps.lucahome.common.enums.TemperatureType;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.view.customadapter.*;
+
+import guepardoapps.lucahomelibrary.common.classes.*;
+import guepardoapps.lucahomelibrary.common.constants.Color;
+import guepardoapps.lucahomelibrary.common.controller.*;
+import guepardoapps.lucahomelibrary.common.dto.*;
+import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
+import guepardoapps.lucahomelibrary.common.enums.TemperatureType;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.services.helper.NavigationService;
+import guepardoapps.lucahomelibrary.view.customadapter.*;
 
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
@@ -61,9 +61,9 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 	private Context _context;
 
 	private BroadcastController _broadcastController;
+	private LucaNotificationController _notificationController;
 	private NavigationService _navigationService;
 	private ReceiverController _receiverController;
-	private ServiceController _serviceController;
 
 	private SensorManager _sensorManager;
 	private Sensor _sensor;
@@ -136,7 +136,7 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 			}
 
 			if (_temperatureList != null && _currentWeather != null) {
-				_serviceController.StartTemperatureNotificationService(IDs.NOTIFICATION_TEMPERATURE, _temperatureList,
+				_notificationController.CreateTemperatureNotification(SensorTemperatureView.class, _temperatureList,
 						_currentWeather);
 			}
 
@@ -158,8 +158,8 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 
 		_broadcastController = new BroadcastController(_context);
 		_navigationService = new NavigationService(_context);
+		_notificationController = new LucaNotificationController(_context);
 		_receiverController = new ReceiverController(_context);
-		_serviceController = new ServiceController(_context);
 
 		_listView = (ListView) findViewById(R.id.listView);
 		_progressBar = (ProgressBar) findViewById(R.id.progressBarListView);

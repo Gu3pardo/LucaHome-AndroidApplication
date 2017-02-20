@@ -22,25 +22,26 @@ import android.widget.Toast;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.classes.SerializableList;
-import guepardoapps.lucahome.common.classes.Sound;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.constants.Color;
-import guepardoapps.lucahome.common.constants.IDs;
-import guepardoapps.lucahome.common.constants.ServerActions;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-import guepardoapps.lucahome.common.controller.ServiceController;
-import guepardoapps.lucahome.common.converter.json.JsonDataToSocketConverter;
-import guepardoapps.lucahome.common.converter.json.JsonDataToSoundConverter;
-import guepardoapps.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.lucahome.common.enums.LucaObject;
-import guepardoapps.lucahome.common.enums.RaspberrySelection;
-import guepardoapps.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.lucahome.services.helper.DialogService;
-import guepardoapps.lucahome.services.helper.NavigationService;
-import guepardoapps.lucahome.view.controller.SoundController;
-import guepardoapps.lucahome.view.customadapter.SoundListAdapter;
+
+import guepardoapps.lucahomelibrary.common.classes.SerializableList;
+import guepardoapps.lucahomelibrary.common.classes.Sound;
+import guepardoapps.lucahomelibrary.common.constants.Color;
+import guepardoapps.lucahomelibrary.common.constants.ServerActions;
+import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
+import guepardoapps.lucahomelibrary.common.controller.ServiceController;
+import guepardoapps.lucahomelibrary.common.converter.json.JsonDataToSocketConverter;
+import guepardoapps.lucahomelibrary.common.converter.json.JsonDataToSoundConverter;
+import guepardoapps.lucahomelibrary.common.dto.WirelessSocketDto;
+import guepardoapps.lucahomelibrary.common.enums.LucaObject;
+import guepardoapps.lucahomelibrary.common.enums.RaspberrySelection;
+import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahomelibrary.services.helper.DialogService;
+import guepardoapps.lucahomelibrary.services.helper.NavigationService;
+import guepardoapps.lucahomelibrary.view.controller.SoundController;
+import guepardoapps.lucahomelibrary.view.customadapter.SoundListAdapter;
 
 import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
@@ -74,6 +75,7 @@ public class SoundView extends Activity {
 	private Context _context;
 
 	private DialogService _dialogService;
+	private LucaNotificationController _notificationController;
 	private NavigationService _navigationService;
 	private ReceiverController _receiverController;
 	private ServiceController _serviceController;
@@ -348,7 +350,7 @@ public class SoundView extends Activity {
 				String[] socketStringArray = intent.getStringArrayExtra(Bundles.SOCKET_DOWNLOAD);
 				if (socketStringArray != null) {
 					_wirelessSocketList = JsonDataToSocketConverter.GetList(socketStringArray);
-					_serviceController.StartSocketNotificationService(IDs.NOTIFICATION_WEAR, _wirelessSocketList);
+					_notificationController.CreateSocketNotification(_wirelessSocketList);
 				}
 				break;
 			default:
@@ -396,6 +398,7 @@ public class SoundView extends Activity {
 
 		_dialogService = new DialogService(_context);
 		_navigationService = new NavigationService(_context);
+		_notificationController = new LucaNotificationController(_context);
 		_receiverController = new ReceiverController(_context);
 		_serviceController = new ServiceController(_context);
 		_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
