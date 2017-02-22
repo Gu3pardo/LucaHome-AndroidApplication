@@ -20,11 +20,11 @@ import guepardoapps.lucahome.services.ControlServiceStateService;
 import guepardoapps.lucahome.services.MainService;
 
 import guepardoapps.lucahomelibrary.common.constants.Color;
+import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.enums.Command;
 import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
 import guepardoapps.lucahomelibrary.common.enums.NavigateData;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.DialogService;
 import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 import guepardoapps.lucahomelibrary.services.wearcontrol.PhoneMessageListenerService;
 
@@ -46,7 +46,7 @@ public class BootView extends Activity {
 
 	private Context _context;
 
-	private DialogService _dialogService;
+	private LucaDialogController _dialogController;
 	private NavigationService _navigationService;
 	private NetworkController _networkController;
 	private ReceiverController _receiverController;
@@ -98,7 +98,7 @@ public class BootView extends Activity {
 					break;
 				case SHOW_USER_LOGIN_DIALOG:
 					_logger.Debug("SHOW_USER_LOGIN_DIALOG");
-					_dialogService.ShowUserCredentialsDialog(null, _startDownloadRunnable, false);
+					_dialogController.ShowUserCredentialsDialog(null, _startDownloadRunnable, false);
 					break;
 				default:
 					_logger.Warn("Command is not supported: " + command.toString());
@@ -140,9 +140,9 @@ public class BootView extends Activity {
 
 		_context = this;
 
-		_dialogService = new DialogService(_context);
+		_dialogController = new LucaDialogController(_context);
 		_navigationService = new NavigationService(_context);
-		_networkController = new NetworkController(_context, _dialogService);
+		_networkController = new NetworkController(_context, _dialogController);
 		_receiverController = new ReceiverController(_context);
 
 		if (_networkController.IsNetworkAvailable()) {

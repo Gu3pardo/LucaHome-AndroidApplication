@@ -152,8 +152,8 @@ public final class R {
 		public static final int center_vertical = 0x7f10000b;
 		public static final int clip_horizontal = 0x7f10000c;
 		public static final int clip_vertical = 0x7f10000d;
-		public static final int dismiss_overlay_button = 0x7f10007b;
-		public static final int dismiss_overlay_explain = 0x7f10007a;
+		public static final int dismiss_overlay_button = 0x7f100081;
+		public static final int dismiss_overlay_explain = 0x7f100080;
 		public static final int end = 0x7f10000e;
 		public static final int fill = 0x7f10000f;
 		public static final int fill_horizontal = 0x7f100010;
@@ -161,13 +161,13 @@ public final class R {
 		public static final int fit = 0x7f100009;
 		public static final int height = 0x7f100005;
 		public static final int left = 0x7f100002;
-		public static final int message = 0x7f10007c;
+		public static final int message = 0x7f100082;
 		public static final int none = 0x7f100006;
 		public static final int parentPanel = 0x7f100029;
 		public static final int right = 0x7f100003;
 		public static final int start = 0x7f100012;
-		public static final int text = 0x7f100171;
-		public static final int title = 0x7f100170;
+		public static final int text = 0x7f100179;
+		public static final int title = 0x7f100178;
 		public static final int top = 0x7f100004;
 		public static final int width = 0x7f100007;
 	}

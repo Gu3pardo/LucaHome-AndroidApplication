@@ -30,6 +30,7 @@ import guepardoapps.lucahomelibrary.common.classes.SerializableList;
 import guepardoapps.lucahomelibrary.common.classes.Sound;
 import guepardoapps.lucahomelibrary.common.constants.Color;
 import guepardoapps.lucahomelibrary.common.constants.ServerActions;
+import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
 import guepardoapps.lucahomelibrary.common.controller.ServiceController;
 import guepardoapps.lucahomelibrary.common.converter.json.JsonDataToSocketConverter;
@@ -38,7 +39,6 @@ import guepardoapps.lucahomelibrary.common.dto.WirelessSocketDto;
 import guepardoapps.lucahomelibrary.common.enums.LucaObject;
 import guepardoapps.lucahomelibrary.common.enums.RaspberrySelection;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.DialogService;
 import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 import guepardoapps.lucahomelibrary.view.controller.SoundController;
 import guepardoapps.lucahomelibrary.view.customadapter.SoundListAdapter;
@@ -74,7 +74,7 @@ public class SoundView extends Activity {
 
 	private Context _context;
 
-	private DialogService _dialogService;
+	private LucaDialogController _dialogController;
 	private LucaNotificationController _notificationController;
 	private NavigationService _navigationService;
 	private ReceiverController _receiverController;
@@ -370,7 +370,7 @@ public class SoundView extends Activity {
 						"Cannot change raspberry! Raspberry 1 has not file " + _soundPlaying.GetFileName(),
 						Toast.LENGTH_LONG).show();
 			}
-			_dialogService.CloseDialogCallback.run();
+			_dialogController.CloseDialogCallback.run();
 		}
 	};
 
@@ -384,7 +384,7 @@ public class SoundView extends Activity {
 						"Cannot change raspberry! Raspberry 2 has not file " + _soundPlaying.GetFileName(),
 						Toast.LENGTH_LONG).show();
 			}
-			_dialogService.CloseDialogCallback.run();
+			_dialogController.CloseDialogCallback.run();
 		}
 	};
 
@@ -396,7 +396,7 @@ public class SoundView extends Activity {
 		_logger = new LucaHomeLogger(TAG);
 		_logger.Debug("onCreate");
 
-		_dialogService = new DialogService(_context);
+		_dialogController = new LucaDialogController(_context);
 		_navigationService = new NavigationService(_context);
 		_notificationController = new LucaNotificationController(_context);
 		_receiverController = new ReceiverController(_context);
@@ -516,7 +516,7 @@ public class SoundView extends Activity {
 		_buttonSelectRaspberry.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				_dialogService.ShowDialogDouble("Select a raspberry", "", "Raspberry 1", _selectRaspberry1,
+				_dialogController.ShowDialogDouble("Select a raspberry", "", "Raspberry 1", _selectRaspberry1,
 						"Raspberry 2", _selectRaspberry2, true);
 			}
 		});

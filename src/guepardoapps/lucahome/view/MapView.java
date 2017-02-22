@@ -30,10 +30,10 @@ import guepardoapps.lucahome.common.constants.Bundles;
 
 import guepardoapps.lucahomelibrary.common.classes.*;
 import guepardoapps.lucahomelibrary.common.constants.Color;
+import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.dto.*;
 import guepardoapps.lucahomelibrary.common.enums.*;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.DialogService;
 import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 import guepardoapps.lucahomelibrary.view.controller.MapContentController;
 
@@ -62,7 +62,7 @@ public class MapView extends Activity {
 	private Context _context;
 
 	private BroadcastController _broadcastController;
-	private DialogService _dialogService;
+	private LucaDialogController _dialogController;
 	private MapContentController _mapContentController;
 	private NavigationService _navigationService;
 	private ReceiverController _receiverController;
@@ -198,7 +198,7 @@ public class MapView extends Activity {
 		_context = this;
 
 		_broadcastController = new BroadcastController(_context);
-		_dialogService = new DialogService(_context);
+		_dialogController = new LucaDialogController(_context);
 		_mapContentController = new MapContentController(_context);
 		_navigationService = new NavigationService(_context);
 		_receiverController = new ReceiverController(_context);
@@ -391,11 +391,11 @@ public class MapView extends Activity {
 						_logger.Warn("Reactivate delete!");
 						Toasty.info(_context, "Reactivate delete!", Toast.LENGTH_SHORT).show();
 
-						_dialogService.CloseDialogCallback.run();
+						_dialogController.CloseDialogCallback.run();
 					}
 				};
-				_dialogService.ShowDialogDouble("Delete this drawing?", "", "Yes", deleteRunnable, "No",
-						_dialogService.CloseDialogCallback, true);
+				_dialogController.ShowDialogDouble("Delete this drawing?", "", "Yes", deleteRunnable, "No",
+						_dialogController.CloseDialogCallback, true);
 			}
 
 			private void showInformation(SerializableList<WirelessSocketDto> wirelessSocketList,
@@ -461,7 +461,7 @@ public class MapView extends Activity {
 							}
 						}
 
-						_dialogService.ShowMapSocketDialog(socket, scheduleList, timerList);
+						_dialogController.ShowMapSocketDialog(socket, scheduleList, timerList);
 					} else {
 						_logger.Warn("SocketList to big!" + String.valueOf(socketList.size()));
 					}
@@ -475,7 +475,7 @@ public class MapView extends Activity {
 				String temperatureArea = newMapContent.GetTemperatureArea();
 				for (int index = 0; index < temperatureList.getSize(); index++) {
 					if (temperatureList.getValue(index).GetArea().contains(temperatureArea)) {
-						_dialogService.ShowTemperatureGraphDialog(temperatureList.getValue(index).GetGraphPath());
+						_dialogController.ShowTemperatureGraphDialog(temperatureList.getValue(index).GetGraphPath());
 						break;
 					}
 				}

@@ -17,9 +17,9 @@ public final class R {
 		public static final int toast_frame = 0x7f020087;
 	}
 	public static final class id {
-		public static final int toast_icon = 0x7f1000ed;
-		public static final int toast_root = 0x7f1000ec;
-		public static final int toast_text = 0x7f1000ee;
+		public static final int toast_icon = 0x7f1000f4;
+		public static final int toast_root = 0x7f1000f3;
+		public static final int toast_text = 0x7f1000f5;
 	}
 	public static final class layout {
 		public static final int toast_layout = 0x7f030026;

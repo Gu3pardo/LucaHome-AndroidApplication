@@ -21,6 +21,7 @@ import guepardoapps.lucahome.view.SensorTemperatureView;
 import guepardoapps.lucahomelibrary.common.classes.*;
 import guepardoapps.lucahomelibrary.common.constants.IDs;
 import guepardoapps.lucahomelibrary.common.constants.ServerActions;
+import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
 import guepardoapps.lucahomelibrary.common.controller.ServiceController;
 import guepardoapps.lucahomelibrary.common.converter.json.*;
@@ -29,7 +30,6 @@ import guepardoapps.lucahomelibrary.common.enums.*;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 import guepardoapps.lucahomelibrary.mediamirror.client.ClientTask;
 import guepardoapps.lucahomelibrary.mediamirror.common.enums.ServerAction;
-import guepardoapps.lucahomelibrary.services.helper.DialogService;
 import guepardoapps.lucahomelibrary.services.sockets.SocketActionService;
 import guepardoapps.lucahomelibrary.view.controller.MediaMirrorController;
 
@@ -79,7 +79,7 @@ public class MainService extends Service {
 	private Context _context;
 
 	private BroadcastController _broadcastController;
-	private DialogService _dialogService;
+	private LucaDialogController _dialogController;
 	private LucaNotificationController _notificationController;
 	private NetworkController _networkController;
 	private OpenWeatherController _openWeatherController;
@@ -326,6 +326,9 @@ public class MainService extends Service {
 				case ENABLE_HEATING_AND_SOUND:
 					enableHeatingSocket(true);
 					break;
+				case ENABLE_SEA_SOUND:
+					enableSoundSchedule(30);
+					break;
 				default:
 					_logger.Warn("action is not supported! " + action.toString());
 					break;
@@ -368,12 +371,20 @@ public class MainService extends Service {
 			int timerMinute = _sharedPrefController
 					.LoadIntegerValueFromSharedPreferences(SharedPrefConstants.TIMER_MIN);
 			int timerHour = _sharedPrefController.LoadIntegerValueFromSharedPreferences(SharedPrefConstants.TIMER_HOUR);
+			_logger.Debug(String.format("Loaded time values are %s:%s", timerHour, timerMinute));
+			if (timerMinute == 0 && timerHour == 0) {
+				_logger.Error(String.format("timerMinute and timerHour is 0! Setting timerMinute to default %s!",
+						SharedPrefConstants.DEFAULT_TIMER_MIN));
+				timerMinute = SharedPrefConstants.DEFAULT_TIMER_MIN;
+			}
 
 			Calendar currentTime = Calendar.getInstance();
 			int currentDay = currentTime.get(Calendar.DAY_OF_WEEK) - 1;
+			_logger.Debug(String.format("Current time is %s", currentTime));
 
 			int scheduleMinute = currentTime.get(Calendar.MINUTE) + timerMinute;
 			int scheduleHour = currentTime.get(Calendar.HOUR_OF_DAY) + timerHour;
+			_logger.Debug(String.format("schedule time is %s:%s", scheduleHour, scheduleMinute));
 
 			if (scheduleMinute > 59) {
 				scheduleMinute -= 60;
@@ -389,22 +400,28 @@ public class MainService extends Service {
 
 			String addHeatingTimerAction = ServerActions.ADD_SCHEDULE + socketName + "_" + String.valueOf(scheduleHour)
 					+ "_" + String.valueOf(scheduleMinute) + "&socket=" + socketName + "&gpio=&weekday=" + currentDay
-					+ "&hour=" + scheduleHour + "&minute=" + scheduleMinute + "&onoff=0&deleteflag=1";
+					+ "&hour=" + scheduleHour + "&minute=" + scheduleMinute
+					+ "&onoff=0&isTimer=1&playSound=0&playRaspberry=1";
+			_logger.Debug(String.format("Heating action is %s", addHeatingTimerAction));
 
 			_serviceController.StartRestService("", addHeatingTimerAction, Broadcasts.RELOAD_TIMER, LucaObject.TIMER,
 					RaspberrySelection.BOTH);
 
 			if (enableSound) {
-				enableSoundSchedule(currentDay, scheduleHour, scheduleMinute);
+				enableSoundSchedule(30);
 			}
+
+			startDownloadSocket();
+			startDownloadSchedule();
 		}
 
-		private void enableSoundSchedule(int currentDay, int scheduleHour, int scheduleMinute) {
+		private void enableSoundSchedule(int playLength) {
 			_logger.Debug("enableSoundSchedule");
 			ClientTask clientTask = new ClientTask(_context,
 					MediaMirrorController.SERVER_IPS.get(MediaMirrorController.SLEEP_MEDIA_SERVER_INDEX),
 					MediaMirrorController.SERVERPORT);
-			clientTask.SetCommunication(ServerAction.PLAY_SEA_SOUND.toString());
+			clientTask.SetCommunication(
+					"ACTION:" + ServerAction.PLAY_SEA_SOUND.toString() + "&DATA:" + String.valueOf(playLength));
 			clientTask.execute();
 		}
 	};
@@ -1010,7 +1027,7 @@ public class MainService extends Service {
 			_context = this;
 
 			_broadcastController = new BroadcastController(_context);
-			_dialogService = new DialogService(_context);
+			_dialogController = new LucaDialogController(_context);
 			_networkController = new NetworkController(_context,
 					new DialogController(_context, ContextCompat.getColor(_context, R.color.TextIcon),
 							ContextCompat.getColor(_context, R.color.Background)));
@@ -1188,7 +1205,7 @@ public class MainService extends Service {
 
 		if (!_downloadingData) {
 			if (!_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USER_DATA_ENTERED)) {
-				_dialogService.ShowUserCredentialsDialog(null, _startDownloadRunnable, false);
+				_dialogController.ShowUserCredentialsDialog(null, _startDownloadRunnable, false);
 			} else {
 				Calendar now = Calendar.getInstance();
 				if (_lastUpdate != null) {

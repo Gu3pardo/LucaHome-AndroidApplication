@@ -2,7 +2,7 @@ package guepardoapps.lucahome.common.constants;
 
 public class SharedPrefConstants {
 	public static final String SHARED_PREF_NAME = "LUCA_HOME";
-	public static final String SHARED_PREF_INSTALLED = "APP_VERSION_1.10.0.170218_INSTALLED";
+	public static final String SHARED_PREF_INSTALLED = "APP_VERSION_2.0.5.170222_INSTALLED";
 
 	public static final String DISPLAY_SOCKET_NOTIFICATION = "DISPLAY_SOCKET_NOTIFICATION";
 	public static final String DISPLAY_WEATHER_NOTIFICATION = "DISPLAY_WEATHER_NOTIFICATION";
@@ -20,7 +20,7 @@ public class SharedPrefConstants {
 	public static final String DISPLAY_SLEEP_NOTIFICATION_ACTIVE = "DISPLAY_SLEEP_NOTIFICATION_ACTIVE";
 
 	public static final String TIMER_MIN = "Timer_Min";
-	public static final int DEFAULT_TIMER_MIN = 20;
+	public static final int DEFAULT_TIMER_MIN = 15;
 	public static final String TIMER_HOUR = "Timer_Hour";
 	public static final int DEFAULT_TIMER_HOUR = 0;
 }

@@ -58,6 +58,8 @@ public class MediaMirrorView extends Activity {
 	private Button _sendVolumeMuteButton;
 	private Button _sendVolumeUnmuteButton;
 	private TextView _currentVolumeTextView;
+	
+	private Button _sendSeaSoundStopButton;
 
 	private EditText _youtubeIdInput;
 	private Button _youtubeIdInputSendButton;
@@ -224,6 +226,14 @@ public class MediaMirrorView extends Activity {
 		_currentVolumeTextView = (TextView) findViewById(R.id.volumeCurrentValue);
 		_currentVolumeTextView.setText("Loading...");
 		_mediaMirrorController.GetCurrentVolume();
+		
+		_sendSeaSoundStopButton = (Button) findViewById(R.id.seasoundStopButton);
+		_sendSeaSoundStopButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_mediaMirrorController.SendStopSeaSound();
+			}
+		});
 
 		_youtubeIdInput = (EditText) findViewById(R.id.youtubeIdInput);
 		_youtubeIdInputSendButton = (Button) findViewById(R.id.youtubeIdInputSendButton);

@@ -75,12 +75,12 @@ public final class R {
 		public static final int custom_alert_dialog_btn_ok = 0x7f100030;
 		public static final int custom_alert_dialog_prompt = 0x7f10002f;
 		public static final int custom_alert_dialog_title = 0x7f10002e;
-		public static final int floating_message_background = 0x7f10007d;
-		public static final int floating_message_text = 0x7f10007f;
-		public static final int floating_message_title = 0x7f10007e;
-		public static final int toast_icon = 0x7f1000ed;
-		public static final int toast_root = 0x7f1000ec;
-		public static final int toast_text = 0x7f1000ee;
+		public static final int floating_message_background = 0x7f100083;
+		public static final int floating_message_text = 0x7f100085;
+		public static final int floating_message_title = 0x7f100084;
+		public static final int toast_icon = 0x7f1000f4;
+		public static final int toast_root = 0x7f1000f3;
+		public static final int toast_text = 0x7f1000f5;
 	}
 	public static final class layout {
 		public static final int custom_dialog_1 = 0x7f030001;

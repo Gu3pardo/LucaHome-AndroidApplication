@@ -20,10 +20,10 @@ import guepardoapps.lucahome.common.constants.Bundles;
 
 import guepardoapps.lucahomelibrary.common.classes.*;
 import guepardoapps.lucahomelibrary.common.constants.Color;
+import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.dto.*;
 import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.DialogService;
 import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 import guepardoapps.lucahomelibrary.view.customadapter.*;
 
@@ -47,7 +47,7 @@ public class BirthdayView extends Activity {
 	private Context _context;
 
 	private BroadcastController _broadcastController;
-	private DialogService _dialogService;
+	private LucaDialogController _dialogController;
 	private NavigationService _navigationService;
 	private ReceiverController _receiverController;
 
@@ -91,7 +91,7 @@ public class BirthdayView extends Activity {
 		_context = this;
 
 		_broadcastController = new BroadcastController(_context);
-		_dialogService = new DialogService(_context);
+		_dialogController = new LucaDialogController(_context);
 		_navigationService = new NavigationService(_context);
 		_receiverController = new ReceiverController(_context);
 
@@ -103,7 +103,7 @@ public class BirthdayView extends Activity {
 			@Override
 			public void onClick(View v) {
 				_logger.Debug("onClick _buttonAdd");
-				_dialogService.ShowAddBirthdayDialog(_id, _getDataRunnable, null, true);
+				_dialogController.ShowAddBirthdayDialog(_id, _getDataRunnable, null, true);
 			}
 		});
 	}

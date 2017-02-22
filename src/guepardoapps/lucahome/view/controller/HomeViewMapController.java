@@ -23,10 +23,10 @@ import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 
 import guepardoapps.lucahomelibrary.common.classes.SerializableList;
+import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.dto.*;
 import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.DialogService;
 import guepardoapps.lucahomelibrary.view.controller.MapContentController;
 
 import guepardoapps.toolset.controller.BroadcastController;
@@ -43,7 +43,7 @@ public class HomeViewMapController {
 	private Context _context;
 
 	private BroadcastController _broadcastController;
-	private DialogService _dialogService;
+	private LucaDialogController _dialogController;
 	private MapContentController _mapContentController;
 	private ReceiverController _receiverController;
 
@@ -97,7 +97,7 @@ public class HomeViewMapController {
 		_context = context;
 
 		_broadcastController = new BroadcastController(_context);
-		_dialogService = new DialogService(_context);
+		_dialogController = new LucaDialogController(_context);
 		_mapContentController = new MapContentController(_context);
 		_receiverController = new ReceiverController(_context);
 	}
@@ -207,6 +207,7 @@ public class HomeViewMapController {
 				if (socketList != null) {
 					if (socketList.size() == 1) {
 						String socketName = socketList.get(0);
+						_logger.Info(String.format("Socket name is %s", socketName));
 
 						for (int index = 0; index < wirelessSocketList.getSize(); index++) {
 							if (wirelessSocketList.getValue(index).GetName().contains(socketName)) {
@@ -220,19 +221,28 @@ public class HomeViewMapController {
 							return;
 						}
 
+						_logger.Info(String.format("Found %s schedules!", scheduleAllList.getSize()));
 						for (int index = 0; index < scheduleAllList.getSize(); index++) {
-							if (scheduleAllList.getValue(index).GetSocket().GetName().contains(socketName)) {
+							String scheduleName = scheduleAllList.getValue(index).GetSocket().GetName();
+							_logger.Info(String.format("Schedule name is %s", scheduleName));
+							if (scheduleName.contains(socketName)) {
+								_logger.Info(
+										String.format("Found schedule %s for socket %s", scheduleName, socketName));
 								scheduleList.addValue(scheduleAllList.getValue(index));
 							}
 						}
 
+						_logger.Info(String.format("Found %s timer!", timerAllList.getSize()));
 						for (int index = 0; index < timerAllList.getSize(); index++) {
+							String timerName = timerAllList.getValue(index).GetSocket().GetName();
+							_logger.Info(String.format("Timer name is %s", timerName));
 							if (timerAllList.getValue(index).GetSocket().GetName().contains(socketName)) {
+								_logger.Info(String.format("Found timer %s for socket %s", timerName, socketName));
 								timerList.addValue(timerAllList.getValue(index));
 							}
 						}
 
-						_dialogService.ShowMapSocketDialog(socket, scheduleList, timerList);
+						_dialogController.ShowMapSocketDialog(socket, scheduleList, timerList);
 					} else {
 						_logger.Warn("SocketList to big!" + String.valueOf(socketList.size()));
 					}
@@ -246,7 +256,7 @@ public class HomeViewMapController {
 				String temperatureArea = newMapContent.GetTemperatureArea();
 				for (int index = 0; index < temperatureList.getSize(); index++) {
 					if (temperatureList.getValue(index).GetArea().contains(temperatureArea)) {
-						_dialogService.ShowTemperatureGraphDialog(temperatureList.getValue(index).GetGraphPath());
+						_dialogController.ShowTemperatureGraphDialog(temperatureList.getValue(index).GetGraphPath());
 						break;
 					}
 				}

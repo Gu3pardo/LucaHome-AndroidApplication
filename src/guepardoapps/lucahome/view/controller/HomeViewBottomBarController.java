@@ -15,10 +15,9 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.view.InformationView;
 import guepardoapps.lucahome.view.SettingsView;
-
+import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.dto.UserDto;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.DialogService;
 import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 import guepardoapps.lucahomelibrary.services.helper.UserService;
 
@@ -29,7 +28,7 @@ public class HomeViewBottomBarController {
 
 	private Context _context;
 
-	private DialogService _dialogService;
+	private LucaDialogController _dialogController;
 	private NavigationService _navigationService;
 	private UserService _userService;
 
@@ -49,7 +48,7 @@ public class HomeViewBottomBarController {
 		_logger = new LucaHomeLogger(TAG);
 		_context = context;
 
-		_dialogService = new DialogService(_context);
+		_dialogController = new LucaDialogController(_context);
 		_navigationService = new NavigationService(_context);
 		_userService = new UserService(_context);
 	}
@@ -103,7 +102,7 @@ public class HomeViewBottomBarController {
 			@Override
 			public void onClick(View view) {
 				UserDto user = _userService.LoadUser();
-				_dialogService.ShowUserDetailsDialog(user, _updateUser);
+				_dialogController.ShowUserDetailsDialog(user, _updateUser);
 			}
 		});
 
