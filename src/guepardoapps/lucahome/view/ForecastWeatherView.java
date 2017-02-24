@@ -62,6 +62,7 @@ public class ForecastWeatherView extends Activity {
 			ForecastModel data = (ForecastModel) intent.getSerializableExtra(Bundles.WEATHER_FORECAST);
 
 			if (data != null) {
+				_logger.Info(String.format("ForecastModel: %s", data.toString()));
 				_listAdapter = new ForecastListAdapter(_context, data.GetList());
 				_listView.setAdapter(_listAdapter);
 

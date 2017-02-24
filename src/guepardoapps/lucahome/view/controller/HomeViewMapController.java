@@ -126,10 +126,13 @@ public class HomeViewMapController {
 
 	public void onPause() {
 		_logger.Debug("onPause");
+		_isInitialized = false;
+		_receiverController.UnregisterReceiver(_mapDataReceiver);
 	}
 
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
+		_isInitialized = false;
 		_receiverController.UnregisterReceiver(_mapDataReceiver);
 	}
 
