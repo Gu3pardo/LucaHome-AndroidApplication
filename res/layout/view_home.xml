@@ -340,9 +340,7 @@
         android:layout_below="@+id/textViewCenter"
         android:layout_margin="10dp"
         android:layout_toEndOf="@+id/textViewCenter"
-        android:clickable="true"
         android:contentDescription="@string/contentDescription"
-        android:onClick="ShowMap"
         android:padding="5dp"
         android:scaleType="fitXY"
         android:src="@drawable/map_minimized" />

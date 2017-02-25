@@ -165,7 +165,7 @@ public class HomeViewMapController {
 			final SerializableList<ScheduleDto> scheduleAllList, final SerializableList<TimerDto> timerAllList,
 			final SerializableList<TemperatureDto> temperatureList) {
 		final TextView newTextView = _mapContentController.CreateEntry(newMapContent, newMapContent.GetPosition(),
-				wirelessSocketList, _size, true);
+				wirelessSocketList, temperatureList, _size, true);
 		newTextView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {

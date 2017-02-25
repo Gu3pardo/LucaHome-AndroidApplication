@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.view.View;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.view.controller.HomeViewBottomBarController;
@@ -15,7 +14,6 @@ import guepardoapps.lucahome.view.controller.HomeViewWeatherController;
 
 import guepardoapps.lucahomelibrary.common.constants.Color;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 
 public class HomeView extends Activity {
 
@@ -23,8 +21,6 @@ public class HomeView extends Activity {
 	private LucaHomeLogger _logger;
 
 	private Context _context;
-
-	private NavigationService _navigationService;
 
 	private HomeViewBottomBarController _bottomBarController;
 	private HomeViewListButtonController _listButtonController;
@@ -41,8 +37,6 @@ public class HomeView extends Activity {
 		_logger.Debug("onCreate");
 
 		_context = this;
-
-		_navigationService = new NavigationService(_context);
 
 		_bottomBarController = new HomeViewBottomBarController(_context);
 		_listButtonController = new HomeViewListButtonController(_context);
@@ -95,11 +89,5 @@ public class HomeView extends Activity {
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
-	}
-
-	public void ShowMap(View view) {
-		_logger.Debug("ShowMap");
-		_logger.Debug("Selected by view: " + view.getTransitionName());
-		_navigationService.NavigateTo(MapView.class, true);
 	}
 }

@@ -619,7 +619,7 @@ public final class R {
 		public static final int temperature_item_temperatureType = 0x7f1000c2;
 		public static final int temperature_item_value = 0x7f1000bf;
 		public static final int terrain = 0x7f100018;
-		public static final int text = 0x7f10017a;
+		public static final int text = 0x7f10016f;
 		public static final int timer_item_action = 0x7f1000cc;
 		public static final int timer_item_border = 0x7f1000c7;
 		public static final int timer_item_delete = 0x7f1000ce;
@@ -629,7 +629,7 @@ public final class R {
 		public static final int timer_item_socket = 0x7f1000cb;
 		public static final int timer_item_time = 0x7f1000c9;
 		public static final int timer_item_weekday = 0x7f1000ca;
-		public static final int title = 0x7f100179;
+		public static final int title = 0x7f10016e;
 		public static final int toast_icon = 0x7f1000f5;
 		public static final int toast_root = 0x7f1000f4;
 		public static final int toast_text = 0x7f1000f6;
@@ -705,7 +705,7 @@ public final class R {
 		public static final int notification_skeleton_textview = 0x7f030026;
 		public static final int notification_sleep = 0x7f030027;
 		public static final int toast_layout = 0x7f030028;
-		public static final int watch_card_content = 0x7f030033;
+		public static final int watch_card_content = 0x7f030032;
 	}
 	public static final class raw {
 		public static final int gtm_analytics = 0x7f080000;
