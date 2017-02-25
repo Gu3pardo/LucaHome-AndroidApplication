@@ -19,11 +19,10 @@ import guepardoapps.lucahomelibrary.common.controller.ServiceController;
 import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
+import guepardoapps.toolset.controller.AndroidSystemController;
+import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
-import guepardoapps.toolset.services.AndroidSystemService;
-
-import guepardoapps.toolset.controller.BroadcastController;
 
 public class BootReceiver extends BroadcastReceiver {
 
@@ -36,7 +35,7 @@ public class BootReceiver extends BroadcastReceiver {
 
 	private Context _context;
 
-	private AndroidSystemService _androidSystemService;
+	private AndroidSystemController _androidSystemController;
 	private BroadcastController _broadcastController;
 	private DialogController _dialogController;
 	private LucaNotificationController _notificationController;
@@ -67,8 +66,8 @@ public class BootReceiver extends BroadcastReceiver {
 		int textColor = ContextCompat.getColor(_context, R.color.TextIcon);
 		int backgroundColor = ContextCompat.getColor(_context, R.color.Background);
 
-		if (_androidSystemService == null) {
-			_androidSystemService = new AndroidSystemService(_context);
+		if (_androidSystemController == null) {
+			_androidSystemController = new AndroidSystemController(_context);
 		}
 		if (_broadcastController == null) {
 			_broadcastController = new BroadcastController(_context);
@@ -93,7 +92,7 @@ public class BootReceiver extends BroadcastReceiver {
 		_logger.Debug("checkConnection");
 		if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 			_logger.Debug("We are in the homenetwork!");
-			if (_androidSystemService.IsServiceRunning(MainService.class)) {
+			if (_androidSystemController.isServiceRunning(MainService.class)) {
 				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
 						new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.DOWNLOAD_ALL });
 			} else {
