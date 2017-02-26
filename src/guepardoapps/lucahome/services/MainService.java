@@ -22,6 +22,7 @@ import guepardoapps.lucahome.view.SensorTemperatureView;
 import guepardoapps.lucahomelibrary.common.classes.*;
 import guepardoapps.lucahomelibrary.common.constants.IDs;
 import guepardoapps.lucahomelibrary.common.constants.ServerActions;
+import guepardoapps.lucahomelibrary.common.controller.DatabaseController;
 import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
 import guepardoapps.lucahomelibrary.common.controller.ServiceController;
@@ -81,6 +82,7 @@ public class MainService extends Service {
 	private Context _context;
 
 	private BroadcastController _broadcastController;
+	private DatabaseController _databaseController;
 	private LucaDialogController _dialogController;
 	private LucaNotificationController _notificationController;
 	private NetworkController _networkController;
@@ -216,11 +218,13 @@ public class MainService extends Service {
 
 			if (!_networkController.IsNetworkAvailable()) {
 				_logger.Warn("No network available!");
+				_shoppingList = _databaseController.GetShoppingList();
 				return;
 			}
 
 			if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 				_logger.Warn("No LucaHome network! ...");
+				_shoppingList = _databaseController.GetShoppingList();
 				return;
 			}
 
@@ -843,6 +847,12 @@ public class MainService extends Service {
 							guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
 							new String[] { guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
 							new Object[] { _shoppingList });
+
+					_databaseController.ClearDatabaseActions();
+					for (int index = 0; index < _shoppingList.getSize(); index++) {
+						_databaseController.SaveShoppintEntry(_shoppingList.getValue(index));
+					}
+
 					sendShoppingListToWear();
 				} else {
 					_logger.Warn("newShoppingList is null");
@@ -1103,6 +1113,7 @@ public class MainService extends Service {
 			_context = this;
 
 			_broadcastController = new BroadcastController(_context);
+			_databaseController = DatabaseController.getInstance();
 			_dialogController = new LucaDialogController(_context);
 			_networkController = new NetworkController(_context,
 					new DialogController(_context, ContextCompat.getColor(_context, R.color.TextIcon),

@@ -160,8 +160,8 @@ public class WIFIReceiver extends BroadcastReceiver {
 		if (storedActions.getSize() > 0) {
 			for (int index = 0; index < storedActions.getSize(); index++) {
 				ActionDto entry = storedActions.getValue(index);
-				_serviceController.StartRestService(entry.GetSocket(), entry.GetCommandSet(),
-						entry.GetNotificationBroadcast(), LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+				_serviceController.StartRestService(entry.GetName(), entry.GetAction(), entry.GetBroadcast(),
+						LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
 				_databaseController.DeleteAction(entry);
 			}
 		} else {
