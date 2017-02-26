@@ -61,4 +61,5 @@ public class Bundles {
 	public static final String SCHEDULE_DOWNLOAD = "SCHEDULE_DOWNLOAD";
 	public static final String SOCKET_DOWNLOAD = "SOCKET_DOWNLOAD";
 	public static final String TEMPERATURE_DOWNLOAD = "TEMPERATURE_DOWNLOAD";
+	public static final String SHOPPING_LIST_DOWNLOAD = "SHOPPING_LIST_DOWNLOAD";
 }

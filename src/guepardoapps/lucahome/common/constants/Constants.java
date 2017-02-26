@@ -2,7 +2,7 @@ package guepardoapps.lucahome.common.constants;
 
 public class Constants {
 	// ========== DOWNLOADS ==========
-	public static final int DOWNLOAD_STEPS = 10;
+	public static final int DOWNLOAD_STEPS = 12;
 	// ========== RASPBERRY CONNECTION ==========
 	public static final String[] SERVER_URLs = new String[] { "http://192.168.178.22" };
 	public static final String ACTION_PATH = "/lib/lucahome.php?user=";

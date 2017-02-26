@@ -130,16 +130,16 @@ public final class R {
 		public static final int dismiss_padding = 0x7f0c0015;
 	}
 	public static final class drawable {
-		public static final int card_background = 0x7f02001a;
-		public static final int card_frame = 0x7f02001b;
-		public static final int card_frame_pressed = 0x7f02001c;
-		public static final int close_button = 0x7f020021;
-		public static final int generic_confirmation = 0x7f02004c;
-		public static final int generic_confirmation_animation = 0x7f02004d;
-		public static final int ic_full_cancel = 0x7f020054;
-		public static final int ic_full_sad = 0x7f020055;
-		public static final int open_on_phone = 0x7f02006b;
-		public static final int open_on_phone_animation = 0x7f02006c;
+		public static final int card_background = 0x7f02001e;
+		public static final int card_frame = 0x7f02001f;
+		public static final int card_frame_pressed = 0x7f020020;
+		public static final int close_button = 0x7f020026;
+		public static final int generic_confirmation = 0x7f020053;
+		public static final int generic_confirmation_animation = 0x7f020054;
+		public static final int ic_full_cancel = 0x7f02005b;
+		public static final int ic_full_sad = 0x7f02005c;
+		public static final int open_on_phone = 0x7f020076;
+		public static final int open_on_phone_animation = 0x7f020077;
 	}
 	public static final class id {
 		public static final int alertTitle = 0x7f10002b;
@@ -152,8 +152,8 @@ public final class R {
 		public static final int center_vertical = 0x7f10000b;
 		public static final int clip_horizontal = 0x7f10000c;
 		public static final int clip_vertical = 0x7f10000d;
-		public static final int dismiss_overlay_button = 0x7f100081;
-		public static final int dismiss_overlay_explain = 0x7f100080;
+		public static final int dismiss_overlay_button = 0x7f100086;
+		public static final int dismiss_overlay_explain = 0x7f100085;
 		public static final int end = 0x7f10000e;
 		public static final int fill = 0x7f10000f;
 		public static final int fill_horizontal = 0x7f100010;
@@ -161,13 +161,13 @@ public final class R {
 		public static final int fit = 0x7f100009;
 		public static final int height = 0x7f100005;
 		public static final int left = 0x7f100002;
-		public static final int message = 0x7f100082;
+		public static final int message = 0x7f100087;
 		public static final int none = 0x7f100006;
 		public static final int parentPanel = 0x7f100029;
 		public static final int right = 0x7f100003;
 		public static final int start = 0x7f100012;
-		public static final int text = 0x7f10016f;
-		public static final int title = 0x7f10016e;
+		public static final int text = 0x7f10017c;
+		public static final int title = 0x7f10017b;
 		public static final int top = 0x7f100004;
 		public static final int width = 0x7f100007;
 	}
@@ -187,9 +187,9 @@ public final class R {
 	}
 	public static final class layout {
 		public static final int alert_dialog_wearable = 0x7f030000;
-		public static final int dismiss_overlay = 0x7f030010;
-		public static final int error_layout = 0x7f030011;
-		public static final int watch_card_content = 0x7f030032;
+		public static final int dismiss_overlay = 0x7f030011;
+		public static final int error_layout = 0x7f030012;
+		public static final int watch_card_content = 0x7f030034;
 	}
 	public static final class string {
 		public static final int dismiss_overlay_button_label = 0x7f0e0000;

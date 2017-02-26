@@ -117,7 +117,12 @@ public class BootView extends Activity {
 			int progress = intent.getIntExtra(Bundles.VIEW_PROGRESS, -1);
 			_logger.Debug("Progress is: " + String.valueOf(progress));
 
-			_percentProgressBar.setProgress((int) (progress * _progressBarMax / _progressBarSteps));
+			int currentProgress = (int) (progress * _progressBarMax / _progressBarSteps);
+			if (currentProgress > 100) {
+				currentProgress = 100;
+			}
+
+			_percentProgressBar.setProgress(currentProgress);
 			_progressTextView.setText(String.valueOf((int) (progress * _progressBarMax / _progressBarSteps)) + " %");
 		}
 	};

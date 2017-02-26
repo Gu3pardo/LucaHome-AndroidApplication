@@ -265,7 +265,7 @@
                 </LinearLayout>
 
                 <Button
-                    android:id="@+id/buttonSecurity"
+                    android:id="@+id/buttonShoppingList"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -273,7 +273,7 @@
                     android:background="@drawable/button_primary"
                     android:gravity="end|center"
                     android:paddingEnd="10dp"
-                    android:text="Security"
+                    android:text="Shopping List"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />

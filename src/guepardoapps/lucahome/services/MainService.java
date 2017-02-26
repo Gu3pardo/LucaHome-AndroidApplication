@@ -18,6 +18,7 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.*;
 import guepardoapps.lucahome.view.BirthdayView;
 import guepardoapps.lucahome.view.SensorTemperatureView;
+
 import guepardoapps.lucahomelibrary.common.classes.*;
 import guepardoapps.lucahomelibrary.common.constants.IDs;
 import guepardoapps.lucahomelibrary.common.constants.ServerActions;
@@ -69,6 +70,7 @@ public class MainService extends Service {
 	private SerializableList<MapContentDto> _mapContentList = null;
 	private SerializableList<MovieDto> _movieList = null;
 	private SerializableList<ScheduleDto> _scheduleList = null;
+	private SerializableList<ShoppingEntryDto> _shoppingList = null;
 	private SerializableList<TemperatureDto> _temperatureList = null;
 	private SerializableList<TimerDto> _timerList = null;
 	private SerializableList<WirelessSocketDto> _wirelessSocketList = null;
@@ -93,17 +95,22 @@ public class MainService extends Service {
 		public void run() {
 			_logger.Debug("_startDownloadRunnable run");
 
+			prepareDownloadAll();
+
 			if (!_networkController.IsNetworkAvailable()) {
 				_logger.Warn("No network available!");
 				return;
 			}
 
+			startDownloadOtherAll();
+
 			if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 				_logger.Warn("No LucaHome network! ...");
+				_downloadCount = 3;
 				return;
 			}
 
-			startDownloadAll();
+			startDownloadLucaHomeAll();
 		}
 	};
 
@@ -202,6 +209,25 @@ public class MainService extends Service {
 		}
 	};
 
+	private Runnable _downloadShoppingListRunnable = new Runnable() {
+		@Override
+		public void run() {
+			_logger.Debug("_downloadShoppingListRunnable run");
+
+			if (!_networkController.IsNetworkAvailable()) {
+				_logger.Warn("No network available!");
+				return;
+			}
+
+			if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+				_logger.Warn("No LucaHome network! ...");
+				return;
+			}
+
+			startDownloadShoppingList();
+		}
+	};
+
 	private Runnable _timeoutCheck = new Runnable() {
 		public void run() {
 			_logger.Warn("_timeoutCheck received!");
@@ -221,7 +247,9 @@ public class MainService extends Service {
 				switch (action) {
 				case DOWNLOAD_ALL:
 					_downloadCount = Constants.DOWNLOAD_STEPS;
-					startDownloadAll();
+					prepareDownloadAll();
+					startDownloadLucaHomeAll();
+					startDownloadOtherAll();
 					break;
 				case DOWLOAD_SOCKETS:
 					_downloadCount = 1;
@@ -235,15 +263,20 @@ public class MainService extends Service {
 					_downloadCount = 1;
 					startDownloadCurrentWeather();
 					break;
+				case DOWNLOAD_SHOPPING_LIST:
+					_downloadCount = 1;
+					startDownloadShoppingList();
+					break;
 				case GET_ALL:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.GET_ALL,
 							new String[] { Bundles.BIRTHDAY_LIST, Bundles.CHANGE_LIST, Bundles.INFORMATION_SINGLE,
 									Bundles.MAP_CONTENT_LIST, Bundles.MOVIE_LIST, Bundles.SCHEDULE_LIST,
 									Bundles.SOCKET_LIST, Bundles.TEMPERATURE_LIST, Bundles.TIMER_LIST,
-									Bundles.WEATHER_CURRENT, Bundles.WEATHER_FORECAST },
+									Bundles.WEATHER_CURRENT, Bundles.WEATHER_FORECAST,
+									guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
 							new Object[] { _birthdayList, _changeList, _information, _mapContentList, _movieList,
 									_scheduleList, _wirelessSocketList, _temperatureList, _timerList, _currentWeather,
-									_forecastWeather });
+									_forecastWeather, _shoppingList });
 					break;
 				case GET_BIRTHDAYS:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_BIRTHDAY,
@@ -302,6 +335,13 @@ public class MainService extends Service {
 									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST },
 							new Object[] { _mapContentList, _wirelessSocketList, _scheduleList, _timerList,
 									_temperatureList });
+					break;
+				case GET_SHOPPING_LIST:
+					_broadcastController.SendSerializableArrayBroadcast(
+							guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
+							new String[] { guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
+							new Object[] { _shoppingList });
+					sendShoppingListToWear();
 					break;
 				case SHOW_NOTIFICATION_SOCKET:
 					if (_wirelessSocketList != null) {
@@ -787,6 +827,34 @@ public class MainService extends Service {
 		}
 	};
 
+	private BroadcastReceiver _shoppingListDownloadReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_shoppingListDownloadReceiver onReceive");
+
+			String[] shoppingListStringArray = intent.getStringArrayExtra(Bundles.SHOPPING_LIST_DOWNLOAD);
+			if (shoppingListStringArray != null) {
+
+				SerializableList<ShoppingEntryDto> newShoppingList = JsonDataToShoppingListConverter
+						.GetList(shoppingListStringArray);
+				if (newShoppingList != null) {
+					_shoppingList = newShoppingList;
+					_broadcastController.SendSerializableArrayBroadcast(
+							guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
+							new String[] { guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
+							new Object[] { _shoppingList });
+					sendShoppingListToWear();
+				} else {
+					_logger.Warn("newShoppingList is null");
+				}
+			} else {
+				_logger.Warn("shoppingListStringArray is null");
+			}
+
+			updateDownloadCount();
+		}
+	};
+
 	private BroadcastReceiver _addReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1005,6 +1073,14 @@ public class MainService extends Service {
 		}
 	};
 
+	private BroadcastReceiver _reloadShoppingListReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_reloadShoppingListReceiver onReceive");
+			startDownloadShoppingList();
+		}
+	};
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -1126,6 +1202,8 @@ public class MainService extends Service {
 				new String[] { Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED });
 		_receiverController.RegisterReceiver(_weatherModelReceiver,
 				new String[] { OpenWeatherConstants.BROADCAST_GET_CURRENT_WEATHER_JSON_FINISHED });
+		_receiverController.RegisterReceiver(_shoppingListDownloadReceiver, new String[] {
+				guepardoapps.lucahomelibrary.common.constants.Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED });
 
 		_receiverController.RegisterReceiver(_addReceiver, new String[] { Broadcasts.ADD_BIRTHDAY, Broadcasts.ADD_MOVIE,
 				Broadcasts.ADD_SCHEDULE, Broadcasts.ADD_SOCKET });
@@ -1141,10 +1219,11 @@ public class MainService extends Service {
 		_receiverController.RegisterReceiver(_reloadScheduleReceiver,
 				new String[] { Broadcasts.RELOAD_SCHEDULE, Broadcasts.RELOAD_TIMER });
 		_receiverController.RegisterReceiver(_reloadSocketReceiver, new String[] { Broadcasts.RELOAD_SOCKETS });
-
 		_receiverController.RegisterReceiver(_reloadChangeReceiver,
 				new String[] { Broadcasts.RELOAD_BIRTHDAY, Broadcasts.RELOAD_MOVIE, Broadcasts.RELOAD_SCHEDULE,
 						Broadcasts.RELOAD_TIMER, Broadcasts.RELOAD_SOCKETS });
+		_receiverController.RegisterReceiver(_reloadShoppingListReceiver,
+				new String[] { guepardoapps.lucahomelibrary.common.constants.Broadcasts.RELOAD_SHOPPING_LIST });
 	}
 
 	private void unregisterReceiver() {
@@ -1160,6 +1239,7 @@ public class MainService extends Service {
 		_receiverController.UnregisterReceiver(_soundDownloadReceiver);
 		_receiverController.UnregisterReceiver(_temperatureDownloadReceiver);
 		_receiverController.UnregisterReceiver(_weatherModelReceiver);
+		_receiverController.UnregisterReceiver(_shoppingListDownloadReceiver);
 
 		_receiverController.UnregisterReceiver(_addReceiver);
 		_receiverController.UnregisterReceiver(_updateReceiver);
@@ -1169,6 +1249,7 @@ public class MainService extends Service {
 		_receiverController.UnregisterReceiver(_reloadMovieReceiver);
 		_receiverController.UnregisterReceiver(_reloadScheduleReceiver);
 		_receiverController.UnregisterReceiver(_reloadSocketReceiver);
+		_receiverController.UnregisterReceiver(_reloadShoppingListReceiver);
 
 		_receiverController.UnregisterReceiver(_reloadChangeReceiver);
 	}
@@ -1179,6 +1260,7 @@ public class MainService extends Service {
 		_scheduleService.AddSchedule("UpdateIsSoundPlaying", _downloadIsSoundPlayingRunnable, 5 * 60 * 1000);
 		_scheduleService.AddSchedule("UpdateSockets", _downloadSocketRunnable, 15 * 60 * 1000);
 		_scheduleService.AddSchedule("UpdateTemperature", _downloadTemperatureRunnable, 5 * 60 * 1000);
+		_scheduleService.AddSchedule("UpdateShoppingList", _downloadShoppingListRunnable, 30 * 60 * 1000);
 		_schedulesAdded = true;
 	}
 
@@ -1223,7 +1305,9 @@ public class MainService extends Service {
 				}
 				_lastUpdate = now;
 
-				startDownloadAll();
+				prepareDownloadAll();
+				startDownloadLucaHomeAll();
+				startDownloadOtherAll();
 			}
 		}
 	}
@@ -1245,28 +1329,34 @@ public class MainService extends Service {
 				RaspberrySelection.RASPBERRY_1.GetInt());
 	}
 
-	private void startDownloadAll() {
+	private void prepareDownloadAll() {
 		_downloadingData = true;
 		_progress = 0;
 		_downloadCount = Constants.DOWNLOAD_STEPS;
 
+		startTimeout();
+	}
+
+	private void startDownloadLucaHomeAll() {
 		startDownloadBirthday();
 		startDownloadChange();
-		startDownloadCurrentWeather();
-		startDownloadForecastWeather();
 		startDownloadInformation();
 		startDownloadMapContent();
 		startDownloadMovie();
 		startDownloadSocket();
 		startDownloadIsSoundPlaying();
 		startDownloadTemperature();
+		startDownloadShoppingList();
+	}
+
+	private void startDownloadOtherAll() {
+		startDownloadCurrentWeather();
+		startDownloadForecastWeather();
 
 		if (_sharedPrefController
 				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
 			_context.startService(new Intent(_context, OpenWeatherService.class));
 		}
-
-		startTimeout();
 	}
 
 	private void updateDownloadCount() {
@@ -1351,6 +1441,12 @@ public class MainService extends Service {
 				Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED, LucaObject.TEMPERATURE, RaspberrySelection.BOTH);
 	}
 
+	private void startDownloadShoppingList() {
+		_serviceController.StartRestService(Bundles.SHOPPING_LIST_DOWNLOAD, ServerActions.GET_SHOPPING_LIST,
+				guepardoapps.lucahomelibrary.common.constants.Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED,
+				LucaObject.SHOPPING_ENTRY, RaspberrySelection.BOTH);
+	}
+
 	private void startTimeout() {
 		_logger.Debug("Starting timeoutController...");
 		_timeoutHandler.postDelayed(_timeoutCheck, _timeCheck);
@@ -1363,6 +1459,11 @@ public class MainService extends Service {
 	}
 
 	private void sendBirthdaysToWear() {
+		if (_birthdayList == null) {
+			_logger.Warn("_birthdayList is null!");
+			return;
+		}
+
 		String messageText = "Birthdays:";
 		for (int index = 0; index < _birthdayList.getSize(); index++) {
 			messageText += _birthdayList.getValue(index).GetName() + ":"
@@ -1375,6 +1476,11 @@ public class MainService extends Service {
 	}
 
 	private void sendSchedulesToWear() {
+		if (_scheduleList == null) {
+			_logger.Warn("_scheduleList is null!");
+			return;
+		}
+
 		String messageText = "Schedules:";
 		for (int index = 0; index < _scheduleList.getSize(); index++) {
 			String information = _scheduleList.getValue(index).GetWeekday().toString() + ", "
@@ -1389,10 +1495,30 @@ public class MainService extends Service {
 	}
 
 	private void sendSocketsToWear() {
+		if (_wirelessSocketList == null) {
+			_logger.Warn("_wirelessSocketList is null!");
+			return;
+		}
+
 		String messageText = "Sockets:";
 		for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
 			messageText += _wirelessSocketList.getValue(index).GetName() + ":"
 					+ (_wirelessSocketList.getValue(index).GetIsActivated() ? "1" : "0") + "&";
+		}
+		_logger.Info("message is " + messageText);
+		_serviceController.SendMessageToWear(messageText);
+	}
+
+	private void sendShoppingListToWear() {
+		if (_shoppingList == null) {
+			_logger.Warn("_shoppingList is null!");
+			return;
+		}
+
+		String messageText = "ShoppingList:";
+		for (int index = 0; index < _shoppingList.getSize(); index++) {
+			ShoppingEntryDto entry = _shoppingList.getValue(index);
+			messageText += entry.GetName() + ":" + entry.GetGroup().toString() + ":" + entry.GetQuantity() + "&";
 		}
 		_logger.Info("message is " + messageText);
 		_serviceController.SendMessageToWear(messageText);

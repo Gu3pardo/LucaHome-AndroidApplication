@@ -6,9 +6,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import es.dmoral.toasty.Toasty;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.view.*;
@@ -27,7 +24,7 @@ public class HomeViewListButtonController {
 	private Button _buttonControl;
 	private Button _buttonMedia;
 	private Button _buttonSensors;
-	private Button _buttonSecurity;
+	private Button _buttonShoppingList;
 	private Button _buttonSocial;
 
 	private LinearLayout _linearLayoutButtonControl;
@@ -132,12 +129,11 @@ public class HomeViewListButtonController {
 			}
 		});
 
-		_buttonSecurity = (Button) ((Activity) _context).findViewById(R.id.buttonSecurity);
-		_buttonSecurity.setOnClickListener(new OnClickListener() {
+		_buttonShoppingList = (Button) ((Activity) _context).findViewById(R.id.buttonShoppingList);
+		_buttonShoppingList.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_logger.Warn("Security not yet implemented!");
-				Toasty.error(_context, "Security not yet implemented!", Toast.LENGTH_SHORT).show();
+				_navigationService.NavigateTo(ShoppingListView.class, true);
 			}
 		});
 
