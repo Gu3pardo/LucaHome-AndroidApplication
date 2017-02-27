@@ -164,6 +164,10 @@ public class MediaMirrorView extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				_mediaMirrorController.SelectServer(parent.getItemAtPosition(position).toString());
+				
+				_mediaMirrorController.GetPlayedYoutubeVideos();
+				_currentVolumeTextView.setText("Loading...");
+				_mediaMirrorController.GetCurrentVolume();
 			}
 
 			@Override
