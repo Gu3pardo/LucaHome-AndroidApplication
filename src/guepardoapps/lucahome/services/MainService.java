@@ -833,7 +833,9 @@ public class MainService extends Service {
 				_currentWeather = newWeather;
 				_serviceController.SendMessageToWear("CurrentWeather:DESCRIPTION:" + _currentWeather.GetDescription()
 						+ "&TEMPERATURE:" + _currentWeather.GetTemperatureString() + "&LASTUPDATE:"
-						+ _currentWeather.GetLastUpdate().toString());
+						+ _currentWeather.GetLastUpdate().toString() + "&SUNRISE:"
+						+ String.valueOf(_currentWeather.GetSunriseTime().getTime()) + "&SUNSET:"
+						+ String.valueOf(_currentWeather.GetSunsetTime().getTime()));
 			}
 
 			if (_sharedPrefController
@@ -841,6 +843,7 @@ public class MainService extends Service {
 				_notificationController.CreateTemperatureNotification(SensorTemperatureView.class, _temperatureList,
 						_currentWeather);
 			}
+
 			updateDownloadCount();
 		}
 	};
