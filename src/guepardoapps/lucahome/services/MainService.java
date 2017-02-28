@@ -135,6 +135,20 @@ public class MainService extends Service {
 		}
 	};
 
+	private Runnable _downloadCurrentWeatherRunnable = new Runnable() {
+		@Override
+		public void run() {
+			_logger.Debug("_downloadCurrentWeatherRunnable run");
+
+			if (!_networkController.IsNetworkAvailable()) {
+				_logger.Warn("No network available!");
+				return;
+			}
+
+			startDownloadCurrentWeather();
+		}
+	};
+
 	private Runnable _downloadForecastWeatherRunnable = new Runnable() {
 		@Override
 		public void run() {
@@ -848,7 +862,7 @@ public class MainService extends Service {
 							new String[] { guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
 							new Object[] { _shoppingList });
 
-					_databaseController.ClearDatabaseActions();
+					_databaseController.ClearDatabaseShoppingList();
 					for (int index = 0; index < _shoppingList.getSize(); index++) {
 						_databaseController.SaveShoppintEntry(_shoppingList.getValue(index));
 					}
@@ -1114,6 +1128,7 @@ public class MainService extends Service {
 
 			_broadcastController = new BroadcastController(_context);
 			_databaseController = DatabaseController.getInstance();
+			_databaseController.onCreate(_context);
 			_dialogController = new LucaDialogController(_context);
 			_networkController = new NetworkController(_context,
 					new DialogController(_context, ContextCompat.getColor(_context, R.color.TextIcon),
@@ -1266,7 +1281,8 @@ public class MainService extends Service {
 	}
 
 	private void addSchedules() {
-		_scheduleService.AddSchedule("UpdateBirthday", _downloadBirthdayRunnable, 240 * 60 * 1000);
+		_scheduleService.AddSchedule("UpdateBirthday", _downloadBirthdayRunnable, 4 * 60 * 60 * 1000);
+		_scheduleService.AddSchedule("UpdateForecast", _downloadCurrentWeatherRunnable, 15 * 60 * 1000);
 		_scheduleService.AddSchedule("UpdateForecast", _downloadForecastWeatherRunnable, 30 * 60 * 1000);
 		_scheduleService.AddSchedule("UpdateIsSoundPlaying", _downloadIsSoundPlayingRunnable, 5 * 60 * 1000);
 		_scheduleService.AddSchedule("UpdateSockets", _downloadSocketRunnable, 15 * 60 * 1000);
