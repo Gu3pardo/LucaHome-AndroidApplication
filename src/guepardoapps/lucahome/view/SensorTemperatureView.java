@@ -1,6 +1,5 @@
 package guepardoapps.lucahome.view;
 
-import java.sql.Time;
 import java.util.Calendar;
 
 import android.app.Activity;
@@ -28,7 +27,6 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 
-import guepardoapps.lucahomelibrary.common.classes.*;
 import guepardoapps.lucahomelibrary.common.constants.Color;
 import guepardoapps.lucahomelibrary.common.controller.*;
 import guepardoapps.lucahomelibrary.common.dto.*;
@@ -38,6 +36,8 @@ import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 import guepardoapps.lucahomelibrary.view.customadapter.*;
 
+import guepardoapps.toolset.common.classes.SerializableList;
+import guepardoapps.toolset.common.classes.SerializableTime;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 
@@ -218,8 +218,7 @@ public class SensorTemperatureView extends Activity implements SensorEventListen
 			int hour = calendar.get(Calendar.HOUR_OF_DAY);
 			int minute = calendar.get(Calendar.MINUTE);
 			int second = calendar.get(Calendar.SECOND);
-			@SuppressWarnings("deprecation")
-			Time time = new Time(hour, minute, second);
+			SerializableTime time = new SerializableTime(hour, minute, second, 0);
 
 			TemperatureDto newEntry = new TemperatureDto(temperature, "Ambient temperature", time, "n.a.",
 					TemperatureType.SMARTPHONE_SENSOR, "n.a.");

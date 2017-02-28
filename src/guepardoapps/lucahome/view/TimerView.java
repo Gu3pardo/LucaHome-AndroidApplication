@@ -21,7 +21,6 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 
-import guepardoapps.lucahomelibrary.common.classes.*;
 import guepardoapps.lucahomelibrary.common.constants.Color;
 import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.dto.*;
@@ -30,6 +29,7 @@ import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 import guepardoapps.lucahomelibrary.services.helper.NavigationService;
 import guepardoapps.lucahomelibrary.view.customadapter.*;
 
+import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 

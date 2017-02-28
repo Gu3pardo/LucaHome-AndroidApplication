@@ -16,7 +16,6 @@ import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.lucahome.services.MainService;
 
-import guepardoapps.lucahomelibrary.common.classes.SerializableList;
 import guepardoapps.lucahomelibrary.common.constants.IDs;
 import guepardoapps.lucahomelibrary.common.controller.DatabaseController;
 import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
@@ -27,6 +26,7 @@ import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
 import guepardoapps.lucahomelibrary.common.enums.RaspberrySelection;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
+import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.AndroidSystemController;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;

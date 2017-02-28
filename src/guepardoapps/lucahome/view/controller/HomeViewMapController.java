@@ -22,13 +22,13 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 
-import guepardoapps.lucahomelibrary.common.classes.SerializableList;
 import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
 import guepardoapps.lucahomelibrary.common.dto.*;
 import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 import guepardoapps.lucahomelibrary.view.controller.MapContentController;
 
+import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 

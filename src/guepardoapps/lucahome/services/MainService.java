@@ -19,7 +19,6 @@ import guepardoapps.lucahome.common.constants.*;
 import guepardoapps.lucahome.view.BirthdayView;
 import guepardoapps.lucahome.view.SensorTemperatureView;
 
-import guepardoapps.lucahomelibrary.common.classes.*;
 import guepardoapps.lucahomelibrary.common.constants.IDs;
 import guepardoapps.lucahomelibrary.common.constants.ServerActions;
 import guepardoapps.lucahomelibrary.common.controller.DatabaseController;
@@ -35,6 +34,7 @@ import guepardoapps.lucahomelibrary.mediamirror.common.enums.ServerAction;
 import guepardoapps.lucahomelibrary.services.sockets.SocketActionService;
 import guepardoapps.lucahomelibrary.view.controller.MediaMirrorController;
 
+import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
@@ -834,8 +834,8 @@ public class MainService extends Service {
 				_serviceController.SendMessageToWear("CurrentWeather:DESCRIPTION:" + _currentWeather.GetDescription()
 						+ "&TEMPERATURE:" + _currentWeather.GetTemperatureString() + "&LASTUPDATE:"
 						+ _currentWeather.GetLastUpdate().toString() + "&SUNRISE:"
-						+ String.valueOf(_currentWeather.GetSunriseTime().getTime()) + "&SUNSET:"
-						+ String.valueOf(_currentWeather.GetSunsetTime().getTime()));
+						+ String.valueOf(_currentWeather.GetSunriseTime().toMilliSecond()) + "&SUNSET:"
+						+ String.valueOf(_currentWeather.GetSunsetTime().toMilliSecond()));
 			}
 
 			if (_sharedPrefController
