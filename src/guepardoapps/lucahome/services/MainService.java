@@ -789,7 +789,7 @@ public class MainService extends Service {
 							if (entry.GetTemperatureType() == TemperatureType.RASPBERRY) {
 								messageText += "TEMPERATURE:" + entry.GetTemperatureString();
 								messageText += "&AREA:" + entry.GetArea();
-								messageText += "&LASTUPDATE:" + entry.GetLastUpdate().toString();
+								messageText += "&LASTUPDATE:" + entry.GetLastUpdate().HHMM();
 								found++;
 							}
 						}
@@ -1108,6 +1108,59 @@ public class MainService extends Service {
 		}
 	};
 
+	private BroadcastReceiver _updateBoughtShoppingListReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_updateBoughtShoppingListReceiver onReceive");
+
+			String data = intent.getStringExtra(guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST);
+			if (data != null) {
+				String[] content = data.split("\\:");
+				if (content.length == 2) {
+					int id = -1;
+					String idString = content[0];
+					idString = idString.replace(":", "");
+					try {
+						id = Integer.parseInt(idString);
+					} catch (Exception ex) {
+						_logger.Error(ex.toString());
+						return;
+					}
+
+					String boughtString = content[1];
+					boughtString = boughtString.replace(":", "");
+					boolean bought = boughtString.contains("1");
+
+					for (int shoppingIndex = 0; shoppingIndex < _shoppingList.getSize(); shoppingIndex++) {
+						ShoppingEntryDto entry = _shoppingList.getValue(shoppingIndex);
+						if (entry.GetId() == id) {
+							entry.SetBought(bought);
+
+							_broadcastController.SendSerializableArrayBroadcast(
+									guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
+									new String[] {
+											guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
+									new Object[] { _shoppingList });
+
+							_databaseController.ClearDatabaseShoppingList();
+							for (int index = 0; index < _shoppingList.getSize(); index++) {
+								_databaseController.SaveShoppintEntry(_shoppingList.getValue(index));
+							}
+
+							sendShoppingListToWear();
+
+							break;
+						}
+					}
+				} else {
+					_logger.Warn(String.format("Invalid length %s for content %s", content.length, content));
+				}
+			} else {
+				_logger.Warn("Received null data in _updateBoughtShoppingListReceiver");
+			}
+		}
+	};
+
 	@Override
 	public void onCreate() {
 		super.onCreate();
@@ -1253,6 +1306,9 @@ public class MainService extends Service {
 						Broadcasts.RELOAD_TIMER, Broadcasts.RELOAD_SOCKETS });
 		_receiverController.RegisterReceiver(_reloadShoppingListReceiver,
 				new String[] { guepardoapps.lucahomelibrary.common.constants.Broadcasts.RELOAD_SHOPPING_LIST });
+
+		_receiverController.RegisterReceiver(_updateBoughtShoppingListReceiver,
+				new String[] { guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST });
 	}
 
 	private void unregisterReceiver() {
@@ -1281,6 +1337,8 @@ public class MainService extends Service {
 		_receiverController.UnregisterReceiver(_reloadShoppingListReceiver);
 
 		_receiverController.UnregisterReceiver(_reloadChangeReceiver);
+
+		_receiverController.UnregisterReceiver(_updateBoughtShoppingListReceiver);
 	}
 
 	private void addSchedules() {

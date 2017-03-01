@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.IBinder;
 
 import guepardoapps.lucahome.common.constants.Constants;
-
+import guepardoapps.lucahome.view.ForecastWeatherView;
 import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
@@ -42,11 +42,12 @@ public class OpenWeatherService extends Service {
 			if (_forecastModel != null) {
 				_logger.Debug(_forecastModel.toString());
 
-				NotificationContent _message = _forecastModel.TellTodaysWeather();
+				NotificationContent _message = _forecastModel.TellForecastWeather();
 
 				if (_message != null) {
-					_notificationController.CreateForecastWeatherNotification(_message.GetIcon(), _message.GetTitle(),
-							_message.GetText(), OpenWeatherConstants.FORECAST_NOTIFICATION_ID);
+					_notificationController.CreateForecastWeatherNotification(ForecastWeatherView.class,
+							_message.GetIcon(), _message.GetTitle(), _message.GetText(),
+							OpenWeatherConstants.FORECAST_NOTIFICATION_ID);
 				} else {
 					_logger.Error("_message is null!");
 				}

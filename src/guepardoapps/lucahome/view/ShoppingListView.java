@@ -69,8 +69,11 @@ public class ShoppingListView extends Activity {
 
 			if (list != null) {
 				_shoppingList = list;
+
 				_listAdapter = new ShoppingListAdapter(_context, _shoppingList);
 				_listView.setAdapter(_listAdapter);
+
+				setTitle(String.valueOf(_shoppingList.getSize()) + " entries");
 			}
 
 			_progressBar.setVisibility(View.GONE);

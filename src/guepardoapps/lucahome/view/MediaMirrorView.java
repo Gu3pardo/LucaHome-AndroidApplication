@@ -58,7 +58,7 @@ public class MediaMirrorView extends Activity {
 	private Button _sendVolumeMuteButton;
 	private Button _sendVolumeUnmuteButton;
 	private TextView _currentVolumeTextView;
-	
+
 	private Button _sendSeaSoundStopButton;
 
 	private EditText _youtubeIdInput;
@@ -164,7 +164,7 @@ public class MediaMirrorView extends Activity {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 				_mediaMirrorController.SelectServer(parent.getItemAtPosition(position).toString());
-				
+
 				_mediaMirrorController.GetPlayedYoutubeVideos();
 				_currentVolumeTextView.setText("Loading...");
 				_mediaMirrorController.GetCurrentVolume();
@@ -230,7 +230,7 @@ public class MediaMirrorView extends Activity {
 		_currentVolumeTextView = (TextView) findViewById(R.id.volumeCurrentValue);
 		_currentVolumeTextView.setText("Loading...");
 		_mediaMirrorController.GetCurrentVolume();
-		
+
 		_sendSeaSoundStopButton = (Button) findViewById(R.id.seasoundStopButton);
 		_sendSeaSoundStopButton.setOnClickListener(new OnClickListener() {
 			@Override

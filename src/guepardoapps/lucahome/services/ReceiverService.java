@@ -26,7 +26,8 @@ public class ReceiverService extends Service {
 	private LucaHomeLogger _logger;
 
 	private static final int NOTIFICATION_HOUR = 21;
-	private static final int NOTIFICATION_MINUTE = 30;
+	private static final int NOTIFICATION_MINUTE = 45;
+	private static final int NOTIFICATION_TIMESPAN_MINUTE = 5;
 
 	private static final int CLEAR_NOTIFICATION_DISPLAY_HOUR = 2;
 	private static final int CLEAR_NOTIFICATION_DISPLAY_MINUTE = 0;
@@ -71,7 +72,9 @@ public class ReceiverService extends Service {
 				// Check, if the time is ready for displaying the notification
 				// time needs to be NOTIFICATION_HOUR:NOTIFICATION_MINUTE
 				if (calendar.get(Calendar.HOUR_OF_DAY) == NOTIFICATION_HOUR) {
-					if (calendar.get(Calendar.MINUTE) == NOTIFICATION_MINUTE) {
+					if (calendar.get(Calendar.MINUTE) > NOTIFICATION_MINUTE - NOTIFICATION_TIMESPAN_MINUTE
+							&& calendar.get(Calendar.MINUTE) < NOTIFICATION_MINUTE + NOTIFICATION_TIMESPAN_MINUTE) {
+						_logger.Debug("We are in the timespan!");
 
 						// Check also if we are in the home network, otherwise
 						// it's senseless to display the notification, but we
@@ -80,9 +83,12 @@ public class ReceiverService extends Service {
 							_logger.Debug("Showing notification go to sleep!");
 							_notificationController.CreateSleepHeatingNotification();
 						} else {
+							_logger.Debug("Saving flag to display notification later!");
 							_sharedPrefController
 									.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, true);
 						}
+					} else {
+						_logger.Debug("We are NOT in the timespan!");
 					}
 				}
 				// Check if time is ready to delete the flag to display the
@@ -91,6 +97,7 @@ public class ReceiverService extends Service {
 					if (calendar.get(Calendar.MINUTE) == CLEAR_NOTIFICATION_DISPLAY_MINUTE) {
 						if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(
 								SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
+							_logger.Debug("We entered home and flag is active to display sleep notification");
 							_sharedPrefController
 									.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
 						}

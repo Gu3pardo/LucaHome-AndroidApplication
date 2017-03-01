@@ -391,6 +391,9 @@ public class SoundView extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.view_sound);
+		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
+
 		_context = this;
 
 		_logger = new LucaHomeLogger(TAG);
@@ -403,9 +406,6 @@ public class SoundView extends Activity {
 		_serviceController = new ServiceController(_context);
 		_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
 		_soundController = new SoundController(_context);
-
-		setContentView(R.layout.view_sound);
-		getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
 		initializeViews();
 		loadValues();

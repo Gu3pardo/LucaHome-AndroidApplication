@@ -72,6 +72,8 @@ public class MovieView extends Activity {
 
 				_progressBar.setVisibility(View.GONE);
 				_listView.setVisibility(View.VISIBLE);
+
+				setTitle(String.valueOf(list.getSize()) + " movies");
 			}
 		}
 	};
