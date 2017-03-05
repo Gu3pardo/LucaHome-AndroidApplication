@@ -833,7 +833,7 @@ public class MainService extends Service {
 				_currentWeather = newWeather;
 				_serviceController.SendMessageToWear("CurrentWeather:DESCRIPTION:" + _currentWeather.GetDescription()
 						+ "&TEMPERATURE:" + _currentWeather.GetTemperatureString() + "&LASTUPDATE:"
-						+ _currentWeather.GetLastUpdate().toString() + "&SUNRISE:"
+						+ _currentWeather.GetLastUpdate().toMilliSecond() + "&SUNRISE:"
 						+ String.valueOf(_currentWeather.GetSunriseTime().toMilliSecond()) + "&SUNSET:"
 						+ String.valueOf(_currentWeather.GetSunsetTime().toMilliSecond()));
 			}
@@ -1606,7 +1606,8 @@ public class MainService extends Service {
 		String messageText = "ShoppingList:";
 		for (int index = 0; index < _shoppingList.getSize(); index++) {
 			ShoppingEntryDto entry = _shoppingList.getValue(index);
-			messageText += entry.GetName() + ":" + entry.GetGroup().toString() + ":" + entry.GetQuantity() + "&";
+			messageText += entry.GetName() + ":" + entry.GetGroup().toString() + ":" + entry.GetQuantity() + ":"
+					+ (entry.GetBought() ? "1" : "0") + "&";
 		}
 		_logger.Info("message is " + messageText);
 		_serviceController.SendMessageToWear(messageText);
