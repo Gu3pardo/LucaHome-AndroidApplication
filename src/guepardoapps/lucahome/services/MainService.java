@@ -1117,23 +1117,19 @@ public class MainService extends Service {
 			if (data != null) {
 				String[] content = data.split("\\:");
 				if (content.length == 2) {
-					int id = -1;
-					String idString = content[0];
-					idString = idString.replace(":", "");
-					try {
-						id = Integer.parseInt(idString);
-					} catch (Exception ex) {
-						_logger.Error(ex.toString());
-						return;
-					}
+					String name = content[0];
+					_logger.Debug(String.format("_name is %s", name));
 
 					String boughtString = content[1];
 					boughtString = boughtString.replace(":", "");
 					boolean bought = boughtString.contains("1");
+					_logger.Debug(String.format("bought is %s", bought));
 
 					for (int shoppingIndex = 0; shoppingIndex < _shoppingList.getSize(); shoppingIndex++) {
 						ShoppingEntryDto entry = _shoppingList.getValue(shoppingIndex);
-						if (entry.GetId() == id) {
+						if (entry.GetName().contains(name)) {
+							_logger.Debug("Found matching entry at with name " + name);
+
 							entry.SetBought(bought);
 
 							_broadcastController.SendSerializableArrayBroadcast(
@@ -1152,6 +1148,7 @@ public class MainService extends Service {
 							break;
 						}
 					}
+					_logger.Warn(String.format("Found no matching entry with name %s to update!", name));
 				} else {
 					_logger.Warn(String.format("Invalid length %s for content %s", content.length, content));
 				}

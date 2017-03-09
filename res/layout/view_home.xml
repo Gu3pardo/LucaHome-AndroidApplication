@@ -182,7 +182,8 @@
                         android:text="Sound"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/TextIcon"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:visibility="gone" />
 
                     <Button
                         android:id="@+id/buttonMediaServer"
