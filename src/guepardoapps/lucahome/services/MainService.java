@@ -517,7 +517,7 @@ public class MainService extends Service {
 				if (birthday.HasBirthday()) {
 					int age = birthday.GetAge();
 					_logger.Debug("It is " + birthday.GetName() + "'s " + String.valueOf(age) + "th birthday!");
-					_notificationController.CreateBirthdayNotification(BirthdayView.class, birthday.GetNotificationId(),
+					_notificationController.CreateBirthdayNotification(BirthdayView.class, R.drawable.birthday,
 							birthday.GetName(), birthday.GetNotificationBody(age), true);
 				}
 			}

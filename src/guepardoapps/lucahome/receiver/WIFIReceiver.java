@@ -143,7 +143,6 @@ public class WIFIReceiver extends BroadcastReceiver {
 		} else {
 			_logger.Warn("We are NOT in the homenetwork!");
 
-			_notificationController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
 			_notificationController.CloseNotification(IDs.NOTIFICATION_WEAR);
 			_serviceController.SendMessageToWear(WIFI + "NO");
 
