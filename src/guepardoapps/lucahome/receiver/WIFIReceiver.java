@@ -32,6 +32,7 @@ import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.DialogController;
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.controller.SharedPrefController;
+import guepardoapps.toolset.scheduler.ScheduleService;
 
 public class WIFIReceiver extends BroadcastReceiver {
 
@@ -50,6 +51,7 @@ public class WIFIReceiver extends BroadcastReceiver {
 	private DialogController _dialogController;
 	private LucaNotificationController _notificationController;
 	private NetworkController _networkController;
+	private ScheduleService _scheduleService;
 	private ServiceController _serviceController;
 	private SharedPrefController _sharedPrefController;
 
@@ -106,6 +108,9 @@ public class WIFIReceiver extends BroadcastReceiver {
 		if (_notificationController == null) {
 			_notificationController = new LucaNotificationController(_context);
 		}
+		if (_scheduleService == null) {
+			_scheduleService = ScheduleService.getInstance();
+		}
 		if (_serviceController == null) {
 			_serviceController = new ServiceController(_context);
 		}
@@ -159,9 +164,10 @@ public class WIFIReceiver extends BroadcastReceiver {
 		if (storedActions.getSize() > 0) {
 			for (int index = 0; index < storedActions.getSize(); index++) {
 				ActionDto entry = storedActions.getValue(index);
+				_databaseController.DeleteAction(entry);
+				_scheduleService.DeleteSchedule(entry.GetName());
 				_serviceController.StartRestService(entry.GetName(), entry.GetAction(), entry.GetBroadcast(),
 						LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
-				_databaseController.DeleteAction(entry);
 			}
 		} else {
 			_logger.Debug("No actions stored!");

@@ -333,15 +333,18 @@ public class MainService extends Service {
 				case GET_TEMPERATURE:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_TEMPERATURE,
 							new String[] { Bundles.TEMPERATURE_LIST }, new Object[] { _temperatureList });
+					sendTemperatureToWear();
 					break;
 				case GET_TIMER:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_TIMER,
 							new String[] { Bundles.TIMER_LIST, Bundles.SOCKET_LIST },
 							new Object[] { _timerList, _wirelessSocketList });
+					sendTimerToWear();
 					break;
 				case GET_WEATHER_CURRENT:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_WEATHER_VIEW,
 							new String[] { Bundles.WEATHER_CURRENT }, new Object[] { _currentWeather });
+					sendWeatherToWear();
 					break;
 				case GET_WEATHER_FORECAST:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_FORECAST_VIEW,
@@ -781,25 +784,7 @@ public class MainService extends Service {
 					_temperatureList = newTemperatureList;
 
 					if (_temperatureList.getSize() >= 1) {
-						String messageText = "RaspberryTemperature:";
-
-						int found = 0;
-						for (int index = 0; index < _temperatureList.getSize(); index++) {
-							TemperatureDto entry = _temperatureList.getValue(index);
-							if (entry.GetTemperatureType() == TemperatureType.RASPBERRY) {
-								messageText += "TEMPERATURE:" + entry.GetTemperatureString();
-								messageText += "&AREA:" + entry.GetArea();
-								messageText += "&LASTUPDATE:" + entry.GetLastUpdate().HHMM();
-								found++;
-							}
-						}
-
-						_logger.Info("messageText for temperature is " + messageText);
-						if (found == 1) {
-							_serviceController.SendMessageToWear(messageText);
-						} else {
-							_logger.Warn("found " + String.valueOf(found) + " different temperatures!");
-						}
+						sendTemperatureToWear();
 					} else {
 						_logger.Warn("Temperaturelist has size " + String.valueOf(_temperatureList.getSize()));
 					}
@@ -831,11 +816,7 @@ public class MainService extends Service {
 					.getSerializableExtra(OpenWeatherConstants.BUNDLE_EXTRA_WEATHER_MODEL);
 			if (newWeather != null) {
 				_currentWeather = newWeather;
-				_serviceController.SendMessageToWear("CurrentWeather:DESCRIPTION:" + _currentWeather.GetDescription()
-						+ "&TEMPERATURE:" + _currentWeather.GetTemperatureString() + "&LASTUPDATE:"
-						+ _currentWeather.GetLastUpdate().toMilliSecond() + "&SUNRISE:"
-						+ String.valueOf(_currentWeather.GetSunriseTime().toMilliSecond()) + "&SUNSET:"
-						+ String.valueOf(_currentWeather.GetSunsetTime().toMilliSecond()));
+				sendWeatherToWear();
 			}
 
 			if (_sharedPrefController
@@ -1189,7 +1170,7 @@ public class MainService extends Service {
 			_notificationController = new LucaNotificationController(_context);
 			_openWeatherController = new OpenWeatherController(_context, Constants.CITY);
 			_receiverController = new ReceiverController(_context);
-			_scheduleService = new ScheduleService();
+			_scheduleService = ScheduleService.getInstance();
 			_serviceController = new ServiceController(_context);
 			_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
 
@@ -1203,17 +1184,16 @@ public class MainService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startid) {
-		if (_logger != null) {
-			_logger.Debug("onStartCommand");
+		if (_logger == null) {
+			_logger = new LucaHomeLogger(TAG);
 		}
+		_logger.Debug("onStartCommand");
 
 		try {
 			Bundle data = intent.getExtras();
 			MainServiceAction action = (MainServiceAction) data.getSerializable(Bundles.MAIN_SERVICE_ACTION);
 			if (action != null) {
-				if (_logger != null) {
-					_logger.Debug("Received action is: " + action.toString());
-				}
+				_logger.Debug("Received action is: " + action.toString());
 				switch (action) {
 				case BOOT:
 					_progress = 0;
@@ -1221,39 +1201,38 @@ public class MainService extends Service {
 					boot();
 					break;
 				default:
-					if (_logger != null) {
-						_logger.Warn("Action not supported! " + action.toString());
-					}
+					_logger.Warn("Action not supported! " + action.toString());
 					break;
 				}
 			} else {
-				if (_logger != null) {
-					_logger.Warn("Action is null!");
-				}
+				_logger.Warn("Action is null!");
 			}
 		} catch (Exception e) {
-			if (_logger != null) {
-				_logger.Error(e.toString());
-			}
+			_logger.Error(e.toString());
 		}
+
+		checkDatabase();
+		checkSleepNotificationFlag();
 
 		return 0;
 	}
 
 	@Override
 	public IBinder onBind(Intent arg0) {
-		if (_logger != null) {
-			_logger.Debug("onBind");
+		if (_logger == null) {
+			_logger = new LucaHomeLogger(TAG);
 		}
+		_logger.Debug("onBind");
 		return null;
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		if (_logger != null) {
-			_logger.Debug("onDestroy");
+		if (_logger == null) {
+			_logger = new LucaHomeLogger(TAG);
 		}
+		_logger.Debug("onDestroy");
 		_scheduleService.Dispose();
 		unregisterReceiver();
 	}
@@ -1339,13 +1318,13 @@ public class MainService extends Service {
 	}
 
 	private void addSchedules() {
-		_scheduleService.AddSchedule("UpdateBirthday", _downloadBirthdayRunnable, 4 * 60 * 60 * 1000);
-		_scheduleService.AddSchedule("UpdateForecast", _downloadCurrentWeatherRunnable, 15 * 60 * 1000);
-		_scheduleService.AddSchedule("UpdateForecast", _downloadForecastWeatherRunnable, 30 * 60 * 1000);
-		_scheduleService.AddSchedule("UpdateIsSoundPlaying", _downloadIsSoundPlayingRunnable, 5 * 60 * 1000);
-		_scheduleService.AddSchedule("UpdateSockets", _downloadSocketRunnable, 15 * 60 * 1000);
-		_scheduleService.AddSchedule("UpdateTemperature", _downloadTemperatureRunnable, 5 * 60 * 1000);
-		_scheduleService.AddSchedule("UpdateShoppingList", _downloadShoppingListRunnable, 30 * 60 * 1000);
+		_scheduleService.AddSchedule("UpdateBirthday", _downloadBirthdayRunnable, 4 * 60 * 60 * 1000, true);
+		_scheduleService.AddSchedule("UpdateForecast", _downloadCurrentWeatherRunnable, 15 * 60 * 1000, true);
+		_scheduleService.AddSchedule("UpdateForecast", _downloadForecastWeatherRunnable, 30 * 60 * 1000, true);
+		_scheduleService.AddSchedule("UpdateIsSoundPlaying", _downloadIsSoundPlayingRunnable, 5 * 60 * 1000, true);
+		_scheduleService.AddSchedule("UpdateSockets", _downloadSocketRunnable, 15 * 60 * 1000, true);
+		_scheduleService.AddSchedule("UpdateTemperature", _downloadTemperatureRunnable, 5 * 60 * 1000, true);
+		_scheduleService.AddSchedule("UpdateShoppingList", _downloadShoppingListRunnable, 30 * 60 * 1000, true);
 		_schedulesAdded = true;
 	}
 
@@ -1608,5 +1587,112 @@ public class MainService extends Service {
 		}
 		_logger.Info("message is " + messageText);
 		_serviceController.SendMessageToWear(messageText);
+	}
+
+	private void sendTemperatureToWear() {
+		if (_temperatureList == null) {
+			_logger.Warn("_temperatureList is null!");
+			return;
+		}
+
+		String messageText = "RaspberryTemperature:";
+
+		int found = 0;
+		for (int index = 0; index < _temperatureList.getSize(); index++) {
+			TemperatureDto entry = _temperatureList.getValue(index);
+			if (entry.GetTemperatureType() == TemperatureType.RASPBERRY) {
+				messageText += "TEMPERATURE:" + entry.GetTemperatureString();
+				messageText += "&AREA:" + entry.GetArea();
+				messageText += "&LASTUPDATE:" + entry.GetLastUpdate().HHMM();
+				found++;
+			}
+		}
+
+		_logger.Info("messageText for temperature is " + messageText);
+		if (found == 1) {
+			_serviceController.SendMessageToWear(messageText);
+		} else {
+			_logger.Warn("found " + String.valueOf(found) + " different temperatures!");
+		}
+	}
+
+	private void sendTimerToWear() {
+		if (_timerList == null) {
+			_logger.Warn("_timerList is null!");
+			return;
+		}
+
+		String messageText = "Timer:";
+		for (int index = 0; index < _timerList.getSize(); index++) {
+			String information = _timerList.getValue(index).GetWeekday().toString() + ", "
+					+ _timerList.getValue(index).GetTime().toString() + " set "
+					+ _timerList.getValue(index).GetSocket().GetName() + " to "
+					+ String.valueOf(_timerList.getValue(index).GetAction());
+			messageText += _timerList.getValue(index).GetName() + ":" + information + ":"
+					+ (_timerList.getValue(index).GetIsActive() ? "1" : "0") + "&";
+		}
+		_logger.Info("message is " + messageText);
+		_serviceController.SendMessageToWear(messageText);
+	}
+
+	private void sendWeatherToWear() {
+		if (_currentWeather == null) {
+			_logger.Warn("_currentWeather is null!");
+			return;
+		}
+
+		String messageText = "CurrentWeather:DESCRIPTION:" + _currentWeather.GetDescription() + "&TEMPERATURE:"
+				+ _currentWeather.GetTemperatureString() + "&LASTUPDATE:"
+				+ _currentWeather.GetLastUpdate().toMilliSecond() + "&SUNRISE:"
+				+ String.valueOf(_currentWeather.GetSunriseTime().toMilliSecond()) + "&SUNSET:"
+				+ String.valueOf(_currentWeather.GetSunsetTime().toMilliSecond());
+
+		_serviceController.SendMessageToWear(messageText);
+	}
+
+	private void checkDatabase() {
+		_logger.Debug("checkDatabase");
+
+		if (!_networkController.IsNetworkAvailable()) {
+			_logger.Warn("No network available!");
+			return;
+		}
+
+		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+			_logger.Warn("No LucaHome network! ...");
+			return;
+		}
+
+		SerializableList<ActionDto> storedActions = _databaseController.GetActions();
+		if (storedActions.getSize() > 0) {
+			for (int index = 0; index < storedActions.getSize(); index++) {
+				ActionDto entry = storedActions.getValue(index);
+				_databaseController.DeleteAction(entry);
+				_scheduleService.DeleteSchedule(entry.GetName());
+				_serviceController.StartRestService(entry.GetName(), entry.GetAction(), entry.GetBroadcast(),
+						LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+			}
+		} else {
+			_logger.Debug("No actions stored!");
+		}
+	}
+
+	private void checkSleepNotificationFlag() {
+
+		if (!_networkController.IsNetworkAvailable()) {
+			_logger.Warn("No network available!");
+			return;
+		}
+
+		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+			_logger.Warn("No LucaHome network! ...");
+			return;
+		}
+
+		if (_sharedPrefController
+				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
+			_notificationController.CreateSleepHeatingNotification();
+			_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
+		}
 	}
 }
