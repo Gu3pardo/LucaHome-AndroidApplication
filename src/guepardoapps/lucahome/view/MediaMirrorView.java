@@ -76,11 +76,6 @@ public class MediaMirrorView extends Activity {
 	private EditText _youtubeSearchInput;
 	private Button _youtubeSearchInputSendButton;
 
-	private Button _selectTagesschauButton;
-	private Button _selectHearthstoneButton;
-	private Button _selectFailarmyButton;
-	private Button _selectPeopleAreAwesomeButton;
-
 	private int _selectedRssFeedId;
 	private Spinner _selectRssFeedSpinner;
 	private Button _sendRssFeedButton;
@@ -93,6 +88,7 @@ public class MediaMirrorView extends Activity {
 	private Button _updateRaspiTemperatureButton;
 	private Button _updateIpAddressButton;
 	private Button _updateBirthdayButton;
+	private Button _updateCalendarButton;
 
 	private Button _increaseScreenBrightnessButton;
 	private Button _decreaseScreenBrightnessButton;
@@ -151,7 +147,7 @@ public class MediaMirrorView extends Activity {
 		_selectedRssFeedId = -1;
 
 		_context = this;
-		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController = new MediaMirrorController(_context, true);
 		_navigationService = new NavigationService(_context);
 		_receiverController = new ReceiverController(_context);
 
@@ -337,35 +333,6 @@ public class MediaMirrorView extends Activity {
 			}
 		});
 
-		_selectTagesschauButton = (Button) findViewById(R.id.selectTagesschauButton);
-		_selectTagesschauButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				_mediaMirrorController.LoadVideos("Tagesschau in 100 Sekunden", 5);
-			}
-		});
-		_selectHearthstoneButton = (Button) findViewById(R.id.selectHearthstoneButton);
-		_selectHearthstoneButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				_mediaMirrorController.LoadVideos("Hearthstone", 30);
-			}
-		});
-		_selectFailarmyButton = (Button) findViewById(R.id.selectFailarmyButton);
-		_selectFailarmyButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				_mediaMirrorController.LoadVideos("Failarmy", 10);
-			}
-		});
-		_selectPeopleAreAwesomeButton = (Button) findViewById(R.id.selectPeopleAreAwesomeButton);
-		_selectPeopleAreAwesomeButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				_mediaMirrorController.LoadVideos("People are awesome", 10);
-			}
-		});
-
 		_selectRssFeedSpinner = (Spinner) findViewById(R.id.rssFeedSpinner);
 		List<String> rssFeedIds = new ArrayList<String>();
 		for (RSSFeed entry : RSSFeed.values()) {
@@ -439,6 +406,13 @@ public class MediaMirrorView extends Activity {
 			@Override
 			public void onClick(View view) {
 				_mediaMirrorController.SendUpdateBirthdayAlarm();
+			}
+		});
+		_updateCalendarButton = (Button) findViewById(R.id.updateCalendarButton);
+		_updateCalendarButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_mediaMirrorController.SendUpdateCalendarAlarm();
 			}
 		});
 

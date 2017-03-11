@@ -8,21 +8,21 @@ package es.dmoral.toasty;
 
 public final class R {
 	public static final class drawable {
-		public static final int ic_check_white_48dp = 0x7f020058;
-		public static final int ic_clear_white_48dp = 0x7f020059;
-		public static final int ic_error_outline_white_48dp = 0x7f02005a;
-		public static final int ic_info_outline_white_48dp = 0x7f02005d;
-		public static final int ic_warning_outline_white = 0x7f020063;
-		public static final int ic_warning_white_48dp = 0x7f020064;
-		public static final int toast_frame = 0x7f020096;
+		public static final int ic_check_white_48dp = 0x7f020059;
+		public static final int ic_clear_white_48dp = 0x7f02005a;
+		public static final int ic_error_outline_white_48dp = 0x7f02005b;
+		public static final int ic_info_outline_white_48dp = 0x7f02005e;
+		public static final int ic_warning_outline_white = 0x7f020064;
+		public static final int ic_warning_white_48dp = 0x7f020065;
+		public static final int toast_frame = 0x7f020097;
 	}
 	public static final class id {
-		public static final int toast_icon = 0x7f100107;
-		public static final int toast_root = 0x7f100106;
-		public static final int toast_text = 0x7f100108;
+		public static final int toast_icon = 0x7f100113;
+		public static final int toast_root = 0x7f100112;
+		public static final int toast_text = 0x7f100114;
 	}
 	public static final class layout {
-		public static final int toast_layout = 0x7f03002b;
+		public static final int toast_layout = 0x7f03002c;
 	}
 	public static final class string {
 		public static final int app_name = 0x7f0e0024;

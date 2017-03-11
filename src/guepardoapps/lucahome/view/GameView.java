@@ -60,7 +60,7 @@ public class GameView extends Activity {
 		_logger.Debug("onCreate");
 
 		_context = this;
-		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController = new MediaMirrorController(_context, true);
 		_navigationService = new NavigationService(_context);
 
 		initializeSpinner();

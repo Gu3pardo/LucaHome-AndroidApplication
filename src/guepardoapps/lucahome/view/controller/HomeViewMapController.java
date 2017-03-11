@@ -27,7 +27,7 @@ import guepardoapps.lucahomelibrary.common.dto.*;
 import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
 import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 import guepardoapps.lucahomelibrary.view.controller.MapContentController;
-
+import guepardoapps.lucahomelibrary.view.controller.MediaMirrorController;
 import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
@@ -45,6 +45,7 @@ public class HomeViewMapController {
 	private BroadcastController _broadcastController;
 	private LucaDialogController _dialogController;
 	private MapContentController _mapContentController;
+	private MediaMirrorController _mediaMirrorController;
 	private ReceiverController _receiverController;
 
 	@SuppressWarnings("unused")
@@ -92,6 +93,47 @@ public class HomeViewMapController {
 		}
 	};
 
+	private BroadcastReceiver _mediaMirrorDataReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String commandBundle = intent
+					.getStringExtra(guepardoapps.lucahomelibrary.common.constants.Bundles.MEDIAMIRROR_COMMAND);
+			if (commandBundle != null) {
+				String[] data = commandBundle.split("\\&");
+				if (data.length == 2) {
+					String ip = data[0].replace("IP:", "");
+					String command = data[1].replace("CMD:", "");
+					switch (command) {
+					case "PLAY":
+						_mediaMirrorController.SelectServer(ip);
+						_mediaMirrorController.SendPlayYoutube();
+						break;
+					case "STOP":
+						_mediaMirrorController.SelectServer(ip);
+						_mediaMirrorController.SendStopYoutube();
+						break;
+					case "VOL_INCREASE":
+						_mediaMirrorController.SelectServer(ip);
+						_mediaMirrorController.SendVolumeIncrease();
+						break;
+					case "VOL_DECREASE":
+						_mediaMirrorController.SelectServer(ip);
+						_mediaMirrorController.SendVolumeDecrease();
+						break;
+					default:
+						_logger.Error(String.format("Cannot perform command %s", command));
+						Toasty.error(_context, "Command failed!", Toast.LENGTH_LONG).show();
+						break;
+					}
+				} else {
+					_logger.Error(String.format("Invalid length %s for data!", data.length));
+				}
+			} else {
+				_logger.Error("CommandBundle is null!");
+			}
+		}
+	};
+
 	public HomeViewMapController(Context context) {
 		_logger = new LucaHomeLogger(TAG);
 		_context = context;
@@ -99,6 +141,7 @@ public class HomeViewMapController {
 		_broadcastController = new BroadcastController(_context);
 		_dialogController = new LucaDialogController(_context);
 		_mapContentController = new MapContentController(_context);
+		_mediaMirrorController = new MediaMirrorController(_context, true);
 		_receiverController = new ReceiverController(_context);
 	}
 
@@ -115,6 +158,9 @@ public class HomeViewMapController {
 			if (_receiverController != null) {
 				_receiverController.RegisterReceiver(_mapDataReceiver,
 						new String[] { Broadcasts.UPDATE_MAP_CONTENT_VIEW });
+				_receiverController.RegisterReceiver(_mediaMirrorDataReceiver,
+						new String[] { guepardoapps.lucahomelibrary.common.constants.Broadcasts.MEDIAMIRROR_COMMAND });
+				_mediaMirrorController = new MediaMirrorController(_context, true);
 				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
 						new String[] { Bundles.MAIN_SERVICE_ACTION },
 						new Object[] { MainServiceAction.GET_MAP_CONTENT });
@@ -127,13 +173,17 @@ public class HomeViewMapController {
 	public void onPause() {
 		_logger.Debug("onPause");
 		_isInitialized = false;
+		_mediaMirrorController.Dispose();
 		_receiverController.UnregisterReceiver(_mapDataReceiver);
+		_receiverController.UnregisterReceiver(_mediaMirrorDataReceiver);
 	}
 
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
 		_isInitialized = false;
+		_mediaMirrorController.Dispose();
 		_receiverController.UnregisterReceiver(_mapDataReceiver);
+		_receiverController.UnregisterReceiver(_mediaMirrorDataReceiver);
 	}
 
 	private void initializeView() {
@@ -192,6 +242,9 @@ public class HomeViewMapController {
 				case TEMPERATURE:
 					showTemperatureDetailsDialog(newMapContent, temperatureList);
 					break;
+				case MEDIASERVER:
+					showMediaserverDetailsDialog(newMapContent, wirelessSocketList);
+					break;
 				default:
 					_logger.Warn("drawingType: " + newMapContent.toString() + " is not supported!");
 					return;
@@ -247,7 +300,7 @@ public class HomeViewMapController {
 
 						_dialogController.ShowMapSocketDialog(socket, scheduleList, timerList);
 					} else {
-						_logger.Warn("SocketList to big!" + String.valueOf(socketList.size()));
+						_logger.Warn("SocketList too big!" + String.valueOf(socketList.size()));
 					}
 				} else {
 					_logger.Warn("SocketList is null!");
@@ -262,6 +315,38 @@ public class HomeViewMapController {
 						_dialogController.ShowTemperatureGraphDialog(temperatureList.getValue(index).GetGraphPath());
 						break;
 					}
+				}
+			}
+
+			private void showMediaserverDetailsDialog(MapContentDto newMapContent,
+					SerializableList<WirelessSocketDto> wirelessSocketList) {
+				ArrayList<String> socketList = newMapContent.GetSockets();
+
+				WirelessSocketDto socket = null;
+
+				if (socketList != null) {
+					if (socketList.size() == 1) {
+						String socketName = socketList.get(0);
+						_logger.Info(String.format("Socket name is %s", socketName));
+
+						for (int index = 0; index < wirelessSocketList.getSize(); index++) {
+							if (wirelessSocketList.getValue(index).GetName().contains(socketName)) {
+								socket = wirelessSocketList.getValue(index);
+								break;
+							}
+						}
+
+						if (socket == null) {
+							_logger.Warn("Socket not found! " + socketName);
+							return;
+						}
+
+						_dialogController.ShowMapMediaMirrorDialog(socket, newMapContent.GetMediaServerIp());
+					} else {
+						_logger.Warn("SocketList too big!" + String.valueOf(socketList.size()));
+					}
+				} else {
+					_logger.Warn("SocketList is null!");
 				}
 			}
 		});
