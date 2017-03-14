@@ -7,13 +7,16 @@ import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-
+import android.widget.Toast;
+import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Bundles;
 
@@ -142,11 +145,53 @@ public class ShoppingListView extends Activity {
 	}
 
 	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_shopping_list, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+
+		if (id == R.id.buttonShareShoppingList) {
+			if (_shoppingList != null) {
+				if (_shoppingList.getSize() > 0) {
+					shareShoppingList();
+				} else {
+					Toasty.warning(_context, "Nothing to share!", Toast.LENGTH_LONG).show();
+				}
+			} else {
+				Toasty.warning(_context, "Nothing to share!", Toast.LENGTH_LONG).show();
+			}
+		}
+
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			_navigationService.NavigateTo(HomeView.class, true);
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	private void shareShoppingList() {
+		String shareText = "ShoppingList:\n";
+
+		for (int index = 0; index < _shoppingList.getSize(); index++) {
+			ShoppingEntryDto entry = _shoppingList.getValue(index);
+			shareText += String.valueOf(entry.GetQuantity()) + "x " + entry.GetName() + "\n";
+		}
+
+		Intent sendIntent = new Intent();
+
+		sendIntent.setAction(Intent.ACTION_SEND);
+		sendIntent.putExtra(Intent.EXTRA_TEXT, shareText);
+		sendIntent.setType("text/plain");
+
+		startActivity(sendIntent);
 	}
 }
