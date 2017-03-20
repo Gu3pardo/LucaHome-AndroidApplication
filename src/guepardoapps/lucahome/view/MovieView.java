@@ -14,17 +14,17 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.dto.*;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.LucaDialogController;
+import guepardoapps.library.lucahome.customadapter.*;
+import guepardoapps.library.lucahome.services.helper.NavigationService;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
-import guepardoapps.lucahomelibrary.common.dto.*;
-import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
-import guepardoapps.lucahomelibrary.view.customadapter.*;
 
 import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.BroadcastController;
@@ -32,7 +32,7 @@ import guepardoapps.toolset.controller.ReceiverController;
 
 public class MovieView extends Activity {
 
-	private static final String TAG = MovieView.class.getName();
+	private static final String TAG = MovieView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private boolean _isInitialized;

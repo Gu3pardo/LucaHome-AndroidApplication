@@ -21,18 +21,18 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import es.dmoral.toasty.Toasty;
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.dto.*;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.customadapter.*;
+import guepardoapps.library.lucahome.services.helper.NavigationService;
+
+import guepardoapps.library.toastview.ToastView;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.dto.*;
-import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
-import guepardoapps.lucahomelibrary.view.customadapter.*;
 
 import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.common.classes.SerializableTime;
@@ -41,7 +41,7 @@ import guepardoapps.toolset.controller.ReceiverController;
 
 public class SensorHumidityView extends Activity implements SensorEventListener {
 
-	private static final String TAG = SensorHumidityView.class.getName();
+	private static final String TAG = SensorHumidityView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private static final int SENSOR_TYPE = Sensor.TYPE_RELATIVE_HUMIDITY;
@@ -209,7 +209,7 @@ public class SensorHumidityView extends Activity implements SensorEventListener 
 			_sensorManager.registerListener(this, _sensor, SensorManager.SENSOR_DELAY_NORMAL);
 			return true;
 		} else {
-			Toasty.warning(_context, "Sensor is not available", Toast.LENGTH_SHORT).show();
+			ToastView.warning(_context, "Sensor is not available", Toast.LENGTH_SHORT).show();
 			_logger.Debug("Sensor is not available");
 			return false;
 		}

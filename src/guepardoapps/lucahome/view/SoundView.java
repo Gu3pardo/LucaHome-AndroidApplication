@@ -19,28 +19,28 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import es.dmoral.toasty.Toasty;
+import guepardoapps.library.lucahome.common.classes.Sound;
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.constants.ServerActions;
+import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.library.lucahome.common.enums.LucaObject;
+import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.LucaDialogController;
+import guepardoapps.library.lucahome.controller.LucaNotificationController;
+import guepardoapps.library.lucahome.controller.ServiceController;
+import guepardoapps.library.lucahome.controller.SoundController;
+import guepardoapps.library.lucahome.converter.json.JsonDataToSocketConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToSoundConverter;
+import guepardoapps.library.lucahome.customadapter.SoundListAdapter;
+import guepardoapps.library.lucahome.services.helper.NavigationService;
+
+import guepardoapps.library.toastview.ToastView;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-
-import guepardoapps.lucahomelibrary.common.classes.Sound;
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.constants.ServerActions;
-import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
-import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
-import guepardoapps.lucahomelibrary.common.controller.ServiceController;
-import guepardoapps.lucahomelibrary.common.converter.json.JsonDataToSocketConverter;
-import guepardoapps.lucahomelibrary.common.converter.json.JsonDataToSoundConverter;
-import guepardoapps.lucahomelibrary.common.dto.WirelessSocketDto;
-import guepardoapps.lucahomelibrary.common.enums.LucaObject;
-import guepardoapps.lucahomelibrary.common.enums.RaspberrySelection;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
-import guepardoapps.lucahomelibrary.view.controller.SoundController;
-import guepardoapps.lucahomelibrary.view.customadapter.SoundListAdapter;
 
 import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.ReceiverController;
@@ -48,7 +48,7 @@ import guepardoapps.toolset.controller.SharedPrefController;
 
 public class SoundView extends Activity {
 
-	private static final String TAG = SoundView.class.getName();
+	private static final String TAG = SoundView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private ArrayList<ArrayList<Sound>> _soundLists = new ArrayList<ArrayList<Sound>>(2);
@@ -145,7 +145,7 @@ public class SoundView extends Activity {
 				_serviceController.StartRestService(TAG, ServerActions.GET_VOLUME, Broadcasts.GET_VOLUME,
 						LucaObject.SOUND, _raspberrySelection);
 			} else {
-				Toasty.error(_context, "Failed to download sound list", Toast.LENGTH_LONG).show();
+				ToastView.error(_context, "Failed to download sound list", Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -175,7 +175,7 @@ public class SoundView extends Activity {
 			if (soundFileArray == null) {
 				soundFileArray = intent.getStringArrayExtra("SoundController");
 				if (soundFileArray == null) {
-					Toasty.error(_context, "Failed to start sound!", Toast.LENGTH_LONG).show();
+					ToastView.error(_context, "Failed to start sound!", Toast.LENGTH_LONG).show();
 					return;
 				} else {
 					handleSendStartIntent(soundFileArray);
@@ -212,7 +212,7 @@ public class SoundView extends Activity {
 					}
 				}
 			} else {
-				Toasty.error(_context, "Failed to start sound!", Toast.LENGTH_LONG).show();
+				ToastView.error(_context, "Failed to start sound!", Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -233,7 +233,7 @@ public class SoundView extends Activity {
 
 			if (_isPlaying) {
 				_logger.Error(stopStringArray[0]);
-				Toasty.error(_context, "Failed to stop sound!", Toast.LENGTH_LONG).show();
+				ToastView.error(_context, "Failed to stop sound!", Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -256,11 +256,11 @@ public class SoundView extends Activity {
 						} catch (Exception ex) {
 							_logger.Error(volumeStringArray[0]);
 							_logger.Error(ex.toString());
-							Toasty.error(_context, "Failed to set volume!", Toast.LENGTH_SHORT).show();
+							ToastView.error(_context, "Failed to set volume!", Toast.LENGTH_SHORT).show();
 						}
 					} else {
 						_logger.Error(volumeStringArray[0]);
-						Toasty.error(_context, "Failed to set volume!", Toast.LENGTH_SHORT).show();
+						ToastView.error(_context, "Failed to set volume!", Toast.LENGTH_SHORT).show();
 					}
 				}
 			}
@@ -366,7 +366,7 @@ public class SoundView extends Activity {
 			if (checkFileInList(_soundPlaying, _soundLists.get(0))) {
 				_soundController.SelectRaspberry(_raspberrySelection, RaspberrySelection.RASPBERRY_1, _soundPlaying);
 			} else {
-				Toasty.error(_context,
+				ToastView.error(_context,
 						"Cannot change raspberry! Raspberry 1 has not file " + _soundPlaying.GetFileName(),
 						Toast.LENGTH_LONG).show();
 			}
@@ -380,7 +380,7 @@ public class SoundView extends Activity {
 			if (checkFileInList(_soundPlaying, _soundLists.get(1))) {
 				_soundController.SelectRaspberry(_raspberrySelection, RaspberrySelection.RASPBERRY_2, _soundPlaying);
 			} else {
-				Toasty.error(_context,
+				ToastView.error(_context,
 						"Cannot change raspberry! Raspberry 2 has not file " + _soundPlaying.GetFileName(),
 						Toast.LENGTH_LONG).show();
 			}

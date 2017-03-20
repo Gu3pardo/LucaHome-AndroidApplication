@@ -16,15 +16,15 @@ import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.lucahome.services.MainService;
 
-import guepardoapps.lucahomelibrary.common.constants.IDs;
-import guepardoapps.lucahomelibrary.common.controller.DatabaseController;
-import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
-import guepardoapps.lucahomelibrary.common.controller.ServiceController;
-import guepardoapps.lucahomelibrary.common.dto.ActionDto;
-import guepardoapps.lucahomelibrary.common.enums.LucaObject;
-import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
-import guepardoapps.lucahomelibrary.common.enums.RaspberrySelection;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.common.constants.IDs;
+import guepardoapps.library.lucahome.common.dto.ActionDto;
+import guepardoapps.library.lucahome.common.enums.LucaObject;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.DatabaseController;
+import guepardoapps.library.lucahome.controller.LucaNotificationController;
+import guepardoapps.library.lucahome.controller.ServiceController;
 
 import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.AndroidSystemController;
@@ -36,7 +36,7 @@ import guepardoapps.toolset.scheduler.ScheduleService;
 
 public class WIFIReceiver extends BroadcastReceiver {
 
-	private static final String TAG = WIFIReceiver.class.getName();
+	private static final String TAG = WIFIReceiver.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private static final String WIFI = "Wifi:";

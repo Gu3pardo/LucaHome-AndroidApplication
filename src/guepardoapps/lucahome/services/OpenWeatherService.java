@@ -6,21 +6,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.LucaNotificationController;
+
+import guepardoapps.library.openweather.common.OWBroadcasts;
+import guepardoapps.library.openweather.common.OWBundles;
+import guepardoapps.library.openweather.common.OWIds;
+import guepardoapps.library.openweather.common.model.ForecastModel;
+import guepardoapps.library.openweather.controller.OpenWeatherController;
+
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.view.ForecastWeatherView;
-import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
 import guepardoapps.toolset.common.classes.NotificationContent;
 import guepardoapps.toolset.controller.ReceiverController;
 
-import guepardoapps.toolset.openweather.OpenWeatherController;
-import guepardoapps.toolset.openweather.common.OpenWeatherConstants;
-import guepardoapps.toolset.openweather.model.ForecastModel;
-
 public class OpenWeatherService extends Service {
 
-	private static final String TAG = OpenWeatherService.class.getName();
+	private static final String TAG = OpenWeatherService.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private ForecastModel _forecastModel;
@@ -36,8 +39,7 @@ public class OpenWeatherService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			_receiverController.UnregisterReceiver(_forecastReceiver);
 
-			_forecastModel = (ForecastModel) intent
-					.getSerializableExtra(OpenWeatherConstants.BUNDLE_EXTRA_FORECAST_MODEL);
+			_forecastModel = (ForecastModel) intent.getSerializableExtra(OWBundles.EXTRA_FORECAST_MODEL);
 
 			if (_forecastModel != null) {
 				_logger.Debug(_forecastModel.toString());
@@ -47,7 +49,7 @@ public class OpenWeatherService extends Service {
 				if (_message != null) {
 					_notificationController.CreateForecastWeatherNotification(ForecastWeatherView.class,
 							_message.GetIcon(), _message.GetTitle(), _message.GetText(),
-							OpenWeatherConstants.FORECAST_NOTIFICATION_ID);
+							OWIds.FORECAST_NOTIFICATION_ID);
 				} else {
 					_logger.Error("_message is null!");
 				}
@@ -76,7 +78,7 @@ public class OpenWeatherService extends Service {
 		}
 
 		_receiverController.RegisterReceiver(_forecastReceiver,
-				new String[] { OpenWeatherConstants.BROADCAST_GET_FORECAST_WEATHER_JSON_FINISHED });
+				new String[] { OWBroadcasts.FORECAST_WEATHER_JSON_FINISHED });
 
 		_openWeatherController.loadForecastWeather();
 

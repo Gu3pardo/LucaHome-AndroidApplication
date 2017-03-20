@@ -13,17 +13,25 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.AdapterView.OnItemSelectedListener;
 
-import guepardoapps.lucahome.R;
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.constants.Constants;
+import guepardoapps.library.lucahome.common.constants.MediaMirrorIds;
+import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.MediaMirrorController;
+import guepardoapps.library.lucahome.services.helper.NavigationService;
 
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
-import guepardoapps.lucahomelibrary.view.controller.MediaMirrorController;
+import guepardoapps.lucahome.R;
 
 public class GameView extends Activity {
 
-	private static final String TAG = GameView.class.getName();
+	private static final String TAG = GameView.class.getSimpleName();
 	private LucaHomeLogger _logger;
+
+	private String _selectedIp = MediaMirrorIds.SERVER_IPS.get(0);
+
+	private boolean _pongIsRunning;
+	private String _selectedPongPlayer = Constants.MEDIAMIRROR_PLAYER.get(0);
 
 	private Context _context;
 	private MediaMirrorController _mediaMirrorController;
@@ -60,7 +68,7 @@ public class GameView extends Activity {
 		_logger.Debug("onCreate");
 
 		_context = this;
-		_mediaMirrorController = new MediaMirrorController(_context, true);
+		_mediaMirrorController = new MediaMirrorController(_context);
 		_navigationService = new NavigationService(_context);
 
 		initializeSpinner();
@@ -86,7 +94,6 @@ public class GameView extends Activity {
 	public void onDestroy() {
 		super.onDestroy();
 		_logger.Debug("onDestroy");
-		_mediaMirrorController.Dispose();
 	}
 
 	@Override
@@ -103,13 +110,16 @@ public class GameView extends Activity {
 
 		_selectServerSpinner = (Spinner) findViewById(R.id.selectServerSpinner);
 		ArrayAdapter<String> serverDataAdapter = new ArrayAdapter<String>(_context,
-				android.R.layout.simple_spinner_item, MediaMirrorController.SERVER_IPS);
+				android.R.layout.simple_spinner_item, MediaMirrorIds.SERVER_IPS);
 		serverDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_selectServerSpinner.setAdapter(serverDataAdapter);
 		_selectServerSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				_mediaMirrorController.SelectServer(parent.getItemAtPosition(position).toString());
+				String selectedIp = parent.getItemAtPosition(position).toString();
+				if (selectedIp != null) {
+					_selectedIp = selectedIp;
+				}
 			}
 
 			@Override
@@ -121,39 +131,54 @@ public class GameView extends Activity {
 	private void initializeButtonControl() {
 		_logger.Debug("initializeButtonControl");
 
-		_buttonUp = (Button) findViewById(R.id.buttonUp);
-		_buttonUp.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				_mediaMirrorController.SendGameCommandUp();
-			}
-		});
 		_buttonLeft = (Button) findViewById(R.id.buttonLeft);
 		_buttonLeft.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendGameCommandLeft();
+				String data = "";
+				if (_pongIsRunning) {
+					data = _selectedPongPlayer + ":" + Constants.DIR_LEFT;
+				} else {
+					data = Constants.DIR_LEFT;
+				}
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(), data);
 			}
 		});
 		_buttonRight = (Button) findViewById(R.id.buttonRight);
 		_buttonRight.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendGameCommandRight();
+				String data = "";
+				if (_pongIsRunning) {
+					data = _selectedPongPlayer + ":" + Constants.DIR_RIGHT;
+				} else {
+					data = Constants.DIR_RIGHT;
+				}
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(), data);
+			}
+		});
+		_buttonUp = (Button) findViewById(R.id.buttonUp);
+		_buttonUp.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(),
+						Constants.DIR_UP);
 			}
 		});
 		_buttonDown = (Button) findViewById(R.id.buttonDown);
 		_buttonDown.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendGameCommandDown();
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(),
+						Constants.DIR_DOWN);
 			}
 		});
 		_buttonRotate = (Button) findViewById(R.id.buttonRotate);
 		_buttonRotate.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendGameCommandRotate();
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(),
+						Constants.DIR_ROTATE);
 			}
 		});
 	}
@@ -163,13 +188,13 @@ public class GameView extends Activity {
 
 		_selectPongPlayerSpinner = (Spinner) findViewById(R.id.selectPongPlayerSpinner);
 		ArrayAdapter<String> serverDataAdapter = new ArrayAdapter<String>(_context,
-				android.R.layout.simple_spinner_item, MediaMirrorController.PLAYER);
+				android.R.layout.simple_spinner_item, Constants.MEDIAMIRROR_PLAYER);
 		serverDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_selectPongPlayerSpinner.setAdapter(serverDataAdapter);
 		_selectPongPlayerSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				_mediaMirrorController.SelectPongPlayer(parent.getItemAtPosition(position).toString());
+				_selectedPongPlayer = parent.getItemAtPosition(position).toString();
 			}
 
 			@Override
@@ -181,35 +206,39 @@ public class GameView extends Activity {
 		_buttonPongPlay.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendPongCommandStart();
+				_pongIsRunning = true;
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_PONG_START.toString(), "");
 			}
 		});
 		_buttonPongRestart = (Button) findViewById(R.id.buttonPongRestart);
 		_buttonPongRestart.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendPongCommandRestart();
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_PONG_RESTART.toString(), "");
 			}
 		});
 		_buttonPongStop = (Button) findViewById(R.id.buttonPongStop);
 		_buttonPongStop.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendPongCommandStop();
+				_pongIsRunning = false;
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_PONG_STOP.toString(), "");
 			}
 		});
 		_buttonPongPause = (Button) findViewById(R.id.buttonPongPause);
 		_buttonPongPause.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendPongCommandPause();
+				_pongIsRunning = false;
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_PONG_PAUSE.toString(), "");
 			}
 		});
 		_buttonPongResume = (Button) findViewById(R.id.buttonPongResume);
 		_buttonPongResume.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendPongCommandResume();
+				_pongIsRunning = true;
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_PONG_RESUME.toString(), "");
 			}
 		});
 	}
@@ -221,14 +250,14 @@ public class GameView extends Activity {
 		_buttonSnakePlay.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendSnakeCommandStart();
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_SNAKE_START.toString(), "");
 			}
 		});
 		_buttonSnakeStop = (Button) findViewById(R.id.buttonSnakeStop);
 		_buttonSnakeStop.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendSnakeCommandStop();
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_SNAKE_STOP.toString(), "");
 			}
 		});
 	}
@@ -240,14 +269,14 @@ public class GameView extends Activity {
 		_buttonTetrisPlay.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendTetrisCommandStart();
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_TETRIS_START.toString(), "");
 			}
 		});
 		_buttonTetrisStop = (Button) findViewById(R.id.buttonTetrisStop);
 		_buttonTetrisStop.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_mediaMirrorController.SendTetrisCommandStop();
+				_mediaMirrorController.SendServerCommand(_selectedIp, ServerAction.GAME_TETRIS_STOP.toString(), "");
 			}
 		});
 	}

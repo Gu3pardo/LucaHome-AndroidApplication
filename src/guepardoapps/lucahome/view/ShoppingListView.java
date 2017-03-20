@@ -16,18 +16,20 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import es.dmoral.toasty.Toasty;
+
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.dto.ShoppingEntryDto;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.LucaDialogController;
+import guepardoapps.library.lucahome.customadapter.ShoppingListAdapter;
+import guepardoapps.library.lucahome.services.helper.NavigationService;
+
+import guepardoapps.library.toastview.ToastView;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Bundles;
-
-import guepardoapps.lucahomelibrary.common.constants.Broadcasts;
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
-import guepardoapps.lucahomelibrary.common.dto.ShoppingEntryDto;
-import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
-import guepardoapps.lucahomelibrary.view.customadapter.ShoppingListAdapter;
 
 import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.BroadcastController;
@@ -35,7 +37,7 @@ import guepardoapps.toolset.controller.ReceiverController;
 
 public class ShoppingListView extends Activity {
 
-	private static final String TAG = ShoppingListView.class.getName();
+	private static final String TAG = ShoppingListView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private boolean _isInitialized;
@@ -68,7 +70,7 @@ public class ShoppingListView extends Activity {
 
 			@SuppressWarnings("unchecked")
 			SerializableList<ShoppingEntryDto> list = (SerializableList<ShoppingEntryDto>) intent
-					.getSerializableExtra(guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST);
+					.getSerializableExtra(guepardoapps.library.lucahome.common.constants.Bundles.SHOPPING_LIST);
 
 			if (list != null) {
 				_shoppingList = list;
@@ -159,10 +161,10 @@ public class ShoppingListView extends Activity {
 				if (_shoppingList.getSize() > 0) {
 					shareShoppingList();
 				} else {
-					Toasty.warning(_context, "Nothing to share!", Toast.LENGTH_LONG).show();
+					ToastView.warning(_context, "Nothing to share!", Toast.LENGTH_LONG).show();
 				}
 			} else {
-				Toasty.warning(_context, "Nothing to share!", Toast.LENGTH_LONG).show();
+				ToastView.warning(_context, "Nothing to share!", Toast.LENGTH_LONG).show();
 			}
 		}
 

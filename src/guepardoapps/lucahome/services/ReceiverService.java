@@ -9,12 +9,12 @@ import android.content.Intent;
 import android.os.BatteryManager;
 import android.os.IBinder;
 
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.LucaNotificationController;
+import guepardoapps.library.lucahome.controller.ServiceController;
+
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-
-import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
-import guepardoapps.lucahomelibrary.common.controller.ServiceController;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.controller.ReceiverController;
@@ -22,7 +22,7 @@ import guepardoapps.toolset.controller.SharedPrefController;
 
 public class ReceiverService extends Service {
 
-	private static final String TAG = ReceiverService.class.getName();
+	private static final String TAG = ReceiverService.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private static final int NOTIFICATION_HOUR = 21;

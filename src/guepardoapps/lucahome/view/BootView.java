@@ -10,7 +10,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import es.dmoral.toasty.Toasty;
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.enums.Command;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.NavigateData;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.LucaDialogController;
+import guepardoapps.library.lucahome.services.helper.NavigationService;
+import guepardoapps.library.lucahome.services.wearcontrol.PhoneMessageListenerService;
+
+import guepardoapps.library.toastview.ToastView;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
@@ -19,21 +28,12 @@ import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.services.ControlServiceStateService;
 import guepardoapps.lucahome.services.MainService;
 
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
-import guepardoapps.lucahomelibrary.common.enums.Command;
-import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
-import guepardoapps.lucahomelibrary.common.enums.NavigateData;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
-import guepardoapps.lucahomelibrary.services.wearcontrol.PhoneMessageListenerService;
-
 import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.controller.ReceiverController;
 
 public class BootView extends Activity {
 
-	private static final String TAG = BootView.class.getName();
+	private static final String TAG = BootView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private int _progressBarMax = 100;
@@ -155,12 +155,12 @@ public class BootView extends Activity {
 				_startDownloadRunnable.run();
 			} else {
 				_logger.Warn("No LucaHome network! ...");
-				Toasty.warning(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
+				ToastView.warning(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
 				_navigationService.NavigateTo(HomeView.class, null, true);
 			}
 		} else {
 			_logger.Warn("No network available!");
-			Toasty.warning(_context, "No network available!", Toast.LENGTH_LONG).show();
+			ToastView.warning(_context, "No network available!", Toast.LENGTH_LONG).show();
 			_navigationService.NavigateTo(HomeView.class, null, true);
 		}
 	}

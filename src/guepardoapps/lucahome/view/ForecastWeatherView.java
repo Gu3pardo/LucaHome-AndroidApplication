@@ -13,23 +13,24 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.customadapter.*;
+import guepardoapps.library.lucahome.services.helper.NavigationService;
+
+import guepardoapps.library.openweather.common.model.ForecastModel;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
-import guepardoapps.lucahomelibrary.view.customadapter.*;
-
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
-import guepardoapps.toolset.openweather.model.ForecastModel;
 
 public class ForecastWeatherView extends Activity {
 
-	private static final String TAG = ForecastWeatherView.class.getName();
+	private static final String TAG = ForecastWeatherView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private boolean _isInitialized;

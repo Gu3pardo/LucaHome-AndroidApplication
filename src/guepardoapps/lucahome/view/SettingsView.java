@@ -17,31 +17,32 @@ import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.Toast;
 
-import es.dmoral.toasty.Toasty;
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.constants.IDs;
+import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.DatabaseController;
+import guepardoapps.library.lucahome.controller.LucaNotificationController;
+import guepardoapps.library.lucahome.services.helper.NavigationService;
+
+import guepardoapps.library.openweather.common.OWIds;
+
+import guepardoapps.library.toastview.ToastView;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.constants.IDs;
-import guepardoapps.lucahomelibrary.common.controller.DatabaseController;
-import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
-import guepardoapps.lucahomelibrary.common.dto.WirelessSocketDto;
-import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.services.helper.NavigationService;
-
 import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.BroadcastController;
 import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
-import guepardoapps.toolset.openweather.common.OpenWeatherConstants;
 
 public class SettingsView extends Activity {
 
-	private static final String TAG = SettingsView.class.getName();
+	private static final String TAG = SettingsView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private SerializableList<WirelessSocketDto> _socketList;
@@ -181,7 +182,7 @@ public class SettingsView extends Activity {
 							new String[] { Bundles.MAIN_SERVICE_ACTION },
 							new Object[] { MainServiceAction.SHOW_NOTIFICATION_WEATHER });
 				} else {
-					_notificationController.CloseNotification(OpenWeatherConstants.FORECAST_NOTIFICATION_ID);
+					_notificationController.CloseNotification(OWIds.FORECAST_NOTIFICATION_ID);
 				}
 			}
 		});
@@ -232,7 +233,7 @@ public class SettingsView extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				_databaseController.ClearDatabaseActions();
-				Toasty.info(_context, "Cleared actions!", Toast.LENGTH_LONG).show();
+				ToastView.info(_context, "Cleared actions!", Toast.LENGTH_LONG).show();
 			}
 		});
 	}

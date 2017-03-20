@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="guepardoapps.lucahome"
-    android:versionCode="20211"
-    android:versionName="2.2.11.170314" >
+    android:versionCode="20402"
+    android:versionName="2.4.2.170320" >
 
     <uses-sdk
         android:minSdkVersion="21"
@@ -84,21 +84,35 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name="guepardoapps.lucahomelibrary.receiver.notifications.HeatingReceiver"
+            android:name="guepardoapps.library.lucahome.receiver.notifications.HeatingReceiver"
             android:enabled="true"
             android:exported="false" >
         </receiver>
         <receiver
-            android:name="guepardoapps.lucahomelibrary.receiver.notifications.SocketActionReceiver"
+            android:name="guepardoapps.library.lucahome.receiver.notifications.SocketActionReceiver"
             android:enabled="true"
             android:exported="false" >
         </receiver>
         <receiver
-            android:name="guepardoapps.lucahomelibrary.receiver.notifications.StopSoundReceiver"
+            android:name="guepardoapps.library.lucahome.receiver.notifications.StopSoundReceiver"
             android:enabled="true"
             android:exported="false" >
         </receiver>
 
+        <service
+            android:name="guepardoapps.library.lucahome.services.RESTService"
+            android:enabled="true" />
+        <service
+            android:name="guepardoapps.library.lucahome.services.sockets.SocketActionService"
+            android:enabled="true" />
+        <service android:name="guepardoapps.library.lucahome.services.wearcontrol.PhoneMessageListenerService" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="guepardoapps.library.lucahome.services.wearcontrol.WearMessageService"
+            android:enabled="true" />
         <service
             android:name="guepardoapps.lucahome.services.ControlServiceStateService"
             android:enabled="true" />
@@ -113,20 +127,6 @@
             android:enabled="true" />
         <service
             android:name="guepardoapps.lucahome.services.ReceiverService"
-            android:enabled="true" />
-        <service
-            android:name="guepardoapps.lucahomelibrary.services.RESTService"
-            android:enabled="true" />
-        <service
-            android:name="guepardoapps.lucahomelibrary.services.sockets.SocketActionService"
-            android:enabled="true" />
-        <service android:name="guepardoapps.lucahomelibrary.services.wearcontrol.PhoneMessageListenerService" >
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
-            </intent-filter>
-        </service>
-        <service
-            android:name="guepardoapps.lucahomelibrary.services.wearcontrol.WearMessageService"
             android:enabled="true" />
 
         <meta-data

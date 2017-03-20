@@ -12,27 +12,32 @@ import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
-import es.dmoral.toasty.Toasty;
-
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.*;
 import guepardoapps.lucahome.view.BirthdayView;
 import guepardoapps.lucahome.view.SensorTemperatureView;
 
-import guepardoapps.lucahomelibrary.common.constants.IDs;
-import guepardoapps.lucahomelibrary.common.constants.ServerActions;
-import guepardoapps.lucahomelibrary.common.controller.DatabaseController;
-import guepardoapps.lucahomelibrary.common.controller.LucaDialogController;
-import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
-import guepardoapps.lucahomelibrary.common.controller.ServiceController;
-import guepardoapps.lucahomelibrary.common.converter.json.*;
-import guepardoapps.lucahomelibrary.common.dto.*;
-import guepardoapps.lucahomelibrary.common.enums.*;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
-import guepardoapps.lucahomelibrary.mediamirror.client.ClientTask;
-import guepardoapps.lucahomelibrary.mediamirror.common.enums.ServerAction;
-import guepardoapps.lucahomelibrary.services.sockets.SocketActionService;
-import guepardoapps.lucahomelibrary.view.controller.MediaMirrorController;
+import guepardoapps.library.lucahome.common.constants.IDs;
+import guepardoapps.library.lucahome.common.constants.MediaMirrorIds;
+import guepardoapps.library.lucahome.common.constants.ServerActions;
+import guepardoapps.library.lucahome.common.dto.*;
+import guepardoapps.library.lucahome.common.enums.*;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.DatabaseController;
+import guepardoapps.library.lucahome.controller.LucaDialogController;
+import guepardoapps.library.lucahome.controller.LucaNotificationController;
+import guepardoapps.library.lucahome.controller.ServiceController;
+import guepardoapps.library.lucahome.converter.json.*;
+import guepardoapps.library.lucahome.services.sockets.SocketActionService;
+import guepardoapps.library.lucahome.tasks.ClientTask;
+
+import guepardoapps.library.openweather.common.OWBroadcasts;
+import guepardoapps.library.openweather.common.OWBundles;
+import guepardoapps.library.openweather.common.model.ForecastModel;
+import guepardoapps.library.openweather.common.model.WeatherModel;
+import guepardoapps.library.openweather.controller.OpenWeatherController;
+
+import guepardoapps.library.toastview.ToastView;
 
 import guepardoapps.toolset.common.classes.SerializableList;
 import guepardoapps.toolset.controller.BroadcastController;
@@ -41,16 +46,11 @@ import guepardoapps.toolset.controller.NetworkController;
 import guepardoapps.toolset.controller.ReceiverController;
 import guepardoapps.toolset.controller.SharedPrefController;
 
-import guepardoapps.toolset.openweather.OpenWeatherController;
-import guepardoapps.toolset.openweather.common.OpenWeatherConstants;
-import guepardoapps.toolset.openweather.model.ForecastModel;
-import guepardoapps.toolset.openweather.model.WeatherModel;
-
 import guepardoapps.toolset.scheduler.ScheduleService;
 
 public class MainService extends Service {
 
-	private static final String TAG = MainService.class.getName();
+	private static final String TAG = MainService.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private boolean _isInitialized;
@@ -291,7 +291,7 @@ public class MainService extends Service {
 									Bundles.MAP_CONTENT_LIST, Bundles.MOVIE_LIST, Bundles.SCHEDULE_LIST,
 									Bundles.SOCKET_LIST, Bundles.TEMPERATURE_LIST, Bundles.TIMER_LIST,
 									Bundles.WEATHER_CURRENT, Bundles.WEATHER_FORECAST,
-									guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
+									guepardoapps.library.lucahome.common.constants.Bundles.SHOPPING_LIST },
 							new Object[] { _birthdayList, _changeList, _information, _mapContentList, _movieList,
 									_scheduleList, _wirelessSocketList, _temperatureList, _timerList, _currentWeather,
 									_forecastWeather, _shoppingList });
@@ -359,8 +359,8 @@ public class MainService extends Service {
 					break;
 				case GET_SHOPPING_LIST:
 					_broadcastController.SendSerializableArrayBroadcast(
-							guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
-							new String[] { guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
+							guepardoapps.library.lucahome.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
+							new String[] { guepardoapps.library.lucahome.common.constants.Bundles.SHOPPING_LIST },
 							new Object[] { _shoppingList });
 					sendShoppingListToWear();
 					break;
@@ -423,7 +423,7 @@ public class MainService extends Service {
 			}
 
 			_logger.Warn("Found no socket for heating!");
-			Toasty.warning(_context, "Found no socket for heating!", Toast.LENGTH_LONG).show();
+			ToastView.warning(_context, "Found no socket for heating!", Toast.LENGTH_LONG).show();
 		}
 
 		private void createDeactivatingSchedule(String socketName, boolean enableSound) {
@@ -478,9 +478,9 @@ public class MainService extends Service {
 
 		private void enableSoundSchedule(int playLength) {
 			_logger.Debug("enableSoundSchedule");
-			ClientTask clientTask = new ClientTask(_context,
-					MediaMirrorController.SERVER_IPS.get(MediaMirrorController.SLEEP_MEDIA_SERVER_INDEX),
-					MediaMirrorController.SERVERPORT);
+
+			ClientTask clientTask = new ClientTask(_context, MediaMirrorIds.SLEEP_SERVER_IP,
+					guepardoapps.library.lucahome.common.constants.Constants.MEDIAMIRROR_SERVERPORT);
 			clientTask.SetCommunication(
 					"ACTION:" + ServerAction.PLAY_SEA_SOUND.toString() + "&DATA:" + String.valueOf(playLength));
 			clientTask.execute();
@@ -557,7 +557,7 @@ public class MainService extends Service {
 			_logger.Debug("_forecastModelReceiver onReceive");
 
 			ForecastModel newForecastWeather = (ForecastModel) intent
-					.getSerializableExtra(OpenWeatherConstants.BUNDLE_EXTRA_FORECAST_MODEL);
+					.getSerializableExtra(OWBundles.EXTRA_FORECAST_MODEL);
 			if (newForecastWeather != null) {
 				_forecastWeather = newForecastWeather;
 			} else {
@@ -812,8 +812,7 @@ public class MainService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_weatherModelReceiver onReceive");
 
-			WeatherModel newWeather = (WeatherModel) intent
-					.getSerializableExtra(OpenWeatherConstants.BUNDLE_EXTRA_WEATHER_MODEL);
+			WeatherModel newWeather = (WeatherModel) intent.getSerializableExtra(OWBundles.EXTRA_WEATHER_MODEL);
 			if (newWeather != null) {
 				_currentWeather = newWeather;
 				sendWeatherToWear();
@@ -842,8 +841,8 @@ public class MainService extends Service {
 				if (newShoppingList != null) {
 					_shoppingList = newShoppingList;
 					_broadcastController.SendSerializableArrayBroadcast(
-							guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
-							new String[] { guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
+							guepardoapps.library.lucahome.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
+							new String[] { guepardoapps.library.lucahome.common.constants.Bundles.SHOPPING_LIST },
 							new Object[] { _shoppingList });
 
 					_databaseController.ClearDatabaseShoppingList();
@@ -979,7 +978,7 @@ public class MainService extends Service {
 					startDownloadBirthday();
 				} else {
 					_logger.Warn("Add of birthday failed!");
-					Toasty.error(_context, "Add of birthday failed!", Toast.LENGTH_LONG).show();
+					ToastView.error(_context, "Add of birthday failed!", Toast.LENGTH_LONG).show();
 				}
 				break;
 			case MOVIE:
@@ -996,7 +995,7 @@ public class MainService extends Service {
 					startDownloadMovie();
 				} else {
 					_logger.Warn("Add of movie failed!");
-					Toasty.error(_context, "Add of movie failed!", Toast.LENGTH_LONG).show();
+					ToastView.error(_context, "Add of movie failed!", Toast.LENGTH_LONG).show();
 				}
 				break;
 			case SCHEDULE:
@@ -1014,7 +1013,7 @@ public class MainService extends Service {
 					startDownloadSchedule();
 				} else {
 					_logger.Warn("Add of schedule failed!");
-					Toasty.error(_context, "Add of schedule failed!", Toast.LENGTH_LONG).show();
+					ToastView.error(_context, "Add of schedule failed!", Toast.LENGTH_LONG).show();
 				}
 				break;
 			case WIRELESS_SOCKET:
@@ -1031,7 +1030,7 @@ public class MainService extends Service {
 					startDownloadSocket();
 				} else {
 					_logger.Warn("Add of socket failed!");
-					Toasty.error(_context, "Add of socket failed!", Toast.LENGTH_LONG).show();
+					ToastView.error(_context, "Add of socket failed!", Toast.LENGTH_LONG).show();
 				}
 				break;
 			default:
@@ -1094,7 +1093,7 @@ public class MainService extends Service {
 		public void onReceive(Context context, Intent intent) {
 			_logger.Debug("_updateBoughtShoppingListReceiver onReceive");
 
-			String data = intent.getStringExtra(guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST);
+			String data = intent.getStringExtra(guepardoapps.library.lucahome.common.constants.Bundles.SHOPPING_LIST);
 			if (data != null) {
 				String[] content = data.split("\\:");
 				if (content.length == 2) {
@@ -1114,9 +1113,9 @@ public class MainService extends Service {
 							entry.SetBought(bought);
 
 							_broadcastController.SendSerializableArrayBroadcast(
-									guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
+									guepardoapps.library.lucahome.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
 									new String[] {
-											guepardoapps.lucahomelibrary.common.constants.Bundles.SHOPPING_LIST },
+											guepardoapps.library.lucahome.common.constants.Bundles.SHOPPING_LIST },
 									new Object[] { _shoppingList });
 
 							_databaseController.ClearDatabaseShoppingList();
@@ -1244,7 +1243,7 @@ public class MainService extends Service {
 		_receiverController.RegisterReceiver(_changeDownloadReceiver,
 				new String[] { Broadcasts.DOWNLOAD_CHANGE_FINISHED });
 		_receiverController.RegisterReceiver(_forecastModelReceiver,
-				new String[] { OpenWeatherConstants.BROADCAST_GET_FORECAST_WEATHER_JSON_FINISHED });
+				new String[] { OWBroadcasts.FORECAST_WEATHER_JSON_FINISHED });
 		_receiverController.RegisterReceiver(_informationDownloadReceiver,
 				new String[] { Broadcasts.DOWNLOAD_INFORMATION_FINISHED });
 		_receiverController.RegisterReceiver(_mapContentDownloadReceiver,
@@ -1259,9 +1258,9 @@ public class MainService extends Service {
 		_receiverController.RegisterReceiver(_temperatureDownloadReceiver,
 				new String[] { Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED });
 		_receiverController.RegisterReceiver(_weatherModelReceiver,
-				new String[] { OpenWeatherConstants.BROADCAST_GET_CURRENT_WEATHER_JSON_FINISHED });
+				new String[] { OWBroadcasts.CURRENT_WEATHER_JSON_FINISHED });
 		_receiverController.RegisterReceiver(_shoppingListDownloadReceiver, new String[] {
-				guepardoapps.lucahomelibrary.common.constants.Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED });
+				guepardoapps.library.lucahome.common.constants.Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED });
 
 		_receiverController.RegisterReceiver(_addReceiver, new String[] { Broadcasts.ADD_BIRTHDAY, Broadcasts.ADD_MOVIE,
 				Broadcasts.ADD_SCHEDULE, Broadcasts.ADD_SOCKET });
@@ -1281,10 +1280,10 @@ public class MainService extends Service {
 				new String[] { Broadcasts.RELOAD_BIRTHDAY, Broadcasts.RELOAD_MOVIE, Broadcasts.RELOAD_SCHEDULE,
 						Broadcasts.RELOAD_TIMER, Broadcasts.RELOAD_SOCKETS });
 		_receiverController.RegisterReceiver(_reloadShoppingListReceiver,
-				new String[] { guepardoapps.lucahomelibrary.common.constants.Broadcasts.RELOAD_SHOPPING_LIST });
+				new String[] { guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_SHOPPING_LIST });
 
 		_receiverController.RegisterReceiver(_updateBoughtShoppingListReceiver,
-				new String[] { guepardoapps.lucahomelibrary.common.constants.Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST });
+				new String[] { guepardoapps.library.lucahome.common.constants.Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST });
 	}
 
 	private void unregisterReceiver() {
@@ -1345,7 +1344,7 @@ public class MainService extends Service {
 
 		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 			_logger.Warn("No LucaHome network! ...");
-			Toasty.warning(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
+			ToastView.warning(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
 			return;
 		}
 
@@ -1507,7 +1506,7 @@ public class MainService extends Service {
 
 	private void startDownloadShoppingList() {
 		_serviceController.StartRestService(Bundles.SHOPPING_LIST_DOWNLOAD, ServerActions.GET_SHOPPING_LIST,
-				guepardoapps.lucahomelibrary.common.constants.Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED,
+				guepardoapps.library.lucahome.common.constants.Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED,
 				LucaObject.SHOPPING_ENTRY, RaspberrySelection.BOTH);
 	}
 

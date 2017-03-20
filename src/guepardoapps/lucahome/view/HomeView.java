@@ -6,26 +6,26 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 
-import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.view.controller.HomeViewBottomBarController;
-import guepardoapps.lucahome.view.controller.HomeViewListButtonController;
-import guepardoapps.lucahome.view.controller.HomeViewMapController;
-import guepardoapps.lucahome.view.controller.HomeViewWeatherController;
+import guepardoapps.library.lucahome.common.constants.Color;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
-import guepardoapps.lucahomelibrary.common.constants.Color;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
+import guepardoapps.lucahome.R;
+import guepardoapps.lucahome.view.controller.home.BottomBarController;
+import guepardoapps.lucahome.view.controller.home.ListButtonController;
+import guepardoapps.lucahome.view.controller.home.MapController;
+import guepardoapps.lucahome.view.controller.home.WeatherController;
 
 public class HomeView extends Activity {
 
-	private static final String TAG = HomeView.class.getName();
+	private static final String TAG = HomeView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private Context _context;
 
-	private HomeViewBottomBarController _bottomBarController;
-	private HomeViewListButtonController _listButtonController;
-	private HomeViewMapController _mapController;
-	private HomeViewWeatherController _weatherController;
+	private BottomBarController _bottomBarController;
+	private ListButtonController _listButtonController;
+	private MapController _mapController;
+	private WeatherController _weatherController;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -38,10 +38,10 @@ public class HomeView extends Activity {
 
 		_context = this;
 
-		_bottomBarController = new HomeViewBottomBarController(_context);
-		_listButtonController = new HomeViewListButtonController(_context);
-		_mapController = new HomeViewMapController(_context);
-		_weatherController = new HomeViewWeatherController(_context);
+		_bottomBarController = new BottomBarController(_context);
+		_listButtonController = new ListButtonController(_context);
+		_mapController = new MapController(_context);
+		_weatherController = new WeatherController(_context);
 
 		_bottomBarController.onCreate();
 		_listButtonController.onCreate();
@@ -84,10 +84,13 @@ public class HomeView extends Activity {
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		_logger.Debug(String.format("onKeyDown: keyCode: %s | event: %s", keyCode, event));
+
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			finish();
 			return true;
 		}
+
 		return super.onKeyDown(keyCode, event);
 	}
 }

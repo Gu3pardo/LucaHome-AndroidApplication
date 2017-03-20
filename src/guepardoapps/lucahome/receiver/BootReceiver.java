@@ -7,17 +7,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
+import guepardoapps.library.lucahome.common.constants.IDs;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.controller.LucaNotificationController;
+import guepardoapps.library.lucahome.controller.ServiceController;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.services.MainService;
-
-import guepardoapps.lucahomelibrary.common.constants.IDs;
-import guepardoapps.lucahomelibrary.common.controller.LucaNotificationController;
-import guepardoapps.lucahomelibrary.common.controller.ServiceController;
-import guepardoapps.lucahomelibrary.common.enums.MainServiceAction;
-import guepardoapps.lucahomelibrary.common.tools.LucaHomeLogger;
 
 import guepardoapps.toolset.controller.AndroidSystemController;
 import guepardoapps.toolset.controller.BroadcastController;
@@ -26,7 +26,7 @@ import guepardoapps.toolset.controller.NetworkController;
 
 public class BootReceiver extends BroadcastReceiver {
 
-	private static final String TAG = BootReceiver.class.getName();
+	private static final String TAG = BootReceiver.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private static final String WIFI = "Wifi:";
