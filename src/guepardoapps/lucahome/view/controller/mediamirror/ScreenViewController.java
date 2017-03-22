@@ -52,7 +52,8 @@ public class ScreenViewController {
 			if (mediaMirrorViewDto != null) {
 				_logger.Debug("New Dto is: " + mediaMirrorViewDto.toString());
 				_mediaMirrorViewDto = mediaMirrorViewDto;
-				_screenBrightnessTextView.setText(String.valueOf(_mediaMirrorViewDto.GetScreenBrightness()));
+				int screenBrightness = (_mediaMirrorViewDto.GetScreenBrightness() * 100) / 255;
+				_screenBrightnessTextView.setText(String.valueOf(screenBrightness) + "%");
 			} else {
 				_logger.Warn("Received null MediaMirrorViewDto...!");
 			}
@@ -102,10 +103,10 @@ public class ScreenViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -121,10 +122,10 @@ public class ScreenViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.DECREASE_SCREEN_BRIGHTNESS.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});

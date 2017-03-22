@@ -116,7 +116,7 @@ public class WebsiteViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SHOW_WEBVIEW.toString(), url);
 			}
 		});

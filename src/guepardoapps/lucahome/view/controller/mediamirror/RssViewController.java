@@ -113,7 +113,7 @@ public class RssViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SET_RSS_FEED.toString(), String.valueOf(selectedRSSFeed.GetId()));
 			}
 

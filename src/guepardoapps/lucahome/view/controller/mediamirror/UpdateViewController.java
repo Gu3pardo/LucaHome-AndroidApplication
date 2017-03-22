@@ -103,7 +103,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_CURRENT_WEATHER.toString(), "");
 			}
 		});
@@ -117,7 +117,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_FORECAST_WEATHER.toString(), "");
 			}
 		});
@@ -132,7 +132,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(), "");
 			}
 		});
@@ -146,7 +146,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_IP_ADDRESS.toString(), "");
 			}
 		});
@@ -160,7 +160,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_BIRTHDAY_ALARM.toString(), "");
 			}
 		});
@@ -174,7 +174,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_CALENDAR_ALARM.toString(), "");
 			}
 		});

@@ -95,7 +95,7 @@ public class AdvancedViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SYSTEM_REBOOT.toString(), "");
 			}
 		});
@@ -109,7 +109,7 @@ public class AdvancedViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SYSTEM_SHUTDOWN.toString(), "");
 			}
 		});

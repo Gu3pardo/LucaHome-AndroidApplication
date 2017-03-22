@@ -18,7 +18,6 @@ import guepardoapps.lucahome.view.BirthdayView;
 import guepardoapps.lucahome.view.SensorTemperatureView;
 
 import guepardoapps.library.lucahome.common.constants.IDs;
-import guepardoapps.library.lucahome.common.constants.MediaMirrorIds;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.*;
 import guepardoapps.library.lucahome.common.enums.*;
@@ -479,11 +478,16 @@ public class MainService extends Service {
 		private void enableSoundSchedule(int playLength) {
 			_logger.Debug("enableSoundSchedule");
 
-			ClientTask clientTask = new ClientTask(_context, MediaMirrorIds.SLEEP_SERVER_IP,
-					guepardoapps.library.lucahome.common.constants.Constants.MEDIAMIRROR_SERVERPORT);
-			clientTask.SetCommunication(
-					"ACTION:" + ServerAction.PLAY_SEA_SOUND.toString() + "&DATA:" + String.valueOf(playLength));
-			clientTask.execute();
+			for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+				if (entry.IsSleepingMirror()) {
+					ClientTask clientTask = new ClientTask(_context, entry.GetIp(),
+							guepardoapps.library.lucahome.common.constants.Constants.MEDIAMIRROR_SERVERPORT);
+					clientTask.SetCommunication(
+							"ACTION:" + ServerAction.PLAY_SEA_SOUND.toString() + "&DATA:" + String.valueOf(playLength));
+					clientTask.execute();
+					break;
+				}
+			}
 		}
 	};
 

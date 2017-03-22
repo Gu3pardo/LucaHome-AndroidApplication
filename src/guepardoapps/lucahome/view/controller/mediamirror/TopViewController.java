@@ -1,5 +1,7 @@
 package guepardoapps.lucahome.view.controller.mediamirror;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,10 +24,10 @@ import android.widget.Toast;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
-import guepardoapps.library.lucahome.common.constants.MediaMirrorIds;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
 import guepardoapps.library.lucahome.common.enums.LucaObject;
+import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
 import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.library.lucahome.common.enums.ServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -56,6 +58,7 @@ public class TopViewController {
 	private MediaMirrorViewDto _mediaMirrorViewDto;
 
 	private Spinner _mediamirrorSelectionSpinner;
+	private boolean _switchEnabled = true;
 
 	private TextView _mediaMirrorBatteryTextView;
 	private Switch _mediamirrorSocketSwitch;
@@ -72,6 +75,30 @@ public class TopViewController {
 	private TextView _sleepTimerTextView;
 	private int _sleepTimerSec = -1;
 	private Handler _sleepTimerHandler = new Handler();
+	private Runnable _sleepTimerRunnable = new Runnable() {
+		@Override
+		public void run() {
+			_sleepTimerSec--;
+			if (_sleepTimerSec >= 0) {
+				int min = _sleepTimerSec / 60;
+				int sec = _sleepTimerSec % 60;
+				_sleepTimerTextView.setText(String.format("Sleep timer: %s:%s min", min, sec));
+				_sleepTimerHandler.postDelayed(_sleepTimerRunnable, COUNTDOWN_TIMEOUT);
+			}
+		}
+	};
+
+	private static final int UPDATE_TIMEOUT = 5 * 1000;
+	private Handler _updateInfoHandler = new Handler();
+	private Runnable _updateInfoRunnable = new Runnable() {
+		@Override
+		public void run() {
+			if (_mediaMirrorViewDto != null) {
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+			}
+		}
+	};
 
 	private TextView _versionTextView;
 
@@ -84,14 +111,15 @@ public class TopViewController {
 				_logger.Debug("New Dto is: " + mediaMirrorViewDto.toString());
 				_mediaMirrorViewDto = mediaMirrorViewDto;
 
-				ToastView.success(_context, "Received data! Updating view...", Toast.LENGTH_LONG).show();
-
 				_mediaMirrorBatteryTextView.setText(String.valueOf(_mediaMirrorViewDto.GetBatteryLevel()));
+
+				_switchEnabled = false;
 				_mediamirrorSocketSwitch.setChecked(_mediaMirrorViewDto.GetSocketState());
+				_switchEnabled = true;
 
-				_youtubeIdTextView.setText(_mediaMirrorViewDto.GetYoutubeId());
+				_youtubeIdTextView.setText("YoutubeId: " + _mediaMirrorViewDto.GetYoutubeId());
 
-				_volumeTextView.setText(String.valueOf(_mediaMirrorViewDto.GetVolume()));
+				_volumeTextView.setText("Vol.: " + String.valueOf(_mediaMirrorViewDto.GetVolume()));
 
 				if (_mediaMirrorViewDto.GetSleepTimerEnabled()) {
 					_sleepTimerTextView.setVisibility(View.VISIBLE);
@@ -112,19 +140,9 @@ public class TopViewController {
 				_logger.Warn("Received null MediaMirrorViewDto...!");
 				ToastView.warning(_context, "Received null MediaMirrorViewDto...!", Toast.LENGTH_LONG).show();
 			}
-		}
-	};
 
-	private Runnable _sleepTimerRunnable = new Runnable() {
-		@Override
-		public void run() {
-			_sleepTimerSec--;
-			if (_sleepTimerSec >= 0) {
-				int min = _sleepTimerSec / 60;
-				int sec = _sleepTimerSec % 60;
-				_sleepTimerTextView.setText(String.format("Sleep timer: %s:%s min", min, sec));
-				_sleepTimerHandler.postDelayed(_sleepTimerRunnable, COUNTDOWN_TIMEOUT);
-			}
+			_updateInfoHandler.removeCallbacks(_updateInfoRunnable);
+			_updateInfoHandler.postDelayed(_updateInfoRunnable, UPDATE_TIMEOUT);
 		}
 	};
 
@@ -141,18 +159,23 @@ public class TopViewController {
 		_logger.Debug("onCreate");
 
 		_mediamirrorSelectionSpinner = (Spinner) ((Activity) _context).findViewById(R.id.mediamirrorSelectionSpinner);
+		final ArrayList<String> serverLocations = new ArrayList<String>();
+		for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+			if (entry.GetId() > 0) {
+				serverLocations.add(entry.GetLocation());
+			}
+		}
 		ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(_context, android.R.layout.simple_spinner_item,
-				MediaMirrorIds.SERVER_IPS);
+				serverLocations);
 		dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_mediamirrorSelectionSpinner.setAdapter(dataAdapter);
 		_mediamirrorSelectionSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				String selectedIp = MediaMirrorIds.SERVER_IPS.get(position);
-				_logger.Debug(String.format("Selected ip %s", selectedIp));
+				String selectedLocation = serverLocations.get(position);
+				_logger.Debug(String.format("Selected location %s", selectedLocation));
 
-				ToastView.info(_context, "Requesting data from selected mirror!", Toast.LENGTH_LONG).show();
-
+				String selectedIp = MediaMirrorSelection.GetByLocation(selectedLocation).GetIp();
 				_mediaMirrorController.SendServerCommand(selectedIp, ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 
@@ -171,6 +194,11 @@ public class TopViewController {
 
 				if (_mediaMirrorViewDto == null) {
 					_logger.Error("_mediaMirrorViewDto is null!");
+					return;
+				}
+
+				if (!_switchEnabled) {
+					_logger.Warn("Switch diabled!");
 					return;
 				}
 
@@ -195,10 +223,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.PLAY_YOUTUBE_VIDEO.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -213,10 +241,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.PAUSE_YOUTUBE_VIDEO.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -231,10 +259,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.STOP_YOUTUBE_VIDEO.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -252,10 +280,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.INCREASE_VOLUME.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -271,10 +299,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.DECREASE_VOLUME.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetServerIp(),
+				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -297,12 +325,14 @@ public class TopViewController {
 		_logger.Debug("onPause");
 		_initialized = false;
 		_receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
+		_updateInfoHandler.removeCallbacks(_updateInfoRunnable);
 	}
 
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
 		_initialized = false;
 		_receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
+		_updateInfoHandler.removeCallbacks(_updateInfoRunnable);
 	}
 
 	public void SelecteYoutubeId() {
@@ -313,7 +343,7 @@ public class TopViewController {
 			return;
 		}
 
-		_lucaDialogController.ShowYoutubeIdSelectionDialog(_mediaMirrorViewDto.GetServerIp(),
+		_lucaDialogController.ShowYoutubeIdSelectionDialog(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 				_mediaMirrorViewDto.GetPlayedYoutubeIds());
 	}
 }

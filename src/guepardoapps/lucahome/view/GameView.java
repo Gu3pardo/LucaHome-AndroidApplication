@@ -1,5 +1,7 @@
 package guepardoapps.lucahome.view;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
@@ -15,7 +17,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.constants.Constants;
-import guepardoapps.library.lucahome.common.constants.MediaMirrorIds;
+import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
 import guepardoapps.library.lucahome.common.enums.ServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
@@ -28,7 +30,7 @@ public class GameView extends Activity {
 	private static final String TAG = GameView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
-	private String _selectedIp = MediaMirrorIds.SERVER_IPS.get(0);
+	private String _selectedIp = MediaMirrorSelection.MEDIAMIRROR_1.GetIp();
 
 	private boolean _pongIsRunning;
 	private String _selectedPongPlayer = Constants.MEDIAMIRROR_PLAYER.get(0);
@@ -109,14 +111,23 @@ public class GameView extends Activity {
 		_logger.Debug("initializeSpinner");
 
 		_selectServerSpinner = (Spinner) findViewById(R.id.selectServerSpinner);
+		final ArrayList<String> serverLocations = new ArrayList<String>();
+		for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+			if (entry.GetId() > 0) {
+				serverLocations.add(entry.GetLocation());
+			}
+		}
 		ArrayAdapter<String> serverDataAdapter = new ArrayAdapter<String>(_context,
-				android.R.layout.simple_spinner_item, MediaMirrorIds.SERVER_IPS);
+				android.R.layout.simple_spinner_item, serverLocations);
 		serverDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		_selectServerSpinner.setAdapter(serverDataAdapter);
 		_selectServerSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
 			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-				String selectedIp = parent.getItemAtPosition(position).toString();
+				String selectedLocation = serverLocations.get(position);
+				_logger.Debug(String.format("Selected location %s", selectedLocation));
+
+				String selectedIp = MediaMirrorSelection.GetByLocation(selectedLocation).GetIp();
 				if (selectedIp != null) {
 					_selectedIp = selectedIp;
 				}
