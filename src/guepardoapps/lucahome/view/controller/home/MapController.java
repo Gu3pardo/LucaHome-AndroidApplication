@@ -7,6 +7,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Point;
+import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
@@ -18,22 +20,22 @@ import android.widget.Toast;
 
 import guepardoapps.library.lucahome.common.dto.*;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
 import guepardoapps.library.lucahome.common.enums.ServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
+import guepardoapps.library.lucahome.controller.MapContentController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
 import guepardoapps.library.toastview.ToastView;
 
-import guepardoapps.library.lucahome.controller.MapContentController;
+import guepardoapps.library.toolset.common.classes.SerializableList;
+import guepardoapps.library.toolset.controller.BroadcastController;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-
-import guepardoapps.toolset.common.classes.SerializableList;
-import guepardoapps.toolset.controller.BroadcastController;
-import guepardoapps.toolset.controller.ReceiverController;
 
 public class MapController {
 
@@ -55,6 +57,16 @@ public class MapController {
 	private ImageView _imageViewMapOverview;
 	private RelativeLayout _relativeLayoutMapPaint;
 
+	private int _callForDataTimeout = 3 * 1000;
+	private Handler _callForDataHandler = new Handler();
+	private Runnable _callForDataRunnable = new Runnable() {
+		@Override
+		public void run() {
+			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+					new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.GET_MAP_CONTENT });
+		}
+	};
+
 	private BroadcastReceiver _mapDataReceiver = new BroadcastReceiver() {
 		@SuppressWarnings("unchecked")
 		@Override
@@ -69,12 +81,18 @@ public class MapController {
 					.getSerializableExtra(Bundles.TIMER_LIST);
 			SerializableList<TemperatureDto> temperatureList = (SerializableList<TemperatureDto>) intent
 					.getSerializableExtra(Bundles.TEMPERATURE_LIST);
+			SerializableList<ShoppingEntryDto> shoppingList = (SerializableList<ShoppingEntryDto>) intent
+					.getSerializableExtra(Bundles.SHOPPING_LIST);
+			SerializableList<MenuDto> menu = (SerializableList<MenuDto>) intent.getSerializableExtra(Bundles.MENU);
 
 			if (mapContentList != null && wirelessSocketList != null && scheduleAllList != null && timerAllList != null
-					&& temperatureList != null) {
+					&& temperatureList != null && shoppingList != null && menu != null) {
+				_callForDataHandler.removeCallbacks(_callForDataRunnable);
+
 				for (int index = 0; index < mapContentList.getSize(); index++) {
 					MapContentDto entry = mapContentList.getValue(index);
-					addView(entry, wirelessSocketList, scheduleAllList, timerAllList, temperatureList);
+					addView(entry, wirelessSocketList, scheduleAllList, timerAllList, temperatureList, shoppingList,
+							menu);
 				}
 			} else {
 				if (mapContentList == null) {
@@ -91,6 +109,12 @@ public class MapController {
 				}
 				if (temperatureList == null) {
 					_logger.Warn("temperatureList is null!");
+				}
+				if (shoppingList == null) {
+					_logger.Warn("shoppingList is null!");
+				}
+				if (menu == null) {
+					_logger.Warn("menu is null!");
 				}
 			}
 		}
@@ -109,16 +133,19 @@ public class MapController {
 					String command = data[1].replace("CMD:", "");
 					switch (command) {
 					case "PLAY":
-						_mediaMirrorController.SendServerCommand(ip, ServerAction.PLAY_YOUTUBE_VIDEO.toString(), "");
+						_mediaMirrorController.SendCommand(ip, ServerAction.PLAY_YOUTUBE_VIDEO.toString(), "");
+						break;
+					case "PAUSE":
+						_mediaMirrorController.SendCommand(ip, ServerAction.PAUSE_YOUTUBE_VIDEO.toString(), "");
 						break;
 					case "STOP":
-						_mediaMirrorController.SendServerCommand(ip, ServerAction.STOP_YOUTUBE_VIDEO.toString(), "");
+						_mediaMirrorController.SendCommand(ip, ServerAction.STOP_YOUTUBE_VIDEO.toString(), "");
 						break;
 					case "VOL_INCREASE":
-						_mediaMirrorController.SendServerCommand(ip, ServerAction.INCREASE_VOLUME.toString(), "");
+						_mediaMirrorController.SendCommand(ip, ServerAction.INCREASE_VOLUME.toString(), "");
 						break;
 					case "VOL_DECREASE":
-						_mediaMirrorController.SendServerCommand(ip, ServerAction.DECREASE_VOLUME.toString(), "");
+						_mediaMirrorController.SendCommand(ip, ServerAction.DECREASE_VOLUME.toString(), "");
 						break;
 					default:
 						_logger.Error(String.format("Cannot perform command %s", command));
@@ -142,6 +169,7 @@ public class MapController {
 		_dialogController = new LucaDialogController(_context);
 		_mapContentController = new MapContentController(_context);
 		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController.Initialize();
 		_receiverController = new ReceiverController(_context);
 	}
 
@@ -163,6 +191,7 @@ public class MapController {
 				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
 						new String[] { Bundles.MAIN_SERVICE_ACTION },
 						new Object[] { MainServiceAction.GET_MAP_CONTENT });
+				_callForDataHandler.postDelayed(_callForDataRunnable, _callForDataTimeout);
 
 				_isInitialized = true;
 			}
@@ -178,9 +207,11 @@ public class MapController {
 
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
+
+		_mediaMirrorController.Dispose();
+		_receiverController.Dispose();
+
 		_isInitialized = false;
-		_receiverController.UnregisterReceiver(_mapDataReceiver);
-		_receiverController.UnregisterReceiver(_mediaMirrorDataReceiver);
 	}
 
 	private void initializeView() {
@@ -210,18 +241,20 @@ public class MapController {
 	private void addView(final MapContentDto newMapContent,
 			final SerializableList<WirelessSocketDto> wirelessSocketList,
 			final SerializableList<ScheduleDto> scheduleAllList, final SerializableList<TimerDto> timerAllList,
-			final SerializableList<TemperatureDto> temperatureList) {
+			final SerializableList<TemperatureDto> temperatureList,
+			final SerializableList<ShoppingEntryDto> shoppingList, final SerializableList<MenuDto> menu) {
 		final TextView newTextView = _mapContentController.CreateEntry(newMapContent, newMapContent.GetPosition(),
 				wirelessSocketList, temperatureList, _size, true);
 		newTextView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showInformation(wirelessSocketList, scheduleAllList, timerAllList, temperatureList);
+				showInformation(wirelessSocketList, scheduleAllList, timerAllList, temperatureList, shoppingList, menu);
 			}
 
 			private void showInformation(SerializableList<WirelessSocketDto> wirelessSocketList,
 					SerializableList<ScheduleDto> scheduleAllList, SerializableList<TimerDto> timerAllList,
-					SerializableList<TemperatureDto> temperatureList) {
+					SerializableList<TemperatureDto> temperatureList, SerializableList<ShoppingEntryDto> shoppingList,
+					final SerializableList<MenuDto> menu) {
 				_logger.Debug("onClick showInformation");
 
 				switch (newMapContent.GetDrawingType()) {
@@ -241,6 +274,12 @@ public class MapController {
 					break;
 				case MEDIASERVER:
 					showMediaserverDetailsDialog(newMapContent, wirelessSocketList);
+					break;
+				case SHOPPING_LIST:
+					showShoppingListDialog(shoppingList);
+					break;
+				case MENU:
+					showMenuDialog(menu);
 					break;
 				default:
 					_logger.Warn("drawingType: " + newMapContent.toString() + " is not supported!");
@@ -319,6 +358,7 @@ public class MapController {
 					SerializableList<WirelessSocketDto> wirelessSocketList) {
 				ArrayList<String> socketList = newMapContent.GetSockets();
 
+				MediaMirrorSelection selection = MediaMirrorSelection.GetByIp(newMapContent.GetMediaServerIp());
 				WirelessSocketDto socket = null;
 
 				if (socketList != null) {
@@ -335,16 +375,24 @@ public class MapController {
 
 						if (socket == null) {
 							_logger.Warn("Socket not found! " + socketName);
-							return;
+							ToastView.warning(_context, "Socket not found! ", Toast.LENGTH_SHORT).show();
 						}
 
-						_dialogController.ShowMapMediaMirrorDialog(socket, newMapContent.GetMediaServerIp());
+						_dialogController.ShowMapMediaMirrorDialog(selection, socket);
 					} else {
 						_logger.Warn("SocketList too big!" + String.valueOf(socketList.size()));
 					}
 				} else {
 					_logger.Warn("SocketList is null!");
 				}
+			}
+
+			private void showShoppingListDialog(@NonNull SerializableList<ShoppingEntryDto> shoppingList) {
+				_dialogController.ShowShoppingListDialog(shoppingList);
+			}
+
+			private void showMenuDialog(SerializableList<MenuDto> menu) {
+				_dialogController.ShowMenuDialog(menu);
 			}
 		});
 

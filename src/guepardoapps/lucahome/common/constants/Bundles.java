@@ -38,6 +38,10 @@ public class Bundles {
 	// Mediamirror
 	public static final String CURRENT_RECEIVED_VOLUME = "CURRENT_RECEIVED_VOLUME";
 
+	// Menu
+	public static final String MENU = "MENU";
+	public static final String MENU_DOWNLOAD = "MENU_DOWNLOAD";
+
 	// Movie
 	public static final String MOVIE_LIST = "MOVIE_LIST";
 	public static final String MOVIE_SINGLE = "MOVIE_SINGLE";
@@ -60,6 +64,7 @@ public class Bundles {
 
 	// Shopping List
 	public static final String SHOPPING_LIST_DOWNLOAD = "SHOPPING_LIST_DOWNLOAD";
+	public static final String SHOPPING_LIST = "SHOPPING_LIST";
 
 	// Socket
 	public static final String SOCKET_DATA = "SOCKET_DATA";

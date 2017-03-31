@@ -14,7 +14,7 @@ import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toastview.ToastView;
 
-import guepardoapps.toolset.controller.ReceiverController;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
 public class ControlServiceStateService extends Service {
 

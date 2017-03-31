@@ -21,9 +21,9 @@ import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
 import guepardoapps.library.toastview.ToastView;
 
-import guepardoapps.lucahome.R;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
-import guepardoapps.toolset.controller.ReceiverController;
+import guepardoapps.lucahome.R;
 
 public class TextViewController {
 
@@ -62,6 +62,7 @@ public class TextViewController {
 		_logger = new LucaHomeLogger(TAG);
 		_context = context;
 		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController.Initialize();
 		_receiverController = new ReceiverController(_context);
 	}
 
@@ -111,7 +112,7 @@ public class TextViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SHOW_CENTER_TEXT.toString(), text);
 			}
 		});
@@ -135,6 +136,7 @@ public class TextViewController {
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
 		_initialized = false;
+		_mediaMirrorController.Dispose();
 		_receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
 	}
 }

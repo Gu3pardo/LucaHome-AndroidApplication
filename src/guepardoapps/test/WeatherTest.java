@@ -7,7 +7,7 @@ import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.openweather.common.model.WeatherModel;
 
-import guepardoapps.toolset.common.classes.SerializableTime;
+import guepardoapps.library.toolset.common.classes.SerializableTime;
 
 public class WeatherTest {
 

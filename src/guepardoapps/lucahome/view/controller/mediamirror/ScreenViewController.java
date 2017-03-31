@@ -18,9 +18,9 @@ import guepardoapps.library.lucahome.common.enums.ServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
-import guepardoapps.lucahome.R;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
-import guepardoapps.toolset.controller.ReceiverController;
+import guepardoapps.lucahome.R;
 
 public class ScreenViewController {
 
@@ -64,6 +64,7 @@ public class ScreenViewController {
 		_logger = new LucaHomeLogger(TAG);
 		_context = context;
 		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController.Initialize();
 		_receiverController = new ReceiverController(_context);
 	}
 
@@ -103,10 +104,10 @@ public class ScreenViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -122,10 +123,10 @@ public class ScreenViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.DECREASE_SCREEN_BRIGHTNESS.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -149,6 +150,7 @@ public class ScreenViewController {
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
 		_initialized = false;
+		_mediaMirrorController.Dispose();
 		_receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
 	}
 }

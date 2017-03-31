@@ -27,9 +27,9 @@ import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
 import guepardoapps.library.toastview.ToastView;
 
-import guepardoapps.lucahome.R;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
-import guepardoapps.toolset.controller.ReceiverController;
+import guepardoapps.lucahome.R;
 
 public class RssViewController {
 
@@ -67,6 +67,7 @@ public class RssViewController {
 		_logger = new LucaHomeLogger(TAG);
 		_context = context;
 		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController.Initialize();
 		_receiverController = new ReceiverController(_context);
 	}
 
@@ -113,7 +114,7 @@ public class RssViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SET_RSS_FEED.toString(), String.valueOf(selectedRSSFeed.GetId()));
 			}
 
@@ -141,6 +142,7 @@ public class RssViewController {
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
 		_initialized = false;
+		_mediaMirrorController.Dispose();
 		_receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
 	}
 }

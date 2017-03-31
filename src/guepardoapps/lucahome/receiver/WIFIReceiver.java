@@ -9,13 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
-import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-import guepardoapps.lucahome.services.MainService;
-
 import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.dto.ActionDto;
 import guepardoapps.library.lucahome.common.enums.LucaObject;
@@ -26,13 +19,20 @@ import guepardoapps.library.lucahome.controller.DatabaseController;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.controller.ServiceController;
 
-import guepardoapps.toolset.common.classes.SerializableList;
-import guepardoapps.toolset.controller.AndroidSystemController;
-import guepardoapps.toolset.controller.BroadcastController;
-import guepardoapps.toolset.controller.DialogController;
-import guepardoapps.toolset.controller.NetworkController;
-import guepardoapps.toolset.controller.SharedPrefController;
-import guepardoapps.toolset.scheduler.ScheduleService;
+import guepardoapps.library.toolset.common.classes.SerializableList;
+import guepardoapps.library.toolset.controller.AndroidSystemController;
+import guepardoapps.library.toolset.controller.BroadcastController;
+import guepardoapps.library.toolset.controller.DialogController;
+import guepardoapps.library.toolset.controller.NetworkController;
+import guepardoapps.library.toolset.controller.SharedPrefController;
+import guepardoapps.library.toolset.scheduler.ScheduleService;
+
+import guepardoapps.lucahome.R;
+import guepardoapps.lucahome.common.constants.Broadcasts;
+import guepardoapps.lucahome.common.constants.Bundles;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.constants.SharedPrefConstants;
+import guepardoapps.lucahome.services.MainService;
 
 public class WIFIReceiver extends BroadcastReceiver {
 

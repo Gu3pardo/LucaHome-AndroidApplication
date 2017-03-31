@@ -18,9 +18,9 @@ import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
-import guepardoapps.lucahome.R;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
-import guepardoapps.toolset.controller.ReceiverController;
+import guepardoapps.lucahome.R;
 
 public class AdvancedViewController {
 
@@ -60,6 +60,7 @@ public class AdvancedViewController {
 		_logger = new LucaHomeLogger(TAG);
 		_context = context;
 		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController.Initialize();
 		_receiverController = new ReceiverController(_context);
 	}
 
@@ -95,7 +96,7 @@ public class AdvancedViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SYSTEM_REBOOT.toString(), "");
 			}
 		});
@@ -109,7 +110,7 @@ public class AdvancedViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SYSTEM_SHUTDOWN.toString(), "");
 			}
 		});
@@ -133,6 +134,7 @@ public class AdvancedViewController {
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
 		_initialized = false;
+		_mediaMirrorController.Dispose();
 		_receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
 	}
 }

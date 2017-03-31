@@ -30,15 +30,15 @@ import guepardoapps.library.openweather.common.OWIds;
 
 import guepardoapps.library.toastview.ToastView;
 
+import guepardoapps.library.toolset.common.classes.SerializableList;
+import guepardoapps.library.toolset.controller.BroadcastController;
+import guepardoapps.library.toolset.controller.ReceiverController;
+import guepardoapps.library.toolset.controller.SharedPrefController;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.SharedPrefConstants;
-
-import guepardoapps.toolset.common.classes.SerializableList;
-import guepardoapps.toolset.controller.BroadcastController;
-import guepardoapps.toolset.controller.ReceiverController;
-import guepardoapps.toolset.controller.SharedPrefController;
 
 public class SettingsView extends Activity {
 

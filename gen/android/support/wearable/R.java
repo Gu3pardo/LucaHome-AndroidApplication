@@ -134,12 +134,12 @@ public final class R {
 		public static final int card_frame = 0x7f020023;
 		public static final int card_frame_pressed = 0x7f020024;
 		public static final int close_button = 0x7f02002b;
-		public static final int generic_confirmation = 0x7f020058;
-		public static final int generic_confirmation_animation = 0x7f020059;
-		public static final int ic_full_cancel = 0x7f020060;
-		public static final int ic_full_sad = 0x7f020061;
-		public static final int open_on_phone = 0x7f02007b;
-		public static final int open_on_phone_animation = 0x7f02007c;
+		public static final int generic_confirmation = 0x7f02005c;
+		public static final int generic_confirmation_animation = 0x7f02005d;
+		public static final int ic_full_cancel = 0x7f020064;
+		public static final int ic_full_sad = 0x7f020065;
+		public static final int open_on_phone = 0x7f020080;
+		public static final int open_on_phone_animation = 0x7f020081;
 	}
 	public static final class id {
 		public static final int alertTitle = 0x7f11002f;
@@ -152,8 +152,8 @@ public final class R {
 		public static final int center_vertical = 0x7f11000b;
 		public static final int clip_horizontal = 0x7f11000c;
 		public static final int clip_vertical = 0x7f11000d;
-		public static final int dismiss_overlay_button = 0x7f11009e;
-		public static final int dismiss_overlay_explain = 0x7f11009d;
+		public static final int dismiss_overlay_button = 0x7f1100a4;
+		public static final int dismiss_overlay_explain = 0x7f1100a3;
 		public static final int end = 0x7f11000e;
 		public static final int fill = 0x7f11000f;
 		public static final int fill_horizontal = 0x7f110010;
@@ -161,13 +161,13 @@ public final class R {
 		public static final int fit = 0x7f110009;
 		public static final int height = 0x7f110005;
 		public static final int left = 0x7f110002;
-		public static final int message = 0x7f11009f;
+		public static final int message = 0x7f1100a5;
 		public static final int none = 0x7f110006;
 		public static final int parentPanel = 0x7f11002d;
 		public static final int right = 0x7f110003;
 		public static final int start = 0x7f110012;
-		public static final int text = 0x7f11011c;
-		public static final int title = 0x7f11019f;
+		public static final int text = 0x7f11012b;
+		public static final int title = 0x7f1101b3;
 		public static final int top = 0x7f110004;
 		public static final int width = 0x7f110007;
 	}
@@ -187,9 +187,9 @@ public final class R {
 	}
 	public static final class layout {
 		public static final int alert_dialog_wearable = 0x7f030001;
-		public static final int dismiss_overlay = 0x7f030015;
-		public static final int error_layout = 0x7f030016;
-		public static final int watch_card_content = 0x7f030038;
+		public static final int dismiss_overlay = 0x7f030016;
+		public static final int error_layout = 0x7f030017;
+		public static final int watch_card_content = 0x7f03003a;
 	}
 	public static final class string {
 		public static final int dismiss_overlay_button_label = 0x7f090039;

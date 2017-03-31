@@ -18,9 +18,9 @@ import guepardoapps.library.lucahome.common.enums.ServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
-import guepardoapps.lucahome.R;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
-import guepardoapps.toolset.controller.ReceiverController;
+import guepardoapps.lucahome.R;
 
 public class UpdateViewController {
 
@@ -65,6 +65,7 @@ public class UpdateViewController {
 		_logger = new LucaHomeLogger(TAG);
 		_context = context;
 		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController.Initialize();
 		_receiverController = new ReceiverController(_context);
 	}
 
@@ -103,7 +104,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_CURRENT_WEATHER.toString(), "");
 			}
 		});
@@ -117,7 +118,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_FORECAST_WEATHER.toString(), "");
 			}
 		});
@@ -132,7 +133,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(), "");
 			}
 		});
@@ -146,7 +147,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_IP_ADDRESS.toString(), "");
 			}
 		});
@@ -160,7 +161,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_BIRTHDAY_ALARM.toString(), "");
 			}
 		});
@@ -174,7 +175,7 @@ public class UpdateViewController {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.UPDATE_CALENDAR_ALARM.toString(), "");
 			}
 		});
@@ -198,6 +199,7 @@ public class UpdateViewController {
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
 		_initialized = false;
+		_mediaMirrorController.Dispose();
 		_receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
 	}
 }

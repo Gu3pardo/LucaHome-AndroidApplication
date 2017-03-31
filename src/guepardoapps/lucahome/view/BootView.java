@@ -21,15 +21,15 @@ import guepardoapps.library.lucahome.services.wearcontrol.PhoneMessageListenerSe
 
 import guepardoapps.library.toastview.ToastView;
 
+import guepardoapps.library.toolset.controller.NetworkController;
+import guepardoapps.library.toolset.controller.ReceiverController;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.services.ControlServiceStateService;
 import guepardoapps.lucahome.services.MainService;
-
-import guepardoapps.toolset.controller.NetworkController;
-import guepardoapps.toolset.controller.ReceiverController;
 
 public class BootView extends Activity {
 
@@ -123,7 +123,7 @@ public class BootView extends Activity {
 			}
 
 			_percentProgressBar.setProgress(currentProgress);
-			_progressTextView.setText(String.valueOf((int) (progress * _progressBarMax / _progressBarSteps)) + " %");
+			_progressTextView.setText(String.valueOf(currentProgress) + " %");
 		}
 	};
 
@@ -150,10 +150,10 @@ public class BootView extends Activity {
 		_networkController = new NetworkController(_context, _dialogController);
 		_receiverController = new ReceiverController(_context);
 
+		_startDownloadRunnable.run();
+
 		if (_networkController.IsNetworkAvailable()) {
-			if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-				_startDownloadRunnable.run();
-			} else {
+			if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
 				_logger.Warn("No LucaHome network! ...");
 				ToastView.warning(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
 				_navigationService.NavigateTo(HomeView.class, null, true);

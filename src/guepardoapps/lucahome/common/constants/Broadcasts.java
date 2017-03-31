@@ -36,6 +36,12 @@ public class Broadcasts {
 	// Mediamirror
 	public static final String MEDIAMIRROR_VOLUME = "guepardoapps.mediamirror.broadcast.current.volume";
 
+	// Menu
+	public static final String CLEAR_MENU = "guepardoapps.lucahome.broadcast.clear.menu";
+	public static final String RELOAD_MENU = "guepardoapps.lucahome.broadcast.reload.menu";
+	public static final String UPDATE_MENU = "guepardoapps.lucahome.broadcast.UPDATE_MENU";
+	public static final String DOWNLOAD_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MENU_FINISHED";
+
 	// Movie
 	public static final String ADD_MOVIE = "guepardoapps.lucahome.broadcast.add.movie";
 	public static final String UPDATE_MOVIE = "guepardoapps.lucahome.broadcast.update.movie";

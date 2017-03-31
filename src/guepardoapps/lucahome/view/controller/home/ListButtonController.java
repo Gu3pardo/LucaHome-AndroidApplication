@@ -24,7 +24,7 @@ public class ListButtonController {
 	private Button _buttonControl;
 	private Button _buttonMedia;
 	private Button _buttonSensors;
-	private Button _buttonShoppingList;
+	private Button _buttonLiving;
 	private Button _buttonSocial;
 
 	private LinearLayout _linearLayoutButtonControl;
@@ -42,6 +42,10 @@ public class ListButtonController {
 	private Button _buttonHumidity;
 	private Button _buttonAirPressure;
 
+	private LinearLayout _linearLayoutButtonLiving;
+	private Button _buttonMenu;
+	private Button _buttonShoppingList;
+
 	private LinearLayout _linearLayoutButtonSocial;
 	private Button _buttonBirthdays;
 	private Button _buttonGames;
@@ -49,11 +53,13 @@ public class ListButtonController {
 	private int _controlVisibility = View.GONE;
 	private int _mediaVisibility = View.GONE;
 	private int _sensorVisibility = View.GONE;
+	private int _livingVisibility = View.GONE;
 	private int _socialVisibility = View.GONE;
 
 	private boolean _controlSelectionActive = _controlVisibility == View.VISIBLE;
 	private boolean _mediaSelectionActive = _mediaVisibility == View.VISIBLE;
 	private boolean _sensorSelectionActive = _sensorVisibility == View.VISIBLE;
+	private boolean _livingSelectionActive = _livingVisibility == View.VISIBLE;
 	private boolean _socialSelectionActive = _socialVisibility == View.VISIBLE;
 
 	public ListButtonController(Context context) {
@@ -69,6 +75,7 @@ public class ListButtonController {
 		initializeButtonControl();
 		initializeButtonMedia();
 		initializeButtonSensor();
+		initializeButtonLiving();
 		initializeButtonSocial();
 	}
 
@@ -129,11 +136,17 @@ public class ListButtonController {
 			}
 		});
 
-		_buttonShoppingList = (Button) ((Activity) _context).findViewById(R.id.buttonShoppingList);
-		_buttonShoppingList.setOnClickListener(new OnClickListener() {
+		_buttonLiving = (Button) ((Activity) _context).findViewById(R.id.buttonLiving);
+		_buttonLiving.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				_navigationService.NavigateTo(ShoppingListView.class, true);
+				if (_livingSelectionActive) {
+					_livingVisibility = View.GONE;
+				} else {
+					_livingVisibility = View.VISIBLE;
+				}
+				_livingSelectionActive = _livingVisibility == View.VISIBLE;
+				_linearLayoutButtonLiving.setVisibility(_livingVisibility);
 			}
 		});
 
@@ -241,6 +254,29 @@ public class ListButtonController {
 			@Override
 			public void onClick(View view) {
 				_navigationService.NavigateTo(SensorAirPressureView.class, true);
+			}
+		});
+	}
+
+	private void initializeButtonLiving() {
+		_logger.Debug("initializeButtonLiving");
+
+		_linearLayoutButtonLiving = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutLiving);
+		_linearLayoutButtonLiving.setVisibility(_livingVisibility);
+
+		_buttonMenu = (Button) ((Activity) _context).findViewById(R.id.buttonMenu);
+		_buttonMenu.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_navigationService.NavigateTo(MenuView.class, true);
+			}
+		});
+
+		_buttonShoppingList = (Button) ((Activity) _context).findViewById(R.id.buttonShoppingList);
+		_buttonShoppingList.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_navigationService.NavigateTo(ShoppingListView.class, true);
 			}
 		});
 	}

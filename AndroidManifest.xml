@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="guepardoapps.lucahome"
-    android:versionCode="20406"
-    android:versionName="2.4.6.170322" >
+    android:versionCode="20602"
+    android:versionName="2.6.2.170331" >
 
     <uses-sdk
         android:minSdkVersion="21"
@@ -43,6 +43,8 @@
         <activity android:name="guepardoapps.lucahome.view.HomeView" >
         </activity>
         <activity android:name="guepardoapps.lucahome.view.InformationView" >
+        </activity>
+        <activity android:name="guepardoapps.lucahome.view.MenuView" >
         </activity>
         <activity android:name="guepardoapps.lucahome.view.MovieView" >
         </activity>

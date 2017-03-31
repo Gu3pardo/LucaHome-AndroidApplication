@@ -8,7 +8,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -18,7 +17,6 @@ import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.dto.*;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.customadapter.*;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
@@ -30,13 +28,12 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 
-public class BirthdayView extends Activity {
+public class MenuView extends Activity {
 
-	private static final String TAG = BirthdayView.class.getSimpleName();
+	private static final String TAG = MenuView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
 	private boolean _isInitialized;
-	private int _id = -1;
 
 	private ProgressBar _progressBar;
 	private ListView _listView;
@@ -47,14 +44,13 @@ public class BirthdayView extends Activity {
 	private Context _context;
 
 	private BroadcastController _broadcastController;
-	private LucaDialogController _dialogController;
 	private NavigationService _navigationService;
 	private ReceiverController _receiverController;
 
 	private Runnable _getDataRunnable = new Runnable() {
 		public void run() {
 			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-					new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.GET_BIRTHDAYS });
+					new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.GET_MENU });
 		}
 	};
 
@@ -64,19 +60,14 @@ public class BirthdayView extends Activity {
 			_logger.Debug("_updateReceiver onReceive");
 
 			@SuppressWarnings("unchecked")
-			SerializableList<BirthdayDto> list = (SerializableList<BirthdayDto>) intent
-					.getSerializableExtra(Bundles.BIRTHDAY_LIST);
+			SerializableList<MenuDto> list = (SerializableList<MenuDto>) intent.getSerializableExtra(Bundles.MENU);
 
 			if (list != null) {
-				_id = list.getSize();
-
-				_listAdapter = new BirthdayListAdapter(_context, list);
+				_listAdapter = new MenuListAdapter(_context, list, false, false);
 				_listView.setAdapter(_listAdapter);
 
 				_progressBar.setVisibility(View.GONE);
 				_listView.setVisibility(View.VISIBLE);
-
-				setTitle(String.valueOf(_id) + " birthdays");
 			}
 		}
 	};
@@ -93,7 +84,6 @@ public class BirthdayView extends Activity {
 		_context = this;
 
 		_broadcastController = new BroadcastController(_context);
-		_dialogController = new LucaDialogController(_context);
 		_navigationService = new NavigationService(_context);
 		_receiverController = new ReceiverController(_context);
 
@@ -101,13 +91,7 @@ public class BirthdayView extends Activity {
 		_progressBar = (ProgressBar) findViewById(R.id.progressBarListView);
 
 		_buttonAdd = (Button) findViewById(R.id.buttonAddListView);
-		_buttonAdd.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				_logger.Debug("onClick _buttonAdd");
-				_dialogController.ShowAddBirthdayDialog(_id, _getDataRunnable, null, true);
-			}
-		});
+		_buttonAdd.setVisibility(View.GONE);
 	}
 
 	@Override
@@ -117,7 +101,7 @@ public class BirthdayView extends Activity {
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
 				_isInitialized = true;
-				_receiverController.RegisterReceiver(_updateReceiver, new String[] { Broadcasts.UPDATE_BIRTHDAY });
+				_receiverController.RegisterReceiver(_updateReceiver, new String[] { Broadcasts.UPDATE_MENU });
 				_getDataRunnable.run();
 			}
 		}

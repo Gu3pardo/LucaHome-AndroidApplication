@@ -2,17 +2,21 @@ package guepardoapps.lucahome.view.controller.mediamirror;
 
 import java.util.ArrayList;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -37,9 +41,9 @@ import guepardoapps.library.lucahome.controller.ServiceController;
 
 import guepardoapps.library.toastview.ToastView;
 
-import guepardoapps.lucahome.R;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
-import guepardoapps.toolset.controller.ReceiverController;
+import guepardoapps.lucahome.R;
 
 public class TopViewController {
 
@@ -58,19 +62,55 @@ public class TopViewController {
 	private MediaMirrorViewDto _mediaMirrorViewDto;
 
 	private Spinner _mediamirrorSelectionSpinner;
-	private boolean _switchEnabled = true;
 
 	private TextView _mediaMirrorBatteryTextView;
 	private Switch _mediamirrorSocketSwitch;
-
-	private TextView _youtubeIdTextView;
-	private ImageButton _imageButtonVideoPlay;
-	private ImageButton _imageButtonVideoPause;
-	private ImageButton _imageButtonVideoStop;
+	private boolean _switchEnabled = true;
 
 	private TextView _volumeTextView;
 	private Button _buttonVolumeIncrease;
 	private Button _buttonVolumeDecrease;
+
+	private TextView _youtubeIdTextView;
+	private SeekBar _seekBarYoutubeDuration;
+	private boolean _seekbarEnabled = true;
+	private ImageButton _imageButtonVideoPlay;
+	private ImageButton _imageButtonVideoPause;
+	private ImageButton _imageButtonVideoStop;
+	private TextView _youtubeVideoTimeTextView;
+	private int _youtubePlayTimeSec = -1;
+	private int _youtubeDurationSec = -1;
+	private Handler _youtubePlayTimeHandler = new Handler();
+	private Runnable _youtubePlayTimeRunnable = new Runnable() {
+		@SuppressLint("DefaultLocale")
+		@Override
+		public void run() {
+			if (!_mediaMirrorViewDto.IsYoutubePlaying()) {
+				_logger.Debug("Youtube is not longer playing! Stopping Runnable");
+				_youtubePlayTimeSec = -1;
+				_youtubeDurationSec = -1;
+				return;
+			}
+
+			_youtubePlayTimeSec--;
+
+			if (_youtubePlayTimeSec >= 0) {
+				int playHour = _youtubePlayTimeSec / 3600;
+				int playMin = (_youtubePlayTimeSec / 60) - (playHour * 60);
+				int playSec = _youtubePlayTimeSec % 60;
+				String playTime = String.format("%02d:%02d:%02d", playHour, playMin, playSec);
+
+				int durationHour = _youtubeDurationSec / 3600;
+				int durationMinute = (_youtubeDurationSec / 60) - (durationHour * 60);
+				int durationSecond = _youtubeDurationSec % 60;
+				String durationTime = String.format("%02d:%02d:%02d", durationHour, durationMinute, durationSecond);
+
+				_youtubeVideoTimeTextView.setText(String.format("%s / %s", playTime, durationTime));
+
+				_youtubePlayTimeHandler.postDelayed(_youtubePlayTimeRunnable, COUNTDOWN_TIMEOUT);
+			}
+		}
+	};
 
 	private TextView _sleepTimerTextView;
 	private int _sleepTimerSec = -1;
@@ -94,7 +134,7 @@ public class TopViewController {
 		@Override
 		public void run() {
 			if (_mediaMirrorViewDto != null) {
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		}
@@ -102,11 +142,16 @@ public class TopViewController {
 
 	private TextView _versionTextView;
 
+	@SuppressLint("DefaultLocale")
 	private BroadcastReceiver _mediaMirrorViewDtoReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			MediaMirrorViewDto mediaMirrorViewDto = (MediaMirrorViewDto) intent
 					.getSerializableExtra(Bundles.MEDIAMIRROR_VIEW_DTO);
+
+			_updateInfoHandler.removeCallbacks(_updateInfoRunnable);
+			_youtubePlayTimeHandler.removeCallbacks(_youtubePlayTimeRunnable);
+
 			if (mediaMirrorViewDto != null) {
 				_logger.Debug("New Dto is: " + mediaMirrorViewDto.toString());
 				_mediaMirrorViewDto = mediaMirrorViewDto;
@@ -119,12 +164,63 @@ public class TopViewController {
 
 				_youtubeIdTextView.setText("YoutubeId: " + _mediaMirrorViewDto.GetYoutubeId());
 
+				boolean isYoutubePlaying = _mediaMirrorViewDto.IsYoutubePlaying();
+				if (isYoutubePlaying) {
+					int youtubeCurrentTimeSec = _mediaMirrorViewDto.GetYoutubeVideoCurrentPlayTime();
+					if (youtubeCurrentTimeSec == -1) {
+						_logger.Warn("youtubeCurrentTimeSec is -1, but isYoutubePlaying is true!");
+						_seekBarYoutubeDuration.setVisibility(View.INVISIBLE);
+						_youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);
+						return;
+					}
+					_youtubePlayTimeSec = youtubeCurrentTimeSec;
+					int playHour = _youtubePlayTimeSec / 3600;
+					int playMinute = (_youtubePlayTimeSec / 60) - (playHour * 60);
+					int playSecond = _youtubePlayTimeSec % 60;
+					String playTime = String.format("%02d:%02d:%02d", playHour, playMinute, playSecond);
+
+					int youtubeDuration = _mediaMirrorViewDto.GetYoutubeVideoDuration();
+					if (youtubeDuration == -1) {
+						_logger.Warn("youtubeDuration is -1, but isYoutubePlaying is true!");
+						_seekBarYoutubeDuration.setVisibility(View.INVISIBLE);
+						_youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);
+						return;
+					} else if (youtubeDuration == 0) {
+						if (youtubeCurrentTimeSec == 0) {
+							youtubeDuration = -1;
+						} else {
+							youtubeDuration = youtubeCurrentTimeSec;
+						}
+					}
+
+					_youtubeDurationSec = youtubeDuration;
+					int durationHour = _youtubeDurationSec / 3600;
+					int durationMinute = (_youtubeDurationSec / 60) - (durationHour * 60);
+					int durationSecond = _youtubeDurationSec % 60;
+					String durationTime = String.format("%02d:%02d:%02d", durationHour, durationMinute, durationSecond);
+
+					_youtubeVideoTimeTextView.setVisibility(View.VISIBLE);
+					_youtubeVideoTimeTextView.setText(String.format("%s / %s", playTime, durationTime));
+
+					int progress = (youtubeCurrentTimeSec * 100) / youtubeDuration;
+					_seekBarYoutubeDuration.setVisibility(View.VISIBLE);
+					_seekbarEnabled = false;
+					_seekBarYoutubeDuration.setProgress(progress);
+					_seekbarEnabled = true;
+
+					_youtubePlayTimeHandler.postDelayed(_youtubePlayTimeRunnable, UPDATE_TIMEOUT);
+				} else {
+					_seekBarYoutubeDuration.setVisibility(View.INVISIBLE);
+					_youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);
+				}
+
 				_volumeTextView.setText("Vol.: " + String.valueOf(_mediaMirrorViewDto.GetVolume()));
 
 				if (_mediaMirrorViewDto.GetSleepTimerEnabled()) {
 					_sleepTimerTextView.setVisibility(View.VISIBLE);
 					_sleepTimerHandler.removeCallbacks(_sleepTimerRunnable);
 					_sleepTimerSec = _mediaMirrorViewDto.GetCountDownSec();
+					_sleepTimerTextView.setText(String.format("Sleep timer sec: %s", _sleepTimerSec));
 					int min = _sleepTimerSec / 60;
 					int sec = _sleepTimerSec % 60;
 					_sleepTimerTextView.setText(String.format("Sleep timer: %s:%s min", min, sec));
@@ -141,16 +237,16 @@ public class TopViewController {
 				ToastView.warning(_context, "Received null MediaMirrorViewDto...!", Toast.LENGTH_LONG).show();
 			}
 
-			_updateInfoHandler.removeCallbacks(_updateInfoRunnable);
 			_updateInfoHandler.postDelayed(_updateInfoRunnable, UPDATE_TIMEOUT);
 		}
 	};
 
-	public TopViewController(Context context) {
+	public TopViewController(@NonNull Context context) {
 		_logger = new LucaHomeLogger(TAG);
 		_context = context;
 		_lucaDialogController = new LucaDialogController(_context);
 		_mediaMirrorController = new MediaMirrorController(_context);
+		_mediaMirrorController.Initialize();
 		_receiverController = new ReceiverController(_context);
 		_serviceController = new ServiceController(_context);
 	}
@@ -176,7 +272,7 @@ public class TopViewController {
 				_logger.Debug(String.format("Selected location %s", selectedLocation));
 
 				String selectedIp = MediaMirrorSelection.GetByLocation(selectedLocation).GetIp();
-				_mediaMirrorController.SendServerCommand(selectedIp, ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+				_mediaMirrorController.SendCommand(selectedIp, ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 
 			@Override
@@ -198,7 +294,7 @@ public class TopViewController {
 				}
 
 				if (!_switchEnabled) {
-					_logger.Warn("Switch diabled!");
+					_logger.Warn("Switch disabled!");
 					return;
 				}
 
@@ -212,6 +308,40 @@ public class TopViewController {
 
 		_youtubeIdTextView = (TextView) ((Activity) _context).findViewById(R.id.youtubeIdTextView);
 
+		_seekBarYoutubeDuration = (SeekBar) ((Activity) _context).findViewById(R.id.seekBarYoutubeDuration);
+		_seekBarYoutubeDuration.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+				_logger.Debug("_seekBarYoutubeDuration onProgressChanged to " + String.valueOf(progressValue));
+
+				if (_mediaMirrorViewDto == null) {
+					_logger.Error("_mediaMirrorViewDto is null!");
+					return;
+				}
+
+				if (!_seekbarEnabled) {
+					_logger.Warn("SeekBar disabled!");
+					return;
+				}
+
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+						ServerAction.SET_YOUTUBE_PLAY_POSITION.toString(), String.valueOf(progressValue));
+
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+		});
+
+		_youtubeVideoTimeTextView = (TextView) ((Activity) _context).findViewById(R.id.youtubeVideoTimeTextView);
+
 		_imageButtonVideoPlay = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonVideoPlay);
 		_imageButtonVideoPlay.setOnClickListener(new OnClickListener() {
 			@Override
@@ -223,10 +353,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.PLAY_YOUTUBE_VIDEO.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -241,10 +371,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.PAUSE_YOUTUBE_VIDEO.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -259,10 +389,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.STOP_YOUTUBE_VIDEO.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -280,10 +410,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.INCREASE_VOLUME.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -299,10 +429,10 @@ public class TopViewController {
 					return;
 				}
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.DECREASE_VOLUME.toString(), "");
 
-				_mediaMirrorController.SendServerCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 			}
 		});
@@ -331,6 +461,7 @@ public class TopViewController {
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
 		_initialized = false;
+		_mediaMirrorController.Dispose();
 		_receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
 		_updateInfoHandler.removeCallbacks(_updateInfoRunnable);
 	}
