@@ -1205,8 +1205,8 @@ containing a value of this type.
         public static final int book_now=0x7f110022;
         public static final int bottom=0x7f110001;
         public static final int brightnessLinearLayout=0x7f110181;
-        public static final int btnDeleteDatabaseEntries=0x7f11019a;
-        public static final int buttonAddListView=0x7f1101a0;
+        public static final int btnDeleteDatabaseEntries=0x7f11019b;
+        public static final int buttonAddListView=0x7f1101a1;
         public static final int buttonAirPressure=0x7f110154;
         public static final int buttonBirthdays=0x7f11015b;
         public static final int buttonCenterWeather=0x7f110142;
@@ -1235,7 +1235,7 @@ containing a value of this type.
         public static final int buttonSendText=0x7f110177;
         public static final int buttonSendWebsite=0x7f11017c;
         public static final int buttonSensors=0x7f110150;
-        public static final int buttonShareShoppingList=0x7f1101b4;
+        public static final int buttonShareShoppingList=0x7f1101b5;
         public static final int buttonShoppingList=0x7f110158;
         public static final int buttonShutdown=0x7f110194;
         public static final int buttonSnakePlay=0x7f11013d;
@@ -1257,7 +1257,7 @@ containing a value of this type.
         public static final int buttonVersionInformation=0x7f11015e;
         public static final int buttonVolumeDecrease=0x7f11016a;
         public static final int buttonVolumeIncrease=0x7f110169;
-        public static final int buttonbarListView=0x7f11019f;
+        public static final int buttonbarListView=0x7f1101a0;
         public static final int buyButton=0x7f11001e;
         public static final int buy_now=0x7f110023;
         public static final int buy_with_google=0x7f110024;
@@ -1272,7 +1272,7 @@ containing a value of this type.
         public static final int classic=0x7f110026;
         public static final int clip_horizontal=0x7f11000c;
         public static final int clip_vertical=0x7f11000d;
-        public static final int currentTemperature=0x7f1101b2;
+        public static final int currentTemperature=0x7f1101b3;
         public static final int custom_alert_dialog_background=0x7f110031;
         public static final int custom_alert_dialog_btn_cancel=0x7f110035;
         public static final int custom_alert_dialog_btn_neutral=0x7f110036;
@@ -1400,7 +1400,7 @@ containing a value of this type.
         public static final int enableHeatingOnly=0x7f110126;
         public static final int enableSoundOnly=0x7f110127;
         public static final int end=0x7f11000e;
-        public static final int farmListFrame=0x7f1101a5;
+        public static final int farmListFrame=0x7f1101a6;
         public static final int fill=0x7f11000f;
         public static final int fill_horizontal=0x7f110010;
         public static final int fill_vertical=0x7f110011;
@@ -1442,10 +1442,10 @@ containing a value of this type.
         public static final int linearLayoutLiving=0x7f110156;
         public static final int linearLayoutUpdateI=0x7f110187;
         public static final int linearLayoutUpdateII=0x7f11018b;
-        public static final int listView=0x7f11019d;
-        public static final int listViewAbove=0x7f1101a2;
-        public static final int listViewBelow=0x7f1101a4;
-        public static final int listViewDivider=0x7f11019e;
+        public static final int listView=0x7f11019e;
+        public static final int listViewAbove=0x7f1101a3;
+        public static final int listViewBelow=0x7f1101a5;
+        public static final int listViewDivider=0x7f11019f;
         public static final int logoStartUp=0x7f11012c;
         public static final int match_parent=0x7f110020;
         public static final int mediaMirrorBatteryTextView=0x7f110162;
@@ -1472,7 +1472,7 @@ containing a value of this type.
         public static final int nameStartUp=0x7f11012d;
         public static final int none=0x7f110006;
         public static final int normal=0x7f110016;
-        public static final int notificationSocketLayout=0x7f11019b;
+        public static final int notificationSocketLayout=0x7f11019c;
         public static final int notification_linear_layout=0x7f11010f;
         public static final int notification_playsound=0x7f110107;
         public static final int notification_playsound_raspberry=0x7f110109;
@@ -1487,10 +1487,10 @@ containing a value of this type.
         public static final int percentProgressBar=0x7f11012f;
         public static final int percentProgressTextView=0x7f110130;
         public static final int production=0x7f11001b;
-        public static final int progressBarListView=0x7f11019c;
-        public static final int progressBarListViewAbove=0x7f1101a1;
-        public static final int progressBarListViewBelow=0x7f1101a3;
-        public static final int progressBarSoundListView=0x7f1101a7;
+        public static final int progressBarListView=0x7f11019d;
+        public static final int progressBarListViewAbove=0x7f1101a2;
+        public static final int progressBarListViewBelow=0x7f1101a4;
+        public static final int progressBarSoundListView=0x7f1101a8;
         public static final int relativeLayoutButtonBar=0x7f110145;
         public static final int relativeLayoutMapPaint=0x7f110143;
         public static final int right=0x7f110003;
@@ -1548,26 +1548,27 @@ containing a value of this type.
         public static final int socket_item_image=0x7f1100e9;
         public static final int socket_item_name=0x7f1100eb;
         public static final int socket_item_switch=0x7f1100ee;
-        public static final int soundBorder=0x7f1101a6;
-        public static final int soundButtonBar=0x7f1101aa;
-        public static final int soundButtonDecreaseVolume=0x7f1101af;
-        public static final int soundButtonIncreaseVolume=0x7f1101ae;
-        public static final int soundButtonPlay=0x7f1101ab;
-        public static final int soundButtonStop=0x7f1101ac;
-        public static final int soundInformation=0x7f1101a9;
-        public static final int soundListView=0x7f1101a8;
-        public static final int soundSwitchRaspberry=0x7f1101b0;
-        public static final int soundVolumeView=0x7f1101ad;
+        public static final int soundBorder=0x7f1101a7;
+        public static final int soundButtonBar=0x7f1101ab;
+        public static final int soundButtonDecreaseVolume=0x7f1101b0;
+        public static final int soundButtonIncreaseVolume=0x7f1101af;
+        public static final int soundButtonPlay=0x7f1101ac;
+        public static final int soundButtonStop=0x7f1101ad;
+        public static final int soundInformation=0x7f1101aa;
+        public static final int soundListView=0x7f1101a9;
+        public static final int soundSwitchRaspberry=0x7f1101b1;
+        public static final int soundVolumeView=0x7f1101ae;
         public static final int sound_item_name=0x7f1100ef;
         public static final int sound_item_play=0x7f1100f0;
         public static final int start=0x7f110012;
         public static final int startAudioAppCheckbox=0x7f110198;
+        public static final int startBeaconsCheckbox=0x7f11019a;
         public static final int startOsmcAppCheckbox=0x7f110199;
         public static final int strict_sandbox=0x7f11001d;
         public static final int switch_display_socket_notification=0x7f110195;
         public static final int switch_display_temperature_notification=0x7f110197;
         public static final int switch_display_weather_notification=0x7f110196;
-        public static final int temperatureLayout=0x7f1101b1;
+        public static final int temperatureLayout=0x7f1101b2;
         public static final int temperature_dialog_button=0x7f110094;
         public static final int temperature_dialog_progressbar=0x7f110095;
         public static final int temperature_dialog_webview=0x7f110093;
@@ -1599,7 +1600,7 @@ containing a value of this type.
         public static final int timer_item_socket=0x7f1100ff;
         public static final int timer_item_time=0x7f1100fd;
         public static final int timer_item_weekday=0x7f1100fe;
-        public static final int title=0x7f1101b3;
+        public static final int title=0x7f1101b4;
         public static final int toast_root=0x7f110129;
         public static final int top=0x7f110004;
         public static final int versionTextView=0x7f11016e;
@@ -1706,6 +1707,7 @@ containing a value of this type.
     public static final class string {
         public static final int about=0x7f090008;
         public static final int accept=0x7f09003c;
+        public static final int activateBeacons=0x7f0900aa;
         public static final int active=0x7f09006d;
         public static final int add=0x7f090064;
         public static final int addPlus=0x7f090063;
@@ -2174,6 +2176,7 @@ Detail page strings
         public static final int transmitting_not_supported=0x7f090025;
         public static final int transmitting_not_supported_message=0x7f090026;
         public static final int update=0x7f09006b;
+        public static final int useBeacons=0x7f0900a9;
         public static final int user=0x7f09008d;
         /**  Text on a placeholder buy button when Google Play services is not
          available or up-to-date 

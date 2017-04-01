@@ -34,6 +34,7 @@ import guepardoapps.library.openweather.controller.OpenWeatherController;
 
 import guepardoapps.library.toastview.ToastView;
 
+import guepardoapps.library.toolset.beacon.BeaconController;
 import guepardoapps.library.toolset.common.classes.SerializableList;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.DialogController;
@@ -82,6 +83,7 @@ public class MainService extends Service {
 
 	private Context _context;
 
+	private BeaconController _beaconController;
 	private BroadcastController _broadcastController;
 	private DatabaseController _databaseController;
 	private LucaDialogController _dialogController;
@@ -443,6 +445,12 @@ public class MainService extends Service {
 					break;
 				case ENABLE_SEA_SOUND:
 					enableSoundSchedule(30);
+					break;
+				case BEACON_SCANNING_START:
+					_beaconController.startScanning();
+					break;
+				case BEACON_SCANNING_STOP:
+					_beaconController.stopScanning();
 					break;
 				default:
 					_logger.Warn("action is not supported! " + action.toString());
@@ -1311,6 +1319,7 @@ public class MainService extends Service {
 
 			_context = this;
 
+			_beaconController = new BeaconController(_context);
 			_broadcastController = new BroadcastController(_context);
 			_databaseController = DatabaseController.getInstance();
 			_databaseController.onCreate(_context);
@@ -1334,6 +1343,10 @@ public class MainService extends Service {
 			_downloadCount = Constants.DOWNLOAD_STEPS;
 
 			boot();
+
+			if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USE_BEACONS)) {
+				_beaconController.startScanning();
+			}
 		}
 	}
 
@@ -1529,6 +1542,8 @@ public class MainService extends Service {
 
 		_sharedPrefController.SaveIntegerValue(SharedPrefConstants.SOUND_RASPBERRY_SELECTION,
 				RaspberrySelection.RASPBERRY_1.GetInt());
+
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.USE_BEACONS, false);
 	}
 
 	private void prepareDownloadAll() {

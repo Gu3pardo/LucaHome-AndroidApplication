@@ -95,6 +95,7 @@ public class SettingsView extends Activity {
 
 		initializeSwitches();
 		initializeAppCheckboxes();
+		initializeBeaconCheckbox();
 		initializeButtons();
 		initializeSocketNotificationCheckboxes();
 	}
@@ -223,6 +224,27 @@ public class SettingsView extends Activity {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				_sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_OSMC_APP, isChecked);
+			}
+		});
+	}
+
+	private void initializeBeaconCheckbox() {
+		CheckBox beaconActivate = (CheckBox) findViewById(R.id.startBeaconsCheckbox);
+		beaconActivate.setChecked(
+				_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USE_BEACONS));
+		beaconActivate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				_sharedPrefController.SaveBooleanValue(SharedPrefConstants.USE_BEACONS, isChecked);
+				if (isChecked) {
+					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+							new String[] { Bundles.MAIN_SERVICE_ACTION },
+							new Object[] { MainServiceAction.BEACON_SCANNING_START });
+				} else {
+					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+							new String[] { Bundles.MAIN_SERVICE_ACTION },
+							new Object[] { MainServiceAction.BEACON_SCANNING_STOP });
+				}
 			}
 		});
 	}

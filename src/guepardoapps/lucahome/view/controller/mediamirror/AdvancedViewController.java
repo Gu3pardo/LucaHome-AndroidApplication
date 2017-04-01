@@ -92,10 +92,12 @@ public class AdvancedViewController {
 			@Override
 			public void onClick(View view) {
 				_logger.Debug("_buttonReboot onClick");
+
 				if (_mediaMirrorViewDto == null) {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
+
 				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SYSTEM_REBOOT.toString(), "");
 			}
@@ -106,10 +108,12 @@ public class AdvancedViewController {
 			@Override
 			public void onClick(View view) {
 				_logger.Debug("_buttonShutdown onClick");
+
 				if (_mediaMirrorViewDto == null) {
 					_logger.Error("_mediaMirrorViewDto is null!");
 					return;
 				}
+
 				_mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
 						ServerAction.SYSTEM_SHUTDOWN.toString(), "");
 			}
