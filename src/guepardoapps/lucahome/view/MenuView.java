@@ -111,13 +111,14 @@ public class MenuView extends Activity {
 	public void onPause() {
 		super.onPause();
 		_logger.Debug("onPause");
+		_receiverController.Dispose();
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		_logger.Debug("onDestroy");
-		_receiverController.UnregisterReceiver(_updateReceiver);
+		_receiverController.Dispose();
 	}
 
 	@Override

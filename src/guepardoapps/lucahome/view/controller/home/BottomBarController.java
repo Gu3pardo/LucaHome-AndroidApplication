@@ -67,10 +67,12 @@ public class BottomBarController {
 
 	public void onPause() {
 		_logger.Debug("onPause");
+		_dialogController.Dispose();
 	}
 
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
+		_dialogController.Dispose();
 	}
 
 	private void initializeButton() {

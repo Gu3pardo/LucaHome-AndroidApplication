@@ -97,13 +97,13 @@ public class WeatherController {
 
 	public void onPause() {
 		_logger.Debug("onPause");
+		_receiverController.Dispose();
 		_isInitialized = false;
-		_receiverController.UnregisterReceiver(_updateWeatherViewReceiver);
 	}
 
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
+		_receiverController.Dispose();
 		_isInitialized = false;
-		_receiverController.UnregisterReceiver(_updateWeatherViewReceiver);
 	}
 }

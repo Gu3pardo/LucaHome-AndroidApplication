@@ -71,4 +71,6 @@
     <string name="hint_enter_schedule_name">Enter a name</string>
     <string name="dialog_timer_title">Create a new timer</string>
     <string name="sendCommand">Send Command</string>
+    <string name="useBeacons">Use beacons to get your location in the flat. Used for automation of sockets and other stuff!</string>
+    <string name="activateBeacons">Activate beacon scanner</string>
 </resources>

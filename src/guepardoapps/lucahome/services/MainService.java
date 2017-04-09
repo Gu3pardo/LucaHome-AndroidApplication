@@ -46,6 +46,7 @@ import guepardoapps.library.toolset.scheduler.ScheduleService;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.*;
 import guepardoapps.lucahome.view.BirthdayView;
+import guepardoapps.lucahome.view.SecurityView;
 import guepardoapps.lucahome.view.SensorTemperatureView;
 
 public class MainService extends Service {
@@ -71,6 +72,7 @@ public class MainService extends Service {
 	private SerializableList<MapContentDto> _mapContentList = null;
 	private SerializableList<MediaMirrorViewDto> _mediaMirrorList = new SerializableList<MediaMirrorViewDto>();
 	private SerializableList<MenuDto> _menu = null;
+	private MotionCameraDto _motionCameraDto = null;
 	private SerializableList<MovieDto> _movieList = null;
 	private SerializableList<ScheduleDto> _scheduleList = null;
 	private SerializableList<ShoppingEntryDto> _shoppingList = null;
@@ -79,7 +81,7 @@ public class MainService extends Service {
 	private SerializableList<WirelessSocketDto> _wirelessSocketList = null;
 
 	private Handler _timeoutHandler = new Handler();
-	private int _timeCheck = 30 * 1000;
+	private int _timeCheck = 45 * 1000;
 
 	private Context _context;
 
@@ -201,6 +203,25 @@ public class MainService extends Service {
 			}
 
 			startDownloadMenu();
+		}
+	};
+
+	private Runnable _downloadMotionCameraDtoRunnable = new Runnable() {
+		@Override
+		public void run() {
+			_logger.Debug("_downloadMotionCameraDtoRunnable run");
+
+			if (!_networkController.IsNetworkAvailable()) {
+				_logger.Warn("No network available!");
+				return;
+			}
+
+			if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+				_logger.Warn("No LucaHome network! ...");
+				return;
+			}
+
+			startDownloadMotionCameraDto();
 		}
 	};
 
@@ -333,12 +354,17 @@ public class MainService extends Service {
 					_downloadCount = 1;
 					startDownloadMenu();
 					break;
+				case DOWNLOAD_MOTION_CAMERA_DTO:
+					_downloadCount = 1;
+					startDownloadMotionCameraDto();
+					break;
 				case GET_ALL:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MAP_CONTENT_VIEW,
 							new String[] { Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST,
-									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU },
+									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU,
+									Bundles.MOTION_CAMERA_DTO },
 							new Object[] { _mapContentList, _wirelessSocketList, _scheduleList, _timerList,
-									_temperatureList, _shoppingList, _menu });
+									_temperatureList, _shoppingList, _menu, _motionCameraDto });
 					break;
 				case GET_BIRTHDAYS:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_BIRTHDAY,
@@ -363,6 +389,10 @@ public class MainService extends Service {
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MENU,
 							new String[] { Bundles.MENU }, new Object[] { _menu });
 					sendMenuToWear();
+					break;
+				case GET_MOTION_CAMERA_DTO:
+					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MOTION_CAMERA_DTO,
+							new String[] { Bundles.MOTION_CAMERA_DTO }, new Object[] { _motionCameraDto });
 					break;
 				case GET_MOVIES:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MOVIE,
@@ -402,9 +432,10 @@ public class MainService extends Service {
 				case GET_MAP_CONTENT:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MAP_CONTENT_VIEW,
 							new String[] { Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST,
-									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU },
+									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU,
+									Bundles.MOTION_CAMERA_DTO },
 							new Object[] { _mapContentList, _wirelessSocketList, _scheduleList, _timerList,
-									_temperatureList, _shoppingList, _menu });
+									_temperatureList, _shoppingList, _menu, _motionCameraDto });
 					break;
 				case GET_SHOPPING_LIST:
 					_broadcastController.SendSerializableArrayBroadcast(
@@ -451,6 +482,10 @@ public class MainService extends Service {
 					break;
 				case BEACON_SCANNING_STOP:
 					_beaconController.stopScanning();
+					break;
+				case DISABLE_SECURITY_CAMERA:
+					_serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, ServerActions.STOP_MOTION,
+							Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO, RaspberrySelection.BOTH);
 					break;
 				default:
 					_logger.Warn("action is not supported! " + action.toString());
@@ -742,6 +777,43 @@ public class MainService extends Service {
 		}
 	};
 
+	private BroadcastReceiver _motionCameraDtoDownloadReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_motionCameraDtoDownloadReceiver onReceive");
+
+			String[] motionCameraDtoStringArray = intent.getStringArrayExtra(Bundles.MOTION_CAMERA_DTO_DOWNLOAD);
+			if (motionCameraDtoStringArray != null) {
+
+				SerializableList<MotionCameraDto> motionCameraDtoList = JsonDataToMotionCameraDtoConverter
+						.GetList(motionCameraDtoStringArray);
+				if (motionCameraDtoList != null) {
+					if (motionCameraDtoList.getSize() != 1) {
+						_logger.Error(
+								String.format("MotionCameraDtoList has wrong size %d!", motionCameraDtoList.getSize()));
+						return;
+					}
+
+					_motionCameraDto = motionCameraDtoList.getValue(0);
+					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MOTION_CAMERA_DTO,
+							new String[] { Bundles.MOTION_CAMERA_DTO }, new Object[] { _motionCameraDto });
+
+					if (_motionCameraDto.GetCameraState()) {
+						_notificationController.CreateCameraNotification(_motionCameraDto, SecurityView.class);
+					} else {
+						_notificationController.CloseNotification(IDs.NOTIFICATION_CAMERA);
+					}
+				} else {
+					_logger.Warn("motionCameraDtoList is null");
+				}
+			} else {
+				_logger.Warn("motionCameraDtoStringArray is null");
+			}
+
+			updateDownloadCount();
+		}
+	};
+
 	private BroadcastReceiver _movieDownloadReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -824,9 +896,10 @@ public class MainService extends Service {
 							new String[] { Bundles.SOCKET_LIST }, new Object[] { _wirelessSocketList });
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MAP_CONTENT_VIEW,
 							new String[] { Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST,
-									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU },
+									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU,
+									Bundles.MOTION_CAMERA_DTO },
 							new Object[] { _mapContentList, _wirelessSocketList, _scheduleList, _timerList,
-									_temperatureList, _shoppingList, _menu });
+									_temperatureList, _shoppingList, _menu, _motionCameraDto });
 
 					sendSocketsToWear();
 
@@ -1207,6 +1280,14 @@ public class MainService extends Service {
 		}
 	};
 
+	private BroadcastReceiver _reloadMotionCameraDtoReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_reloadMotionCameraDtoReceiver onReceive");
+			startDownloadMotionCameraDto();
+		}
+	};
+
 	private BroadcastReceiver _reloadMovieReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1424,6 +1505,8 @@ public class MainService extends Service {
 				new String[] { guepardoapps.library.lucahome.common.constants.Broadcasts.MEDIAMIRROR_VIEW_DTO });
 		_receiverController.RegisterReceiver(_menuDtoDownloadReceiver,
 				new String[] { Broadcasts.DOWNLOAD_MENU_FINISHED });
+		_receiverController.RegisterReceiver(_motionCameraDtoDownloadReceiver,
+				new String[] { Broadcasts.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED });
 		_receiverController.RegisterReceiver(_movieDownloadReceiver,
 				new String[] { Broadcasts.DOWNLOAD_MOVIE_FINISHED });
 		_receiverController.RegisterReceiver(_scheduleDownloadReceiver,
@@ -1451,6 +1534,8 @@ public class MainService extends Service {
 		_receiverController.RegisterReceiver(_reloadMediaMirrorReceiver,
 				new String[] { guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_MEDIAMIRROR });
 		_receiverController.RegisterReceiver(_reloadMenuReceiver, new String[] { Broadcasts.RELOAD_MENU });
+		_receiverController.RegisterReceiver(_reloadMotionCameraDtoReceiver,
+				new String[] { Broadcasts.RELOAD_MOTION_CAMERA_DTO });
 		_receiverController.RegisterReceiver(_reloadMovieReceiver, new String[] { Broadcasts.RELOAD_MOVIE });
 		_receiverController.RegisterReceiver(_reloadScheduleReceiver,
 				new String[] { Broadcasts.RELOAD_SCHEDULE, Broadcasts.RELOAD_TIMER });
@@ -1472,6 +1557,7 @@ public class MainService extends Service {
 		_scheduleService.AddSchedule("UpdateIsSoundPlaying", _downloadIsSoundPlayingRunnable, 5 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateMediaMirror", _downloadMediaMirrorRunnable, 5 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateMenu", _downloadMenuRunnable, 3 * 60 * 60 * 1000, true);
+		_scheduleService.AddSchedule("UpdateMotionCameraDto", _downloadMotionCameraDtoRunnable, 5 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateSockets", _downloadSocketRunnable, 15 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateTemperature", _downloadTemperatureRunnable, 5 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateShoppingList", _downloadShoppingListRunnable, 30 * 60 * 1000, true);
@@ -1565,6 +1651,7 @@ public class MainService extends Service {
 		startDownloadMapContent();
 		startDownloadMediaMirror();
 		startDownloadMenu();
+		startDownloadMotionCameraDto();
 		startDownloadMovie();
 		startDownloadSocket();
 		startDownloadIsSoundPlaying();
@@ -1667,6 +1754,12 @@ public class MainService extends Service {
 		_logger.Debug("startDownloadMenu");
 		_serviceController.StartRestService(Bundles.MENU_DOWNLOAD, ServerActions.GET_MENU,
 				Broadcasts.DOWNLOAD_MENU_FINISHED, LucaObject.MENU, RaspberrySelection.BOTH);
+	}
+
+	private void startDownloadMotionCameraDto() {
+		_logger.Debug("startDownloadMotionCameraDto");
+		_serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO_DOWNLOAD, ServerActions.GET_MOTION_DATA,
+				Broadcasts.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED, LucaObject.MOTION_CAMERA_DTO, RaspberrySelection.BOTH);
 	}
 
 	private void startDownloadMovie() {

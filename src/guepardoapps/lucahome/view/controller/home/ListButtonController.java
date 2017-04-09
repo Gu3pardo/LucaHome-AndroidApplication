@@ -26,6 +26,7 @@ public class ListButtonController {
 	private Button _buttonSensors;
 	private Button _buttonLiving;
 	private Button _buttonSocial;
+	private Button _buttonSecurity;
 
 	private LinearLayout _linearLayoutButtonControl;
 	private Button _buttonSockets;
@@ -161,6 +162,14 @@ public class ListButtonController {
 				}
 				_socialSelectionActive = _socialVisibility == View.VISIBLE;
 				_linearLayoutButtonSocial.setVisibility(_socialVisibility);
+			}
+		});
+
+		_buttonSecurity = (Button) ((Activity) _context).findViewById(R.id.buttonSecurity);
+		_buttonSecurity.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_navigationService.NavigateTo(SecurityView.class, true);
 			}
 		});
 	}

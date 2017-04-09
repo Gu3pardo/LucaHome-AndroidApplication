@@ -366,6 +366,20 @@
                         android:textColor="@color/TextIcon"
                         android:textStyle="bold" />
                 </LinearLayout>
+
+                <Button
+                    android:id="@+id/buttonSecurity"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:background="@drawable/button_primary"
+                    android:gravity="end|center"
+                    android:paddingEnd="10dp"
+                    android:text="Security"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@color/TextIcon"
+                    android:textStyle="bold" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

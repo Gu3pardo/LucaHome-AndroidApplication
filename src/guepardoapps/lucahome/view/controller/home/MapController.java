@@ -84,15 +84,16 @@ public class MapController {
 			SerializableList<ShoppingEntryDto> shoppingList = (SerializableList<ShoppingEntryDto>) intent
 					.getSerializableExtra(Bundles.SHOPPING_LIST);
 			SerializableList<MenuDto> menu = (SerializableList<MenuDto>) intent.getSerializableExtra(Bundles.MENU);
+			MotionCameraDto motionCameraDto = (MotionCameraDto) intent.getSerializableExtra(Bundles.MOTION_CAMERA_DTO);
 
 			if (mapContentList != null && wirelessSocketList != null && scheduleAllList != null && timerAllList != null
-					&& temperatureList != null && shoppingList != null && menu != null) {
+					&& temperatureList != null && shoppingList != null && menu != null && motionCameraDto != null) {
 				_callForDataHandler.removeCallbacks(_callForDataRunnable);
 
 				for (int index = 0; index < mapContentList.getSize(); index++) {
 					MapContentDto entry = mapContentList.getValue(index);
 					addView(entry, wirelessSocketList, scheduleAllList, timerAllList, temperatureList, shoppingList,
-							menu);
+							menu, motionCameraDto);
 				}
 			} else {
 				if (mapContentList == null) {
@@ -115,6 +116,9 @@ public class MapController {
 				}
 				if (menu == null) {
 					_logger.Warn("menu is null!");
+				}
+				if (motionCameraDto == null) {
+					_logger.Warn("motionCameraDto is null!");
 				}
 			}
 		}
@@ -200,17 +204,17 @@ public class MapController {
 
 	public void onPause() {
 		_logger.Debug("onPause");
+		_dialogController.Dispose();
+		_mediaMirrorController.Dispose();
+		_receiverController.Dispose();
 		_isInitialized = false;
-		_receiverController.UnregisterReceiver(_mapDataReceiver);
-		_receiverController.UnregisterReceiver(_mediaMirrorDataReceiver);
 	}
 
 	public void onDestroy() {
 		_logger.Debug("onDestroy");
-
+		_dialogController.Dispose();
 		_mediaMirrorController.Dispose();
 		_receiverController.Dispose();
-
 		_isInitialized = false;
 	}
 
@@ -242,29 +246,47 @@ public class MapController {
 			final SerializableList<WirelessSocketDto> wirelessSocketList,
 			final SerializableList<ScheduleDto> scheduleAllList, final SerializableList<TimerDto> timerAllList,
 			final SerializableList<TemperatureDto> temperatureList,
-			final SerializableList<ShoppingEntryDto> shoppingList, final SerializableList<MenuDto> menu) {
+			final SerializableList<ShoppingEntryDto> shoppingList, final SerializableList<MenuDto> menu,
+			final MotionCameraDto motionCameraDto) {
 		final TextView newTextView = _mapContentController.CreateEntry(newMapContent, newMapContent.GetPosition(),
 				wirelessSocketList, temperatureList, _size, true);
 		newTextView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				showInformation(wirelessSocketList, scheduleAllList, timerAllList, temperatureList, shoppingList, menu);
+				showInformation(wirelessSocketList, scheduleAllList, timerAllList, temperatureList, shoppingList, menu,
+						motionCameraDto);
 			}
 
 			private void showInformation(SerializableList<WirelessSocketDto> wirelessSocketList,
 					SerializableList<ScheduleDto> scheduleAllList, SerializableList<TimerDto> timerAllList,
 					SerializableList<TemperatureDto> temperatureList, SerializableList<ShoppingEntryDto> shoppingList,
-					final SerializableList<MenuDto> menu) {
+					final SerializableList<MenuDto> menu, MotionCameraDto motionCameraDto) {
 				_logger.Debug("onClick showInformation");
 
 				switch (newMapContent.GetDrawingType()) {
+				case ARDUINO:
+					ToastView.info(_context, "Here is an arduino!", Toast.LENGTH_SHORT).show();
+					// TODO show details
+					break;
+				case CAMERA:
+					if (motionCameraDto.GetCameraState()) {
+						showCameraDialog(motionCameraDto);
+					} else {
+						ToastView.info(_context, "Camera not active!", Toast.LENGTH_SHORT).show();
+					}
+					break;
+				case MEDIASERVER:
+					showMediaserverDetailsDialog(newMapContent, wirelessSocketList);
+					break;
+				case MENU:
+					showMenuDialog(menu);
+					break;
 				case RASPBERRY:
 					ToastView.info(_context, "Here is a raspberry!", Toast.LENGTH_SHORT).show();
 					// TODO show details
 					break;
-				case ARDUINO:
-					ToastView.info(_context, "Here is an arduino!", Toast.LENGTH_SHORT).show();
-					// TODO show details
+				case SHOPPING_LIST:
+					showShoppingListDialog(shoppingList);
 					break;
 				case SOCKET:
 					showSocketDetailsDialog(newMapContent, wirelessSocketList, scheduleAllList, timerAllList);
@@ -272,19 +294,55 @@ public class MapController {
 				case TEMPERATURE:
 					showTemperatureDetailsDialog(newMapContent, temperatureList);
 					break;
-				case MEDIASERVER:
-					showMediaserverDetailsDialog(newMapContent, wirelessSocketList);
-					break;
-				case SHOPPING_LIST:
-					showShoppingListDialog(shoppingList);
-					break;
-				case MENU:
-					showMenuDialog(menu);
-					break;
 				default:
 					_logger.Warn("drawingType: " + newMapContent.toString() + " is not supported!");
 					return;
 				}
+			}
+
+			private void showCameraDialog(MotionCameraDto motionCameraDto) {
+				_dialogController.ShowAlertDialogWebview("Security camera", motionCameraDto.GetCameraUrl());
+			}
+
+			private void showMediaserverDetailsDialog(MapContentDto newMapContent,
+					SerializableList<WirelessSocketDto> wirelessSocketList) {
+				ArrayList<String> socketList = newMapContent.GetSockets();
+
+				MediaMirrorSelection selection = MediaMirrorSelection.GetByIp(newMapContent.GetMediaServerIp());
+				WirelessSocketDto socket = null;
+
+				if (socketList != null) {
+					if (socketList.size() == 1) {
+						String socketName = socketList.get(0);
+						_logger.Info(String.format("Socket name is %s", socketName));
+
+						for (int index = 0; index < wirelessSocketList.getSize(); index++) {
+							if (wirelessSocketList.getValue(index).GetName().contains(socketName)) {
+								socket = wirelessSocketList.getValue(index);
+								break;
+							}
+						}
+
+						if (socket == null) {
+							_logger.Warn("Socket not found! " + socketName);
+							ToastView.warning(_context, "Socket not found! ", Toast.LENGTH_SHORT).show();
+						}
+
+						_dialogController.ShowMapMediaMirrorDialog(selection, socket);
+					} else {
+						_logger.Warn("SocketList too big!" + String.valueOf(socketList.size()));
+					}
+				} else {
+					_logger.Warn("SocketList is null!");
+				}
+			}
+
+			private void showMenuDialog(SerializableList<MenuDto> menu) {
+				_dialogController.ShowMenuDialog(menu);
+			}
+
+			private void showShoppingListDialog(@NonNull SerializableList<ShoppingEntryDto> shoppingList) {
+				_dialogController.ShowShoppingListDialog(shoppingList);
 			}
 
 			private void showSocketDetailsDialog(MapContentDto newMapContent,
@@ -352,47 +410,6 @@ public class MapController {
 						break;
 					}
 				}
-			}
-
-			private void showMediaserverDetailsDialog(MapContentDto newMapContent,
-					SerializableList<WirelessSocketDto> wirelessSocketList) {
-				ArrayList<String> socketList = newMapContent.GetSockets();
-
-				MediaMirrorSelection selection = MediaMirrorSelection.GetByIp(newMapContent.GetMediaServerIp());
-				WirelessSocketDto socket = null;
-
-				if (socketList != null) {
-					if (socketList.size() == 1) {
-						String socketName = socketList.get(0);
-						_logger.Info(String.format("Socket name is %s", socketName));
-
-						for (int index = 0; index < wirelessSocketList.getSize(); index++) {
-							if (wirelessSocketList.getValue(index).GetName().contains(socketName)) {
-								socket = wirelessSocketList.getValue(index);
-								break;
-							}
-						}
-
-						if (socket == null) {
-							_logger.Warn("Socket not found! " + socketName);
-							ToastView.warning(_context, "Socket not found! ", Toast.LENGTH_SHORT).show();
-						}
-
-						_dialogController.ShowMapMediaMirrorDialog(selection, socket);
-					} else {
-						_logger.Warn("SocketList too big!" + String.valueOf(socketList.size()));
-					}
-				} else {
-					_logger.Warn("SocketList is null!");
-				}
-			}
-
-			private void showShoppingListDialog(@NonNull SerializableList<ShoppingEntryDto> shoppingList) {
-				_dialogController.ShowShoppingListDialog(shoppingList);
-			}
-
-			private void showMenuDialog(SerializableList<MenuDto> menu) {
-				_dialogController.ShowMenuDialog(menu);
 			}
 		});
 

@@ -182,14 +182,15 @@ public class BootView extends Activity {
 	public void onPause() {
 		super.onPause();
 		_logger.Debug("onPause");
+		_dialogController.Dispose();
+		_receiverController.Dispose();
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		_logger.Debug("onDestroy");
-
-		_receiverController.UnregisterReceiver(_commandReceiver);
-		_receiverController.UnregisterReceiver(_updateProgressBarReceiver);
+		_dialogController.Dispose();
+		_receiverController.Dispose();
 	}
 }

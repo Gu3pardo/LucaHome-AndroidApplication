@@ -42,6 +42,11 @@ public class Broadcasts {
 	public static final String UPDATE_MENU = "guepardoapps.lucahome.broadcast.UPDATE_MENU";
 	public static final String DOWNLOAD_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MENU_FINISHED";
 
+	// Motion Camera Dto
+	public static final String RELOAD_MOTION_CAMERA_DTO = "guepardoapps.lucahome.broadcast.RELOAD_MOTION_CAMERA_DTO";
+	public static final String UPDATE_MOTION_CAMERA_DTO = "guepardoapps.lucahome.broadcast.UPDATE_MOTION_CAMERA_DTO";
+	public static final String DOWNLOAD_MOTION_CAMERA_DTO_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED";
+
 	// Movie
 	public static final String ADD_MOVIE = "guepardoapps.lucahome.broadcast.add.movie";
 	public static final String UPDATE_MOVIE = "guepardoapps.lucahome.broadcast.update.movie";
