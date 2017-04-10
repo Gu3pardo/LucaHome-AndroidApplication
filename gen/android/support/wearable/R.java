@@ -167,7 +167,7 @@ public final class R {
 		public static final int right = 0x7f110003;
 		public static final int start = 0x7f110012;
 		public static final int text = 0x7f110132;
-		public static final int title = 0x7f1101c1;
+		public static final int title = 0x7f1101c2;
 		public static final int top = 0x7f110004;
 		public static final int width = 0x7f110007;
 	}

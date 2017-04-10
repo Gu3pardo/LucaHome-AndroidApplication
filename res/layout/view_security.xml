@@ -47,10 +47,22 @@
         android:id="@+id/buttonMotionHandle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/buttonSetMotionControl"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/button_blank"
+        android:text="Activate motion" />
+
+    <Button
+        android:id="@+id/buttonSetMotionControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="5dp"
         android:background="@drawable/button_blank"
-        android:text="Deactivate motion" />
+        android:enabled="false"
+        android:text="Activate motion control"
+        android:visibility="invisible" />
 
 </RelativeLayout>

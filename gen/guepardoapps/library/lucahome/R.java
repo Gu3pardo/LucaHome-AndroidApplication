@@ -718,7 +718,7 @@ public final class R {
 		public static final int timer_item_socket = 0x7f110104;
 		public static final int timer_item_time = 0x7f110102;
 		public static final int timer_item_weekday = 0x7f110103;
-		public static final int title = 0x7f1101c1;
+		public static final int title = 0x7f1101c2;
 		public static final int toast_root = 0x7f110130;
 		public static final int top = 0x7f110004;
 		public static final int weather_item_border = 0x7f1100bf;

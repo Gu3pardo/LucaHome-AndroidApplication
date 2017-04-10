@@ -59,6 +59,7 @@ public class SecurityView extends Activity {
 	private WebView _motionCamera;
 	private ListView _listView;
 	private Button _buttionMotionHandle;
+	private Button _buttonSetMotionControl;
 
 	private Context _context;
 
@@ -190,6 +191,41 @@ public class SecurityView extends Activity {
 				}
 			}
 		});
+
+		_buttonSetMotionControl = (Button) findViewById(R.id.buttonSetMotionControl);
+		_buttonSetMotionControl.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_logger.Debug("_buttonSetMotionControl onClick");
+				if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+					if (_motionCameraDto != null) {
+						if (_motionCameraDto.GetCameraState()) {
+							if (_motionCameraDto.GetCameraControlState()) {
+								String action = ServerActions.SET_MOTION_CONTROL_TASK + "0";
+								_serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, action,
+										Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO,
+										RaspberrySelection.BOTH);
+							} else {
+								String action = ServerActions.SET_MOTION_CONTROL_TASK + "1";
+								_serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, action,
+										Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO,
+										RaspberrySelection.BOTH);
+							}
+						} else {
+							_logger.Warn("Motion is not running!");
+							ToastView.warning(_context, "Motion is not running!", Toast.LENGTH_LONG).show();
+						}
+					} else {
+						_logger.Warn("No data from server available!");
+						ToastView.warning(_context, "No data from server available!", Toast.LENGTH_LONG).show();
+					}
+				} else {
+					_logger.Warn("Not possible outside home WIFI!");
+					ToastView.warning(_context, "Not possible outside home WIFI!", Toast.LENGTH_LONG).show();
+					updateView();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -245,10 +281,19 @@ public class SecurityView extends Activity {
 			_motionCamera.setVisibility(View.VISIBLE);
 			_motionCamera.loadUrl("http://" + _motionCameraDto.GetCameraUrl());
 			_buttionMotionHandle.setText("Deactivate motion");
+			_buttonSetMotionControl.setVisibility(View.VISIBLE);
+			_buttonSetMotionControl.setEnabled(true);
+			if (_motionCameraDto.GetCameraControlState()) {
+				_buttonSetMotionControl.setText("Deactivate motion control");
+			} else {
+				_buttonSetMotionControl.setText("Activate motion control");
+			}
 		} else {
 			_motionCameraState.setVisibility(View.VISIBLE);
 			_motionCamera.setVisibility(View.INVISIBLE);
 			_buttionMotionHandle.setText("Activate motion");
+			_buttonSetMotionControl.setVisibility(View.INVISIBLE);
+			_buttonSetMotionControl.setEnabled(false);
 		}
 		_buttionMotionHandle.setEnabled(true);
 
