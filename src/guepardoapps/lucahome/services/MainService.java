@@ -14,11 +14,11 @@ import android.widget.Toast;
 
 import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
+import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.*;
 import guepardoapps.library.lucahome.common.enums.*;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.DatabaseController;
-import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 import guepardoapps.library.lucahome.controller.MenuController;
@@ -88,7 +88,6 @@ public class MainService extends Service {
 	private BeaconController _beaconController;
 	private BroadcastController _broadcastController;
 	private DatabaseController _databaseController;
-	private LucaDialogController _dialogController;
 	private LucaNotificationController _notificationController;
 	private MediaMirrorController _mediaMirrorController;
 	private MenuController _menuController;
@@ -286,30 +285,6 @@ public class MainService extends Service {
 		}
 	};
 
-	private Runnable _startDownloadRunnable = new Runnable() {
-		@Override
-		public void run() {
-			_logger.Debug("_startDownloadRunnable run");
-
-			prepareDownloadAll();
-
-			if (!_networkController.IsNetworkAvailable()) {
-				_logger.Warn("No network available!");
-				return;
-			}
-
-			startDownloadOtherAll();
-
-			if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-				_logger.Warn("No LucaHome network! ...");
-				_downloadCount = 3;
-				return;
-			}
-
-			startDownloadLucaHomeAll();
-		}
-	};
-
 	private Runnable _timeoutCheck = new Runnable() {
 		public void run() {
 			_logger.Warn("_timeoutCheck received!");
@@ -386,7 +361,7 @@ public class MainService extends Service {
 							new String[] { Bundles.INFORMATION_SINGLE }, new Object[] { _information });
 					break;
 				case GET_MENU:
-					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MENU,
+					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MENU_VIEW,
 							new String[] { Bundles.MENU }, new Object[] { _menu });
 					sendMenuToWear();
 					break;
@@ -476,6 +451,15 @@ public class MainService extends Service {
 					break;
 				case ENABLE_SEA_SOUND:
 					enableSoundSchedule(30);
+					break;
+				case DISABLE_SEA_SOUND:
+					for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+						if (entry.IsSleepingMirror()) {
+							_mediaMirrorController.SendCommand(entry.GetIp(), ServerAction.STOP_SEA_SOUND.toString(),
+									"");
+							break;
+						}
+					}
 					break;
 				case BEACON_SCANNING_START:
 					_beaconController.startScanning();
@@ -763,7 +747,7 @@ public class MainService extends Service {
 				if (newMenuList != null) {
 					_menu = newMenuList;
 					_menuController.CheckMenuDto(_menu);
-					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MENU,
+					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MENU_VIEW,
 							new String[] { Bundles.MENU }, new Object[] { _menu });
 				} else {
 					_logger.Warn("newMenuList is null");
@@ -1328,6 +1312,22 @@ public class MainService extends Service {
 		}
 	};
 
+	private BroadcastReceiver _reloadCurrentWeatherReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_reloadCurrentWeatherReceiver onReceive");
+			_downloadCurrentWeatherRunnable.run();
+		}
+	};
+
+	private BroadcastReceiver _reloadForecastWeatherReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_reloadForecastWeatherReceiver onReceive");
+			_downloadForecastWeatherRunnable.run();
+		}
+	};
+
 	private BroadcastReceiver _updateBoughtShoppingListReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1404,7 +1404,6 @@ public class MainService extends Service {
 			_broadcastController = new BroadcastController(_context);
 			_databaseController = DatabaseController.getInstance();
 			_databaseController.onCreate(_context);
-			_dialogController = new LucaDialogController(_context);
 			_mediaMirrorController = new MediaMirrorController(_context);
 			_mediaMirrorController.Initialize();
 			_menuController = new MenuController(_context);
@@ -1545,6 +1544,10 @@ public class MainService extends Service {
 						Broadcasts.RELOAD_TIMER, Broadcasts.RELOAD_SOCKETS });
 		_receiverController.RegisterReceiver(_reloadShoppingListReceiver,
 				new String[] { guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_SHOPPING_LIST });
+		_receiverController.RegisterReceiver(_reloadCurrentWeatherReceiver,
+				new String[] { Broadcasts.RELOAD_CURRENT_WEATHER });
+		_receiverController.RegisterReceiver(_reloadForecastWeatherReceiver,
+				new String[] { Broadcasts.RELOAD_FORECAST_WEATHER });
 
 		_receiverController.RegisterReceiver(_updateBoughtShoppingListReceiver,
 				new String[] { guepardoapps.library.lucahome.common.constants.Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST });
@@ -1569,10 +1572,6 @@ public class MainService extends Service {
 			install();
 		}
 
-		if (!_schedulesAdded) {
-			addSchedules();
-		}
-
 		if (!_networkController.IsNetworkAvailable()) {
 			_logger.Warn("No network available!");
 			return;
@@ -1586,7 +1585,8 @@ public class MainService extends Service {
 
 		if (!_downloadingData) {
 			if (!_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USER_DATA_ENTERED)) {
-				_dialogController.ShowUserCredentialsDialog(null, _startDownloadRunnable, false);
+				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.COMMAND,
+						new String[] { Bundles.COMMAND }, new Object[] { Command.SHOW_USER_LOGIN_DIALOG });
 			} else {
 				Calendar now = Calendar.getInstance();
 				if (_lastUpdate != null) {
@@ -1604,32 +1604,15 @@ public class MainService extends Service {
 				}
 				_lastUpdate = now;
 
+				if (!_schedulesAdded) {
+					addSchedules();
+				}
+
 				prepareDownloadAll();
 				startDownloadLucaHomeAll();
 				startDownloadOtherAll();
 			}
 		}
-	}
-
-	private void install() {
-		_logger.Debug("install");
-
-		_broadcastController.SendSerializableBroadcast(Broadcasts.COMMAND, Bundles.COMMAND,
-				Command.SHOW_USER_LOGIN_DIALOG);
-
-		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.SHARED_PREF_INSTALLED, true);
-
-		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION, true);
-		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION, true);
-		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION, true);
-
-		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_AUDIO_APP, true);
-		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_OSMC_APP, true);
-
-		_sharedPrefController.SaveIntegerValue(SharedPrefConstants.SOUND_RASPBERRY_SELECTION,
-				RaspberrySelection.RASPBERRY_1.GetInt());
-
-		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.USE_BEACONS, false);
 	}
 
 	private void prepareDownloadAll() {
@@ -1682,6 +1665,30 @@ public class MainService extends Service {
 					new String[] { Bundles.COMMAND, Bundles.NAVIGATE_DATA },
 					new Object[] { Command.NAVIGATE, NavigateData.HOME });
 		}
+	}
+
+	private void install() {
+		_logger.Debug("install");
+
+		_broadcastController.SendSerializableBroadcast(Broadcasts.COMMAND, Bundles.COMMAND,
+				Command.SHOW_USER_LOGIN_DIALOG);
+
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.SHARED_PREF_INSTALLED, true);
+
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION, true);
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION, true);
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION, true);
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION, true);
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION, true);
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_CAMERA_NOTIFICATION, true);
+
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_AUDIO_APP, true);
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_OSMC_APP, true);
+
+		_sharedPrefController.SaveIntegerValue(SharedPrefConstants.SOUND_RASPBERRY_SELECTION,
+				RaspberrySelection.RASPBERRY_1.GetInt());
+
+		_sharedPrefController.SaveBooleanValue(SharedPrefConstants.USE_BEACONS, false);
 	}
 
 	private void installNotificationSettings() {

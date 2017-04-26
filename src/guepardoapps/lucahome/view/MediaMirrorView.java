@@ -5,11 +5,14 @@ import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
+import guepardoapps.library.toolset.controller.BroadcastController;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.view.controller.mediamirror.*;
@@ -20,6 +23,7 @@ public class MediaMirrorView extends Activity {
 	private LucaHomeLogger _logger;
 
 	private Context _context;
+	private BroadcastController _broadcastController;
 	private NavigationService _navigationService;
 
 	private AdvancedViewController _advancedViewController;
@@ -40,6 +44,7 @@ public class MediaMirrorView extends Activity {
 		_logger.Debug("onCreate");
 
 		_context = this;
+		_broadcastController = new BroadcastController(_context);
 		_navigationService = new NavigationService(_context);
 
 		_advancedViewController = new AdvancedViewController(_context);
@@ -111,6 +116,24 @@ public class MediaMirrorView extends Activity {
 		}
 
 		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_basic_reload, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+
+		if (id == R.id.buttonReload) {
+			_broadcastController
+					.SendSimpleBroadcast(guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_MEDIAMIRROR);
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	public void SelecteYoutubeId(View view) {

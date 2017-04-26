@@ -22,6 +22,7 @@ import android.widget.Toast;
 import guepardoapps.library.lucahome.common.classes.Sound;
 import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
+import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.enums.LucaObject;
 import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
@@ -44,7 +45,6 @@ import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 
 public class SoundView extends Activity {
 

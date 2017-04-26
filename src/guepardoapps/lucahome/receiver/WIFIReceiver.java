@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
 import guepardoapps.library.lucahome.common.constants.IDs;
+import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.ActionDto;
 import guepardoapps.library.lucahome.common.enums.LucaObject;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
@@ -31,7 +32,6 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.lucahome.services.MainService;
 
 public class WIFIReceiver extends BroadcastReceiver {

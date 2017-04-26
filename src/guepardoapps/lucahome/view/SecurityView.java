@@ -9,6 +9,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.CookieManager;
@@ -201,12 +203,12 @@ public class SecurityView extends Activity {
 					if (_motionCameraDto != null) {
 						if (_motionCameraDto.GetCameraState()) {
 							if (_motionCameraDto.GetCameraControlState()) {
-								String action = ServerActions.SET_MOTION_CONTROL_TASK + "0";
+								String action = ServerActions.SET_MOTION_CONTROL_TASK + "OFF";
 								_serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, action,
 										Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO,
 										RaspberrySelection.BOTH);
 							} else {
-								String action = ServerActions.SET_MOTION_CONTROL_TASK + "1";
+								String action = ServerActions.SET_MOTION_CONTROL_TASK + "ON";
 								_serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, action,
 										Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO,
 										RaspberrySelection.BOTH);
@@ -270,6 +272,23 @@ public class SecurityView extends Activity {
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.menu_basic_reload, menu);
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+
+		if (id == R.id.buttonReload) {
+			_broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MOTION_CAMERA_DTO);
+		}
+
+		return super.onOptionsItemSelected(item);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

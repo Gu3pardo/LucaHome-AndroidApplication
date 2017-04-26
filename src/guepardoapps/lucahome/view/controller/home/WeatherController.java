@@ -8,7 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-
+import android.widget.ImageButton;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
@@ -38,6 +38,7 @@ public class WeatherController {
 	private ReceiverController _receiverController;
 
 	private Button _buttonCenterWeather;
+	private ImageButton _imageButtonReloadWeather;
 
 	private BroadcastReceiver _updateWeatherViewReceiver = new BroadcastReceiver() {
 		@SuppressWarnings("deprecation")
@@ -77,6 +78,13 @@ public class WeatherController {
 			@Override
 			public void onClick(View view) {
 				_navigationService.NavigateTo(ForecastWeatherView.class, true);
+			}
+		});
+		_imageButtonReloadWeather = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonReloadWeather);
+		_imageButtonReloadWeather.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				_broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_CURRENT_WEATHER);
 			}
 		});
 	}

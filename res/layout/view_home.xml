@@ -50,6 +50,16 @@
         android:textAppearance="?android:attr/textAppearanceSmall"
         android:textColor="@color/TextIcon" />
 
+    <ImageButton
+        android:id="@+id/imageButtonReloadWeather"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/buttonCenterWeather"
+        android:layout_alignEnd="@+id/buttonCenterWeather"
+        android:layout_alignTop="@+id/buttonCenterWeather"
+        android:background="@drawable/button_primary"
+        android:src="@android:drawable/stat_notify_sync" />
+
     <ScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

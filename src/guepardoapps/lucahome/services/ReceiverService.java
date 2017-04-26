@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.BatteryManager;
 import android.os.IBinder;
 
+import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.controller.ServiceController;
@@ -18,16 +19,15 @@ import guepardoapps.library.toolset.controller.ReceiverController;
 import guepardoapps.library.toolset.controller.SharedPrefController;
 
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.constants.SharedPrefConstants;
 
 public class ReceiverService extends Service {
 
 	private static final String TAG = ReceiverService.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
-	private static final int NOTIFICATION_HOUR = 21;
-	private static final int NOTIFICATION_MINUTE = 45;
-	private static final int NOTIFICATION_TIMESPAN_MINUTE = 5;
+	public static final int SLEEP_NOTIFICATION_HOUR = 21;
+	public static final int SLEEP_NOTIFICATION_MINUTE = 45;
+	public static final int SLEEP_NOTIFICATION_TIMESPAN_MINUTE = 5;
 
 	private static final int CLEAR_NOTIFICATION_DISPLAY_HOUR = 2;
 	private static final int CLEAR_NOTIFICATION_DISPLAY_MINUTE = 0;
@@ -71,9 +71,10 @@ public class ReceiverService extends Service {
 
 				// Check, if the time is ready for displaying the notification
 				// time needs to be NOTIFICATION_HOUR:NOTIFICATION_MINUTE
-				if (calendar.get(Calendar.HOUR_OF_DAY) == NOTIFICATION_HOUR) {
-					if (calendar.get(Calendar.MINUTE) > NOTIFICATION_MINUTE - NOTIFICATION_TIMESPAN_MINUTE
-							&& calendar.get(Calendar.MINUTE) < NOTIFICATION_MINUTE + NOTIFICATION_TIMESPAN_MINUTE) {
+				if (calendar.get(Calendar.HOUR_OF_DAY) == SLEEP_NOTIFICATION_HOUR) {
+					if (calendar.get(Calendar.MINUTE) > SLEEP_NOTIFICATION_MINUTE - SLEEP_NOTIFICATION_TIMESPAN_MINUTE
+							&& calendar.get(Calendar.MINUTE) < SLEEP_NOTIFICATION_MINUTE
+									+ SLEEP_NOTIFICATION_TIMESPAN_MINUTE) {
 						_logger.Debug("We are in the timespan!");
 
 						// Check also if we are in the home network, otherwise

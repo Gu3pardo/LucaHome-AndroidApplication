@@ -49,6 +49,9 @@
     <string name="set_display_socket_notification">Show socket notification</string>
     <string name="set_display_weather_notification">Enable notification for weather forecast</string>
     <string name="set_display_temperature_notification">Show temperature notification</string>
+    <string name="set_display_birthday_notification">Show birthday notification</string>
+    <string name="set_display_sleep_notification">Show sleep notification</string>
+    <string name="set_display_camera_notification">Show camera notification</string>
     <string name="change">Change</string>
     <string name="user">User</string>
     <string name="ok">Ok</string>

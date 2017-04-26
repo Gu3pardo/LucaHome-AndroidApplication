@@ -166,6 +166,9 @@ public class ShoppingListView extends Activity {
 			} else {
 				ToastView.warning(_context, "Nothing to share!", Toast.LENGTH_LONG).show();
 			}
+		} else if (id == R.id.buttonReload) {
+			_broadcastController.SendSimpleBroadcast(
+					guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_SHOPPING_LIST);
 		}
 
 		return super.onOptionsItemSelected(item);

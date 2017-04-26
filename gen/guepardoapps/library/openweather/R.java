@@ -81,12 +81,12 @@ public final class R {
 		public static final int custom_webview_dialog_prompt = 0x7f11003a;
 		public static final int custom_webview_dialog_title = 0x7f110039;
 		public static final int custom_webview_dialog_webview = 0x7f11003b;
-		public static final int floating_message_background = 0x7f1100ab;
-		public static final int floating_message_text = 0x7f1100ad;
-		public static final int floating_message_title = 0x7f1100ac;
-		public static final int icon = 0x7f110131;
-		public static final int text = 0x7f110132;
-		public static final int toast_root = 0x7f110130;
+		public static final int floating_message_background = 0x7f1100ae;
+		public static final int floating_message_text = 0x7f1100b0;
+		public static final int floating_message_title = 0x7f1100af;
+		public static final int icon = 0x7f110134;
+		public static final int text = 0x7f110135;
+		public static final int toast_root = 0x7f110133;
 	}
 	public static final class layout {
 		public static final int custom_dialog_1button = 0x7f030002;

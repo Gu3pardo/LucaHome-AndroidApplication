@@ -40,6 +40,7 @@ public class Broadcasts {
 	public static final String CLEAR_MENU = "guepardoapps.lucahome.broadcast.clear.menu";
 	public static final String RELOAD_MENU = "guepardoapps.lucahome.broadcast.reload.menu";
 	public static final String UPDATE_MENU = "guepardoapps.lucahome.broadcast.UPDATE_MENU";
+	public static final String UPDATE_MENU_VIEW = "guepardoapps.lucahome.broadcast.UPDATE_MENU_VIEW";
 	public static final String DOWNLOAD_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MENU_FINISHED";
 
 	// Motion Camera Dto
@@ -101,6 +102,10 @@ public class Broadcasts {
 	public static final String UPDATE_WEATHER_VIEW = "guepardoapps.lucahome.broadcast.update.view.weather";
 	public static final String UPDATE_FORECAST_VIEW = "guepardoapps.lucahome.broadcast.update.view.forecast";
 	public static final String UPDATE_SOCKETLIST_CHECKBOX_VIEW = "guepardoapps.lucahome.broadcast.update.view.socketlist.checkboxes";
+
+	// Weather
+	public static final String RELOAD_CURRENT_WEATHER = "guepardoapps.lucahome.broadcast.reload.current_weather";
+	public static final String RELOAD_FORECAST_WEATHER = "guepardoapps.lucahome.broadcast.reload.forecast_weather";
 
 	// Youtube
 	public static final String YOUTUBE_ID = "guepardoapps.mediamirror.broadcast.youtube.selected.id";

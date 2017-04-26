@@ -1,5 +1,7 @@
 package guepardoapps.lucahome.view;
 
+import java.util.Calendar;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,6 +21,7 @@ import android.widget.Toast;
 
 import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.constants.IDs;
+import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -32,13 +35,15 @@ import guepardoapps.library.toastview.ToastView;
 
 import guepardoapps.library.toolset.common.classes.SerializableList;
 import guepardoapps.library.toolset.controller.BroadcastController;
+import guepardoapps.library.toolset.controller.NetworkController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 import guepardoapps.library.toolset.controller.SharedPrefController;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.constants.Broadcasts;
 import guepardoapps.lucahome.common.constants.Bundles;
-import guepardoapps.lucahome.common.constants.SharedPrefConstants;
+import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.services.ReceiverService;
 
 public class SettingsView extends Activity {
 
@@ -56,6 +61,7 @@ public class SettingsView extends Activity {
 	private DatabaseController _databaseController;
 	private LucaNotificationController _notificationController;
 	private NavigationService _navigationService;
+	private NetworkController _networkController;
 	private ReceiverController _receiverController;
 	private SharedPrefController _sharedPrefController;
 
@@ -89,6 +95,7 @@ public class SettingsView extends Activity {
 		_broadcastController = new BroadcastController(_context);
 		_databaseController = DatabaseController.getInstance();
 		_navigationService = new NavigationService(_context);
+		_networkController = new NetworkController(_context);
 		_notificationController = new LucaNotificationController(_context);
 		_receiverController = new ReceiverController(_context);
 		_sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
@@ -204,6 +211,73 @@ public class SettingsView extends Activity {
 				}
 			}
 		});
+
+		Switch birthdayNotification = (Switch) findViewById(R.id.switch_display_birthday_notification);
+		birthdayNotification.setChecked(_sharedPrefController
+				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION));
+		birthdayNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION, isChecked);
+				if (isChecked) {
+					_broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_BIRTHDAY);
+				} else {
+					_notificationController.CloseNotification(IDs.NOTIFICATION_BIRTHDAY);
+				}
+			}
+		});
+
+		Switch sleepNotification = (Switch) findViewById(R.id.switch_display_sleep_notification);
+		sleepNotification.setChecked(_sharedPrefController
+				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION));
+		sleepNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION, isChecked);
+				if (isChecked) {
+					Calendar calendar = Calendar.getInstance();
+
+					if (calendar.get(Calendar.HOUR_OF_DAY) == ReceiverService.SLEEP_NOTIFICATION_HOUR) {
+						if (calendar.get(Calendar.MINUTE) > ReceiverService.SLEEP_NOTIFICATION_MINUTE
+								- ReceiverService.SLEEP_NOTIFICATION_TIMESPAN_MINUTE
+								&& calendar.get(Calendar.MINUTE) < ReceiverService.SLEEP_NOTIFICATION_MINUTE
+										+ ReceiverService.SLEEP_NOTIFICATION_TIMESPAN_MINUTE) {
+							_logger.Debug("We are in the timespan!");
+
+							if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+								_logger.Debug("Showing notification go to sleep!");
+								_notificationController.CreateSleepHeatingNotification();
+							} else {
+								_logger.Debug("Saving flag to display notification later!");
+								_sharedPrefController
+										.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, true);
+							}
+						} else {
+							_logger.Debug("We are NOT in the timespan!");
+						}
+					}
+				} else {
+					_notificationController.CloseNotification(IDs.NOTIFICATION_SLEEP);
+				}
+			}
+		});
+
+		Switch cameraNotification = (Switch) findViewById(R.id.switch_display_camera_notification);
+		cameraNotification.setChecked(_sharedPrefController
+				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_CAMERA_NOTIFICATION));
+		cameraNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				_sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_CAMERA_NOTIFICATION, isChecked);
+				if (isChecked) {
+					// TODO check if camera is active
+				} else {
+					_notificationController.CloseNotification(IDs.NOTIFICATION_CAMERA);
+				}
+			}
+		});
+		// TODO reactivate after above TODO is done!
+		cameraNotification.setVisibility(View.GONE);
 	}
 
 	private void initializeAppCheckboxes() {
