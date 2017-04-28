@@ -647,6 +647,9 @@ public class MainService extends Service {
 				_logger.Warn("newForecastWeather is null");
 			}
 
+			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_FORECAST_VIEW,
+					new String[] { Bundles.WEATHER_FORECAST }, new Object[] { _forecastWeather });
+
 			updateDownloadCount();
 		}
 	};
@@ -1002,6 +1005,9 @@ public class MainService extends Service {
 				_notificationController.CreateTemperatureNotification(SensorTemperatureView.class, _temperatureList,
 						_currentWeather);
 			}
+
+			_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_WEATHER_VIEW,
+					new String[] { Bundles.WEATHER_CURRENT }, new Object[] { _currentWeather });
 
 			updateDownloadCount();
 		}
@@ -1570,17 +1576,6 @@ public class MainService extends Service {
 	private void boot() {
 		if (!_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.SHARED_PREF_INSTALLED)) {
 			install();
-		}
-
-		if (!_networkController.IsNetworkAvailable()) {
-			_logger.Warn("No network available!");
-			return;
-		}
-
-		if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-			_logger.Warn("No LucaHome network! ...");
-			ToastView.warning(_context, "No LucaHome network! ...", Toast.LENGTH_LONG).show();
-			return;
 		}
 
 		if (!_downloadingData) {

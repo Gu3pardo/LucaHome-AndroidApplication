@@ -16,17 +16,21 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
+import guepardoapps.library.lucahome.common.dto.ActionDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.DatabaseController;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
+import guepardoapps.library.lucahome.customadapter.StoredActionListAdapter;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
 import guepardoapps.library.openweather.common.OWIds;
@@ -50,10 +54,15 @@ public class SettingsView extends Activity {
 	private static final String TAG = SettingsView.class.getSimpleName();
 	private LucaHomeLogger _logger;
 
+	private SerializableList<ActionDto> _storedActions;
 	private SerializableList<WirelessSocketDto> _socketList;
 	private boolean _isInitialized;
 
+	private Button _deleteActionDatabase;
 	private LinearLayout _socketLayout;
+	private ListView _storedActionsListView;
+
+	private ListAdapter _storedActionListAdapter;
 
 	private Context _context;
 
@@ -69,13 +78,34 @@ public class SettingsView extends Activity {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			_logger.Debug("_updateSocketListCheckBoxViewReceiver");
+			_logger.Debug("_updateSocketListCheckBoxViewReceiver onReceive");
 			_socketList = (SerializableList<WirelessSocketDto>) intent.getSerializableExtra(Bundles.SOCKET_LIST);
 			if (_socketList != null) {
 				initializeSocketNotificationCheckboxes();
 			} else {
 				_logger.Warn("SocketList is null!");
 			}
+		}
+	};
+
+	private BroadcastReceiver _reloadStoredActionsFromDB = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_reloadStoredActionsFromDB onReceive");
+			_storedActions = _databaseController.GetActions();
+
+			if (_storedActions.getSize() < 1) {
+				_deleteActionDatabase.setEnabled(false);
+				_deleteActionDatabase.setTextColor(0xFF545454);
+				_storedActionsListView.setVisibility(View.GONE);
+			} else {
+				_deleteActionDatabase.setEnabled(true);
+				_deleteActionDatabase.setTextColor(0xFFFFFFFF);
+				_storedActionsListView.setVisibility(View.VISIBLE);
+			}
+
+			_storedActionListAdapter = new StoredActionListAdapter(_context, _storedActions);
+			_storedActionsListView.setAdapter(_storedActionListAdapter);
 		}
 	};
 
@@ -103,8 +133,8 @@ public class SettingsView extends Activity {
 		initializeSwitches();
 		initializeAppCheckboxes();
 		initializeBeaconCheckbox();
-		initializeButtons();
 		initializeSocketNotificationCheckboxes();
+		initializeStoredActions();
 	}
 
 	@Override
@@ -120,6 +150,8 @@ public class SettingsView extends Activity {
 				_isInitialized = true;
 				_receiverController.RegisterReceiver(_updateSocketListCheckBoxViewReceiver,
 						new String[] { Broadcasts.UPDATE_SOCKET });
+				_receiverController.RegisterReceiver(_reloadStoredActionsFromDB, new String[] {
+						guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_SHOPPING_LIST_FROM_DB });
 				_broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
 						new String[] { Bundles.MAIN_SERVICE_ACTION }, new Object[] { MainServiceAction.GET_SOCKETS });
 			}
@@ -143,7 +175,7 @@ public class SettingsView extends Activity {
 			_logger.Debug("onDestroy");
 		}
 
-		_receiverController.UnregisterReceiver(_updateSocketListCheckBoxViewReceiver);
+		_receiverController.Dispose();
 	}
 
 	@Override
@@ -323,17 +355,6 @@ public class SettingsView extends Activity {
 		});
 	}
 
-	private void initializeButtons() {
-		Button deleteDatabase = (Button) findViewById(R.id.btnDeleteDatabaseEntries);
-		deleteDatabase.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				_databaseController.ClearDatabaseActions();
-				ToastView.info(_context, "Cleared actions!", Toast.LENGTH_LONG).show();
-			}
-		});
-	}
-
 	private void initializeSocketNotificationCheckboxes() {
 		if (!_sharedPrefController
 				.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
@@ -370,6 +391,33 @@ public class SettingsView extends Activity {
 			});
 
 			_socketLayout.addView(socketCheckbox);
+		}
+	}
+
+	private void initializeStoredActions() {
+		_deleteActionDatabase = (Button) findViewById(R.id.btnDeleteDatabaseEntries);
+		_deleteActionDatabase.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				_databaseController.ClearDatabaseActions();
+				ToastView.info(_context, "Cleared actions!", Toast.LENGTH_LONG).show();
+			}
+		});
+
+		_storedActions = _databaseController.GetActions();
+
+		_storedActionsListView = (ListView) findViewById(R.id.storedActionListView);
+		_storedActionListAdapter = new StoredActionListAdapter(_context, _storedActions);
+		_storedActionsListView.setAdapter(_storedActionListAdapter);
+
+		if (_storedActions.getSize() < 1) {
+			_deleteActionDatabase.setEnabled(false);
+			_deleteActionDatabase.setTextColor(0xFF545454);
+			_storedActionsListView.setVisibility(View.GONE);
+		} else {
+			_deleteActionDatabase.setEnabled(true);
+			_deleteActionDatabase.setTextColor(0xFFFFFFFF);
+			_storedActionsListView.setVisibility(View.VISIBLE);
 		}
 	}
 }

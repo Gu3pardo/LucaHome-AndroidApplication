@@ -166,8 +166,8 @@ public final class R {
 		public static final int parentPanel = 0x7f11002d;
 		public static final int right = 0x7f110003;
 		public static final int start = 0x7f110012;
-		public static final int text = 0x7f110135;
-		public static final int title = 0x7f1101c9;
+		public static final int text = 0x7f110137;
+		public static final int title = 0x7f1101cc;
 		public static final int top = 0x7f110004;
 		public static final int width = 0x7f110007;
 	}
@@ -189,7 +189,7 @@ public final class R {
 		public static final int alert_dialog_wearable = 0x7f030001;
 		public static final int dismiss_overlay = 0x7f030017;
 		public static final int error_layout = 0x7f030018;
-		public static final int watch_card_content = 0x7f03003d;
+		public static final int watch_card_content = 0x7f03003e;
 	}
 	public static final class string {
 		public static final int dismiss_overlay_button_label = 0x7f090039;
