@@ -71,6 +71,7 @@ public class MainService extends Service {
 	private InformationDto _information = null;
 	private SerializableList<MapContentDto> _mapContentList = null;
 	private SerializableList<MediaMirrorViewDto> _mediaMirrorList = new SerializableList<MediaMirrorViewDto>();
+	private SerializableList<ListedMenuDto> _listedMenu = null;
 	private SerializableList<MenuDto> _menu = null;
 	private MotionCameraDto _motionCameraDto = null;
 	private SerializableList<MovieDto> _movieList = null;
@@ -183,6 +184,25 @@ public class MainService extends Service {
 			}
 
 			startDownloadMediaMirror();
+		}
+	};
+
+	private Runnable _downloadListedMenuRunnable = new Runnable() {
+		@Override
+		public void run() {
+			_logger.Debug("_downloadListedMenuRunnable run");
+
+			if (!_networkController.IsNetworkAvailable()) {
+				_logger.Warn("No network available!");
+				return;
+			}
+
+			if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+				_logger.Warn("No LucaHome network! ...");
+				return;
+			}
+
+			startDownloadListedMenu();
 		}
 	};
 
@@ -326,8 +346,9 @@ public class MainService extends Service {
 					startDownloadShoppingList();
 					break;
 				case DOWNLOAD_MENU:
-					_downloadCount = 1;
+					_downloadCount = 2;
 					startDownloadMenu();
+					startDownloadListedMenu();
 					break;
 				case DOWNLOAD_MOTION_CAMERA_DTO:
 					_downloadCount = 1;
@@ -337,9 +358,9 @@ public class MainService extends Service {
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MAP_CONTENT_VIEW,
 							new String[] { Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST,
 									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU,
-									Bundles.MOTION_CAMERA_DTO },
+									Bundles.LISTED_MENU, Bundles.MOTION_CAMERA_DTO },
 							new Object[] { _mapContentList, _wirelessSocketList, _scheduleList, _timerList,
-									_temperatureList, _shoppingList, _menu, _motionCameraDto });
+									_temperatureList, _shoppingList, _menu, _listedMenu, _motionCameraDto });
 					break;
 				case GET_BIRTHDAYS:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_BIRTHDAY,
@@ -363,6 +384,8 @@ public class MainService extends Service {
 				case GET_MENU:
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MENU_VIEW,
 							new String[] { Bundles.MENU }, new Object[] { _menu });
+					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_LISTED_MENU_VIEW,
+							new String[] { Bundles.LISTED_MENU }, new Object[] { _listedMenu });
 					sendMenuToWear();
 					break;
 				case GET_MOTION_CAMERA_DTO:
@@ -408,9 +431,9 @@ public class MainService extends Service {
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MAP_CONTENT_VIEW,
 							new String[] { Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST,
 									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU,
-									Bundles.MOTION_CAMERA_DTO },
+									Bundles.LISTED_MENU, Bundles.MOTION_CAMERA_DTO },
 							new Object[] { _mapContentList, _wirelessSocketList, _scheduleList, _timerList,
-									_temperatureList, _shoppingList, _menu, _motionCameraDto });
+									_temperatureList, _shoppingList, _menu, _listedMenu, _motionCameraDto });
 					break;
 				case GET_SHOPPING_LIST:
 					_broadcastController.SendSerializableArrayBroadcast(
@@ -735,6 +758,31 @@ public class MainService extends Service {
 
 			updateDownloadCount();
 			sendMediaMirrorToWear();
+		}
+	};
+
+	private BroadcastReceiver _listedMenuDtoDownloadReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_listedMenuDtoDownloadReceiver onReceive");
+
+			String[] listedMenuStringArray = intent.getStringArrayExtra(Bundles.LISTED_MENU_DOWNLOAD);
+			if (listedMenuStringArray != null) {
+
+				SerializableList<ListedMenuDto> newListedMenuList = JsonDataToListedMenuConverter
+						.GetList(listedMenuStringArray);
+				if (newListedMenuList != null) {
+					_listedMenu = newListedMenuList;
+					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_LISTED_MENU_VIEW,
+							new String[] { Bundles.LISTED_MENU }, new Object[] { _listedMenu });
+				} else {
+					_logger.Warn("newListedMenuList is null");
+				}
+			} else {
+				_logger.Warn("listedMenuStringArray is null");
+			}
+
+			updateDownloadCount();
 		}
 	};
 
@@ -1262,6 +1310,14 @@ public class MainService extends Service {
 		}
 	};
 
+	private BroadcastReceiver _reloadListedMenuReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_reloadListedMenuReceiver onReceive");
+			startDownloadListedMenu();
+		}
+	};
+
 	private BroadcastReceiver _reloadMenuReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
@@ -1397,6 +1453,7 @@ public class MainService extends Service {
 
 			_birthdayList = new SerializableList<BirthdayDto>();
 			_changeList = new SerializableList<ChangeDto>();
+			_listedMenu = new SerializableList<ListedMenuDto>();
 			_menu = new SerializableList<MenuDto>();
 			_movieList = new SerializableList<MovieDto>();
 			_scheduleList = new SerializableList<ScheduleDto>();
@@ -1508,6 +1565,8 @@ public class MainService extends Service {
 				new String[] { Broadcasts.DOWNLOAD_MAP_CONTENT_FINISHED });
 		_receiverController.RegisterReceiver(_mediaMirrorViewDtoDownloadReceiver,
 				new String[] { guepardoapps.library.lucahome.common.constants.Broadcasts.MEDIAMIRROR_VIEW_DTO });
+		_receiverController.RegisterReceiver(_listedMenuDtoDownloadReceiver,
+				new String[] { Broadcasts.DOWNLOAD_LISTED_MENU_FINISHED });
 		_receiverController.RegisterReceiver(_menuDtoDownloadReceiver,
 				new String[] { Broadcasts.DOWNLOAD_MENU_FINISHED });
 		_receiverController.RegisterReceiver(_motionCameraDtoDownloadReceiver,
@@ -1538,6 +1597,7 @@ public class MainService extends Service {
 		_receiverController.RegisterReceiver(_reloadBirthdayReceiver, new String[] { Broadcasts.RELOAD_BIRTHDAY });
 		_receiverController.RegisterReceiver(_reloadMediaMirrorReceiver,
 				new String[] { guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_MEDIAMIRROR });
+		_receiverController.RegisterReceiver(_reloadListedMenuReceiver, new String[] { Broadcasts.RELOAD_LISTED_MENU });
 		_receiverController.RegisterReceiver(_reloadMenuReceiver, new String[] { Broadcasts.RELOAD_MENU });
 		_receiverController.RegisterReceiver(_reloadMotionCameraDtoReceiver,
 				new String[] { Broadcasts.RELOAD_MOTION_CAMERA_DTO });
@@ -1566,6 +1626,7 @@ public class MainService extends Service {
 		_scheduleService.AddSchedule("UpdateIsSoundPlaying", _downloadIsSoundPlayingRunnable, 5 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateMediaMirror", _downloadMediaMirrorRunnable, 5 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateMenu", _downloadMenuRunnable, 3 * 60 * 60 * 1000, true);
+		_scheduleService.AddSchedule("UpdateListedMenu", _downloadListedMenuRunnable, 3 * 60 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateMotionCameraDto", _downloadMotionCameraDtoRunnable, 5 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateSockets", _downloadSocketRunnable, 15 * 60 * 1000, true);
 		_scheduleService.AddSchedule("UpdateTemperature", _downloadTemperatureRunnable, 5 * 60 * 1000, true);
@@ -1628,6 +1689,7 @@ public class MainService extends Service {
 		startDownloadInformation();
 		startDownloadMapContent();
 		startDownloadMediaMirror();
+		startDownloadListedMenu();
 		startDownloadMenu();
 		startDownloadMotionCameraDto();
 		startDownloadMovie();
@@ -1750,6 +1812,12 @@ public class MainService extends Service {
 			_logger.Debug(String.format("Trying serverIp %s", entry.GetIp()));
 			_mediaMirrorController.SendCommand(entry.GetIp(), ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 		}
+	}
+
+	private void startDownloadListedMenu() {
+		_logger.Debug("startDownloadListedMenu");
+		_serviceController.StartRestService(Bundles.LISTED_MENU_DOWNLOAD, ServerActions.GET_LISTED_MENU,
+				Broadcasts.DOWNLOAD_LISTED_MENU_FINISHED, LucaObject.LISTEDMENU, RaspberrySelection.BOTH);
 	}
 
 	private void startDownloadMenu() {

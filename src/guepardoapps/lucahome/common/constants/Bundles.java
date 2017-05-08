@@ -41,6 +41,8 @@ public class Bundles {
 	// Menu
 	public static final String MENU = "MENU";
 	public static final String MENU_DOWNLOAD = "MENU_DOWNLOAD";
+	public static final String LISTED_MENU = "LISTED_MENU";
+	public static final String LISTED_MENU_DOWNLOAD = "LISTED_MENU_DOWNLOAD";
 
 	// Motion Camera Dto
 	public static final String MOTION_CAMERA_DTO = "MOTION_CAMERA_DTO";

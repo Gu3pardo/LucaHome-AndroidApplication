@@ -83,17 +83,20 @@ public class MapController {
 					.getSerializableExtra(Bundles.TEMPERATURE_LIST);
 			SerializableList<ShoppingEntryDto> shoppingList = (SerializableList<ShoppingEntryDto>) intent
 					.getSerializableExtra(Bundles.SHOPPING_LIST);
+			SerializableList<ListedMenuDto> listedMenu = (SerializableList<ListedMenuDto>) intent
+					.getSerializableExtra(Bundles.LISTED_MENU);
 			SerializableList<MenuDto> menu = (SerializableList<MenuDto>) intent.getSerializableExtra(Bundles.MENU);
 			MotionCameraDto motionCameraDto = (MotionCameraDto) intent.getSerializableExtra(Bundles.MOTION_CAMERA_DTO);
 
 			if (mapContentList != null && wirelessSocketList != null && scheduleAllList != null && timerAllList != null
-					&& temperatureList != null && shoppingList != null && menu != null && motionCameraDto != null) {
+					&& temperatureList != null && shoppingList != null && menu != null && listedMenu != null
+					&& motionCameraDto != null) {
 				_callForDataHandler.removeCallbacks(_callForDataRunnable);
 
 				for (int index = 0; index < mapContentList.getSize(); index++) {
 					MapContentDto entry = mapContentList.getValue(index);
 					addView(entry, wirelessSocketList, scheduleAllList, timerAllList, temperatureList, shoppingList,
-							menu, motionCameraDto);
+							menu, listedMenu, motionCameraDto);
 				}
 			} else {
 				if (mapContentList == null) {
@@ -247,20 +250,21 @@ public class MapController {
 			final SerializableList<ScheduleDto> scheduleAllList, final SerializableList<TimerDto> timerAllList,
 			final SerializableList<TemperatureDto> temperatureList,
 			final SerializableList<ShoppingEntryDto> shoppingList, final SerializableList<MenuDto> menu,
-			final MotionCameraDto motionCameraDto) {
+			final SerializableList<ListedMenuDto> listedMenu, final MotionCameraDto motionCameraDto) {
 		final TextView newTextView = _mapContentController.CreateEntry(newMapContent, newMapContent.GetPosition(),
 				wirelessSocketList, temperatureList, _size, true);
 		newTextView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				showInformation(wirelessSocketList, scheduleAllList, timerAllList, temperatureList, shoppingList, menu,
-						motionCameraDto);
+						listedMenu, motionCameraDto);
 			}
 
 			private void showInformation(SerializableList<WirelessSocketDto> wirelessSocketList,
 					SerializableList<ScheduleDto> scheduleAllList, SerializableList<TimerDto> timerAllList,
 					SerializableList<TemperatureDto> temperatureList, SerializableList<ShoppingEntryDto> shoppingList,
-					final SerializableList<MenuDto> menu, MotionCameraDto motionCameraDto) {
+					SerializableList<MenuDto> menu, SerializableList<ListedMenuDto> listedMenu,
+					MotionCameraDto motionCameraDto) {
 				_logger.Debug("onClick showInformation");
 
 				switch (newMapContent.GetDrawingType()) {
@@ -279,7 +283,7 @@ public class MapController {
 					showMediaserverDetailsDialog(newMapContent, wirelessSocketList);
 					break;
 				case MENU:
-					showMenuDialog(menu);
+					showMenuDialog(menu, listedMenu);
 					break;
 				case RASPBERRY:
 					ToastView.info(_context, "Here is a raspberry!", Toast.LENGTH_SHORT).show();
@@ -337,8 +341,8 @@ public class MapController {
 				}
 			}
 
-			private void showMenuDialog(SerializableList<MenuDto> menu) {
-				_dialogController.ShowMenuDialog(menu);
+			private void showMenuDialog(SerializableList<MenuDto> menu, SerializableList<ListedMenuDto> listedMenu) {
+				_dialogController.ShowMenuDialog(menu, listedMenu);
 			}
 
 			private void showShoppingListDialog(@NonNull SerializableList<ShoppingEntryDto> shoppingList) {

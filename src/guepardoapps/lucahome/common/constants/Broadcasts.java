@@ -42,6 +42,12 @@ public class Broadcasts {
 	public static final String UPDATE_MENU = "guepardoapps.lucahome.broadcast.UPDATE_MENU";
 	public static final String UPDATE_MENU_VIEW = "guepardoapps.lucahome.broadcast.UPDATE_MENU_VIEW";
 	public static final String DOWNLOAD_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MENU_FINISHED";
+	public static final String ADD_LISTED_MENU = "guepardoapps.lucahome.broadcast.add.listedmenu";
+	public static final String UPDATE_LISTED_MENU = "guepardoapps.lucahome.broadcast.update.listedmenu";
+	public static final String DELETE_LISTED_MENU = "guepardoapps.lucahome.broadcast.delete.listedmenu";
+	public static final String RELOAD_LISTED_MENU = "guepardoapps.lucahome.broadcast.reload.listedmenu";
+	public static final String UPDATE_LISTED_MENU_VIEW = "guepardoapps.lucahome.broadcast.UPDATE_LISTED_MENU_VIEW";
+	public static final String DOWNLOAD_LISTED_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_LISTED_MENU_FINISHED";
 
 	// Motion Camera Dto
 	public static final String RELOAD_MOTION_CAMERA_DTO = "guepardoapps.lucahome.broadcast.RELOAD_MOTION_CAMERA_DTO";

@@ -37,6 +37,9 @@ public class MenuView extends Activity {
 
 	private boolean _isInitialized;
 
+	private SerializableList<MenuDto> _menu;
+	private SerializableList<ListedMenuDto> _listedMenu;
+
 	private ProgressBar _progressBar;
 	private ListView _listView;
 	private Button _buttonAdd;
@@ -56,20 +59,51 @@ public class MenuView extends Activity {
 		}
 	};
 
-	private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
+	private BroadcastReceiver _updateListedMenuReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			_logger.Debug("_updateReceiver onReceive");
+			_logger.Debug("_updateListedMenuReceiver onReceive");
+
+			@SuppressWarnings("unchecked")
+			SerializableList<ListedMenuDto> list = (SerializableList<ListedMenuDto>) intent
+					.getSerializableExtra(Bundles.LISTED_MENU);
+
+			if (list != null) {
+				_listedMenu = list;
+
+				if (_menu != null) {
+					_listAdapter = new MenuListAdapter(_context, _menu, _listedMenu, false, false);
+					_listView.setAdapter(_listAdapter);
+
+					_progressBar.setVisibility(View.GONE);
+					_listView.setVisibility(View.VISIBLE);
+				} else {
+					_logger.Warn("_menu is currently null!");
+				}
+			}
+		}
+	};
+
+	private BroadcastReceiver _updateMenuReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			_logger.Debug("_updateMenuReceiver onReceive");
 
 			@SuppressWarnings("unchecked")
 			SerializableList<MenuDto> list = (SerializableList<MenuDto>) intent.getSerializableExtra(Bundles.MENU);
 
 			if (list != null) {
-				_listAdapter = new MenuListAdapter(_context, list, false, false);
-				_listView.setAdapter(_listAdapter);
+				_menu = list;
 
-				_progressBar.setVisibility(View.GONE);
-				_listView.setVisibility(View.VISIBLE);
+				if (_listedMenu != null) {
+					_listAdapter = new MenuListAdapter(_context, _menu, _listedMenu, false, false);
+					_listView.setAdapter(_listAdapter);
+
+					_progressBar.setVisibility(View.GONE);
+					_listView.setVisibility(View.VISIBLE);
+				} else {
+					_logger.Warn("_listedMenu is currently null!");
+				}
 			}
 		}
 	};
@@ -103,7 +137,9 @@ public class MenuView extends Activity {
 		if (!_isInitialized) {
 			if (_receiverController != null && _broadcastController != null) {
 				_isInitialized = true;
-				_receiverController.RegisterReceiver(_updateReceiver, new String[] { Broadcasts.UPDATE_MENU_VIEW });
+				_receiverController.RegisterReceiver(_updateListedMenuReceiver,
+						new String[] { Broadcasts.UPDATE_LISTED_MENU_VIEW });
+				_receiverController.RegisterReceiver(_updateMenuReceiver, new String[] { Broadcasts.UPDATE_MENU_VIEW });
 				_getDataRunnable.run();
 			}
 		}
@@ -144,6 +180,7 @@ public class MenuView extends Activity {
 
 		if (id == R.id.buttonReload) {
 			_broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MENU);
+			_broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_LISTED_MENU);
 		}
 
 		return super.onOptionsItemSelected(item);
