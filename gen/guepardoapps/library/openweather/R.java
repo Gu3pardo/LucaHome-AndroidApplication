@@ -60,14 +60,26 @@ public final class R {
 		public static final int ic_warning_outline_white = 0x7f02006e;
 		public static final int ic_warning_white_48dp = 0x7f02006f;
 		public static final int toast_frame = 0x7f0200a2;
-		public static final int weather_clear = 0x7f0200a8;
-		public static final int weather_cloud = 0x7f0200a9;
-		public static final int weather_dummy = 0x7f0200aa;
-		public static final int weather_fog = 0x7f0200ab;
-		public static final int weather_haze = 0x7f0200ac;
-		public static final int weather_rain = 0x7f0200ad;
-		public static final int weather_sleet = 0x7f0200ae;
-		public static final int weather_snow = 0x7f0200af;
+		public static final int wallpaper_clear = 0x7f0200a7;
+		public static final int wallpaper_cloud = 0x7f0200a8;
+		public static final int wallpaper_drizzle = 0x7f0200a9;
+		public static final int wallpaper_dummy = 0x7f0200aa;
+		public static final int wallpaper_fog = 0x7f0200ab;
+		public static final int wallpaper_haze = 0x7f0200ac;
+		public static final int wallpaper_mist = 0x7f0200ad;
+		public static final int wallpaper_night = 0x7f0200ae;
+		public static final int wallpaper_rain = 0x7f0200af;
+		public static final int wallpaper_sleet = 0x7f0200b0;
+		public static final int wallpaper_snow = 0x7f0200b1;
+		public static final int wallpaper_sun = 0x7f0200b2;
+		public static final int weather_clear = 0x7f0200b5;
+		public static final int weather_cloud = 0x7f0200b6;
+		public static final int weather_dummy = 0x7f0200b7;
+		public static final int weather_fog = 0x7f0200b8;
+		public static final int weather_haze = 0x7f0200b9;
+		public static final int weather_rain = 0x7f0200ba;
+		public static final int weather_sleet = 0x7f0200bb;
+		public static final int weather_snow = 0x7f0200bc;
 	}
 	public static final class id {
 		public static final int custom_alert_dialog_background = 0x7f110031;

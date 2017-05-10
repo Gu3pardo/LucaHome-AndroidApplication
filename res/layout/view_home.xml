@@ -61,6 +61,7 @@
         android:src="@android:drawable/stat_notify_sync" />
 
     <ScrollView
+        android:id="@+id/buttonScrollView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayoutButtonBar"
@@ -395,7 +396,7 @@
     </ScrollView>
 
     <ImageView
-        android:id="@+id/imageViewMapMinimized"
+        android:id="@+id/imageViewWeatherCondition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayoutButtonBar"
@@ -405,7 +406,7 @@
         android:contentDescription="@string/contentDescription"
         android:padding="5dp"
         android:scaleType="fitXY"
-        android:src="@drawable/map_minimized" />
+        android:src="@drawable/wallpaper" />
 
     <RelativeLayout
         android:id="@+id/relativeLayoutButtonBar"

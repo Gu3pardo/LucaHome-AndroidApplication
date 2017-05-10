@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
@@ -20,6 +21,8 @@ public class ListButtonController {
 
 	private Context _context;
 	private NavigationService _navigationService;
+
+	private ScrollView _buttonScrollView;
 
 	private Button _buttonControl;
 	private Button _buttonMedia;
@@ -72,12 +75,15 @@ public class ListButtonController {
 	public void onCreate() {
 		_logger.Debug("onCreate");
 
+		_buttonScrollView = (ScrollView) ((Activity) _context).findViewById(R.id.buttonScrollView);
+
 		initializeButtonMain();
+
 		initializeButtonControl();
 		initializeButtonMedia();
-		initializeButtonSensor();
 		initializeButtonLiving();
 		initializeButtonSocial();
+		initializeButtonSensor();
 	}
 
 	public void onResume() {
@@ -123,20 +129,6 @@ public class ListButtonController {
 			}
 		});
 
-		_buttonSensors = (Button) ((Activity) _context).findViewById(R.id.buttonSensors);
-		_buttonSensors.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (_sensorSelectionActive) {
-					_sensorVisibility = View.GONE;
-				} else {
-					_sensorVisibility = View.VISIBLE;
-				}
-				_sensorSelectionActive = _sensorVisibility == View.VISIBLE;
-				_linearLayoutButtonSensors.setVisibility(_sensorVisibility);
-			}
-		});
-
 		_buttonLiving = (Button) ((Activity) _context).findViewById(R.id.buttonLiving);
 		_buttonLiving.setOnClickListener(new OnClickListener() {
 			@Override
@@ -170,6 +162,27 @@ public class ListButtonController {
 			@Override
 			public void onClick(View view) {
 				_navigationService.NavigateTo(SecurityView.class, true);
+			}
+		});
+
+		_buttonSensors = (Button) ((Activity) _context).findViewById(R.id.buttonSensors);
+		_buttonSensors.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (_sensorSelectionActive) {
+					_sensorVisibility = View.GONE;
+				} else {
+					_sensorVisibility = View.VISIBLE;
+
+					_buttonScrollView.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+							_buttonScrollView.fullScroll(ScrollView.FOCUS_DOWN);
+						}
+					}, 100);
+				}
+				_sensorSelectionActive = _sensorVisibility == View.VISIBLE;
+				_linearLayoutButtonSensors.setVisibility(_sensorVisibility);
 			}
 		});
 	}

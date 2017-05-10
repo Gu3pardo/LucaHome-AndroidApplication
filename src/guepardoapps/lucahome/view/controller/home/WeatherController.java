@@ -9,12 +9,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
 import guepardoapps.library.openweather.common.model.WeatherModel;
-import guepardoapps.library.openweather.converter.WeatherConverter;
 
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
@@ -39,6 +39,7 @@ public class WeatherController {
 
 	private Button _buttonCenterWeather;
 	private ImageButton _imageButtonReloadWeather;
+	private ImageView _imageViewWeatherCondition;
 
 	private BroadcastReceiver _updateWeatherViewReceiver = new BroadcastReceiver() {
 		@SuppressWarnings("deprecation")
@@ -53,10 +54,11 @@ public class WeatherController {
 				text = text.replace("\n", " ");
 				_buttonCenterWeather.setText(text);
 
-				Drawable drawable = _context.getResources()
-						.getDrawable(WeatherConverter.GetIconId(currentWeather.GetDescription()));
+				Drawable drawable = _context.getResources().getDrawable(currentWeather.GetCondition().GetIcon());
 				drawable.setBounds(0, 0, 30, 30);
 				_buttonCenterWeather.setCompoundDrawablesRelative(drawable, null, null, null);
+
+				_imageViewWeatherCondition.setImageResource(currentWeather.GetCondition().GetWallpaper());
 			} else {
 				_logger.Warn("currentWeather is null!");
 			}
@@ -87,6 +89,7 @@ public class WeatherController {
 				_broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_CURRENT_WEATHER);
 			}
 		});
+		_imageViewWeatherCondition = (ImageView) ((Activity) _context).findViewById(R.id.imageViewWeatherCondition);
 	}
 
 	public void onResume() {

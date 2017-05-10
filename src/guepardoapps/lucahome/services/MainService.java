@@ -932,9 +932,9 @@ public class MainService extends Service {
 					_broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MAP_CONTENT_VIEW,
 							new String[] { Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST,
 									Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU,
-									Bundles.MOTION_CAMERA_DTO },
+									Bundles.LISTED_MENU, Bundles.MOTION_CAMERA_DTO },
 							new Object[] { _mapContentList, _wirelessSocketList, _scheduleList, _timerList,
-									_temperatureList, _shoppingList, _menu, _motionCameraDto });
+									_temperatureList, _shoppingList, _menu, _listedMenu, _motionCameraDto });
 
 					sendSocketsToWear();
 
