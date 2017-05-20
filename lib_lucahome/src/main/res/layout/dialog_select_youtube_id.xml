@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@xml/shape_rounded"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Select youtube id"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/TextIcon"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/dialog_enter_youtube_search_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25"
+            android:background="@xml/button_blank"
+            android:contentDescription="@string/contentDescription"
+            android:src="@android:drawable/ic_menu_search" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="10dp"
+        android:background="@color/TextIcon" />
+
+    <EditText
+        android:id="@+id/dialog_enter_youtube_id_editText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:textColor="@color/TextIcon" />
+
+    <Spinner
+        android:id="@+id/dialog_select_youtube_predefined_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <Spinner
+        android:id="@+id/dialog_select_youtube_played_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+
+    <CheckBox
+        android:id="@+id/dialog_select_youtube_play_on_all_mirror"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play on all mirror"
+        android:textColor="@color/TextIcon" />
+
+    <Button
+        android:id="@+id/dialog_select_youtube_play"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@xml/button_blank_white"
+        android:text="@string/play"
+        android:textColor="@color/TextIcon" />
+
+</LinearLayout>

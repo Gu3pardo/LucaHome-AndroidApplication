@@ -1,0 +1,44 @@
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+    }
+    compileSdkVersion 25
+    buildToolsVersion "25.0.3"
+    defaultConfig {
+        applicationId "guepardoapps.lucahome"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 30000
+        versionName "3.0.0.170521"
+        multiDexEnabled true
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    aaptOptions {
+        cruncherEnabled = false
+    }
+    compileOptions.encoding = 'windows-1251'
+}
+
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'com.android.support:multidex:1.0.1'
+    compile 'com.google.android.support:wearable:2.0.2'
+    provided 'com.google.android.wearable:wearable:2.0.2'
+    compile 'com.google.android.gms:play-services-wearable:10.2.6'
+    compile 'com.github.GrenderG:Toasty:1.2.5'
+    compile 'com.github.matecode:Snacky:1.0.2'
+    compile project(':lib_openweather')
+    compile project(':lib_toolset')
+    compile project(':lib_lucahome')
+}

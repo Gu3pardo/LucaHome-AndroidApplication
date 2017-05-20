@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@xml/shape_rounded"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/dialog_map_mediamirror_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MediaMirror"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/TextIcon" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="5dp"
+        android:background="@color/TextIcon" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@color/DarkPrimary"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/dialog_map_mediamirror_area"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/example"
+            android:textColor="@color/TextIcon" />
+
+        <TextView
+            android:id="@+id/dialog_map_mediamirror_code"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/example"
+            android:textColor="@color/TextIcon" />
+
+        <TextView
+            android:id="@+id/dialog_map_mediamirror_ip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:text="@string/example"
+            android:textColor="@color/TextIcon" />
+    </LinearLayout>
+
+    <Switch
+        android:id="@+id/dialog_map_mediamirror_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:textOff="@string/off"
+        android:textOn="@string/on"
+        android:thumb="@xml/customswitchselector"
+        android:track="@xml/custom_track" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@color/DarkPrimary"
+        android:orientation="vertical"
+        android:padding="5dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:gravity="start"
+            android:text="Video and volume actions"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/TextIcon" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_margin="5dp"
+            android:background="@color/TextIcon" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_play"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="Play"
+                android:textColor="@color/TextIcon" />
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_pause"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="Pause"
+                android:textColor="@color/TextIcon" />
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_stop"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="Stop"
+                android:textColor="@color/TextIcon" />
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_vol_increase"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="35dp"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="+"
+                android:textColor="@color/TextIcon" />
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_vol_decrease"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="5dp"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="-"
+                android:textColor="@color/TextIcon" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dialog_map_mediamirror_sleep_linearlayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_sleep_start"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="3dp"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="Start Sleep"
+                android:textColor="@color/TextIcon" />
+
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_sleep_stop"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="3dp"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="Sleep stop"
+                android:textColor="@color/TextIcon" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dialog_map_mediamirror_button_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@xml/button_blank_white"
+        android:text="@string/close"
+        android:textColor="@color/TextIcon" />
+
+</LinearLayout>

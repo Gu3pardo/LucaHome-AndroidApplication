@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/TextIcon"
+    android:padding="5dp" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/DarkPrimary"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Notifications"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="2dp"
+                android:background="@color/TextIcon" />
+
+            <Switch
+                android:id="@+id/switch_display_socket_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/set_display_socket_notification"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/TextIcon"
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@xml/customswitchselector"
+                android:track="@xml/custom_track" />
+
+            <Switch
+                android:id="@+id/switch_display_weather_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/set_display_weather_notification"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/TextIcon"
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@xml/customswitchselector"
+                android:track="@xml/custom_track" />
+
+            <Switch
+                android:id="@+id/switch_display_temperature_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/set_display_temperature_notification"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/TextIcon"
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@xml/customswitchselector"
+                android:track="@xml/custom_track" />
+
+            <Switch
+                android:id="@+id/switch_display_birthday_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/set_display_birthday_notification"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/TextIcon"
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@xml/customswitchselector"
+                android:track="@xml/custom_track" />
+
+            <Switch
+                android:id="@+id/switch_display_sleep_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/set_display_sleep_notification"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/TextIcon"
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@xml/customswitchselector"
+                android:track="@xml/custom_track" />
+
+            <Switch
+                android:id="@+id/switch_display_camera_notification"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/set_display_camera_notification"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/TextIcon"
+                android:textOff="OFF"
+                android:textOn="ON"
+                android:textStyle="bold"
+                android:thumb="@xml/customswitchselector"
+                android:track="@xml/custom_track" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/DarkPrimary"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Media applications"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="2dp"
+                android:background="@color/TextIcon" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/startOtherApps"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/TextIcon" />
+
+            <CheckBox
+                android:id="@+id/startAudioAppCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="5dp"
+                android:button="@null"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:text="@string/startAudioApp"
+                android:textColor="@color/TextIcon" />
+
+            <CheckBox
+                android:id="@+id/startOsmcAppCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="5dp"
+                android:button="@null"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:text="@string/startOsmcApp"
+                android:textColor="@color/TextIcon" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/DarkPrimary"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Beacons"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="2dp"
+                android:background="@color/TextIcon" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/useBeacons"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="@color/TextIcon" />
+
+            <CheckBox
+                android:id="@+id/startBeaconsCheckbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="5dp"
+                android:button="@null"
+                android:drawableEnd="?android:attr/listChoiceIndicatorMultiple"
+                android:text="@string/activateBeacons"
+                android:textColor="@color/TextIcon" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/DarkPrimary"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="Saved actions"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="2dp"
+                android:background="@color/TextIcon" />
+
+            <ListView
+                android:id="@+id/storedActionListView"
+                android:layout_width="match_parent"
+                android:layout_height="150dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="2dp"
+                android:background="@color/TextIcon" />
+
+            <Button
+                android:id="@+id/btnDeleteDatabaseEntries"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="2dp"
+                android:background="@xml/button_blank_white"
+                android:text="Delete saved actions."
+                android:textColor="@color/TextIcon" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/notificationSocketLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/DarkPrimary"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:padding="5dp"
+                android:text="@string/set_socket_notification_visibility"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

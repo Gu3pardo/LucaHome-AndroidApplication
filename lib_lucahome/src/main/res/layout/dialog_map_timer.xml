@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@xml/shape_rounded"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/dialog_map_timer_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/example"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/TextIcon" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_margin="10dp"
+        android:background="@color/TextIcon" />
+
+    <TextView
+        android:id="@+id/dialog_map_timer_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/time_example"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/TextIcon"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dialog_map_timer_weekday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/time_example"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/TextIcon"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dialog_map_timer_socket"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/time_example"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/TextIcon"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dialog_map_timer_action"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/time_example"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/TextIcon"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dialog_map_timer_playsound"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:text="@string/time_example"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/TextIcon"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/dialog_map_timer_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@xml/selector_state"
+        android:text="@string/delete"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/TextIcon"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/dialog_map_timer_button_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@xml/button_blank_white"
+        android:text="@string/close"
+        android:textColor="@color/TextIcon" />
+
+</LinearLayout>

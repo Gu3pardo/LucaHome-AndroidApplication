@@ -1,0 +1,101 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="125dp"
+    android:background="@color/TextIcon">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="5dp"
+        android:background="@color/Background"
+        android:padding="2dp">
+
+        <ImageView
+            android:id="@+id/shopping_item_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:contentDescription="@string/contentDescription"
+            android:src="@drawable/shopping" />
+
+        <CheckBox
+            android:id="@+id/shopping_checkbox_bought"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignStart="@+id/shopping_item_image"
+            android:layout_alignTop="@+id/shopping_item_image" />
+
+        <TextView
+            android:id="@+id/shopping_item_border"
+            android:layout_width="1dp"
+            android:layout_height="105dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/shopping_item_image"
+            android:background="@color/TextIcon" />
+
+        <TextView
+            android:id="@+id/shopping_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_toEndOf="@+id/shopping_item_border"
+            android:padding="5dp"
+            android:text="@string/example"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/TextIcon"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/shopping_button_quantity"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/shopping_item_name"
+            android:layout_margin="5dp"
+            android:layout_toEndOf="@+id/shopping_item_border"
+            android:background="@xml/button_blank_white"
+            android:text="@string/minusOne"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/TextIcon"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/shopping_button_increase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/shopping_item_name"
+            android:layout_margin="10dp"
+            android:layout_toEndOf="@+id/shopping_button_quantity"
+            android:background="@xml/button_blank_white"
+            android:contentDescription="@string/contentDescription"
+            android:src="@android:drawable/arrow_up_float" />
+
+        <ImageButton
+            android:id="@+id/shopping_button_decrease"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/shopping_button_increase"
+            android:layout_margin="10dp"
+            android:layout_toEndOf="@+id/shopping_button_quantity"
+            android:background="@xml/button_blank_white"
+            android:contentDescription="@string/contentDescription"
+            android:src="@android:drawable/arrow_down_float" />
+
+        <ImageButton
+            android:id="@+id/shopping_button_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="5dp"
+            android:background="@xml/button_blank_white"
+            android:contentDescription="@string/contentDescription"
+            android:padding="5dp"
+            android:src="@android:drawable/ic_menu_close_clear_cancel" />
+    </RelativeLayout>
+
+</RelativeLayout>

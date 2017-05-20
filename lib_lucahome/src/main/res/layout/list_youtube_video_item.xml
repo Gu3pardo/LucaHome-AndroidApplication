@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="125dp"
+    android:background="@color/TextIcon">
+
+    <RelativeLayout
+        android:id="@+id/youtube_video_background"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="5dp"
+        android:background="@color/Background"
+        android:padding="2dp">
+
+        <TextView
+            android:id="@+id/youtube_video_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="5dp"
+            android:layout_toStartOf="@+id/youtube_video_id"
+            android:clickable="true"
+            android:text="@string/example"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/TextIcon"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/youtube_video_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:text="@string/example"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/TextIcon" />
+
+        <TextView
+            android:id="@+id/youtube_video_description"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/youtube_video_title"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:text="@string/example"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/TextIcon" />
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,62 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+
+    package="guepardoapps.library.lucahome" >
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application 
+        android:allowBackup="false"
+        android:label="@string/app_name"
+        android:supportsRtl="true" >
+
+        <receiver
+            android:name="guepardoapps.library.lucahome.receiver.notifications.CameraReceiver"
+            android:enabled="true"
+            android:exported="false" >
+        </receiver>
+        <receiver
+            android:name="guepardoapps.library.lucahome.receiver.notifications.HeatingReceiver"
+            android:enabled="true"
+            android:exported="false" >
+        </receiver>
+        <receiver
+            android:name="guepardoapps.library.lucahome.receiver.notifications.SocketActionReceiver"
+            android:enabled="true"
+            android:exported="false" >
+        </receiver>
+        <receiver
+            android:name="guepardoapps.library.lucahome.receiver.notifications.StopSoundReceiver"
+            android:enabled="true"
+            android:exported="false" >
+        </receiver>
+
+        <service
+            android:name="guepardoapps.library.lucahome.services.RESTService"
+            android:enabled="true" />
+        <service
+            android:name="guepardoapps.library.lucahome.services.sockets.SocketActionService"
+            android:enabled="true" />
+        <service android:name="guepardoapps.library.lucahome.services.wearcontrol.PhoneMessageListenerService" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+            </intent-filter>
+        </service>
+        <service
+            android:name="guepardoapps.library.lucahome.services.wearcontrol.WearMessageService"
+            android:enabled="true" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+    </application>
+
+</manifest>

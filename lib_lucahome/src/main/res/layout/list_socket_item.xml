@@ -1,0 +1,88 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="100dp"
+    android:background="@color/TextIcon">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="5dp"
+        android:background="@color/Background"
+        android:padding="2dp">
+
+        <ImageView
+            android:id="@+id/socket_item_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="10dp"
+            android:contentDescription="@string/contentDescription"
+            android:src="@drawable/socket" />
+
+        <TextView
+            android:id="@+id/socket_item_border"
+            android:layout_width="1dp"
+            android:layout_height="fill_parent"
+            android:layout_marginBottom="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/socket_item_image"
+            android:background="@color/TextIcon" />
+
+        <Button
+            android:id="@+id/socket_item_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/socket_item_border"
+            android:layout_toStartOf="@+id/socket_item_switch"
+            android:background="@xml/button_blank"
+            android:gravity="center_vertical|start"
+            android:text="@string/socket_example"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/TextIcon"
+            android:textStyle="bold" />
+
+        <Switch
+            android:id="@+id/socket_item_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="5dp"
+            android:textOff="@string/off"
+            android:textOn="@string/on"
+            android:thumb="@xml/customswitchselector"
+            android:track="@xml/custom_track" />
+
+        <TextView
+            android:id="@+id/socket_item_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/socket_item_border"
+            android:gravity="center_vertical|start"
+            android:paddingEnd="5dp"
+            android:paddingStart="5dp"
+            android:text="@string/example"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/TextIcon" />
+
+        <TextView
+            android:id="@+id/socket_item_area"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/socket_item_code"
+            android:gravity="center_vertical|start"
+            android:paddingEnd="5dp"
+            android:paddingStart="5dp"
+            android:text="@string/example"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/TextIcon" />
+    </RelativeLayout>
+
+</RelativeLayout>
