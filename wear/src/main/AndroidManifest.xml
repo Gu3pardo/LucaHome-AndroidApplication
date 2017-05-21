@@ -1,7 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="guepardoapps.lucahome">
 
-    <uses-feature android:name="android.hardware.type.watch" />
+    <uses-feature
+        android:name="android.hardware.type.watch"
+        android:required="true" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
@@ -9,9 +11,9 @@
     <uses-permission android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
@@ -36,7 +38,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.DeviceDefault">
+        android:theme="@style/AppTheme">
         <activity
             android:name="guepardoapps.lucahome.views.MainView"
             android:label="@string/app_name">
@@ -49,10 +51,8 @@
         <activity android:name="guepardoapps.lucahome.views.BirthdayView" />
         <activity android:name="guepardoapps.lucahome.views.MediaMirrorView" />
         <activity android:name="guepardoapps.lucahome.views.MenuView" />
-        <activity android:name="guepardoapps.lucahome.views.ScheduleView" />
         <activity android:name="guepardoapps.lucahome.views.ShoppingListView" />
         <activity android:name="guepardoapps.lucahome.views.SocketView" />
-        <activity android:name="guepardoapps.lucahome.views.TimerView" />
 
         <service
             android:name="guepardoapps.lucahome.services.PhoneMessageService"

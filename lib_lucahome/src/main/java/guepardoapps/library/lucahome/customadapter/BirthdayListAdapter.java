@@ -70,6 +70,7 @@ public class BirthdayListAdapter extends BaseAdapter {
 
     private class Holder {
         private ImageView _image;
+        private TextView _border;
         private TextView _age;
         private TextView _date;
         private Button _name;
@@ -88,6 +89,14 @@ public class BirthdayListAdapter extends BaseAdapter {
             rowView.setBackgroundColor(Color.BIRTHDAY_BACKGROUND);
             new ParticleSystem((Activity) _context, 150, R.drawable.particle, 1250)
                     .setSpeedRange(0.2f, 0.5f).oneShot(rowView, 150);
+        }
+
+        if (_isOnWear) {
+            holder._image.setVisibility(View.GONE);
+
+
+            holder._border = (TextView) rowView.findViewById(R.id.birthday_item_border);
+            holder._border.setVisibility(View.GONE);
         }
 
         holder._age = (TextView) rowView.findViewById(R.id.birthday_item_age);

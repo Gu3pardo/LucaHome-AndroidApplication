@@ -34,13 +34,10 @@ public class MainView extends Activity {
         logger.Debug(MainView.class.getName() + " onCreate");
 
         _viewItemList.add(new MainListViewItemDto(R.drawable.socket, TargetActivity.SOCKET.GetName()));
-        _viewItemList.add(new MainListViewItemDto(R.drawable.scheduler, TargetActivity.SCHEDULE.GetName()));
-        _viewItemList.add(new MainListViewItemDto(R.drawable.timer, TargetActivity.TIMER.GetName()));
         _viewItemList.add(new MainListViewItemDto(R.drawable.ic_launcher, TargetActivity.MEDIA_MIRROR.GetName()));
         _viewItemList.add(new MainListViewItemDto(R.drawable.birthday, TargetActivity.BIRTHDAYS.GetName()));
         _viewItemList.add(new MainListViewItemDto(R.drawable.shopping, TargetActivity.SHOPPING_LIST.GetName()));
         _viewItemList.add(new MainListViewItemDto(R.drawable.menu, TargetActivity.MENU.GetName()));
-        //_viewItemList.add(new MainListViewItemDto(R.xml.circle_blue, TargetActivity.GRAVITY.GetName()));
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.basicListWatchViewStub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {

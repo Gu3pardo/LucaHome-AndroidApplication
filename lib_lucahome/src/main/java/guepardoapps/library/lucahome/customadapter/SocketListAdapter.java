@@ -12,6 +12,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -84,6 +85,8 @@ public class SocketListAdapter extends BaseAdapter {
     }
 
     private class Holder {
+        private ImageView _imageView;
+        private TextView _border;
         private Button _name;
         private TextView _code;
         private TextView _area;
@@ -95,6 +98,14 @@ public class SocketListAdapter extends BaseAdapter {
     public View getView(final int index, View convertView, ViewGroup parent) {
         Holder holder = new Holder();
         View rowView = _inflater.inflate(R.layout.list_socket_item, null);
+
+        if (_isOnWear) {
+            holder._imageView = (ImageView) rowView.findViewById(R.id.socket_item_image);
+            holder._imageView.setVisibility(View.GONE);
+
+            holder._border = (TextView) rowView.findViewById(R.id.socket_item_border);
+            holder._border.setVisibility(View.GONE);
+        }
 
         holder._name = (Button) rowView.findViewById(R.id.socket_item_name);
         holder._name.setText(_socketList.getValue(index).GetName());

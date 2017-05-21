@@ -6,9 +6,7 @@ import guepardoapps.lucahome.views.*;
 
 public enum TargetActivity implements Serializable {
 	
-	SOCKET("Sockets", SocketView.class), 
-	SCHEDULE("Schedules", ScheduleView.class), 
-	TIMER("Timer", TimerView.class), 
+	SOCKET("Sockets", SocketView.class),
 	BIRTHDAYS("Birthdays", BirthdayView.class), 
 	SHOPPING_LIST("ShoppingList", ShoppingListView.class),
 	MEDIA_MIRROR("MediaMirror", MediaMirrorView.class),

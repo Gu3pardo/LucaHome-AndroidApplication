@@ -109,6 +109,7 @@ public class ShoppingListAdapter extends BaseAdapter {
 
     private class Holder {
         private ImageView _image;
+        private TextView _border;
         private TextView _name;
         private Button _quantity;
         private ImageButton _increase;
@@ -128,6 +129,13 @@ public class ShoppingListAdapter extends BaseAdapter {
 
         holder._image = (ImageView) rowView.findViewById(R.id.shopping_item_image);
         holder._image.setImageResource(entry.GetGroup().GetDrawable());
+
+        if (_isOnWear) {
+            holder._image.setVisibility(View.GONE);
+
+            holder._border = (TextView) rowView.findViewById(R.id.shopping_item_border);
+            holder._border.setVisibility(View.GONE);
+        }
 
         holder._name = (TextView) rowView.findViewById(R.id.shopping_item_name);
         holder._name.setText(entry.GetName());

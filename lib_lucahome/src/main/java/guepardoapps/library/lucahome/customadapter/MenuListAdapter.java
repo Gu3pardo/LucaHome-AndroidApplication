@@ -13,6 +13,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.library.lucahome.R;
@@ -45,13 +47,36 @@ public class MenuListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public MenuListAdapter(@NonNull Context context, @NonNull SerializableList<MenuDto> menu,
+    public MenuListAdapter(@NonNull Context context,
+                           @NonNull SerializableList<MenuDto> menu,
                            SerializableList<ListedMenuDto> listedMenu,
-                           boolean isOnMediaMirror, boolean isOnWatch) {
+                           boolean isOnMediaMirror,
+                           boolean isOnWatch) {
         _logger = new LucaHomeLogger(TAG);
 
+        int dayOfMonth = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        int startIndex = -1;
+        for (int index = 0; index < menu.getSize(); index++) {
+            if (menu.getValue(index).GetDay() == dayOfMonth) {
+                startIndex = index;
+                break;
+            }
+        }
         _menu = menu;
         _listedMenu = listedMenu;
+
+        if (startIndex != -1) {
+            SerializableList<MenuDto> sortedList = new SerializableList<>();
+            int selectedIndex = startIndex;
+            for (int index = 0; index < menu.getSize(); index++) {
+                if (selectedIndex >= menu.getSize()) {
+                    selectedIndex = selectedIndex - menu.getSize();
+                }
+                sortedList.addValue(menu.getValue(selectedIndex));
+                selectedIndex++;
+            }
+            _menu = sortedList;
+        }
 
         _isOnMediaMirror = isOnMediaMirror;
         _isOnWatch = isOnWatch;
@@ -96,14 +121,12 @@ public class MenuListAdapter extends BaseAdapter {
         Holder holder = new Holder();
         View rowView = _inflater.inflate(R.layout.list_menu_item, null);
 
-        holder._image = (ImageView) rowView.findViewById(R.id.menu_item_image);
         if (_isOnWatch) {
+            holder._image = (ImageView) rowView.findViewById(R.id.menu_item_image);
             holder._image.setVisibility(View.GONE);
             holder._image.setEnabled(false);
-        }
 
-        holder._border = (TextView) rowView.findViewById(R.id.menu_item_border);
-        if (_isOnWatch) {
+            holder._border = (TextView) rowView.findViewById(R.id.menu_item_border);
             holder._border.setVisibility(View.GONE);
             holder._border.setEnabled(false);
         }

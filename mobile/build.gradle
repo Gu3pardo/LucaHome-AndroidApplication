@@ -9,8 +9,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 30001
-        versionName "3.0.1.170521"
+        versionCode 30002
+        versionName "3.0.2.170521"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
