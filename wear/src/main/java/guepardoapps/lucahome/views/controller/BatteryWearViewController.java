@@ -12,6 +12,7 @@ import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toolset.common.Tools;
 
+import guepardoapps.library.toolset.controller.DisplayController;
 import guepardoapps.lucahome.common.constants.CanvasConstants;
 
 @SuppressWarnings("deprecation")
@@ -29,9 +30,9 @@ public class BatteryWearViewController {
         _logger = new LucaHomeLogger(TAG);
 
         _context = context;
-        _tools = new Tools(_context);
+        _tools = new Tools();
 
-        _display = _tools.GetDisplayDimension();
+        _display = new DisplayController(_context).GetDisplayDimension();
     }
 
     public void onDestroy() {

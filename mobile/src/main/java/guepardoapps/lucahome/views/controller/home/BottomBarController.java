@@ -9,6 +9,9 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+import com.mikepenz.aboutlibraries.Libs;
+import com.mikepenz.aboutlibraries.LibsBuilder;
+
 import guepardoapps.library.lucahome.common.dto.UserDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
@@ -81,18 +84,18 @@ public class BottomBarController {
                 _navigationService.NavigateTo(InformationView.class, true);
             }
         });
+    }
 
-        Button buttonChanges = (Button) ((Activity) _context).findViewById(R.id.buttonChanges);
-        buttonChanges.setOnClickListener(new OnClickListener() {
+    private void initializeImageButton() {
+        _logger.Debug("initializeImageButton");
+
+        ImageButton imageButtonChanges = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonChanges);
+        imageButtonChanges.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _navigationService.NavigateTo(ChangeView.class, true);
             }
         });
-    }
-
-    private void initializeImageButton() {
-        _logger.Debug("initializeImageButton");
 
         ImageButton imageButtonUser = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonUser);
         imageButtonUser.setOnClickListener(new OnClickListener() {
@@ -108,6 +111,16 @@ public class BottomBarController {
             @Override
             public void onClick(View view) {
                 _navigationService.NavigateTo(SettingsView.class, true);
+            }
+        });
+
+        ImageButton imageButtonAbout = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonAbout);
+        imageButtonAbout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new LibsBuilder()
+                        .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                        .start(_context);
             }
         });
     }

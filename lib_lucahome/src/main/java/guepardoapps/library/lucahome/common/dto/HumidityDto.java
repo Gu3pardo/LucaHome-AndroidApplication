@@ -1,6 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import guepardoapps.library.toolset.common.classes.SerializableTime;
 
@@ -27,7 +28,7 @@ public class HumidityDto implements Serializable {
 	}
 
 	public String GetHumidityString() {
-		return String.valueOf(_humidity).substring(0, 6) + "%";
+		return String.format(Locale.GERMAN, "%.2f%%", _humidity);
 	}
 
 	public String GetArea() {

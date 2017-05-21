@@ -18,8 +18,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.baoyz.widget.PullRefreshLayout;
+
 import java.util.Locale;
 
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.MovieDto;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -32,8 +36,6 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
 
 public class MovieView extends AppCompatActivity {
 
@@ -43,6 +45,7 @@ public class MovieView extends AppCompatActivity {
     private boolean _isInitialized;
 
     private CollapsingToolbarLayout _collapsingToolbar;
+    private PullRefreshLayout _pullRefreshLayout;
 
     private ProgressBar _progressBar;
     private ListView _listView;
@@ -81,18 +84,18 @@ public class MovieView extends AppCompatActivity {
                 }
 
                 _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.VISIBLE);
 
                 _collapsingToolbar.setTitle(String.format(Locale.GERMAN, " %d movies", list.getSize()));
             } else {
                 _logger.Warn("movieList is null!");
 
                 _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.GONE);
                 _noDataFallback.setVisibility(View.VISIBLE);
 
                 _collapsingToolbar.setTitle(String.format(Locale.GERMAN, " %d movies", 0));
             }
+
+            _pullRefreshLayout.setRefreshing(false);
         }
     };
 
@@ -114,6 +117,15 @@ public class MovieView extends AppCompatActivity {
         _collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.skeletonList_collapsing);
         _collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(_context, R.color.TextIcon));
         _collapsingToolbar.setCollapsedTitleTextColor(android.graphics.Color.argb(0, 0, 0, 0));
+
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                _logger.Debug("onRefresh " + TAG);
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MOVIE);
+            }
+        });
 
         _listView = (ListView) findViewById(R.id.skeletonList_listView);
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);

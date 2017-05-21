@@ -28,6 +28,8 @@ import android.widget.Toast;
 
 import es.dmoral.toasty.Toasty;
 
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.IDs;
@@ -47,8 +49,6 @@ import guepardoapps.library.toolset.controller.NetworkController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
 
 public class SecurityView extends Activity {
 

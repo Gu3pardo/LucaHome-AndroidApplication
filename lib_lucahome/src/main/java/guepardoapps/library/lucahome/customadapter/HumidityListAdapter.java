@@ -51,15 +51,16 @@ public class HumidityListAdapter extends BaseAdapter {
     public View getView(final int index, View convertView, ViewGroup parent) {
         Holder holder = new Holder();
         View rowView = _inflater.inflate(R.layout.list_humidity_item, null);
+        HumidityDto entry = _humidityList.getValue(index);
 
         holder._value = (TextView) rowView.findViewById(R.id.humidity_item_value);
-        holder._value.setText(_humidityList.getValue(index).GetHumidityString());
+        holder._value.setText(entry.GetHumidityString());
 
         holder._area = (TextView) rowView.findViewById(R.id.humidity_item_area);
-        holder._area.setText(_humidityList.getValue(index).GetArea());
+        holder._area.setText(entry.GetArea());
 
         holder._lastUpdate = (TextView) rowView.findViewById(R.id.humidity_item_lastUpdate);
-        holder._lastUpdate.setText(_humidityList.getValue(index).GetLastUpdate().toString());
+        holder._lastUpdate.setText(entry.GetLastUpdate().toString());
 
         return rowView;
     }

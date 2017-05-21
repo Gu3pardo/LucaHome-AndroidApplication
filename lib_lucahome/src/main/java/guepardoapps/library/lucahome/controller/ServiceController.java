@@ -4,15 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.constants.IDs;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.UserDto;
 import guepardoapps.library.lucahome.common.enums.LucaObject;
 import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.library.lucahome.services.*;
+import guepardoapps.library.lucahome.services.RESTService;
 import guepardoapps.library.lucahome.services.helper.UserService;
 import guepardoapps.library.lucahome.services.wearcontrol.WearMessageService;
 
@@ -22,20 +19,19 @@ public class ServiceController {
     private LucaHomeLogger _logger;
 
     private Context _context;
-
-    private LucaNotificationController _lucaNotificationController;
     private UserService _userService;
 
     public ServiceController(Context context) {
         _logger = new LucaHomeLogger(TAG);
 
         _context = context;
-
-        _lucaNotificationController = new LucaNotificationController(_context);
         _userService = new UserService(_context);
     }
 
-    public void StartRestService(String name, String action, String broadcast, LucaObject lucaObject,
+    public void StartRestService(String name,
+                                 String action,
+                                 String broadcast,
+                                 LucaObject lucaObject,
                                  RaspberrySelection raspberrySelection) {
         UserDto loggedInUser = _userService.LoadUser();
         if (loggedInUser != null) {
@@ -47,8 +43,13 @@ public class ServiceController {
         }
     }
 
-    public void StartRestService(String user, String password, String name, String action, String broadcast,
-                                 LucaObject lucaObject, RaspberrySelection raspberrySelection) {
+    public void StartRestService(String user,
+                                 String password,
+                                 String name,
+                                 String action,
+                                 String broadcast,
+                                 LucaObject lucaObject,
+                                 RaspberrySelection raspberrySelection) {
         Intent serviceIntent = new Intent(_context, RESTService.class);
         Bundle serviceData = new Bundle();
 
@@ -63,13 +64,6 @@ public class ServiceController {
 
         serviceIntent.putExtras(serviceData);
         _context.startService(serviceIntent);
-    }
-
-    public void StopSound() {
-        StartRestService(TAG, ServerActions.STOP_SOUND, Broadcasts.STOP_SOUND, LucaObject.SOUND,
-                RaspberrySelection.BOTH);
-        _lucaNotificationController.CloseNotification(IDs.NOTIFICATION_SONG + RaspberrySelection.RASPBERRY_1.GetInt());
-        _lucaNotificationController.CloseNotification(IDs.NOTIFICATION_SONG + RaspberrySelection.RASPBERRY_2.GetInt());
     }
 
     public void SendMessageToWear(String message) {

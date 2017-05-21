@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/lib_lucahome/src/main/java/guepardoapps/library/lucahome/common/dto/TemperatureDto.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/lib_lucahome/src/main/java/guepardoapps/library/lucahome/controller/MapContentController.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/lib_lucahome/src/main/java/guepardoapps/library/lucahome/converter/wear/MessageToRaspberryConverter.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/lib_lucahome/src/main/java/guepardoapps/library/lucahome/converter/wear/MessageToWeatherConverter.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/common/model/ForecastModel.java" charset="ISO-8859-1" />
+    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/common/model/ForecastWeatherModel.java" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/common/model/WeatherModel.java" charset="windows-1251" />
+    <file url="PROJECT" charset="windows-1251" />
+  </component>
+</project>

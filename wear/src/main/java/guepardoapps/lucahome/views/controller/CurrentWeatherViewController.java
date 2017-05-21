@@ -15,6 +15,7 @@ import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.openweather.common.enums.WeatherCondition;
 
 import guepardoapps.library.toolset.common.Tools;
+import guepardoapps.library.toolset.controller.DisplayController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.common.constants.CanvasConstants;
@@ -50,9 +51,9 @@ public class CurrentWeatherViewController {
         _receiverController = new ReceiverController(context);
         _receiverController.RegisterReceiver(_currentWeatherReceiver,
                 new String[]{Broadcasts.UPDATE_CURRENT_WEATHER});
-        _tools = new Tools(context);
+        _tools = new Tools();
 
-        _display = _tools.GetDisplayDimension();
+        _display = new DisplayController(context).GetDisplayDimension();
 
         _currentWeather = new WeatherModelDto(-273.15, WeatherCondition.NULL, null, null, null);
     }

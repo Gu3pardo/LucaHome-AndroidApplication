@@ -81,7 +81,7 @@ public class MediaMirrorController {
 
     public void Dispose() {
         _logger.Debug("Dispose");
-        _receiverController.UnregisterReceiver(_clientTaskResponseReceiver);
+        _receiverController.Dispose();
         _initialized = false;
     }
 

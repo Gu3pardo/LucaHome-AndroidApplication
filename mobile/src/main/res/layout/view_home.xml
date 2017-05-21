@@ -418,31 +418,26 @@
             android:id="@+id/buttonVersionInformation"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/imageButtonUser"
-            android:layout_alignTop="@+id/imageButtonUser"
+            android:layout_alignBottom="@+id/imageButtonChanges"
+            android:layout_alignParentStart="true"
+            android:layout_alignTop="@+id/imageButtonChanges"
             android:layout_centerVertical="true"
             android:layout_margin="3dp"
-            android:layout_toStartOf="@+id/buttonChanges"
             android:background="@xml/button_blank_white"
             android:text="@string/example"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/TextIcon"
-            android:textStyle="bold" />
+            android:textColor="@color/TextIcon" />
 
-        <Button
-            android:id="@+id/buttonChanges"
+        <ImageButton
+            android:id="@+id/imageButtonChanges"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/imageButtonUser"
-            android:layout_alignTop="@+id/imageButtonUser"
             android:layout_centerVertical="true"
             android:layout_margin="3dp"
             android:layout_toStartOf="@+id/imageButtonUser"
             android:background="@xml/button_blank_white"
-            android:text="@string/change"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/TextIcon"
-            android:textStyle="bold" />
+            android:contentDescription="@string/contentDescription"
+            android:src="@android:drawable/ic_menu_recent_history" />
 
         <ImageButton
             android:id="@+id/imageButtonUser"
@@ -459,12 +454,23 @@
             android:id="@+id/imageButtonSettings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_margin="3dp"
+            android:layout_toStartOf="@+id/imageButtonAbout"
+            android:background="@xml/button_blank_white"
+            android:contentDescription="@string/contentDescription"
+            android:src="@android:drawable/ic_menu_preferences" />
+
+        <ImageButton
+            android:id="@+id/imageButtonAbout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:layout_margin="3dp"
             android:background="@xml/button_blank_white"
             android:contentDescription="@string/contentDescription"
-            android:src="@android:drawable/ic_menu_preferences" />
+            android:src="@android:drawable/ic_menu_info_details" />
     </RelativeLayout>
 
 </RelativeLayout>

@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -20,9 +21,15 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.baoyz.widget.PullRefreshLayout;
+import com.synnapps.carouselview.CarouselView;
+import com.synnapps.carouselview.ImageListener;
+
 import java.util.Locale;
 
-import guepardoapps.library.lucahome.common.dto.*;
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
@@ -34,8 +41,6 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
 
 public class SocketView extends AppCompatActivity {
 
@@ -45,6 +50,7 @@ public class SocketView extends AppCompatActivity {
     private boolean _isInitialized;
 
     private CollapsingToolbarLayout _collapsingToolbar;
+    private PullRefreshLayout _pullRefreshLayout;
 
     private ProgressBar _progressBar;
     private ListView _listView;
@@ -56,6 +62,16 @@ public class SocketView extends AppCompatActivity {
     private LucaDialogController _dialogController;
     private NavigationService _navigationService;
     private ReceiverController _receiverController;
+
+    private Class<?>[] _activities = {null, ScheduleView.class, TimerView.class};
+    private int[] _images = {R.drawable.main_image_sockets, R.drawable.main_image_schedule, R.drawable.main_image_timer};
+    private static final int _startImageIndex = 0;
+    private ImageListener _imageListener = new ImageListener() {
+        @Override
+        public void setImageForPosition(int position, ImageView imageView) {
+            imageView.setImageResource(_images[position]);
+        }
+    };
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
@@ -77,7 +93,6 @@ public class SocketView extends AppCompatActivity {
                 _listView.setAdapter(new SocketListAdapter(_context, list, false, null));
 
                 _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.VISIBLE);
 
                 if (list.getSize() > 0) {
                     _noDataFallback.setVisibility(View.GONE);
@@ -87,13 +102,15 @@ public class SocketView extends AppCompatActivity {
 
                 _collapsingToolbar.setTitle(String.format(Locale.GERMAN, "%d sockets", list.getSize()));
             }
+
+            _pullRefreshLayout.setRefreshing(false);
         }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_skeleton_nested_list);
+        setContentView(R.layout.view_skeleton_nested_list_carousel);
 
         _logger = new LucaHomeLogger(TAG);
         _logger.Debug("onCreate");
@@ -109,12 +126,45 @@ public class SocketView extends AppCompatActivity {
         _collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(_context, R.color.TextIcon));
         _collapsingToolbar.setCollapsedTitleTextColor(Color.argb(0, 0, 0, 0));
 
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                _logger.Debug("onRefresh " + TAG);
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_SOCKETS);
+            }
+        });
+
         _listView = (ListView) findViewById(R.id.skeletonList_listView);
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);
         _noDataFallback = (TextView) findViewById(R.id.skeletonList_fallBackTextView);
 
-        ImageView mainBackground = (ImageView) findViewById(R.id.skeletonList_backdrop);
-        mainBackground.setImageResource(R.drawable.main_image_sockets);
+        CarouselView carouselView = (CarouselView) findViewById(R.id.skeletonList_carouselView);
+        carouselView.setPageCount(_images.length);
+        carouselView.setCurrentItem(_startImageIndex);
+        carouselView.setImageListener(_imageListener);
+        carouselView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                _logger.Info(String.format(Locale.GERMAN,
+                        "onPageScrolled at position %d with positionOffset %f and positionOffsetPixels %d",
+                        position, positionOffset, positionOffsetPixels));
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                _logger.Info(String.format(Locale.GERMAN, "onPageSelected at position %d", position));
+                Class<?> targetActivity = _activities[position];
+                if (targetActivity != null) {
+                    _navigationService.NavigateTo(targetActivity, true);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                _logger.Info(String.format(Locale.GERMAN, "onPageScrollStateChanged at state %d", state));
+            }
+        });
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);
         buttonAdd.setOnClickListener(new OnClickListener() {
@@ -132,9 +182,12 @@ public class SocketView extends AppCompatActivity {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
-                _isInitialized = true;
+                if (_dialogController == null) {
+                    _dialogController = new LucaDialogController(_context);
+                }
                 _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_SOCKET});
                 _getDataRunnable.run();
+                _isInitialized = true;
             }
         }
     }
@@ -142,6 +195,10 @@ public class SocketView extends AppCompatActivity {
     @Override
     public void onPause() {
         _logger.Debug("onPause");
+        if (_dialogController != null) {
+            _dialogController.Dispose();
+            _dialogController = null;
+        }
         _receiverController.Dispose();
         _isInitialized = false;
         super.onPause();
@@ -150,6 +207,10 @@ public class SocketView extends AppCompatActivity {
     @Override
     public void onDestroy() {
         _logger.Debug("onDestroy");
+        if (_dialogController != null) {
+            _dialogController.Dispose();
+            _dialogController = null;
+        }
         _receiverController.Dispose();
         _isInitialized = false;
         super.onDestroy();

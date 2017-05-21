@@ -34,6 +34,7 @@ import guepardoapps.library.openweather.common.enums.WeatherCondition;
 
 import guepardoapps.library.toolset.common.Tools;
 import guepardoapps.library.toolset.common.classes.SerializableTime;
+import guepardoapps.library.toolset.controller.DisplayController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
@@ -73,6 +74,7 @@ public class WatchFaceService extends CanvasWatchFaceService {
         private Bitmap _launcherBitmap;
 
         private Context _context;
+        private DisplayController _displayController;
         private Tools _tools;
 
         private int _textColor = 0xFFFFFFFF;
@@ -149,8 +151,9 @@ public class WatchFaceService extends CanvasWatchFaceService {
             _logger.Debug("onCreate");
 
             _context = WatchFaceService.this;
-            _tools = new Tools(_context);
-            _display = _tools.GetDisplayDimension();
+            _displayController = new DisplayController(_context);
+            _tools = new Tools();
+            _display = _displayController.GetDisplayDimension();
 
             startService(new Intent(_context, WearMessageListenerService.class));
 

@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -21,11 +22,16 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baoyz.widget.PullRefreshLayout;
+import com.synnapps.carouselview.CarouselView;
+import com.synnapps.carouselview.ImageListener;
+
 import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.ShoppingEntryDto;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -38,7 +44,6 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Bundles;
 
 public class ShoppingListView extends AppCompatActivity {
 
@@ -49,6 +54,7 @@ public class ShoppingListView extends AppCompatActivity {
     private SerializableList<ShoppingEntryDto> _shoppingList;
 
     private CollapsingToolbarLayout _collapsingToolbar;
+    private PullRefreshLayout _pullRefreshLayout;
 
     private ProgressBar _progressBar;
     private ListView _listView;
@@ -60,6 +66,16 @@ public class ShoppingListView extends AppCompatActivity {
     private LucaDialogController _dialogController;
     private NavigationService _navigationService;
     private ReceiverController _receiverController;
+
+    private Class<?>[] _activities = {MenuView.class, null};
+    private int[] _images = {R.drawable.main_image_menu, R.drawable.main_image_shopping};
+    private static final int _startImageIndex = 1;
+    private ImageListener _imageListener = new ImageListener() {
+        @Override
+        public void setImageForPosition(int position, ImageView imageView) {
+            imageView.setImageResource(_images[position]);
+        }
+    };
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
@@ -90,28 +106,25 @@ public class ShoppingListView extends AppCompatActivity {
                 }
 
                 _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.VISIBLE);
 
                 _collapsingToolbar.setTitle(String.format(Locale.GERMAN, " %d entries", list.getSize()));
             } else {
                 _logger.Warn("shoppingList is null!");
 
                 _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.GONE);
                 _noDataFallback.setVisibility(View.VISIBLE);
 
                 _collapsingToolbar.setTitle(String.format(Locale.GERMAN, " %d entries", 0));
             }
 
-            _progressBar.setVisibility(View.GONE);
-            _listView.setVisibility(View.VISIBLE);
+            _pullRefreshLayout.setRefreshing(false);
         }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_skeleton_nested_list);
+        setContentView(R.layout.view_skeleton_nested_list_carousel);
 
         _logger = new LucaHomeLogger(TAG);
         _logger.Debug("onCreate");
@@ -127,12 +140,45 @@ public class ShoppingListView extends AppCompatActivity {
         _collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(_context, R.color.TextIcon));
         _collapsingToolbar.setCollapsedTitleTextColor(android.graphics.Color.argb(0, 0, 0, 0));
 
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                _logger.Debug("onRefresh " + TAG);
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_SHOPPING_LIST);
+            }
+        });
+
         _listView = (ListView) findViewById(R.id.skeletonList_listView);
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);
         _noDataFallback = (TextView) findViewById(R.id.skeletonList_fallBackTextView);
 
-        ImageView mainBackground = (ImageView) findViewById(R.id.skeletonList_backdrop);
-        mainBackground.setImageResource(R.drawable.main_image_shopping);
+        CarouselView carouselView = (CarouselView) findViewById(R.id.skeletonList_carouselView);
+        carouselView.setPageCount(_images.length);
+        carouselView.setCurrentItem(_startImageIndex);
+        carouselView.setImageListener(_imageListener);
+        carouselView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                _logger.Info(String.format(Locale.GERMAN,
+                        "onPageScrolled at position %d with positionOffset %f and positionOffsetPixels %d",
+                        position, positionOffset, positionOffsetPixels));
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                _logger.Info(String.format(Locale.GERMAN, "onPageSelected at position %d", position));
+                Class<?> targetActivity = _activities[position];
+                if (targetActivity != null) {
+                    _navigationService.NavigateTo(targetActivity, true);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                _logger.Info(String.format(Locale.GERMAN, "onPageScrollStateChanged at state %d", state));
+            }
+        });
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);
         buttonAdd.setOnClickListener(new OnClickListener() {
@@ -199,8 +245,7 @@ public class ShoppingListView extends AppCompatActivity {
                 Toasty.warning(_context, "Nothing to share!", Toast.LENGTH_LONG).show();
             }
         } else if (id == R.id.buttonReload) {
-            _broadcastController.SendSimpleBroadcast(
-                    guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_SHOPPING_LIST);
+            _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_SHOPPING_LIST);
         }
 
         return super.onOptionsItemSelected(item);

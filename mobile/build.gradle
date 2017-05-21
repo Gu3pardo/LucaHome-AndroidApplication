@@ -9,8 +9,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 30000
-        versionName "3.0.0.170521"
+        versionCode 30001
+        versionName "3.0.1.170521"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -46,6 +46,11 @@ dependencies {
     compile 'com.google.android.gms:play-services-wearable:10.2.6'
     compile 'com.github.GrenderG:Toasty:1.2.5'
     compile 'com.github.matecode:Snacky:1.0.2'
+    compile 'com.baoyz.pullrefreshlayout:library:1.2.0'
+    compile 'com.synnapps:carouselview:0.1.4'
+    compile('com.mikepenz:aboutlibraries:5.9.6@aar') {
+        transitive = true
+    }
     testCompile 'junit:junit:4.12'
     compile project(':lib_openweather')
     compile project(':lib_toolset')

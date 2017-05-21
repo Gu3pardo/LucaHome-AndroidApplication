@@ -15,6 +15,8 @@ import android.widget.Toast;
 
 import es.dmoral.toasty.Toasty;
 
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
@@ -47,7 +49,6 @@ import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.library.toolset.scheduler.ScheduleService;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.*;
 import guepardoapps.lucahome.views.BirthdayView;
 import guepardoapps.lucahome.views.SecurityView;
 import guepardoapps.lucahome.views.SensorTemperatureView;
@@ -148,25 +149,6 @@ public class MainService extends Service {
                     .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
                 _context.startService(new Intent(_context, OpenWeatherService.class));
             }
-        }
-    };
-
-    private Runnable _downloadIsSoundPlayingRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadIsSoundPlayingRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                return;
-            }
-
-            startDownloadIsSoundPlaying();
         }
     };
 
@@ -956,54 +938,6 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _soundDownloadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_soundDownloadReceiver onReceive");
-            String[] isPlayingStringArray = intent.getStringArrayExtra(TAG);
-
-            if (isPlayingStringArray != null) {
-                if (isPlayingStringArray[0] != null) {
-                    _logger.Debug(isPlayingStringArray[0]);
-                    String[] data = isPlayingStringArray[0].split("\\};");
-
-                    String isPlayingString = data[0].replace("{IsPlaying:", "").replace("};", "");
-                    if (isPlayingString.contains("1")) {
-                        if (data.length == 4) {
-                            String playingFile = data[1].replace("{PlayingFile:", "").replace("};", "");
-                            int raspberry = Integer.parseInt(data[3].replace("{Raspberry:", "").replace("};", ""));
-                            _notificationController.CreateSoundNotification(playingFile,
-                                    RaspberrySelection.GetById(raspberry).toString(),
-                                    IDs.NOTIFICATION_SONG + raspberry);
-                        } else {
-                            _logger.Warn("data has wrong size!");
-                        }
-                    }
-                }
-
-                if (isPlayingStringArray.length > 1) {
-                    if (isPlayingStringArray[1] != null) {
-                        _logger.Debug(isPlayingStringArray[1]);
-                        String[] data = isPlayingStringArray[1].split("\\};");
-
-                        String isPlayingString = data[0].replace("{IsPlaying:", "").replace("};", "");
-                        if (isPlayingString.contains("1")) {
-                            if (data.length == 4) {
-                                String playingFile = data[1].replace("{PlayingFile:", "").replace("};", "");
-                                int raspberry = Integer.parseInt(data[3].replace("{Raspberry:", "").replace("};", ""));
-                                _notificationController.CreateSoundNotification(playingFile,
-                                        RaspberrySelection.GetById(raspberry).toString(),
-                                        IDs.NOTIFICATION_SONG + raspberry);
-                            } else {
-                                _logger.Warn("data has wrong size!");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    };
-
     private BroadcastReceiver _temperatureDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1585,7 +1519,6 @@ public class MainService extends Service {
                 new String[]{Broadcasts.DOWNLOAD_SCHEDULE_FINISHED});
         _receiverController.RegisterReceiver(_socketDownloadReceiver,
                 new String[]{Broadcasts.DOWNLOAD_SOCKET_FINISHED});
-        _receiverController.RegisterReceiver(_soundDownloadReceiver, new String[]{Broadcasts.IS_SOUND_PLAYING});
         _receiverController.RegisterReceiver(_temperatureDownloadReceiver,
                 new String[]{Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED});
         _receiverController.RegisterReceiver(_weatherModelReceiver,
@@ -1631,7 +1564,6 @@ public class MainService extends Service {
         _scheduleService.AddSchedule("UpdateBirthday", _downloadBirthdayRunnable, 4 * 60 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateForecast", _downloadCurrentWeatherRunnable, 15 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateForecast", _downloadForecastWeatherRunnable, 30 * 60 * 1000, true);
-        _scheduleService.AddSchedule("UpdateIsSoundPlaying", _downloadIsSoundPlayingRunnable, 5 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateMediaMirror", _downloadMediaMirrorRunnable, 5 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateMenu", _downloadMenuRunnable, 3 * 60 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateListedMenu", _downloadListedMenuRunnable, 3 * 60 * 60 * 1000, true);
@@ -1702,7 +1634,6 @@ public class MainService extends Service {
         startDownloadMotionCameraDto();
         startDownloadMovie();
         startDownloadSocket();
-        startDownloadIsSoundPlaying();
         startDownloadTemperature();
         startDownloadShoppingList();
     }
@@ -1863,12 +1794,6 @@ public class MainService extends Service {
         _logger.Debug("startDownloadSocket");
         _serviceController.StartRestService(Bundles.SOCKET_DOWNLOAD, ServerActions.GET_SOCKETS,
                 Broadcasts.DOWNLOAD_SOCKET_FINISHED, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadIsSoundPlaying() {
-        _logger.Debug("startDownloadIsSoundPlaying");
-        _serviceController.StartRestService(TAG, ServerActions.IS_SOUND_PLAYING, Broadcasts.IS_SOUND_PLAYING,
-                LucaObject.SOUND, RaspberrySelection.BOTH);
     }
 
     private void startDownloadTemperature() {

@@ -1092,10 +1092,10 @@ public class LucaDialogController extends DialogController {
                 _serviceController.StartRestService(socket.GetName(), socket.GetCommandSet(true),
                         Broadcasts.RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
 
-                if (_timerPlaySound && socket.GetName().contains("Sound")) {
+                /*if (_timerPlaySound && socket.GetName().contains("Sound")) {
                     SoundController soundController = new SoundController(_context);
                     soundController.StartSound("ALARM", _timerPlayRaspberry);
-                }
+                }*/
 
                 TimerDto newTimer = new TimerDto(_timerName, socket, weekday, _timerTime, false, _timerPlaySound,
                         _timerPlayRaspberry, true);
@@ -2121,12 +2121,7 @@ public class LucaDialogController extends DialogController {
 
     public void Dispose() {
         CloseDialogCallback.run();
-        if (_menuReceiver != null) {
-            _receiverController.UnregisterReceiver(_menuReceiver);
-        }
-        if (_shoppingListReceiver != null) {
-            _receiverController.UnregisterReceiver(_shoppingListReceiver);
-        }
+        _receiverController.Dispose();
         _mediaMirrorController.Dispose();
     }
 

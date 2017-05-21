@@ -58,12 +58,6 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true" />
 
-        <ListView
-            android:id="@+id/skeletonList.listView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="invisible" />
-
         <TextView
             android:id="@+id/skeletonList.fallBackTextView"
             android:layout_width="match_parent"
@@ -74,6 +68,18 @@
             android:text="@string/noData"
             android:textColor="@color/black"
             android:visibility="invisible" />
+
+        <com.baoyz.widget.PullRefreshLayout
+            android:id="@+id/skeletonList.pullRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@+id/skeletonList.listView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </com.baoyz.widget.PullRefreshLayout>
     </RelativeLayout>
 
     <android.support.design.widget.FloatingActionButton

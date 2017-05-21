@@ -27,7 +27,7 @@ public class StepViewController implements SensorEventListener {
     public StepViewController(Context context) {
         _logger = new LucaHomeLogger(TAG);
 
-        _tools = new Tools(context);
+        _tools = new Tools();
 
         _stepCount = 2130;
         _sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);

@@ -12,6 +12,7 @@ import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toolset.common.Tools;
+import guepardoapps.library.toolset.controller.DisplayController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.common.constants.CanvasConstants;
@@ -26,7 +27,6 @@ public class BatteryPhoneViewController {
     private Tools _tools;
 
     private Display _display;
-
     private String _batteryPhoneValue;
 
     private BroadcastReceiver _batteryPhoneReceiver = new BroadcastReceiver() {
@@ -45,9 +45,9 @@ public class BatteryPhoneViewController {
 
         _receiverController = new ReceiverController(context);
         _receiverController.RegisterReceiver(_batteryPhoneReceiver, new String[]{Broadcasts.UPDATE_PHONE_BATTERY});
-        _tools = new Tools(context);
+        _tools = new Tools();
 
-        _display = _tools.GetDisplayDimension();
+        _display = new DisplayController(context).GetDisplayDimension();
 
         _batteryPhoneValue = "94%";
     }

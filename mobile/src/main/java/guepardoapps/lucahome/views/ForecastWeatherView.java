@@ -17,8 +17,12 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.baoyz.widget.PullRefreshLayout;
+
 import java.util.List;
 
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.customadapter.*;
@@ -33,8 +37,6 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
 
 public class ForecastWeatherView extends AppCompatActivity {
 
@@ -42,6 +44,8 @@ public class ForecastWeatherView extends AppCompatActivity {
     private LucaHomeLogger _logger;
 
     private boolean _isInitialized;
+
+    private PullRefreshLayout _pullRefreshLayout;
 
     private ProgressBar _progressBar;
     private ListView _listView;
@@ -86,16 +90,16 @@ public class ForecastWeatherView extends AppCompatActivity {
 
                 _noDataFallback.setVisibility(View.GONE);
                 _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.VISIBLE);
             } else {
                 _logger.Warn("ForecastModel is null!");
 
                 _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.GONE);
                 _noDataFallback.setVisibility(View.VISIBLE);
 
                 _mainBackground.setImageResource(R.drawable.wallpaper);
             }
+
+            _pullRefreshLayout.setRefreshing(false);
         }
     };
 
@@ -116,6 +120,15 @@ public class ForecastWeatherView extends AppCompatActivity {
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.skeletonList_collapsing);
         collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(_context, R.color.TextIcon));
         collapsingToolbar.setCollapsedTitleTextColor(android.graphics.Color.argb(0, 0, 0, 0));
+
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                _logger.Debug("onRefresh " + TAG);
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_FORECAST_WEATHER);
+            }
+        });
 
         _listView = (ListView) findViewById(R.id.skeletonList_listView);
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Constants {
 	// ========== DOWNLOADS ==========
-	public static final int DOWNLOAD_STEPS = 15;
+	public static final int DOWNLOAD_STEPS = 14;
 	// ========== RASPBERRY CONNECTION ==========
 	public static final String[] SERVER_URLs = new String[] { "http://192.168.178.22" };
 	public static final String ACTION_PATH = "/lib/lucahome.php?user=";

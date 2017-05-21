@@ -5,19 +5,19 @@ Containing the shared library LucaHome, a wearable project and the main android 
 Android client to remotely control sockets, mediaserver, view temperature, share your shoppinglist, plan your menu and much more...
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/image001_2.png)
+![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_001.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/image002.png)
+![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_002.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/image003.png)
+![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_003.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/image004.png)
+![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_004.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/image005.png)
+![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_005.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/image006.png)
+![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_006.png)

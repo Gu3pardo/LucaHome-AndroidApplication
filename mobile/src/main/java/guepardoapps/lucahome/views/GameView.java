@@ -40,27 +40,6 @@ public class GameView extends Activity {
     private MediaMirrorController _mediaMirrorController;
     private NavigationService _navigationService;
 
-    private Spinner _selectServerSpinner;
-
-    private Button _buttonUp;
-    private Button _buttonLeft;
-    private Button _buttonRight;
-    private Button _buttonDown;
-    private Button _buttonRotate;
-
-    private Spinner _selectPongPlayerSpinner;
-    private Button _buttonPongPlay;
-    private Button _buttonPongRestart;
-    private Button _buttonPongStop;
-    private Button _buttonPongPause;
-    private Button _buttonPongResume;
-
-    private Button _buttonSnakePlay;
-    private Button _buttonSnakeStop;
-
-    private Button _buttonTetrisPlay;
-    private Button _buttonTetrisStop;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,7 +98,7 @@ public class GameView extends Activity {
     private void initializeSpinner() {
         _logger.Debug("initializeSpinner");
 
-        _selectServerSpinner = (Spinner) findViewById(R.id.selectServerSpinner);
+        Spinner selectServerSpinner = (Spinner) findViewById(R.id.selectServerSpinner);
         final ArrayList<String> serverLocations = new ArrayList<>();
         for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
             if (entry.GetId() > 0) {
@@ -129,8 +108,8 @@ public class GameView extends Activity {
         ArrayAdapter<String> serverDataAdapter = new ArrayAdapter<>(_context,
                 android.R.layout.simple_spinner_item, serverLocations);
         serverDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _selectServerSpinner.setAdapter(serverDataAdapter);
-        _selectServerSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+        selectServerSpinner.setAdapter(serverDataAdapter);
+        selectServerSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedLocation = serverLocations.get(position);
@@ -151,8 +130,8 @@ public class GameView extends Activity {
     private void initializeButtonControl() {
         _logger.Debug("initializeButtonControl");
 
-        _buttonLeft = (Button) findViewById(R.id.buttonLeft);
-        _buttonLeft.setOnClickListener(new OnClickListener() {
+        Button buttonLeft = (Button) findViewById(R.id.buttonLeft);
+        buttonLeft.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 String data;
@@ -164,8 +143,8 @@ public class GameView extends Activity {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(), data);
             }
         });
-        _buttonRight = (Button) findViewById(R.id.buttonRight);
-        _buttonRight.setOnClickListener(new OnClickListener() {
+        Button buttonRight = (Button) findViewById(R.id.buttonRight);
+        buttonRight.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 String data;
@@ -177,23 +156,23 @@ public class GameView extends Activity {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(), data);
             }
         });
-        _buttonUp = (Button) findViewById(R.id.buttonUp);
-        _buttonUp.setOnClickListener(new OnClickListener() {
+        Button buttonUp = (Button) findViewById(R.id.buttonUp);
+        buttonUp.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(), Constants.DIR_UP);
             }
         });
-        _buttonDown = (Button) findViewById(R.id.buttonDown);
-        _buttonDown.setOnClickListener(new OnClickListener() {
+        Button buttonDown = (Button) findViewById(R.id.buttonDown);
+        buttonDown.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(),
                         Constants.DIR_DOWN);
             }
         });
-        _buttonRotate = (Button) findViewById(R.id.buttonRotate);
-        _buttonRotate.setOnClickListener(new OnClickListener() {
+        Button buttonRotate = (Button) findViewById(R.id.buttonRotate);
+        buttonRotate.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_COMMAND.toString(),
@@ -205,12 +184,12 @@ public class GameView extends Activity {
     private void initializeButtonPong() {
         _logger.Debug("initializeButtonPong");
 
-        _selectPongPlayerSpinner = (Spinner) findViewById(R.id.selectPongPlayerSpinner);
+        Spinner selectPongPlayerSpinner = (Spinner) findViewById(R.id.selectPongPlayerSpinner);
         ArrayAdapter<String> serverDataAdapter = new ArrayAdapter<>(_context,
                 android.R.layout.simple_spinner_item, Constants.MEDIAMIRROR_PLAYER);
         serverDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _selectPongPlayerSpinner.setAdapter(serverDataAdapter);
-        _selectPongPlayerSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+        selectPongPlayerSpinner.setAdapter(serverDataAdapter);
+        selectPongPlayerSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 _selectedPongPlayer = parent.getItemAtPosition(position).toString();
@@ -221,39 +200,39 @@ public class GameView extends Activity {
             }
         });
 
-        _buttonPongPlay = (Button) findViewById(R.id.buttonPongPlay);
-        _buttonPongPlay.setOnClickListener(new OnClickListener() {
+        Button buttonPongPlay = (Button) findViewById(R.id.buttonPongPlay);
+        buttonPongPlay.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _pongIsRunning = true;
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_PONG_START.toString(), "");
             }
         });
-        _buttonPongRestart = (Button) findViewById(R.id.buttonPongRestart);
-        _buttonPongRestart.setOnClickListener(new OnClickListener() {
+        Button buttonPongRestart = (Button) findViewById(R.id.buttonPongRestart);
+        buttonPongRestart.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_PONG_RESTART.toString(), "");
             }
         });
-        _buttonPongStop = (Button) findViewById(R.id.buttonPongStop);
-        _buttonPongStop.setOnClickListener(new OnClickListener() {
+        Button buttonPongStop = (Button) findViewById(R.id.buttonPongStop);
+        buttonPongStop.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _pongIsRunning = false;
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_PONG_STOP.toString(), "");
             }
         });
-        _buttonPongPause = (Button) findViewById(R.id.buttonPongPause);
-        _buttonPongPause.setOnClickListener(new OnClickListener() {
+        Button buttonPongPause = (Button) findViewById(R.id.buttonPongPause);
+        buttonPongPause.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _pongIsRunning = false;
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_PONG_PAUSE.toString(), "");
             }
         });
-        _buttonPongResume = (Button) findViewById(R.id.buttonPongResume);
-        _buttonPongResume.setOnClickListener(new OnClickListener() {
+        Button buttonPongResume = (Button) findViewById(R.id.buttonPongResume);
+        buttonPongResume.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _pongIsRunning = true;
@@ -265,15 +244,15 @@ public class GameView extends Activity {
     private void initializeButtonSnake() {
         _logger.Debug("initializeButtonSnake");
 
-        _buttonSnakePlay = (Button) findViewById(R.id.buttonSnakePlay);
-        _buttonSnakePlay.setOnClickListener(new OnClickListener() {
+        Button buttonSnakePlay = (Button) findViewById(R.id.buttonSnakePlay);
+        buttonSnakePlay.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_SNAKE_START.toString(), "");
             }
         });
-        _buttonSnakeStop = (Button) findViewById(R.id.buttonSnakeStop);
-        _buttonSnakeStop.setOnClickListener(new OnClickListener() {
+        Button buttonSnakeStop = (Button) findViewById(R.id.buttonSnakeStop);
+        buttonSnakeStop.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_SNAKE_STOP.toString(), "");
@@ -284,15 +263,15 @@ public class GameView extends Activity {
     private void initializeButtonTetris() {
         _logger.Debug("initializeButtonTetris");
 
-        _buttonTetrisPlay = (Button) findViewById(R.id.buttonTetrisPlay);
-        _buttonTetrisPlay.setOnClickListener(new OnClickListener() {
+        Button buttonTetrisPlay = (Button) findViewById(R.id.buttonTetrisPlay);
+        buttonTetrisPlay.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_TETRIS_START.toString(), "");
             }
         });
-        _buttonTetrisStop = (Button) findViewById(R.id.buttonTetrisStop);
-        _buttonTetrisStop.setOnClickListener(new OnClickListener() {
+        Button buttonTetrisStop = (Button) findViewById(R.id.buttonTetrisStop);
+        buttonTetrisStop.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 _mediaMirrorController.SendCommand(_selectedIp, ServerAction.GAME_TETRIS_STOP.toString(), "");

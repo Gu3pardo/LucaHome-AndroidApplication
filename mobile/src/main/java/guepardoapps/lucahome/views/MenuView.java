@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -17,6 +18,14 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.baoyz.widget.PullRefreshLayout;
+import com.synnapps.carouselview.CarouselView;
+import com.synnapps.carouselview.ImageListener;
+
+import java.util.Locale;
+
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.ListedMenuDto;
 import guepardoapps.library.lucahome.common.dto.MenuDto;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
@@ -29,8 +38,6 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
 
 public class MenuView extends AppCompatActivity {
 
@@ -42,6 +49,8 @@ public class MenuView extends AppCompatActivity {
     private SerializableList<MenuDto> _menu;
     private SerializableList<ListedMenuDto> _listedMenu;
 
+    private PullRefreshLayout _pullRefreshLayout;
+
     private ProgressBar _progressBar;
     private ListView _listView;
 
@@ -52,6 +61,16 @@ public class MenuView extends AppCompatActivity {
     private BroadcastController _broadcastController;
     private NavigationService _navigationService;
     private ReceiverController _receiverController;
+
+    private Class<?>[] _activities = {null, ShoppingListView.class};
+    private int[] _images = {R.drawable.main_image_menu, R.drawable.main_image_shopping};
+    private static final int _startImageIndex = 0;
+    private ImageListener _imageListener = new ImageListener() {
+        @Override
+        public void setImageForPosition(int position, ImageView imageView) {
+            imageView.setImageResource(_images[position]);
+        }
+    };
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
@@ -71,13 +90,10 @@ public class MenuView extends AppCompatActivity {
 
             if (list != null) {
                 _listedMenu = list;
-
                 if (_menu != null) {
                     _listAdapter = new MenuListAdapter(_context, _menu, _listedMenu, false, false);
                     _listView.setAdapter(_listAdapter);
-
                     _progressBar.setVisibility(View.GONE);
-                    _listView.setVisibility(View.VISIBLE);
                 } else {
                     _logger.Warn("_menu is currently null!");
                 }
@@ -95,24 +111,23 @@ public class MenuView extends AppCompatActivity {
 
             if (list != null) {
                 _menu = list;
-
                 if (_listedMenu != null) {
                     _listAdapter = new MenuListAdapter(_context, _menu, _listedMenu, false, false);
                     _listView.setAdapter(_listAdapter);
-
                     _progressBar.setVisibility(View.GONE);
-                    _listView.setVisibility(View.VISIBLE);
                 } else {
                     _logger.Warn("_listedMenu is currently null!");
                 }
             }
+
+            _pullRefreshLayout.setRefreshing(false);
         }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_skeleton_nested_list);
+        setContentView(R.layout.view_skeleton_nested_list_carousel);
 
         _logger = new LucaHomeLogger(TAG);
         _logger.Debug("onCreate");
@@ -128,11 +143,45 @@ public class MenuView extends AppCompatActivity {
         collapsingToolbar.setCollapsedTitleTextColor(android.graphics.Color.argb(0, 0, 0, 0));
         collapsingToolbar.setTitle("Menu");
 
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                _logger.Debug("onRefresh " + TAG);
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MENU);
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_LISTED_MENU);
+            }
+        });
+
         _listView = (ListView) findViewById(R.id.skeletonList_listView);
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);
 
-        ImageView mainBackground = (ImageView) findViewById(R.id.skeletonList_backdrop);
-        mainBackground.setImageResource(R.drawable.main_image_menu);
+        CarouselView carouselView = (CarouselView) findViewById(R.id.skeletonList_carouselView);
+        carouselView.setPageCount(_images.length);
+        carouselView.setCurrentItem(_startImageIndex);
+        carouselView.setImageListener(_imageListener);
+        carouselView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                _logger.Info(String.format(Locale.GERMAN,
+                        "onPageScrolled at position %d with positionOffset %f and positionOffsetPixels %d",
+                        position, positionOffset, positionOffsetPixels));
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                _logger.Info(String.format(Locale.GERMAN, "onPageSelected at position %d", position));
+                Class<?> targetActivity = _activities[position];
+                if (targetActivity != null) {
+                    _navigationService.NavigateTo(targetActivity, true);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                _logger.Info(String.format(Locale.GERMAN, "onPageScrollStateChanged at state %d", state));
+            }
+        });
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);
         buttonAdd.setVisibility(View.GONE);

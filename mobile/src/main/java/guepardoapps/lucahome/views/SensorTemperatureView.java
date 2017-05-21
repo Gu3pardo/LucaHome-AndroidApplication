@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -24,8 +25,14 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.baoyz.widget.PullRefreshLayout;
+import com.synnapps.carouselview.CarouselView;
+import com.synnapps.carouselview.ImageListener;
+
 import es.dmoral.toasty.Toasty;
 
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.TemperatureDto;
 import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.enums.TemperatureType;
@@ -42,8 +49,6 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
 
 public class SensorTemperatureView extends AppCompatActivity implements SensorEventListener {
 
@@ -56,6 +61,8 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
     private WeatherModel _currentWeather;
     private SerializableList<TemperatureDto> _temperatureList;
 
+    private PullRefreshLayout _pullRefreshLayout;
+
     private ProgressBar _progressBar;
     private ListView _listView;
 
@@ -67,6 +74,16 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
     private LucaNotificationController _notificationController;
     private NavigationService _navigationService;
     private ReceiverController _receiverController;
+
+    private Class<?>[] _activities = {null, SensorHumidityView.class, SensorAirPressureView.class};
+    private int[] _images = {R.drawable.wallpaper, R.drawable.main_image_humidity, R.drawable.main_image_airpressure};
+    private static final int _startImageIndex = 0;
+    private ImageListener _imageListener = new ImageListener() {
+        @Override
+        public void setImageForPosition(int position, ImageView imageView) {
+            imageView.setImageResource(_images[position]);
+        }
+    };
 
     private SensorManager _sensorManager;
     private Sensor _sensor;
@@ -97,10 +114,10 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
             if (_temperatureList != null) {
                 _listAdapter = new TemperatureListAdapter(_context, _temperatureList);
                 _listView.setAdapter(_listAdapter);
-
                 _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.VISIBLE);
             }
+
+            _pullRefreshLayout.setRefreshing(false);
         }
     };
 
@@ -144,13 +161,15 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
                 _listAdapter = new TemperatureListAdapter(_context, _temperatureList);
                 _listView.setAdapter(_listAdapter);
             }
+
+            _pullRefreshLayout.setRefreshing(false);
         }
     };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_skeleton_nested_list);
+        setContentView(R.layout.view_skeleton_nested_list_carousel);
 
         _logger = new LucaHomeLogger(TAG);
         _logger.Debug("onCreate");
@@ -167,11 +186,49 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
         collapsingToolbar.setCollapsedTitleTextColor(android.graphics.Color.argb(0, 0, 0, 0));
         collapsingToolbar.setTitle("Temperature");
 
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                _logger.Debug("onRefresh " + TAG);
+                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+                        new String[]{Bundles.MAIN_SERVICE_ACTION},
+                        new Object[]{MainServiceAction.DOWNLOAD_TEMPERATURE});
+                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+                        new String[]{Bundles.MAIN_SERVICE_ACTION},
+                        new Object[]{MainServiceAction.DOWNLOAD_WEATHER_CURRENT});
+            }
+        });
+
         _listView = (ListView) findViewById(R.id.skeletonList_listView);
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);
 
-        ImageView mainBackground = (ImageView) findViewById(R.id.skeletonList_backdrop);
-        mainBackground.setImageResource(R.drawable.wallpaper);
+        CarouselView carouselView = (CarouselView) findViewById(R.id.skeletonList_carouselView);
+        carouselView.setPageCount(_images.length);
+        carouselView.setCurrentItem(_startImageIndex);
+        carouselView.setImageListener(_imageListener);
+        carouselView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                _logger.Info(String.format(Locale.GERMAN,
+                        "onPageScrolled at position %d with positionOffset %f and positionOffsetPixels %d",
+                        position, positionOffset, positionOffsetPixels));
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                _logger.Info(String.format(Locale.GERMAN, "onPageSelected at position %d", position));
+                Class<?> targetActivity = _activities[position];
+                if (targetActivity != null) {
+                    _navigationService.NavigateTo(targetActivity, true);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                _logger.Info(String.format(Locale.GERMAN, "onPageScrollStateChanged at state %d", state));
+            }
+        });
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);
         buttonAdd.setVisibility(View.GONE);

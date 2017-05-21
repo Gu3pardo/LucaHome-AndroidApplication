@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
@@ -31,8 +33,6 @@ import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.library.toolset.scheduler.ScheduleService;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.common.constants.Broadcasts;
-import guepardoapps.lucahome.common.constants.Bundles;
 import guepardoapps.lucahome.services.MainService;
 
 public class WIFIReceiver extends BroadcastReceiver {

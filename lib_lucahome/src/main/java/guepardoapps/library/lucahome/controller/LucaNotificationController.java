@@ -25,10 +25,10 @@ import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.receiver.notifications.CameraReceiver;
 import guepardoapps.library.lucahome.receiver.notifications.HeatingReceiver;
 import guepardoapps.library.lucahome.receiver.notifications.SocketActionReceiver;
-import guepardoapps.library.lucahome.receiver.notifications.StopSoundReceiver;
 
 import guepardoapps.library.openweather.common.model.WeatherModel;
 
+import guepardoapps.library.toolset.common.Tools;
 import guepardoapps.library.toolset.common.classes.SerializableList;
 import guepardoapps.library.toolset.controller.NotificationController;
 import guepardoapps.library.toolset.controller.SharedPrefController;
@@ -51,15 +51,20 @@ public class LucaNotificationController extends NotificationController {
 
     private Context _context;
     private SharedPrefController _sharedPrefController;
+    private Tools _tools;
 
     public LucaNotificationController(Context context) {
         super(context);
         _logger = new LucaHomeLogger(TAG);
         _context = context;
         _sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
+        _tools = new Tools();
     }
 
-    public void CreateBirthdayNotification(Class<?> birthdayActivity, int icon, String title, String body,
+    public void CreateBirthdayNotification(@NonNull Class<?> birthdayActivity,
+                                           int icon,
+                                           @NonNull String title,
+                                           @NonNull String body,
                                            boolean autoCancelable) {
         if (!_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION)) {
@@ -79,37 +84,6 @@ public class LucaNotificationController extends NotificationController {
 
         Notification notification = builder.build();
         notificationManager.notify(IDs.NOTIFICATION_BIRTHDAY, notification);
-    }
-
-    @SuppressWarnings("deprecation")
-    public void CreateSoundNotification(String soundFile, String raspberry, int id) {
-        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), R.drawable.sound_on);
-        NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender()
-                .setHintHideIcon(true).setBackground(bitmap);
-
-        Intent stopSoundIntent = new Intent(_context, StopSoundReceiver.class);
-        PendingIntent stopSoundPendingIntent = PendingIntent.getBroadcast(_context, 7452348, stopSoundIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Action wearAction = new NotificationCompat.Action.Builder(R.drawable.sound_on, "Stop",
-                stopSoundPendingIntent).build();
-
-        RemoteViews remoteViews = new RemoteViews(_context.getPackageName(), R.layout.notification_play_sound);
-        remoteViews.setTextViewText(R.id.notification_playsound_title, soundFile);
-        remoteViews.setOnClickPendingIntent(R.id.notification_playsound_stop, stopSoundPendingIntent);
-
-        remoteViews.setTextViewText(R.id.notification_playsound_raspberry, raspberry);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context);
-        builder.setSmallIcon(R.drawable.sound_on).setContentTitle("Sound is playing").setContentText("Stop Sound")
-                .setTicker("Stop Sound").extend(wearableExtender).addAction(wearAction);
-
-        Notification notification = builder.build();
-        notification.contentView = remoteViews;
-        notification.bigContentView = remoteViews;
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
-        notificationManager.notify(id, notification);
     }
 
     public void CreateTemperatureNotification(@NonNull Class<?> sensorTemperatureActivity,
@@ -144,6 +118,8 @@ public class LucaNotificationController extends NotificationController {
 
         String title = "Temperatures";
         String body = "";
+        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), currentWeather.GetCondition().GetWallpaper());
+        bitmap = _tools.GetCircleBitmap(bitmap);
 
         for (int index = 0; index < temperatureList.getSize(); index++) {
             body += temperatureList.getValue(index).GetArea() + ":"
@@ -157,15 +133,18 @@ public class LucaNotificationController extends NotificationController {
         NotificationManager notificationManager = (NotificationManager) _context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(_context);
-        // TODO add icon of weather for background
-        builder.setSmallIcon(R.drawable.temperature).setContentIntent(pendingIntent).setContentTitle(title)
-                .setContentText(body).setTicker(body);
+        builder.setSmallIcon(R.drawable.temperature)
+                .setLargeIcon(bitmap)
+                .setContentIntent(pendingIntent)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setTicker(body);
         Notification notification = builder.build();
         notificationManager.notify(IDs.NOTIFICATION_TEMPERATURE, notification);
     }
 
     @SuppressWarnings("deprecation")
-    public void CreateSocketNotification(SerializableList<WirelessSocketDto> wirelessSocketList) {
+    public void CreateSocketNotification(@NonNull SerializableList<WirelessSocketDto> wirelessSocketList) {
         if (!_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
             _logger.Warn("Not allowed to display socket notification!");
@@ -305,18 +284,19 @@ public class LucaNotificationController extends NotificationController {
         notificationManager.notify(IDs.NOTIFICATION_WEAR, notification);
     }
 
-    public void CreateForecastWeatherNotification(Class<?> receiverActivity, int icon, String title, String body,
+    public void CreateForecastWeatherNotification(@NonNull Class<?> receiverActivity,
+                                                  int icon,
+                                                  @NonNull String title,
+                                                  @NonNull String body,
                                                   int id) {
         NotificationManager notificationManager = (NotificationManager) _context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(_context);
         builder.setSmallIcon(icon).setContentTitle(title).setContentText(body).setTicker(body);
 
-        if (receiverActivity != null) {
-            Intent intent = new Intent(_context, receiverActivity);
-            PendingIntent pendingIntent = PendingIntent.getActivity(_context, id, intent, 0);
-            builder.setContentIntent(pendingIntent);
-        }
+        Intent intent = new Intent(_context, receiverActivity);
+        PendingIntent pendingIntent = PendingIntent.getActivity(_context, id, intent, 0);
+        builder.setContentIntent(pendingIntent);
 
         Notification notification = builder.build();
         notificationManager.notify(id, notification);

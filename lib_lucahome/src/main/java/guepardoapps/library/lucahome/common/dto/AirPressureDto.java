@@ -1,6 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import guepardoapps.library.toolset.common.classes.SerializableTime;
 
@@ -27,7 +28,7 @@ public class AirPressureDto implements Serializable {
     }
 
     public String GetAirPressureString() {
-        return String.valueOf(_airPressure).substring(0, 6) + "mbar";
+        return String.format(Locale.GERMAN, "%.2fmBar", _airPressure);
     }
 
     public String GetArea() {
