@@ -57,6 +57,7 @@ public class SocketView extends AppCompatActivity {
     private TextView _noDataFallback;
 
     private Context _context;
+    private SerializableList<WirelessSocketDto> _socketList;
 
     private BroadcastController _broadcastController;
     private LucaDialogController _dialogController;
@@ -90,7 +91,8 @@ public class SocketView extends AppCompatActivity {
                     .getSerializableExtra(Bundles.SOCKET_LIST);
 
             if (list != null) {
-                _listView.setAdapter(new SocketListAdapter(_context, list, false, null));
+                _socketList = list;
+                _listView.setAdapter(new SocketListAdapter(_context, _socketList, false, null));
 
                 _progressBar.setVisibility(View.GONE);
 
@@ -116,6 +118,7 @@ public class SocketView extends AppCompatActivity {
         _logger.Debug("onCreate");
 
         _context = this;
+        _socketList = new SerializableList<>();
 
         _broadcastController = new BroadcastController(_context);
         _dialogController = new LucaDialogController(_context);
@@ -171,7 +174,7 @@ public class SocketView extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 _logger.Debug("onClick buttonAdd");
-                _dialogController.ShowAddSocketDialog((Activity) _context, _getDataRunnable, null, true);
+                _dialogController.ShowAddSocketDialog(_socketList.getSize(), (Activity) _context, _getDataRunnable, null, true);
             }
         });
     }

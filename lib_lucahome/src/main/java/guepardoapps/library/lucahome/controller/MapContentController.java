@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.support.annotation.NonNull;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -31,7 +32,7 @@ public class MapContentController {
     private Context _context;
     private ServiceController _serviceController;
 
-    public MapContentController(Context context) {
+    public MapContentController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _context = context;
         _serviceController = new ServiceController(_context);
@@ -43,27 +44,32 @@ public class MapContentController {
                 LucaObject.MAP_CONTENT, RaspberrySelection.BOTH);
     }
 
-    public void AddMapContent(MapContentDto mapContent) {
+    public void AddMapContent(@NonNull MapContentDto mapContent) {
         _logger.Debug("AddMapContent");
         _serviceController.StartRestService(TAG, mapContent.GetCommandAdd(), Broadcasts.RELOAD_MAP_CONTENT,
                 LucaObject.MAP_CONTENT, RaspberrySelection.BOTH);
     }
 
-    public void UpdateMapContent(MapContentDto mapContent) {
+    public void UpdateMapContent(@NonNull MapContentDto mapContent) {
         _logger.Debug("UpdateMapContent");
         _serviceController.StartRestService(TAG, mapContent.GetCommandUpdate(), Broadcasts.RELOAD_MAP_CONTENT,
                 LucaObject.MAP_CONTENT, RaspberrySelection.BOTH);
     }
 
-    public void DeleteMapContent(MapContentDto mapContent) {
+    public void DeleteMapContent(@NonNull MapContentDto mapContent) {
         _logger.Debug("DeleteMapContent");
         _serviceController.StartRestService(TAG, mapContent.GetCommandDelete(), Broadcasts.RELOAD_MAP_CONTENT,
                 LucaObject.MAP_CONTENT, RaspberrySelection.BOTH);
     }
 
-    public TextView CreateEntry(final MapContentDto newMapContent, int[] clickPosition,
-                                SerializableList<WirelessSocketDto> wirelessSocketList, SerializableList<TemperatureDto> temperatureList,
-                                Point size, boolean rotated) {
+    public TextView CreateEntry(
+            @NonNull final MapContentDto newMapContent,
+            int[] clickPosition,
+            SerializableList<WirelessSocketDto> wirelessSocketList,
+            SerializableList<TemperatureDto> temperatureList,
+            @NonNull Point size,
+            boolean rotated) {
+
         final TextView newTextView = new TextView(_context);
         newTextView.setVisibility(newMapContent.IsVisible() ? View.VISIBLE : View.GONE);
 
@@ -103,7 +109,7 @@ public class MapContentController {
                     newTextView.setText(mediaMirrorSocket.GetShortName());
                     newTextView.setTextColor(Color.WHITE);
 
-                    if (mediaMirrorSocket.GetIsActivated()) {
+                    if (mediaMirrorSocket.IsActivated()) {
                         newTextView.setBackgroundResource(R.drawable.drawing_mediamirror_on);
                     } else {
                         newTextView.setBackgroundResource(R.drawable.drawing_mediamirror_off);
@@ -151,7 +157,7 @@ public class MapContentController {
                 }
 
                 if (socket != null) {
-                    if (socket.GetIsActivated()) {
+                    if (socket.IsActivated()) {
                         newTextView.setBackgroundResource(R.drawable.drawing_socket_on);
                     } else {
                         newTextView.setBackgroundResource(R.drawable.drawing_socket_off);

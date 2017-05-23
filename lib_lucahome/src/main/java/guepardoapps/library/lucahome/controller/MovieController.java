@@ -1,6 +1,7 @@
 package guepardoapps.library.lucahome.controller;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Packages;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
@@ -18,27 +19,23 @@ public class MovieController {
     private static final String TAG = MovieController.class.getSimpleName();
     private LucaHomeLogger _logger;
 
-    private Context _context;
-
     private ServiceController _serviceController;
     private SharedPrefController _sharedPrefController;
     private SocketController _socketController;
 
     private PackageService _packageService;
 
-    public MovieController(Context context) {
+    public MovieController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
 
-        _context = context;
+        _serviceController = new ServiceController(context);
+        _sharedPrefController = new SharedPrefController(context, SharedPrefConstants.SHARED_PREF_NAME);
+        _socketController = new SocketController(context);
 
-        _serviceController = new ServiceController(_context);
-        _sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
-        _socketController = new SocketController(_context);
-
-        _packageService = new PackageService(_context);
+        _packageService = new PackageService(context);
     }
 
-    public void StartMovie(MovieDto movie) {
+    public void StartMovie(@NonNull MovieDto movie) {
         _logger.Debug("Trying to start movie: " + movie.GetTitle());
 
         String action = ServerActions.START_MOVIE + movie.GetTitle();

@@ -1,6 +1,7 @@
 package guepardoapps.library.lucahome.controller;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
@@ -18,7 +19,7 @@ public class ScheduleController {
 
     private ServiceController _serviceController;
 
-    public ScheduleController(Context context) {
+    public ScheduleController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _serviceController = new ServiceController(context);
     }
@@ -29,20 +30,24 @@ public class ScheduleController {
                 Broadcasts.DOWNLOAD_SCHEDULE_FINISHED, LucaObject.SCHEDULE, RaspberrySelection.BOTH);
     }
 
-    public void SetSchedule(ScheduleDto schedule, boolean newState) {
+    public void SetSchedule(
+            @NonNull ScheduleDto schedule,
+            boolean newState) {
         _logger.Debug("SetSchedule: " + schedule.GetName() + " to " + String.valueOf(newState));
         _serviceController.StartRestService(schedule.GetName(), schedule.GetCommandSet(newState),
                 Broadcasts.RELOAD_SCHEDULE, LucaObject.SCHEDULE, RaspberrySelection.BOTH);
     }
 
-    public void SetSchedule(String scheduleName, boolean newState) {
+    public void SetSchedule(
+            @NonNull String scheduleName,
+            boolean newState) {
         _logger.Debug("SetSchedule: " + scheduleName + " to " + String.valueOf(newState));
         _serviceController.StartRestService(scheduleName,
                 ServerActions.SET_SCHEDULE + scheduleName + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF),
                 Broadcasts.RELOAD_SCHEDULE, LucaObject.SCHEDULE, RaspberrySelection.BOTH);
     }
 
-    public void DeleteSchedule(ScheduleDto schedule) {
+    public void DeleteSchedule(@NonNull ScheduleDto schedule) {
         _logger.Debug("DeleteSchedule");
         _serviceController.StartRestService(schedule.GetName(), schedule.GetCommandDelete(), Broadcasts.RELOAD_SCHEDULE,
                 LucaObject.SCHEDULE, RaspberrySelection.BOTH);

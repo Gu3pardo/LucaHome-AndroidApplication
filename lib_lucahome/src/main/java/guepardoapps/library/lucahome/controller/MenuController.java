@@ -24,7 +24,7 @@ public class MenuController {
     private BroadcastController _broadcastController;
     private ServiceController _serviceController;
 
-    public MenuController(Context context) {
+    public MenuController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
 
         _broadcastController = new BroadcastController(context);
@@ -160,7 +160,12 @@ public class MenuController {
         return menu;
     }
 
-    private MenuDto getMenuDto(@NonNull MenuDto menu, int year, int month, int dayOfMonth, int dayOfWeekDifference) {
+    private MenuDto getMenuDto(
+            @NonNull MenuDto menu,
+            int year,
+            int month,
+            int dayOfMonth,
+            int dayOfWeekDifference) {
         dayOfMonth += dayOfWeekDifference;
 
         switch (month - 1) {

@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class ActionDto implements Serializable {
@@ -14,7 +16,11 @@ public class ActionDto implements Serializable {
 
     private static final String TAG = ActionDto.class.getSimpleName();
 
-    public ActionDto(int id, String name, String action, String broadcast) {
+    public ActionDto(
+            int id,
+            @NonNull String name,
+            @NonNull String action,
+            @NonNull String broadcast) {
         _id = id;
 
         _name = name;
@@ -40,7 +46,9 @@ public class ActionDto implements Serializable {
 
     @Override
     public String toString() {
-        return "{" + TAG + ":{Id:" + String.valueOf(_id) + "};{Name:" + _name + "};{Action:" + _action + "};{Broadcast:"
-                + _broadcast + "};}";
+        return "{" + TAG + ":{Id:" + String.valueOf(_id)
+                + "};{Name:" + _name
+                + "};{Action:" + _action
+                + "};{Broadcast:" + _broadcast + "};}";
     }
 }

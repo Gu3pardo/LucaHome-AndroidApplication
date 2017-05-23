@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
 import guepardoapps.library.lucahome.common.constants.Bundles;
@@ -17,7 +18,6 @@ public class NotificationDetails implements Serializable {
 
     private static final long serialVersionUID = 5583702640190370633L;
 
-    @SuppressWarnings("unused")
     private static final String TAG = NotificationDetails.class.getSimpleName();
 
     private int _iconActive;
@@ -35,9 +35,16 @@ public class NotificationDetails implements Serializable {
 
     private Context _context;
 
-    public NotificationDetails(int iconActive, int iconDeActive, String textActive, String textDeActive,
-                               WirelessSocketDto socket, boolean iconIsVisible, int broadcastActiveCode, int broadcastDeActiveCode,
-                               Context context) {
+    public NotificationDetails(
+            int iconActive,
+            int iconDeActive,
+            @NonNull String textActive,
+            @NonNull String textDeActive,
+            @NonNull WirelessSocketDto socket,
+            boolean iconIsVisible,
+            int broadcastActiveCode,
+            int broadcastDeActiveCode,
+            @NonNull Context context) {
         _iconActive = iconActive;
         _iconDeActive = iconDeActive;
         _textActive = textActive;
@@ -74,7 +81,7 @@ public class NotificationDetails implements Serializable {
     }
 
     public boolean GetCurrentSocketState() {
-        return _socket.GetIsActivated();
+        return _socket.IsActivated();
     }
 
     public boolean GetIconIsVisible() {
@@ -106,7 +113,7 @@ public class NotificationDetails implements Serializable {
     public PendingIntent GetPendingIntent() {
         PendingIntent pendingIntent;
 
-        if (_socket.GetIsActivated()) {
+        if (_socket.IsActivated()) {
             pendingIntent = PendingIntent.getBroadcast(_context, _broadcastCodeActive, GetIntent(),
                     PendingIntent.FLAG_UPDATE_CURRENT);
         } else {
@@ -120,7 +127,7 @@ public class NotificationDetails implements Serializable {
     public NotificationCompat.Action GetWearableAction() {
         NotificationCompat.Action action;
 
-        if (_socket.GetIsActivated()) {
+        if (_socket.IsActivated()) {
             action = new NotificationCompat.Action.Builder(_iconActive, _textActive, GetPendingIntent()).build();
         } else {
             action = new NotificationCompat.Action.Builder(_iconDeActive, _textDeActive, GetPendingIntent()).build();
@@ -131,7 +138,15 @@ public class NotificationDetails implements Serializable {
 
     public String toString() {
         return String.format(Locale.GERMAN,
-                "{NotificationDetails: {IconActive: %d};{IconDeActive: %d};{TextActive: %s};{TextDeActive: %s};{Socket: %s};{IsVisible: %s};{BroadcastCodeActive: %s};{BroadcastCodeActive: %s}}",
-                _iconActive, _iconDeActive, _textActive, _textDeActive, _socket.GetName(), _iconIsVisible, _broadcastCodeActive, _broadcastCodeDeActive);
+                "{%s: {IconActive: %d};{IconDeActive: %d};{TextActive: %s};{TextDeActive: %s};{Socket: %s};{IsVisible: %s};{BroadcastCodeActive: %s};{BroadcastCodeActive: %s}}",
+                TAG,
+                _iconActive,
+                _iconDeActive,
+                _textActive,
+                _textDeActive,
+                _socket.GetName(),
+                _iconIsVisible,
+                _broadcastCodeActive,
+                _broadcastCodeDeActive);
     }
 }

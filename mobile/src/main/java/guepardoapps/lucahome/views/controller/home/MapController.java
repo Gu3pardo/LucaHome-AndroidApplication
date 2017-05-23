@@ -275,7 +275,7 @@ public class MapController {
                         }
                         break;
                     case MEDIASERVER:
-                        showMediaserverDetailsDialog(newMapContent, wirelessSocketList);
+                        showMediaServerDetailsDialog(newMapContent, wirelessSocketList);
                         break;
                     case MENU:
                         showMenuDialog(menu, listedMenu);
@@ -299,10 +299,10 @@ public class MapController {
             }
 
             private void showCameraDialog(MotionCameraDto motionCameraDto) {
-                _dialogController.ShowAlertDialogWebview("Security camera", motionCameraDto.GetCameraUrl());
+                _dialogController.ShowAlertDialogWebView("Security camera", motionCameraDto.GetCameraUrl());
             }
 
-            private void showMediaserverDetailsDialog(MapContentDto newMapContent,
+            private void showMediaServerDetailsDialog(MapContentDto newMapContent,
                                                       SerializableList<WirelessSocketDto> wirelessSocketList) {
                 ArrayList<String> socketList = newMapContent.GetSockets();
 

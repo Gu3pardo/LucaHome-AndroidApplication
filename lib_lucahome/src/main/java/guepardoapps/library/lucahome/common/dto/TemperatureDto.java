@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Calendar;
 
@@ -11,6 +13,8 @@ public class TemperatureDto implements Serializable {
 
     private static final long serialVersionUID = -8509818903730279328L;
 
+    private static final String TAG = TemperatureDto.class.getSimpleName();
+
     private double _temperature;
     private String _area;
     private SerializableTime _lastUpdate;
@@ -18,8 +22,13 @@ public class TemperatureDto implements Serializable {
     private TemperatureType _temperatureType;
     private String _graphPath;
 
-    public TemperatureDto(double temperature, String area, SerializableTime lastUpdate, String sensorPath,
-                          TemperatureType temperatureType, String graphPath) {
+    public TemperatureDto(
+            double temperature,
+            @NonNull String area,
+            SerializableTime lastUpdate,
+            @NonNull String sensorPath,
+            @NonNull TemperatureType temperatureType,
+            @NonNull String graphPath) {
         _temperature = temperature;
         _area = area;
 
@@ -39,10 +48,6 @@ public class TemperatureDto implements Serializable {
         return _temperature;
     }
 
-    public void SetTemperature(double temperature) {
-        _temperature = temperature;
-    }
-
     public String GetTemperatureString() {
         return String.valueOf(_temperature) + "°C";
     }
@@ -53,10 +58,6 @@ public class TemperatureDto implements Serializable {
 
     public SerializableTime GetLastUpdate() {
         return _lastUpdate;
-    }
-
-    public void SetLastUpdate(SerializableTime lastUpdate) {
-        _lastUpdate = lastUpdate;
     }
 
     public String GetSensorPath() {
@@ -76,8 +77,12 @@ public class TemperatureDto implements Serializable {
     }
 
     public String toString() {
-        return "{Temperature: {Value: " + GetTemperatureString() + "};{Area: " + _area + "};{LastUpdate: "
-                + _lastUpdate.toString() + "};{SensorPath: " + _sensorPath + "};{TemperatureType: "
-                + _temperatureType.toString() + "};{GraphPath: " + _graphPath + "}}";
+        return "{"+ TAG
+                + ": {Value: " + GetTemperatureString()
+                + "};{Area: " + _area
+                + "};{LastUpdate: " + _lastUpdate.toString()
+                + "};{SensorPath: " + _sensorPath
+                + "};{TemperatureType: " + _temperatureType.toString()
+                + "};{GraphPath: " + _graphPath + "}}";
     }
 }

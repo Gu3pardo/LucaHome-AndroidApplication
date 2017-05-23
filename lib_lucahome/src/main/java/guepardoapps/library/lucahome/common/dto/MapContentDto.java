@@ -1,19 +1,18 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.enums.DrawingType;
-import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 public class MapContentDto implements Serializable {
 
 	private static final long serialVersionUID = 8764451572750126391L;
 
 	private static final String TAG = MapContentDto.class.getSimpleName();
-	@SuppressWarnings("unused")
-	private LucaHomeLogger _logger;
 
 	private int _id;
 	private int[] _position;
@@ -27,10 +26,15 @@ public class MapContentDto implements Serializable {
 
 	private boolean _visibility;
 
-	public MapContentDto(int id, int[] position, DrawingType drawingType, ArrayList<String> schedules,
-			ArrayList<String> sockets, String temperatureArea, String mediaServerIp, boolean visibility) {
-		_logger = new LucaHomeLogger(TAG);
-
+	public MapContentDto(
+			int id,
+			int[] position,
+			@NonNull DrawingType drawingType,
+			@NonNull ArrayList<String> schedules,
+			@NonNull ArrayList<String> sockets,
+			@NonNull String temperatureArea,
+			@NonNull String mediaServerIp,
+			boolean visibility) {
 		_id = id;
 		_position = position;
 		_drawingType = drawingType;
@@ -114,9 +118,13 @@ public class MapContentDto implements Serializable {
 
 	@Override
 	public String toString() {
-		return "MapContent: {Id: " + String.valueOf(_id) + "}{Position: " + String.valueOf(_position[0]) + "|"
-				+ String.valueOf(_position[1]) + "}{DrawingType: " + _drawingType.toString() + "}{Schedules: "
-				+ getSchedulesString() + "}{Sockets: " + getSocketsString() + "}{Temperature: " + _temperatureArea
-				+ "}{MediaServerIp: " + _mediaServerIp + "}{Visibility: " + String.valueOf(_visibility) + "}";
+		return "{" + TAG + ": {Id: " + String.valueOf(_id)
+				+ "}{Position: " + String.valueOf(_position[0]) + "|" + String.valueOf(_position[1])
+				+ "}{DrawingType: " + _drawingType.toString()
+				+ "}{Schedules: " + getSchedulesString()
+				+ "}{Sockets: " + getSocketsString()
+				+ "}{Temperature: " + _temperatureArea
+				+ "}{MediaServerIp: " + _mediaServerIp
+				+ "}{Visibility: " + String.valueOf(_visibility) + "}";
 	}
 }

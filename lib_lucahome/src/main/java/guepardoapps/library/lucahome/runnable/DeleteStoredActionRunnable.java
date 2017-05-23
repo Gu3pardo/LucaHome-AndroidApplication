@@ -1,6 +1,5 @@
 package guepardoapps.library.lucahome.runnable;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -17,12 +16,12 @@ public class DeleteStoredActionRunnable implements Runnable {
 
     private boolean _isInitialized = false;
 
-    public DeleteStoredActionRunnable(@NonNull Context context,
-                                      @NonNull String actionName) {
+    public DeleteStoredActionRunnable(
+            @NonNull String actionName,
+            @NonNull DatabaseController databaseController) {
         _logger = new LucaHomeLogger(TAG);
 
-        _databaseController = DatabaseController.getInstance();
-        _databaseController.onCreate(context);
+        _databaseController = databaseController;
 
         if (actionName.isEmpty()) {
             _logger.Error("actionName is null or is empty!");

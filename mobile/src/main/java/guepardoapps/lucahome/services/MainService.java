@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -33,11 +34,13 @@ import guepardoapps.library.lucahome.services.sockets.SocketActionService;
 
 import guepardoapps.library.openweather.common.OWBroadcasts;
 import guepardoapps.library.openweather.common.OWBundles;
+import guepardoapps.library.openweather.common.OWIds;
 import guepardoapps.library.openweather.common.model.ForecastModel;
 import guepardoapps.library.openweather.common.model.WeatherModel;
 import guepardoapps.library.openweather.controller.OpenWeatherController;
 
 import guepardoapps.library.toolset.beacon.BeaconController;
+import guepardoapps.library.toolset.common.classes.NotificationContent;
 import guepardoapps.library.toolset.common.classes.SerializableList;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
@@ -50,6 +53,7 @@ import guepardoapps.library.toolset.scheduler.ScheduleService;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.views.BirthdayView;
+import guepardoapps.lucahome.views.ForecastWeatherView;
 import guepardoapps.lucahome.views.SecurityView;
 import guepardoapps.lucahome.views.SensorTemperatureView;
 
@@ -57,6 +61,13 @@ public class MainService extends Service {
 
     private static final String TAG = MainService.class.getSimpleName();
     private LucaHomeLogger _logger;
+
+    public static final int SLEEP_NOTIFICATION_HOUR = 21;
+    public static final int SLEEP_NOTIFICATION_MINUTE = 45;
+    public static final int SLEEP_NOTIFICATION_TIME_SPAN_MINUTE = 5;
+
+    private static final int CLEAR_NOTIFICATION_DISPLAY_HOUR = 2;
+    private static final int CLEAR_NOTIFICATION_DISPLAY_MINUTE = 0;
 
     private boolean _downloadingData;
     private boolean _schedulesAdded;
@@ -101,202 +112,6 @@ public class MainService extends Service {
     private ScheduleService _scheduleService;
     private ServiceController _serviceController;
     private SharedPrefController _sharedPrefController;
-
-    private Runnable _downloadBirthdayRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadBirthdayRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                return;
-            }
-
-            startDownloadBirthday();
-        }
-    };
-
-    private Runnable _downloadCurrentWeatherRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadCurrentWeatherRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            startDownloadCurrentWeather();
-        }
-    };
-
-    private Runnable _downloadForecastWeatherRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadForecastWeatherRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            if (_sharedPrefController
-                    .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
-                _context.startService(new Intent(_context, OpenWeatherService.class));
-            }
-        }
-    };
-
-    private Runnable _downloadMediaMirrorRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadMediaMirrorRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                return;
-            }
-
-            startDownloadMediaMirror();
-        }
-    };
-
-    private Runnable _downloadListedMenuRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadListedMenuRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                return;
-            }
-
-            startDownloadListedMenu();
-        }
-    };
-
-    private Runnable _downloadMenuRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadMenuRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                return;
-            }
-
-            startDownloadMenu();
-        }
-    };
-
-    private Runnable _downloadMotionCameraDtoRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadMotionCameraDtoRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                return;
-            }
-
-            startDownloadMotionCameraDto();
-        }
-    };
-
-    private Runnable _downloadSocketRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadSocketRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                return;
-            }
-
-            startDownloadSocket();
-        }
-    };
-
-    private Runnable _downloadTemperatureRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadTemperatureRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                return;
-            }
-
-            startDownloadCurrentWeather();
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                return;
-            }
-
-            startDownloadTemperature();
-        }
-    };
-
-    private Runnable _downloadShoppingListRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Debug("_downloadShoppingListRunnable run");
-
-            if (!_networkController.IsNetworkAvailable()) {
-                _logger.Warn("No network available!");
-                _shoppingList = _databaseController.GetShoppingList();
-                return;
-            }
-
-            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                _logger.Warn("No LucaHome network! ...");
-                _shoppingList = _databaseController.GetShoppingList();
-                return;
-            }
-
-            startDownloadShoppingList();
-        }
-    };
-
-    private Runnable _timeoutCheck = new Runnable() {
-        public void run() {
-            _logger.Warn("_timeoutCheck received!");
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.COMMAND,
-                    new String[]{Bundles.COMMAND, Bundles.NAVIGATE_DATA},
-                    new Object[]{Command.NAVIGATE, NavigateData.FINISH});
-        }
-    };
 
     private BroadcastReceiver _actionReceiver = new BroadcastReceiver() {
         @Override
@@ -447,7 +262,7 @@ public class MainService extends Service {
                     case SHOW_NOTIFICATION_WEATHER:
                         if (_sharedPrefController
                                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
-                            _context.startService(new Intent(_context, OpenWeatherService.class));
+                            _openWeatherController.LoadForecastWeather();
                         }
                         break;
                     case ENABLE_HEATING:
@@ -490,7 +305,7 @@ public class MainService extends Service {
         private void enableHeatingSocket(boolean enableSound) {
             _logger.Debug("enableHeatingSocket");
             if (_wirelessSocketList == null) {
-                _logger.Warn("Socketlist is null!");
+                _logger.Warn("SocketList is null!");
                 return;
             }
 
@@ -519,9 +334,8 @@ public class MainService extends Service {
 
             int timerMinute = _sharedPrefController
                     .LoadIntegerValueFromSharedPreferences(SharedPrefConstants.TIMER_MIN);
-            int timerHour = _sharedPrefController.LoadIntegerValueFromSharedPreferences(SharedPrefConstants.TIMER_HOUR);
-            _logger.Debug(String.format("Loaded time values are %s:%s", timerHour, timerMinute));
-            if (timerMinute == 0 && timerHour == 0) {
+            _logger.Debug(String.format(Locale.GERMAN, "Loaded time value is %d sec", timerMinute));
+            if (timerMinute == 0) {
                 _logger.Error(String.format("timerMinute and timerHour is 0! Setting timerMinute to default %s!",
                         SharedPrefConstants.DEFAULT_TIMER_MIN));
                 timerMinute = SharedPrefConstants.DEFAULT_TIMER_MIN;
@@ -532,7 +346,7 @@ public class MainService extends Service {
             _logger.Debug(String.format("Current time is %s", currentTime));
 
             int scheduleMinute = currentTime.get(Calendar.MINUTE) + timerMinute;
-            int scheduleHour = currentTime.get(Calendar.HOUR_OF_DAY) + timerHour;
+            int scheduleHour = currentTime.get(Calendar.HOUR_OF_DAY);
             _logger.Debug(String.format("schedule time is %s:%s", scheduleHour, scheduleMinute));
 
             if (scheduleMinute > 59) {
@@ -573,6 +387,22 @@ public class MainService extends Service {
                             String.valueOf(playLength));
                     break;
                 }
+            }
+        }
+    };
+
+    // Receiver used for receiving the current battery state of the phone and
+    // sending the state to the watch
+    private BroadcastReceiver _batteryChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_batteryChangedReceiver onReceive");
+
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            if (level != -1) {
+                _logger.Debug("new battery level: " + String.valueOf(level));
+                String message = "PhoneBattery:" + String.valueOf(level) + "%";
+                _serviceController.SendMessageToWear(message);
             }
         }
     };
@@ -641,6 +471,34 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _forecastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _receiverController.UnregisterReceiver(_forecastReceiver);
+
+            ForecastModel forecastModel = (ForecastModel) intent.getSerializableExtra(OWBundles.EXTRA_FORECAST_MODEL);
+            if (forecastModel != null) {
+                _logger.Debug(forecastModel.toString());
+
+                NotificationContent _message = forecastModel.TellForecastWeather();
+
+                if (_message != null) {
+                    _notificationController.CreateForecastWeatherNotification(
+                            ForecastWeatherView.class,
+                            _message.GetIcon(),
+                            _message.GetBigIcon(),
+                            _message.GetTitle(),
+                            _message.GetText(),
+                            OWIds.FORECAST_NOTIFICATION_ID);
+                } else {
+                    _logger.Error("_message is null!");
+                }
+            } else {
+                _logger.Error("_forecastModel is null!");
+            }
+        }
+    };
+
     private BroadcastReceiver _forecastModelReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -690,11 +548,11 @@ public class MainService extends Service {
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_mapContentDownloadReceiver onReceive");
 
-            String[] mapcontentStringArray = intent.getStringArrayExtra(Bundles.MAP_CONTENT_DOWNLOAD);
-            if (mapcontentStringArray != null) {
+            String[] mapContentStringArray = intent.getStringArrayExtra(Bundles.MAP_CONTENT_DOWNLOAD);
+            if (mapContentStringArray != null) {
 
                 SerializableList<MapContentDto> newMapContentList = JsonDataToMapContentConverter
-                        .GetList(mapcontentStringArray);
+                        .GetList(mapContentStringArray);
                 if (newMapContentList != null) {
                     _mapContentList = newMapContentList;
                 }
@@ -707,8 +565,38 @@ public class MainService extends Service {
                     _logger.Warn("_mapContentList is null!");
                 }
             } else {
-                _logger.Warn("mapcontentStringArray is null!");
+                _logger.Warn("mapContentStringArray is null!");
             }
+            updateDownloadCount();
+        }
+    };
+
+    private BroadcastReceiver _listedMenuDtoDownloadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_listedMenuDtoDownloadReceiver onReceive");
+
+            String[] listedMenuStringArray = intent.getStringArrayExtra(Bundles.LISTED_MENU_DOWNLOAD);
+            if (listedMenuStringArray != null) {
+
+                SerializableList<ListedMenuDto> newListedMenuList = JsonDataToListedMenuConverter
+                        .GetList(listedMenuStringArray);
+                if (newListedMenuList != null) {
+                    _listedMenu = newListedMenuList;
+                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_LISTED_MENU_VIEW,
+                            new String[]{Bundles.LISTED_MENU}, new Object[]{_listedMenu});
+
+                    _databaseController.ClearDatabaseListedMenu();
+                    for (int index = 0; index < _listedMenu.getSize(); index++) {
+                        _databaseController.SaveListedMenu(_listedMenu.getValue(index));
+                    }
+                } else {
+                    _logger.Warn("newListedMenuList is null");
+                }
+            } else {
+                _logger.Warn("listedMenuStringArray is null");
+            }
+
             updateDownloadCount();
         }
     };
@@ -745,31 +633,6 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _listedMenuDtoDownloadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_listedMenuDtoDownloadReceiver onReceive");
-
-            String[] listedMenuStringArray = intent.getStringArrayExtra(Bundles.LISTED_MENU_DOWNLOAD);
-            if (listedMenuStringArray != null) {
-
-                SerializableList<ListedMenuDto> newListedMenuList = JsonDataToListedMenuConverter
-                        .GetList(listedMenuStringArray);
-                if (newListedMenuList != null) {
-                    _listedMenu = newListedMenuList;
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_LISTED_MENU_VIEW,
-                            new String[]{Bundles.LISTED_MENU}, new Object[]{_listedMenu});
-                } else {
-                    _logger.Warn("newListedMenuList is null");
-                }
-            } else {
-                _logger.Warn("listedMenuStringArray is null");
-            }
-
-            updateDownloadCount();
-        }
-    };
-
     private BroadcastReceiver _menuDtoDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -784,6 +647,11 @@ public class MainService extends Service {
                     _menuController.CheckMenuDto(_menu);
                     _broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_MENU_VIEW,
                             new String[]{Bundles.MENU}, new Object[]{_menu});
+
+                    _databaseController.ClearDatabaseMenu();
+                    for (int index = 0; index < _menu.getSize(); index++) {
+                        _databaseController.SaveMenu(_menu.getValue(index));
+                    }
                 } else {
                     _logger.Warn("newMenuList is null");
                 }
@@ -895,6 +763,40 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _shoppingListDownloadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_shoppingListDownloadReceiver onReceive");
+
+            String[] shoppingListStringArray = intent.getStringArrayExtra(Bundles.SHOPPING_LIST_DOWNLOAD);
+            if (shoppingListStringArray != null) {
+
+                SerializableList<ShoppingEntryDto> newShoppingList = JsonDataToShoppingListConverter
+                        .GetList(shoppingListStringArray);
+                if (newShoppingList != null) {
+                    _shoppingList = newShoppingList;
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            guepardoapps.library.lucahome.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
+                            new String[]{guepardoapps.library.lucahome.common.constants.Bundles.SHOPPING_LIST},
+                            new Object[]{_shoppingList});
+
+                    _databaseController.ClearDatabaseShoppingList();
+                    for (int index = 0; index < _shoppingList.getSize(); index++) {
+                        _databaseController.SaveShoppingEntry(_shoppingList.getValue(index));
+                    }
+
+                    sendShoppingListToWear();
+                } else {
+                    _logger.Warn("newShoppingList is null");
+                }
+            } else {
+                _logger.Warn("shoppingListStringArray is null");
+            }
+
+            updateDownloadCount();
+        }
+    };
+
     private BroadcastReceiver _socketDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -927,6 +829,11 @@ public class MainService extends Service {
                     if (_sharedPrefController
                             .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
                         _notificationController.CreateSocketNotification(_wirelessSocketList);
+                    }
+
+                    _databaseController.ClearDatabaseSocket();
+                    for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
+                        _databaseController.SaveSocket(_wirelessSocketList.getValue(index));
                     }
                 } else {
                     _logger.Warn("_wirelessSocketList is null");
@@ -975,6 +882,56 @@ public class MainService extends Service {
         }
     };
 
+    // Receiver used for receiving the current time and check if time is ready
+    // to display sleep notification or set a flag if not or to delete this flag
+    private BroadcastReceiver _timeTickReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            _logger.Debug("action: " + action);
+
+            if (action.equals(Intent.ACTION_TIME_TICK)) {
+                Calendar calendar = Calendar.getInstance();
+
+                // Check, if the time is ready for displaying the notification
+                // time needs to be NOTIFICATION_HOUR:NOTIFICATION_MINUTE
+                if ((int) calendar.get(Calendar.HOUR_OF_DAY) == SLEEP_NOTIFICATION_HOUR) {
+                    if (calendar.get(Calendar.MINUTE) > SLEEP_NOTIFICATION_MINUTE - SLEEP_NOTIFICATION_TIME_SPAN_MINUTE
+                            && calendar.get(Calendar.MINUTE) < SLEEP_NOTIFICATION_MINUTE
+                            + SLEEP_NOTIFICATION_TIME_SPAN_MINUTE) {
+                        _logger.Debug("We are in the timeSpan!");
+
+                        // Check also if we are in the home network, otherwise
+                        // it's senseless to display the notification, but we
+                        // set a flag to display notification later
+                        if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                            _logger.Debug("Showing notification go to sleep!");
+                            _notificationController.CreateSleepHeatingNotification();
+                        } else {
+                            _logger.Debug("Saving flag to display notification later!");
+                            _sharedPrefController
+                                    .SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, true);
+                        }
+                    } else {
+                        _logger.Debug("We are NOT in the timeSpan!");
+                    }
+                }
+                // Check if time is ready to delete the flag to display the
+                // sleep notification
+                else if ((int) calendar.get(Calendar.HOUR_OF_DAY) == CLEAR_NOTIFICATION_DISPLAY_HOUR) {
+                    if ((int) calendar.get(Calendar.MINUTE) == CLEAR_NOTIFICATION_DISPLAY_MINUTE) {
+                        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(
+                                SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
+                            _logger.Debug("We entered home and flag is active to display sleep notification");
+                            _sharedPrefController
+                                    .SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
     private BroadcastReceiver _weatherModelReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -994,40 +951,6 @@ public class MainService extends Service {
 
             _broadcastController.SendSerializableArrayBroadcast(Broadcasts.UPDATE_WEATHER_VIEW,
                     new String[]{Bundles.WEATHER_CURRENT}, new Object[]{_currentWeather});
-
-            updateDownloadCount();
-        }
-    };
-
-    private BroadcastReceiver _shoppingListDownloadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_shoppingListDownloadReceiver onReceive");
-
-            String[] shoppingListStringArray = intent.getStringArrayExtra(Bundles.SHOPPING_LIST_DOWNLOAD);
-            if (shoppingListStringArray != null) {
-
-                SerializableList<ShoppingEntryDto> newShoppingList = JsonDataToShoppingListConverter
-                        .GetList(shoppingListStringArray);
-                if (newShoppingList != null) {
-                    _shoppingList = newShoppingList;
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            guepardoapps.library.lucahome.common.constants.Broadcasts.UPDATE_SHOPPING_LIST,
-                            new String[]{guepardoapps.library.lucahome.common.constants.Bundles.SHOPPING_LIST},
-                            new Object[]{_shoppingList});
-
-                    _databaseController.ClearDatabaseShoppingList();
-                    for (int index = 0; index < _shoppingList.getSize(); index++) {
-                        _databaseController.SaveShoppintEntry(_shoppingList.getValue(index));
-                    }
-
-                    sendShoppingListToWear();
-                } else {
-                    _logger.Warn("newShoppingList is null");
-                }
-            } else {
-                _logger.Warn("shoppingListStringArray is null");
-            }
 
             updateDownloadCount();
         }
@@ -1075,49 +998,99 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _reloadBirthdayReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateReceiver onReceive");
+            _logger.Debug("_reloadBirthdayReceiver onReceive");
+            startDownloadBirthday();
+        }
+    };
 
-            LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
-            if (lucaObject == null) {
-                _logger.Error("_updateReceiver received data with null lucaobject!");
-                return;
-            }
+    private BroadcastReceiver _reloadMediaMirrorReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadMediaMirrorReceiver onReceive");
+            startDownloadMediaMirror();
+        }
+    };
 
-            String action = intent.getStringExtra(Bundles.ACTION);
-            if (action == null) {
-                _logger.Error("_updateReceiver received data with null action!");
-                return;
-            }
+    private BroadcastReceiver _reloadListedMenuReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadListedMenuReceiver onReceive");
+            startDownloadListedMenu();
+        }
+    };
 
-            switch (lucaObject) {
-                case BIRTHDAY:
-                    _serviceController.StartRestService(Bundles.BIRTHDAY_DOWNLOAD, action, Broadcasts.UPDATE_BIRTHDAY,
-                            lucaObject, RaspberrySelection.BOTH);
-                    break;
-                case MENU:
-                    _serviceController.StartRestService(Bundles.MENU_DOWNLOAD, action, Broadcasts.UPDATE_MENU, lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case MOVIE:
-                    _serviceController.StartRestService(Bundles.MOVIE_DOWNLOAD, action, Broadcasts.UPDATE_MOVIE, lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case SCHEDULE:
-                case TIMER:
-                    _serviceController.StartRestService(Bundles.SCHEDULE_DOWNLOAD, action, Broadcasts.UPDATE_SCHEDULE,
-                            lucaObject, RaspberrySelection.BOTH);
-                    break;
-                case WIRELESS_SOCKET:
-                    _serviceController.StartRestService(Bundles.SOCKET_DOWNLOAD, action, Broadcasts.UPDATE_SOCKET,
-                            lucaObject, RaspberrySelection.BOTH);
-                    break;
-                default:
-                    _logger.Error("Cannot update object: " + lucaObject.toString());
-                    break;
-            }
+    private BroadcastReceiver _reloadMenuReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadMenuReceiver onReceive");
+            startDownloadMenu();
+        }
+    };
+
+    private BroadcastReceiver _reloadMotionCameraDtoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadMotionCameraDtoReceiver onReceive");
+            startDownloadMotionCameraDto();
+        }
+    };
+
+    private BroadcastReceiver _reloadMovieReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadMovieReceiver onReceive");
+            startDownloadMovie();
+        }
+    };
+
+    private BroadcastReceiver _reloadScheduleReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadScheduleReceiver onReceive");
+            startDownloadSchedule();
+        }
+    };
+
+    private BroadcastReceiver _reloadSocketReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadSocketReceiver onReceive");
+            startDownloadSocket();
+        }
+    };
+
+    private BroadcastReceiver _reloadChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadChangeReceiver onReceive");
+            startDownloadChange();
+        }
+    };
+
+    private BroadcastReceiver _reloadShoppingListReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadShoppingListReceiver onReceive");
+            startDownloadShoppingList();
+        }
+    };
+
+    private BroadcastReceiver _reloadCurrentWeatherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadCurrentWeatherReceiver onReceive");
+            _downloadCurrentWeatherRunnable.run();
+        }
+    };
+
+    private BroadcastReceiver _reloadForecastWeatherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadForecastWeatherReceiver onReceive");
+            _downloadForecastWeatherRunnable.run();
         }
     };
 
@@ -1232,102 +1205,6 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _reloadBirthdayReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadBirthdayReceiver onReceive");
-            startDownloadBirthday();
-        }
-    };
-
-    private BroadcastReceiver _reloadMediaMirrorReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadMediaMirrorReceiver onReceive");
-            startDownloadMediaMirror();
-        }
-    };
-
-    private BroadcastReceiver _reloadListedMenuReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadListedMenuReceiver onReceive");
-            startDownloadListedMenu();
-        }
-    };
-
-    private BroadcastReceiver _reloadMenuReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadMenuReceiver onReceive");
-            startDownloadMenu();
-        }
-    };
-
-    private BroadcastReceiver _reloadMotionCameraDtoReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadMotionCameraDtoReceiver onReceive");
-            startDownloadMotionCameraDto();
-        }
-    };
-
-    private BroadcastReceiver _reloadMovieReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadMovieReceiver onReceive");
-            startDownloadMovie();
-        }
-    };
-
-    private BroadcastReceiver _reloadScheduleReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadScheduleReceiver onReceive");
-            startDownloadSchedule();
-        }
-    };
-
-    private BroadcastReceiver _reloadSocketReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadSocketReceiver onReceive");
-            startDownloadSocket();
-        }
-    };
-
-    private BroadcastReceiver _reloadChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadChangeReceiver onReceive");
-            startDownloadChange();
-        }
-    };
-
-    private BroadcastReceiver _reloadShoppingListReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadShoppingListReceiver onReceive");
-            startDownloadShoppingList();
-        }
-    };
-
-    private BroadcastReceiver _reloadCurrentWeatherReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadCurrentWeatherReceiver onReceive");
-            _downloadCurrentWeatherRunnable.run();
-        }
-    };
-
-    private BroadcastReceiver _reloadForecastWeatherReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadForecastWeatherReceiver onReceive");
-            _downloadForecastWeatherRunnable.run();
-        }
-    };
-
     private BroadcastReceiver _updateBoughtShoppingListReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1360,7 +1237,7 @@ public class MainService extends Service {
 
                             _databaseController.ClearDatabaseShoppingList();
                             for (int index = 0; index < _shoppingList.getSize(); index++) {
-                                _databaseController.SaveShoppintEntry(_shoppingList.getValue(index));
+                                _databaseController.SaveShoppingEntry(_shoppingList.getValue(index));
                             }
 
                             sendShoppingListToWear();
@@ -1375,6 +1252,254 @@ public class MainService extends Service {
             } else {
                 _logger.Warn("Received null data in _updateBoughtShoppingListReceiver");
             }
+        }
+    };
+
+    private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_updateReceiver onReceive");
+
+            LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
+            if (lucaObject == null) {
+                _logger.Error("_updateReceiver received data with null lucaobject!");
+                return;
+            }
+
+            String action = intent.getStringExtra(Bundles.ACTION);
+            if (action == null) {
+                _logger.Error("_updateReceiver received data with null action!");
+                return;
+            }
+
+            switch (lucaObject) {
+                case BIRTHDAY:
+                    _serviceController.StartRestService(Bundles.BIRTHDAY_DOWNLOAD, action, Broadcasts.UPDATE_BIRTHDAY,
+                            lucaObject, RaspberrySelection.BOTH);
+                    break;
+                case MENU:
+                    _serviceController.StartRestService(Bundles.MENU_DOWNLOAD, action, Broadcasts.UPDATE_MENU, lucaObject,
+                            RaspberrySelection.BOTH);
+                    break;
+                case MOVIE:
+                    _serviceController.StartRestService(Bundles.MOVIE_DOWNLOAD, action, Broadcasts.UPDATE_MOVIE, lucaObject,
+                            RaspberrySelection.BOTH);
+                    break;
+                case SCHEDULE:
+                case TIMER:
+                    _serviceController.StartRestService(Bundles.SCHEDULE_DOWNLOAD, action, Broadcasts.UPDATE_SCHEDULE,
+                            lucaObject, RaspberrySelection.BOTH);
+                    break;
+                case WIRELESS_SOCKET:
+                    _serviceController.StartRestService(Bundles.SOCKET_DOWNLOAD, action, Broadcasts.UPDATE_SOCKET,
+                            lucaObject, RaspberrySelection.BOTH);
+                    break;
+                default:
+                    _logger.Error("Cannot update object: " + lucaObject.toString());
+                    break;
+            }
+        }
+    };
+
+    private Runnable _downloadBirthdayRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadBirthdayRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            startDownloadBirthday();
+        }
+    };
+
+    private Runnable _downloadCurrentWeatherRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadCurrentWeatherRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            startDownloadCurrentWeather();
+        }
+    };
+
+    private Runnable _downloadForecastWeatherRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadForecastWeatherRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (_sharedPrefController
+                    .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
+                _openWeatherController.LoadForecastWeather();
+            }
+        }
+    };
+
+    private Runnable _downloadListedMenuRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadListedMenuRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                _listedMenu = _databaseController.GetListedMenuList();
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                _listedMenu = _databaseController.GetListedMenuList();
+                return;
+            }
+
+            startDownloadListedMenu();
+        }
+    };
+
+    private Runnable _downloadMediaMirrorRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadMediaMirrorRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            startDownloadMediaMirror();
+        }
+    };
+
+    private Runnable _downloadMenuRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadMenuRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                _menu = _databaseController.GetMenuList();
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                _menu = _databaseController.GetMenuList();
+                return;
+            }
+
+            startDownloadMenu();
+        }
+    };
+
+    private Runnable _downloadMotionCameraDtoRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadMotionCameraDtoRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            startDownloadMotionCameraDto();
+        }
+    };
+
+    private Runnable _downloadShoppingListRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadShoppingListRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                _shoppingList = _databaseController.GetShoppingList();
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                _shoppingList = _databaseController.GetShoppingList();
+                return;
+            }
+
+            startDownloadShoppingList();
+        }
+    };
+
+    private Runnable _downloadSocketRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadSocketRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                _wirelessSocketList = _databaseController.GetSocketList();
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                _wirelessSocketList = _databaseController.GetSocketList();
+                return;
+            }
+
+            startDownloadSocket();
+        }
+    };
+
+    private Runnable _downloadTemperatureRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadTemperatureRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            startDownloadCurrentWeather();
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            startDownloadTemperature();
+        }
+    };
+
+    private Runnable _timeoutCheck = new Runnable() {
+        public void run() {
+            _logger.Warn("_timeoutCheck received!");
+            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.COMMAND,
+                    new String[]{Bundles.COMMAND, Bundles.NAVIGATE_DATA},
+                    new Object[]{Command.NAVIGATE, NavigateData.FINISH});
         }
     };
 
@@ -1403,8 +1528,8 @@ public class MainService extends Service {
 
             _beaconController = new BeaconController(_context);
             _broadcastController = new BroadcastController(_context);
-            _databaseController = DatabaseController.getInstance();
-            _databaseController.onCreate(_context);
+            _databaseController = new DatabaseController(_context);
+            _databaseController.Initialize();
             _mediaMirrorController = new MediaMirrorController(_context);
             _mediaMirrorController.Initialize();
             _menuController = new MenuController(_context);
@@ -1486,6 +1611,7 @@ public class MainService extends Service {
         }
         _logger.Debug("onDestroy");
 
+        _databaseController.Dispose();
         _mediaMirrorController.Dispose();
         _receiverController.Dispose();
         _scheduleService.Dispose();
@@ -1558,6 +1684,13 @@ public class MainService extends Service {
 
         _receiverController.RegisterReceiver(_updateBoughtShoppingListReceiver,
                 new String[]{guepardoapps.library.lucahome.common.constants.Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST});
+
+        _receiverController.RegisterReceiver(_batteryChangedReceiver,
+                new String[]{Intent.ACTION_BATTERY_CHANGED});
+        _receiverController.RegisterReceiver(_timeTickReceiver, new String[]{Intent.ACTION_TIME_TICK});
+
+        _receiverController.RegisterReceiver(_forecastReceiver,
+                new String[]{OWBroadcasts.FORECAST_WEATHER_JSON_FINISHED});
     }
 
     private void addSchedules() {
@@ -1646,7 +1779,7 @@ public class MainService extends Service {
 
         if (_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
-            _context.startService(new Intent(_context, OpenWeatherService.class));
+            _openWeatherController.LoadForecastWeather();
         }
     }
 
@@ -1896,7 +2029,7 @@ public class MainService extends Service {
         String messageText = "Sockets:";
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
             messageText += _wirelessSocketList.getValue(index).GetName() + ":"
-                    + (_wirelessSocketList.getValue(index).GetIsActivated() ? "1" : "0") + "&";
+                    + (_wirelessSocketList.getValue(index).IsActivated() ? "1" : "0") + "&";
         }
         _logger.Info("message is " + messageText);
         _serviceController.SendMessageToWear(messageText);

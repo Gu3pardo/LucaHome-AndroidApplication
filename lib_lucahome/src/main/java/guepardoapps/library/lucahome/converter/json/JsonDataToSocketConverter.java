@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.converter.json;
 
+import android.support.annotation.NonNull;
+
 import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
@@ -15,7 +17,7 @@ public final class JsonDataToSocketConverter {
 
     private static String _searchParameter = "{socket:";
 
-    public static SerializableList<WirelessSocketDto> GetList(String[] stringArray) {
+    public static SerializableList<WirelessSocketDto> GetList(@NonNull String[] stringArray) {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return ParseStringToList(stringArray[0]);
         } else {
@@ -24,13 +26,13 @@ public final class JsonDataToSocketConverter {
         }
     }
 
-    public static WirelessSocketDto Get(String value) {
+    public static WirelessSocketDto Get(@NonNull String value) {
         if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
             if (value.contains(_searchParameter)) {
                 value = value.replace(_searchParameter, "").replace("};};", "");
 
                 String[] data = value.split("\\};");
-                WirelessSocketDto newValue = ParseStringToValue(data);
+                WirelessSocketDto newValue = ParseStringToValue(-1, data);
                 if (newValue != null) {
                     return newValue;
                 }
@@ -51,11 +53,12 @@ public final class JsonDataToSocketConverter {
                 SerializableList<WirelessSocketDto> list = new SerializableList<>();
 
                 String[] entries = value.split("\\" + _searchParameter);
-                for (String entry : entries) {
+                for (int index = 0; index < entries.length; index++) {
+                    String entry = entries[index];
                     entry = entry.replace(_searchParameter, "").replace("};};", "");
 
                     String[] data = entry.split("\\};");
-                    WirelessSocketDto newValue = ParseStringToValue(data);
+                    WirelessSocketDto newValue = ParseStringToValue(index, data);
                     if (newValue != null) {
                         list.addValue(newValue);
                     }
@@ -73,7 +76,9 @@ public final class JsonDataToSocketConverter {
         return new SerializableList<>();
     }
 
-    private static WirelessSocketDto ParseStringToValue(String[] data) {
+    private static WirelessSocketDto ParseStringToValue(
+            int id,
+            @NonNull String[] data) {
         if (data.length == 4) {
             if (data[0].contains("{Name:") && data[1].contains("{Area:") && data[2].contains("{Code:")
                     && data[3].contains("{State:")) {
@@ -85,7 +90,7 @@ public final class JsonDataToSocketConverter {
                 String isActivatedString = data[3].replace("{State:", "").replace("};", "");
                 boolean isActivated = isActivatedString.contains("1");
 
-                WirelessSocketDto newValue = new WirelessSocketDto(name, area, code, isActivated);
+                WirelessSocketDto newValue = new WirelessSocketDto(id, name, area, code, isActivated);
                 _logger.Debug(String.format(Locale.GERMAN, "New WirelessSocketDto %s", newValue));
 
                 return newValue;

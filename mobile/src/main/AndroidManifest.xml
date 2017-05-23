@@ -136,12 +136,6 @@
         <service
             android:name="guepardoapps.lucahome.services.MainService"
             android:enabled="true" />
-        <service
-            android:name="guepardoapps.lucahome.services.OpenWeatherService"
-            android:enabled="true" />
-        <service
-            android:name="guepardoapps.lucahome.services.ReceiverService"
-            android:enabled="true" />
 
         <meta-data
             android:name="com.google.android.gms.version"

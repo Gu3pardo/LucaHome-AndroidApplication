@@ -1,6 +1,7 @@
 package guepardoapps.library.lucahome.controller;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
@@ -17,12 +18,12 @@ public class TemperatureController {
 
     private BroadcastController _broadcastController;
 
-    public TemperatureController(Context context) {
+    public TemperatureController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _broadcastController = new BroadcastController(context);
     }
 
-    public void ReloadTemperature(TemperatureDto temperature) {
+    public void ReloadTemperature(@NonNull TemperatureDto temperature) {
         _logger.Debug("Trying to reload temperature: " + temperature.toString());
 
         switch (temperature.GetTemperatureType()) {

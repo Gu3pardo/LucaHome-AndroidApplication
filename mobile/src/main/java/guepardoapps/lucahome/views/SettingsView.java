@@ -48,7 +48,7 @@ import guepardoapps.library.toolset.controller.ReceiverController;
 import guepardoapps.library.toolset.controller.SharedPrefController;
 
 import guepardoapps.lucahome.R;
-import guepardoapps.lucahome.services.ReceiverService;
+import guepardoapps.lucahome.services.MainService;
 
 public class SettingsView extends Activity {
 
@@ -105,7 +105,11 @@ public class SettingsView extends Activity {
                 _storedActionsListView.setVisibility(View.VISIBLE);
             }
 
-            _storedActionListAdapter = new StoredActionListAdapter(_context, _storedActions);
+            _storedActionListAdapter = new StoredActionListAdapter(
+                    _context,
+                    _storedActions,
+                    _broadcastController,
+                    _databaseController);
             _storedActionsListView.setAdapter(_storedActionListAdapter);
         }
     };
@@ -130,7 +134,8 @@ public class SettingsView extends Activity {
         _context = this;
 
         _broadcastController = new BroadcastController(_context);
-        _databaseController = DatabaseController.getInstance();
+        _databaseController = new DatabaseController(_context);
+        _databaseController.Initialize();
         _navigationService = new NavigationService(_context);
         _networkController = new NetworkController(_context);
         _notificationController = new LucaNotificationController(_context);
@@ -272,11 +277,9 @@ public class SettingsView extends Activity {
                 if (isChecked) {
                     Calendar calendar = Calendar.getInstance();
 
-                    if ((int) calendar.get(Calendar.HOUR_OF_DAY) == ReceiverService.SLEEP_NOTIFICATION_HOUR) {
-                        if (calendar.get(Calendar.MINUTE) > ReceiverService.SLEEP_NOTIFICATION_MINUTE
-                                - ReceiverService.SLEEP_NOTIFICATION_TIME_SPAN_MINUTE
-                                && calendar.get(Calendar.MINUTE) < ReceiverService.SLEEP_NOTIFICATION_MINUTE
-                                + ReceiverService.SLEEP_NOTIFICATION_TIME_SPAN_MINUTE) {
+                    if ((int) calendar.get(Calendar.HOUR_OF_DAY) == MainService.SLEEP_NOTIFICATION_HOUR) {
+                        if (calendar.get(Calendar.MINUTE) > MainService.SLEEP_NOTIFICATION_MINUTE - MainService.SLEEP_NOTIFICATION_TIME_SPAN_MINUTE
+                                && calendar.get(Calendar.MINUTE) < MainService.SLEEP_NOTIFICATION_MINUTE + MainService.SLEEP_NOTIFICATION_TIME_SPAN_MINUTE) {
                             _logger.Debug("We are in the timeSpan!");
 
                             if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
@@ -410,7 +413,11 @@ public class SettingsView extends Activity {
         _storedActions = _databaseController.GetActions();
 
         _storedActionsListView = (ListView) findViewById(R.id.storedActionListView);
-        _storedActionListAdapter = new StoredActionListAdapter(_context, _storedActions);
+        _storedActionListAdapter = new StoredActionListAdapter(
+                _context,
+                _storedActions,
+                _broadcastController,
+                _databaseController);
         _storedActionsListView.setAdapter(_storedActionListAdapter);
 
         if (_storedActions.getSize() < 1) {

@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.sql.Date;
 
@@ -15,7 +17,11 @@ public class ChangeDto implements Serializable {
 	private String _user;
 
 	@SuppressWarnings("deprecation")
-	public ChangeDto(String type, Date date, SerializableTime time, String user) {
+	public ChangeDto(
+			@NonNull String type,
+			@NonNull Date date,
+			@NonNull SerializableTime time,
+			@NonNull String user) {
 		_type = type;
 		_date = date;
 		_date.setYear(_date.getYear() - 1900);
@@ -40,7 +46,9 @@ public class ChangeDto implements Serializable {
 	}
 
 	public String toString() {
-		return "{Change: {Type: " + _type + "};{Date: " + _date.toString() + "};{Time: " + _time.toString()
+		return "{Change: {Type: " + _type
+				+ "};{Date: " + _date.toString()
+				+ "};{Time: " + _time.toString()
 				+ "};{User: " + _user + "}}";
 	}
 }

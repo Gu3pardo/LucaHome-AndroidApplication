@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 import guepardoapps.library.lucahome.common.constants.ServerActions;
@@ -18,7 +20,12 @@ public class ShoppingEntryDto implements Serializable {
 
 	private boolean _bought;
 
-	public ShoppingEntryDto(int id, String name, ShoppingEntryGroup group, int quantity, boolean bought) {
+	public ShoppingEntryDto(
+			int id,
+			@NonNull String name,
+			@NonNull ShoppingEntryGroup group,
+			int quantity,
+			boolean bought) {
 		_id = id;
 		_name = name;
 		_group = group;
@@ -79,7 +86,10 @@ public class ShoppingEntryDto implements Serializable {
 	}
 
 	public String toString() {
-		return "{" + TAG + ": {ID: " + String.valueOf(_id) + "};{Name: " + _name + "};{Group: " + _group.toString()
+		return "{" + TAG
+				+ ": {ID: " + String.valueOf(_id)
+				+ "};{Name: " + _name
+				+ "};{Group: " + _group.toString()
 				+ "};{Quantity: " + String.valueOf(_quantity) + "}}";
 	}
 }

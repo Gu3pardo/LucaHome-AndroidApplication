@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.converter.wear;
 
+import android.support.annotation.NonNull;
+
 import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -17,7 +19,7 @@ public class MessageToSocketConverter {
         _logger = new LucaHomeLogger(TAG);
     }
 
-    public SerializableList<WirelessSocketDto> ConvertMessageToSocketList(String message) {
+    public SerializableList<WirelessSocketDto> ConvertMessageToSocketList(@NonNull String message) {
         if (message.startsWith(SOCKETS)) {
             _logger.Debug("message starts with " + SOCKETS + "! replacing!");
             message = message.replace(SOCKETS, "");
@@ -27,7 +29,8 @@ public class MessageToSocketConverter {
         String[] items = message.split("\\&");
         if (items.length > 0) {
             SerializableList<WirelessSocketDto> list = new SerializableList<>();
-            for (String entry : items) {
+            for (int index = 0; index < items.length; index++) {
+                String entry = items[index];
                 String[] data = entry.split("\\:");
 
                 _logger.Info("Socket dataContent");
@@ -37,7 +40,10 @@ public class MessageToSocketConverter {
 
                 if (data.length == 2) {
                     if (data[0] != null && data[1] != null) {
-                        WirelessSocketDto item = new WirelessSocketDto(R.drawable.socket, data[0],
+                        WirelessSocketDto item = new WirelessSocketDto(
+                                index,
+                                R.drawable.socket,
+                                data[0],
                                 (data[1].contains("1")));
                         list.addValue(item);
                     } else {

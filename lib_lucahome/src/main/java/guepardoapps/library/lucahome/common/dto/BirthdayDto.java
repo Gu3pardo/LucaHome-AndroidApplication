@@ -1,10 +1,10 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.Locale;
 
-import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.enums.BirthdayDateType;
@@ -24,10 +24,10 @@ public class BirthdayDto implements Serializable {
     private int _notificationId;
     private boolean _notifyMe;
 
-    private String _deleteBroadcastReceiverString;
-    private String _hasBirthdayBroadcastReceiverString;
-
-    public BirthdayDto(String name, Calendar birthday, int id) {
+    public BirthdayDto(
+            @NonNull String name,
+            @NonNull Calendar birthday,
+            int id) {
         _drawable = -1;
 
         _name = name;
@@ -36,12 +36,12 @@ public class BirthdayDto implements Serializable {
         _id = id;
         _notificationId = IDs.NOTIFICATION_BIRTHDAY + _id;
         _notifyMe = true;
-
-        _deleteBroadcastReceiverString = Broadcasts.DELETE_BIRTHDAY + _name.toUpperCase(Locale.GERMAN).trim();
-        _hasBirthdayBroadcastReceiverString = Broadcasts.HAS_BIRTHDAY + _name.toUpperCase(Locale.GERMAN).trim();
     }
 
-    public BirthdayDto(int drawable, String name, Calendar birthday) {
+    public BirthdayDto(
+            int drawable,
+            @NonNull String name,
+            @NonNull Calendar birthday) {
         _drawable = drawable;
 
         _name = name;
@@ -50,9 +50,6 @@ public class BirthdayDto implements Serializable {
         _id = -1;
         _notificationId = IDs.NOTIFICATION_BIRTHDAY + _id;
         _notifyMe = true;
-
-        _deleteBroadcastReceiverString = Broadcasts.DELETE_BIRTHDAY + _name.toUpperCase(Locale.GERMAN).trim();
-        _hasBirthdayBroadcastReceiverString = Broadcasts.HAS_BIRTHDAY + _name.toUpperCase(Locale.GERMAN).trim();
     }
 
     public int GetDrawable() {
@@ -65,58 +62,6 @@ public class BirthdayDto implements Serializable {
 
     public Calendar GetBirthday() {
         return _birthday;
-    }
-
-    public String GetBirthdayWearString() {
-        String day = String.valueOf(_birthday.get(Calendar.DAY_OF_MONTH));
-        while (day.length() < 2) {
-            day = "0" + day;
-        }
-
-        String month;
-        switch (_birthday.get(Calendar.MONTH)) {
-            case Calendar.JANUARY:
-                month = "January";
-                break;
-            case Calendar.FEBRUARY:
-                month = "February";
-                break;
-            case Calendar.MARCH:
-                month = "March";
-                break;
-            case Calendar.APRIL:
-                month = "April";
-                break;
-            case Calendar.MAY:
-                month = "May";
-                break;
-            case Calendar.JUNE:
-                month = "June";
-                break;
-            case Calendar.JULY:
-                month = "July";
-                break;
-            case Calendar.AUGUST:
-                month = "August";
-                break;
-            case Calendar.SEPTEMBER:
-                month = "September";
-                break;
-            case Calendar.OCTOBER:
-                month = "October";
-                break;
-            case Calendar.NOVEMBER:
-                month = "November";
-                break;
-            case Calendar.DECEMBER:
-                month = "December";
-                break;
-            default:
-                month = "NULL";
-                break;
-        }
-
-        return day + "." + month + " " + String.valueOf(_birthday.get(Calendar.YEAR));
     }
 
     public boolean HasBirthday() {
@@ -175,30 +120,24 @@ public class BirthdayDto implements Serializable {
         return "It is " + _name + "'s " + String.valueOf(age) + "th birthday!";
     }
 
-    public boolean GetNotifyMe() {
+    public boolean NotifyMe() {
         return _notifyMe;
     }
 
-    public String GetDeleteBroadcast() {
-        return _deleteBroadcastReceiverString;
-    }
-
-    public String GetHasBirthdayBroadcast() {
-        return _hasBirthdayBroadcastReceiverString;
-    }
-
     public String GetCommandAdd() {
-        return ServerActions.ADD_BIRTHDAY + String.valueOf(_id) + "&name=" + _name + "&day="
-                + String.valueOf(_birthday.get(Calendar.DAY_OF_MONTH)) + "&month="
-                + String.valueOf(_birthday.get(Calendar.MONTH) + 1) + "&year="
-                + String.valueOf(_birthday.get(Calendar.YEAR));
+        return ServerActions.ADD_BIRTHDAY + String.valueOf(_id)
+                + "&name=" + _name
+                + "&day=" + String.valueOf(_birthday.get(Calendar.DAY_OF_MONTH))
+                + "&month=" + String.valueOf(_birthday.get(Calendar.MONTH) + 1)
+                + "&year=" + String.valueOf(_birthday.get(Calendar.YEAR));
     }
 
     public String GetCommandUpdate() {
-        return ServerActions.UPDATE_BIRTHDAY + String.valueOf(_id) + "&name=" + _name + "&day="
-                + String.valueOf(_birthday.get(Calendar.DAY_OF_MONTH)) + "&month="
-                + String.valueOf(_birthday.get(Calendar.MONTH) + 1) + "&year="
-                + String.valueOf(_birthday.get(Calendar.YEAR));
+        return ServerActions.UPDATE_BIRTHDAY + String.valueOf(_id)
+                + "&name=" + _name
+                + "&day=" + String.valueOf(_birthday.get(Calendar.DAY_OF_MONTH))
+                + "&month=" + String.valueOf(_birthday.get(Calendar.MONTH) + 1)
+                + "&year=" + String.valueOf(_birthday.get(Calendar.YEAR));
     }
 
     public String GetCommandDelete() {
@@ -206,10 +145,10 @@ public class BirthdayDto implements Serializable {
     }
 
     public String toString() {
-        return "{" + TAG + ": {Name: " + _name + "};{Birthday: " + _birthday.toString() + "};{NotifyMe: "
-                + String.valueOf(_notifyMe) + "};{Id: " + String.valueOf(_id) + "};{NotificationId: "
-                + String.valueOf(_notificationId) + "};{DeleteBroadcastReceiverString: "
-                + _deleteBroadcastReceiverString + "};{HasBirthdayBroadcastReceiverString: "
-                + _hasBirthdayBroadcastReceiverString + "}}";
+        return "{" + TAG + ": {Name: " + _name
+                + "};{Birthday: " + _birthday.toString()
+                + "};{NotifyMe: " + String.valueOf(_notifyMe)
+                + "};{Id: " + String.valueOf(_id)
+                + "};{NotificationId: " + String.valueOf(_notificationId) + "}}";
     }
 }

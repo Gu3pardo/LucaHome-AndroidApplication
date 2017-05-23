@@ -3,6 +3,7 @@ package guepardoapps.library.lucahome.controller;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.UserDto;
@@ -21,18 +22,19 @@ public class ServiceController {
     private Context _context;
     private UserService _userService;
 
-    public ServiceController(Context context) {
+    public ServiceController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
 
         _context = context;
         _userService = new UserService(_context);
     }
 
-    public void StartRestService(String name,
-                                 String action,
-                                 String broadcast,
-                                 LucaObject lucaObject,
-                                 RaspberrySelection raspberrySelection) {
+    public void StartRestService(
+            @NonNull String name,
+            @NonNull String action,
+            @NonNull String broadcast,
+            @NonNull LucaObject lucaObject,
+            @NonNull RaspberrySelection raspberrySelection) {
         UserDto loggedInUser = _userService.LoadUser();
         if (loggedInUser != null) {
             StartRestService(loggedInUser.GetUserName(), loggedInUser.GetPassword(), name, action, broadcast,
@@ -43,13 +45,14 @@ public class ServiceController {
         }
     }
 
-    public void StartRestService(String user,
-                                 String password,
-                                 String name,
-                                 String action,
-                                 String broadcast,
-                                 LucaObject lucaObject,
-                                 RaspberrySelection raspberrySelection) {
+    public void StartRestService(
+            @NonNull String user,
+            @NonNull String password,
+            @NonNull String name,
+            @NonNull String action,
+            @NonNull String broadcast,
+            @NonNull LucaObject lucaObject,
+            @NonNull RaspberrySelection raspberrySelection) {
         Intent serviceIntent = new Intent(_context, RESTService.class);
         Bundle serviceData = new Bundle();
 
@@ -66,7 +69,7 @@ public class ServiceController {
         _context.startService(serviceIntent);
     }
 
-    public void SendMessageToWear(String message) {
+    public void SendMessageToWear(@NonNull String message) {
         _logger.Info("Wear message is " + message);
         Intent serviceIntent = new Intent(_context, WearMessageService.class);
         Bundle serviceData = new Bundle();

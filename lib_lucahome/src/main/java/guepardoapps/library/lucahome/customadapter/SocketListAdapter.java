@@ -129,7 +129,7 @@ public class SocketListAdapter extends BaseAdapter {
         holder._area.setText(_socketList.getValue(index).GetArea());
 
         holder._state = (Switch) rowView.findViewById(R.id.socket_item_switch);
-        holder._state.setChecked(_socketList.getValue(index).GetIsActivated());
+        holder._state.setChecked(_socketList.getValue(index).IsActivated());
         holder._state.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

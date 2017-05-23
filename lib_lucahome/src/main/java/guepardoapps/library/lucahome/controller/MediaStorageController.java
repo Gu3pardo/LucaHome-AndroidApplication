@@ -4,6 +4,7 @@ import java.io.File;
 
 import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.common.constants.NASConstants;
@@ -37,7 +38,7 @@ public class MediaStorageController {
         _logger.Debug(TAG + " created...");
     }
 
-    public void initialize(Context context) {
+    public void initialize(@NonNull Context context) {
         if (!_isInitialized) {
 
             _commandController = new CommandController(context);

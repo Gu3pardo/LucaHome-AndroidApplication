@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.converter.json;
 
+import android.support.annotation.NonNull;
+
 import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.dto.MenuDto;
@@ -15,7 +17,7 @@ public final class JsonDataToMenuConverter {
 
     private static String _searchParameter = "{menu:";
 
-    public static SerializableList<MenuDto> GetList(String[] stringArray) {
+    public static SerializableList<MenuDto> GetList(@NonNull String[] stringArray) {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return ParseStringToList(stringArray[0]);
         } else {
@@ -24,13 +26,13 @@ public final class JsonDataToMenuConverter {
         }
     }
 
-    public static MenuDto Get(String value) {
+    public static MenuDto Get(@NonNull String value) {
         if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
             if (value.contains(_searchParameter)) {
                 value = value.replace(_searchParameter, "").replace("};};", "");
 
                 String[] data = value.split("\\};");
-                MenuDto newValue = ParseStringToValue(data);
+                MenuDto newValue = ParseStringToValue(-1, data);
                 if (newValue != null) {
                     return newValue;
                 }
@@ -45,17 +47,18 @@ public final class JsonDataToMenuConverter {
         return null;
     }
 
-    private static SerializableList<MenuDto> ParseStringToList(String value) {
+    private static SerializableList<MenuDto> ParseStringToList(@NonNull String value) {
         if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
             if (value.contains(_searchParameter)) {
                 SerializableList<MenuDto> list = new SerializableList<>();
 
                 String[] entries = value.split("\\" + _searchParameter);
-                for (String entry : entries) {
+                for (int index = 0; index < entries.length; index++) {
+                    String entry = entries[index];
                     entry = entry.replace(_searchParameter, "").replace("};};", "");
 
                     String[] data = entry.split("\\};");
-                    MenuDto newValue = ParseStringToValue(data);
+                    MenuDto newValue = ParseStringToValue(index, data);
                     if (newValue != null) {
                         list.addValue(newValue);
                     }
@@ -72,7 +75,9 @@ public final class JsonDataToMenuConverter {
         return new SerializableList<>();
     }
 
-    private static MenuDto ParseStringToValue(String[] data) {
+    private static MenuDto ParseStringToValue(
+            int id,
+            @NonNull String[] data) {
         if (data.length == 6) {
             if (data[0].contains("{weekday:") && data[1].contains("{day:") && data[2].contains("{month:")
                     && data[3].contains("{year:") && data[4].contains("{title:") && data[5].contains("{description:")) {
@@ -95,7 +100,7 @@ public final class JsonDataToMenuConverter {
                     description = " ";
                 }
 
-                MenuDto newValue = new MenuDto(weekday, day, month, year, title, description);
+                MenuDto newValue = new MenuDto(id, weekday, day, month, year, title, description);
                 _logger.Debug(String.format(Locale.GERMAN, "New MenuDto %s", newValue));
 
                 return newValue;

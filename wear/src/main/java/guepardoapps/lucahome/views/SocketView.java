@@ -77,7 +77,7 @@ public class SocketView extends Activity {
         _messageSendHelper = new MessageSendHelper(_context, PhoneMessageService.class);
         _receiverController = new ReceiverController(_context);
 
-        _itemList.addValue(new WirelessSocketDto(R.xml.circle_yellow, "Loading...", false));
+        _itemList.addValue(new WirelessSocketDto(-1, R.xml.circle_yellow, "Loading...", false));
 
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.basicListWatchViewStub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {

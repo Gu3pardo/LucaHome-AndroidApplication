@@ -1,16 +1,16 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
 
 public class MovieDto implements Serializable {
 
     private static final long serialVersionUID = -7601101130730680392L;
 
-    @SuppressWarnings("unused")
     private static final String TAG = MovieDto.class.getSimpleName();
 
     private static final int MAX_RATING = 5;
@@ -22,19 +22,19 @@ public class MovieDto implements Serializable {
     private int _watched;
     private String[] _sockets;
 
-    private String _deleteBroadcastReceiverString;
-    private String _updateBroadcastReceiverString;
-
-    public MovieDto(String title, String genre, String description, int rating, int watched, String[] sockets) {
+    public MovieDto(
+            @NonNull String title,
+            @NonNull String genre,
+            @NonNull String description,
+            int rating,
+            int watched,
+            String[] sockets) {
         _title = title;
         _genre = genre;
         _description = description;
         _rating = rating;
         _watched = watched;
         _sockets = sockets;
-
-        _deleteBroadcastReceiverString = Broadcasts.DELETE_MOVIE + _title.toUpperCase(Locale.GERMAN).replace(" ", "_");
-        _updateBroadcastReceiverString = Broadcasts.UPDATE_MOVIE + _title.toUpperCase(Locale.GERMAN).replace(" ", "_");
     }
 
     public String GetTitle() {
@@ -57,10 +57,6 @@ public class MovieDto implements Serializable {
         return String.format(Locale.GERMAN, "%d/%d", _rating, MAX_RATING);
     }
 
-    public void SetRating(int rating) {
-        _rating = rating;
-    }
-
     public int GetWatched() {
         return _watched;
     }
@@ -69,37 +65,36 @@ public class MovieDto implements Serializable {
         return _sockets;
     }
 
-    public String GetDeleteBroadcast() {
-        return _deleteBroadcastReceiverString;
-    }
-
-    public String GetUpdateBroadcast() {
-        return _updateBroadcastReceiverString;
-    }
-
     public String GetCommandAdd() {
-        return ServerActions.ADD_MOVIE + _title + "&genre=" + _genre + "&description=" + _description + "&rating="
-                + String.valueOf(_rating) + "&watched=" + String.valueOf(_watched) + "&sockets=" + GetSocketsString();
+        return ServerActions.ADD_MOVIE + _title
+                + "&genre=" + _genre
+                + "&description=" + _description
+                + "&rating=" + String.valueOf(_rating)
+                + "&watched=" + String.valueOf(_watched)
+                + "&sockets=" + GetSocketsString();
     }
 
     public String GetCommandUpdate() {
-        return ServerActions.UPDATE_MOVIE + _title + "&genre=" + _genre + "&description=" + _description + "&rating="
-                + String.valueOf(_rating) + "&watched=" + String.valueOf(_watched) + "&sockets=" + GetSocketsString();
+        return ServerActions.UPDATE_MOVIE + _title
+                + "&genre=" + _genre
+                + "&description=" + _description
+                + "&rating=" + String.valueOf(_rating)
+                + "&watched=" + String.valueOf(_watched)
+                + "&sockets=" + GetSocketsString();
     }
 
     public String GetCommandDelete() {
         return ServerActions.DELETE_MOVIE + _title;
     }
 
-    public String GetCommandStart() {
-        return ServerActions.START_MOVIE + _title;
-    }
-
     public String toString() {
-        return "{Movie: {Title: " + _title + "};{Genre: " + _genre + "};{Description: " + _description + "};{Rating: "
-                + String.valueOf(_rating) + "};{Watched: " + String.valueOf(_watched) + "};{Sockets: "
-                + GetSocketsString() + "};{DeleteBroadcastReceiverString: " + _deleteBroadcastReceiverString
-                + "};{UpdateBroadcastReceiverString: " + _updateBroadcastReceiverString + "}}";
+        return "{" + TAG
+                + ": {Title: " + _title
+                + "};{Genre: " + _genre
+                + "};{Description: " + _description
+                + "};{Rating: " + String.valueOf(_rating)
+                + "};{Watched: " + String.valueOf(_watched)
+                + "};{Sockets: " + GetSocketsString() + "}}";
     }
 
     private String GetSocketsString() {

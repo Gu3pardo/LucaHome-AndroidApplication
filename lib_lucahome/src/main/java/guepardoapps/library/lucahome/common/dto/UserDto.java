@@ -1,24 +1,37 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 public class UserDto implements Serializable {
 
-	private static final long serialVersionUID = 1533208191654743604L;
-	
-	private String _userName;
-	private String _password;
+    private static final long serialVersionUID = 1533208191654743604L;
 
-	public UserDto(String userName, String password) {
-		_userName = userName;
-		_password = password;
-	}
+    private static final String TAG = UserDto.class.getSimpleName();
 
-	public String GetUserName() {
-		return _userName;
-	}
+    private String _userName;
+    private String _password;
 
-	public String GetPassword() {
-		return _password;
-	}
+    public UserDto(
+            @NonNull String userName,
+            @NonNull String password) {
+        _userName = userName;
+        _password = password;
+    }
+
+    public String GetUserName() {
+        return _userName;
+    }
+
+    public String GetPassword() {
+        return _password;
+    }
+
+    @Override
+    public String toString() {
+        return "{" + TAG
+                + ": {UserName: " + ""
+                + "};{Password: " + "" + "}}";
+    }
 }

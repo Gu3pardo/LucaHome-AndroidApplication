@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.converter.wear;
 
+import android.support.annotation.NonNull;
+
 import guepardoapps.library.lucahome.common.dto.MenuDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
@@ -16,7 +18,7 @@ public class MessageToMenuConverter {
         _logger = new LucaHomeLogger(TAG);
     }
 
-    public SerializableList<MenuDto> ConvertMessageToList(String message) {
+    public SerializableList<MenuDto> ConvertMessageToList(@NonNull String message) {
         if (message.startsWith(MENU)) {
             _logger.Debug("message starts with " + MENU + "! replacing!");
             message = message.replace(MENU, "");
@@ -26,7 +28,8 @@ public class MessageToMenuConverter {
         String[] items = message.split("\\&");
         if (items.length > 0) {
             SerializableList<MenuDto> list = new SerializableList<>();
-            for (String entry : items) {
+            for (int index = 0; index < items.length; index++) {
+                String entry = items[index];
                 String[] data = entry.split("\\:");
 
                 _logger.Info("Menu dataContent");
@@ -37,8 +40,14 @@ public class MessageToMenuConverter {
                 if (data.length == 6) {
                     if (data[0] != null && data[1] != null && data[2] != null && data[3] != null && data[4] != null
                             && data[5] != null) {
-                        MenuDto item = new MenuDto(data[0], Integer.parseInt(data[1]), Integer.parseInt(data[2]),
-                                Integer.parseInt(data[3]), data[4], data[5]);
+                        MenuDto item = new MenuDto(
+                                index,
+                                data[0],
+                                Integer.parseInt(data[1]),
+                                Integer.parseInt(data[2]),
+                                Integer.parseInt(data[3]),
+                                data[4],
+                                data[5]);
                         list.addValue(item);
                     } else {
                         _logger.Warn("data[0] or data[1] or data[2] or data[3] or data[4] or data[5] is null!");

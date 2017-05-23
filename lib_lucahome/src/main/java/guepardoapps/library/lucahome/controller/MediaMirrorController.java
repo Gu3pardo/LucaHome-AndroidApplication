@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
@@ -48,7 +49,7 @@ public class MediaMirrorController {
         }
     };
 
-    public MediaMirrorController(Context context) {
+    public MediaMirrorController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _context = context;
         _broadcastController = new BroadcastController(_context);
@@ -62,7 +63,10 @@ public class MediaMirrorController {
         _initialized = true;
     }
 
-    public boolean SendCommand(String serverIp, String command, String data) {
+    public boolean SendCommand(
+            @NonNull String serverIp,
+            @NonNull String command,
+            @NonNull String data) {
         _logger.Debug("SendServerCommand: " + command + " with data " + data);
 
         if (!_initialized) {
@@ -85,7 +89,7 @@ public class MediaMirrorController {
         _initialized = false;
     }
 
-    private void handleResponse(String response) {
+    private void handleResponse(@NonNull String response) {
         _logger.Debug("handleResponse");
 
         String[] responseData = response.split("\\:");

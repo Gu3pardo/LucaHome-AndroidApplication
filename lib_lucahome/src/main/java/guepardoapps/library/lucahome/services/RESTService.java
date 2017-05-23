@@ -90,8 +90,8 @@ public class RESTService extends Service {
         _logger.Debug("Broadcast is: " + broadcast);
 
         if (_databaseController == null) {
-            _databaseController = DatabaseController.getInstance();
-            _databaseController.onCreate(_context);
+            _databaseController = new DatabaseController(_context);
+            _databaseController.Initialize();
         }
 
         if (!_networkController.IsNetworkAvailable()) {
@@ -140,6 +140,10 @@ public class RESTService extends Service {
         task.setValues(name, broadcast, lucaObject, actions.length);
         task.execute(actions);
 
+        if (_databaseController != null) {
+            _databaseController.Dispose();
+        }
+
         return Service.START_NOT_STICKY;
     }
 
@@ -153,7 +157,7 @@ public class RESTService extends Service {
 
         ActionDto storeAction = new ActionDto(-1, name, action, broadcast);
         if (_databaseController.SaveAction(storeAction)) {
-            _scheduleService.AddSchedule(name, new DeleteStoredActionRunnable(_context, name),
+            _scheduleService.AddSchedule(name, new DeleteStoredActionRunnable(name, _databaseController),
                     Timeouts.DELETE_STORED_ACTION, false);
             Toasty.success(_context, "Saved action!", Toast.LENGTH_SHORT).show();
         } else {
@@ -172,7 +176,11 @@ public class RESTService extends Service {
 
         private String[] _answer;
 
-        public void setValues(String name, String broadcast, LucaObject lucaObject, int answerSize) {
+        public void setValues(
+                String name,
+                String broadcast,
+                LucaObject lucaObject,
+                int answerSize) {
             _logger = new LucaHomeLogger(TAG);
 
             _name = name;
@@ -185,7 +193,7 @@ public class RESTService extends Service {
 
         @Override
         protected String doInBackground(String... actions) {
-            String response = "";
+            String response;
             int answerIndex = 0;
             boolean downloadSuccess = false;
 
@@ -249,8 +257,9 @@ public class RESTService extends Service {
             // End hack
             else {
                 if (_broadcast != null && _broadcast.length() > 0) {
-                    _logger.Info(String.format("Sending broadcast %s with bundle %s and data %s!", _broadcast, _name,
-                            _answer));
+                    _logger.Info(String.format(Locale.GERMAN,
+                            "Sending broadcast %s with bundle %s and data %s!",
+                            _broadcast, _name, _answer));
                     Intent broadcastIntent = new Intent(_broadcast);
                     Bundle broadcastData = new Bundle();
                     broadcastData.putStringArray(_name, _answer);

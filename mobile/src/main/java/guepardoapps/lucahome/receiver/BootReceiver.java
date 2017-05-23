@@ -91,7 +91,7 @@ public class BootReceiver extends BroadcastReceiver {
         _logger.Debug("checkConnection");
         if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
             _logger.Debug("We are in the homeNetwork!");
-            if (_androidSystemController.isServiceRunning(MainService.class)) {
+            if (_androidSystemController.IsServiceRunning(MainService.class)) {
                 _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
                         new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.DOWNLOAD_ALL});
             } else {

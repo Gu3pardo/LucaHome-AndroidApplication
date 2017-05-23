@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,13 +10,20 @@ public class InformationDto implements Serializable {
 
 	private static final long serialVersionUID = 2257042096692273681L;
 
-	private Map<String, String> _informationList;
+	private Map<String, String> _informationList = new HashMap<>();
 
-	public InformationDto(String author, String company, String contact, String buildDate, String serverVersion,
-			String websiteVersion, String temperatureLogVersion, String androidAppVersion, String androidWearVersion,
-			String androidAccessVersion, String mediaServerVersion) {
-		_informationList = new HashMap<>();
-
+	public InformationDto(
+			@NonNull String author,
+			@NonNull String company,
+			@NonNull String contact,
+			@NonNull String buildDate,
+			@NonNull String serverVersion,
+			@NonNull String websiteVersion,
+			@NonNull String temperatureLogVersion,
+			@NonNull String androidAppVersion,
+			@NonNull String androidWearVersion,
+			@NonNull String androidAccessVersion,
+			@NonNull String mediaServerVersion) {
 		_informationList.put("author", author);
 		_informationList.put("company", company);
 		_informationList.put("contact", contact);
@@ -30,50 +39,6 @@ public class InformationDto implements Serializable {
 
 	public Map<String, String> GetInformationList() {
 		return _informationList;
-	}
-
-	public String GetAuthor() {
-		return _informationList.get("author");
-	}
-
-	public String GetCompany() {
-		return _informationList.get("company");
-	}
-
-	public String GetContact() {
-		return _informationList.get("contact");
-	}
-
-	public String GetBuildDate() {
-		return _informationList.get("buildDate");
-	}
-
-	public String GetServerVersion() {
-		return _informationList.get("serverVersion");
-	}
-
-	public String GetWebsiteVersion() {
-		return _informationList.get("websiteVersion");
-	}
-
-	public String GetTemperatureLogVersion() {
-		return _informationList.get("temperatureLogVersion");
-	}
-
-	public String GetAndroidAppVersion() {
-		return _informationList.get("androidAppVersion");
-	}
-
-	public String GetAndroidWearVersion() {
-		return _informationList.get("androidWearVersion");
-	}
-
-	public String GetAndroidAccessVersion() {
-		return _informationList.get("androidAccessVersion");
-	}
-
-	public String GetMediaServerVersion() {
-		return _informationList.get("mediaServerVersion");
 	}
 
 	public String GetKey(int index) {

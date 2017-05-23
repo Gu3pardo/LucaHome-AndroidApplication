@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -13,18 +15,13 @@ public class HumidityDto implements Serializable {
 	private String _area;
 	private SerializableTime _lastUpdate;
 
-	public HumidityDto(double humidity, String area, SerializableTime lastUpdate) {
+	public HumidityDto(
+			double humidity,
+			@NonNull String area,
+			@NonNull SerializableTime lastUpdate) {
 		_humidity = humidity;
 		_area = area;
 		_lastUpdate = lastUpdate;
-	}
-
-	public double GetHumidityValue() {
-		return _humidity;
-	}
-
-	public void SetHumidity(double humidity) {
-		_humidity = humidity;
 	}
 
 	public String GetHumidityString() {
@@ -39,16 +36,9 @@ public class HumidityDto implements Serializable {
 		return _lastUpdate;
 	}
 
-	public void SetLastUpdate(SerializableTime lastUpdate) {
-		_lastUpdate = lastUpdate;
-	}
-
-	public String GetWatchFaceText() {
-		return _area + ": " + GetHumidityString() + " " + _lastUpdate.toString();
-	}
-
 	public String toString() {
-		return "{Humidity: {Value: " + GetHumidityString() + "};{Area: " + _area + "};{LastUpdate: "
-				+ _lastUpdate.toString() + "}}";
+		return "{Humidity: {Value: " + GetHumidityString()
+				+ "};{Area: " + _area
+				+ "};{LastUpdate: " + _lastUpdate.toString() + "}}";
 	}
 }

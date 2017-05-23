@@ -1,6 +1,7 @@
 package guepardoapps.library.lucahome.controller;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
@@ -25,20 +26,24 @@ public class SocketController {
     private SharedPrefController _sharedPrefController;
     private PackageService _packageService;
 
-    public SocketController(Context context) {
+    public SocketController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _serviceController = new ServiceController(context);
         _sharedPrefController = new SharedPrefController(context, SharedPrefConstants.SHARED_PREF_NAME);
         _packageService = new PackageService(context);
     }
 
-    public void SetSocket(WirelessSocketDto socket, boolean newState) {
+    public void SetSocket(
+            @NonNull WirelessSocketDto socket,
+            boolean newState) {
         _logger.Debug("SetSocket: " + socket.GetName() + " to " + String.valueOf(newState));
         _serviceController.StartRestService(socket.GetName(), socket.GetCommandSet(newState), Broadcasts.RELOAD_SOCKETS,
                 LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
     }
 
-    public void SetSocket(String socketName, boolean newState) {
+    public void SetSocket(
+            @NonNull String socketName,
+            boolean newState) {
         _logger.Debug("SetSocket: " + socketName + " to " + String.valueOf(newState));
         _serviceController.StartRestService(socketName,
                 ServerActions.SET_SOCKET + socketName + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF),
@@ -51,13 +56,13 @@ public class SocketController {
                 Broadcasts.DOWNLOAD_SOCKET_FINISHED, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
     }
 
-    public void DeleteSocket(WirelessSocketDto socket) {
+    public void DeleteSocket(@NonNull WirelessSocketDto socket) {
         _logger.Debug("DeleteSocket: " + socket.GetName());
         _serviceController.StartRestService(socket.GetName(), socket.GetCommandDelete(), Broadcasts.RELOAD_SOCKETS,
                 LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
     }
 
-    public boolean ValidateSocketCode(String code) {
+    public boolean ValidateSocketCode(@NonNull String code) {
         _logger.Debug("ValidateSocketCode: " + code);
 
         if (code.length() != 6) {
@@ -77,11 +82,11 @@ public class SocketController {
                 || code.charAt(5) == 'E');
     }
 
-    public void CheckMedia(WirelessSocketDto socket) {
+    public void CheckMedia(@NonNull WirelessSocketDto socket) {
         _logger.Debug("GetDrawable: " + socket.GetName());
 
         if (socket.GetName().contains("Sound")) {
-            if (socket.GetIsActivated()) {
+            if (socket.IsActivated()) {
                 return;
             }
 

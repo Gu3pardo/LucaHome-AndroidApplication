@@ -53,7 +53,7 @@ public class LucaNotificationController extends NotificationController {
     private SharedPrefController _sharedPrefController;
     private Tools _tools;
 
-    public LucaNotificationController(Context context) {
+    public LucaNotificationController(@NonNull Context context) {
         super(context);
         _logger = new LucaHomeLogger(TAG);
         _context = context;
@@ -61,11 +61,12 @@ public class LucaNotificationController extends NotificationController {
         _tools = new Tools();
     }
 
-    public void CreateBirthdayNotification(@NonNull Class<?> birthdayActivity,
-                                           int icon,
-                                           @NonNull String title,
-                                           @NonNull String body,
-                                           boolean autoCancelable) {
+    public void CreateBirthdayNotification(
+            @NonNull Class<?> birthdayActivity,
+            int icon,
+            @NonNull String title,
+            @NonNull String body,
+            boolean autoCancelable) {
         if (!_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION)) {
             _logger.Warn("Not allowed to display birthday notification!");
@@ -79,16 +80,25 @@ public class LucaNotificationController extends NotificationController {
         Intent intent = new Intent(_context, birthdayActivity);
         PendingIntent pendingIntent = PendingIntent.getActivity(_context, IDs.NOTIFICATION_BIRTHDAY, intent, 0);
 
-        builder.setSmallIcon(icon).setContentTitle(title).setContentText(body).setTicker(body)
-                .setContentIntent(pendingIntent).setAutoCancel(autoCancelable);
+        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), R.drawable.birthday_hd);
+        bitmap = _tools.GetCircleBitmap(bitmap);
+
+        builder.setSmallIcon(icon)
+                .setLargeIcon(bitmap)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setTicker(body)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(autoCancelable);
 
         Notification notification = builder.build();
         notificationManager.notify(IDs.NOTIFICATION_BIRTHDAY, notification);
     }
 
-    public void CreateTemperatureNotification(@NonNull Class<?> sensorTemperatureActivity,
-                                              @NonNull SerializableList<TemperatureDto> temperatureList,
-                                              @NonNull WeatherModel currentWeather) {
+    public void CreateTemperatureNotification(
+            @NonNull Class<?> sensorTemperatureActivity,
+            @NonNull SerializableList<TemperatureDto> temperatureList,
+            @NonNull WeatherModel currentWeather) {
         if (!_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
             _logger.Warn("Not allowed to display socket notification!");
@@ -186,12 +196,28 @@ public class LucaNotificationController extends NotificationController {
         }
         _logger.Info(String.format("Size of wirelessSocketList is: %s!", wirelessSocketList.getSize()));
 
-        int[] imageButtonArray = new int[]{R.id.socket_1_on, R.id.socket_1_off, R.id.socket_2_on, R.id.socket_2_off,
-                R.id.socket_3_on, R.id.socket_3_off, R.id.socket_4_on, R.id.socket_4_off, R.id.socket_5_on,
-                R.id.socket_5_off, R.id.socket_6_on, R.id.socket_6_off, R.id.socket_7_on, R.id.socket_7_off,
-                R.id.socket_8_on, R.id.socket_8_off, R.id.socket_9_on, R.id.socket_9_off, R.id.socket_10_on,
-                R.id.socket_10_off};
-        boolean[] socketVisibility = new boolean[]{false, false, false, false, false, false, false, false, false,
+        int[] imageButtonArray = new int[]{
+                R.id.socket_1_on, R.id.socket_1_off,
+                R.id.socket_2_on, R.id.socket_2_off,
+                R.id.socket_3_on, R.id.socket_3_off,
+                R.id.socket_4_on, R.id.socket_4_off,
+                R.id.socket_5_on, R.id.socket_5_off,
+                R.id.socket_6_on, R.id.socket_6_off,
+                R.id.socket_7_on, R.id.socket_7_off,
+                R.id.socket_8_on, R.id.socket_8_off,
+                R.id.socket_9_on, R.id.socket_9_off,
+                R.id.socket_10_on, R.id.socket_10_off};
+
+        boolean[] socketVisibility = new boolean[]{
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
                 false};
 
         Intent[] socketIntents = new Intent[wirelessSocketList.getSize()];
@@ -221,14 +247,14 @@ public class LucaNotificationController extends NotificationController {
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
             int iconId = wirelessSocketList.getValue(index).GetDrawable();
-            String text = ((wirelessSocketList.getValue(index).GetIsActivated()) ? "ON" : "OFF");
+            String text = ((wirelessSocketList.getValue(index).IsActivated()) ? "ON" : "OFF");
             Bitmap icon = BitmapFactory.decodeResource(_context.getResources(), iconId);
 
             wearActions[index] = new NotificationCompat.Action.Builder(iconId, text, socketPendingIntents[index])
                     .build();
 
             if (socketVisibility[index]) {
-                if (wirelessSocketList.getValue(index).GetIsActivated()) {
+                if (wirelessSocketList.getValue(index).IsActivated()) {
                     remoteViews.setViewVisibility(imageButtonArray[(index * 2)], View.GONE);
                     remoteViews.setViewVisibility(imageButtonArray[(index * 2) + 1], View.VISIBLE);
                     remoteViews.setOnClickPendingIntent(imageButtonArray[(index * 2) + 1], socketPendingIntents[index]);
@@ -284,15 +310,26 @@ public class LucaNotificationController extends NotificationController {
         notificationManager.notify(IDs.NOTIFICATION_WEAR, notification);
     }
 
-    public void CreateForecastWeatherNotification(@NonNull Class<?> receiverActivity,
-                                                  int icon,
-                                                  @NonNull String title,
-                                                  @NonNull String body,
-                                                  int id) {
+    public void CreateForecastWeatherNotification(
+            @NonNull Class<?> receiverActivity,
+            int icon,
+            int largeIcon,
+            @NonNull String title,
+            @NonNull String body,
+            int id) {
         NotificationManager notificationManager = (NotificationManager) _context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), largeIcon);
+        bitmap = _tools.GetCircleBitmap(bitmap);
+
         Notification.Builder builder = new Notification.Builder(_context);
-        builder.setSmallIcon(icon).setContentTitle(title).setContentText(body).setTicker(body);
+        builder
+                .setSmallIcon(icon)
+                .setLargeIcon(bitmap)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setTicker(body);
 
         Intent intent = new Intent(_context, receiverActivity);
         PendingIntent pendingIntent = PendingIntent.getActivity(_context, id, intent, 0);

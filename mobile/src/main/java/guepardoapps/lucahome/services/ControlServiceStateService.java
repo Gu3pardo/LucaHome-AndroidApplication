@@ -1,7 +1,5 @@
 package guepardoapps.lucahome.services;
 
-import android.app.ActivityManager;
-import android.app.ActivityManager.RunningServiceInfo;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -15,6 +13,7 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
+import guepardoapps.library.toolset.controller.AndroidSystemController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 public class ControlServiceStateService extends Service {
@@ -25,6 +24,7 @@ public class ControlServiceStateService extends Service {
     private boolean _isInitialized;
 
     private Context _context;
+    private AndroidSystemController _androidSystemController;
     private ReceiverController _receiverController;
 
     private Handler _checkServiceHandler;
@@ -44,6 +44,7 @@ public class ControlServiceStateService extends Service {
             _logger = new LucaHomeLogger(TAG);
 
             _context = this;
+            _androidSystemController = new AndroidSystemController(_context);
             _receiverController = new ReceiverController(_context);
             _receiverController.RegisterReceiver(_timeTickReceiver, new String[]{Intent.ACTION_TIME_TICK});
 
@@ -70,16 +71,6 @@ public class ControlServiceStateService extends Service {
         _receiverController.UnregisterReceiver(_timeTickReceiver);
     }
 
-    private boolean isServiceRunning(Class<?> serviceClass) {
-        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private class CustomRunnable implements Runnable {
         private void runSingle() {
             _logger.Debug("CustomRunnable runSingle");
@@ -98,17 +89,10 @@ public class ControlServiceStateService extends Service {
         private void checkServices() {
             _logger.Debug("CustomRunnable checkServices");
 
-            if (!isServiceRunning(MainService.class)) {
+            if (!_androidSystemController.IsServiceRunning(MainService.class)) {
                 _logger.Warn("MainService not running! Restarting!");
                 Toasty.warning(_context, "Restarting MainService!", Toast.LENGTH_LONG).show();
                 Intent serviceIntent = new Intent(_context, MainService.class);
-                startService(serviceIntent);
-            }
-
-            if (!isServiceRunning(ReceiverService.class)) {
-                _logger.Warn("ReceiverService not running! Restarting!");
-                Toasty.warning(_context, "Restarting ReceiverService!", Toast.LENGTH_LONG).show();
-                Intent serviceIntent = new Intent(_context, ReceiverService.class);
                 startService(serviceIntent);
             }
         }

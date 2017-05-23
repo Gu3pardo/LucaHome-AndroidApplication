@@ -13,6 +13,8 @@ public class MenuDto implements Serializable {
 
     private static final long serialVersionUID = 9010866792096047325L;
 
+    private int _id;
+
     private String _weekday;
     private int _day;
     private int _month;
@@ -22,8 +24,13 @@ public class MenuDto implements Serializable {
 
     private boolean _needsUpdate = false;
 
-    public MenuDto(@NonNull String weekday, int day, int month, int year,
-                   @NonNull String title, @NonNull String description) {
+    public MenuDto(int id,
+                   @NonNull String weekday,
+                   int day, int month, int year,
+                   @NonNull String title,
+                   @NonNull String description) {
+        _id = id;
+
         _weekday = weekday;
 
         _day = day;
@@ -41,6 +48,10 @@ public class MenuDto implements Serializable {
         if (_description.length() == 0) {
             _description = "-";
         }
+    }
+
+    public int GetId() {
+        return _id;
     }
 
     public String GetWeekday() {
@@ -127,7 +138,7 @@ public class MenuDto implements Serializable {
 
     @Override
     public String toString() {
-        return "{" + TAG + ":{Weekday:" + _weekday + "};{Day:" + String.valueOf(_day) + "};{Month:"
+        return "{" + TAG + ":{Weekday:" + _weekday + "};{Id:" + String.valueOf(_id) + "};{Day:" + String.valueOf(_day) + "};{Month:"
                 + String.valueOf(_month) + "};{Year:" + String.valueOf(_year) + "};{Title:" + _title + "};{Description:"
                 + _description + "};}";
     }

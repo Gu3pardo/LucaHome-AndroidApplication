@@ -54,7 +54,7 @@ public class SocketActionService extends Service {
             _logger.Debug(String.format(Locale.GERMAN, "socket: %s", socket));
 
             _receiverController.RegisterReceiver(_notificationReceiver, new String[]{socket.GetNotificationBroadcast()});
-            serviceController.StartRestService(socket.GetName(), socket.GetCommandSet(!socket.GetIsActivated()),
+            serviceController.StartRestService(socket.GetName(), socket.GetCommandSet(!socket.IsActivated()),
                     socket.GetNotificationBroadcast(), LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
             socketController.CheckMedia(socket);
         }

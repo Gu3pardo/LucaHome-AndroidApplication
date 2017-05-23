@@ -8,9 +8,7 @@ public class Broadcasts {
     public static final String ADD_BIRTHDAY = "guepardoapps.lucahome.broadcast.add.birthday";
     public static final String UPDATE_BIRTHDAY = "guepardoapps.lucahome.broadcast.update.birthday";
     public static final String UPDATE_BIRTHDAY_LIST = "guepardoapps.lucahome.watchface.broadcast.update.birthday_list";
-    public static final String DELETE_BIRTHDAY = "guepardoapps.lucahome.broadcast.delete.birthday";
     public static final String RELOAD_BIRTHDAY = "guepardoapps.lucahome.broadcast.reload.birthday";
-    public static final String HAS_BIRTHDAY = "guepardoapps.lucahome.broadcast.has.birthday";
     public static final String DOWNLOAD_BIRTHDAY_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_BIRTHDAY_FINISHED";
 
     // Change
@@ -20,7 +18,6 @@ public class Broadcasts {
     // Command MainService
     public static final String COMMAND = "guepardoapps.lucahome.broadcast.command";
     public static final String MAIN_SERVICE_COMMAND = "guepardoapps.lucahome.broadcast.main_service.command";
-    public static final String GET_ALL = "guepardoapps.lucahome.broadcast.get.all";
 
     // Humidity
     public static final String UPDATE_HUMIDITY = "guepardoapps.lucahome.broadcast.UPDATE_HUMIDITY";
@@ -45,14 +42,10 @@ public class Broadcasts {
     public static final String MEDIAMIRROR_SERVER_VERSION = "guepardoapps.mediamirror.broadcast.current.server_version";
 
     // Menu
-    public static final String CLEAR_MENU = "guepardoapps.lucahome.broadcast.clear.menu";
     public static final String RELOAD_MENU = "guepardoapps.lucahome.broadcast.reload.menu";
     public static final String UPDATE_MENU = "guepardoapps.lucahome.broadcast.UPDATE_MENU";
     public static final String UPDATE_MENU_VIEW = "guepardoapps.lucahome.broadcast.UPDATE_MENU_VIEW";
     public static final String DOWNLOAD_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MENU_FINISHED";
-    public static final String ADD_LISTED_MENU = "guepardoapps.lucahome.broadcast.add.listedmenu";
-    public static final String UPDATE_LISTED_MENU = "guepardoapps.lucahome.broadcast.update.listedmenu";
-    public static final String DELETE_LISTED_MENU = "guepardoapps.lucahome.broadcast.delete.listedmenu";
     public static final String RELOAD_LISTED_MENU = "guepardoapps.lucahome.broadcast.reload.listedmenu";
     public static final String UPDATE_LISTED_MENU_VIEW = "guepardoapps.lucahome.broadcast.UPDATE_LISTED_MENU_VIEW";
     public static final String DOWNLOAD_LISTED_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_LISTED_MENU_FINISHED";
@@ -65,9 +58,6 @@ public class Broadcasts {
     // Movie
     public static final String ADD_MOVIE = "guepardoapps.lucahome.broadcast.add.movie";
     public static final String UPDATE_MOVIE = "guepardoapps.lucahome.broadcast.update.movie";
-    public static final String UPDATE_MOVIE_LIST = "guepardoapps.lucahome.watchface.broadcast.update.movie_list";
-    public static final String DELETE_MOVIE = "guepardoapps.lucahome.broadcast.delete.movie";
-    public static final String ACTIVATE_MOVIE = "guepardoapps.lucahome.broadcast.activate.movie";
     public static final String RELOAD_MOVIE = "guepardoapps.lucahome.broadcast.reload.movie";
     public static final String DOWNLOAD_MOVIE_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MOVIE_FINISHED";
 
@@ -76,12 +66,9 @@ public class Broadcasts {
     public static final String PERMISSION_WRITE_SETTINGS = "guepardoapps.lucahome.broadcast.PERMISSION_WRITE_SETTINGS";
 
     // Socket
-    public static final String UPDATE_SOCKET_VIEW = "guepardoapps.lucahome.broadcast.update.view.socket.details";
     public static final String ADD_SOCKET = "guepardoapps.lucahome.broadcast.add.wirelesssocket";
     public static final String UPDATE_SOCKET = "guepardoapps.lucahome.broadcast.update.wirelesssockets";
     public static final String UPDATE_SOCKET_LIST = "guepardoapps.lucahome.watchface.broadcast.update.socket_list";
-    public static final String DELETE_SOCKET = "guepardoapps.lucahome.broadcast.delete.wirelesssocket";
-    public static final String SET_SOCKET = "guepardoapps.lucahome.broadcast.set.wirelesssocket";
     public static final String RELOAD_SOCKETS = "guepardoapps.lucahome.broadcast.reload.wirelesssockets";
     public static final String NOTIFICATION_SOCKET = "guepardoapps.lucahome.broadcast.notification.wirelesssocket";
     public static final String DOWNLOAD_SOCKET_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_SOCKET_FINISHED";
@@ -132,6 +119,5 @@ public class Broadcasts {
 
     // Youtube
     public static final String YOUTUBE_ID = "guepardoapps.mediamirror.broadcast.youtube.selected.id";
-    public static final String SELECTED_YOUTUBE_ID_DIALOG = "guepardoapps.mediamirror.broadcast.youtube.selected.youtubeid.dialog";
     public static final String PLAYED_YOUTUBE_VIDEOS = "guepardoapps.mediamirror.broadcast.youtube.played.videos";
 }

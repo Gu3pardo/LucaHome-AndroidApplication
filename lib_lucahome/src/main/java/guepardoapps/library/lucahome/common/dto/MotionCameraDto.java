@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 import guepardoapps.library.toolset.common.classes.SerializableList;
@@ -15,7 +17,10 @@ public class MotionCameraDto implements Serializable {
 	private SerializableList<String> _motionEvents;
 	private boolean _cameraControlState;
 
-	public MotionCameraDto(boolean cameraState, String cameraUrl, SerializableList<String> motionEvents,
+	public MotionCameraDto(
+			boolean cameraState,
+			@NonNull String cameraUrl,
+			@NonNull SerializableList<String> motionEvents,
 			boolean cameraControlState) {
 		_cameraState = cameraState;
 		_cameraUrl = cameraUrl;
@@ -40,8 +45,9 @@ public class MotionCameraDto implements Serializable {
 	}
 
 	public String toString() {
-		return "{" + TAG + ": {CameraState: " + String.valueOf(_cameraState) + "};{CameraUrl: " + _cameraUrl
-				+ "};{MotionEvents: " + _motionEvents.toString() + "};{CameraControlState: "
-				+ String.valueOf(_cameraControlState) + "}}";
+		return "{" + TAG + ": {CameraState: " + String.valueOf(_cameraState)
+				+ "};{CameraUrl: " + _cameraUrl
+				+ "};{MotionEvents: " + _motionEvents.toString()
+				+ "};{CameraControlState: " + String.valueOf(_cameraControlState) + "}}";
 	}
 }

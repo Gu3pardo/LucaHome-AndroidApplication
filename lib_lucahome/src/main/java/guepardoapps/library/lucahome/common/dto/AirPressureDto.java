@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -13,18 +15,13 @@ public class AirPressureDto implements Serializable {
     private String _area;
     private SerializableTime _lastUpdate;
 
-    public AirPressureDto(double airPressure, String area, SerializableTime lastUpdate) {
+    public AirPressureDto(
+            double airPressure,
+            @NonNull String area,
+            @NonNull SerializableTime lastUpdate) {
         _airPressure = airPressure;
         _area = area;
         _lastUpdate = lastUpdate;
-    }
-
-    public double GetAirPressureValue() {
-        return _airPressure;
-    }
-
-    public void SetAirPressure(double airPressure) {
-        _airPressure = airPressure;
     }
 
     public String GetAirPressureString() {
@@ -39,16 +36,9 @@ public class AirPressureDto implements Serializable {
         return _lastUpdate;
     }
 
-    public void SetLastUpdate(SerializableTime lastUpdate) {
-        _lastUpdate = lastUpdate;
-    }
-
-    public String GetWatchFaceText() {
-        return _area + ": " + GetAirPressureString() + " " + _lastUpdate.toString();
-    }
-
     public String toString() {
-        return "{AirPressure: {Value: " + GetAirPressureString() + "};{Area: " + _area + "};{LastUpdate: "
-                + _lastUpdate.toString() + "}}";
+        return "{AirPressure: {Value: " + GetAirPressureString()
+                + "};{Area: " + _area
+                + "};{LastUpdate: " + _lastUpdate.toString() + "}}";
     }
 }

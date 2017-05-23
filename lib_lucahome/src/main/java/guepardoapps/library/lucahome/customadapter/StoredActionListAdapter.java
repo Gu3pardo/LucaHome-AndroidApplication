@@ -33,13 +33,15 @@ public class StoredActionListAdapter extends BaseAdapter {
     private static LayoutInflater _inflater = null;
 
     public StoredActionListAdapter(@NonNull Context context,
-                                   @NonNull SerializableList<ActionDto> entryList) {
+                                   @NonNull SerializableList<ActionDto> entryList,
+                                   @NonNull BroadcastController broadcastController,
+                                   @NonNull DatabaseController databaseController) {
         _logger = new LucaHomeLogger(TAG);
 
         _entryList = entryList;
 
-        _broadcastController = new BroadcastController(context);
-        _databaseController = DatabaseController.getInstance();
+        _broadcastController = broadcastController;
+        _databaseController = databaseController;
 
         _inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }

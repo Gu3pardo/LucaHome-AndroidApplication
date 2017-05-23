@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 import guepardoapps.library.openweather.common.enums.WeatherCondition;
@@ -21,8 +23,12 @@ public class WeatherModelDto implements Serializable {
 
 	private SerializableTime _lastUpdate;
 
-	public WeatherModelDto(double temperature, WeatherCondition condition, SerializableTime sunriseTime,
-			SerializableTime sunsetTime, SerializableTime lastUpdate) {
+	public WeatherModelDto(
+			double temperature,
+			@NonNull WeatherCondition condition,
+			SerializableTime sunriseTime,
+			SerializableTime sunsetTime,
+			SerializableTime lastUpdate) {
 		_temperature = temperature;
 
 		_condition = condition;
@@ -72,8 +78,11 @@ public class WeatherModelDto implements Serializable {
 
 	@Override
 	public String toString() {
-		return "[" + TAG + ": Condition: " + _condition.toString() + "; Temperature: " + String.valueOf(_temperature)
-				+ "°C; SunriseTime: " + _sunriseTime.toString() + "; SunsetTime: " + _sunsetTime.toString()
-				+ "; LastUpdate: " + _lastUpdate.toString() + "]";
+		return "{" + TAG
+				+ ": {Condition: " + _condition.toString()
+				+ "}; {Temperature: " + String.valueOf(_temperature)
+				+ "°C}; {SunriseTime: " + _sunriseTime.toString()
+				+ "}; {SunsetTime: " + _sunsetTime.toString()
+				+ "}; {LastUpdate: " + _lastUpdate.toString() + "}}";
 	}
 }

@@ -44,15 +44,9 @@ public class WIFIReceiver extends BroadcastReceiver {
 
     private Context _context;
 
-    private AndroidSystemController _androidSystemController;
-    private BroadcastController _broadcastController;
-    private DatabaseController _databaseController;
     private DialogController _dialogController;
     private LucaNotificationController _notificationController;
-    private NetworkController _networkController;
-    private ScheduleService _scheduleService;
     private ServiceController _serviceController;
-    private SharedPrefController _sharedPrefController;
 
     private boolean _checkConnectionEnabled;
     private Runnable _checkConnectionRunnable = new Runnable() {
@@ -75,6 +69,7 @@ public class WIFIReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)) {
             SupplicantState state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+
             if (!(SupplicantState.isValidState(state) && state == SupplicantState.COMPLETED)) {
                 _logger.Warn("Not yet a valid connection!");
                 return;
@@ -86,35 +81,11 @@ public class WIFIReceiver extends BroadcastReceiver {
         _context = context;
         _checkConnectionEnabled = true;
 
-        if (_androidSystemController == null) {
-            _androidSystemController = new AndroidSystemController(_context);
-        }
-        if (_broadcastController == null) {
-            _broadcastController = new BroadcastController(_context);
-        }
-        if (_databaseController == null) {
-            _databaseController = DatabaseController.getInstance();
-            _databaseController.onCreate(_context);
-        }
-        if (_dialogController == null) {
-            int textColor = ContextCompat.getColor(_context, R.color.TextIcon);
-            int backgroundColor = ContextCompat.getColor(_context, R.color.Background);
-            _dialogController = new DialogController(_context, textColor, backgroundColor);
-        }
-        if (_networkController == null) {
-            _networkController = new NetworkController(_context, _dialogController);
-        }
         if (_notificationController == null) {
             _notificationController = new LucaNotificationController(_context);
         }
-        if (_scheduleService == null) {
-            _scheduleService = ScheduleService.getInstance();
-        }
         if (_serviceController == null) {
             _serviceController = new ServiceController(_context);
-        }
-        if (_sharedPrefController == null) {
-            _sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
         }
 
         checkConnection();
@@ -123,12 +94,20 @@ public class WIFIReceiver extends BroadcastReceiver {
     private void checkConnection() {
         _logger.Debug("checkConnection");
 
-        if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+        if (new NetworkController(
+                _context,
+                new DialogController(
+                        _context,
+                        ContextCompat.getColor(_context, R.color.TextIcon),
+                        ContextCompat.getColor(_context, R.color.Background)))
+                .IsHomeNetwork(Constants.LUCAHOME_SSID)) {
             _logger.Debug("We are in the homeNetwork!");
 
-            if (_androidSystemController.isServiceRunning(MainService.class)) {
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.DOWNLOAD_ALL});
+            if (new AndroidSystemController(_context).IsServiceRunning(MainService.class)) {
+                new BroadcastController(_context).SendSerializableArrayBroadcast(
+                        Broadcasts.MAIN_SERVICE_COMMAND,
+                        new String[]{Bundles.MAIN_SERVICE_ACTION},
+                        new Object[]{MainServiceAction.DOWNLOAD_ALL});
             } else {
                 Intent startMainService = new Intent(_context, MainService.class);
                 Bundle mainServiceBundle = new Bundle();
@@ -159,25 +138,29 @@ public class WIFIReceiver extends BroadcastReceiver {
 
     private void checkDatabase() {
         _logger.Debug("checkDatabase");
-        SerializableList<ActionDto> storedActions = _databaseController.GetActions();
+        DatabaseController databaseController = new DatabaseController(_context);
+        databaseController.Initialize();
+
+        SerializableList<ActionDto> storedActions = databaseController.GetActions();
         if (storedActions.getSize() > 0) {
             for (int index = 0; index < storedActions.getSize(); index++) {
                 ActionDto entry = storedActions.getValue(index);
-                _databaseController.DeleteAction(entry);
-                _scheduleService.DeleteSchedule(entry.GetName());
+                databaseController.DeleteAction(entry);
+                ScheduleService.getInstance().DeleteSchedule(entry.GetName());
                 _serviceController.StartRestService(entry.GetName(), entry.GetAction(), entry.GetBroadcast(),
                         LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
             }
         } else {
             _logger.Debug("No actions stored!");
         }
+        databaseController.Dispose();
     }
 
     private void checkSleepNotificationFlag() {
-        if (_sharedPrefController
-                .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
+        SharedPrefController sharedPrefController = new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME);
+        if (sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
             _notificationController.CreateSleepHeatingNotification();
-            _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
+            sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
         }
     }
 }

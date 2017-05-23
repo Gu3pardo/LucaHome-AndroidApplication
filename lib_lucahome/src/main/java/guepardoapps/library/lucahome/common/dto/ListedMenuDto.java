@@ -15,8 +15,11 @@ public class ListedMenuDto implements Serializable {
     private int _rating;
     private boolean _lastSuggestion;
 
-    public ListedMenuDto(int id, @NonNull String description, int rating,
-                         boolean lastSuggestion) {
+    public ListedMenuDto(
+            int id,
+            @NonNull String description,
+            int rating,
+            boolean lastSuggestion) {
         _id = id;
         _description = description;
         _rating = rating;
@@ -35,17 +38,15 @@ public class ListedMenuDto implements Serializable {
         return _rating;
     }
 
-    public void SetRating(int rating) {
-        _rating = rating;
-    }
-
     public boolean IsLastSuggestion() {
         return _lastSuggestion;
     }
 
     @Override
     public String toString() {
-        return "{" + TAG + ":{Id:" + String.valueOf(_id) + "};{Description:" + _description + "};{Rating:"
-                + String.valueOf(_rating) + "};{LastSuggestion:" + String.valueOf(_lastSuggestion) + "};}";
+        return "{" + TAG + ":{Id:" + String.valueOf(_id)
+                + "};{Description:" + _description
+                + "};{Rating:" + String.valueOf(_rating)
+                + "};{LastSuggestion:" + String.valueOf(_lastSuggestion) + "};}";
     }
 }

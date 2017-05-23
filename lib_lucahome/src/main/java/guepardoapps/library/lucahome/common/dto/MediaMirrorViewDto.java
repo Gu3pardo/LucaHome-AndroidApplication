@@ -1,17 +1,17 @@
 package guepardoapps.library.lucahome.common.dto;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 public class MediaMirrorViewDto implements Serializable {
 
 	private static final long serialVersionUID = -6336573950675481913L;
 
 	private static final String TAG = MediaMirrorViewDto.class.getSimpleName();
-	private LucaHomeLogger _logger;
 
 	private MediaMirrorSelection _mediaMirrorSelection;
 
@@ -35,14 +35,21 @@ public class MediaMirrorViewDto implements Serializable {
 
 	private int _screenBrightness;
 
-	public MediaMirrorViewDto(MediaMirrorSelection mediaMirrorSelection, int batteryLevel, String socketName,
-			boolean socketState, int volume, String youtubeId, boolean youtubeIsPlaying,
-			int youtubeVideoCurrentPlayTime, int youtubeVideoDuration,
-			ArrayList<PlayedYoutubeVideoDto> playedYoutubeIds, boolean sleepTimerEnabled, int countDownSec,
-			String serverVersion, int screenBrightness) {
-		_logger = new LucaHomeLogger(TAG);
-		_logger.Debug("Creating...");
-
+	public MediaMirrorViewDto(
+			@NonNull MediaMirrorSelection mediaMirrorSelection,
+			int batteryLevel,
+			@NonNull String socketName,
+			boolean socketState,
+			int volume,
+			@NonNull String youtubeId,
+			boolean youtubeIsPlaying,
+			int youtubeVideoCurrentPlayTime,
+			int youtubeVideoDuration,
+			@NonNull ArrayList<PlayedYoutubeVideoDto> playedYoutubeIds,
+			boolean sleepTimerEnabled,
+			int countDownSec,
+			String serverVersion,
+			int screenBrightness) {
 		_mediaMirrorSelection = mediaMirrorSelection;
 
 		_batteryLevel = batteryLevel;
@@ -66,8 +73,12 @@ public class MediaMirrorViewDto implements Serializable {
 		_screenBrightness = screenBrightness;
 	}
 
-	public MediaMirrorViewDto(MediaMirrorSelection mediaMirrorSelection, int batteryLevel, int volume, String youtubeId,
-			String serverVersion) {
+	public MediaMirrorViewDto(
+			@NonNull MediaMirrorSelection mediaMirrorSelection,
+			int batteryLevel,
+			int volume,
+			@NonNull String youtubeId,
+			@NonNull String serverVersion) {
 		this(mediaMirrorSelection, batteryLevel, "", false, volume, youtubeId, false, -1, -1,
 				new ArrayList<PlayedYoutubeVideoDto>(), false, -1, serverVersion, -1);
 	}
@@ -132,8 +143,20 @@ public class MediaMirrorViewDto implements Serializable {
 	public String toString() {
 		return String.format(
 				"{%s:{MediaMirrorSelection:%s}{BatteryLevel:%s}{Socket:{Name:%s}{State:%s}}{Volume:%s}{YoutubeId:%s}{IsYoutubePlaying:%s}{YoutubeVideoCurrentPlayTime:%s}{YoutubeVideoDuration:%s}{PlayedYoutubeIds:%s}{SleepTimer:{State:%s}{Countdown:%s}}{ServerVersion:%s}{ScreenBrightness:%s}}",
-				TAG, _mediaMirrorSelection, _batteryLevel, _socketName, _socketState, _volume, _youtubeId,
-				_youtubeIsPlaying, _youtubeVideoCurrentPlayTime, _youtubeVideoDuration, _playedYoutubeIds,
-				_sleepTimerEnabled, _countDownSec, _serverVersion, _screenBrightness);
+				TAG,
+				_mediaMirrorSelection,
+				_batteryLevel,
+				_socketName,
+				_socketState,
+				_volume,
+				_youtubeId,
+				_youtubeIsPlaying,
+				_youtubeVideoCurrentPlayTime,
+				_youtubeVideoDuration,
+				_playedYoutubeIds,
+				_sleepTimerEnabled,
+				_countDownSec,
+				_serverVersion,
+				_screenBrightness);
 	}
 }
