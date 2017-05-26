@@ -50,7 +50,7 @@ public class ShoppingEntryDto implements Serializable {
 		return _quantity;
 	}
 
-	public boolean GetBought() {
+	public boolean IsBought() {
 		return _bought;
 	}
 

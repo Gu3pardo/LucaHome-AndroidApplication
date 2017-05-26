@@ -14,6 +14,8 @@ import guepardoapps.library.toolset.common.classes.SerializableList;
 
 public class DatabaseController {
 
+    private static final DatabaseController SINGLETON = new DatabaseController();
+
     private static final String TAG = DatabaseController.class.getSimpleName();
     private LucaHomeLogger _logger;
 
@@ -25,24 +27,28 @@ public class DatabaseController {
     private DatabaseShoppingList _databaseShoppingList;
     private DatabaseSocketList _databaseSocketList;
 
-    public DatabaseController(Context context) {
+    private DatabaseController() {
         _logger = new LucaHomeLogger(TAG);
         _logger.Debug("DatabaseController created...");
-
-        _databaseActionStore = new DatabaseActionStore(context);
-        _databaseListedMenuList = new DatabaseListedMenuList(context);
-        _databaseMenuList = new DatabaseMenuList(context);
-        _databaseShoppingList = new DatabaseShoppingList(context);
-        _databaseSocketList = new DatabaseSocketList(context);
     }
 
-    public void Initialize() {
+    public static DatabaseController getInstance() {
+        return SINGLETON;
+    }
+
+    public void Initialize(Context context) {
         _logger.Debug("Initialize");
 
         if (_isInitialized) {
             _logger.Warn("Already initialized!");
             return;
         }
+
+        _databaseActionStore = new DatabaseActionStore(context);
+        _databaseListedMenuList = new DatabaseListedMenuList(context);
+        _databaseMenuList = new DatabaseMenuList(context);
+        _databaseShoppingList = new DatabaseShoppingList(context);
+        _databaseSocketList = new DatabaseSocketList(context);
 
         _databaseActionStore.Open();
         _databaseListedMenuList.Open();
@@ -184,7 +190,7 @@ public class DatabaseController {
     }
 
 	/*
-	Methods for MenuDto
+    Methods for MenuDto
 	 */
 
     public SerializableList<MenuDto> GetMenuList() {
@@ -229,7 +235,7 @@ public class DatabaseController {
     }
 
 	/*
-	Methods for ShoppingEntryDto
+    Methods for ShoppingEntryDto
 	 */
 
     public SerializableList<ShoppingEntryDto> GetShoppingList() {
@@ -273,7 +279,7 @@ public class DatabaseController {
     }
 
 	/*
-	Methods for SocketDto
+    Methods for SocketDto
 	 */
 
     public SerializableList<WirelessSocketDto> GetSocketList() {

@@ -40,26 +40,42 @@ public class MapContentController {
 
     public void LoadMapContents() {
         _logger.Debug("GetMapContents");
-        _serviceController.StartRestService(TAG, ServerActions.GET_MAP_CONTENTS, Broadcasts.UPDATE_MAP_CONTENT_VIEW,
-                LucaObject.MAP_CONTENT, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                TAG,
+                ServerActions.GET_MAP_CONTENTS,
+                Broadcasts.UPDATE_MAP_CONTENT_VIEW,
+                LucaObject.MAP_CONTENT,
+                RaspberrySelection.BOTH);
     }
 
     public void AddMapContent(@NonNull MapContentDto mapContent) {
         _logger.Debug("AddMapContent");
-        _serviceController.StartRestService(TAG, mapContent.GetCommandAdd(), Broadcasts.RELOAD_MAP_CONTENT,
-                LucaObject.MAP_CONTENT, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                TAG,
+                mapContent.GetCommandAdd(),
+                Broadcasts.RELOAD_MAP_CONTENT,
+                LucaObject.MAP_CONTENT,
+                RaspberrySelection.BOTH);
     }
 
     public void UpdateMapContent(@NonNull MapContentDto mapContent) {
         _logger.Debug("UpdateMapContent");
-        _serviceController.StartRestService(TAG, mapContent.GetCommandUpdate(), Broadcasts.RELOAD_MAP_CONTENT,
-                LucaObject.MAP_CONTENT, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                TAG,
+                mapContent.GetCommandUpdate(),
+                Broadcasts.RELOAD_MAP_CONTENT,
+                LucaObject.MAP_CONTENT,
+                RaspberrySelection.BOTH);
     }
 
     public void DeleteMapContent(@NonNull MapContentDto mapContent) {
         _logger.Debug("DeleteMapContent");
-        _serviceController.StartRestService(TAG, mapContent.GetCommandDelete(), Broadcasts.RELOAD_MAP_CONTENT,
-                LucaObject.MAP_CONTENT, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                TAG,
+                mapContent.GetCommandDelete(),
+                Broadcasts.RELOAD_MAP_CONTENT,
+                LucaObject.MAP_CONTENT,
+                RaspberrySelection.BOTH);
     }
 
     public TextView CreateEntry(
@@ -225,7 +241,8 @@ public class MapContentController {
         }
 
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT);
         layoutParams.setMargins(positionX, positionY, 0, 0);
 
         newTextView.setLayoutParams(layoutParams);

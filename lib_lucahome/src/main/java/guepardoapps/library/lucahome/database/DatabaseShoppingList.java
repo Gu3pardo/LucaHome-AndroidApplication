@@ -75,7 +75,7 @@ public class DatabaseShoppingList {
         contentValues.put(KEY_NAME, newEntry.GetName());
         contentValues.put(KEY_GROUP, newEntry.GetGroup().toString());
         contentValues.put(KEY_QUANTITY, newEntry.GetQuantity());
-        contentValues.put(KEY_BOUGHT, (newEntry.GetBought() ? "1" : "0"));
+        contentValues.put(KEY_BOUGHT, (newEntry.IsBought() ? "1" : "0"));
 
         return _database.insert(DATABASE_TABLE, null, contentValues);
     }

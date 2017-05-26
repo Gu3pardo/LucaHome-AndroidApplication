@@ -37,11 +37,24 @@ public class ServiceController {
             @NonNull RaspberrySelection raspberrySelection) {
         UserDto loggedInUser = _userService.LoadUser();
         if (loggedInUser != null) {
-            StartRestService(loggedInUser.GetUserName(), loggedInUser.GetPassword(), name, action, broadcast,
-                    lucaObject, raspberrySelection);
+            StartRestService(
+                    loggedInUser.GetUserName(),
+                    loggedInUser.GetPassword(),
+                    name,
+                    action,
+                    broadcast,
+                    lucaObject,
+                    raspberrySelection);
         } else {
             _logger.Warn("loggedInUser is null!");
-            StartRestService("", "", name, action, broadcast, lucaObject, raspberrySelection);
+            StartRestService(
+                    "",
+                    "",
+                    name,
+                    action,
+                    broadcast,
+                    lucaObject,
+                    raspberrySelection);
         }
     }
 

@@ -37,29 +37,44 @@ public class SocketController {
             @NonNull WirelessSocketDto socket,
             boolean newState) {
         _logger.Debug("SetSocket: " + socket.GetName() + " to " + String.valueOf(newState));
-        _serviceController.StartRestService(socket.GetName(), socket.GetCommandSet(newState), Broadcasts.RELOAD_SOCKETS,
-                LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                socket.GetName(),
+                socket.GetCommandSet(newState),
+                Broadcasts.RELOAD_SOCKETS,
+                LucaObject.WIRELESS_SOCKET,
+                RaspberrySelection.BOTH);
     }
 
     public void SetSocket(
             @NonNull String socketName,
             boolean newState) {
         _logger.Debug("SetSocket: " + socketName + " to " + String.valueOf(newState));
-        _serviceController.StartRestService(socketName,
+        _serviceController.StartRestService(
+                socketName,
                 ServerActions.SET_SOCKET + socketName + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF),
-                Broadcasts.RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_SOCKETS,
+                LucaObject.WIRELESS_SOCKET,
+                RaspberrySelection.BOTH);
     }
 
     public void LoadSockets() {
         _logger.Debug("SetSocket");
-        _serviceController.StartRestService(Bundles.SOCKET_DOWNLOAD, ServerActions.GET_SOCKETS,
-                Broadcasts.DOWNLOAD_SOCKET_FINISHED, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                Bundles.SOCKET_DOWNLOAD,
+                ServerActions.GET_SOCKETS,
+                Broadcasts.DOWNLOAD_SOCKET_FINISHED,
+                LucaObject.WIRELESS_SOCKET,
+                RaspberrySelection.BOTH);
     }
 
     public void DeleteSocket(@NonNull WirelessSocketDto socket) {
         _logger.Debug("DeleteSocket: " + socket.GetName());
-        _serviceController.StartRestService(socket.GetName(), socket.GetCommandDelete(), Broadcasts.RELOAD_SOCKETS,
-                LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                socket.GetName(),
+                socket.GetCommandDelete(),
+                Broadcasts.RELOAD_SOCKETS,
+                LucaObject.WIRELESS_SOCKET,
+                RaspberrySelection.BOTH);
     }
 
     public boolean ValidateSocketCode(@NonNull String code) {

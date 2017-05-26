@@ -40,8 +40,9 @@ public class MovieListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public MovieListAdapter(@NonNull Context context,
-                            @NonNull SerializableList<MovieDto> movieList) {
+    public MovieListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<MovieDto> movieList) {
         _logger = new LucaHomeLogger(TAG);
 
         _movieList = movieList;

@@ -63,6 +63,8 @@ public class Broadcasts {
 
     // Permissions
     public static final String PERMISSION_READ_CALENDAR = "guepardoapps.lucahome.broadcast.PERMISSION_READ_CALENDAR";
+    public static final String PERMISSION_READ_EXTERNAL_STORAGE = "guepardoapps.lucahome.broadcast.PERMISSION_READ_EXTERNAL_STORAGE";
+    public static final String PERMISSION_WRITE_EXTERNAL_STORAGE = "guepardoapps.lucahome.broadcast.PERMISSION_WRITE_EXTERNAL_STORAGE";
     public static final String PERMISSION_WRITE_SETTINGS = "guepardoapps.lucahome.broadcast.PERMISSION_WRITE_SETTINGS";
 
     // Socket
@@ -119,5 +121,6 @@ public class Broadcasts {
 
     // Youtube
     public static final String YOUTUBE_ID = "guepardoapps.mediamirror.broadcast.youtube.selected.id";
+    public static final String YOUTUBE_VIDEO = "guepardoapps.mediamirror.broadcast.youtube.selected.video";
     public static final String PLAYED_YOUTUBE_VIDEOS = "guepardoapps.mediamirror.broadcast.youtube.played.videos";
 }

@@ -44,7 +44,9 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
+import shortbread.Shortcut;
 
+@Shortcut(id = "shoppingList", icon = R.drawable.shopping, shortLabel = "Shopping List")
 public class ShoppingListView extends AppCompatActivity {
 
     private static final String TAG = ShoppingListView.class.getSimpleName();

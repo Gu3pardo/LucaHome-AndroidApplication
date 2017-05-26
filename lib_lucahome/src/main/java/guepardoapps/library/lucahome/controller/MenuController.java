@@ -54,7 +54,11 @@ public class MenuController {
                 }
                 menu.SetTitle("-");
                 menu.SetDescription("-");
-                _serviceController.StartRestService(Bundles.MENU, menu.GetCommandUpdate(), "", LucaObject.MENU,
+                _serviceController.StartRestService(
+                        Bundles.MENU,
+                        menu.GetCommandUpdate(),
+                        "",
+                        LucaObject.MENU,
                         RaspberrySelection.BOTH);
                 reload = true;
                 continue;
@@ -69,7 +73,11 @@ public class MenuController {
                 }
                 menu.SetTitle("-");
                 menu.SetDescription("-");
-                _serviceController.StartRestService(Bundles.MENU, menu.GetCommandUpdate(), "", LucaObject.MENU,
+                _serviceController.StartRestService(
+                        Bundles.MENU,
+                        menu.GetCommandUpdate(),
+                        "",
+                        LucaObject.MENU,
                         RaspberrySelection.BOTH);
                 reload = true;
                 continue;
@@ -86,7 +94,11 @@ public class MenuController {
                 }
                 menu.SetTitle("-");
                 menu.SetDescription("-");
-                _serviceController.StartRestService(Bundles.MENU, menu.GetCommandUpdate(), "", LucaObject.MENU,
+                _serviceController.StartRestService(
+                        Bundles.MENU,
+                        menu.GetCommandUpdate(),
+                        "",
+                        LucaObject.MENU,
                         RaspberrySelection.BOTH);
                 reload = true;
             }

@@ -56,6 +56,8 @@ public class Bundles {
 
     // Permission
     public static final String PERMISSION_READ_CALENDAR = "PERMISSION_READ_CALENDAR";
+    public static final String PERMISSION_READ_EXTERNAL_STORAGE = "PERMISSION_READ_EXTERNAL_STORAGE";
+    public static final String PERMISSION_WRITE_EXTERNAL_STORAGE = "PERMISSION_WRITE_EXTERNAL_STORAGE";
     public static final String PERMISSION_WRITE_SETTINGS = "PERMISSION_WRITE_SETTINGS";
 
     // Raspberry
@@ -101,6 +103,7 @@ public class Bundles {
 
     // Youtube
     public static final String YOUTUBE_ID = "YOUTUBE_ID";
+    public static final String YOUTUBE_VIDEO = "YOUTUBE_VIDEO";
     public static final String PLAYED_YOUTUBE_VIDEOS = "PLAYED_YOUTUBE_VIDEOS";
 
     // other

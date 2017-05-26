@@ -41,7 +41,9 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
+import shortbread.Shortcut;
 
+@Shortcut(id = "sockets", icon = R.drawable.socket, shortLabel = "Sockets")
 public class SocketView extends AppCompatActivity {
 
     private static final String TAG = SocketView.class.getSimpleName();

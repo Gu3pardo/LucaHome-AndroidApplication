@@ -90,8 +90,7 @@ public class RESTService extends Service {
         _logger.Debug("Broadcast is: " + broadcast);
 
         if (_databaseController == null) {
-            _databaseController = new DatabaseController(_context);
-            _databaseController.Initialize();
+            _databaseController = DatabaseController.getInstance();
         }
 
         if (!_networkController.IsNetworkAvailable()) {

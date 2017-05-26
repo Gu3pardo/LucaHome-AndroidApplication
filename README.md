@@ -1,4 +1,7 @@
 # LucaHome-AndroidApplication
+
+<a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
+
 Part of the LucaHome-Project
 Containing the shared library LucaHome, a wearable project and the main android client application.
 

@@ -28,4 +28,7 @@ public class Constants {
 	public static final String DIR_RIGHT = "RIGHT";
 	public static final String DIR_LEFT = "LEFT";
 	public static final String DIR_ROTATE = "ROTATE";
+	// ========== YOUTUBE DATA ==========
+	public static final String YOUTUBE_SEARCH = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=%d&q=%s&key=%s";
+	public static final int YOUTUBE_MAX_RESULTS = 15;
 }

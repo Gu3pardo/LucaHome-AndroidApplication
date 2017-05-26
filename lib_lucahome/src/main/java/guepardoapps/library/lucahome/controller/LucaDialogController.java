@@ -52,6 +52,7 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.Keys;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.BirthdayDto;
@@ -65,7 +66,13 @@ import guepardoapps.library.lucahome.common.dto.TimerDto;
 import guepardoapps.library.lucahome.common.dto.UserDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.dto.YoutubeVideoDto;
-import guepardoapps.library.lucahome.common.enums.*;
+import guepardoapps.library.lucahome.common.enums.LucaObject;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
+import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.ShoppingEntryGroup;
+import guepardoapps.library.lucahome.common.enums.YoutubeId;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.customadapter.MenuListAdapter;
 import guepardoapps.library.lucahome.customadapter.ShoppingListAdapter;
@@ -76,13 +83,17 @@ import guepardoapps.library.lucahome.tasks.DownloadYoutubeVideoTask;
 import guepardoapps.library.toolset.common.classes.SerializableList;
 import guepardoapps.library.toolset.common.classes.SerializableTime;
 import guepardoapps.library.toolset.common.enums.Weekday;
-import guepardoapps.library.toolset.controller.*;
+import guepardoapps.library.toolset.controller.BroadcastController;
+import guepardoapps.library.toolset.controller.DialogController;
+
+import guepardoapps.library.toolset.controller.MailController;
+import guepardoapps.library.toolset.controller.ReceiverController;
+import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.library.toolset.runnable.EditDialogRunnable;
 
 public class LucaDialogController extends DialogController {
 
     private static final String TAG = LucaDialogController.class.getSimpleName();
-    private LucaHomeLogger _logger;
 
     private LucaObject _lucaObject;
     private BirthdayDto _birthday;
@@ -107,8 +118,6 @@ public class LucaDialogController extends DialogController {
     private String _timerName;
     private String _timerSocketString;
     private SerializableTime _timerTime;
-    private boolean _timerPlaySound = false;
-    private RaspberrySelection _timerPlayRaspberry;
 
     private ScheduleDto _selectedSchedule;
     private TimerDto _selectedTimer;
@@ -151,15 +160,17 @@ public class LucaDialogController extends DialogController {
             search = search.replace(" ", "+");
 
             String ip = _data[_ipIndex];
-
-            String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=15&q=" + search + "&key="
-                    + Keys.YOUTUBE_API_KEY;
+            String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, Constants.YOUTUBE_MAX_RESULTS, search, Keys.YOUTUBE_API_KEY);
 
             ProgressDialog loadingVideosDialog = ProgressDialog.show(_context, "Loading Videos...", "");
             loadingVideosDialog.setCancelable(false);
 
-            DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(_context, _broadcastController,
-                    LucaDialogController.this, loadingVideosDialog, ip);
+            DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(
+                    _context,
+                    _broadcastController,
+                    LucaDialogController.this,
+                    loadingVideosDialog,
+                    ip);
             task.execute(url);
         }
     };
@@ -1011,12 +1022,8 @@ public class LucaDialogController extends DialogController {
         timerTimePicker.setCurrentMinute(currentMinute);
 
         CheckBox timerPlaySoundCheckbox = (CheckBox) _dialog.findViewById(R.id.dialog_timer_playsound_select);
-        timerPlaySoundCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                _timerPlaySound = isChecked;
-            }
-        });
+        timerPlaySoundCheckbox.setEnabled(false);
+        timerPlaySoundCheckbox.setVisibility(View.GONE);
 
         final Spinner timerPlayRaspberrySelect = (Spinner) _dialog.findViewById(R.id.dialog_timer_playraspberry_select);
         List<String> raspberryServer = new ArrayList<>();
@@ -1030,11 +1037,11 @@ public class LucaDialogController extends DialogController {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (parent.getItemAtPosition(position).toString().contains("Living Room")) {
-                    _timerPlayRaspberry = RaspberrySelection.RASPBERRY_1;
+                    _logger.Debug(RaspberrySelection.RASPBERRY_1.toString());
                 } else if (parent.getItemAtPosition(position).toString().contains("Sleeping Room")) {
-                    _timerPlayRaspberry = RaspberrySelection.RASPBERRY_2;
+                    _logger.Debug(RaspberrySelection.RASPBERRY_2.toString());
                 } else {
-                    _timerPlayRaspberry = RaspberrySelection.DUMMY;
+                    _logger.Debug(RaspberrySelection.DUMMY.toString());
                 }
             }
 
@@ -1042,6 +1049,8 @@ public class LucaDialogController extends DialogController {
             public void onNothingSelected(AdapterView<?> arg0) {
             }
         });
+        timerPlayRaspberrySelect.setEnabled(false);
+        timerPlayRaspberrySelect.setVisibility(View.GONE);
 
         if (timer != null) {
             timerNameEdit.setText(timer.GetName());
@@ -1064,16 +1073,14 @@ public class LucaDialogController extends DialogController {
             @Override
             public void onClick(View v) {
                 _timerName = timerNameEdit.getText().toString();
+
                 if (_timerName.length() < 3) {
                     Toasty.error(_context, "Name too short!", Toast.LENGTH_LONG).show();
                     return;
                 }
+
                 if (_timerSocketString == null || _timerSocketString.length() == 0) {
                     Toasty.error(_context, "Please select a socket!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (_timerPlayRaspberry == null || _timerPlayRaspberry == RaspberrySelection.DUMMY) {
-                    Toasty.error(_context, "Please select a valid raspberry!", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -1108,11 +1115,23 @@ public class LucaDialogController extends DialogController {
                 }
                 Weekday weekday = Weekday.GetById(timerDay);
 
-                _serviceController.StartRestService(socket.GetName(), socket.GetCommandSet(true),
-                        Broadcasts.RELOAD_SOCKETS, LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+                _serviceController.StartRestService(
+                        socket.GetName(),
+                        socket.GetCommandSet(true),
+                        Broadcasts.RELOAD_SOCKETS,
+                        LucaObject.WIRELESS_SOCKET,
+                        RaspberrySelection.BOTH);
 
-                TimerDto newTimer = new TimerDto(_timerName, socket, weekday, _timerTime, false, _timerPlaySound,
-                        _timerPlayRaspberry, true);
+                TimerDto newTimer = new TimerDto(
+                        _timerName,
+                        socket,
+                        weekday,
+                        _timerTime,
+                        false,
+                        false,
+                        RaspberrySelection.DUMMY,
+                        true);
+
                 _logger.Debug(String.format(Locale.GERMAN, "new Timer: %s", _timerName));
 
                 if (runnable != null) {
@@ -1250,7 +1269,7 @@ public class LucaDialogController extends DialogController {
                     newEntry = new ShoppingEntryDto(shoppingListSize, name, group, count, false);
                 } else {
                     if (entry != null) {
-                        newEntry = new ShoppingEntryDto(entry.GetId(), name, group, count, entry.GetBought());
+                        newEntry = new ShoppingEntryDto(entry.GetId(), name, group, count, entry.IsBought());
                     } else {
                         newEntry = new ShoppingEntryDto(shoppingListSize, name, group, count, false);
                     }
@@ -1955,10 +1974,8 @@ public class LucaDialogController extends DialogController {
         titleTextView.setText(_context.getResources().getString(R.string.shoppingList));
         final ListView listView = (ListView) _dialog.findViewById(R.id.dialog_list_view);
 
-        if (shoppingList != null) {
-            ShoppingListAdapter listAdapter = new ShoppingListAdapter(_context, shoppingList, false, null);
-            listView.setAdapter(listAdapter);
-        }
+        ShoppingListAdapter listAdapter = new ShoppingListAdapter(_context, shoppingList, false, null);
+        listView.setAdapter(listAdapter);
 
         if (_shoppingListReceiver != null) {
             _receiverController.UnregisterReceiver(_shoppingListReceiver);
@@ -1993,7 +2010,7 @@ public class LucaDialogController extends DialogController {
         titleTextView.setText(_context.getResources().getString(R.string.menu));
         final ListView listView = (ListView) _dialog.findViewById(R.id.dialog_list_view);
 
-        MenuListAdapter listAdapter = new MenuListAdapter(_context, menu, listedMenu, false, false);
+        MenuListAdapter listAdapter = new MenuListAdapter(_context, menu, listedMenu, false);
         listView.setAdapter(listAdapter);
 
         if (_menuReceiver != null) {
@@ -2007,7 +2024,7 @@ public class LucaDialogController extends DialogController {
                 SerializableList<MenuDto> receivedMenu = (SerializableList<MenuDto>) intent
                         .getSerializableExtra(Bundles.MENU);
                 if (receivedMenu != null) {
-                    MenuListAdapter listAdapter = new MenuListAdapter(_context, menu, listedMenu, false, false);
+                    MenuListAdapter listAdapter = new MenuListAdapter(_context, menu, listedMenu, false);
                     listView.setAdapter(listAdapter);
                 }
             }
@@ -2153,10 +2170,19 @@ public class LucaDialogController extends DialogController {
         _mediaMirrorController.Dispose();
     }
 
-    private void createDialog(
+    protected void checkOpenDialog() {
+        _logger.Debug("checkOpenDialog");
+
+        if (_isDialogOpen || _dialog != null) {
+            _logger.Warn("Closing other Dialog...");
+            CloseDialogCallback.run();
+        }
+    }
+
+    protected void createDialog(
             @NonNull String dialogType,
             int layout) {
-        _logger.Debug(dialogType);
+        _logger.Debug(String.format(Locale.GERMAN, "createDialog %s with layout %d", dialogType, layout));
 
         _dialog = new Dialog(_context);
 
@@ -2164,11 +2190,21 @@ public class LucaDialogController extends DialogController {
         _dialog.setContentView(layout);
     }
 
-    private void checkOpenDialog() {
-        if (_isDialogOpen) {
-            _logger.Warn("Closing other Dialog...");
-            CloseDialogCallback.run();
+    @SuppressWarnings("deprecation")
+    protected void showDialog(boolean isCancelable) {
+        _logger.Debug(String.format(Locale.GERMAN, "showDialog and isCancelable: %s", isCancelable));
+
+        _dialog.setCancelable(isCancelable);
+        _dialog.show();
+
+        Window window = _dialog.getWindow();
+        if (window != null) {
+            window.setLayout(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+        } else {
+            _logger.Warn("Window is null!");
         }
+
+        _isDialogOpen = true;
     }
 
     private void resetValues() {
@@ -2192,21 +2228,5 @@ public class LucaDialogController extends DialogController {
         broadcastIntent.putExtras(broadcastData);
 
         _context.sendBroadcast(broadcastIntent);
-    }
-
-    private void showDialog(boolean isCancelable) {
-        _logger.Debug("showDialog, isCancelable: " + String.valueOf(isCancelable));
-
-        _dialog.setCancelable(isCancelable);
-        _dialog.show();
-
-        Window window = _dialog.getWindow();
-        if (window != null) {
-            window.setLayout(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-        } else {
-            _logger.Warn("Window is null!");
-        }
-
-        _isDialogOpen = true;
     }
 }

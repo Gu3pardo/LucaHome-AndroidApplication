@@ -58,8 +58,7 @@ public class MediaMirrorController {
 
     public void Initialize() {
         _logger.Debug("Initialize");
-        _receiverController.RegisterReceiver(_clientTaskResponseReceiver,
-                new String[]{guepardoapps.library.toolset.common.Broadcasts.CLIENT_TASK_RESPONSE});
+        _receiverController.RegisterReceiver(_clientTaskResponseReceiver, new String[]{guepardoapps.library.toolset.common.Broadcasts.CLIENT_TASK_RESPONSE});
         _initialized = true;
     }
 
@@ -77,7 +76,11 @@ public class MediaMirrorController {
         String communication = "ACTION:" + command + "&DATA:" + data;
         _logger.Debug("Communication is: " + communication);
 
-        ClientTask clientTask = new ClientTask(_context, serverIp, Constants.MEDIAMIRROR_SERVERPORT, communication);
+        ClientTask clientTask = new ClientTask(
+                _context,
+                serverIp,
+                Constants.MEDIAMIRROR_SERVERPORT,
+                communication);
         clientTask.execute();
 
         return true;
@@ -106,16 +109,20 @@ public class MediaMirrorController {
                     case UNMUTE_VOLUME:
                     case GET_CURRENT_VOLUME:
                         String currentVolume = responseData[responseData.length - 1];
-                        _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_VOLUME,
-                                Bundles.CURRENT_RECEIVED_VOLUME, currentVolume);
+                        _broadcastController.SendStringBroadcast(
+                                Broadcasts.MEDIAMIRROR_VOLUME,
+                                Bundles.CURRENT_RECEIVED_VOLUME,
+                                currentVolume);
                         break;
 
                     case INCREASE_SCREEN_BRIGHTNESS:
                     case DECREASE_SCREEN_BRIGHTNESS:
                     case GET_SCREEN_BRIGHTNESS:
                         String currentBrightness = responseData[responseData.length - 1];
-                        _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_BRIGHTNESS,
-                                Bundles.CURRENT_RECEIVED_BRIGHTNESS, currentBrightness);
+                        _broadcastController.SendStringBroadcast(
+                                Broadcasts.MEDIAMIRROR_BRIGHTNESS,
+                                Bundles.CURRENT_RECEIVED_BRIGHTNESS,
+                                currentBrightness);
                         break;
 
                     case GET_SAVED_YOUTUBE_IDS:
@@ -126,8 +133,10 @@ public class MediaMirrorController {
                         for (String entry : rawYoutubeIds) {
                             String[] data = entry.split("\\.");
                             if (data.length == 3) {
-                                PlayedYoutubeVideoDto newData = new PlayedYoutubeVideoDto(Integer.parseInt(data[0]),
-                                        data[1], Integer.parseInt(data[2]));
+                                PlayedYoutubeVideoDto newData = new PlayedYoutubeVideoDto(
+                                        Integer.parseInt(data[0]),
+                                        data[1],
+                                        Integer.parseInt(data[2]));
                                 _logger.Debug("Created new entry: " + newData.toString());
                                 playedYoutubeVideos.add(newData);
                             } else {
@@ -135,20 +144,26 @@ public class MediaMirrorController {
                             }
                         }
 
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.PLAYED_YOUTUBE_VIDEOS,
-                                Bundles.PLAYED_YOUTUBE_VIDEOS, playedYoutubeVideos);
+                        _broadcastController.SendSerializableBroadcast(
+                                Broadcasts.PLAYED_YOUTUBE_VIDEOS,
+                                Bundles.PLAYED_YOUTUBE_VIDEOS,
+                                playedYoutubeVideos);
                         break;
 
                     case GET_BATTERY_LEVEL:
                         String currentBatteryLevel = responseData[responseData.length - 1];
-                        _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_BATTERY_LEVEL,
-                                Bundles.CURRENT_BATTERY_LEVEL, currentBatteryLevel);
+                        _broadcastController.SendStringBroadcast(
+                                Broadcasts.MEDIAMIRROR_BATTERY_LEVEL,
+                                Bundles.CURRENT_BATTERY_LEVEL,
+                                currentBatteryLevel);
                         break;
 
                     case GET_SERVER_VERSION:
                         String currentServerVersion = responseData[responseData.length - 1];
-                        _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_SERVER_VERSION,
-                                Bundles.CURRENT_SERVER_VERSION, currentServerVersion);
+                        _broadcastController.SendStringBroadcast(
+                                Broadcasts.MEDIAMIRROR_SERVER_VERSION,
+                                Bundles.CURRENT_SERVER_VERSION,
+                                currentServerVersion);
                         break;
 
                     case GET_MEDIAMIRROR_DTO:
@@ -205,8 +220,10 @@ public class MediaMirrorController {
                             for (String entry : rawPlayedYoutubeIds) {
                                 String[] data = entry.split("\\.");
                                 if (data.length == 3) {
-                                    PlayedYoutubeVideoDto newData = new PlayedYoutubeVideoDto(Integer.parseInt(data[0]),
-                                            data[1], Integer.parseInt(data[2]));
+                                    PlayedYoutubeVideoDto newData = new PlayedYoutubeVideoDto(
+                                            Integer.parseInt(data[0]),
+                                            data[1],
+                                            Integer.parseInt(data[2]));
                                     _logger.Debug("Created new entry: " + newData.toString());
                                     alreadyPlayedYoutubeVideos.add(newData);
                                 } else {
@@ -238,11 +255,13 @@ public class MediaMirrorController {
                                     batteryLevel, socketName, socketState, volume, youtubeId, youtubeIsPlaying,
                                     youtubeVideoCurrentPlayTime, youtubeVideoDuration, alreadyPlayedYoutubeVideos,
                                     isSeaSSoundPlaying, seaSoundCountdownSec, serverVersion, screenBrightness);
-                            _broadcastController.SendSerializableBroadcast(Broadcasts.MEDIAMIRROR_VIEW_DTO,
-                                    Bundles.MEDIAMIRROR_VIEW_DTO, mediaMirrorDto);
+
+                            _broadcastController.SendSerializableBroadcast(
+                                    Broadcasts.MEDIAMIRROR_VIEW_DTO,
+                                    Bundles.MEDIAMIRROR_VIEW_DTO,
+                                    mediaMirrorDto);
                         } else {
-                            _logger.Warn(
-                                    String.format("Length %s for MediaMirrorData is invalid!", mediaMirrorData.length));
+                            _logger.Warn(String.format("Length %s for MediaMirrorData is invalid!", mediaMirrorData.length));
                         }
                         break;
 

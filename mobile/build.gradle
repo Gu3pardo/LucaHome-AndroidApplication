@@ -9,15 +9,15 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 30003
-        versionName "3.0.3.170523"
+        versionCode 30006
+        versionName "3.0.6.170526"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     aaptOptions {
@@ -41,6 +41,7 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:percent:25.3.1'
+    compile 'com.android.support:support-compat:25.3.1'
     compile 'com.google.android.support:wearable:2.0.2'
     provided 'com.google.android.wearable:wearable:2.0.2'
     compile 'com.google.android.gms:play-services-wearable:10.2.6'
@@ -51,6 +52,8 @@ dependencies {
     compile('com.mikepenz:aboutlibraries:5.9.6@aar') {
         transitive = true
     }
+    compile 'com.github.matthiasrobbers:shortbread:1.0.1'
+    annotationProcessor 'com.github.matthiasrobbers:shortbread-compiler:1.0.1'
     testCompile 'junit:junit:4.12'
     compile project(':lib_openweather')
     compile project(':lib_toolset')

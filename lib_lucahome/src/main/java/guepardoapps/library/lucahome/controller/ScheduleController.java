@@ -26,30 +26,45 @@ public class ScheduleController {
 
     public void LoadSchedules() {
         _logger.Debug("LoadSchedules");
-        _serviceController.StartRestService(Bundles.SCHEDULE_DOWNLOAD, ServerActions.GET_SCHEDULES,
-                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED, LucaObject.SCHEDULE, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                Bundles.SCHEDULE_DOWNLOAD,
+                ServerActions.GET_SCHEDULES,
+                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED,
+                LucaObject.SCHEDULE,
+                RaspberrySelection.BOTH);
     }
 
     public void SetSchedule(
             @NonNull ScheduleDto schedule,
             boolean newState) {
         _logger.Debug("SetSchedule: " + schedule.GetName() + " to " + String.valueOf(newState));
-        _serviceController.StartRestService(schedule.GetName(), schedule.GetCommandSet(newState),
-                Broadcasts.RELOAD_SCHEDULE, LucaObject.SCHEDULE, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                schedule.GetName(),
+                schedule.GetCommandSet(newState),
+                Broadcasts.RELOAD_SCHEDULE,
+                LucaObject.SCHEDULE,
+                RaspberrySelection.BOTH);
     }
 
     public void SetSchedule(
             @NonNull String scheduleName,
             boolean newState) {
         _logger.Debug("SetSchedule: " + scheduleName + " to " + String.valueOf(newState));
-        _serviceController.StartRestService(scheduleName,
+        _serviceController.StartRestService(
+                scheduleName,
                 ServerActions.SET_SCHEDULE + scheduleName + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF),
-                Broadcasts.RELOAD_SCHEDULE, LucaObject.SCHEDULE, RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_SCHEDULE,
+                LucaObject.SCHEDULE,
+                RaspberrySelection.BOTH);
     }
 
     public void DeleteSchedule(@NonNull ScheduleDto schedule) {
         _logger.Debug("DeleteSchedule");
-        _serviceController.StartRestService(schedule.GetName(), schedule.GetCommandDelete(), Broadcasts.RELOAD_SCHEDULE,
-                LucaObject.SCHEDULE, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                schedule.GetName(),
+                schedule.GetCommandDelete(),
+                Broadcasts.RELOAD_SCHEDULE,
+                LucaObject.SCHEDULE,
+                RaspberrySelection.BOTH);
     }
 }

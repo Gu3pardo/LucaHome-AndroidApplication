@@ -38,7 +38,6 @@ public class MenuListAdapter extends BaseAdapter {
     private SerializableList<MenuDto> _menu;
     private SerializableList<ListedMenuDto> _listedMenu;
 
-    private boolean _isOnMediaMirror;
     private boolean _isOnWatch;
 
     private Context _context;
@@ -50,7 +49,6 @@ public class MenuListAdapter extends BaseAdapter {
     public MenuListAdapter(@NonNull Context context,
                            @NonNull SerializableList<MenuDto> menu,
                            SerializableList<ListedMenuDto> listedMenu,
-                           boolean isOnMediaMirror,
                            boolean isOnWatch) {
         _logger = new LucaHomeLogger(TAG);
 
@@ -78,7 +76,6 @@ public class MenuListAdapter extends BaseAdapter {
             _menu = sortedList;
         }
 
-        _isOnMediaMirror = isOnMediaMirror;
         _isOnWatch = isOnWatch;
 
         _context = context;
@@ -161,9 +158,9 @@ public class MenuListAdapter extends BaseAdapter {
                 }
             }
         });
-        if (_isOnMediaMirror || _isOnWatch) {
-            holder._update.setVisibility(View.INVISIBLE);
-            holder._update.setEnabled(false);
+        if (_isOnWatch) {
+            holder._random.setVisibility(View.INVISIBLE);
+            holder._random.setEnabled(false);
         }
 
         holder._update = (ImageButton) rowView.findViewById(R.id.menu_item_update);
@@ -174,7 +171,7 @@ public class MenuListAdapter extends BaseAdapter {
                 _dialogController.ShowUpdateMenuDialog(_menu.getValue(index), _listedMenu);
             }
         });
-        if (_isOnMediaMirror || _isOnWatch) {
+        if (_isOnWatch) {
             holder._update.setVisibility(View.INVISIBLE);
             holder._update.setEnabled(false);
         }
@@ -184,8 +181,12 @@ public class MenuListAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 _logger.Debug("onClick _clear button: " + _menu.getValue(index).GetTitle());
-                _serviceController.StartRestService(Bundles.MENU, _menu.getValue(index).GetCommandClear(),
-                        Broadcasts.RELOAD_MENU, LucaObject.MENU, RaspberrySelection.BOTH);
+                _serviceController.StartRestService(
+                        Bundles.MENU,
+                        _menu.getValue(index).GetCommandClear(),
+                        Broadcasts.RELOAD_MENU,
+                        LucaObject.MENU,
+                        RaspberrySelection.BOTH);
             }
         });
         if (_isOnWatch) {

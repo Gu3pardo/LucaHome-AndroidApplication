@@ -57,7 +57,7 @@ public class MenuView extends Activity {
                     _noDataHintView.setVisibility(View.GONE);
                     _listView.setVisibility(View.VISIBLE);
 
-                    _listAdapter = new MenuListAdapter(_context, _itemList, null, false, true);
+                    _listAdapter = new MenuListAdapter(_context, _itemList, null, true);
                     _listView.setAdapter(_listAdapter);
                 }
             }
@@ -81,7 +81,7 @@ public class MenuView extends Activity {
             @Override
             public void onLayoutInflated(WatchViewStub stub) {
                 _listView = (ListView) stub.findViewById(R.id.basicListView);
-                _listAdapter = new MenuListAdapter(_context, _itemList, null, false, true);
+                _listAdapter = new MenuListAdapter(_context, _itemList, null, true);
                 _listView.setAdapter(_listAdapter);
                 _noDataHintView = (TextView) stub.findViewById(R.id.noDataTextView);
 

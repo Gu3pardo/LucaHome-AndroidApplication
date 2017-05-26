@@ -51,8 +51,10 @@ public class ShoppingListAdapter extends BaseAdapter {
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_SHOPPING_LIST});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.MAIN_SERVICE_COMMAND,
+                    new String[]{Bundles.MAIN_SERVICE_ACTION},
+                    new Object[]{MainServiceAction.GET_SHOPPING_LIST});
         }
     };
 
@@ -70,7 +72,7 @@ public class ShoppingListAdapter extends BaseAdapter {
         SerializableList<ShoppingEntryDto> sortedList = new SerializableList<>();
         for (int index = 0; index < _entryList.getSize(); index++) {
             ShoppingEntryDto entry = _entryList.getValue(index);
-            if (!entry.GetBought()) {
+            if (!entry.IsBought()) {
                 sortedList.setFirstValue(entry);
             } else {
                 sortedList.addValue(entry);
@@ -151,7 +153,13 @@ public class ShoppingListAdapter extends BaseAdapter {
                     if (_entryList != null) {
                         size = _entryList.getSize();
                     }
-                    _dialogController.ShowAddShoppingEntryDialog((Activity) _context, _getDataRunnable, entry, false, true, size);
+                    _dialogController.ShowAddShoppingEntryDialog(
+                            (Activity) _context,
+                            _getDataRunnable,
+                            entry,
+                            false,
+                            true,
+                            size);
                 } else {
                     _logger.Warn("Not supported on wearable device!");
                 }
@@ -165,8 +173,12 @@ public class ShoppingListAdapter extends BaseAdapter {
                 _logger.Debug("onClick _increase button: " + entry.GetName());
                 if (!_isOnWear) {
                     entry.IncreaseQuantity();
-                    _serviceController.StartRestService(Bundles.SHOPPING_LIST, entry.GetCommandUpdate(),
-                            Broadcasts.RELOAD_SHOPPING_LIST, LucaObject.SHOPPING_ENTRY, RaspberrySelection.BOTH);
+                    _serviceController.StartRestService(
+                            Bundles.SHOPPING_LIST,
+                            entry.GetCommandUpdate(),
+                            Broadcasts.RELOAD_SHOPPING_LIST,
+                            LucaObject.SHOPPING_ENTRY,
+                            RaspberrySelection.BOTH);
                 } else {
                     _logger.Warn("Not supported on wearable device!");
                 }
@@ -180,8 +192,12 @@ public class ShoppingListAdapter extends BaseAdapter {
                 _logger.Debug("onClick _decrease button: " + entry.GetName());
                 if (!_isOnWear) {
                     entry.DecreaseQuantity();
-                    _serviceController.StartRestService(Bundles.SHOPPING_LIST, entry.GetCommandUpdate(),
-                            Broadcasts.RELOAD_SHOPPING_LIST, LucaObject.SHOPPING_ENTRY, RaspberrySelection.BOTH);
+                    _serviceController.StartRestService(
+                            Bundles.SHOPPING_LIST,
+                            entry.GetCommandUpdate(),
+                            Broadcasts.RELOAD_SHOPPING_LIST,
+                            LucaObject.SHOPPING_ENTRY,
+                            RaspberrySelection.BOTH);
                 } else {
                     _logger.Warn("Not supported on wearable device!");
                 }
@@ -194,8 +210,12 @@ public class ShoppingListAdapter extends BaseAdapter {
             public void onClick(View arg0) {
                 _logger.Debug("onClick _delete button: " + entry.GetName());
                 if (!_isOnWear) {
-                    _serviceController.StartRestService(Bundles.SHOPPING_LIST, entry.GetCommandDelete(),
-                            Broadcasts.RELOAD_SHOPPING_LIST, LucaObject.SHOPPING_ENTRY, RaspberrySelection.BOTH);
+                    _serviceController.StartRestService(
+                            Bundles.SHOPPING_LIST,
+                            entry.GetCommandDelete(),
+                            Broadcasts.RELOAD_SHOPPING_LIST,
+                            LucaObject.SHOPPING_ENTRY,
+                            RaspberrySelection.BOTH);
                 } else {
                     _logger.Warn("Not supported on wearable device!");
                 }
@@ -203,14 +223,16 @@ public class ShoppingListAdapter extends BaseAdapter {
         });
 
         holder._bought = (CheckBox) rowView.findViewById(R.id.shopping_checkbox_bought);
-        holder._bought.setChecked(entry.GetBought());
+        holder._bought.setChecked(entry.IsBought());
         holder._bought.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton button, boolean checked) {
                 _logger.Debug("onCheckChanged _bought button: " + entry.GetName());
                 entry.SetBought(checked);
                 if (!_isOnWear) {
-                    _broadcastController.SendStringBroadcast(Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST, Bundles.SHOPPING_LIST,
+                    _broadcastController.SendStringBroadcast(
+                            Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST,
+                            Bundles.SHOPPING_LIST,
                             String.valueOf(entry.GetName()) + ":" + (checked ? "1" : "0"));
                 } else {
                     if (_messageSendHelper != null) {

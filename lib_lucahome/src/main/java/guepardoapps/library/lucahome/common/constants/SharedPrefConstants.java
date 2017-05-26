@@ -18,8 +18,6 @@ public class SharedPrefConstants {
     public static final String USER_NAME = "USER_NAME";
     public static final String USER_PASSPHRASE = "USER_PASSPHRASE";
 
-    public static final String SOUND_RASPBERRY_SELECTION = "SOUND_RASPBERRY_SELECTION";
-
     public static final String DISPLAY_SLEEP_NOTIFICATION_ACTIVE = "DISPLAY_SLEEP_NOTIFICATION_ACTIVE";
 
     public static final String TIMER_MIN = "Timer_Min";

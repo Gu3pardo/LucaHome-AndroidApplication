@@ -38,7 +38,9 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
+import shortbread.Shortcut;
 
+@Shortcut(id = "menu", icon = R.drawable.menu, shortLabel = "Menu")
 public class MenuView extends AppCompatActivity {
 
     private static final String TAG = MenuView.class.getSimpleName();
@@ -91,7 +93,7 @@ public class MenuView extends AppCompatActivity {
             if (list != null) {
                 _listedMenu = list;
                 if (_menu != null) {
-                    _listAdapter = new MenuListAdapter(_context, _menu, _listedMenu, false, false);
+                    _listAdapter = new MenuListAdapter(_context, _menu, _listedMenu, false);
                     _listView.setAdapter(_listAdapter);
                     _progressBar.setVisibility(View.GONE);
                 } else {
@@ -112,7 +114,7 @@ public class MenuView extends AppCompatActivity {
             if (list != null) {
                 _menu = list;
                 if (_listedMenu != null) {
-                    _listAdapter = new MenuListAdapter(_context, _menu, _listedMenu, false, false);
+                    _listAdapter = new MenuListAdapter(_context, _menu, _listedMenu, false);
                     _listView.setAdapter(_listAdapter);
                     _progressBar.setVisibility(View.GONE);
                 } else {

@@ -28,12 +28,14 @@ public class TemperatureController {
 
         switch (temperature.GetTemperatureType()) {
             case RASPBERRY:
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.MAIN_SERVICE_COMMAND,
                         new String[]{Bundles.MAIN_SERVICE_ACTION},
                         new Object[]{MainServiceAction.DOWNLOAD_TEMPERATURE});
                 break;
             case CITY:
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.MAIN_SERVICE_COMMAND,
                         new String[]{Bundles.MAIN_SERVICE_ACTION},
                         new Object[]{MainServiceAction.DOWNLOAD_WEATHER_CURRENT});
                 break;

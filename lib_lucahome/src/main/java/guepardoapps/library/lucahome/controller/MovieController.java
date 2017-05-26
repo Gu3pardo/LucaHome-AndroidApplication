@@ -39,7 +39,12 @@ public class MovieController {
         _logger.Debug("Trying to start movie: " + movie.GetTitle());
 
         String action = ServerActions.START_MOVIE + movie.GetTitle();
-        _serviceController.StartRestService(movie.GetTitle(), action, null, LucaObject.MOVIE, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                movie.GetTitle(),
+                action,
+                "",
+                LucaObject.MOVIE,
+                RaspberrySelection.BOTH);
 
         if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.START_OSMC_APP)) {
             if (_packageService.IsPackageInstalled(Packages.KORE)) {

@@ -15,7 +15,7 @@ import guepardoapps.library.toolset.controller.FileController;
 
 public class MediaStorageController {
 
-    private static final MediaStorageController SINGLETON_CONTROLLER = new MediaStorageController();
+    private static final MediaStorageController SINGLETON = new MediaStorageController();
 
     private static final String TAG = MediaStorageController.class.getSimpleName();
     private LucaHomeLogger _logger;
@@ -25,12 +25,11 @@ public class MediaStorageController {
 
     private boolean _isInitialized;
 
-    private String _raspberryCameraDir = Environment.getExternalStorageDirectory() + File.separator
-            + NASConstants.NAS_RASPBERRY_CAMERA;
+    private String _raspberryCameraDir = Environment.getExternalStorageDirectory() + File.separator + NASConstants.NAS_RASPBERRY_CAMERA;
     private boolean _nasCameraMounted;
 
     public static MediaStorageController getInstance() {
-        return SINGLETON_CONTROLLER;
+        return SINGLETON;
     }
 
     private MediaStorageController() {

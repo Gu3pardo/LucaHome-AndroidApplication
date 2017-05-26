@@ -2,7 +2,9 @@ package guepardoapps.library.lucahome.common.dto;
 
 import android.support.annotation.NonNull;
 
-public class YoutubeVideoDto {
+import java.io.Serializable;
+
+public class YoutubeVideoDto implements Serializable {
 
     private static final String TAG = YoutubeVideoDto.class.getSimpleName();
 

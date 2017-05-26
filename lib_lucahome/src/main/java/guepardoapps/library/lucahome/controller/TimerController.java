@@ -25,13 +25,21 @@ public class TimerController {
 
     public void LoadTimer() {
         _logger.Debug("LoadTimer");
-        _serviceController.StartRestService(Bundles.SCHEDULE_DOWNLOAD, ServerActions.GET_SCHEDULES,
-                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED, LucaObject.SCHEDULE, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                Bundles.SCHEDULE_DOWNLOAD,
+                ServerActions.GET_SCHEDULES,
+                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED,
+                LucaObject.SCHEDULE,
+                RaspberrySelection.BOTH);
     }
 
     public void Delete(@NonNull TimerDto timer) {
         _logger.Debug("Delete: " + timer.toString());
-        _serviceController.StartRestService(timer.GetName(), timer.GetCommandDelete(), Broadcasts.RELOAD_TIMER,
-                LucaObject.TIMER, RaspberrySelection.BOTH);
+        _serviceController.StartRestService(
+                timer.GetName(),
+                timer.GetCommandDelete(),
+                Broadcasts.RELOAD_TIMER,
+                LucaObject.TIMER,
+                RaspberrySelection.BOTH);
     }
 }

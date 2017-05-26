@@ -41,11 +41,12 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
     private String _serverIp;
     private ArrayList<YoutubeVideoDto> _youtubeVideoList;
 
-    public DownloadYoutubeVideoTask(@NonNull Context context,
-                                    @NonNull BroadcastController broadcastController,
-                                    @NonNull LucaDialogController dialogController,
-                                    @NonNull ProgressDialog loadingVideosDialog,
-                                    @NonNull String serverIp) {
+    public DownloadYoutubeVideoTask(
+            @NonNull Context context,
+            @NonNull BroadcastController broadcastController,
+            LucaDialogController dialogController,
+            ProgressDialog loadingVideosDialog,
+            @NonNull String serverIp) {
         _logger = new LucaHomeLogger(TAG);
 
         _context = context;
@@ -59,21 +60,27 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
         _isInitialized = true;
     }
 
-    public DownloadYoutubeVideoTask(@NonNull Context context,
-                                    @NonNull BroadcastController broadcastController,
-                                    @NonNull String serverIp) {
+    public DownloadYoutubeVideoTask(
+            @NonNull Context context,
+            @NonNull BroadcastController broadcastController,
+            @NonNull String serverIp) {
         this(context, broadcastController, null, null, serverIp);
     }
 
-    public void SetLoadingVideosDialog(@NonNull ProgressDialog loadingVideosDialog) {
-        _logger.Debug("SetLoadingVideosDialog");
-
-        _loadingVideosDialog = loadingVideosDialog;
+    public DownloadYoutubeVideoTask(
+            @NonNull Context context,
+            @NonNull BroadcastController broadcastController) {
+        this(context, broadcastController, null, null, "");
     }
 
     public void SetSendFirstEntry(boolean sendFirstEntry) {
         _logger.Debug("SetSendFirstEntry to " + String.valueOf(sendFirstEntry));
         _sendFirstEntry = sendFirstEntry;
+    }
+
+    public void SetLoadingVideosDialog(@NonNull ProgressDialog loadingVideosDialog) {
+        _logger.Debug("SetLoadingVideosDialog");
+        _loadingVideosDialog = loadingVideosDialog;
     }
 
     @Override
@@ -195,8 +202,15 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
                 return;
             }
 
-            _broadcastController.SendStringBroadcast(Broadcasts.YOUTUBE_ID, Bundles.YOUTUBE_ID,
+            _broadcastController.SendStringBroadcast(
+                    Broadcasts.YOUTUBE_ID,
+                    Bundles.YOUTUBE_ID,
                     _youtubeVideoList.get(0).GetYoutubeId());
+
+            _broadcastController.SendSerializableBroadcast(
+                    Broadcasts.YOUTUBE_VIDEO,
+                    Bundles.YOUTUBE_VIDEO,
+                    _youtubeVideoList.get(0));
         }
     }
 }

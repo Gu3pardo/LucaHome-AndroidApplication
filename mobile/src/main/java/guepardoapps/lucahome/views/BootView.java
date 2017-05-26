@@ -34,6 +34,8 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.services.ControlServiceStateService;
 import guepardoapps.lucahome.services.MainService;
 
+import shortbread.Shortbread;
+
 public class BootView extends Activity {
 
     private static final String TAG = BootView.class.getSimpleName();
@@ -131,6 +133,9 @@ public class BootView extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Shortbread.create(this);
+
         setContentView(R.layout.view_boot);
 
         _logger = new LucaHomeLogger(TAG);

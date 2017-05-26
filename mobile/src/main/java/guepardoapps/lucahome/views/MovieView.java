@@ -36,7 +36,9 @@ import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
+import shortbread.Shortcut;
 
+@Shortcut(id = "movies", icon = R.drawable.movie, shortLabel = "Movies")
 public class MovieView extends AppCompatActivity {
 
     private static final String TAG = MovieView.class.getSimpleName();

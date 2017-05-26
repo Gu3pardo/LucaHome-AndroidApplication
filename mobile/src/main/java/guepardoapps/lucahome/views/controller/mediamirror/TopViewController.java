@@ -31,9 +31,11 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
+import guepardoapps.library.lucahome.common.constants.Keys;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
+import guepardoapps.library.lucahome.common.dto.YoutubeVideoDto;
 import guepardoapps.library.lucahome.common.enums.LucaObject;
 import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
 import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
@@ -43,6 +45,8 @@ import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 import guepardoapps.library.lucahome.controller.ServiceController;
 
+import guepardoapps.library.lucahome.tasks.DownloadYoutubeVideoTask;
+import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
@@ -135,12 +139,24 @@ public class TopViewController {
 
     private TextView _versionTextView;
 
+    private BroadcastReceiver _currentYoutubeVideoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_currentYoutubeVideoReceiver");
+            YoutubeVideoDto currentYoutubeId = (YoutubeVideoDto) intent.getSerializableExtra(Bundles.YOUTUBE_VIDEO);
+            if (currentYoutubeId != null) {
+                _youtubeIdTextView.setText(String.format(Locale.getDefault(), "%s", currentYoutubeId.GetTitle()));
+            } else {
+                _logger.Warn("currentYoutubeId is null");
+            }
+        }
+    };
+
     @SuppressLint("DefaultLocale")
     private BroadcastReceiver _mediaMirrorViewDtoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MediaMirrorViewDto mediaMirrorViewDto = (MediaMirrorViewDto) intent
-                    .getSerializableExtra(Bundles.MEDIAMIRROR_VIEW_DTO);
+            MediaMirrorViewDto mediaMirrorViewDto = (MediaMirrorViewDto) intent.getSerializableExtra(Bundles.MEDIAMIRROR_VIEW_DTO);
 
             _updateInfoHandler.removeCallbacks(_updateInfoRunnable);
             _youtubePlayTimeHandler.removeCallbacks(_youtubePlayTimeRunnable);
@@ -155,10 +171,17 @@ public class TopViewController {
                 _mediaMirrorSocketSwitch.setChecked(_mediaMirrorViewDto.GetSocketState());
                 _switchEnabled = true;
 
-                _youtubeIdTextView.setText(String.format(Locale.GERMAN, "YoutubeId: %s", _mediaMirrorViewDto.GetYoutubeId()));
+                _youtubeIdTextView.setText(String.format(Locale.getDefault(), "YoutubeId: %s", _mediaMirrorViewDto.GetYoutubeId()));
 
                 boolean isYoutubePlaying = _mediaMirrorViewDto.IsYoutubePlaying();
                 if (isYoutubePlaying) {
+                    String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, 1, _mediaMirrorViewDto.GetYoutubeId(), Keys.YOUTUBE_API_KEY);
+                    DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(
+                            _context,
+                            new BroadcastController(_context));
+                    task.SetSendFirstEntry(true);
+                    task.execute(url);
+
                     int youtubeCurrentTimeSec = _mediaMirrorViewDto.GetYoutubeVideoCurrentPlayTime();
                     if (youtubeCurrentTimeSec == -1) {
                         _logger.Warn("youtubeCurrentTimeSec is -1, but isYoutubePlaying is true!");
@@ -438,8 +461,8 @@ public class TopViewController {
     public void onResume() {
         _logger.Debug("onResume");
         if (!_initialized) {
-            _receiverController.RegisterReceiver(_mediaMirrorViewDtoReceiver,
-                    new String[]{Broadcasts.MEDIAMIRROR_VIEW_DTO});
+            _receiverController.RegisterReceiver(_currentYoutubeVideoReceiver, new String[]{Broadcasts.YOUTUBE_VIDEO});
+            _receiverController.RegisterReceiver(_mediaMirrorViewDtoReceiver, new String[]{Broadcasts.MEDIAMIRROR_VIEW_DTO});
             _initialized = true;
         }
     }
@@ -447,7 +470,7 @@ public class TopViewController {
     public void onPause() {
         _logger.Debug("onPause");
         _initialized = false;
-        _receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
+        _receiverController.Dispose();
         _updateInfoHandler.removeCallbacks(_updateInfoRunnable);
     }
 
@@ -455,7 +478,7 @@ public class TopViewController {
         _logger.Debug("onDestroy");
         _initialized = false;
         _mediaMirrorController.Dispose();
-        _receiverController.UnregisterReceiver(_mediaMirrorViewDtoReceiver);
+        _receiverController.Dispose();
         _updateInfoHandler.removeCallbacks(_updateInfoRunnable);
     }
 

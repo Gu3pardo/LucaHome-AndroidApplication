@@ -44,7 +44,6 @@ public class WIFIReceiver extends BroadcastReceiver {
 
     private Context _context;
 
-    private DialogController _dialogController;
     private LucaNotificationController _notificationController;
     private ServiceController _serviceController;
 
@@ -138,8 +137,7 @@ public class WIFIReceiver extends BroadcastReceiver {
 
     private void checkDatabase() {
         _logger.Debug("checkDatabase");
-        DatabaseController databaseController = new DatabaseController(_context);
-        databaseController.Initialize();
+        DatabaseController databaseController = DatabaseController.getInstance();
 
         SerializableList<ActionDto> storedActions = databaseController.GetActions();
         if (storedActions.getSize() > 0) {
