@@ -136,8 +136,12 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
                             String title = snippet.getString("title");
                             String description = snippet.getString("description");
 
+                            JSONObject thumbnails = snippet.getJSONObject("thumbnails");
+                            JSONObject mediumThumbnails = thumbnails.getJSONObject("medium");
+                            String mediumUrl = mediumThumbnails.getString("url");
+
                             if (videoId != null && title != null && description != null) {
-                                YoutubeVideoDto modelDto = new YoutubeVideoDto(videoId, title, description);
+                                YoutubeVideoDto modelDto = new YoutubeVideoDto(videoId, title, description, mediumUrl);
                                 _logger.Debug("New Dto: " + modelDto.toString());
                                 youtubeVideoList.add(modelDto);
                             } else {

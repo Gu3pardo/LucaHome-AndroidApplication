@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">LucaHome</string>
-    <string name="versionName">3.0.2.170521</string>
-    <string name="my_analog_name">Analog LucaHome Watchface</string>
+    <string name="versionName">3.0.8.170528</string>
+    <string name="watch_face_name">LucaHome Watchface</string>
     <string name="hello_world">Hello world!</string>
     <string name="hello_round">Hello Round World!</string>
     <string name="hello_square">Hello Square World!</string>

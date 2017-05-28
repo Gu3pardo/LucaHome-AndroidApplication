@@ -1,64 +1,118 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/TextIcon"
-    android:orientation="vertical"
-    android:padding="5dp" >
+    android:background="@color/TextIcon">
 
     <LinearLayout
+        android:id="@+id/topMediaMirrorLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/DarkPrimary"
+        android:orientation="vertical">
+
+        <Spinner
+            android:id="@+id/mediaMirrorSelectionSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_gravity="center"
+            android:layout_margin="3dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/youtubeMediaMirrorLinearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/topMediaMirrorLinearLayout"
         android:layout_margin="10dp"
         android:background="@color/DarkPrimary"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="2dp" >
+            android:layout_height="match_parent"
+            android:layout_margin="5dp"
+            android:baselineAligned="false"
+            android:gravity="center"
+            android:orientation="vertical">
 
-            <Spinner
-                android:id="@+id/mediamirrorSelectionSpinner"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="2dp"
-                android:layout_weight="5" />
+                android:layout_margin="2dp"
+                android:gravity="center">
 
-            <ImageView
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_gravity="center"
-                android:layout_marginEnd="2dp"
-                android:layout_marginStart="2dp"
-                android:layout_weight="0.25"
-                android:contentDescription="@string/contentDescription"
-                android:src="@drawable/battery" />
+                <ImageView
+                    android:id="@+id/youtubeVideoImageView"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:layout_marginEnd="5dp"
+                    android:contentDescription="@string/contentDescription"
+                    android:src="@drawable/youtube_icon" />
 
-            <TextView
-                android:id="@+id/mediaMirrorBatteryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginEnd="2dp"
-                android:layout_marginStart="2dp"
-                android:layout_weight="0.25"
-                android:text="-1%"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="@color/TextIcon" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp"
+                    android:orientation="vertical">
 
-            <Switch
-                android:id="@+id/mediamirrorSocketSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="2dp"
-                android:layout_weight="0.25"
-                android:textOff="OFF"
-                android:textOn="ON"
-                android:thumb="@xml/customswitchselector"
-                android:track="@xml/custom_track" />
+                    <TextView
+                        android:id="@+id/youtubeIdTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@xml/button_blank_white"
+                        android:clickable="true"
+                        android:onClick="SelectedYoutubeId"
+                        android:padding="3dp"
+                        android:text="@string/exampleYoutubeId"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/TextIcon"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp">
+
+                        <ImageButton
+                            android:id="@+id/imageButtonVideoPlay"
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginEnd="5dp"
+                            android:background="@xml/button_blank_white"
+                            android:contentDescription="@string/contentDescription"
+                            android:src="@android:drawable/ic_media_play" />
+
+                        <ImageButton
+                            android:id="@+id/imageButtonVideoPause"
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginEnd="5dp"
+                            android:background="@xml/button_blank_white"
+                            android:contentDescription="@string/contentDescription"
+                            android:src="@android:drawable/ic_media_pause" />
+
+                        <ImageButton
+                            android:id="@+id/imageButtonVideoStop"
+                            style="?android:attr/buttonStyleSmall"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@xml/button_blank_white"
+                            android:contentDescription="@string/contentDescription"
+                            android:src="@android:drawable/editbox_dropdown_light_frame" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
 
         <TextView
@@ -70,114 +124,57 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/volumeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/exampleVolume"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="@color/TextIcon"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical" >
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="2dp"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/youtubeIdTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                <Button
+                    android:id="@+id/buttonVolumeIncrease"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_marginEnd="5dp"
+                    android:layout_weight="1"
                     android:background="@xml/button_blank_white"
-                    android:clickable="true"
-                    android:onClick="SelectedYoutubeId"
-                    android:padding="3dp"
-                    android:text="Youtube ID: xxxxxxxx"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
+                    android:text="@string/plus"
+                    android:textColor="@color/TextIcon" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="2dp"
-                    android:gravity="center" >
-
-                    <ImageButton
-                        android:id="@+id/imageButtonVideoPlay"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:background="@xml/button_blank_white"
-                        android:contentDescription="@string/contentDescription"
-                        android:src="@android:drawable/ic_media_play" />
-
-                    <ImageButton
-                        android:id="@+id/imageButtonVideoPause"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:background="@xml/button_blank_white"
-                        android:contentDescription="@string/contentDescription"
-                        android:src="@android:drawable/ic_media_pause" />
-
-                    <ImageButton
-                        android:id="@+id/imageButtonVideoStop"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@xml/button_blank_white"
-                        android:contentDescription="@string/contentDescription"
-                        android:src="@android:drawable/editbox_dropdown_light_frame" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_margin="5dp"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:orientation="horizontal" >
-
-                <TextView
-                    android:id="@+id/volumeTextView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="Vol.: -1"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:textColor="@color/TextIcon"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_margin="2dp"
-                    android:orientation="vertical" >
-
-                    <Button
-                        android:id="@+id/buttonVolumeIncrease"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
-                        android:background="@xml/button_blank_white"
-                        android:text="+"
-                        android:textColor="@color/TextIcon" />
-
-                    <Button
-                        android:id="@+id/buttonVolumeDecrease"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="25dp"
-                        android:layout_height="25dp"
-                        android:layout_weight="1"
-                        android:background="@xml/button_blank_white"
-                        android:text="-"
-                        android:textColor="@color/TextIcon" />
-                </LinearLayout>
+                <Button
+                    android:id="@+id/buttonVolumeDecrease"
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_weight="1"
+                    android:background="@xml/button_blank_white"
+                    android:text="@string/minus"
+                    android:textColor="@color/TextIcon" />
             </LinearLayout>
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:background="@color/TextIcon" />
 
         <SeekBar
             android:id="@+id/seekBarYoutubeDuration"
@@ -185,6 +182,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
             android:max="100" />
 
         <TextView
@@ -193,11 +191,18 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
-            android:gravity="center"
+            android:gravity="end"
             android:padding="5dp"
-            android:text="00:00/99:99"
+            android:text="@string/examplePlayTime"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/TextIcon" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginStart="5dp"
+            android:background="@color/TextIcon" />
 
         <TextView
             android:id="@+id/sleepTimerTextView"
@@ -205,59 +210,54 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
-            android:gravity="start"
-            android:padding="5dp"
-            android:text="Sleep timer: 00:00min"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/TextIcon"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/versionTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_marginStart="5dp"
             android:gravity="end"
             android:padding="5dp"
-            android:text="vXX.XX.XX.XXXXXX"
+            android:text="@string/exampleSleepTimer"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/TextIcon"
             android:textStyle="bold" />
     </LinearLayout>
 
     <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="10dp"
+        android:layout_above="@+id/bottomMediaMirrorRelativeLayout"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/youtubeMediaMirrorLinearLayout"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="10dp"
         android:background="@color/DarkPrimary"
-        android:padding="5dp" >
+        android:padding="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:orientation="vertical">
 
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:background="@color/Primary"
-                android:padding="3dp" >
+                android:padding="3dp">
 
                 <TextView
                     android:id="@+id/textViewRSS"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="RSS"
+                    android:layout_height="30dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/imageButtonShowRSS"
+                    android:text="@string/rss"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/imageButtonShowRSS"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:layout_margin="3dp"
@@ -295,21 +295,23 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:background="@color/Primary"
-                android:padding="3dp" >
+                android:padding="3dp">
 
                 <TextView
                     android:id="@+id/textViewText"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Text"
+                    android:layout_height="30dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/imageButtonShowText"
+                    android:text="@string/text"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/imageButtonShowText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:layout_margin="3dp"
@@ -346,7 +348,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_below="@+id/dividerText"
                     android:background="@xml/button_blank_white"
-                    android:text="Send"
+                    android:text="@string/send"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold"
                     android:visibility="gone" />
@@ -364,21 +366,23 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:background="@color/Primary"
-                android:padding="3dp" >
+                android:padding="3dp">
 
                 <TextView
                     android:id="@+id/textViewWebsite"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Website"
+                    android:layout_height="30dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/imageButtonShowWebsite"
+                    android:text="@string/website"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/imageButtonShowWebsite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:layout_margin="3dp"
@@ -415,7 +419,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_below="@+id/dividerWebsite"
                     android:background="@xml/button_blank_white"
-                    android:text="Send"
+                    android:text="@string/send"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold"
                     android:visibility="gone" />
@@ -433,13 +437,15 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:background="@color/Primary"
-                android:padding="3dp" >
+                android:padding="3dp">
 
                 <TextView
                     android:id="@+id/textViewScreen"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Screen"
+                    android:layout_height="30dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/textViewBrightnessPercent"
+                    android:text="@string/screen"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
@@ -449,15 +455,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerHorizontal="true"
-                    android:text="-1%"
+                    android:text="@string/exampleBrightness"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/imageButtonShowScreen"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:layout_margin="3dp"
@@ -484,7 +490,7 @@
                     android:layout_below="@+id/dividerScreen"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:visibility="gone" >
+                    android:visibility="gone">
 
                     <Button
                         android:id="@+id/buttonScreenBrightnessIncrease"
@@ -493,7 +499,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
                         android:background="@xml/button_blank_white"
-                        android:text="+"
+                        android:text="@string/plus"
                         android:textColor="@color/TextIcon" />
 
                     <Button
@@ -502,7 +508,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:background="@xml/button_blank_white"
-                        android:text="-"
+                        android:text="@string/minus"
                         android:textColor="@color/TextIcon" />
                 </LinearLayout>
             </RelativeLayout>
@@ -519,21 +525,23 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:background="@color/Primary"
-                android:padding="3dp" >
+                android:padding="3dp">
 
                 <TextView
                     android:id="@+id/textViewUpdate"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Update"
+                    android:layout_height="30dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/imageButtonShowUpdate"
+                    android:text="@string/update"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/imageButtonShowUpdate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:layout_margin="3dp"
@@ -561,7 +569,7 @@
                     android:layout_marginTop="3dp"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:visibility="gone" >
+                    android:visibility="gone">
 
                     <Button
                         android:id="@+id/buttonUpdateCurrentWeather"
@@ -571,7 +579,7 @@
                         android:layout_marginEnd="5dp"
                         android:background="@xml/button_blank_white"
                         android:padding="5dp"
-                        android:text="Weather"
+                        android:text="@string/weather"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/TextIcon" />
 
@@ -583,7 +591,7 @@
                         android:layout_marginEnd="5dp"
                         android:background="@xml/button_blank_white"
                         android:padding="5dp"
-                        android:text="Forecast"
+                        android:text="@string/forecast"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/TextIcon" />
 
@@ -594,7 +602,7 @@
                         android:layout_height="wrap_content"
                         android:background="@xml/button_blank_white"
                         android:padding="5dp"
-                        android:text="Temperature"
+                        android:text="@string/temperature"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/TextIcon" />
                 </LinearLayout>
@@ -609,7 +617,7 @@
                     android:layout_marginTop="3dp"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:visibility="gone" >
+                    android:visibility="gone">
 
                     <Button
                         android:id="@+id/buttonUpdateIp"
@@ -619,7 +627,7 @@
                         android:layout_marginEnd="5dp"
                         android:background="@xml/button_blank_white"
                         android:padding="5dp"
-                        android:text="IP"
+                        android:text="@string/ip"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/TextIcon" />
 
@@ -631,7 +639,7 @@
                         android:layout_marginEnd="5dp"
                         android:background="@xml/button_blank_white"
                         android:padding="5dp"
-                        android:text="Birthdays"
+                        android:text="@string/birthdays"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/TextIcon" />
 
@@ -642,7 +650,7 @@
                         android:layout_height="wrap_content"
                         android:background="@xml/button_blank_white"
                         android:padding="5dp"
-                        android:text="Calendar"
+                        android:text="@string/calendar"
                         android:textAppearance="?android:attr/textAppearanceSmall"
                         android:textColor="@color/TextIcon" />
                 </LinearLayout>
@@ -660,21 +668,23 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="3dp"
                 android:background="@color/Primary"
-                android:padding="3dp" >
+                android:padding="3dp">
 
                 <TextView
                     android:id="@+id/textViewAdvanced"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Advanced"
+                    android:layout_height="30dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_toStartOf="@+id/imageButtonShowAdvanced"
+                    android:text="@string/advanced"
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="@color/TextIcon"
                     android:textStyle="bold" />
 
                 <ImageButton
                     android:id="@+id/imageButtonShowAdvanced"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:layout_margin="3dp"
@@ -701,7 +711,7 @@
                     android:layout_below="@+id/dividerAdvanced"
                     android:gravity="center"
                     android:orientation="horizontal"
-                    android:visibility="gone" >
+                    android:visibility="gone">
 
                     <Button
                         android:id="@+id/buttonReboot"
@@ -711,7 +721,7 @@
                         android:layout_marginEnd="5dp"
                         android:background="@xml/button_blank_white"
                         android:padding="5dp"
-                        android:text="Reboot"
+                        android:text="@string/reboot"
                         android:textColor="@color/TextIcon" />
 
                     <Button
@@ -721,11 +731,69 @@
                         android:layout_height="wrap_content"
                         android:background="@xml/button_blank_white"
                         android:padding="5dp"
-                        android:text="Shutdown"
+                        android:text="@string/shutdown"
                         android:textColor="@color/TextIcon" />
                 </LinearLayout>
             </RelativeLayout>
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+    <RelativeLayout
+        android:id="@+id/bottomMediaMirrorRelativeLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="10dp"
+        android:background="@color/DarkPrimary"
+        android:padding="3dp">
+
+        <ImageView
+            android:id="@+id/batteryImage"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentStart="true"
+            android:contentDescription="@string/contentDescription"
+            android:src="@drawable/battery" />
+
+        <TextView
+            android:id="@+id/mediaMirrorBatteryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/batteryImage"
+            android:text="@string/exampleBattery"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/TextIcon" />
+
+        <Switch
+            android:id="@+id/mediaMirrorSocketSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/mediaMirrorBatteryTextView"
+            android:textOff="@string/off"
+            android:textOn="@string/on"
+            android:thumb="@xml/customswitchselector"
+            android:track="@xml/custom_track" />
+
+        <TextView
+            android:id="@+id/versionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginEnd="5dp"
+            android:layout_toEndOf="@+id/mediaMirrorSocketSwitch"
+            android:gravity="end"
+            android:padding="5dp"
+            android:text="@string/exampleVersion"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/TextIcon"
+            android:textStyle="bold" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

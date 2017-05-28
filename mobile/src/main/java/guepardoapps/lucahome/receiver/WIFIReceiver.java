@@ -145,8 +145,12 @@ public class WIFIReceiver extends BroadcastReceiver {
                 ActionDto entry = storedActions.getValue(index);
                 databaseController.DeleteAction(entry);
                 ScheduleService.getInstance().DeleteSchedule(entry.GetName());
-                _serviceController.StartRestService(entry.GetName(), entry.GetAction(), entry.GetBroadcast(),
-                        LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+                _serviceController.StartRestService(
+                        entry.GetName(),
+                        entry.GetAction(),
+                        entry.GetBroadcast(),
+                        LucaObject.WIRELESS_SOCKET,
+                        RaspberrySelection.BOTH);
             }
         } else {
             _logger.Debug("No actions stored!");

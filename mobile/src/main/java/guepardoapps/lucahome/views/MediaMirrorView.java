@@ -26,8 +26,10 @@ public class MediaMirrorView extends Activity {
     private NavigationService _navigationService;
 
     private AdvancedViewController _advancedViewController;
+    private BottomViewController _bottomViewController;
     private RssViewController _rssViewController;
     private ScreenViewController _screenViewController;
+    private SelectionController _selectionController;
     private TextViewController _textViewController;
     private TopViewController _topViewController;
     private UpdateViewController _updateViewController;
@@ -36,7 +38,7 @@ public class MediaMirrorView extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_mediamirror);
+        setContentView(R.layout.view_media_mirror);
 
         _logger = new LucaHomeLogger(TAG);
         _logger.Debug("onCreate");
@@ -52,16 +54,20 @@ public class MediaMirrorView extends Activity {
         _navigationService = new NavigationService(this);
 
         _advancedViewController = new AdvancedViewController(this);
+        _bottomViewController = new BottomViewController(this);
         _rssViewController = new RssViewController(this);
         _screenViewController = new ScreenViewController(this);
+        _selectionController = new SelectionController(this);
         _textViewController = new TextViewController(this);
         _topViewController = new TopViewController(this);
         _updateViewController = new UpdateViewController(this);
         _websiteViewController = new WebsiteViewController(this);
 
         _advancedViewController.onCreate();
+        _bottomViewController.onCreate();
         _rssViewController.onCreate();
         _screenViewController.onCreate();
+        _selectionController.onCreate();
         _textViewController.onCreate();
         _topViewController.onCreate();
         _updateViewController.onCreate();
@@ -74,8 +80,10 @@ public class MediaMirrorView extends Activity {
         _logger.Debug("onResume");
 
         _advancedViewController.onResume();
+        _bottomViewController.onResume();
         _rssViewController.onResume();
         _screenViewController.onResume();
+        _selectionController.onResume();
         _textViewController.onResume();
         _topViewController.onResume();
         _updateViewController.onResume();
@@ -87,8 +95,10 @@ public class MediaMirrorView extends Activity {
         _logger.Debug("onPause");
 
         _advancedViewController.onPause();
+        _bottomViewController.onPause();
         _rssViewController.onPause();
         _screenViewController.onPause();
+        _selectionController.onPause();
         _textViewController.onPause();
         _topViewController.onPause();
         _updateViewController.onPause();
@@ -102,8 +112,10 @@ public class MediaMirrorView extends Activity {
         _logger.Debug("onDestroy");
 
         _advancedViewController.onDestroy();
+        _bottomViewController.onDestroy();
         _rssViewController.onDestroy();
         _screenViewController.onDestroy();
+        _selectionController.onDestroy();
         _textViewController.onDestroy();
         _topViewController.onDestroy();
         _updateViewController.onDestroy();

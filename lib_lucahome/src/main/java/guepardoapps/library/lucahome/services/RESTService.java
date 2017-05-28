@@ -60,7 +60,9 @@ public class RESTService extends Service {
         }
         if (_networkController == null) {
             _networkController = new NetworkController(_context,
-                    new DialogController(_context, ContextCompat.getColor(_context, R.color.TextIcon),
+                    new DialogController(
+                            _context,
+                            ContextCompat.getColor(_context, R.color.TextIcon),
                             ContextCompat.getColor(_context, R.color.Background)));
         }
 

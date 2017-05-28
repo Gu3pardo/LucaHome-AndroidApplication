@@ -89,9 +89,36 @@
     <string name="security">Security</string>
     <string name="sensors">Sensors</string>
     <string name="temperature">Temperature</string>
+    <string name="weather">Weather</string>
+    <string name="forecast">Forecast</string>
     <string name="humidity">Humidity</string>
     <string name="airPressure">Air Pressure</string>
 
     <string name="notavailable">n.a.</string>
     <string name="noData">There is no data!</string>
+
+    <string name="calendar">Calendar</string>
+    <string name="ip">IP</string>
+
+    <string name="screen">Screen</string>
+
+    <string name="send">Send</string>
+    <string name="rss">RSS</string>
+    <string name="text">Text</string>
+    <string name="website">Website</string>
+
+    <string name="advanced">Advanced</string>
+    <string name="reboot">Reboot</string>
+    <string name="shutdown">Shutdown</string>
+
+    <string name="plus">+</string>
+    <string name="minus">-</string>
+
+    <string name="exampleBattery">-1%</string>
+    <string name="exampleBrightness">-1%</string>
+    <string name="examplePlayTime">00:00/99:99</string>
+    <string name="exampleSleepTimer">Sleep timer: 00:00min</string>
+    <string name="exampleVersion">vXX.XX.XX.XXXXXX</string>
+    <string name="exampleVolume">Vol.: 4</string>
+    <string name="exampleYoutubeId">YoutubeId: xxxxxxx</string>
 </resources>

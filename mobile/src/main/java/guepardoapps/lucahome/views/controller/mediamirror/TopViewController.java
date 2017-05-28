@@ -14,17 +14,17 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import es.dmoral.toasty.Toasty;
 
@@ -32,18 +32,14 @@ import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.Keys;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
 import guepardoapps.library.lucahome.common.dto.YoutubeVideoDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
 import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.library.lucahome.common.enums.ServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
-import guepardoapps.library.lucahome.controller.ServiceController;
 
 import guepardoapps.library.lucahome.tasks.DownloadYoutubeVideoTask;
 import guepardoapps.library.toolset.controller.BroadcastController;
@@ -60,17 +56,13 @@ public class TopViewController {
     private LucaDialogController _lucaDialogController;
     private MediaMirrorController _mediaMirrorController;
     private ReceiverController _receiverController;
-    private ServiceController _serviceController;
 
     private boolean _initialized;
     private MediaMirrorViewDto _mediaMirrorViewDto;
 
-    private TextView _mediaMirrorBatteryTextView;
-    private Switch _mediaMirrorSocketSwitch;
-    private boolean _switchEnabled = true;
-
     private TextView _volumeTextView;
 
+    private ImageView _youtubeImageView;
     private TextView _youtubeIdTextView;
     private SeekBar _seekBarYoutubeDuration;
     private boolean _seekBarEnabled = true;
@@ -125,26 +117,13 @@ public class TopViewController {
         }
     };
 
-    private static final int UPDATE_TIMEOUT = 5 * 1000;
-    private Handler _updateInfoHandler = new Handler();
-    private Runnable _updateInfoRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (_mediaMirrorViewDto != null) {
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
-            }
-        }
-    };
-
-    private TextView _versionTextView;
-
     private BroadcastReceiver _currentYoutubeVideoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_currentYoutubeVideoReceiver");
             YoutubeVideoDto currentYoutubeId = (YoutubeVideoDto) intent.getSerializableExtra(Bundles.YOUTUBE_VIDEO);
             if (currentYoutubeId != null) {
+                Picasso.with(context).load(currentYoutubeId.GetMediumImageUrl()).into(_youtubeImageView);
                 _youtubeIdTextView.setText(String.format(Locale.getDefault(), "%s", currentYoutubeId.GetTitle()));
             } else {
                 _logger.Warn("currentYoutubeId is null");
@@ -158,30 +137,23 @@ public class TopViewController {
         public void onReceive(Context context, Intent intent) {
             MediaMirrorViewDto mediaMirrorViewDto = (MediaMirrorViewDto) intent.getSerializableExtra(Bundles.MEDIAMIRROR_VIEW_DTO);
 
-            _updateInfoHandler.removeCallbacks(_updateInfoRunnable);
             _youtubePlayTimeHandler.removeCallbacks(_youtubePlayTimeRunnable);
 
             if (mediaMirrorViewDto != null) {
                 _logger.Debug("New Dto is: " + mediaMirrorViewDto.toString());
                 _mediaMirrorViewDto = mediaMirrorViewDto;
 
-                _mediaMirrorBatteryTextView.setText(String.valueOf(_mediaMirrorViewDto.GetBatteryLevel()));
-
-                _switchEnabled = false;
-                _mediaMirrorSocketSwitch.setChecked(_mediaMirrorViewDto.GetSocketState());
-                _switchEnabled = true;
-
                 _youtubeIdTextView.setText(String.format(Locale.getDefault(), "YoutubeId: %s", _mediaMirrorViewDto.GetYoutubeId()));
+
+                String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, 1, _mediaMirrorViewDto.GetYoutubeId(), Keys.YOUTUBE_API_KEY);
+                DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(
+                        _context,
+                        new BroadcastController(_context));
+                task.SetSendFirstEntry(true);
+                task.execute(url);
 
                 boolean isYoutubePlaying = _mediaMirrorViewDto.IsYoutubePlaying();
                 if (isYoutubePlaying) {
-                    String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, 1, _mediaMirrorViewDto.GetYoutubeId(), Keys.YOUTUBE_API_KEY);
-                    DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(
-                            _context,
-                            new BroadcastController(_context));
-                    task.SetSendFirstEntry(true);
-                    task.execute(url);
-
                     int youtubeCurrentTimeSec = _mediaMirrorViewDto.GetYoutubeVideoCurrentPlayTime();
                     if (youtubeCurrentTimeSec == -1) {
                         _logger.Warn("youtubeCurrentTimeSec is -1, but isYoutubePlaying is true!");
@@ -224,7 +196,7 @@ public class TopViewController {
                     _seekBarYoutubeDuration.setProgress(progress);
                     _seekBarEnabled = true;
 
-                    _youtubePlayTimeHandler.postDelayed(_youtubePlayTimeRunnable, UPDATE_TIMEOUT);
+                    _youtubePlayTimeHandler.postDelayed(_youtubePlayTimeRunnable, Timeouts.COUNTDOWN);
                 } else {
                     _seekBarYoutubeDuration.setVisibility(View.INVISIBLE);
                     _youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);
@@ -246,14 +218,10 @@ public class TopViewController {
                     _sleepTimerHandler.removeCallbacks(_sleepTimerRunnable);
                     _sleepTimerTextView.setVisibility(View.INVISIBLE);
                 }
-
-                _versionTextView.setText(_mediaMirrorViewDto.GetServerVersion());
             } else {
                 _logger.Warn("Received null MediaMirrorViewDto...!");
                 Toasty.warning(_context, "Received null MediaMirrorViewDto...!", Toast.LENGTH_LONG).show();
             }
-
-            _updateInfoHandler.postDelayed(_updateInfoRunnable, UPDATE_TIMEOUT);
         }
     };
 
@@ -264,13 +232,12 @@ public class TopViewController {
         _mediaMirrorController = new MediaMirrorController(_context);
         _mediaMirrorController.Initialize();
         _receiverController = new ReceiverController(_context);
-        _serviceController = new ServiceController(_context);
     }
 
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        Spinner mediaMirrorSelectionSpinner = (Spinner) ((Activity) _context).findViewById(R.id.mediamirrorSelectionSpinner);
+        Spinner mediaMirrorSelectionSpinner = (Spinner) ((Activity) _context).findViewById(R.id.mediaMirrorSelectionSpinner);
         final ArrayList<String> serverLocations = new ArrayList<>();
         for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
             if (entry.GetId() > 0) {
@@ -296,32 +263,7 @@ public class TopViewController {
             }
         });
 
-        _mediaMirrorBatteryTextView = (TextView) ((Activity) _context).findViewById(R.id.mediaMirrorBatteryTextView);
-
-        _mediaMirrorSocketSwitch = (Switch) ((Activity) _context).findViewById(R.id.mediamirrorSocketSwitch);
-        _mediaMirrorSocketSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                _logger.Debug("_mediaMirrorSocketSwitch onCheckedChanged to " + String.valueOf(isChecked));
-
-                if (_mediaMirrorViewDto == null) {
-                    _logger.Error("_mediaMirrorViewDto is null!");
-                    return;
-                }
-
-                if (!_switchEnabled) {
-                    _logger.Warn("Switch disabled!");
-                    return;
-                }
-
-                String socketName = _mediaMirrorViewDto.GetSocketName();
-                String command = ServerActions.SET_SOCKET + socketName
-                        + ((isChecked) ? Constants.STATE_ON : Constants.STATE_OFF);
-                _serviceController.StartRestService(socketName, command, Broadcasts.RELOAD_SOCKETS,
-                        LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
-            }
-        });
-
+        _youtubeImageView = (ImageView) ((Activity) _context).findViewById(R.id.youtubeVideoImageView);
         _youtubeIdTextView = (TextView) ((Activity) _context).findViewById(R.id.youtubeIdTextView);
 
         _seekBarYoutubeDuration = (SeekBar) ((Activity) _context).findViewById(R.id.seekBarYoutubeDuration);
@@ -454,8 +396,6 @@ public class TopViewController {
         });
 
         _sleepTimerTextView = (TextView) ((Activity) _context).findViewById(R.id.sleepTimerTextView);
-
-        _versionTextView = (TextView) ((Activity) _context).findViewById(R.id.versionTextView);
     }
 
     public void onResume() {
@@ -471,7 +411,6 @@ public class TopViewController {
         _logger.Debug("onPause");
         _initialized = false;
         _receiverController.Dispose();
-        _updateInfoHandler.removeCallbacks(_updateInfoRunnable);
     }
 
     public void onDestroy() {
@@ -479,7 +418,6 @@ public class TopViewController {
         _initialized = false;
         _mediaMirrorController.Dispose();
         _receiverController.Dispose();
-        _updateInfoHandler.removeCallbacks(_updateInfoRunnable);
     }
 
     public void SelectedYoutubeId() {

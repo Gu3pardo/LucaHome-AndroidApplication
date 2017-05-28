@@ -81,8 +81,10 @@ public class ShoppingListView extends AppCompatActivity {
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_SHOPPING_LIST});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.MAIN_SERVICE_COMMAND,
+                    new String[]{Bundles.MAIN_SERVICE_ACTION},
+                    new Object[]{MainServiceAction.GET_SHOPPING_LIST});
         }
     };
 

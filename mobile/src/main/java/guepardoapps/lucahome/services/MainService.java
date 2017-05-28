@@ -1,8 +1,5 @@
 package guepardoapps.lucahome.services;
 
-import java.util.Calendar;
-import java.util.Locale;
-
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,43 +11,75 @@ import android.os.IBinder;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
-import es.dmoral.toasty.Toasty;
+import java.util.Calendar;
+import java.util.Locale;
 
+import es.dmoral.toasty.Toasty;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
-import guepardoapps.library.lucahome.common.dto.*;
-import guepardoapps.library.lucahome.common.enums.*;
+import guepardoapps.library.lucahome.common.constants.Timeouts;
+import guepardoapps.library.lucahome.common.dto.ActionDto;
+import guepardoapps.library.lucahome.common.dto.BirthdayDto;
+import guepardoapps.library.lucahome.common.dto.ChangeDto;
+import guepardoapps.library.lucahome.common.dto.InformationDto;
+import guepardoapps.library.lucahome.common.dto.ListedMenuDto;
+import guepardoapps.library.lucahome.common.dto.MapContentDto;
+import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
+import guepardoapps.library.lucahome.common.dto.MenuDto;
+import guepardoapps.library.lucahome.common.dto.MotionCameraDto;
+import guepardoapps.library.lucahome.common.dto.MovieDto;
+import guepardoapps.library.lucahome.common.dto.ScheduleDto;
+import guepardoapps.library.lucahome.common.dto.ShoppingEntryDto;
+import guepardoapps.library.lucahome.common.dto.TemperatureDto;
+import guepardoapps.library.lucahome.common.dto.TimerDto;
+import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.library.lucahome.common.enums.Command;
+import guepardoapps.library.lucahome.common.enums.LucaObject;
+import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
+import guepardoapps.library.lucahome.common.enums.NavigateData;
+import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.TemperatureType;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.DatabaseController;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 import guepardoapps.library.lucahome.controller.MenuController;
 import guepardoapps.library.lucahome.controller.ServiceController;
-import guepardoapps.library.lucahome.converter.json.*;
+import guepardoapps.library.lucahome.converter.json.JsonDataToBirthdayConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToChangeConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToInformationConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToListedMenuConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToMapContentConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToMenuConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToMotionCameraDtoConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToMovieConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToScheduleConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToShoppingListConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToSocketConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToTemperatureConverter;
+import guepardoapps.library.lucahome.converter.json.JsonDataToTimerConverter;
 import guepardoapps.library.lucahome.services.sockets.SocketActionService;
-
 import guepardoapps.library.openweather.common.OWBroadcasts;
 import guepardoapps.library.openweather.common.OWBundles;
 import guepardoapps.library.openweather.common.OWIds;
 import guepardoapps.library.openweather.common.model.ForecastModel;
 import guepardoapps.library.openweather.common.model.WeatherModel;
 import guepardoapps.library.openweather.controller.OpenWeatherController;
-
 import guepardoapps.library.toolset.beacon.BeaconController;
 import guepardoapps.library.toolset.common.classes.NotificationContent;
 import guepardoapps.library.toolset.common.classes.SerializableList;
-import guepardoapps.library.lucahome.common.constants.Constants;
-import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.DialogController;
 import guepardoapps.library.toolset.controller.NetworkController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.library.toolset.scheduler.ScheduleService;
-
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.views.BirthdayView;
 import guepardoapps.lucahome.views.ForecastWeatherView;
@@ -130,28 +159,28 @@ public class MainService extends Service {
                         break;
                     case DOWNLOAD_SOCKETS:
                         _downloadCount = 1;
-                        startDownloadSocket();
+                        _downloadSocketRunnable.run();
                         break;
                     case DOWNLOAD_TEMPERATURE:
                         _downloadCount = 1;
-                        startDownloadTemperature();
+                        _downloadTemperatureRunnable.run();
                         break;
                     case DOWNLOAD_WEATHER_CURRENT:
                         _downloadCount = 1;
-                        startDownloadCurrentWeather();
+                        _downloadCurrentWeatherRunnable.run();
                         break;
                     case DOWNLOAD_SHOPPING_LIST:
                         _downloadCount = 1;
-                        startDownloadShoppingList();
+                        _downloadShoppingListRunnable.run();
                         break;
                     case DOWNLOAD_MENU:
                         _downloadCount = 2;
-                        startDownloadMenu();
-                        startDownloadListedMenu();
+                        _downloadMenuRunnable.run();
+                        _downloadListedMenuRunnable.run();
                         break;
                     case DOWNLOAD_MOTION_CAMERA_DTO:
                         _downloadCount = 1;
-                        startDownloadMotionCameraDto();
+                        _downloadMotionCameraDtoRunnable.run();
                         break;
                     case GET_ALL:
                         _broadcastController.SendSerializableArrayBroadcast(
@@ -176,13 +205,13 @@ public class MainService extends Service {
                         _logger.Debug("GET_INFORMATIONS");
                         if (_information != null) {
                             _logger.Debug(_information.toString());
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_INFORMATION,
+                                    new String[]{Bundles.INFORMATION_SINGLE},
+                                    new Object[]{_information});
                         } else {
                             _logger.Warn("Information is null!");
                         }
-                        _broadcastController.SendSerializableArrayBroadcast(
-                                Broadcasts.UPDATE_INFORMATION,
-                                new String[]{Bundles.INFORMATION_SINGLE},
-                                new Object[]{_information});
                         break;
                     case GET_MENU:
                         _broadcastController.SendSerializableArrayBroadcast(
@@ -282,9 +311,7 @@ public class MainService extends Service {
                         }
                         break;
                     case SHOW_NOTIFICATION_WEATHER:
-                        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
-                            _openWeatherController.LoadForecastWeather();
-                        }
+                        _downloadForecastWeatherRunnable.run();
                         break;
                     case ENABLE_HEATING:
                         enableHeatingSocket(false);
@@ -404,8 +431,8 @@ public class MainService extends Service {
                 enableSoundSchedule(30);
             }
 
-            startDownloadSocket();
-            startDownloadSchedule();
+            _downloadSocketRunnable.run();
+            _downloadScheduleRunnable.run();
         }
 
         private void enableSoundSchedule(int playLength) {
@@ -880,7 +907,7 @@ public class MainService extends Service {
             }
 
             updateDownloadCount();
-            startDownloadSchedule();
+            _downloadScheduleRunnable.run();
         }
     };
 
@@ -1052,7 +1079,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadBirthdayReceiver onReceive");
-            startDownloadBirthday();
+            _downloadBirthdayRunnable.run();
         }
     };
 
@@ -1060,7 +1087,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadMediaMirrorReceiver onReceive");
-            startDownloadMediaMirror();
+            _downloadMediaMirrorRunnable.run();
         }
     };
 
@@ -1068,7 +1095,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadListedMenuReceiver onReceive");
-            startDownloadListedMenu();
+            _downloadListedMenuRunnable.run();
         }
     };
 
@@ -1076,7 +1103,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadMenuReceiver onReceive");
-            startDownloadMenu();
+            _downloadMenuRunnable.run();
         }
     };
 
@@ -1084,7 +1111,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadMotionCameraDtoReceiver onReceive");
-            startDownloadMotionCameraDto();
+            _downloadMotionCameraDtoRunnable.run();
         }
     };
 
@@ -1092,7 +1119,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadMovieReceiver onReceive");
-            startDownloadMovie();
+            _downloadMovieRunnable.run();
         }
     };
 
@@ -1100,7 +1127,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadScheduleReceiver onReceive");
-            startDownloadSchedule();
+            _downloadScheduleRunnable.run();
         }
     };
 
@@ -1108,7 +1135,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadSocketReceiver onReceive");
-            startDownloadSocket();
+            _downloadSocketRunnable.run();
         }
     };
 
@@ -1116,7 +1143,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadChangeReceiver onReceive");
-            startDownloadChange();
+            _downloadChangeRunnable.run();
         }
     };
 
@@ -1124,7 +1151,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadShoppingListReceiver onReceive");
-            startDownloadShoppingList();
+            _downloadShoppingListRunnable.run();
         }
     };
 
@@ -1151,7 +1178,7 @@ public class MainService extends Service {
 
             LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
             if (lucaObject == null) {
-                _logger.Error("_downloadReceiver received data with null lucaobject!");
+                _logger.Error("_downloadReceiver received data with null lucaObject!");
                 return;
             }
 
@@ -1173,7 +1200,7 @@ public class MainService extends Service {
                         }
                     }
                     if (addBirthdaySuccess) {
-                        startDownloadBirthday();
+                        _downloadBirthdayRunnable.run();
                     } else {
                         _logger.Warn("Add of birthday failed!");
                         Toasty.error(_context, "Add of birthday failed!", Toast.LENGTH_LONG).show();
@@ -1190,7 +1217,7 @@ public class MainService extends Service {
                         }
                     }
                     if (addMenuSuccess) {
-                        startDownloadMenu();
+                        _downloadMenuRunnable.run();
                     } else {
                         _logger.Warn("Add of menu failed!");
                         Toasty.error(_context, "Add of menu failed!", Toast.LENGTH_LONG).show();
@@ -1207,7 +1234,7 @@ public class MainService extends Service {
                         }
                     }
                     if (addMovieSuccess) {
-                        startDownloadMovie();
+                        _downloadMovieRunnable.run();
                     } else {
                         _logger.Warn("Add of movie failed!");
                         Toasty.error(_context, "Add of movie failed!", Toast.LENGTH_LONG).show();
@@ -1225,7 +1252,7 @@ public class MainService extends Service {
                         }
                     }
                     if (addScheduleSuccess) {
-                        startDownloadSchedule();
+                        _downloadScheduleRunnable.run();
                     } else {
                         _logger.Warn("Add of schedule failed!");
                         Toasty.error(_context, "Add of schedule failed!", Toast.LENGTH_LONG).show();
@@ -1242,7 +1269,7 @@ public class MainService extends Service {
                         }
                     }
                     if (addSocketSuccess) {
-                        startDownloadSocket();
+                        _downloadSocketRunnable.run();
                     } else {
                         _logger.Warn("Add of socket failed!");
                         Toasty.error(_context, "Add of socket failed!", Toast.LENGTH_LONG).show();
@@ -1386,7 +1413,36 @@ public class MainService extends Service {
                 return;
             }
 
-            startDownloadBirthday();
+            _serviceController.StartRestService(
+                    Bundles.BIRTHDAY_DOWNLOAD,
+                    ServerActions.GET_BIRTHDAYS,
+                    Broadcasts.DOWNLOAD_BIRTHDAY_FINISHED,
+                    LucaObject.BIRTHDAY,
+                    RaspberrySelection.BOTH);
+        }
+    };
+
+    private Runnable _downloadChangeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadChangeRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            _serviceController.StartRestService(
+                    Bundles.CHANGE_DOWNLOAD,
+                    ServerActions.GET_CHANGES,
+                    Broadcasts.DOWNLOAD_CHANGE_FINISHED,
+                    LucaObject.CHANGE,
+                    RaspberrySelection.BOTH);
         }
     };
 
@@ -1400,7 +1456,7 @@ public class MainService extends Service {
                 return;
             }
 
-            startDownloadCurrentWeather();
+            _openWeatherController.LoadCurrentWeather();
         }
     };
 
@@ -1414,10 +1470,33 @@ public class MainService extends Service {
                 return;
             }
 
-            if (_sharedPrefController
-                    .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
+            if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
                 _openWeatherController.LoadForecastWeather();
             }
+        }
+    };
+
+    private Runnable _downloadInformationRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadInformationRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            _serviceController.StartRestService(
+                    Bundles.INFORMATION_DOWNLOAD,
+                    ServerActions.GET_INFORMATIONS,
+                    Broadcasts.DOWNLOAD_INFORMATION_FINISHED,
+                    LucaObject.INFORMATION,
+                    RaspberrySelection.BOTH);
         }
     };
 
@@ -1428,17 +1507,55 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
-                _listedMenu = _databaseController.GetListedMenuList();
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
-                _listedMenu = _databaseController.GetListedMenuList();
+                loadFromDatabase();
                 return;
             }
 
-            startDownloadListedMenu();
+            _serviceController.StartRestService(
+                    Bundles.LISTED_MENU_DOWNLOAD,
+                    ServerActions.GET_LISTED_MENU,
+                    Broadcasts.DOWNLOAD_LISTED_MENU_FINISHED,
+                    LucaObject.LISTEDMENU,
+                    RaspberrySelection.BOTH);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+            _listedMenu = _databaseController.GetListedMenuList();
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_LISTED_MENU_VIEW,
+                    new String[]{Bundles.LISTED_MENU},
+                    new Object[]{_listedMenu});
+        }
+    };
+
+    private Runnable _downloadMapContentRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadMapContentRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            _serviceController.StartRestService(
+                    Bundles.MAP_CONTENT_DOWNLOAD,
+                    ServerActions.GET_MAP_CONTENTS,
+                    Broadcasts.DOWNLOAD_MAP_CONTENT_FINISHED,
+                    LucaObject.MAP_CONTENT,
+                    RaspberrySelection.BOTH);
         }
     };
 
@@ -1457,7 +1574,14 @@ public class MainService extends Service {
                 return;
             }
 
-            startDownloadMediaMirror();
+            for (final MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+                if (entry.GetId() == 0) {
+                    continue;
+                }
+
+                _logger.Debug(String.format(Locale.GERMAN, "Trying serverIp %s", entry.GetIp()));
+                _mediaMirrorController.SendCommand(entry.GetIp(), ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+            }
         }
     };
 
@@ -1468,17 +1592,31 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
-                _menu = _databaseController.GetMenuList();
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
-                _menu = _databaseController.GetMenuList();
+                loadFromDatabase();
                 return;
             }
 
-            startDownloadMenu();
+            _serviceController.StartRestService(
+                    Bundles.MENU_DOWNLOAD,
+                    ServerActions.GET_MENU,
+                    Broadcasts.DOWNLOAD_MENU_FINISHED,
+                    LucaObject.MENU,
+                    RaspberrySelection.BOTH);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+            _menu = _databaseController.GetMenuList();
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_MENU_VIEW,
+                    new String[]{Bundles.MENU},
+                    new Object[]{_menu});
         }
     };
 
@@ -1497,7 +1635,60 @@ public class MainService extends Service {
                 return;
             }
 
-            startDownloadMotionCameraDto();
+            _serviceController.StartRestService(
+                    Bundles.MOTION_CAMERA_DTO_DOWNLOAD,
+                    ServerActions.GET_MOTION_DATA,
+                    Broadcasts.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED,
+                    LucaObject.MOTION_CAMERA_DTO,
+                    RaspberrySelection.BOTH);
+        }
+    };
+
+    private Runnable _downloadMovieRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadMovieRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            _serviceController.StartRestService(
+                    Bundles.MOVIE_DOWNLOAD,
+                    ServerActions.GET_MOVIES,
+                    Broadcasts.DOWNLOAD_MOVIE_FINISHED,
+                    LucaObject.MOVIE,
+                    RaspberrySelection.BOTH);
+        }
+    };
+
+    private Runnable _downloadScheduleRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_downloadScheduleRunnable run");
+
+            if (!_networkController.IsNetworkAvailable()) {
+                _logger.Warn("No network available!");
+                return;
+            }
+
+            if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                _logger.Warn("No LucaHome network! ...");
+                return;
+            }
+
+            _serviceController.StartRestService(
+                    Bundles.SCHEDULE_DOWNLOAD,
+                    ServerActions.GET_SCHEDULES,
+                    Broadcasts.DOWNLOAD_SCHEDULE_FINISHED,
+                    LucaObject.SCHEDULE,
+                    RaspberrySelection.BOTH);
         }
     };
 
@@ -1508,17 +1699,45 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
-                _shoppingList = _databaseController.GetShoppingList();
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
-                _shoppingList = _databaseController.GetShoppingList();
+                loadFromDatabase();
                 return;
             }
 
-            startDownloadShoppingList();
+            if (_shoppingList != null) {
+                for (int index = 0; index < _shoppingList.getSize(); index++) {
+                    ShoppingEntryDto entry = _shoppingList.getValue(index);
+                    if (entry.IsBought()) {
+                        _serviceController.StartRestService(
+                                Bundles.SHOPPING_LIST,
+                                entry.GetCommandDelete(),
+                                "",
+                                LucaObject.SHOPPING_ENTRY,
+                                RaspberrySelection.BOTH);
+                    }
+                }
+            }
+
+            _serviceController.StartRestService(
+                    Bundles.SHOPPING_LIST_DOWNLOAD,
+                    ServerActions.GET_SHOPPING_LIST,
+                    Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED,
+                    LucaObject.SHOPPING_ENTRY,
+                    RaspberrySelection.BOTH);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+            _shoppingList = _databaseController.GetShoppingList();
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_SHOPPING_LIST,
+                    new String[]{Bundles.SHOPPING_LIST},
+                    new Object[]{_shoppingList});
         }
     };
 
@@ -1529,17 +1748,31 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
-                _wirelessSocketList = _databaseController.GetSocketList();
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
-                _wirelessSocketList = _databaseController.GetSocketList();
+                loadFromDatabase();
                 return;
             }
 
-            startDownloadSocket();
+            _serviceController.StartRestService(
+                    Bundles.SOCKET_DOWNLOAD,
+                    ServerActions.GET_SOCKETS,
+                    Broadcasts.DOWNLOAD_SOCKET_FINISHED,
+                    LucaObject.WIRELESS_SOCKET,
+                    RaspberrySelection.BOTH);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+            _wirelessSocketList = _databaseController.GetSocketList();
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_SOCKET_LIST,
+                    new String[]{Bundles.SOCKET_LIST},
+                    new Object[]{_wirelessSocketList});
         }
     };
 
@@ -1553,14 +1786,19 @@ public class MainService extends Service {
                 return;
             }
 
-            startDownloadCurrentWeather();
+            _downloadCurrentWeatherRunnable.run();
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
                 return;
             }
 
-            startDownloadTemperature();
+            _serviceController.StartRestService(
+                    Bundles.TEMPERATURE_DOWNLOAD,
+                    ServerActions.GET_TEMPERATURES,
+                    Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED,
+                    LucaObject.TEMPERATURE,
+                    RaspberrySelection.BOTH);
         }
     };
 
@@ -1733,15 +1971,17 @@ public class MainService extends Service {
 
     private void addSchedules() {
         _scheduleService.AddSchedule("UpdateBirthday", _downloadBirthdayRunnable, 4 * 60 * 60 * 1000, true);
-        _scheduleService.AddSchedule("UpdateForecast", _downloadCurrentWeatherRunnable, 15 * 60 * 1000, true);
+        _scheduleService.AddSchedule("UpdateChanges", _downloadChangeRunnable, 30 * 60 * 1000, true);
+        _scheduleService.AddSchedule("UpdateCurrent", _downloadCurrentWeatherRunnable, 15 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateForecast", _downloadForecastWeatherRunnable, 30 * 60 * 1000, true);
+        _scheduleService.AddSchedule("UpdateListedMenu", _downloadListedMenuRunnable, 3 * 60 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateMediaMirror", _downloadMediaMirrorRunnable, 5 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateMenu", _downloadMenuRunnable, 3 * 60 * 60 * 1000, true);
-        _scheduleService.AddSchedule("UpdateListedMenu", _downloadListedMenuRunnable, 3 * 60 * 60 * 1000, true);
-        _scheduleService.AddSchedule("UpdateMotionCameraDto", _downloadMotionCameraDtoRunnable, 5 * 60 * 1000, true);
+        _scheduleService.AddSchedule("UpdateMotionCamera", _downloadMotionCameraDtoRunnable, 5 * 60 * 1000, true);
+        _scheduleService.AddSchedule("UpdateMovie", _downloadMovieRunnable, 60 * 60 * 1000, true);
+        _scheduleService.AddSchedule("UpdateShoppingList", _downloadShoppingListRunnable, 30 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateSockets", _downloadSocketRunnable, 15 * 60 * 1000, true);
         _scheduleService.AddSchedule("UpdateTemperature", _downloadTemperatureRunnable, 5 * 60 * 1000, true);
-        _scheduleService.AddSchedule("UpdateShoppingList", _downloadShoppingListRunnable, 30 * 60 * 1000, true);
         _schedulesAdded = true;
     }
 
@@ -1798,29 +2038,25 @@ public class MainService extends Service {
     private void startDownloadLucaHomeAll() {
         _logger.Debug("startDownloadLucaHomeAll");
 
-        startDownloadBirthday();
-        startDownloadChange();
-        startDownloadInformation();
-        startDownloadMapContent();
-        startDownloadMediaMirror();
-        startDownloadListedMenu();
-        startDownloadMenu();
-        startDownloadMotionCameraDto();
-        startDownloadMovie();
-        startDownloadSocket();
-        startDownloadTemperature();
-        startDownloadShoppingList();
+        _downloadBirthdayRunnable.run();
+        _downloadChangeRunnable.run();
+        _downloadInformationRunnable.run();
+        _downloadListedMenuRunnable.run();
+        _downloadMapContentRunnable.run();
+        _downloadMediaMirrorRunnable.run();
+        _downloadMenuRunnable.run();
+        _downloadMotionCameraDtoRunnable.run();
+        _downloadMovieRunnable.run();
+        _downloadShoppingListRunnable.run();
+        _downloadSocketRunnable.run();
+        _downloadTemperatureRunnable.run();
     }
 
     private void startDownloadOtherAll() {
         _logger.Debug("startDownloadOtherAll");
 
-        startDownloadCurrentWeather();
-        startDownloadForecastWeather();
-
-        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION)) {
-            _openWeatherController.LoadForecastWeather();
-        }
+        _downloadCurrentWeatherRunnable.run();
+        _downloadForecastWeatherRunnable.run();
     }
 
     private void updateDownloadCount() {
@@ -1879,163 +2115,6 @@ public class MainService extends Service {
                         _sharedPrefController.LoadBooleanValueFromSharedPreferences(key)));
             }
         }
-    }
-
-    private void startDownloadBirthday() {
-        _logger.Debug("startDownloadBirthday");
-        _serviceController.StartRestService(
-                Bundles.BIRTHDAY_DOWNLOAD,
-                ServerActions.GET_BIRTHDAYS,
-                Broadcasts.DOWNLOAD_BIRTHDAY_FINISHED,
-                LucaObject.BIRTHDAY,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadChange() {
-        _logger.Debug("startDownloadChange");
-        _serviceController.StartRestService(
-                Bundles.CHANGE_DOWNLOAD,
-                ServerActions.GET_CHANGES,
-                Broadcasts.DOWNLOAD_CHANGE_FINISHED,
-                LucaObject.CHANGE,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadCurrentWeather() {
-        _logger.Debug("startDownloadCurrentWeather");
-        _openWeatherController.LoadCurrentWeather();
-    }
-
-    private void startDownloadForecastWeather() {
-        _logger.Debug("startDownloadForecastWeather");
-        _openWeatherController.LoadForecastWeather();
-    }
-
-    private void startDownloadInformation() {
-        _logger.Debug("startDownloadInformation");
-        _serviceController.StartRestService(
-                Bundles.INFORMATION_DOWNLOAD,
-                ServerActions.GET_INFORMATIONS,
-                Broadcasts.DOWNLOAD_INFORMATION_FINISHED,
-                LucaObject.INFORMATION,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadMapContent() {
-        _logger.Debug("startDownloadMapContent");
-        _serviceController.StartRestService(
-                Bundles.MAP_CONTENT_DOWNLOAD,
-                ServerActions.GET_MAP_CONTENTS,
-                Broadcasts.DOWNLOAD_MAP_CONTENT_FINISHED,
-                LucaObject.MAP_CONTENT,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadMediaMirror() {
-        _logger.Debug("startDownloadMediaMirror");
-        for (final MediaMirrorSelection entry : MediaMirrorSelection.values()) {
-            if (entry.GetId() == 0) {
-                continue;
-            }
-
-            _logger.Debug(String.format(Locale.GERMAN, "Trying serverIp %s", entry.GetIp()));
-            _mediaMirrorController.SendCommand(entry.GetIp(), ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
-        }
-    }
-
-    private void startDownloadListedMenu() {
-        _logger.Debug("startDownloadListedMenu");
-        _serviceController.StartRestService(
-                Bundles.LISTED_MENU_DOWNLOAD,
-                ServerActions.GET_LISTED_MENU,
-                Broadcasts.DOWNLOAD_LISTED_MENU_FINISHED,
-                LucaObject.LISTEDMENU,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadMenu() {
-        _logger.Debug("startDownloadMenu");
-        _serviceController.StartRestService(
-                Bundles.MENU_DOWNLOAD,
-                ServerActions.GET_MENU,
-                Broadcasts.DOWNLOAD_MENU_FINISHED,
-                LucaObject.MENU,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadMotionCameraDto() {
-        _logger.Debug("startDownloadMotionCameraDto");
-        _serviceController.StartRestService(
-                Bundles.MOTION_CAMERA_DTO_DOWNLOAD,
-                ServerActions.GET_MOTION_DATA,
-                Broadcasts.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED,
-                LucaObject.MOTION_CAMERA_DTO,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadMovie() {
-        _logger.Debug("startDownloadMovie");
-        _serviceController.StartRestService(
-                Bundles.MOVIE_DOWNLOAD,
-                ServerActions.GET_MOVIES,
-                Broadcasts.DOWNLOAD_MOVIE_FINISHED,
-                LucaObject.MOVIE,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadSchedule() {
-        _logger.Debug("startDownloadSchedule");
-        _serviceController.StartRestService(
-                Bundles.SCHEDULE_DOWNLOAD,
-                ServerActions.GET_SCHEDULES,
-                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED,
-                LucaObject.SCHEDULE,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadShoppingList() {
-        _logger.Debug("startDownloadShoppingList");
-
-        if (_shoppingList != null) {
-            for (int index = 0; index < _shoppingList.getSize(); index++) {
-                ShoppingEntryDto entry = _shoppingList.getValue(index);
-                if (entry.IsBought()) {
-                    _serviceController.StartRestService(
-                            Bundles.SHOPPING_LIST,
-                            entry.GetCommandDelete(),
-                            "",
-                            LucaObject.SHOPPING_ENTRY,
-                            RaspberrySelection.BOTH);
-                }
-            }
-        }
-
-        _serviceController.StartRestService(
-                Bundles.SHOPPING_LIST_DOWNLOAD,
-                ServerActions.GET_SHOPPING_LIST,
-                Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED,
-                LucaObject.SHOPPING_ENTRY,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadSocket() {
-        _logger.Debug("startDownloadSocket");
-        _serviceController.StartRestService(
-                Bundles.SOCKET_DOWNLOAD,
-                ServerActions.GET_SOCKETS,
-                Broadcasts.DOWNLOAD_SOCKET_FINISHED,
-                LucaObject.WIRELESS_SOCKET,
-                RaspberrySelection.BOTH);
-    }
-
-    private void startDownloadTemperature() {
-        _logger.Debug("startDownloadTemperature");
-        _serviceController.StartRestService(
-                Bundles.TEMPERATURE_DOWNLOAD,
-                ServerActions.GET_TEMPERATURES,
-                Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED,
-                LucaObject.TEMPERATURE,
-                RaspberrySelection.BOTH);
     }
 
     private void startTimeout() {
