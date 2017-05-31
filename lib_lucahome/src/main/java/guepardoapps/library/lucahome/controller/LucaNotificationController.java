@@ -149,7 +149,7 @@ public class LucaNotificationController extends NotificationController {
             @NonNull String body,
             int id) {
         _logger.Debug(String.format(
-                Locale.GERMAN,
+                Locale.getDefault(),
                 "CreateForecastWeatherNotification with receiverActivity %s, icon %d, largeIcon %d, title %s, body %s and id %d",
                 receiverActivity, icon, largeIcon, title, body, id));
 

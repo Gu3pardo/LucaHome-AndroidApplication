@@ -23,9 +23,9 @@ import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.dto.*;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.MapContentController;
@@ -59,8 +59,10 @@ public class MapController {
     private Runnable _callForDataRunnable = new Runnable() {
         @Override
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_MAP_CONTENT});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.GET_MAP_DATA});
         }
     };
 
@@ -137,19 +139,19 @@ public class MapController {
                     String command = data[1].replace("CMD:", "");
                     switch (command) {
                         case "PLAY":
-                            _mediaMirrorController.SendCommand(ip, ServerAction.PLAY_YOUTUBE_VIDEO.toString(), "");
+                            _mediaMirrorController.SendCommand(ip, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), "");
                             break;
                         case "PAUSE":
-                            _mediaMirrorController.SendCommand(ip, ServerAction.PAUSE_YOUTUBE_VIDEO.toString(), "");
+                            _mediaMirrorController.SendCommand(ip, MediaServerAction.PAUSE_YOUTUBE_VIDEO.toString(), "");
                             break;
                         case "STOP":
-                            _mediaMirrorController.SendCommand(ip, ServerAction.STOP_YOUTUBE_VIDEO.toString(), "");
+                            _mediaMirrorController.SendCommand(ip, MediaServerAction.STOP_YOUTUBE_VIDEO.toString(), "");
                             break;
                         case "VOL_INCREASE":
-                            _mediaMirrorController.SendCommand(ip, ServerAction.INCREASE_VOLUME.toString(), "");
+                            _mediaMirrorController.SendCommand(ip, MediaServerAction.INCREASE_VOLUME.toString(), "");
                             break;
                         case "VOL_DECREASE":
-                            _mediaMirrorController.SendCommand(ip, ServerAction.DECREASE_VOLUME.toString(), "");
+                            _mediaMirrorController.SendCommand(ip, MediaServerAction.DECREASE_VOLUME.toString(), "");
                             break;
                         default:
                             _logger.Error(String.format("Cannot perform command %s", command));
@@ -188,13 +190,13 @@ public class MapController {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null) {
-                _receiverController.RegisterReceiver(_mapDataReceiver,
-                        new String[]{Broadcasts.UPDATE_MAP_CONTENT_VIEW});
-                _receiverController.RegisterReceiver(_mediaMirrorDataReceiver,
-                        new String[]{guepardoapps.library.lucahome.common.constants.Broadcasts.MEDIAMIRROR_COMMAND});
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION},
-                        new Object[]{MainServiceAction.GET_MAP_CONTENT});
+                _receiverController.RegisterReceiver(_mapDataReceiver, new String[]{Broadcasts.UPDATE_MAP_CONTENT_VIEW});
+                _receiverController.RegisterReceiver(_mediaMirrorDataReceiver, new String[]{Broadcasts.MEDIAMIRROR_COMMAND});
+
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.HOME_AUTOMATION_COMMAND,
+                        new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                        new Object[]{HomeAutomationAction.GET_MAP_DATA});
                 _callForDataHandler.postDelayed(_callForDataRunnable, Timeouts.CALL_FOR_DATA);
 
                 _isInitialized = true;
@@ -306,7 +308,7 @@ public class MapController {
                                                       SerializableList<WirelessSocketDto> wirelessSocketList) {
                 ArrayList<String> socketList = newMapContent.GetSockets();
 
-                MediaMirrorSelection selection = MediaMirrorSelection.GetByIp(newMapContent.GetMediaServerIp());
+                MediaServerSelection selection = MediaServerSelection.GetByIp(newMapContent.GetMediaServerIp());
                 WirelessSocketDto socket = null;
 
                 if (socketList != null) {

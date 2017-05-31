@@ -125,7 +125,7 @@ public final class JsonDataToShoppingListConverter {
                 }
 
                 ShoppingEntryDto newValue = new ShoppingEntryDto(id, name, group, quantity, false);
-                _logger.Debug(String.format(Locale.GERMAN, "New ShoppingEntryDto %s", newValue));
+                _logger.Debug(String.format(Locale.getDefault(), "New ShoppingEntryDto %s", newValue));
 
                 return newValue;
             } else {

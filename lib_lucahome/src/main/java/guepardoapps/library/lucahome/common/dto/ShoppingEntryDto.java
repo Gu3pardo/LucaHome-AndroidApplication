@@ -4,92 +4,92 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
-import guepardoapps.library.lucahome.common.constants.ServerActions;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.enums.ShoppingEntryGroup;
 
 public class ShoppingEntryDto implements Serializable {
 
-	private static final long serialVersionUID = 1356205499060127468L;
+    private static final long serialVersionUID = 1356205499060127468L;
 
-	private static final String TAG = ShoppingEntryDto.class.getSimpleName();
+    private static final String TAG = ShoppingEntryDto.class.getSimpleName();
 
-	private int _id;
-	private String _name;
-	private ShoppingEntryGroup _group;
-	private int _quantity;
+    private int _id;
+    private String _name;
+    private ShoppingEntryGroup _group;
+    private int _quantity;
 
-	private boolean _bought;
+    private boolean _bought;
 
-	public ShoppingEntryDto(
-			int id,
-			@NonNull String name,
-			@NonNull ShoppingEntryGroup group,
-			int quantity,
-			boolean bought) {
-		_id = id;
-		_name = name;
-		_group = group;
-		_quantity = quantity;
+    public ShoppingEntryDto(
+            int id,
+            @NonNull String name,
+            @NonNull ShoppingEntryGroup group,
+            int quantity,
+            boolean bought) {
+        _id = id;
+        _name = name;
+        _group = group;
+        _quantity = quantity;
 
-		_bought = bought;
-	}
+        _bought = bought;
+    }
 
-	public int GetId() {
-		return _id;
-	}
+    public int GetId() {
+        return _id;
+    }
 
-	public String GetName() {
-		return _name;
-	}
+    public String GetName() {
+        return _name;
+    }
 
-	public ShoppingEntryGroup GetGroup() {
-		return _group;
-	}
+    public ShoppingEntryGroup GetGroup() {
+        return _group;
+    }
 
-	public int GetQuantity() {
-		return _quantity;
-	}
+    public int GetQuantity() {
+        return _quantity;
+    }
 
-	public boolean IsBought() {
-		return _bought;
-	}
+    public boolean IsBought() {
+        return _bought;
+    }
 
-	public void SetBought(boolean bought) {
-		_bought = bought;
-	}
+    public void SetBought(boolean bought) {
+        _bought = bought;
+    }
 
-	public void IncreaseQuantity() {
-		_quantity++;
-	}
+    public void IncreaseQuantity() {
+        _quantity++;
+    }
 
-	public void DecreaseQuantity() {
-		_quantity--;
-		if (_quantity < 0) {
-			_quantity = 0;
-		}
-	}
+    public void DecreaseQuantity() {
+        _quantity--;
+        if (_quantity < 0) {
+            _quantity = 0;
+        }
+    }
 
-	public String GetCommandAdd() {
-		return String.format(ServerActions.ADD_SHOPPING_ENTRY_F, _id, _name, _group.toString(), _quantity);
-	}
+    public String GetCommandAdd() {
+        return String.format(LucaServerAction.ADD_SHOPPING_ENTRY_F.toString(), _id, _name, _group.toString(), _quantity);
+    }
 
-	public String GetCommandUpdate() {
-		return String.format(ServerActions.UPDATE_SHOPPING_ENTRY_F, _id, _name, _group.toString(), _quantity);
-	}
+    public String GetCommandUpdate() {
+        return String.format(LucaServerAction.UPDATE_SHOPPING_ENTRY_F.toString(), _id, _name, _group.toString(), _quantity);
+    }
 
-	public String GetCommandDelete() {
-		return ServerActions.DELETE_SHOPPING_ENTRY + String.valueOf(_id);
-	}
+    public String GetCommandDelete() {
+        return LucaServerAction.DELETE_SHOPPING_ENTRY.toString() + String.valueOf(_id);
+    }
 
-	public String GetCommandBoughtChanged() {
-		return "ACTION:SET:SHOPPING:BOUGHT:" + String.valueOf(_name) + ":" + (_bought ? "1" : "0");
-	}
+    public String GetCommandBoughtChanged() {
+        return "ACTION:SET:SHOPPING:BOUGHT:" + String.valueOf(_name) + ":" + (_bought ? "1" : "0");
+    }
 
-	public String toString() {
-		return "{" + TAG
-				+ ": {ID: " + String.valueOf(_id)
-				+ "};{Name: " + _name
-				+ "};{Group: " + _group.toString()
-				+ "};{Quantity: " + String.valueOf(_quantity) + "}}";
-	}
+    public String toString() {
+        return "{" + TAG
+                + ": {ID: " + String.valueOf(_id)
+                + "};{Name: " + _name
+                + "};{Group: " + _group.toString()
+                + "};{Quantity: " + String.valueOf(_quantity) + "}}";
+    }
 }

@@ -91,7 +91,7 @@ public final class JsonDataToSocketConverter {
                 boolean isActivated = isActivatedString.contains("1");
 
                 WirelessSocketDto newValue = new WirelessSocketDto(id, name, area, code, isActivated);
-                _logger.Debug(String.format(Locale.GERMAN, "New WirelessSocketDto %s", newValue));
+                _logger.Debug(String.format(Locale.getDefault(), "New WirelessSocketDto %s", newValue));
 
                 return newValue;
             }

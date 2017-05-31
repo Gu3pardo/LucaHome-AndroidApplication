@@ -6,9 +6,9 @@ import java.util.Locale;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
@@ -34,9 +34,11 @@ public class MainListViewAdapter extends BaseAdapter {
     private NavigationController _navigationController;
     private static LayoutInflater _inflater = null;
 
-    public MainListViewAdapter(Context context, List<MainListViewItemDto> _viewItemList) {
+    public MainListViewAdapter(
+            @NonNull Context context,
+            @NonNull List<MainListViewItemDto> _viewItemList) {
         _logger = new LucaHomeLogger(TAG);
-        _logger.Debug(String.format(Locale.GERMAN, "%s created...", TAG));
+        _logger.Debug(String.format(Locale.getDefault(), "%s created...", TAG));
 
         _list = _viewItemList;
         _context = context;
@@ -76,9 +78,9 @@ public class MainListViewAdapter extends BaseAdapter {
         holder._item = (TextView) rowView.findViewById(R.id.list_main_item_text);
         holder._item.setText(_list.get(index).GetText());
         holder._item.setCompoundDrawablesRelative(drawable, null, null, null);
-        holder._item.setOnClickListener(new OnClickListener() {
+        holder._item.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 TargetActivity targetActivity = TargetActivity.GetByString(_list.get(index).GetText());
                 if (targetActivity != null) {
                     _navigationController.NavigateTo(targetActivity.GetActivity(), false);

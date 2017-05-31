@@ -3,12 +3,9 @@ package guepardoapps.library.lucahome.common.dto;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
-import java.util.Locale;
 
-import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Constants;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.converter.BooleanToScheduleStateConverter;
 
 import guepardoapps.library.toolset.common.classes.SerializableTime;
@@ -28,13 +25,8 @@ public class ScheduleDto implements Serializable {
     protected Weekday _weekday;
     protected SerializableTime _time;
     protected boolean _action;
-    protected boolean _isTimer;
     protected boolean _playSound;
-    protected RaspberrySelection _playRaspberry;
     protected boolean _isActive;
-
-    private String _setBroadcastReceiverString;
-    protected String _deleteBroadcastReceiverString;
 
     public ScheduleDto(
             @NonNull String name,
@@ -42,9 +34,7 @@ public class ScheduleDto implements Serializable {
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             boolean action,
-            boolean isTimer,
             boolean playSound,
-            @NonNull RaspberrySelection playRaspberry,
             boolean isActive) {
         _drawable = -1;
 
@@ -54,13 +44,8 @@ public class ScheduleDto implements Serializable {
         _weekday = weekday;
         _time = time;
         _action = action;
-        _isTimer = isTimer;
         _playSound = playSound;
-        _playRaspberry = playRaspberry;
         _isActive = isActive;
-
-        _setBroadcastReceiverString = Broadcasts.SET_SCHEDULE + _name.toUpperCase(Locale.GERMAN);
-        _deleteBroadcastReceiverString = Broadcasts.DELETE_SCHEDULE + _name.toUpperCase(Locale.GERMAN);
     }
 
     public ScheduleDto(
@@ -76,13 +61,8 @@ public class ScheduleDto implements Serializable {
         _weekday = Weekday.NULL;
         _time = new SerializableTime();
         _action = false;
-        _isTimer = false;
         _playSound = false;
-        _playRaspberry = RaspberrySelection.DUMMY;
         _isActive = isActive;
-
-        _setBroadcastReceiverString = Broadcasts.SET_SCHEDULE + _name.toUpperCase(Locale.GERMAN);
-        _deleteBroadcastReceiverString = Broadcasts.DELETE_SCHEDULE + _name.toUpperCase(Locale.GERMAN);
     }
 
     public int GetDrawable() {
@@ -113,16 +93,8 @@ public class ScheduleDto implements Serializable {
         return _action;
     }
 
-    public boolean IsTimer() {
-        return _isTimer;
-    }
-
     public boolean GetPlaySound() {
         return _playSound;
-    }
-
-    public RaspberrySelection GetPlayRaspberry() {
-        return _playRaspberry;
     }
 
     public boolean IsActive() {
@@ -133,47 +105,39 @@ public class ScheduleDto implements Serializable {
         return BooleanToScheduleStateConverter.GetStringOfBoolean(_isActive);
     }
 
-    public String GetSetBroadcast() {
-        return _setBroadcastReceiverString;
-    }
-
-    public String GetDeleteBroadcast() {
-        return _deleteBroadcastReceiverString;
-    }
-
     public String GetCommandSet(boolean newState) {
-        return ServerActions.SET_SCHEDULE + _name + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF);
+        return LucaServerAction.SET_SCHEDULE.toString() + _name + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF);
     }
 
     public String GetCommandAdd() {
-        return ServerActions.ADD_SCHEDULE + _name
+        return LucaServerAction.ADD_SCHEDULE.toString() + _name
                 + "&socket=" + _socket.GetName()
                 + "&gpio=" + ""
                 + "&weekday=" + String.valueOf(_weekday.GetInt())
                 + "&hour=" + String.valueOf(_time.Hour())
                 + "&minute=" + String.valueOf(_time.Minute())
                 + "&onoff=" + (_action ? "1" : "0")
-                + "&isTimer=" + (_isTimer ? "1" : "0")
+                + "&isTimer=0"
                 + "&playSound=" + (_playSound ? "1" : "0")
-                + "&playRaspberry=" + String.valueOf(_playRaspberry.GetInt());
+                + "&playRaspberry=1";
     }
 
     public String GetCommandUpdate() {
-        return ServerActions.UPDATE_SCHEDULE + _name
+        return LucaServerAction.UPDATE_SCHEDULE.toString() + _name
                 + "&socket=" + _socket.GetName()
                 + "&gpio=" + ""
                 + "&weekday=" + String.valueOf(_weekday.GetInt())
                 + "&hour=" + String.valueOf(_time.Hour())
                 + "&minute=" + String.valueOf(_time.Minute())
                 + "&onoff=" + (_action ? "1" : "0")
-                + "&isTimer=" + (_isTimer ? "1" : "0")
+                + "&isTimer=0"
                 + "&playSound=" + (_playSound ? "1" : "0")
-                + "&playRaspberry=" + String.valueOf(_playRaspberry.GetInt())
+                + "&playRaspberry=1"
                 + "&isactive=" + String.valueOf(_isActive);
     }
 
     public String GetCommandDelete() {
-        return ServerActions.DELETE_SCHEDULE + _name;
+        return LucaServerAction.DELETE_SCHEDULE.toString() + _name;
     }
 
     public String GetCommandWear() {
@@ -187,12 +151,8 @@ public class ScheduleDto implements Serializable {
                 + "};{Weekday: " + _weekday.toString()
                 + "};{Time: " + _time.toString()
                 + "};{Action: " + String.valueOf(_action)
-                + "};{isTimer: " + String.valueOf(_isTimer)
                 + "};{playSound: " + String.valueOf(_playSound)
-                + "};{playRaspberry: " + _playRaspberry.toString()
                 + "};{IsActive: " + BooleanToScheduleStateConverter.GetStringOfBoolean(_isActive)
-                + "};{SetBroadcastReceiverString: " + _setBroadcastReceiverString
-                + "};{DeleteBroadcastReceiverString: " + _deleteBroadcastReceiverString
                 + "}}";
     }
 }

@@ -3,9 +3,9 @@ package guepardoapps.library.lucahome.common.dto;
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
 
-import guepardoapps.library.lucahome.common.constants.ServerActions;
-
 import java.io.Serializable;
+
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 
 public class MenuDto implements Serializable {
 
@@ -119,13 +119,13 @@ public class MenuDto implements Serializable {
             _description = "-";
         }
 
-        return ServerActions.UPDATE_MENU + _weekday + "&day=" + String.valueOf(_day) + "&month="
+        return LucaServerAction.UPDATE_MENU.toString() + _weekday + "&day=" + String.valueOf(_day) + "&month="
                 + String.valueOf(_month) + "&year=" + String.valueOf(_year) + "&title=" + _title + "&description="
                 + _description;
     }
 
     public String GetCommandClear() {
-        return ServerActions.CLEAR_MENU + _weekday;
+        return LucaServerAction.CLEAR_MENU.toString() + _weekday;
     }
 
     public boolean NeedsUpdate() {

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
@@ -22,8 +21,6 @@ import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.ListedMenuDto;
 import guepardoapps.library.lucahome.common.dto.MenuDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.ServiceController;
@@ -46,10 +43,11 @@ public class MenuListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public MenuListAdapter(@NonNull Context context,
-                           @NonNull SerializableList<MenuDto> menu,
-                           SerializableList<ListedMenuDto> listedMenu,
-                           boolean isOnWatch) {
+    public MenuListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<MenuDto> menu,
+            SerializableList<ListedMenuDto> listedMenu,
+            boolean isOnWatch) {
         _logger = new LucaHomeLogger(TAG);
 
         int dayOfMonth = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
@@ -141,7 +139,7 @@ public class MenuListAdapter extends BaseAdapter {
         holder._date.setText(_menu.getValue(index).GetDate());
 
         holder._random = (ImageButton) rowView.findViewById(R.id.menu_item_random);
-        holder._random.setOnClickListener(new OnClickListener() {
+        holder._random.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("onClick _random button: " + _menu.getValue(index).GetTitle());
@@ -164,7 +162,7 @@ public class MenuListAdapter extends BaseAdapter {
         }
 
         holder._update = (ImageButton) rowView.findViewById(R.id.menu_item_update);
-        holder._update.setOnClickListener(new OnClickListener() {
+        holder._update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("onClick _update button: " + _menu.getValue(index).GetTitle());
@@ -177,16 +175,14 @@ public class MenuListAdapter extends BaseAdapter {
         }
 
         holder._clear = (ImageButton) rowView.findViewById(R.id.menu_item_clear);
-        holder._clear.setOnClickListener(new OnClickListener() {
+        holder._clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("onClick _clear button: " + _menu.getValue(index).GetTitle());
                 _serviceController.StartRestService(
                         Bundles.MENU,
                         _menu.getValue(index).GetCommandClear(),
-                        Broadcasts.RELOAD_MENU,
-                        LucaObject.MENU,
-                        RaspberrySelection.BOTH);
+                        Broadcasts.RELOAD_MENU);
             }
         });
         if (_isOnWatch) {

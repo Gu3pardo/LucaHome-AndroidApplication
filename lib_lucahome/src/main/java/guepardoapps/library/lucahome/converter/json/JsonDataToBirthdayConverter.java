@@ -100,7 +100,7 @@ public final class JsonDataToBirthdayConverter {
                 birthday.set(Calendar.YEAR, year);
 
                 BirthdayDto newValue = new BirthdayDto(name, birthday, id);
-                _logger.Debug(String.format(Locale.GERMAN, "New BirthdayDto %s", newValue));
+                _logger.Debug(String.format(Locale.getDefault(), "New BirthdayDto %s", newValue));
 
                 return newValue;
             }

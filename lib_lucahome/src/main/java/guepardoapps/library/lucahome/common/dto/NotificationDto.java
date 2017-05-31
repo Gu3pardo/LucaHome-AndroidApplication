@@ -1,4 +1,4 @@
-package guepardoapps.library.lucahome.common.classes;
+package guepardoapps.library.lucahome.common.dto;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -11,14 +11,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.receiver.notifications.SocketActionReceiver;
 
-public class NotificationDetails implements Serializable {
+public class NotificationDto implements Serializable {
 
     private static final long serialVersionUID = 5583702640190370633L;
 
-    private static final String TAG = NotificationDetails.class.getSimpleName();
+    private static final String TAG = NotificationDto.class.getSimpleName();
 
     private int _iconActive;
     private int _iconDeActive;
@@ -35,7 +34,7 @@ public class NotificationDetails implements Serializable {
 
     private Context _context;
 
-    public NotificationDetails(
+    public NotificationDto(
             int iconActive,
             int iconDeActive,
             @NonNull String textActive,
@@ -137,7 +136,7 @@ public class NotificationDetails implements Serializable {
     }
 
     public String toString() {
-        return String.format(Locale.GERMAN,
+        return String.format(Locale.getDefault(),
                 "{%s: {IconActive: %d};{IconDeActive: %d};{TextActive: %s};{TextDeActive: %s};{Socket: %s};{IsVisible: %s};{BroadcastCodeActive: %s};{BroadcastCodeActive: %s}}",
                 TAG,
                 _iconActive,

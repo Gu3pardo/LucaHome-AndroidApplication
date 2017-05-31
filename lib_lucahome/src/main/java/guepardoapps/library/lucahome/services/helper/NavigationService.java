@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
@@ -14,12 +15,15 @@ public class NavigationService {
 
     private Context _context;
 
-    public NavigationService(Context context) {
+    public NavigationService(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _context = context;
     }
 
-    public void NavigateTo(Class<?> target, Bundle data, boolean finish) {
+    public void NavigateTo(
+            @NonNull Class<?> target,
+            Bundle data,
+            boolean finish) {
         _logger.Debug("Navigate to " + target.toString());
 
         Intent navigateTo = new Intent(_context, target);
@@ -34,16 +38,14 @@ public class NavigationService {
         }
     }
 
-    public void NavigateTo(Class<?> target) {
-        // TODO
-        // SEND BROADCAST TO MAIN SERVICE AND ASK FOR PERMISSION TO GO THERE
+    public void NavigateTo(@NonNull Class<?> target) {
         Intent navigateTo = new Intent(_context, target);
         _context.startActivity(navigateTo);
     }
 
-    public void NavigateTo(Class<?> target, boolean finish) {
-        // TODO
-        // SEND BROADCAST TO MAIN SERVICE AND ASK FOR PERMISSION TO GO THERE
+    public void NavigateTo(
+            @NonNull Class<?> target,
+            boolean finish) {
         Intent navigateTo = new Intent(_context, target);
         _context.startActivity(navigateTo);
 

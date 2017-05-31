@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ImageButton;
@@ -35,8 +34,8 @@ import guepardoapps.library.lucahome.common.constants.Keys;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
 import guepardoapps.library.lucahome.common.dto.YoutubeVideoDto;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
@@ -202,7 +201,7 @@ public class TopViewController {
                     _youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);
                 }
 
-                _volumeTextView.setText(String.format(Locale.GERMAN, "Vol.: %d", _mediaMirrorViewDto.GetVolume()));
+                _volumeTextView.setText(String.format(Locale.getDefault(), "Vol.: %d", _mediaMirrorViewDto.GetVolume()));
 
                 if (_mediaMirrorViewDto.GetSleepTimerEnabled()) {
                     _sleepTimerTextView.setVisibility(View.VISIBLE);
@@ -239,7 +238,7 @@ public class TopViewController {
 
         Spinner mediaMirrorSelectionSpinner = (Spinner) ((Activity) _context).findViewById(R.id.mediaMirrorSelectionSpinner);
         final ArrayList<String> serverLocations = new ArrayList<>();
-        for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+        for (MediaServerSelection entry : MediaServerSelection.values()) {
             if (entry.GetId() > 0) {
                 serverLocations.add(entry.GetLocation());
             }
@@ -254,8 +253,8 @@ public class TopViewController {
                 String selectedLocation = serverLocations.get(position);
                 _logger.Debug(String.format("Selected location %s", selectedLocation));
 
-                String selectedIp = MediaMirrorSelection.GetByLocation(selectedLocation).GetIp();
-                _mediaMirrorController.SendCommand(selectedIp, ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                String selectedIp = MediaServerSelection.GetByLocation(selectedLocation).GetIp();
+                _mediaMirrorController.SendCommand(selectedIp, MediaServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
             }
 
             @Override
@@ -282,11 +281,15 @@ public class TopViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.SET_YOUTUBE_PLAY_POSITION.toString(), String.valueOf(progressValue));
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.SET_YOUTUBE_PLAY_POSITION.toString(),
+                        String.valueOf(progressValue));
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        "");
             }
 
             @Override
@@ -301,7 +304,7 @@ public class TopViewController {
         _youtubeVideoTimeTextView = (TextView) ((Activity) _context).findViewById(R.id.youtubeVideoTimeTextView);
 
         ImageButton imageButtonVideoPlay = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonVideoPlay);
-        imageButtonVideoPlay.setOnClickListener(new OnClickListener() {
+        imageButtonVideoPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("imageButtonVideoPlay onClick");
@@ -311,15 +314,19 @@ public class TopViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.PLAY_YOUTUBE_VIDEO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(),
+                        "");
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        "");
             }
         });
         ImageButton imageButtonVideoPause = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonVideoPause);
-        imageButtonVideoPause.setOnClickListener(new OnClickListener() {
+        imageButtonVideoPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("imageButtonVideoPause onClick");
@@ -329,15 +336,19 @@ public class TopViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.PAUSE_YOUTUBE_VIDEO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.PAUSE_YOUTUBE_VIDEO.toString(),
+                        "");
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        "");
             }
         });
         ImageButton imageButtonVideoStop = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonVideoStop);
-        imageButtonVideoStop.setOnClickListener(new OnClickListener() {
+        imageButtonVideoStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("imageButtonVideoStop onClick");
@@ -347,18 +358,22 @@ public class TopViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.STOP_YOUTUBE_VIDEO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.STOP_YOUTUBE_VIDEO.toString(),
+                        "");
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        "");
             }
         });
 
         _volumeTextView = (TextView) ((Activity) _context).findViewById(R.id.volumeTextView);
 
         Button buttonVolumeIncrease = (Button) ((Activity) _context).findViewById(R.id.buttonVolumeIncrease);
-        buttonVolumeIncrease.setOnClickListener(new OnClickListener() {
+        buttonVolumeIncrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonVolumeIncrease onClick");
@@ -368,16 +383,20 @@ public class TopViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.INCREASE_VOLUME.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.INCREASE_VOLUME.toString(),
+                        "");
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        "");
             }
         });
 
         Button buttonVolumeDecrease = (Button) ((Activity) _context).findViewById(R.id.buttonVolumeDecrease);
-        buttonVolumeDecrease.setOnClickListener(new OnClickListener() {
+        buttonVolumeDecrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonVolumeDecrease onClick");
@@ -387,11 +406,15 @@ public class TopViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.DECREASE_VOLUME.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.DECREASE_VOLUME.toString(),
+                        "");
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        "");
             }
         });
 
@@ -428,7 +451,8 @@ public class TopViewController {
             return;
         }
 
-        _lucaDialogController.ShowYoutubeIdSelectionDialog(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
+        _lucaDialogController.ShowYoutubeIdSelectionDialog(
+                _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
                 _mediaMirrorViewDto.GetPlayedYoutubeIds());
     }
 }

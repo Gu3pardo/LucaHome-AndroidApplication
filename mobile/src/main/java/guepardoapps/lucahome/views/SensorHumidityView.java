@@ -3,9 +3,7 @@ package guepardoapps.lucahome.views;
 import java.util.Calendar;
 import java.util.Locale;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,7 +18,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -30,18 +27,14 @@ import com.synnapps.carouselview.ImageListener;
 
 import es.dmoral.toasty.Toasty;
 
-import guepardoapps.library.lucahome.common.constants.Broadcasts;
-import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.dto.HumidityDto;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.library.lucahome.customadapter.*;
+import guepardoapps.library.lucahome.customadapter.HumidityListAdapter;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
 import guepardoapps.library.toolset.common.classes.SerializableList;
 import guepardoapps.library.toolset.common.classes.SerializableTime;
-import guepardoapps.library.toolset.controller.BroadcastController;
-import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
 
@@ -51,21 +44,15 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
     private LucaHomeLogger _logger;
 
     private static final int SENSOR_TYPE = Sensor.TYPE_RELATIVE_HUMIDITY;
-    private static final int HUMIDITY_TIMEOUT = 5000;
 
     private boolean _isInitialized;
-    private SerializableList<HumidityDto> _humidityList;
 
     private ProgressBar _progressBar;
     private ListView _listView;
 
-    private ListAdapter _listAdapter;
-
     private Context _context;
 
-    private BroadcastController _broadcastController;
     private NavigationService _navigationService;
-    private ReceiverController _receiverController;
 
     private Class<?>[] _activities = {SensorTemperatureView.class, null, SensorAirPressureView.class};
     private int[] _images = {R.drawable.wallpaper, R.drawable.main_image_humidity, R.drawable.main_image_airpressure};
@@ -82,34 +69,9 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
     private boolean _hasHumiditySensor;
     private Handler _humidityTimeoutHandler = new Handler();
 
-    private Runnable _getDataRunnable = new Runnable() {
-        public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_HUMIDITY});
-        }
-    };
-
     private Runnable _humidityTimeoutCheck = new Runnable() {
         public void run() {
             checkSensorAvailability();
-        }
-    };
-
-    private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateReceiver onReceive");
-
-            _humidityList = (SerializableList<HumidityDto>) intent.getSerializableExtra(Bundles.HUMIDITY_LIST);
-
-            if (_humidityList != null) {
-                _listAdapter = new HumidityListAdapter(_context, _humidityList);
-                _listView.setAdapter(_listAdapter);
-
-                _progressBar.setVisibility(View.GONE);
-                _listView.setVisibility(View.VISIBLE);
-            }
         }
     };
 
@@ -123,9 +85,7 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
 
         _context = this;
 
-        _broadcastController = new BroadcastController(_context);
         _navigationService = new NavigationService(_context);
-        _receiverController = new ReceiverController(_context);
 
         CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.skeletonList_collapsing);
         collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(_context, R.color.TextIcon));
@@ -142,14 +102,14 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
         carouselView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                _logger.Info(String.format(Locale.GERMAN,
+                _logger.Info(String.format(Locale.getDefault(),
                         "onPageScrolled at position %d with positionOffset %f and positionOffsetPixels %d",
                         position, positionOffset, positionOffsetPixels));
             }
 
             @Override
             public void onPageSelected(int position) {
-                _logger.Info(String.format(Locale.GERMAN, "onPageSelected at position %d", position));
+                _logger.Info(String.format(Locale.getDefault(), "onPageSelected at position %d", position));
                 Class<?> targetActivity = _activities[position];
                 if (targetActivity != null) {
                     _navigationService.NavigateTo(targetActivity, true);
@@ -158,7 +118,7 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                _logger.Info(String.format(Locale.GERMAN, "onPageScrollStateChanged at state %d", state));
+                _logger.Info(String.format(Locale.getDefault(), "onPageScrollStateChanged at state %d", state));
             }
         });
 
@@ -173,12 +133,8 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
         super.onResume();
         _logger.Debug("onResume");
         if (!_isInitialized) {
-            if (_receiverController != null && _broadcastController != null) {
-                _isInitialized = true;
-                _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_HUMIDITY});
-                _hasHumiditySensor = checkSensorAvailability();
-                _getDataRunnable.run();
-            }
+            _isInitialized = true;
+            _hasHumiditySensor = checkSensorAvailability();
         }
     }
 
@@ -191,7 +147,6 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
             stopAirPressureTimeout();
         }
 
-        _receiverController.Dispose();
         _isInitialized = false;
 
         super.onPause();
@@ -206,7 +161,6 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
             stopAirPressureTimeout();
         }
 
-        _receiverController.Dispose();
         _isInitialized = false;
 
         super.onDestroy();
@@ -225,11 +179,10 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
 
             HumidityDto newEntry = new HumidityDto(humidity, "Ambient humidity", time);
 
-            _humidityList = new SerializableList<>();
-            _humidityList.addValue(newEntry);
+            SerializableList<HumidityDto> humidityList = new SerializableList<>();
+            humidityList.addValue(newEntry);
 
-            _listAdapter = new HumidityListAdapter(_context, _humidityList);
-            _listView.setAdapter(_listAdapter);
+            _listView.setAdapter(new HumidityListAdapter(_context, humidityList));
 
             _progressBar.setVisibility(View.GONE);
             _listView.setVisibility(View.VISIBLE);
@@ -277,7 +230,7 @@ public class SensorHumidityView extends AppCompatActivity implements SensorEvent
 
     private void startAirPressureTimeout() {
         _logger.Debug("Starting humidityTimeoutController...");
-        _humidityTimeoutHandler.postDelayed(_humidityTimeoutCheck, HUMIDITY_TIMEOUT);
+        _humidityTimeoutHandler.postDelayed(_humidityTimeoutCheck, Timeouts.SENSOR_RELOAD);
     }
 
     private void stopAirPressureTimeout() {

@@ -53,7 +53,7 @@ public final class JsonDataToListedMenuConverter {
                 _logger.Error(String.format("String %s doesnot contain %s!", value, _searchParameter));
             }
         } else {
-            _logger.Error(String.format(Locale.GERMAN, "String %s contains %d x %s!", value,
+            _logger.Error(String.format(Locale.getDefault(), "String %s contains %d x %s!", value,
                     StringHelper.GetStringCount(value, _searchParameter), _searchParameter));
         }
 
@@ -83,7 +83,7 @@ public final class JsonDataToListedMenuConverter {
                 _logger.Error(String.format("String %s doesnot contain %s!", value, _searchParameter));
             }
         } else {
-            _logger.Error(String.format(Locale.GERMAN, "String %s contains %d x %s!", value,
+            _logger.Error(String.format(Locale.getDefault(), "String %s contains %d x %s!", value,
                     StringHelper.GetStringCount(value, _searchParameter), _searchParameter));
         }
 
@@ -111,14 +111,14 @@ public final class JsonDataToListedMenuConverter {
                 boolean lastSuggestion = lastSuggestionString.contains("1");
 
                 ListedMenuDto newValue = new ListedMenuDto(id, description, rating, lastSuggestion);
-                _logger.Debug(String.format(Locale.GERMAN, "New ListedMenuDto %s", newValue));
+                _logger.Debug(String.format(Locale.getDefault(), "New ListedMenuDto %s", newValue));
 
                 return newValue;
             } else {
-                _logger.Error(String.format(Locale.GERMAN, "Data %s has invalid entry!", data));
+                _logger.Error(String.format(Locale.getDefault(), "Data %s has invalid entry!", data));
             }
         } else {
-            _logger.Error(String.format(Locale.GERMAN, "Data %s has wrong length %d!", data, data.length));
+            _logger.Error(String.format(Locale.getDefault(), "Data %s has wrong length %d!", data, data.length));
         }
 
         _logger.Error("Data has an error!");

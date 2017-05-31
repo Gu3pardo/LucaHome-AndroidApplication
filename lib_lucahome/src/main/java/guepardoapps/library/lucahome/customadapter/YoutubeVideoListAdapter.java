@@ -7,7 +7,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -18,8 +17,8 @@ import com.squareup.picasso.Picasso;
 
 import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.dto.YoutubeVideoDto;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
@@ -36,11 +35,12 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
     private Context _context;
     private static LayoutInflater _inflater = null;
 
-    public YoutubeVideoListAdapter(@NonNull Context context,
-                                   @NonNull ArrayList<YoutubeVideoDto> youtubeVideoList,
-                                   @NonNull LucaDialogController lucaDialogController,
-                                   @NonNull MediaMirrorController mediaMirrorController,
-                                   @NonNull String ip) {
+    public YoutubeVideoListAdapter(
+            @NonNull Context context,
+            @NonNull ArrayList<YoutubeVideoDto> youtubeVideoList,
+            @NonNull LucaDialogController lucaDialogController,
+            @NonNull MediaMirrorController mediaMirrorController,
+            @NonNull String ip) {
         _youtubeVideoList = youtubeVideoList;
 
         _lucaDialogController = lucaDialogController;
@@ -88,7 +88,7 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
         final YoutubeVideoDto entry = _youtubeVideoList.get(index);
 
         holder._image = (ImageView) rowView.findViewById(R.id.youtube_video_image);
-        holder._image.setOnClickListener(new OnClickListener() {
+        holder._image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String youtubeId = entry.GetYoutubeId();
@@ -99,7 +99,7 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
 
         holder._id = (TextView) rowView.findViewById(R.id.youtube_video_id);
         holder._id.setText(entry.GetYoutubeId());
-        holder._id.setOnClickListener(new OnClickListener() {
+        holder._id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String youtubeId = entry.GetYoutubeId();
@@ -109,7 +109,7 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
 
         holder._title = (TextView) rowView.findViewById(R.id.youtube_video_title);
         holder._title.setText(entry.GetTitle());
-        holder._title.setOnClickListener(new OnClickListener() {
+        holder._title.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String youtubeId = entry.GetYoutubeId();
@@ -119,7 +119,7 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
 
         holder._description = (TextView) rowView.findViewById(R.id.youtube_video_description);
         holder._description.setText(entry.GetDescription());
-        holder._description.setOnClickListener(new OnClickListener() {
+        holder._description.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String youtubeId = entry.GetYoutubeId();
@@ -128,7 +128,7 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
         });
 
         holder._background = (RelativeLayout) rowView.findViewById(R.id.youtube_video_background);
-        holder._background.setOnClickListener(new OnClickListener() {
+        holder._background.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String youtubeId = entry.GetYoutubeId();
@@ -141,14 +141,14 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
 
     private void sendYoutubeId(String youtubeId) {
         if (_playOnAllMirror) {
-            for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+            for (MediaServerSelection entry : MediaServerSelection.values()) {
                 if (entry.GetId() > 0) {
-                    _mediaMirrorController.SendCommand(entry.GetIp(), ServerAction.PLAY_YOUTUBE_VIDEO.toString(),
+                    _mediaMirrorController.SendCommand(entry.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(),
                             youtubeId);
                 }
             }
         } else {
-            _mediaMirrorController.SendCommand(_ip, ServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+            _mediaMirrorController.SendCommand(_ip, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
         }
         _lucaDialogController.CloseDialogCallback.run();
     }

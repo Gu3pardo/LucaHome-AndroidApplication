@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.wearable.view.WatchViewStub;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -22,6 +21,7 @@ import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
+import guepardoapps.library.lucahome.services.helper.MessageReceiveHelper;
 import guepardoapps.library.lucahome.services.helper.MessageSendHelper;
 
 import guepardoapps.library.toolset.controller.ReceiverController;
@@ -97,14 +97,14 @@ public class MediaMirrorView extends Activity {
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.basicMediaMirrorWatchViewStub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
-            public void onLayoutInflated(WatchViewStub stub) {
+            public void onLayoutInflated(WatchViewStub watchViewStub) {
                 _mediaMirrorYoutubeId = (TextView) findViewById(R.id.textViewMediaMirrorYoutubeId);
                 _mediaMirrorVolume = (TextView) findViewById(R.id.textViewMediaMirrorVolume);
                 _mediaMirrorBattery = (TextView) findViewById(R.id.textViewMediaMirrorBattery);
                 _mediaMirrorVersion = (TextView) findViewById(R.id.textViewMediaMirrorVersion);
 
                 _mediaMirrorIp = (Button) findViewById(R.id.buttonMediaMirrorIp);
-                _mediaMirrorIp.setOnClickListener(new OnClickListener() {
+                _mediaMirrorIp.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         _mediaMirrorIndex++;
@@ -118,7 +118,7 @@ public class MediaMirrorView extends Activity {
                 });
 
                 _youtubePlay = (ImageButton) findViewById(R.id.imageButtonVideoPlay);
-                _youtubePlay.setOnClickListener(new OnClickListener() {
+                _youtubePlay.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (!validateList()) {
@@ -126,15 +126,14 @@ public class MediaMirrorView extends Activity {
                         }
 
                         if (_messageSendHelper != null) {
-                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaMirrorSelection()
-                                    .GetIp();
-                            String message = String.format("ACTION:MEDIAMIRROR:%s:YOUTUBE:PLAY", mediaMirrorIp);
+                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaServerSelection().GetIp();
+                            String message = String.format("ACTION:%s:%s:YOUTUBE:PLAY", MessageReceiveHelper.MEDIA_MIRROR_DATA, mediaMirrorIp);
                             _messageSendHelper.SendMessage(message);
                         }
                     }
                 });
                 _youtubePause = (ImageButton) findViewById(R.id.imageButtonVideoPause);
-                _youtubePause.setOnClickListener(new OnClickListener() {
+                _youtubePause.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (!validateList()) {
@@ -142,15 +141,14 @@ public class MediaMirrorView extends Activity {
                         }
 
                         if (_messageSendHelper != null) {
-                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaMirrorSelection()
-                                    .GetIp();
-                            String message = String.format("ACTION:MEDIAMIRROR:%s:YOUTUBE:PAUSE", mediaMirrorIp);
+                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaServerSelection().GetIp();
+                            String message = String.format("ACTION:%s:%s:YOUTUBE:PAUSE", MessageReceiveHelper.MEDIA_MIRROR_DATA, mediaMirrorIp);
                             _messageSendHelper.SendMessage(message);
                         }
                     }
                 });
                 _youtubeStop = (ImageButton) findViewById(R.id.imageButtonVideoStop);
-                _youtubeStop.setOnClickListener(new OnClickListener() {
+                _youtubeStop.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (!validateList()) {
@@ -158,16 +156,16 @@ public class MediaMirrorView extends Activity {
                         }
 
                         if (_messageSendHelper != null) {
-                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaMirrorSelection()
+                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaServerSelection()
                                     .GetIp();
-                            String message = String.format("ACTION:MEDIAMIRROR:%s:YOUTUBE:STOP", mediaMirrorIp);
+                            String message = String.format("ACTION:%s:%s:YOUTUBE:STOP", MessageReceiveHelper.MEDIA_MIRROR_DATA, mediaMirrorIp);
                             _messageSendHelper.SendMessage(message);
                         }
                     }
                 });
 
                 _volumeIncrease = (Button) findViewById(R.id.buttonVolumeIncrease);
-                _volumeIncrease.setOnClickListener(new OnClickListener() {
+                _volumeIncrease.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (!validateList()) {
@@ -175,15 +173,15 @@ public class MediaMirrorView extends Activity {
                         }
 
                         if (_messageSendHelper != null) {
-                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaMirrorSelection()
+                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaServerSelection()
                                     .GetIp();
-                            String message = String.format("ACTION:MEDIAMIRROR:%s:VOLUME:INCREASE", mediaMirrorIp);
+                            String message = String.format("ACTION:%s:%s:VOLUME:INCREASE", MessageReceiveHelper.MEDIA_MIRROR_DATA, mediaMirrorIp);
                             _messageSendHelper.SendMessage(message);
                         }
                     }
                 });
                 _volumeDecrease = (Button) findViewById(R.id.buttonVolumeDecrease);
-                _volumeDecrease.setOnClickListener(new OnClickListener() {
+                _volumeDecrease.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         if (!validateList()) {
@@ -191,17 +189,16 @@ public class MediaMirrorView extends Activity {
                         }
 
                         if (_messageSendHelper != null) {
-                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaMirrorSelection()
+                            String mediaMirrorIp = _mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaServerSelection()
                                     .GetIp();
-                            String message = String.format("ACTION:MEDIAMIRROR:%s:VOLUME:DECREASE", mediaMirrorIp);
+                            String message = String.format("ACTION:%s:%s:VOLUME:DECREASE", MessageReceiveHelper.MEDIA_MIRROR_DATA, mediaMirrorIp);
                             _messageSendHelper.SendMessage(message);
                         }
                     }
                 });
 
                 if (!_isInitialized) {
-                    _receiverController.RegisterReceiver(_updateReceiver,
-                            new String[]{Broadcasts.UPDATE_MEDIAMIRROR});
+                    _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_MEDIAMIRROR});
                     _messageSendHelper.SendMessage(COMMAND);
                     _isInitialized = true;
                 }
@@ -246,9 +243,9 @@ public class MediaMirrorView extends Activity {
 
     private void displayData() {
         _mediaMirrorYoutubeId.setText(_mediaMirrorDtoList.get(_mediaMirrorIndex).GetYoutubeId());
-        _mediaMirrorVolume.setText(String.format(Locale.GERMAN, "Vol.: %d", _mediaMirrorDtoList.get(_mediaMirrorIndex).GetVolume()));
-        _mediaMirrorBattery.setText(String.format(Locale.GERMAN, "Bat.: %d%%", _mediaMirrorDtoList.get(_mediaMirrorIndex).GetBatteryLevel()));
-        _mediaMirrorIp.setText(_mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaMirrorSelection().GetIp());
+        _mediaMirrorVolume.setText(String.format(Locale.getDefault(), "Vol.: %d", _mediaMirrorDtoList.get(_mediaMirrorIndex).GetVolume()));
+        _mediaMirrorBattery.setText(String.format(Locale.getDefault(), "Bat.: %d%%", _mediaMirrorDtoList.get(_mediaMirrorIndex).GetBatteryLevel()));
+        _mediaMirrorIp.setText(_mediaMirrorDtoList.get(_mediaMirrorIndex).GetMediaServerSelection().GetIp());
         _mediaMirrorVersion.setText(_mediaMirrorDtoList.get(_mediaMirrorIndex).GetServerVersion());
     }
 

@@ -134,7 +134,7 @@ public final class JsonDataToMotionCameraDtoConverter {
 				boolean controlState = controlStateString.contains("1");
 
 				MotionCameraDto newValue = new MotionCameraDto(state, url, events, controlState);
-				_logger.Debug(String.format(Locale.GERMAN, "New MotionCameraDto %s", newValue));
+				_logger.Debug(String.format(Locale.getDefault(), "New MotionCameraDto %s", newValue));
 
 				return newValue;
 			} else {

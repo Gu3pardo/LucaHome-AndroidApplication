@@ -20,8 +20,6 @@ import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.enums.Command;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
-import guepardoapps.library.lucahome.common.enums.NavigateData;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
@@ -31,6 +29,7 @@ import guepardoapps.library.toolset.controller.NetworkController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
 import guepardoapps.lucahome.R;
+import guepardoapps.lucahome.common.enums.NavigationData;
 import guepardoapps.lucahome.services.ControlServiceStateService;
 import guepardoapps.lucahome.services.MainService;
 
@@ -61,7 +60,7 @@ public class BootView extends Activity {
 
             Intent startMainService = new Intent(_context, MainService.class);
             Bundle mainServiceBundle = new Bundle();
-            mainServiceBundle.putSerializable(Bundles.MAIN_SERVICE_ACTION, MainServiceAction.BOOT);
+            mainServiceBundle.putSerializable(Bundles.ACTION, MainService.MainServiceAction.BOOT);
             startMainService.putExtras(mainServiceBundle);
             _context.startService(startMainService);
 
@@ -81,18 +80,18 @@ public class BootView extends Activity {
 
                 switch (command) {
                     case NAVIGATE:
-                        NavigateData navigateData = (NavigateData) intent.getSerializableExtra(Bundles.NAVIGATE_DATA);
+                        NavigationData navigationData = (NavigationData) intent.getSerializableExtra(Bundles.NAVIGATE_DATA);
 
-                        if (navigateData != null) {
-                            switch (navigateData) {
-                                case HOME:
+                        if (navigationData != null) {
+                            switch (navigationData) {
+                                case MAIN:
                                     _navigationService.NavigateTo(HomeView.class, null, true);
                                     break;
                                 case FINISH:
                                     finish();
                                     break;
                                 default:
-                                    _logger.Warn("NavigateData is not supported: " + navigateData.toString());
+                                    _logger.Warn("NavigationData is not supported: " + navigationData.toString());
                                     break;
                             }
                         } else {
@@ -126,7 +125,7 @@ public class BootView extends Activity {
             }
 
             _percentProgressBar.setProgress(currentProgress);
-            _progressTextView.setText(String.format(Locale.GERMAN, "%d%%", currentProgress));
+            _progressTextView.setText(String.format(Locale.getDefault(), "%d%%", currentProgress));
         }
     };
 

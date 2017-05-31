@@ -1,9 +1,6 @@
 package guepardoapps.library.lucahome.common.constants;
 
 public class Broadcasts {
-    // Air Pressure
-    public static final String UPDATE_AIR_PRESSURE = "guepardoapps.lucahome.broadcast.UPDATE_AIR_PRESSURE";
-
     // Birthday
     public static final String ADD_BIRTHDAY = "guepardoapps.lucahome.broadcast.add.birthday";
     public static final String UPDATE_BIRTHDAY = "guepardoapps.lucahome.broadcast.update.birthday";
@@ -17,10 +14,8 @@ public class Broadcasts {
 
     // Command MainService
     public static final String COMMAND = "guepardoapps.lucahome.broadcast.command";
-    public static final String MAIN_SERVICE_COMMAND = "guepardoapps.lucahome.broadcast.main_service.command";
-
-    // Humidity
-    public static final String UPDATE_HUMIDITY = "guepardoapps.lucahome.broadcast.UPDATE_HUMIDITY";
+    public static final String HOME_AUTOMATION_COMMAND = "guepardoapps.lucahome.broadcast.home_automation.command";
+    public static final String RELOAD_ALL = "guepardoapps.lucahome.broadcast.reload.all";
 
     // Information
     public static final String UPDATE_INFORMATION = "guepardoapps.lucahome.broadcast.UPDATE_INFORMATION";
@@ -61,15 +56,8 @@ public class Broadcasts {
     public static final String RELOAD_MOVIE = "guepardoapps.lucahome.broadcast.reload.movie";
     public static final String DOWNLOAD_MOVIE_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MOVIE_FINISHED";
 
-    // Permissions
-    public static final String PERMISSION_READ_CALENDAR = "guepardoapps.lucahome.broadcast.PERMISSION_READ_CALENDAR";
-    public static final String PERMISSION_READ_EXTERNAL_STORAGE = "guepardoapps.lucahome.broadcast.PERMISSION_READ_EXTERNAL_STORAGE";
-    public static final String PERMISSION_WRITE_EXTERNAL_STORAGE = "guepardoapps.lucahome.broadcast.PERMISSION_WRITE_EXTERNAL_STORAGE";
-    public static final String PERMISSION_WRITE_SETTINGS = "guepardoapps.lucahome.broadcast.PERMISSION_WRITE_SETTINGS";
-
     // Socket
     public static final String ADD_SOCKET = "guepardoapps.lucahome.broadcast.add.wirelesssocket";
-    public static final String UPDATE_SOCKET = "guepardoapps.lucahome.broadcast.update.wirelesssockets";
     public static final String UPDATE_SOCKET_LIST = "guepardoapps.lucahome.watchface.broadcast.update.socket_list";
     public static final String RELOAD_SOCKETS = "guepardoapps.lucahome.broadcast.reload.wirelesssockets";
     public static final String NOTIFICATION_SOCKET = "guepardoapps.lucahome.broadcast.notification.wirelesssocket";
@@ -79,8 +67,6 @@ public class Broadcasts {
     public static final String ADD_SCHEDULE = "guepardoapps.lucahome.broadcast.add.schedule";
     public static final String UPDATE_SCHEDULE = "guepardoapps.lucahome.broadcast.update.schedule";
     public static final String UPDATE_SCHEDULE_LIST = "guepardoapps.lucahome.watchface.broadcast.update.schedule_list";
-    public static final String DELETE_SCHEDULE = "guepardoapps.lucahome.broadcast.delete.schedule";
-    public static final String SET_SCHEDULE = "guepardoapps.lucahome.broadcast.set.schedule";
     public static final String RELOAD_SCHEDULE = "guepardoapps.lucahome.broadcast.reload.schedule";
     public static final String DOWNLOAD_SCHEDULE_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_SCHEDULE_FINISHED";
 
@@ -92,6 +78,7 @@ public class Broadcasts {
     public static final String RELOAD_SHOPPING_LIST_FROM_DB = "guepardoapps.lucahome.broadcast.reload.shopping_list.db";
 
     // Temperature
+    public static final String RELOAD_TEMPERATURE = "guepardoapps.lucahome.broadcast.reload.temperature";
     public static final String UPDATE_TEMPERATURE = "guepardoapps.lucahome.broadcast.UPDATE_TEMPERATURE";
     public static final String DOWNLOAD_TEMPERATURE_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_TEMPERATURE_FINISHED";
 
@@ -107,7 +94,6 @@ public class Broadcasts {
     public static final String UPDATE_PROGRESSBAR = "guepardoapps.lucahome.broadcast.update.view.progressbar";
     public static final String UPDATE_WEATHER_VIEW = "guepardoapps.lucahome.broadcast.update.view.weather";
     public static final String UPDATE_FORECAST_VIEW = "guepardoapps.lucahome.broadcast.update.view.forecast";
-    public static final String UPDATE_SOCKETLIST_CHECKBOX_VIEW = "guepardoapps.lucahome.broadcast.update.view.socketlist.checkboxes";
 
     // Wearable
     public static final String UPDATE_CURRENT_WEATHER = "guepardoapps.lucahome.watchface.broadcast.update.current_weather";

@@ -11,7 +11,7 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.IDs;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 
@@ -40,9 +40,9 @@ public class CameraReceiver extends BroadcastReceiver {
             lucaNotificationController.CloseNotification(IDs.NOTIFICATION_CAMERA);
 
             BroadcastController broadcastController = new BroadcastController(context);
-            broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION},
-                    new Object[]{MainServiceAction.DISABLE_SECURITY_CAMERA});
+            broadcastController.SendSerializableArrayBroadcast(Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.DISABLE_SECURITY_CAMERA});
         } else {
             logger.Error("Action contains errors: " + action);
             Toasty.error(context, "Action contains errors: " + action, Toast.LENGTH_LONG).show();

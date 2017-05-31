@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -36,9 +35,10 @@ public class BirthdayListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public BirthdayListAdapter(@NonNull Context context,
-                               @NonNull SerializableList<BirthdayDto> birthdayList,
-                               boolean isOnWear) {
+    public BirthdayListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<BirthdayDto> birthdayList,
+            boolean isOnWear) {
         _logger = new LucaHomeLogger(TAG);
 
         _birthdayList = birthdayList;
@@ -107,9 +107,9 @@ public class BirthdayListAdapter extends BaseAdapter {
 
         holder._name = (Button) rowView.findViewById(R.id.birthday_item_name);
         holder._name.setText(_birthdayList.getValue(index).GetName());
-        holder._name.setOnLongClickListener(new OnLongClickListener() {
+        holder._name.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View arg0) {
+            public boolean onLongClick(View view) {
                 _logger.Debug("onLongClick _name button: " + _birthdayList.getValue(index).GetName());
                 if (!_isOnWear) {
                     _dialogController.ShowUpdateBirthdayDialog(_birthdayList.getValue(index));

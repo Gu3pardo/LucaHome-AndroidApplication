@@ -33,8 +33,9 @@ import es.dmoral.toasty.Toasty;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.dto.TemperatureDto;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.enums.TemperatureType;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
@@ -54,8 +55,6 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
 
     private static final String TAG = SensorTemperatureView.class.getSimpleName();
     private LucaHomeLogger _logger;
-
-    private static final int TEMPERATURE_TIMEOUT = 5000;
 
     private boolean _isInitialized;
     private WeatherModel _currentWeather;
@@ -92,8 +91,10 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_TEMPERATURE});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.GET_TEMPERATURE_LIST});
         }
     };
 
@@ -147,7 +148,7 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
                         }
                         break;
                     default:
-                        _logger.Warn(String.format(Locale.GERMAN, "%s is not supported!", temperatureType));
+                        _logger.Warn(String.format(Locale.getDefault(), "%s is not supported!", temperatureType));
                         break;
                 }
             }
@@ -191,12 +192,8 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION},
-                        new Object[]{MainServiceAction.DOWNLOAD_TEMPERATURE});
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION},
-                        new Object[]{MainServiceAction.DOWNLOAD_WEATHER_CURRENT});
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_CURRENT_WEATHER);
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_TEMPERATURE);
             }
         });
 
@@ -210,14 +207,14 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
         carouselView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                _logger.Info(String.format(Locale.GERMAN,
+                _logger.Info(String.format(Locale.getDefault(),
                         "onPageScrolled at position %d with positionOffset %f and positionOffsetPixels %d",
                         position, positionOffset, positionOffsetPixels));
             }
 
             @Override
             public void onPageSelected(int position) {
-                _logger.Info(String.format(Locale.GERMAN, "onPageSelected at position %d", position));
+                _logger.Info(String.format(Locale.getDefault(), "onPageSelected at position %d", position));
                 Class<?> targetActivity = _activities[position];
                 if (targetActivity != null) {
                     _navigationService.NavigateTo(targetActivity, true);
@@ -226,7 +223,7 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                _logger.Info(String.format(Locale.GERMAN, "onPageScrollStateChanged at state %d", state));
+                _logger.Info(String.format(Locale.getDefault(), "onPageScrollStateChanged at state %d", state));
             }
         });
 
@@ -347,7 +344,7 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
 
     private void startTemperatureTimeout() {
         _logger.Debug("Starting temperatureTimeoutController...");
-        _temperatureTimeoutHandler.postDelayed(_temperatureTimeoutCheck, TEMPERATURE_TIMEOUT);
+        _temperatureTimeoutHandler.postDelayed(_temperatureTimeoutCheck, Timeouts.SENSOR_RELOAD);
     }
 
     private void stopTemperatureTimeout() {

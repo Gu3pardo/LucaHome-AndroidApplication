@@ -5,10 +5,8 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.TimerDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 public class TimerController {
@@ -27,10 +25,8 @@ public class TimerController {
         _logger.Debug("LoadTimer");
         _serviceController.StartRestService(
                 Bundles.SCHEDULE_DOWNLOAD,
-                ServerActions.GET_SCHEDULES,
-                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED,
-                LucaObject.SCHEDULE,
-                RaspberrySelection.BOTH);
+                LucaServerAction.GET_SCHEDULES.toString(),
+                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED);
     }
 
     public void Delete(@NonNull TimerDto timer) {
@@ -38,8 +34,6 @@ public class TimerController {
         _serviceController.StartRestService(
                 timer.GetName(),
                 timer.GetCommandDelete(),
-                Broadcasts.RELOAD_TIMER,
-                LucaObject.TIMER,
-                RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_TIMER);
     }
 }

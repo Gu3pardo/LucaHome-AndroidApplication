@@ -23,7 +23,7 @@ import java.util.List;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.customadapter.*;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
@@ -60,9 +60,10 @@ public class ForecastWeatherView extends AppCompatActivity {
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION},
-                    new Object[]{MainServiceAction.GET_WEATHER_FORECAST});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.GET_WEATHER_FORECAST});
         }
     };
 
@@ -126,6 +127,7 @@ public class ForecastWeatherView extends AppCompatActivity {
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_CURRENT_WEATHER);
                 _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_FORECAST_WEATHER);
             }
         });

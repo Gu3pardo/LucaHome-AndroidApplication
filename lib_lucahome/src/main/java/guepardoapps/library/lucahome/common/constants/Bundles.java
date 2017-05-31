@@ -1,9 +1,6 @@
 package guepardoapps.library.lucahome.common.constants;
 
 public class Bundles {
-    // Air Pressure
-    public static final String AIR_PRESSURE_LIST = "AIR_PRESSURE_LIST";
-
     // Birthday
     public static final String BIRTHDAY_LIST = "BIRTHDAY_LIST";
     public static final String BIRTHDAY_DOWNLOAD = "BIRTHDAY_DOWNLOAD";
@@ -14,18 +11,13 @@ public class Bundles {
 
     // Command
     public static final String COMMAND = "COMMAND";
-    public static final String MAIN_SERVICE_ACTION = "MAIN_SERVICE_ACTION";
+    public static final String HOME_AUTOMATION_ACTION = "HOME_AUTOMATION_ACTION";
+    public static final String LUCA_OBJECT = "LUCA_OBJECT";
     public static final String NAVIGATE_DATA = "NAVIGATE_DATA";
-
-    // Humidity
-    public static final String HUMIDITY_LIST = "HUMIDITY_LIST";
 
     // Information
     public static final String INFORMATION_SINGLE = "INFORMATION_SINGLE";
     public static final String INFORMATION_DOWNLOAD = "INFORMATION_DOWNLOAD";
-
-    // ListedMenu
-    public static final String LISTEDMENU = "LISTEDMENU";
 
     // MapContent
     public static final String MAP_CONTENT_LIST = "MAP_CONTENT_LIST";
@@ -54,15 +46,8 @@ public class Bundles {
     public static final String MOVIE_LIST = "MOVIE_LIST";
     public static final String MOVIE_DOWNLOAD = "MOVIE_DOWNLOAD";
 
-    // Permission
-    public static final String PERMISSION_READ_CALENDAR = "PERMISSION_READ_CALENDAR";
-    public static final String PERMISSION_READ_EXTERNAL_STORAGE = "PERMISSION_READ_EXTERNAL_STORAGE";
-    public static final String PERMISSION_WRITE_EXTERNAL_STORAGE = "PERMISSION_WRITE_EXTERNAL_STORAGE";
-    public static final String PERMISSION_WRITE_SETTINGS = "PERMISSION_WRITE_SETTINGS";
-
     // Raspberry
     public static final String ACTION = "ACTION";
-    public static final String RASPBERRY_SELECTION = "RASPBERRY_SELECTION";
     public static final String RASPBERRY_TEMPERATURE = "RASPBERRY_TEMPERATURE";
 
     // Schedule
@@ -108,7 +93,6 @@ public class Bundles {
 
     // other
     public static final String BROADCAST = "BROADCAST";
-    public static final String LUCA_OBJECT = "LUCA_OBJECT";
     public static final String NAME = "NAME";
     public static final String PHONE_BATTERY = "PHONE_BATTERY";
     public static final String PHONE_MESSAGE_TEXT = "PHONE_MESSAGE_TEXT";

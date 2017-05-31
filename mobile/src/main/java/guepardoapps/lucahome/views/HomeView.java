@@ -26,7 +26,6 @@ public class HomeView extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_home);
-        // TODO getActionBar().setBackgroundDrawable(new ColorDrawable(Color.ACTION_BAR));
 
         _logger = new LucaHomeLogger(TAG);
         _logger.Debug("onCreate");

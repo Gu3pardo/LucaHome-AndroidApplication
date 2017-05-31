@@ -7,8 +7,6 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.UserDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.RESTService;
 import guepardoapps.library.lucahome.services.helper.UserService;
@@ -32,9 +30,7 @@ public class ServiceController {
     public void StartRestService(
             @NonNull String name,
             @NonNull String action,
-            @NonNull String broadcast,
-            @NonNull LucaObject lucaObject,
-            @NonNull RaspberrySelection raspberrySelection) {
+            @NonNull String broadcast) {
         UserDto loggedInUser = _userService.LoadUser();
         if (loggedInUser != null) {
             StartRestService(
@@ -42,9 +38,7 @@ public class ServiceController {
                     loggedInUser.GetPassword(),
                     name,
                     action,
-                    broadcast,
-                    lucaObject,
-                    raspberrySelection);
+                    broadcast);
         } else {
             _logger.Warn("loggedInUser is null!");
             StartRestService(
@@ -52,9 +46,7 @@ public class ServiceController {
                     "",
                     name,
                     action,
-                    broadcast,
-                    lucaObject,
-                    raspberrySelection);
+                    broadcast);
         }
     }
 
@@ -63,9 +55,7 @@ public class ServiceController {
             @NonNull String password,
             @NonNull String name,
             @NonNull String action,
-            @NonNull String broadcast,
-            @NonNull LucaObject lucaObject,
-            @NonNull RaspberrySelection raspberrySelection) {
+            @NonNull String broadcast) {
         Intent serviceIntent = new Intent(_context, RESTService.class);
         Bundle serviceData = new Bundle();
 
@@ -75,8 +65,6 @@ public class ServiceController {
         serviceData.putString(Bundles.ACTION, action);
         serviceData.putString(Bundles.NAME, name);
         serviceData.putString(Bundles.BROADCAST, broadcast);
-        serviceData.putSerializable(Bundles.LUCA_OBJECT, lucaObject);
-        serviceData.putSerializable(Bundles.RASPBERRY_SELECTION, raspberrySelection);
 
         serviceIntent.putExtras(serviceData);
         _context.startService(serviceIntent);

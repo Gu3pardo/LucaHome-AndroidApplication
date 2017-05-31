@@ -6,10 +6,8 @@ import android.support.annotation.NonNull;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.ScheduleDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 public class ScheduleController {
@@ -28,10 +26,8 @@ public class ScheduleController {
         _logger.Debug("LoadSchedules");
         _serviceController.StartRestService(
                 Bundles.SCHEDULE_DOWNLOAD,
-                ServerActions.GET_SCHEDULES,
-                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED,
-                LucaObject.SCHEDULE,
-                RaspberrySelection.BOTH);
+                LucaServerAction.GET_SCHEDULES.toString(),
+                Broadcasts.DOWNLOAD_SCHEDULE_FINISHED);
     }
 
     public void SetSchedule(
@@ -41,9 +37,7 @@ public class ScheduleController {
         _serviceController.StartRestService(
                 schedule.GetName(),
                 schedule.GetCommandSet(newState),
-                Broadcasts.RELOAD_SCHEDULE,
-                LucaObject.SCHEDULE,
-                RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_SCHEDULE);
     }
 
     public void SetSchedule(
@@ -52,10 +46,8 @@ public class ScheduleController {
         _logger.Debug("SetSchedule: " + scheduleName + " to " + String.valueOf(newState));
         _serviceController.StartRestService(
                 scheduleName,
-                ServerActions.SET_SCHEDULE + scheduleName + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF),
-                Broadcasts.RELOAD_SCHEDULE,
-                LucaObject.SCHEDULE,
-                RaspberrySelection.BOTH);
+                LucaServerAction.SET_SCHEDULE.toString() + scheduleName + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF),
+                Broadcasts.RELOAD_SCHEDULE);
     }
 
     public void DeleteSchedule(@NonNull ScheduleDto schedule) {
@@ -63,8 +55,6 @@ public class ScheduleController {
         _serviceController.StartRestService(
                 schedule.GetName(),
                 schedule.GetCommandDelete(),
-                Broadcasts.RELOAD_SCHEDULE,
-                LucaObject.SCHEDULE,
-                RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_SCHEDULE);
     }
 }

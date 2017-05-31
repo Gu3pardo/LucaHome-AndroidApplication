@@ -13,13 +13,11 @@ import android.widget.TextView;
 
 import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.MapContentDto;
 import guepardoapps.library.lucahome.common.dto.TemperatureDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.enums.DrawingType;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toolset.common.classes.SerializableList;
@@ -42,10 +40,8 @@ public class MapContentController {
         _logger.Debug("GetMapContents");
         _serviceController.StartRestService(
                 TAG,
-                ServerActions.GET_MAP_CONTENTS,
-                Broadcasts.UPDATE_MAP_CONTENT_VIEW,
-                LucaObject.MAP_CONTENT,
-                RaspberrySelection.BOTH);
+                LucaServerAction.GET_MAP_CONTENTS.toString(),
+                Broadcasts.UPDATE_MAP_CONTENT_VIEW);
     }
 
     public void AddMapContent(@NonNull MapContentDto mapContent) {
@@ -53,9 +49,7 @@ public class MapContentController {
         _serviceController.StartRestService(
                 TAG,
                 mapContent.GetCommandAdd(),
-                Broadcasts.RELOAD_MAP_CONTENT,
-                LucaObject.MAP_CONTENT,
-                RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_MAP_CONTENT);
     }
 
     public void UpdateMapContent(@NonNull MapContentDto mapContent) {
@@ -63,9 +57,7 @@ public class MapContentController {
         _serviceController.StartRestService(
                 TAG,
                 mapContent.GetCommandUpdate(),
-                Broadcasts.RELOAD_MAP_CONTENT,
-                LucaObject.MAP_CONTENT,
-                RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_MAP_CONTENT);
     }
 
     public void DeleteMapContent(@NonNull MapContentDto mapContent) {
@@ -73,9 +65,7 @@ public class MapContentController {
         _serviceController.StartRestService(
                 TAG,
                 mapContent.GetCommandDelete(),
-                Broadcasts.RELOAD_MAP_CONTENT,
-                LucaObject.MAP_CONTENT,
-                RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_MAP_CONTENT);
     }
 
     public TextView CreateEntry(

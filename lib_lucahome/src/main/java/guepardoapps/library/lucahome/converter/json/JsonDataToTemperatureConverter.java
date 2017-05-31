@@ -82,7 +82,7 @@ public final class JsonDataToTemperatureConverter {
 
                 TemperatureDto newValue = new TemperatureDto(temperature, area, time, sensorPath,
                         TemperatureType.RASPBERRY, graphPath);
-                _logger.Debug(String.format(Locale.GERMAN, "New TemperatureDto %s", newValue));
+                _logger.Debug(String.format(Locale.getDefault(), "New TemperatureDto %s", newValue));
 
                 return newValue;
             }

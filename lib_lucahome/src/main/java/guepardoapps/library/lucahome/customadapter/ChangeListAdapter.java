@@ -19,8 +19,9 @@ public class ChangeListAdapter extends BaseAdapter {
     private SerializableList<ChangeDto> _changeList;
     private static LayoutInflater _inflater = null;
 
-    public ChangeListAdapter(@NonNull Context context,
-                             @NonNull SerializableList<ChangeDto> changeList) {
+    public ChangeListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<ChangeDto> changeList) {
         _changeList = changeList;
         _inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }

@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -14,12 +13,10 @@ import android.widget.TextView;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
-
 import guepardoapps.library.toolset.controller.ReceiverController;
-
 import guepardoapps.lucahome.R;
 
 public class UpdateViewController {
@@ -67,7 +64,7 @@ public class UpdateViewController {
         _logger.Debug("onCreate");
 
         _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowUpdate);
-        _showContent.setOnClickListener(new OnClickListener() {
+        _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (_contentVisible) {
@@ -90,87 +87,111 @@ public class UpdateViewController {
         _updateLinearLayoutII = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutUpdateII);
 
         Button buttonUpdateCurrentWeather = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateCurrentWeather);
-        buttonUpdateCurrentWeather.setOnClickListener(new OnClickListener() {
+        buttonUpdateCurrentWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonUpdateCurrentWeather onClick");
+
                 if (_mediaMirrorViewDto == null) {
                     _logger.Error("_mediaMirrorViewDto is null!");
                     return;
                 }
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.UPDATE_CURRENT_WEATHER.toString(), "");
+
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.UPDATE_CURRENT_WEATHER.toString(),
+                        "");
             }
         });
 
         Button buttonUpdateForecastWeather = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateForecastWeather);
-        buttonUpdateForecastWeather.setOnClickListener(new OnClickListener() {
+        buttonUpdateForecastWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonUpdateForecastWeather onClick");
+
                 if (_mediaMirrorViewDto == null) {
                     _logger.Error("_mediaMirrorViewDto is null!");
                     return;
                 }
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.UPDATE_FORECAST_WEATHER.toString(), "");
+
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.UPDATE_FORECAST_WEATHER.toString(),
+                        "");
             }
         });
 
         Button buttonUpdateRaspberryTemperature = (Button) ((Activity) _context)
                 .findViewById(R.id.buttonUpdateRaspberryTemperature);
-        buttonUpdateRaspberryTemperature.setOnClickListener(new OnClickListener() {
+        buttonUpdateRaspberryTemperature.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonUpdateRaspberryTemperature onClick");
+
                 if (_mediaMirrorViewDto == null) {
                     _logger.Error("_mediaMirrorViewDto is null!");
                     return;
                 }
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(), "");
+
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(),
+                        "");
             }
         });
 
         Button buttonUpdateIp = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateIp);
-        buttonUpdateIp.setOnClickListener(new OnClickListener() {
+        buttonUpdateIp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonUpdateIp onClick");
+
                 if (_mediaMirrorViewDto == null) {
                     _logger.Error("_mediaMirrorViewDto is null!");
                     return;
                 }
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.UPDATE_IP_ADDRESS.toString(), "");
+
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.UPDATE_IP_ADDRESS.toString(),
+                        "");
             }
         });
 
         Button buttonUpdateBirthdays = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateBirthdays);
-        buttonUpdateBirthdays.setOnClickListener(new OnClickListener() {
+        buttonUpdateBirthdays.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonUpdateBirthdays onClick");
+
                 if (_mediaMirrorViewDto == null) {
                     _logger.Error("_mediaMirrorViewDto is null!");
                     return;
                 }
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.UPDATE_BIRTHDAY_ALARM.toString(), "");
+
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.UPDATE_BIRTHDAY_ALARM.toString(),
+                        "");
             }
         });
 
         Button buttonUpdateCalendar = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateCalendar);
-        buttonUpdateCalendar.setOnClickListener(new OnClickListener() {
+        buttonUpdateCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonUpdateCalendar onClick");
+
                 if (_mediaMirrorViewDto == null) {
                     _logger.Error("_mediaMirrorViewDto is null!");
                     return;
                 }
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.UPDATE_CALENDAR_ALARM.toString(), "");
+
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.UPDATE_CALENDAR_ALARM.toString(),
+                        "");
             }
         });
     }

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
@@ -24,8 +23,9 @@ public class InformationListAdapter extends BaseAdapter {
     private LucaDialogController _dialogController;
     private static LayoutInflater _inflater = null;
 
-    public InformationListAdapter(@NonNull Context context,
-                                  @NonNull InformationDto information) {
+    public InformationListAdapter(
+            @NonNull Context context,
+            @NonNull InformationDto information) {
         _logger = new LucaHomeLogger(TAG);
 
         _information = information;
@@ -65,9 +65,9 @@ public class InformationListAdapter extends BaseAdapter {
         holder._key.setText(_information.GetKey(index));
         if (_information.GetKey(index).contains("contact")) {
             holder._key.setLongClickable(true);
-            holder._key.setOnLongClickListener(new OnLongClickListener() {
+            holder._key.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public boolean onLongClick(View arg0) {
+                public boolean onLongClick(View view) {
                     _logger.Debug("_key onLongClick");
                     _dialogController.ShowSendInformationMailDialog();
                     return true;
@@ -79,9 +79,9 @@ public class InformationListAdapter extends BaseAdapter {
         holder._value.setText(_information.GetValue(index));
         if (_information.GetKey(index).contains("contact")) {
             holder._value.setLongClickable(true);
-            holder._value.setOnLongClickListener(new OnLongClickListener() {
+            holder._value.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
-                public boolean onLongClick(View arg0) {
+                public boolean onLongClick(View view) {
                     _logger.Debug("_value onLongClick");
                     _dialogController.ShowSendInformationMailDialog();
                     return true;

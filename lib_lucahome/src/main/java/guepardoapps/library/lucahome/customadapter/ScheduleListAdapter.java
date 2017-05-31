@@ -6,8 +6,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
@@ -36,11 +34,12 @@ public class ScheduleListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public ScheduleListAdapter(@NonNull Context context,
-                               @NonNull SerializableList<ScheduleDto> scheduleList,
-                               SerializableList<WirelessSocketDto> socketList,
-                               boolean isOnWear,
-                               Class<?> phoneMessageService) {
+    public ScheduleListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<ScheduleDto> scheduleList,
+            SerializableList<WirelessSocketDto> socketList,
+            boolean isOnWear,
+            Class<?> phoneMessageService) {
         _logger = new LucaHomeLogger(TAG);
 
         _scheduleList = scheduleList;
@@ -94,9 +93,9 @@ public class ScheduleListAdapter extends BaseAdapter {
 
         holder._name = (Button) rowView.findViewById(R.id.schedule_item_name);
         holder._name.setText(_scheduleList.getValue(index).GetName());
-        holder._name.setOnLongClickListener(new OnLongClickListener() {
+        holder._name.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View arg0) {
+            public boolean onLongClick(View view) {
                 _logger.Debug("onLongClick _name button: " + _scheduleList.getValue(index).GetName());
                 if (!_isOnWear) {
                     _dialogController.ShowUpdateScheduleDialog(_scheduleList.getValue(index));
@@ -136,9 +135,9 @@ public class ScheduleListAdapter extends BaseAdapter {
 
         holder._state = (Button) rowView.findViewById(R.id.schedule_item_state);
         holder._state.setText(_scheduleList.getValue(index).GetIsActiveString());
-        holder._state.setOnClickListener(new OnClickListener() {
+        holder._state.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _state button: " + _scheduleList.getValue(index).GetName());
                 if (!_isOnWear) {
                     _scheduleController.SetSchedule(_scheduleList.getValue(index),

@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.library.lucahome.common.constants.ServerActions;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 
 public class MovieDto implements Serializable {
 
@@ -54,7 +54,7 @@ public class MovieDto implements Serializable {
     }
 
     public String GetRatingString() {
-        return String.format(Locale.GERMAN, "%d/%d", _rating, MAX_RATING);
+        return String.format(Locale.getDefault(), "%d/%d", _rating, MAX_RATING);
     }
 
     public int GetWatched() {
@@ -66,7 +66,7 @@ public class MovieDto implements Serializable {
     }
 
     public String GetCommandAdd() {
-        return ServerActions.ADD_MOVIE + _title
+        return LucaServerAction.ADD_MOVIE.toString() + _title
                 + "&genre=" + _genre
                 + "&description=" + _description
                 + "&rating=" + String.valueOf(_rating)
@@ -75,7 +75,7 @@ public class MovieDto implements Serializable {
     }
 
     public String GetCommandUpdate() {
-        return ServerActions.UPDATE_MOVIE + _title
+        return LucaServerAction.UPDATE_MOVIE.toString() + _title
                 + "&genre=" + _genre
                 + "&description=" + _description
                 + "&rating=" + String.valueOf(_rating)
@@ -84,7 +84,7 @@ public class MovieDto implements Serializable {
     }
 
     public String GetCommandDelete() {
-        return ServerActions.DELETE_MOVIE + _title;
+        return LucaServerAction.DELETE_MOVIE.toString() + _title;
     }
 
     public String toString() {

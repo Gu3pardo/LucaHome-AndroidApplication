@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -15,7 +14,7 @@ import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
@@ -58,7 +57,7 @@ public class WeatherController {
                 _buttonCenterWeather.setText(text);
 
                 WeatherCondition weatherCondition = currentWeather.GetCondition();
-                _logger.Debug(String.format(Locale.GERMAN, "WeatherCondition: %s", weatherCondition));
+                _logger.Debug(String.format(Locale.getDefault(), "WeatherCondition: %s", weatherCondition));
 
                 Drawable drawable = _context.getResources().getDrawable(weatherCondition.GetIcon());
                 drawable.setBounds(0, 0, 30, 30);
@@ -83,7 +82,7 @@ public class WeatherController {
         _logger.Debug("onCreate");
 
         _buttonCenterWeather = (Button) ((Activity) _context).findViewById(R.id.buttonCenterWeather);
-        _buttonCenterWeather.setOnClickListener(new OnClickListener() {
+        _buttonCenterWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _navigationService.NavigateTo(ForecastWeatherView.class, true);
@@ -91,7 +90,7 @@ public class WeatherController {
         });
 
         ImageButton imageButtonReloadWeather = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonReloadWeather);
-        imageButtonReloadWeather.setOnClickListener(new OnClickListener() {
+        imageButtonReloadWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_CURRENT_WEATHER);
@@ -105,11 +104,13 @@ public class WeatherController {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
-                _receiverController.RegisterReceiver(_updateWeatherViewReceiver,
-                        new String[]{Broadcasts.UPDATE_WEATHER_VIEW});
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION},
-                        new Object[]{MainServiceAction.GET_WEATHER_CURRENT});
+                _receiverController.RegisterReceiver(_updateWeatherViewReceiver, new String[]{Broadcasts.UPDATE_WEATHER_VIEW});
+
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.HOME_AUTOMATION_COMMAND,
+                        new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                        new Object[]{HomeAutomationAction.GET_WEATHER_CURRENT});
+
                 _isInitialized = true;
             }
         }

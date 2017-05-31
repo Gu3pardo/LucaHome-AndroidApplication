@@ -27,8 +27,9 @@ public class ForecastListAdapter extends BaseAdapter {
     private List<ForecastWeatherModel> _forecastList;
     private static LayoutInflater _inflater = null;
 
-    public ForecastListAdapter(@NonNull Context context,
-                               @NonNull List<ForecastWeatherModel> forecastList) {
+    public ForecastListAdapter(
+            @NonNull Context context,
+            @NonNull List<ForecastWeatherModel> forecastList) {
         _logger = new LucaHomeLogger(TAG);
 
         _forecastList = forecastList;
@@ -84,10 +85,10 @@ public class ForecastListAdapter extends BaseAdapter {
             holder._temperature.setText(entry.GetTempMin() + "-" + entry.GetTempMax());
 
             holder._humidity = (TextView) rowView.findViewById(R.id.weather_item_humidity);
-            holder._humidity.setText(String.format(Locale.GERMAN, "Humidity: %s", entry.GetHumidity()));
+            holder._humidity.setText(String.format(Locale.getDefault(), "Humidity: %s", entry.GetHumidity()));
 
             holder._pressure = (TextView) rowView.findViewById(R.id.weather_item_pressure);
-            holder._pressure.setText(String.format(Locale.GERMAN, "Pressure: %s", entry.GetPressure()));
+            holder._pressure.setText(String.format(Locale.getDefault(), "Pressure: %s", entry.GetPressure()));
 
             holder._time = (TextView) rowView.findViewById(R.id.weather_item_time);
             holder._time.setText(entry.GetTime());

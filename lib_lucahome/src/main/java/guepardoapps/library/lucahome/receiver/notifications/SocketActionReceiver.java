@@ -11,10 +11,8 @@ import java.util.Locale;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.controller.ServiceController;
@@ -44,11 +42,13 @@ public class SocketActionReceiver extends BroadcastReceiver {
             if (_serviceController == null) {
                 _serviceController = new ServiceController(context);
             }
-            _serviceController.StartRestService("SHOW_NOTIFICATION_SOCKET", ServerActions.DEACTIVATE_ALL_SOCKETS, "",
-                    LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+            _serviceController.StartRestService(
+                    "SHOW_NOTIFICATION_SOCKET",
+                    LucaServerAction.DEACTIVATE_ALL_SOCKETS.toString(),
+                    "");
         } else if (action.contains(LucaNotificationController.SOCKET_SINGLE)) {
             WirelessSocketDto socket = (WirelessSocketDto) details.getSerializable(Bundles.SOCKET_DATA);
-            logger.Debug(String.format(Locale.GERMAN, "socket: %s", socket));
+            logger.Debug(String.format(Locale.getDefault(), "socket: %s", socket));
 
             Intent serviceIntent = new Intent(context, SocketActionService.class);
 

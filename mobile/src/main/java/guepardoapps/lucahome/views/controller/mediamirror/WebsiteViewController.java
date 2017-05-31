@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,7 +16,7 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
@@ -70,7 +69,7 @@ public class WebsiteViewController {
         _logger.Debug("onCreate");
 
         _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowWebsite);
-        _showContent.setOnClickListener(new OnClickListener() {
+        _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (_contentVisible) {
@@ -91,7 +90,7 @@ public class WebsiteViewController {
         _websiteDividerTextView = (TextView) ((Activity) _context).findViewById(R.id.dividerWebsite);
         _editTextWebsite = (EditText) ((Activity) _context).findViewById(R.id.editTextSendWebsite);
         _buttonSendWebsite = (Button) ((Activity) _context).findViewById(R.id.buttonSendWebsite);
-        _buttonSendWebsite.setOnClickListener(new OnClickListener() {
+        _buttonSendWebsite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("_buttonSendText onClick");
@@ -112,8 +111,10 @@ public class WebsiteViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.SHOW_WEBVIEW.toString(), url);
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.SHOW_WEBVIEW.toString(),
+                        url);
             }
         });
     }

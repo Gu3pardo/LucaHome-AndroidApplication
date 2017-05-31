@@ -7,13 +7,10 @@ import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.Packages;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.library.lucahome.services.helper.PackageService;
 
 import guepardoapps.library.toolset.controller.SharedPrefController;
 
@@ -22,15 +19,15 @@ public class SocketController {
     private static final String TAG = SocketController.class.getSimpleName();
     private LucaHomeLogger _logger;
 
+    private LucaPackageController _packageController;
     private ServiceController _serviceController;
     private SharedPrefController _sharedPrefController;
-    private PackageService _packageService;
 
     public SocketController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _serviceController = new ServiceController(context);
         _sharedPrefController = new SharedPrefController(context, SharedPrefConstants.SHARED_PREF_NAME);
-        _packageService = new PackageService(context);
+        _packageController = new LucaPackageController(context);
     }
 
     public void SetSocket(
@@ -40,9 +37,7 @@ public class SocketController {
         _serviceController.StartRestService(
                 socket.GetName(),
                 socket.GetCommandSet(newState),
-                Broadcasts.RELOAD_SOCKETS,
-                LucaObject.WIRELESS_SOCKET,
-                RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_SOCKETS);
     }
 
     public void SetSocket(
@@ -51,20 +46,16 @@ public class SocketController {
         _logger.Debug("SetSocket: " + socketName + " to " + String.valueOf(newState));
         _serviceController.StartRestService(
                 socketName,
-                ServerActions.SET_SOCKET + socketName + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF),
-                Broadcasts.RELOAD_SOCKETS,
-                LucaObject.WIRELESS_SOCKET,
-                RaspberrySelection.BOTH);
+                LucaServerAction.SET_SOCKET.toString() + socketName + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF),
+                Broadcasts.RELOAD_SOCKETS);
     }
 
     public void LoadSockets() {
         _logger.Debug("SetSocket");
         _serviceController.StartRestService(
                 Bundles.SOCKET_DOWNLOAD,
-                ServerActions.GET_SOCKETS,
-                Broadcasts.DOWNLOAD_SOCKET_FINISHED,
-                LucaObject.WIRELESS_SOCKET,
-                RaspberrySelection.BOTH);
+                LucaServerAction.GET_SOCKETS.toString(),
+                Broadcasts.DOWNLOAD_SOCKET_FINISHED);
     }
 
     public void DeleteSocket(@NonNull WirelessSocketDto socket) {
@@ -72,9 +63,7 @@ public class SocketController {
         _serviceController.StartRestService(
                 socket.GetName(),
                 socket.GetCommandDelete(),
-                Broadcasts.RELOAD_SOCKETS,
-                LucaObject.WIRELESS_SOCKET,
-                RaspberrySelection.BOTH);
+                Broadcasts.RELOAD_SOCKETS);
     }
 
     public boolean ValidateSocketCode(@NonNull String code) {
@@ -106,8 +95,8 @@ public class SocketController {
             }
 
             if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.START_AUDIO_APP)) {
-                if (_packageService.IsPackageInstalled(Packages.BUBBLE_UPNP)) {
-                    _packageService.StartApplication(Packages.BUBBLE_UPNP);
+                if (_packageController.IsPackageInstalled(Packages.BUBBLE_UPNP)) {
+                    _packageController.StartApplication(Packages.BUBBLE_UPNP);
                 }
             }
         }

@@ -1,6 +1,7 @@
 package guepardoapps.library.lucahome.controller;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -9,8 +10,6 @@ import android.support.annotation.NonNull;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.MenuDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toolset.common.classes.SerializableList;
@@ -57,9 +56,7 @@ public class MenuController {
                 _serviceController.StartRestService(
                         Bundles.MENU,
                         menu.GetCommandUpdate(),
-                        "",
-                        LucaObject.MENU,
-                        RaspberrySelection.BOTH);
+                        "");
                 reload = true;
                 continue;
             }
@@ -76,15 +73,14 @@ public class MenuController {
                 _serviceController.StartRestService(
                         Bundles.MENU,
                         menu.GetCommandUpdate(),
-                        "",
-                        LucaObject.MENU,
-                        RaspberrySelection.BOTH);
+                        "");
                 reload = true;
                 continue;
             }
 
             if (menu.GetDay() < dayOfMonth && menu.GetMonth() <= month) {
                 _logger.Debug(String.format(
+                        Locale.getDefault(),
                         "Day of menu %s is lower then this day and month is lower then this month! Updating...",
                         menu.toString()));
 
@@ -97,9 +93,7 @@ public class MenuController {
                 _serviceController.StartRestService(
                         Bundles.MENU,
                         menu.GetCommandUpdate(),
-                        "",
-                        LucaObject.MENU,
-                        RaspberrySelection.BOTH);
+                        "");
                 reload = true;
             }
         }
@@ -112,7 +106,7 @@ public class MenuController {
     @SuppressLint("DefaultLocale")
     public String GetDateString(@NonNull MenuDto menu) {
         String weekendString = menu.GetWeekday().substring(0, 2);
-        String dateString = String.format("%2d.%2d.%4d", menu.GetDay(), menu.GetMonth(), menu.GetYear());
+        String dateString = String.format(Locale.getDefault(), "%2d.%2d.%4d", menu.GetDay(), menu.GetMonth(), menu.GetYear());
         return String.format("%s, %s", weekendString, dateString);
     }
 

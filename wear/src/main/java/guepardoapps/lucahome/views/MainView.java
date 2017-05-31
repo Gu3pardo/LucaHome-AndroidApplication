@@ -42,8 +42,8 @@ public class MainView extends Activity {
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.basicListWatchViewStub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                _mainListView = (ListView) stub.findViewById(R.id.basicListView);
+            public void onLayoutInflated(WatchViewStub watchViewStub) {
+                _mainListView = (ListView) watchViewStub.findViewById(R.id.basicListView);
                 _listAdapter = new MainListViewAdapter(MainView.this, _viewItemList);
                 _mainListView.setAdapter(_listAdapter);
             }

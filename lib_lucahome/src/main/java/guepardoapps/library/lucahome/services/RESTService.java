@@ -23,11 +23,9 @@ import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.dto.ActionDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.DatabaseController;
 import guepardoapps.library.lucahome.runnable.DeleteStoredActionRunnable;
@@ -97,7 +95,7 @@ public class RESTService extends Service {
 
         if (!_networkController.IsNetworkAvailable()) {
             _logger.Warn("No network available!");
-            if (action.contains(ServerActions.SET_SOCKET)) {
+            if (action.contains(LucaServerAction.SET_SOCKET.toString())) {
                 storeAction(name, action, broadcast);
             }
             return Service.START_NOT_STICKY;
@@ -105,7 +103,7 @@ public class RESTService extends Service {
 
         if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
             _logger.Warn("No LucaHome network! ...");
-            if (action.contains(ServerActions.SET_SOCKET)) {
+            if (action.contains(LucaServerAction.SET_SOCKET.toString())) {
                 storeAction(name, action, broadcast);
             }
             return Service.START_NOT_STICKY;
@@ -134,11 +132,8 @@ public class RESTService extends Service {
         _logger.Debug("Url: " + url);
         String[] actions = new String[]{url};
 
-        LucaObject lucaObject = (LucaObject) bundle.getSerializable(Bundles.LUCA_OBJECT);
-        _logger.Debug(String.format(Locale.GERMAN, "LucaObject is: %s", lucaObject));
-
         SendActionTask task = new SendActionTask();
-        task.setValues(name, broadcast, lucaObject, actions.length);
+        task.setValues(name, broadcast, actions.length);
         task.execute(actions);
 
         if (_databaseController != null) {
@@ -149,7 +144,7 @@ public class RESTService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent arg0) {
+    public IBinder onBind(Intent intent) {
         return null;
     }
 
@@ -173,23 +168,20 @@ public class RESTService extends Service {
 
         private String _name;
         private String _broadcast;
-        private LucaObject _lucaObject;
 
         private String[] _answer;
 
         public void setValues(
                 String name,
                 String broadcast,
-                LucaObject lucaObject,
                 int answerSize) {
             _logger = new LucaHomeLogger(TAG);
 
             _name = name;
             _broadcast = broadcast;
-            _lucaObject = lucaObject;
             _answer = new String[answerSize];
 
-            _logger.Debug(String.format("SetValues: %s, %s, %s, %s", _name, _broadcast, _lucaObject, _answer));
+            _logger.Debug(String.format(Locale.getDefault(), "SetValues: %s, %s, %s", _name, _broadcast, _answer));
         }
 
         @Override
@@ -251,20 +243,17 @@ public class RESTService extends Service {
             // Hack for deactivating all sockets
             if (_name.contains("SHOW_NOTIFICATION_SOCKET")) {
                 BroadcastController broadcastController = new BroadcastController(RESTService.this);
-                broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION},
-                        new Object[]{MainServiceAction.DOWNLOAD_SOCKETS});
+                broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_SOCKETS);
             }
             // End hack
             else {
                 if (_broadcast != null && _broadcast.length() > 0) {
-                    _logger.Info(String.format(Locale.GERMAN,
+                    _logger.Info(String.format(Locale.getDefault(),
                             "Sending broadcast %s with bundle %s and data %s!",
                             _broadcast, _name, _answer));
                     Intent broadcastIntent = new Intent(_broadcast);
                     Bundle broadcastData = new Bundle();
                     broadcastData.putStringArray(_name, _answer);
-                    broadcastData.putSerializable(Bundles.LUCA_OBJECT, _lucaObject);
                     broadcastIntent.putExtras(broadcastData);
                     sendBroadcast(broadcastIntent);
                 } else {

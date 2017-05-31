@@ -11,9 +11,6 @@ import java.util.Locale;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.ServiceController;
 import guepardoapps.library.lucahome.controller.SocketController;
@@ -33,8 +30,7 @@ public class SocketActionService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_notificationReceiver onReceive");
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.DOWNLOAD_SOCKETS});
+            _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_SOCKETS);
             stopSelf();
         }
     };
@@ -51,11 +47,13 @@ public class SocketActionService extends Service {
 
         WirelessSocketDto socket = (WirelessSocketDto) intent.getExtras().getSerializable(Bundles.SOCKET_DATA);
         if (socket != null) {
-            _logger.Debug(String.format(Locale.GERMAN, "socket: %s", socket));
+            _logger.Debug(String.format(Locale.getDefault(), "socket: %s", socket));
 
             _receiverController.RegisterReceiver(_notificationReceiver, new String[]{socket.GetNotificationBroadcast()});
-            serviceController.StartRestService(socket.GetName(), socket.GetCommandSet(!socket.IsActivated()),
-                    socket.GetNotificationBroadcast(), LucaObject.WIRELESS_SOCKET, RaspberrySelection.BOTH);
+            serviceController.StartRestService(
+                    socket.GetName(),
+                    socket.GetCommandSet(!socket.IsActivated()),
+                    socket.GetNotificationBroadcast());
             socketController.CheckMedia(socket);
         }
 

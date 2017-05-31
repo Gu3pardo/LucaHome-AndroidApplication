@@ -4,7 +4,6 @@ import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.dto.ScheduleDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toolset.common.classes.SerializableList;
@@ -115,10 +114,10 @@ public final class JsonDataToScheduleConverter {
                     && data[6].contains("{OnOff:") && data[7].contains("{IsTimer:") && data[8].contains("{PlaySound:")
                     && data[9].contains("{Raspberry:") && data[10].contains("{State:")) {
 
-                String Name = data[0].replace("{Name:", "").replace("};", "");
+                String name = data[0].replace("{Name:", "").replace("};", "");
 
                 String socketName = data[1].replace("{Socket:", "").replace("};", "");
-                WirelessSocketDto socket = null;
+                WirelessSocketDto socket = new WirelessSocketDto();
                 for (int index = 0; index < socketList.getSize(); index++) {
                     if (socketList.getValue(index).GetName().contains(socketName)) {
                         socket = socketList.getValue(index);
@@ -145,16 +144,21 @@ public final class JsonDataToScheduleConverter {
                 String PlaySoundString = data[8].replace("{PlaySound:", "").replace("};", "");
                 boolean playSound = PlaySoundString.contains("1");
 
-                String PlayRaspberryString = data[9].replace("{Raspberry:", "").replace("};", "");
-                RaspberrySelection playRaspberry = RaspberrySelection.GetById(Integer.parseInt(PlayRaspberryString));
+                //String PlayRaspberryString = data[9].replace("{Raspberry:", "").replace("};", "");
 
                 String IsActiveString = data[10].replace("{State:", "").replace("};", "");
                 boolean isActive = IsActiveString.contains("1");
 
                 if (!isTimer) {
-                    ScheduleDto newValue = new ScheduleDto(Name, socket, weekday, time, action, isTimer, playSound,
-                            playRaspberry, isActive);
-                    _logger.Debug(String.format(Locale.GERMAN, "New ScheduleDto %s", newValue));
+                    ScheduleDto newValue = new ScheduleDto(
+                            name,
+                            socket,
+                            weekday,
+                            time,
+                            action,
+                            playSound,
+                            isActive);
+                    _logger.Debug(String.format(Locale.getDefault(), "New ScheduleDto %s", newValue));
 
                     return newValue;
                 } else {
@@ -169,7 +173,7 @@ public final class JsonDataToScheduleConverter {
             }
         }
 
-        _logger.Error(String.format("Data %s has an error! Size is %s", data, data.length));
+        _logger.Error(String.format(Locale.getDefault(), "Data %s has an error! Size is %s", data, data.length));
 
         return null;
     }

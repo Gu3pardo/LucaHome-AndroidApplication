@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -32,10 +31,11 @@ public class StoredActionListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public StoredActionListAdapter(@NonNull Context context,
-                                   @NonNull SerializableList<ActionDto> entryList,
-                                   @NonNull BroadcastController broadcastController,
-                                   @NonNull DatabaseController databaseController) {
+    public StoredActionListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<ActionDto> entryList,
+            @NonNull BroadcastController broadcastController,
+            @NonNull DatabaseController databaseController) {
         _logger = new LucaHomeLogger(TAG);
 
         _entryList = entryList;
@@ -79,9 +79,9 @@ public class StoredActionListAdapter extends BaseAdapter {
         holder._action.setText(entry.GetAction());
 
         holder._delete = (ImageButton) rowView.findViewById(R.id.stored_action_button_delete);
-        holder._delete.setOnClickListener(new OnClickListener() {
+        holder._delete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _delete button: " + entry.GetName());
                 _databaseController.DeleteAction(entry);
                 _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_SHOPPING_LIST_FROM_DB);

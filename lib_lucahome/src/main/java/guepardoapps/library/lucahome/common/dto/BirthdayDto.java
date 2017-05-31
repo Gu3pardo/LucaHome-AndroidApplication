@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 import guepardoapps.library.lucahome.common.constants.IDs;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.enums.BirthdayDateType;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 
 public class BirthdayDto implements Serializable {
 
@@ -125,7 +125,7 @@ public class BirthdayDto implements Serializable {
     }
 
     public String GetCommandAdd() {
-        return ServerActions.ADD_BIRTHDAY + String.valueOf(_id)
+        return LucaServerAction.ADD_BIRTHDAY.toString() + String.valueOf(_id)
                 + "&name=" + _name
                 + "&day=" + String.valueOf(_birthday.get(Calendar.DAY_OF_MONTH))
                 + "&month=" + String.valueOf(_birthday.get(Calendar.MONTH) + 1)
@@ -133,7 +133,7 @@ public class BirthdayDto implements Serializable {
     }
 
     public String GetCommandUpdate() {
-        return ServerActions.UPDATE_BIRTHDAY + String.valueOf(_id)
+        return LucaServerAction.UPDATE_BIRTHDAY.toString() + String.valueOf(_id)
                 + "&name=" + _name
                 + "&day=" + String.valueOf(_birthday.get(Calendar.DAY_OF_MONTH))
                 + "&month=" + String.valueOf(_birthday.get(Calendar.MONTH) + 1)
@@ -141,7 +141,7 @@ public class BirthdayDto implements Serializable {
     }
 
     public String GetCommandDelete() {
-        return ServerActions.DELETE_BIRTHDAY + String.valueOf(_id);
+        return LucaServerAction.DELETE_BIRTHDAY.toString() + String.valueOf(_id);
     }
 
     public String toString() {

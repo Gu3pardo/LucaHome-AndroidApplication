@@ -91,7 +91,7 @@ public final class JsonDataToMovieConverter {
                 String[] sockets = SocketString.split("\\|");
 
                 MovieDto newValue = new MovieDto(Title, Genre, Description, rating, watched, sockets);
-                _logger.Debug(String.format(Locale.GERMAN, "New MovieDto %s", newValue));
+                _logger.Debug(String.format(Locale.getDefault(), "New MovieDto %s", newValue));
 
                 return newValue;
             }

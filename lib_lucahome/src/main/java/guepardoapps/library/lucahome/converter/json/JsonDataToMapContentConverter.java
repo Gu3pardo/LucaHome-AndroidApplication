@@ -5,7 +5,7 @@ import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.dto.MapContentDto;
 import guepardoapps.library.lucahome.common.enums.DrawingType;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toolset.common.classes.SerializableList;
@@ -111,9 +111,7 @@ public final class JsonDataToMapContentConverter {
             if (data[0].length() == 0) {
                 _logger.Warn("Value at index 0 is null! Trying to fix...");
                 String[] fixedData = new String[7];
-                for (int index = 0; index < 7; index++) {
-                    fixedData[index] = data[index + 1];
-                }
+                System.arraycopy(data, 1, fixedData, 0, 7);
                 data = fixedData;
             }
         }
@@ -164,7 +162,7 @@ public final class JsonDataToMapContentConverter {
                     if (socket.contains("MediaMirror")) {
                         _logger.Debug("Socket contains MediaMirror!");
                         try {
-                            mediaMirrorIp = MediaMirrorSelection.GetBySocket(socket).GetIp();
+                            mediaMirrorIp = MediaServerSelection.GetBySocket(socket).GetIp();
                             _logger.Debug(String.format("Ip for %s is %s", socket, mediaMirrorIp));
                         } catch (Exception ex) {
                             _logger.Error(ex.toString());
@@ -175,9 +173,16 @@ public final class JsonDataToMapContentConverter {
 
                 boolean visibility = data[6].contains("1");
 
-                MapContentDto newValue = new MapContentDto(id, position, drawingType, scheduleList, socketList,
-                        temperatureString, mediaMirrorIp, visibility);
-                _logger.Debug(String.format(Locale.GERMAN, "New MapContentDto %s", newValue));
+                MapContentDto newValue = new MapContentDto(
+                        id,
+                        position,
+                        drawingType,
+                        scheduleList,
+                        socketList,
+                        temperatureString,
+                        mediaMirrorIp,
+                        visibility);
+                _logger.Debug(String.format(Locale.getDefault(), "New MapContentDto %s", newValue));
 
                 return newValue;
             } else {

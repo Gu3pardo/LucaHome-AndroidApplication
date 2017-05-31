@@ -10,13 +10,14 @@ import android.os.Bundle;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 import guepardoapps.library.lucahome.controller.ScheduleController;
 import guepardoapps.library.lucahome.controller.SocketController;
 
+import guepardoapps.library.lucahome.services.helper.MessageReceiveHelper;
 import guepardoapps.library.toolset.controller.BroadcastController;
 
 public class PhoneMessageListenerService extends WearableListenerService
@@ -90,30 +91,41 @@ public class PhoneMessageListenerService extends WearableListenerService
                         return;
                     }
 
-                    if (data[2].contains("BIRTHDAYS")) {
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                                Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_BIRTHDAYS);
-                    } else if (data[2].contains("MENU")) {
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                                Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_MENU);
-                    } else if (data[2].contains("MOVIES")) {
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                                Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_MOVIES);
-                    } else if (data[2].contains("MEDIAMIRROR")) {
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                                Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_MEDIAMIRROR);
-                    } else if (data[2].contains("SCHEDULES")) {
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                                Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_SCHEDULES);
-                    } else if (data[2].contains("SOCKETS")) {
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                                Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_SOCKETS);
-                    } else if (data[2].contains("SHOPPING_LIST")) {
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                                Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_SHOPPING_LIST);
-                    } else if (data[2].contains("TIMER")) {
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                                Bundles.MAIN_SERVICE_ACTION, MainServiceAction.GET_TIMER);
+                    if (data[2].contains(MessageReceiveHelper.BIRTHDAY_LIST)) {
+                        _broadcastController.SendSerializableBroadcast(
+                                Broadcasts.HOME_AUTOMATION_COMMAND,
+                                Bundles.HOME_AUTOMATION_ACTION,
+                                HomeAutomationAction.GET_BIRTHDAY_LIST);
+                    } else if (data[2].contains(MessageReceiveHelper.MENU_LIST)) {
+                        _broadcastController.SendSerializableBroadcast(
+                                Broadcasts.HOME_AUTOMATION_COMMAND,
+                                Bundles.HOME_AUTOMATION_ACTION,
+                                HomeAutomationAction.GET_MENU_LIST);
+                    } else if (data[2].contains(MessageReceiveHelper.MEDIA_MIRROR_DATA)) {
+                        _broadcastController.SendSerializableBroadcast(
+                                Broadcasts.HOME_AUTOMATION_COMMAND,
+                                Bundles.HOME_AUTOMATION_ACTION,
+                                HomeAutomationAction.GET_MEDIA_MIRROR_DATA);
+                    } else if (data[2].contains(MessageReceiveHelper.SCHEDULE_LIST)) {
+                        _broadcastController.SendSerializableBroadcast(
+                                Broadcasts.HOME_AUTOMATION_COMMAND,
+                                Bundles.HOME_AUTOMATION_ACTION,
+                                HomeAutomationAction.GET_SCHEDULE_LIST);
+                    } else if (data[2].contains(MessageReceiveHelper.SHOPPING_LIST)) {
+                        _broadcastController.SendSerializableBroadcast(
+                                Broadcasts.HOME_AUTOMATION_COMMAND,
+                                Bundles.HOME_AUTOMATION_ACTION,
+                                HomeAutomationAction.GET_SHOPPING_LIST);
+                    } else if (data[2].contains(MessageReceiveHelper.SOCKET_LIST)) {
+                        _broadcastController.SendSerializableBroadcast(
+                                Broadcasts.HOME_AUTOMATION_COMMAND,
+                                Bundles.HOME_AUTOMATION_ACTION,
+                                HomeAutomationAction.GET_SOCKET_LIST);
+                    } else if (data[2].contains(MessageReceiveHelper.TIMER_LIST)) {
+                        _broadcastController.SendSerializableBroadcast(
+                                Broadcasts.HOME_AUTOMATION_COMMAND,
+                                Bundles.HOME_AUTOMATION_ACTION,
+                                HomeAutomationAction.GET_TIMER_LIST);
                     } else {
                         _logger.Warn("data[2] not supported: " + data[2]);
                     }
@@ -123,23 +135,25 @@ public class PhoneMessageListenerService extends WearableListenerService
                         return;
                     }
 
-                    if (data[2].contains("SCHEDULE")) {
+                    if (data[2].contains(MessageReceiveHelper.SCHEDULE_LIST)) {
                         if (data[3] != null && data[4] != null) {
                             _scheduleController.SetSchedule(data[3], data[4].contains("1"));
                         } else {
                             _logger.Warn("data[3] or data[4] is null!");
                         }
-                    } else if (data[2].contains("SOCKET")) {
+                    } else if (data[2].contains(MessageReceiveHelper.SOCKET_LIST)) {
                         if (data[3] != null && data[4] != null) {
                             _socketController.SetSocket(data[3], data[4].contains("1"));
                         } else {
                             _logger.Warn("data[3] or data[4] is null!");
                         }
-                    } else if (data[2].contains("SHOPPING")) {
+                    } else if (data[2].contains(MessageReceiveHelper.SHOPPING_LIST)) {
                         if (data[3] != null && data[4] != null && data[5] != null) {
                             if (data[3].contains("BOUGHT")) {
-                                _broadcastController.SendStringBroadcast(Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST,
-                                        Bundles.SHOPPING_LIST, data[4] + ":" + data[5]);
+                                _broadcastController.SendStringBroadcast(
+                                        Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST,
+                                        Bundles.SHOPPING_LIST,
+                                        data[4] + ":" + data[5]);
                             } else {
                                 _logger.Error(String.format("Unknown command %s for shopping!", data[3]));
                             }
@@ -149,7 +163,7 @@ public class PhoneMessageListenerService extends WearableListenerService
                     } else {
                         _logger.Warn("data[2] not supported: " + data[2]);
                     }
-                } else if (data[1].contains("MEDIAMIRROR")) {
+                } else if (data[1].contains(MessageReceiveHelper.MEDIA_MIRROR_DATA)) {
                     if (data.length == 5) {
                         String serverIp = data[2];
                         String action = data[3];
@@ -157,34 +171,44 @@ public class PhoneMessageListenerService extends WearableListenerService
 
                         if (action.contains("YOUTUBE")) {
                             if (command.contains("PLAY")) {
-                                _mediaMirrorController.SendCommand(serverIp,
-                                        ServerAction.PLAY_YOUTUBE_VIDEO.toString(), "");
+                                _mediaMirrorController.SendCommand(
+                                        serverIp,
+                                        MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(),
+                                        "");
                                 _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MEDIAMIRROR);
                             } else if (command.contains("PAUSE")) {
-                                _mediaMirrorController.SendCommand(serverIp,
-                                        ServerAction.PAUSE_YOUTUBE_VIDEO.toString(), "");
+                                _mediaMirrorController.SendCommand(
+                                        serverIp,
+                                        MediaServerAction.PAUSE_YOUTUBE_VIDEO.toString(),
+                                        "");
                                 _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MEDIAMIRROR);
                             } else if (command.contains("STOP")) {
-                                _mediaMirrorController.SendCommand(serverIp,
-                                        ServerAction.STOP_YOUTUBE_VIDEO.toString(), "");
+                                _mediaMirrorController.SendCommand(
+                                        serverIp,
+                                        MediaServerAction.STOP_YOUTUBE_VIDEO.toString(),
+                                        "");
                                 _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MEDIAMIRROR);
                             } else {
-                                _logger.Warn("command not supported for mediamirror youtube: " + command);
+                                _logger.Warn("command not supported for mediaMirror youtube: " + command);
                             }
                         } else if (action.contains("VOLUME")) {
                             if (command.contains("INCREASE")) {
-                                _mediaMirrorController.SendCommand(serverIp,
-                                        ServerAction.INCREASE_VOLUME.toString(), "");
+                                _mediaMirrorController.SendCommand(
+                                        serverIp,
+                                        MediaServerAction.INCREASE_VOLUME.toString(),
+                                        "");
                                 _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MEDIAMIRROR);
                             } else if (command.contains("DECREASE")) {
-                                _mediaMirrorController.SendCommand(serverIp,
-                                        ServerAction.DECREASE_VOLUME.toString(), "");
+                                _mediaMirrorController.SendCommand(
+                                        serverIp,
+                                        MediaServerAction.DECREASE_VOLUME.toString(),
+                                        "");
                                 _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_MEDIAMIRROR);
                             } else {
-                                _logger.Warn("command not supported for mediamirror volume: " + command);
+                                _logger.Warn("command not supported for mediaMirror volume: " + command);
                             }
                         } else {
-                            _logger.Warn("action not supported for mediamirror: " + action);
+                            _logger.Warn("action not supported for mediaMirror: " + action);
                         }
                     } else {
                         _logger.Error("Invalid length of data for mediaMirror: " + String.valueOf(data.length));
@@ -201,7 +225,7 @@ public class PhoneMessageListenerService extends WearableListenerService
     }
 
     @Override
-    public void onConnected(Bundle arg0) {
+    public void onConnected(Bundle bundle) {
         _logger.Debug("onConnected");
         Wearable.MessageApi.addListener(_apiClient, this);
     }

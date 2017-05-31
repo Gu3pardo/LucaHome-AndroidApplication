@@ -11,7 +11,7 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.IDs;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 
@@ -38,21 +38,23 @@ public class HeatingReceiver extends BroadcastReceiver {
         LucaNotificationController lucaNotificationController = new LucaNotificationController(context);
         lucaNotificationController.CloseNotification(IDs.NOTIFICATION_SLEEP);
 
-        MainServiceAction mainServiceAction = MainServiceAction.NULL;
+        HomeAutomationAction homeAutomationAction = HomeAutomationAction.NULL;
 
         if (action.contains(LucaNotificationController.HEATING_AND_SOUND)) {
-            mainServiceAction = MainServiceAction.ENABLE_HEATING_AND_SOUND;
+            homeAutomationAction = HomeAutomationAction.ENABLE_HEATING_AND_SOUND;
         } else if (action.contains(LucaNotificationController.HEATING_SINGLE)) {
-            mainServiceAction = MainServiceAction.ENABLE_HEATING;
+            homeAutomationAction = HomeAutomationAction.ENABLE_HEATING;
         } else if (action.contains(LucaNotificationController.SOUND_SINGLE)) {
-            mainServiceAction = MainServiceAction.ENABLE_SEA_SOUND;
+            homeAutomationAction = HomeAutomationAction.ENABLE_SEA_SOUND;
         } else {
             logger.Error("Action contains errors: " + action);
             Toasty.error(context, "Action contains errors: " + action, Toast.LENGTH_LONG).show();
         }
 
         BroadcastController broadcastController = new BroadcastController(context);
-        broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{mainServiceAction});
+        broadcastController.SendSerializableArrayBroadcast(
+                Broadcasts.HOME_AUTOMATION_COMMAND,
+                new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                new Object[]{homeAutomationAction});
     }
 }

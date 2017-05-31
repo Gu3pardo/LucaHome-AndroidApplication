@@ -83,15 +83,14 @@ public class ShoppingListView extends Activity {
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.basicListWatchViewStub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                _listView = (ListView) stub.findViewById(R.id.basicListView);
+            public void onLayoutInflated(WatchViewStub watchViewStub) {
+                _listView = (ListView) watchViewStub.findViewById(R.id.basicListView);
                 _listAdapter = new ShoppingListAdapter(_context, _itemList, true, PhoneMessageService.class);
                 _listView.setAdapter(_listAdapter);
-                _noDataHintView = (TextView) stub.findViewById(R.id.noDataTextView);
+                _noDataHintView = (TextView) watchViewStub.findViewById(R.id.noDataTextView);
 
                 if (!_isInitialized) {
-                    _receiverController.RegisterReceiver(_updateReceiver,
-                            new String[]{Broadcasts.UPDATE_SHOPPING_LIST});
+                    _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_SHOPPING_LIST});
                     _messageSendHelper.SendMessage(COMMAND);
                     _isInitialized = true;
                 }

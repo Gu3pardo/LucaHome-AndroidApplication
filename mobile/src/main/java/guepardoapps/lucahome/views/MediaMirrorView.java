@@ -29,7 +29,7 @@ public class MediaMirrorView extends Activity {
     private BottomViewController _bottomViewController;
     private RssViewController _rssViewController;
     private ScreenViewController _screenViewController;
-    private SelectionController _selectionController;
+    private SelectionViewController _selectionViewController;
     private TextViewController _textViewController;
     private TopViewController _topViewController;
     private UpdateViewController _updateViewController;
@@ -57,7 +57,7 @@ public class MediaMirrorView extends Activity {
         _bottomViewController = new BottomViewController(this);
         _rssViewController = new RssViewController(this);
         _screenViewController = new ScreenViewController(this);
-        _selectionController = new SelectionController(this);
+        _selectionViewController = new SelectionViewController(this);
         _textViewController = new TextViewController(this);
         _topViewController = new TopViewController(this);
         _updateViewController = new UpdateViewController(this);
@@ -67,7 +67,7 @@ public class MediaMirrorView extends Activity {
         _bottomViewController.onCreate();
         _rssViewController.onCreate();
         _screenViewController.onCreate();
-        _selectionController.onCreate();
+        _selectionViewController.onCreate();
         _textViewController.onCreate();
         _topViewController.onCreate();
         _updateViewController.onCreate();
@@ -83,7 +83,7 @@ public class MediaMirrorView extends Activity {
         _bottomViewController.onResume();
         _rssViewController.onResume();
         _screenViewController.onResume();
-        _selectionController.onResume();
+        _selectionViewController.onResume();
         _textViewController.onResume();
         _topViewController.onResume();
         _updateViewController.onResume();
@@ -98,7 +98,7 @@ public class MediaMirrorView extends Activity {
         _bottomViewController.onPause();
         _rssViewController.onPause();
         _screenViewController.onPause();
-        _selectionController.onPause();
+        _selectionViewController.onPause();
         _textViewController.onPause();
         _topViewController.onPause();
         _updateViewController.onPause();
@@ -115,7 +115,7 @@ public class MediaMirrorView extends Activity {
         _bottomViewController.onDestroy();
         _rssViewController.onDestroy();
         _screenViewController.onDestroy();
-        _selectionController.onDestroy();
+        _selectionViewController.onDestroy();
         _textViewController.onDestroy();
         _topViewController.onDestroy();
         _updateViewController.onDestroy();

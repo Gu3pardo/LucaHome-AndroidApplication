@@ -8,7 +8,7 @@ import java.util.Locale;
 import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Constants;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.converter.BooleanToSocketStateConverter;
 
 public class WirelessSocketDto implements Serializable {
@@ -113,20 +113,20 @@ public class WirelessSocketDto implements Serializable {
     }
 
     public String GetCommandSet(boolean newState) {
-        return ServerActions.SET_SOCKET + _name + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF);
+        return LucaServerAction.SET_SOCKET.toString() + _name + ((newState) ? Constants.STATE_ON : Constants.STATE_OFF);
     }
 
     public String GetCommandAdd() {
-        return ServerActions.ADD_SOCKET + _name + "&area=" + _area + "&code=" + _code;
+        return LucaServerAction.ADD_SOCKET.toString() + _name + "&area=" + _area + "&code=" + _code;
     }
 
     public String GetCommandUpdate() {
-        return ServerActions.UPDATE_SOCKET + _name + "&area=" + _area + "&code=" + _code + "&isactivated="
+        return LucaServerAction.UPDATE_SOCKET.toString() + _name + "&area=" + _area + "&code=" + _code + "&isactivated="
                 + String.valueOf(_isActivated);
     }
 
     public String GetCommandDelete() {
-        return ServerActions.DELETE_SOCKET + _name;
+        return LucaServerAction.DELETE_SOCKET.toString() + _name;
     }
 
     public String GetCommandWear() {

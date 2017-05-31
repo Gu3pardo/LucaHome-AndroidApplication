@@ -12,11 +12,11 @@ import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.controller.ServiceController;
 
+import guepardoapps.library.lucahome.services.helper.MessageReceiveHelper;
 import guepardoapps.library.toolset.controller.AndroidSystemController;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.DialogController;
@@ -29,8 +29,6 @@ public class BootReceiver extends BroadcastReceiver {
 
     private static final String TAG = BootReceiver.class.getSimpleName();
     private LucaHomeLogger _logger;
-
-    private static final String WIFI = "Wifi:";
 
     private Context _context;
 
@@ -92,22 +90,21 @@ public class BootReceiver extends BroadcastReceiver {
         if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
             _logger.Debug("We are in the homeNetwork!");
             if (_androidSystemController.IsServiceRunning(MainService.class)) {
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.DOWNLOAD_ALL});
+                _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_ALL);
             } else {
                 Intent startMainService = new Intent(_context, MainService.class);
                 Bundle mainServiceBundle = new Bundle();
-                mainServiceBundle.putSerializable(Bundles.MAIN_SERVICE_ACTION, MainServiceAction.BOOT);
+                mainServiceBundle.putSerializable(Bundles.ACTION, MainService.MainServiceAction.BOOT);
                 startMainService.putExtras(mainServiceBundle);
                 _context.startService(startMainService);
             }
-            _serviceController.SendMessageToWear(WIFI + "HOME");
+            _serviceController.SendMessageToWear(MessageReceiveHelper.WIFI + "HOME");
         } else {
             _logger.Warn("We are NOT in the homeNetwork!");
 
             _notificationController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
             _notificationController.CloseNotification(IDs.NOTIFICATION_WEAR);
-            _serviceController.SendMessageToWear(WIFI + "NO");
+            _serviceController.SendMessageToWear(MessageReceiveHelper.WIFI + "NO");
 
             if (_checkConnectionEnabled) {
                 Handler checkConnectionHandler = new Handler();

@@ -25,7 +25,7 @@ public class AirPressureDto implements Serializable {
     }
 
     public String GetAirPressureString() {
-        return String.format(Locale.GERMAN, "%.2fmBar", _airPressure);
+        return String.format(Locale.getDefault(), "%.2fmBar", _airPressure);
     }
 
     public String GetArea() {

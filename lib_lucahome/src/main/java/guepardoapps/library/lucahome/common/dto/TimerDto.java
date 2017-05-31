@@ -2,7 +2,7 @@ package guepardoapps.library.lucahome.common.dto;
 
 import android.support.annotation.NonNull;
 
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.converter.BooleanToScheduleStateConverter;
 
 import guepardoapps.library.toolset.common.classes.SerializableTime;
@@ -21,9 +21,8 @@ public class TimerDto extends ScheduleDto {
             @NonNull SerializableTime time,
             boolean action,
             boolean playSound,
-            @NonNull RaspberrySelection playRaspberry,
             boolean isActive) {
-        super(name, socket, weekday, time, action, true, playSound, playRaspberry, isActive);
+        super(name, socket, weekday, time, action, playSound, isActive);
     }
 
     public TimerDto(
@@ -35,6 +34,35 @@ public class TimerDto extends ScheduleDto {
     }
 
     @Override
+    public String GetCommandAdd() {
+        return LucaServerAction.ADD_SCHEDULE.toString() + _name
+                + "&socket=" + _socket.GetName()
+                + "&gpio=" + ""
+                + "&weekday=" + String.valueOf(_weekday.GetInt())
+                + "&hour=" + String.valueOf(_time.Hour())
+                + "&minute=" + String.valueOf(_time.Minute())
+                + "&onoff=" + (_action ? "1" : "0")
+                + "&isTimer=1"
+                + "&playSound=" + (_playSound ? "1" : "0")
+                + "&playRaspberry=1";
+    }
+
+    @Override
+    public String GetCommandUpdate() {
+        return LucaServerAction.UPDATE_SCHEDULE.toString() + _name
+                + "&socket=" + _socket.GetName()
+                + "&gpio=" + ""
+                + "&weekday=" + String.valueOf(_weekday.GetInt())
+                + "&hour=" + String.valueOf(_time.Hour())
+                + "&minute=" + String.valueOf(_time.Minute())
+                + "&onoff=" + (_action ? "1" : "0")
+                + "&isTimer=1"
+                + "&playSound=" + (_playSound ? "1" : "0")
+                + "&playRaspberry=1"
+                + "&isactive=" + String.valueOf(_isActive);
+    }
+
+    @Override
     public String toString() {
         return "{" + TAG
                 + ": {Name: " + _name
@@ -42,10 +70,8 @@ public class TimerDto extends ScheduleDto {
                 + "};{Weekday: " + _weekday.toString()
                 + "};{Time: " + _time.toString()
                 + "};{Action: " + String.valueOf(_action)
-                + "};{isTimer: " + String.valueOf(_isTimer)
                 + "};{playSound: " + String.valueOf(_playSound)
-                + "};{playRaspberry: " + _playRaspberry.toString()
                 + "};{IsActive: " + BooleanToScheduleStateConverter.GetStringOfBoolean(_isActive)
-                + "};{DeleteBroadcastReceiverString: " + _deleteBroadcastReceiverString + "}}";
+                + "}}";
     }
 }

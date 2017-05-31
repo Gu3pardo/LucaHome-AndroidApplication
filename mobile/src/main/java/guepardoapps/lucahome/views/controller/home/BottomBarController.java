@@ -5,13 +5,14 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
 
+import es.dmoral.toasty.Toasty;
 import guepardoapps.library.lucahome.common.dto.UserDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
@@ -78,7 +79,7 @@ public class BottomBarController {
 
         Button buttonVersionInformation = (Button) ((Activity) _context).findViewById(R.id.buttonVersionInformation);
         buttonVersionInformation.setText(version);
-        buttonVersionInformation.setOnClickListener(new OnClickListener() {
+        buttonVersionInformation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _navigationService.NavigateTo(InformationView.class, true);
@@ -90,7 +91,7 @@ public class BottomBarController {
         _logger.Debug("initializeImageButton");
 
         ImageButton imageButtonChanges = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonChanges);
-        imageButtonChanges.setOnClickListener(new OnClickListener() {
+        imageButtonChanges.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _navigationService.NavigateTo(ChangeView.class, true);
@@ -98,16 +99,23 @@ public class BottomBarController {
         });
 
         ImageButton imageButtonUser = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonUser);
-        imageButtonUser.setOnClickListener(new OnClickListener() {
+        imageButtonUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 UserDto user = _userService.LoadUser();
+
+                if (user == null) {
+                    _logger.Error("Loaded user is null!");
+                    Toasty.error(_context, "Loaded user is null!", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 _dialogController.ShowUserDetailsDialog(user);
             }
         });
 
         ImageButton imageButtonSettings = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonSettings);
-        imageButtonSettings.setOnClickListener(new OnClickListener() {
+        imageButtonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _navigationService.NavigateTo(SettingsView.class, true);
@@ -115,7 +123,7 @@ public class BottomBarController {
         });
 
         ImageButton imageButtonAbout = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonAbout);
-        imageButtonAbout.setOnClickListener(new OnClickListener() {
+        imageButtonAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 new LibsBuilder()

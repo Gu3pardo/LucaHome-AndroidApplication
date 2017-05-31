@@ -5,7 +5,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageButton;
@@ -32,8 +31,9 @@ public class TemperatureListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public TemperatureListAdapter(@NonNull Context context,
-                                  @NonNull SerializableList<TemperatureDto> temperatureList) {
+    public TemperatureListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<TemperatureDto> temperatureList) {
         _logger = new LucaHomeLogger(TAG);
 
         _temperatureList = temperatureList;
@@ -94,9 +94,9 @@ public class TemperatureListAdapter extends BaseAdapter {
         holder._sensorPath.setText(_temperatureList.getValue(index).GetSensorPath());
 
         holder._reloadTemperature = (ImageButton) rowView.findViewById(R.id.temperature_item_reload);
-        holder._reloadTemperature.setOnClickListener(new OnClickListener() {
+        holder._reloadTemperature.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _reloadTemperature: " + _temperatureList.toString());
                 _temperatureController.ReloadTemperature(_temperatureList.getValue(index));
             }
@@ -107,9 +107,9 @@ public class TemperatureListAdapter extends BaseAdapter {
         }
 
         holder._graphTemperature = (ImageButton) rowView.findViewById(R.id.temperature_item_graph);
-        holder._graphTemperature.setOnClickListener(new OnClickListener() {
+        holder._graphTemperature.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _graphTemperature: " + _temperatureList.toString());
                 _dialogController.ShowTemperatureGraphDialog(_temperatureList.getValue(index).GetGraphPath());
             }

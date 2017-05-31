@@ -100,7 +100,7 @@ public final class JsonDataToChangeConverter {
                 String user = data[6].replace("{User:", "").replace("};", "");
 
                 ChangeDto newValue = new ChangeDto(type, date, time, user);
-                _logger.Debug(String.format(Locale.GERMAN, "New ChangeDto %s", newValue));
+                _logger.Debug(String.format(Locale.getDefault(), "New ChangeDto %s", newValue));
 
                 return newValue;
             }

@@ -10,6 +10,7 @@ import android.view.Display;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.TemperatureDto;
+import guepardoapps.library.lucahome.common.enums.TemperatureType;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toolset.common.Tools;
@@ -79,7 +80,7 @@ public class TemperatureViewController {
 
         _display = new DisplayController(context).GetDisplayDimension();
 
-        _raspberryTemperature = new TemperatureDto(18.9, "Workspace Jonas", null, "", null, "");
+        _raspberryTemperature = new TemperatureDto(18.9, "Workspace Jonas", null, "", TemperatureType.NULL, "");
     }
 
     public void onDestroy() {

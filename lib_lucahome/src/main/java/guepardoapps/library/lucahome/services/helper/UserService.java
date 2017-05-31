@@ -4,13 +4,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.UserDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.RESTService;
 
@@ -45,7 +45,7 @@ public class UserService {
                         _userValidated = false;
                         break;
                     } else {
-                        answer = answer.replace(ServerActions.VALIDATE_USER, "").replace(":", "");
+                        answer = answer.replace(LucaServerAction.VALIDATE_USER.toString(), "").replace(":", "");
                         if (answer.length() == 1 && answer.contains("1")) {
                             _userValidated &= true;
                         } else {
@@ -62,7 +62,7 @@ public class UserService {
         }
     };
 
-    public UserService(Context context) {
+    public UserService(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
 
         _userValidated = true;
@@ -83,7 +83,9 @@ public class UserService {
         return null;
     }
 
-    public void ValidateUser(UserDto user, Runnable callback) {
+    public void ValidateUser(
+            @NonNull UserDto user,
+            Runnable callback) {
         _receiverController.RegisterReceiver(_receiver, new String[]{Broadcasts.VALIDATE_USER});
 
         if (callback != null) {
@@ -96,10 +98,9 @@ public class UserService {
         serviceData.putString(Bundles.USER, user.GetUserName());
         serviceData.putString(Bundles.PASSPHRASE, user.GetPassword());
 
-        serviceData.putString(Bundles.ACTION, ServerActions.VALIDATE_USER);
+        serviceData.putString(Bundles.ACTION, LucaServerAction.VALIDATE_USER.toString());
         serviceData.putString(Bundles.NAME, Bundles.VALIDATE_USER);
         serviceData.putString(Bundles.BROADCAST, Broadcasts.VALIDATE_USER);
-        serviceData.putSerializable(Bundles.LUCA_OBJECT, LucaObject.USER);
 
         serviceIntent.putExtras(serviceData);
 

@@ -10,6 +10,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -52,12 +53,12 @@ public class PhoneMessageService extends Service implements GoogleApiClient.Conn
     }
 
     @Override
-    public IBinder onBind(Intent arg0) {
+    public IBinder onBind(Intent intent) {
         return null;
     }
 
     @Override
-    public void onConnected(Bundle arg0) {
+    public void onConnected(Bundle bundle) {
         _logger.Debug("onConnected");
     }
 
@@ -78,7 +79,9 @@ public class PhoneMessageService extends Service implements GoogleApiClient.Conn
         _apiClient.connect();
     }
 
-    private void sendMessage(final String path, final String text) {
+    private void sendMessage(
+            @NonNull final String path,
+            @NonNull final String text) {
         new Thread(new Runnable() {
             @Override
             public void run() {

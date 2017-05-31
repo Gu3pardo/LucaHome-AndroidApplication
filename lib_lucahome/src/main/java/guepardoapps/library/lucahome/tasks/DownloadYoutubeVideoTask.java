@@ -78,11 +78,6 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
         _sendFirstEntry = sendFirstEntry;
     }
 
-    public void SetLoadingVideosDialog(@NonNull ProgressDialog loadingVideosDialog) {
-        _logger.Debug("SetLoadingVideosDialog");
-        _loadingVideosDialog = loadingVideosDialog;
-    }
-
     @Override
     protected String doInBackground(String... urls) {
         _logger.Debug("doInBackground");

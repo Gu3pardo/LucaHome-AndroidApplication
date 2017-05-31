@@ -19,16 +19,16 @@ import de.mateware.snacky.Snacky;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 import guepardoapps.lucahome.R;
 
-public class SelectionController {
+public class SelectionViewController {
 
-    private static final String TAG = SelectionController.class.getSimpleName();
+    private static final String TAG = SelectionViewController.class.getSimpleName();
     private LucaHomeLogger _logger;
 
     private Context _context;
@@ -45,8 +45,8 @@ public class SelectionController {
         public void run() {
             if (_mediaMirrorViewDto != null) {
                 _mediaMirrorController.SendCommand(
-                        _mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
                         "");
             }
         }
@@ -77,7 +77,7 @@ public class SelectionController {
         }
     };
 
-    public SelectionController(@NonNull Context context) {
+    public SelectionViewController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _context = context;
         _mediaMirrorController = new MediaMirrorController(_context);
@@ -90,7 +90,7 @@ public class SelectionController {
 
         Spinner mediaMirrorSelectionSpinner = (Spinner) ((Activity) _context).findViewById(R.id.mediaMirrorSelectionSpinner);
         final ArrayList<String> serverLocations = new ArrayList<>();
-        for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+        for (MediaServerSelection entry : MediaServerSelection.values()) {
             if (entry.GetId() > 0) {
                 serverLocations.add(entry.GetLocation());
             }
@@ -107,8 +107,8 @@ public class SelectionController {
                 String selectedLocation = serverLocations.get(position);
                 _logger.Debug(String.format("Selected location %s", selectedLocation));
 
-                String selectedIp = MediaMirrorSelection.GetByLocation(selectedLocation).GetIp();
-                _mediaMirrorController.SendCommand(selectedIp, ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                String selectedIp = MediaServerSelection.GetByLocation(selectedLocation).GetIp();
+                _mediaMirrorController.SendCommand(selectedIp, MediaServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
             }
 
             @Override

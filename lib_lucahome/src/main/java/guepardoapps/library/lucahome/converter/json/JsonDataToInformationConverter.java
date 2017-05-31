@@ -62,7 +62,7 @@ public final class JsonDataToInformationConverter {
                         InformationDto newValue = new InformationDto(Author, Company, Contact, Build_Date,
                                 Server_Version, Website_Version, Temperature_Log_Version, Android_App_Version,
                                 Android_Wear_Version, Android_Access_Version, Media_Server_Version);
-                        _logger.Debug(String.format(Locale.GERMAN, "New InformationDto %s", newValue));
+                        _logger.Debug(String.format(Locale.getDefault(), "New InformationDto %s", newValue));
 
                         return newValue;
                     }

@@ -14,7 +14,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -33,7 +32,7 @@ import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.ScheduleDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.customadapter.ScheduleListAdapter;
@@ -79,8 +78,10 @@ public class ScheduleView extends AppCompatActivity {
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_SCHEDULES});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.GET_SCHEDULE_LIST});
         }
     };
 
@@ -105,7 +106,7 @@ public class ScheduleView extends AppCompatActivity {
                     _noDataFallback.setVisibility(View.VISIBLE);
                 }
 
-                _collapsingToolbar.setTitle(String.format(Locale.GERMAN, "%d schedules", list.getSize()));
+                _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d schedules", list.getSize()));
             }
 
             _pullRefreshLayout.setRefreshing(false);
@@ -151,14 +152,14 @@ public class ScheduleView extends AppCompatActivity {
         carouselView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                _logger.Info(String.format(Locale.GERMAN,
+                _logger.Info(String.format(Locale.getDefault(),
                         "onPageScrolled at position %d with positionOffset %f and positionOffsetPixels %d",
                         position, positionOffset, positionOffsetPixels));
             }
 
             @Override
             public void onPageSelected(int position) {
-                _logger.Info(String.format(Locale.GERMAN, "onPageSelected at position %d", position));
+                _logger.Info(String.format(Locale.getDefault(), "onPageSelected at position %d", position));
                 Class<?> targetActivity = _activities[position];
                 if (targetActivity != null) {
                     _navigationService.NavigateTo(targetActivity, true);
@@ -167,14 +168,14 @@ public class ScheduleView extends AppCompatActivity {
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                _logger.Info(String.format(Locale.GERMAN, "onPageScrollStateChanged at state %d", state));
+                _logger.Info(String.format(Locale.getDefault(), "onPageScrollStateChanged at state %d", state));
             }
         });
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);
-        buttonAdd.setOnClickListener(new OnClickListener() {
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _buttonAdd");
                 if (_socketList != null) {
                     _dialogController.ShowAddScheduleDialog((Activity) _context, _getDataRunnable, _socketList, null, true);

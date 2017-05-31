@@ -6,8 +6,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -35,10 +33,11 @@ public class TimerListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public TimerListAdapter(@NonNull Context context,
-                            @NonNull SerializableList<TimerDto> timerList,
-                            SerializableList<WirelessSocketDto> socketList,
-                            boolean isOnWear) {
+    public TimerListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<TimerDto> timerList,
+            SerializableList<WirelessSocketDto> socketList,
+            boolean isOnWear) {
         _logger = new LucaHomeLogger(TAG);
 
         _timerList = timerList;
@@ -97,9 +96,9 @@ public class TimerListAdapter extends BaseAdapter {
 
         holder._name = (Button) rowView.findViewById(R.id.timer_item_name);
         holder._name.setText(_timerList.getValue(index).GetName());
-        holder._name.setOnLongClickListener(new OnLongClickListener() {
+        holder._name.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View arg0) {
+            public boolean onLongClick(View view) {
                 _logger.Debug("onLongClick _name button: " + _timerList.getValue(index).GetName());
                 if (!_isOnWear) {
                     _dialogController.ShowUpdateTimerDialog(_timerList.getValue(index));
@@ -135,9 +134,9 @@ public class TimerListAdapter extends BaseAdapter {
 
         holder._delete = (Button) rowView.findViewById(R.id.timer_item_delete);
         holder._delete.setText(_timerList.getValue(index).GetIsActiveString());
-        holder._delete.setOnClickListener(new OnClickListener() {
+        holder._delete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _delete button: " + _timerList.getValue(index).GetName());
                 if (!_isOnWear) {
                     _timerController.Delete(_timerList.getValue(index));

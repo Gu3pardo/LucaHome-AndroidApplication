@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 public class MessageToMediaMirrorConverter {
@@ -13,16 +13,16 @@ public class MessageToMediaMirrorConverter {
     private static final String TAG = MessageToMediaMirrorConverter.class.getSimpleName();
     private LucaHomeLogger _logger;
 
-    private static final String MEDIAMIRROR = "MediaMirror:";
+    private static final String MEDIA_MIRROR = "MediaMirror:";
 
     public MessageToMediaMirrorConverter() {
         _logger = new LucaHomeLogger(TAG);
     }
 
     public ArrayList<MediaMirrorViewDto> ConvertMessageToList(@NonNull String message) {
-        if (message.startsWith(MEDIAMIRROR)) {
-            _logger.Debug("message starts with " + MEDIAMIRROR + "! replacing!");
-            message = message.replace(MEDIAMIRROR, "");
+        if (message.startsWith(MEDIA_MIRROR)) {
+            _logger.Debug("message starts with " + MEDIA_MIRROR + "! replacing!");
+            message = message.replace(MEDIA_MIRROR, "");
         }
         _logger.Debug("message: " + message);
 
@@ -34,8 +34,8 @@ public class MessageToMediaMirrorConverter {
 
                 if (data.length == 5) {
                     if (data[0] != null && data[1] != null && data[2] != null && data[3] != null && data[4] != null) {
-                        MediaMirrorSelection selection = MediaMirrorSelection.GetByIp(data[0]);
-                        if (selection == MediaMirrorSelection.NULL) {
+                        MediaServerSelection selection = MediaServerSelection.GetByIp(data[0]);
+                        if (selection == MediaServerSelection.NULL) {
                             continue;
                         }
 

@@ -19,8 +19,9 @@ public class AirPressureListAdapter extends BaseAdapter {
     private SerializableList<AirPressureDto> _airPressureList;
     private static LayoutInflater _inflater = null;
 
-    public AirPressureListAdapter(@NonNull Context context,
-                                  @NonNull SerializableList<AirPressureDto> airPressureList) {
+    public AirPressureListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<AirPressureDto> airPressureList) {
         _airPressureList = airPressureList;
         _inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }

@@ -11,11 +11,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -32,7 +30,7 @@ import guepardoapps.library.lucahome.common.constants.IDs;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.ActionDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.DatabaseController;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
@@ -158,12 +156,13 @@ public class SettingsView extends Activity {
         if (!_isInitialized) {
             if (_receiverController != null) {
                 _isInitialized = true;
-                _receiverController.RegisterReceiver(_updateSocketListCheckBoxViewReceiver,
-                        new String[]{Broadcasts.UPDATE_SOCKET});
-                _receiverController.RegisterReceiver(_reloadStoredActionsFromDB, new String[]{
-                        guepardoapps.library.lucahome.common.constants.Broadcasts.RELOAD_SHOPPING_LIST_FROM_DB});
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_SOCKETS});
+                _receiverController.RegisterReceiver(_updateSocketListCheckBoxViewReceiver, new String[]{Broadcasts.UPDATE_SOCKET_LIST});
+                _receiverController.RegisterReceiver(_reloadStoredActionsFromDB, new String[]{Broadcasts.RELOAD_SHOPPING_LIST_FROM_DB});
+
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.HOME_AUTOMATION_COMMAND,
+                        new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                        new Object[]{HomeAutomationAction.GET_SOCKET_LIST});
             }
         }
     }
@@ -197,18 +196,20 @@ public class SettingsView extends Activity {
         Switch displayNotification = (Switch) findViewById(R.id.switch_display_socket_notification);
         displayNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION));
-        displayNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        displayNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION, isChecked);
                 if (isChecked) {
                     _socketLayout.setVisibility(View.VISIBLE);
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                            new String[]{Bundles.MAIN_SERVICE_ACTION},
-                            new Object[]{MainServiceAction.GET_SOCKETS});
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                            new String[]{Bundles.MAIN_SERVICE_ACTION},
-                            new Object[]{MainServiceAction.SHOW_NOTIFICATION_SOCKET});
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            Broadcasts.HOME_AUTOMATION_COMMAND,
+                            new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                            new Object[]{HomeAutomationAction.GET_SOCKET_LIST});
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            Broadcasts.HOME_AUTOMATION_COMMAND,
+                            new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                            new Object[]{HomeAutomationAction.SHOW_NOTIFICATION_SOCKET});
                 } else {
                     _socketLayout.setVisibility(View.GONE);
                     _notificationController.CloseNotification(IDs.NOTIFICATION_WEAR);
@@ -219,14 +220,15 @@ public class SettingsView extends Activity {
         Switch weatherNotification = (Switch) findViewById(R.id.switch_display_weather_notification);
         weatherNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION));
-        weatherNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        weatherNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION, isChecked);
                 if (isChecked) {
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                            new String[]{Bundles.MAIN_SERVICE_ACTION},
-                            new Object[]{MainServiceAction.SHOW_NOTIFICATION_WEATHER});
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            Broadcasts.HOME_AUTOMATION_COMMAND,
+                            new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                            new Object[]{HomeAutomationAction.SHOW_NOTIFICATION_WEATHER});
                 } else {
                     _notificationController.CloseNotification(OWIds.FORECAST_NOTIFICATION_ID);
                 }
@@ -236,14 +238,15 @@ public class SettingsView extends Activity {
         Switch temperatureNotification = (Switch) findViewById(R.id.switch_display_temperature_notification);
         temperatureNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION));
-        temperatureNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        temperatureNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION, isChecked);
                 if (isChecked) {
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                            new String[]{Bundles.MAIN_SERVICE_ACTION},
-                            new Object[]{MainServiceAction.SHOW_NOTIFICATION_TEMPERATURE});
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            Broadcasts.HOME_AUTOMATION_COMMAND,
+                            new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                            new Object[]{HomeAutomationAction.SHOW_NOTIFICATION_TEMPERATURE});
                 } else {
                     _notificationController.CloseNotification(IDs.NOTIFICATION_TEMPERATURE);
                 }
@@ -253,7 +256,7 @@ public class SettingsView extends Activity {
         Switch birthdayNotification = (Switch) findViewById(R.id.switch_display_birthday_notification);
         birthdayNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION));
-        birthdayNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        birthdayNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION, isChecked);
@@ -268,7 +271,7 @@ public class SettingsView extends Activity {
         Switch sleepNotification = (Switch) findViewById(R.id.switch_display_sleep_notification);
         sleepNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION));
-        sleepNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        sleepNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION, isChecked);
@@ -302,26 +305,27 @@ public class SettingsView extends Activity {
         Switch cameraNotification = (Switch) findViewById(R.id.switch_display_camera_notification);
         cameraNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_CAMERA_NOTIFICATION));
-        cameraNotification.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        cameraNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_CAMERA_NOTIFICATION, isChecked);
                 if (isChecked) {
                     // TODO check if camera is active
+                    _logger.Warn("Implement check for active camera in settings!");
                 } else {
                     _notificationController.CloseNotification(IDs.NOTIFICATION_CAMERA);
                 }
             }
         });
+
         // TODO show after above TODO is done!
         cameraNotification.setVisibility(View.GONE);
     }
 
     private void initializeAppCheckboxes() {
         CheckBox audioStart = (CheckBox) findViewById(R.id.startAudioAppCheckbox);
-        audioStart.setChecked(
-                _sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.START_AUDIO_APP));
-        audioStart.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        audioStart.setChecked(_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.START_AUDIO_APP));
+        audioStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_AUDIO_APP, isChecked);
@@ -329,9 +333,8 @@ public class SettingsView extends Activity {
         });
 
         CheckBox osmcStart = (CheckBox) findViewById(R.id.startOsmcAppCheckbox);
-        osmcStart.setChecked(
-                _sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.START_OSMC_APP));
-        osmcStart.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        osmcStart.setChecked(_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.START_OSMC_APP));
+        osmcStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_OSMC_APP, isChecked);
@@ -341,20 +344,21 @@ public class SettingsView extends Activity {
 
     private void initializeBeaconCheckbox() {
         CheckBox beaconActivate = (CheckBox) findViewById(R.id.startBeaconsCheckbox);
-        beaconActivate.setChecked(
-                _sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USE_BEACONS));
-        beaconActivate.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        beaconActivate.setChecked(_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USE_BEACONS));
+        beaconActivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _sharedPrefController.SaveBooleanValue(SharedPrefConstants.USE_BEACONS, isChecked);
                 if (isChecked) {
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                            new String[]{Bundles.MAIN_SERVICE_ACTION},
-                            new Object[]{MainServiceAction.BEACON_SCANNING_START});
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            Broadcasts.HOME_AUTOMATION_COMMAND,
+                            new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                            new Object[]{HomeAutomationAction.BEACON_SCANNING_START});
                 } else {
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                            new String[]{Bundles.MAIN_SERVICE_ACTION},
-                            new Object[]{MainServiceAction.BEACON_SCANNING_STOP});
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            Broadcasts.HOME_AUTOMATION_COMMAND,
+                            new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                            new Object[]{HomeAutomationAction.BEACON_SCANNING_STOP});
                 }
             }
         });
@@ -384,14 +388,15 @@ public class SettingsView extends Activity {
             socketCheckbox.setText(socket.GetName());
             socketCheckbox.setTextColor(0xffffffff);
             socketCheckbox.setChecked(notificationVisibility);
-            socketCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            socketCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     _logger.Info(String.format("Saving key %s with value %s", key, isChecked));
                     _sharedPrefController.SaveBooleanValue(key, isChecked);
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                            new String[]{Bundles.MAIN_SERVICE_ACTION},
-                            new Object[]{MainServiceAction.SHOW_NOTIFICATION_SOCKET});
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            Broadcasts.HOME_AUTOMATION_COMMAND,
+                            new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                            new Object[]{HomeAutomationAction.SHOW_NOTIFICATION_SOCKET});
                 }
             });
 
@@ -401,9 +406,9 @@ public class SettingsView extends Activity {
 
     private void initializeStoredActions() {
         _deleteActionDatabase = (Button) findViewById(R.id.btnDeleteDatabaseEntries);
-        _deleteActionDatabase.setOnClickListener(new OnClickListener() {
+        _deleteActionDatabase.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 _databaseController.ClearDatabaseActions();
                 Toasty.info(_context, "Cleared actions!", Toast.LENGTH_LONG).show();
             }

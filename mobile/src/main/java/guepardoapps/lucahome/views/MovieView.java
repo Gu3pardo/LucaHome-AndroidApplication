@@ -12,7 +12,6 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -25,7 +24,7 @@ import java.util.Locale;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.MovieDto;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.customadapter.MovieListAdapter;
@@ -62,8 +61,10 @@ public class MovieView extends AppCompatActivity {
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_MOVIES});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.GET_MOVIE_LIST});
         }
     };
 
@@ -87,14 +88,14 @@ public class MovieView extends AppCompatActivity {
 
                 _progressBar.setVisibility(View.GONE);
 
-                _collapsingToolbar.setTitle(String.format(Locale.GERMAN, " %d movies", list.getSize()));
+                _collapsingToolbar.setTitle(String.format(Locale.getDefault(), " %d movies", list.getSize()));
             } else {
                 _logger.Warn("movieList is null!");
 
                 _progressBar.setVisibility(View.GONE);
                 _noDataFallback.setVisibility(View.VISIBLE);
 
-                _collapsingToolbar.setTitle(String.format(Locale.GERMAN, " %d movies", 0));
+                _collapsingToolbar.setTitle(String.format(Locale.getDefault(), " %d movies", 0));
             }
 
             _pullRefreshLayout.setRefreshing(false);
@@ -137,9 +138,9 @@ public class MovieView extends AppCompatActivity {
         mainBackground.setImageResource(R.drawable.main_image_movies);
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);
-        buttonAdd.setOnClickListener(new OnClickListener() {
+        buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _logger.Debug("onClick buttonAdd");
                 _dialogController.ShowAddMovieDialog(_getDataRunnable, null, true);
             }

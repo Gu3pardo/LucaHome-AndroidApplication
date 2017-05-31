@@ -84,15 +84,14 @@ public class BirthdayView extends Activity {
         final WatchViewStub stub = (WatchViewStub) findViewById(R.id.basicListWatchViewStub);
         stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
             @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                _listView = (ListView) stub.findViewById(R.id.basicListView);
+            public void onLayoutInflated(WatchViewStub watchViewStub) {
+                _listView = (ListView) watchViewStub.findViewById(R.id.basicListView);
                 _listAdapter = new BirthdayListAdapter(_context, _itemList, true);
                 _listView.setAdapter(_listAdapter);
-                _noDataHintView = (TextView) stub.findViewById(R.id.noDataTextView);
+                _noDataHintView = (TextView) watchViewStub.findViewById(R.id.noDataTextView);
 
                 if (!_isInitialized) {
-                    _receiverController.RegisterReceiver(_updateReceiver,
-                            new String[]{Broadcasts.UPDATE_BIRTHDAY_LIST});
+                    _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_BIRTHDAY_LIST});
                     _messageSendHelper.SendMessage(COMMAND);
                     _isInitialized = true;
                 }

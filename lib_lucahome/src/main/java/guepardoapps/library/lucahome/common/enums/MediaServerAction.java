@@ -2,7 +2,7 @@ package guepardoapps.library.lucahome.common.enums;
 
 import java.io.Serializable;
 
-public enum ServerAction implements Serializable {
+public enum MediaServerAction implements Serializable {
 
 	NULL(0, "", -1), 
 	
@@ -72,7 +72,7 @@ public enum ServerAction implements Serializable {
 	private String _action;
 	private int _actionLevel;
 
-	ServerAction(int id, String action, int actionLevel) {
+	MediaServerAction(int id, String action, int actionLevel) {
 		_id = id;
 		_action = action;
 		_actionLevel = actionLevel;
@@ -91,8 +91,8 @@ public enum ServerAction implements Serializable {
 		return _actionLevel;
 	}
 
-	public static ServerAction GetById(int id) {
-		for (ServerAction e : values()) {
+	public static MediaServerAction GetById(int id) {
+		for (MediaServerAction e : values()) {
 			if (e._id == id) {
 				return e;
 			}
@@ -100,8 +100,8 @@ public enum ServerAction implements Serializable {
 		return NULL;
 	}
 
-	public static ServerAction GetByString(String action) {
-		for (ServerAction e : values()) {
+	public static MediaServerAction GetByString(String action) {
+		for (MediaServerAction e : values()) {
 			if (e._action.contains(action)) {
 				return e;
 			}

@@ -7,12 +7,10 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,9 +19,7 @@ import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.ShoppingEntryDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.ServiceController;
@@ -52,9 +48,9 @@ public class ShoppingListAdapter extends BaseAdapter {
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
             _broadcastController.SendSerializableArrayBroadcast(
-                    Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION},
-                    new Object[]{MainServiceAction.GET_SHOPPING_LIST});
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.GET_SHOPPING_LIST});
         }
     };
 
@@ -144,15 +140,17 @@ public class ShoppingListAdapter extends BaseAdapter {
 
         holder._quantity = (Button) rowView.findViewById(R.id.shopping_button_quantity);
         holder._quantity.setText(String.valueOf(entry.GetQuantity()));
-        holder._quantity.setOnClickListener(new OnClickListener() {
+        holder._quantity.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _quantity button: " + entry.GetName());
                 if (!_isOnWear) {
                     int size = 0;
+
                     if (_entryList != null) {
                         size = _entryList.getSize();
                     }
+
                     _dialogController.ShowAddShoppingEntryDialog(
                             (Activity) _context,
                             _getDataRunnable,
@@ -167,18 +165,16 @@ public class ShoppingListAdapter extends BaseAdapter {
         });
 
         holder._increase = (ImageButton) rowView.findViewById(R.id.shopping_button_increase);
-        holder._increase.setOnClickListener(new OnClickListener() {
+        holder._increase.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _increase button: " + entry.GetName());
                 if (!_isOnWear) {
                     entry.IncreaseQuantity();
                     _serviceController.StartRestService(
                             Bundles.SHOPPING_LIST,
                             entry.GetCommandUpdate(),
-                            Broadcasts.RELOAD_SHOPPING_LIST,
-                            LucaObject.SHOPPING_ENTRY,
-                            RaspberrySelection.BOTH);
+                            Broadcasts.RELOAD_SHOPPING_LIST);
                 } else {
                     _logger.Warn("Not supported on wearable device!");
                 }
@@ -186,18 +182,16 @@ public class ShoppingListAdapter extends BaseAdapter {
         });
 
         holder._decrease = (ImageButton) rowView.findViewById(R.id.shopping_button_decrease);
-        holder._decrease.setOnClickListener(new OnClickListener() {
+        holder._decrease.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _decrease button: " + entry.GetName());
                 if (!_isOnWear) {
                     entry.DecreaseQuantity();
                     _serviceController.StartRestService(
                             Bundles.SHOPPING_LIST,
                             entry.GetCommandUpdate(),
-                            Broadcasts.RELOAD_SHOPPING_LIST,
-                            LucaObject.SHOPPING_ENTRY,
-                            RaspberrySelection.BOTH);
+                            Broadcasts.RELOAD_SHOPPING_LIST);
                 } else {
                     _logger.Warn("Not supported on wearable device!");
                 }
@@ -205,17 +199,15 @@ public class ShoppingListAdapter extends BaseAdapter {
         });
 
         holder._delete = (ImageButton) rowView.findViewById(R.id.shopping_button_delete);
-        holder._delete.setOnClickListener(new OnClickListener() {
+        holder._delete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 _logger.Debug("onClick _delete button: " + entry.GetName());
                 if (!_isOnWear) {
                     _serviceController.StartRestService(
                             Bundles.SHOPPING_LIST,
                             entry.GetCommandDelete(),
-                            Broadcasts.RELOAD_SHOPPING_LIST,
-                            LucaObject.SHOPPING_ENTRY,
-                            RaspberrySelection.BOTH);
+                            Broadcasts.RELOAD_SHOPPING_LIST);
                 } else {
                     _logger.Warn("Not supported on wearable device!");
                 }
@@ -224,16 +216,16 @@ public class ShoppingListAdapter extends BaseAdapter {
 
         holder._bought = (CheckBox) rowView.findViewById(R.id.shopping_checkbox_bought);
         holder._bought.setChecked(entry.IsBought());
-        holder._bought.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        holder._bought.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton button, boolean checked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _logger.Debug("onCheckChanged _bought button: " + entry.GetName());
-                entry.SetBought(checked);
+                entry.SetBought(isChecked);
                 if (!_isOnWear) {
                     _broadcastController.SendStringBroadcast(
                             Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST,
                             Bundles.SHOPPING_LIST,
-                            String.valueOf(entry.GetName()) + ":" + (checked ? "1" : "0"));
+                            String.valueOf(entry.GetName()) + ":" + (isChecked ? "1" : "0"));
                 } else {
                     if (_messageSendHelper != null) {
                         _messageSendHelper.SendMessage(entry.GetCommandBoughtChanged());

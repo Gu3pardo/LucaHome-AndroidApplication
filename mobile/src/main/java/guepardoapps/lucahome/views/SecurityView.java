@@ -13,13 +13,11 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -33,14 +31,11 @@ import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Color;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.IDs;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.MotionCameraDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
-import guepardoapps.library.lucahome.controller.MediaStorageController;
 import guepardoapps.library.lucahome.controller.ServiceController;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
@@ -67,7 +62,6 @@ public class SecurityView extends Activity {
     private Context _context;
 
     private BroadcastController _broadcastController;
-    private MediaStorageController _mediaStorageController;
     private NavigationService _navigationService;
     private NetworkController _networkController;
     private LucaNotificationController _notificationController;
@@ -105,9 +99,10 @@ public class SecurityView extends Activity {
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION},
-                    new Object[]{MainServiceAction.GET_MOTION_CAMERA_DTO});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.GET_MOTION_CAMERA_DATA});
         }
     };
 
@@ -140,8 +135,6 @@ public class SecurityView extends Activity {
         _context = this;
 
         _broadcastController = new BroadcastController(_context);
-        _mediaStorageController = MediaStorageController.getInstance();
-        _mediaStorageController.initialize(_context);
         _navigationService = new NavigationService(_context);
         _networkController = new NetworkController(_context);
         _notificationController = new LucaNotificationController(_context);
@@ -172,21 +165,23 @@ public class SecurityView extends Activity {
         _listView = (ListView) findViewById(R.id.motionActionsListView);
 
         _buttonMotionHandle = (Button) findViewById(R.id.buttonMotionHandle);
-        _buttonMotionHandle.setOnClickListener(new OnClickListener() {
+        _buttonMotionHandle.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                _logger.Debug("_buttionMotionHandle onClick");
+            public void onClick(View v) {
+                _logger.Debug("_buttonMotionHandle onClick");
                 if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                     if (_motionCameraDto != null) {
                         if (_motionCameraDto.GetCameraState()) {
-                            _serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, ServerActions.STOP_MOTION,
-                                    Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO,
-                                    RaspberrySelection.BOTH);
+                            _serviceController.StartRestService(
+                                    Bundles.MOTION_CAMERA_DTO,
+                                    LucaServerAction.STOP_MOTION.toString(),
+                                    Broadcasts.RELOAD_MOTION_CAMERA_DTO);
                             _notificationController.CloseNotification(IDs.NOTIFICATION_CAMERA);
                         } else {
-                            _serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, ServerActions.START_MOTION,
-                                    Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO,
-                                    RaspberrySelection.BOTH);
+                            _serviceController.StartRestService(
+                                    Bundles.MOTION_CAMERA_DTO,
+                                    LucaServerAction.START_MOTION.toString(),
+                                    Broadcasts.RELOAD_MOTION_CAMERA_DTO);
                             _notificationController.CreateCameraNotification(SecurityView.class);
                         }
                     } else {
@@ -202,7 +197,7 @@ public class SecurityView extends Activity {
         });
 
         _buttonSetMotionControl = (Button) findViewById(R.id.buttonSetMotionControl);
-        _buttonSetMotionControl.setOnClickListener(new OnClickListener() {
+        _buttonSetMotionControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("_buttonSetMotionControl onClick");
@@ -210,15 +205,17 @@ public class SecurityView extends Activity {
                     if (_motionCameraDto != null) {
                         if (_motionCameraDto.GetCameraState()) {
                             if (_motionCameraDto.GetCameraControlState()) {
-                                String action = ServerActions.SET_MOTION_CONTROL_TASK + "OFF";
-                                _serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, action,
-                                        Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO,
-                                        RaspberrySelection.BOTH);
+                                String action = LucaServerAction.SET_MOTION_CONTROL_TASK.toString() + "OFF";
+                                _serviceController.StartRestService(
+                                        Bundles.MOTION_CAMERA_DTO,
+                                        action,
+                                        Broadcasts.RELOAD_MOTION_CAMERA_DTO);
                             } else {
-                                String action = ServerActions.SET_MOTION_CONTROL_TASK + "ON";
-                                _serviceController.StartRestService(Bundles.MOTION_CAMERA_DTO, action,
-                                        Broadcasts.RELOAD_MOTION_CAMERA_DTO, LucaObject.MOTION_CAMERA_DTO,
-                                        RaspberrySelection.BOTH);
+                                String action = LucaServerAction.SET_MOTION_CONTROL_TASK.toString() + "ON";
+                                _serviceController.StartRestService(
+                                        Bundles.MOTION_CAMERA_DTO,
+                                        action,
+                                        Broadcasts.RELOAD_MOTION_CAMERA_DTO);
                             }
                         } else {
                             _logger.Warn("Motion is not running!");
@@ -257,7 +254,6 @@ public class SecurityView extends Activity {
     @Override
     public void onPause() {
         _logger.Debug("onPause");
-        _mediaStorageController.Dispose();
         _receiverController.Dispose();
         _updateHandler.removeCallbacks(_updateRunnable);
         super.onPause();
@@ -266,7 +262,6 @@ public class SecurityView extends Activity {
     @Override
     public void onDestroy() {
         _logger.Debug("onDestroy");
-        _mediaStorageController.Dispose();
         _receiverController.Dispose();
         _updateHandler.removeCallbacks(_updateRunnable);
         super.onDestroy();
@@ -328,14 +323,14 @@ public class SecurityView extends Activity {
             }
 
             _listView.setAdapter(new ArrayAdapter(this, android.R.layout.simple_list_item_1, list));
-            _listView.setOnItemClickListener(new OnItemClickListener() {
+            _listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int arg2, long arg3) {
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                     _logger.Debug("_listView.onItemClick");
                     _logger.Debug("adapterView: " + adapterView.toString());
                     _logger.Debug("view: " + view.toString());
-                    _logger.Debug("arg2: " + String.valueOf(arg2));
-                    _logger.Debug("arg3: " + String.valueOf(arg3));
+                    _logger.Debug("position: " + String.valueOf(position));
+                    _logger.Debug("id: " + String.valueOf(id));
                 }
             });
         } else {

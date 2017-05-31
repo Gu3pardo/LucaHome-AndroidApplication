@@ -7,17 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.ServiceController;
 import guepardoapps.library.toolset.controller.ReceiverController;
@@ -77,7 +74,7 @@ public class BottomViewController {
         _mediaMirrorBatteryTextView = (TextView) ((Activity) _context).findViewById(R.id.mediaMirrorBatteryTextView);
 
         _mediaMirrorSocketSwitch = (Switch) ((Activity) _context).findViewById(R.id.mediaMirrorSocketSwitch);
-        _mediaMirrorSocketSwitch.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        _mediaMirrorSocketSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _logger.Debug("_mediaMirrorSocketSwitch onCheckedChanged to " + String.valueOf(isChecked));
@@ -93,14 +90,12 @@ public class BottomViewController {
                 }
 
                 String socketName = _mediaMirrorViewDto.GetSocketName();
-                String command = ServerActions.SET_SOCKET + socketName + ((isChecked) ? Constants.STATE_ON : Constants.STATE_OFF);
+                String command = LucaServerAction.SET_SOCKET.toString() + socketName + ((isChecked) ? Constants.STATE_ON : Constants.STATE_OFF);
 
                 _serviceController.StartRestService(
                         socketName,
                         command,
-                        Broadcasts.RELOAD_SOCKETS,
-                        LucaObject.WIRELESS_SOCKET,
-                        RaspberrySelection.BOTH);
+                        Broadcasts.RELOAD_SOCKETS);
             }
         });
 

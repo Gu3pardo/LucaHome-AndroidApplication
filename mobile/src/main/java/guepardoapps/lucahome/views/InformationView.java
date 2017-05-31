@@ -20,7 +20,7 @@ import com.baoyz.widget.PullRefreshLayout;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.InformationDto;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.customadapter.InformationListAdapter;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
@@ -51,8 +51,10 @@ public class InformationView extends AppCompatActivity {
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableBroadcast(Broadcasts.MAIN_SERVICE_COMMAND, Bundles.MAIN_SERVICE_ACTION,
-                    MainServiceAction.GET_INFORMATIONS);
+            _broadcastController.SendSerializableBroadcast(
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    Bundles.HOME_AUTOMATION_ACTION,
+                    HomeAutomationAction.GET_INFORMATION_LIST);
             _logger.Debug("Called for information!");
         }
     };

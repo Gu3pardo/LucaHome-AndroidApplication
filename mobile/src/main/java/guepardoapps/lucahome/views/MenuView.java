@@ -28,7 +28,7 @@ import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.ListedMenuDto;
 import guepardoapps.library.lucahome.common.dto.MenuDto;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.customadapter.MenuListAdapter;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
@@ -76,8 +76,10 @@ public class MenuView extends AppCompatActivity {
 
     private Runnable _getDataRunnable = new Runnable() {
         public void run() {
-            _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                    new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{MainServiceAction.GET_MENU});
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.HOME_AUTOMATION_COMMAND,
+                    new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                    new Object[]{HomeAutomationAction.GET_MENU_LIST});
         }
     };
 
@@ -165,14 +167,14 @@ public class MenuView extends AppCompatActivity {
         carouselView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                _logger.Info(String.format(Locale.GERMAN,
+                _logger.Info(String.format(Locale.getDefault(),
                         "onPageScrolled at position %d with positionOffset %f and positionOffsetPixels %d",
                         position, positionOffset, positionOffsetPixels));
             }
 
             @Override
             public void onPageSelected(int position) {
-                _logger.Info(String.format(Locale.GERMAN, "onPageSelected at position %d", position));
+                _logger.Info(String.format(Locale.getDefault(), "onPageSelected at position %d", position));
                 Class<?> targetActivity = _activities[position];
                 if (targetActivity != null) {
                     _navigationService.NavigateTo(targetActivity, true);
@@ -181,7 +183,7 @@ public class MenuView extends AppCompatActivity {
 
             @Override
             public void onPageScrollStateChanged(int state) {
-                _logger.Info(String.format(Locale.GERMAN, "onPageScrollStateChanged at state %d", state));
+                _logger.Info(String.format(Locale.getDefault(), "onPageScrollStateChanged at state %d", state));
             }
         });
 

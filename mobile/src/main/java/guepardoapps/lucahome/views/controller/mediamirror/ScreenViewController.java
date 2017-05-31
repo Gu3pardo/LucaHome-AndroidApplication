@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -16,7 +15,7 @@ import java.util.Locale;
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
@@ -53,7 +52,7 @@ public class ScreenViewController {
                 _logger.Debug("New Dto is: " + mediaMirrorViewDto.toString());
                 _mediaMirrorViewDto = mediaMirrorViewDto;
                 int screenBrightness = (_mediaMirrorViewDto.GetScreenBrightness() * 100) / 255;
-                _screenBrightnessTextView.setText(String.format(Locale.GERMAN, "%d%%", screenBrightness));
+                _screenBrightnessTextView.setText(String.format(Locale.getDefault(), "%d%%", screenBrightness));
             } else {
                 _logger.Warn("Received null MediaMirrorViewDto...!");
             }
@@ -72,7 +71,7 @@ public class ScreenViewController {
         _logger.Debug("onCreate");
 
         _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowScreen);
-        _showContent.setOnClickListener(new OnClickListener() {
+        _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (_contentVisible) {
@@ -95,7 +94,7 @@ public class ScreenViewController {
 
         Button buttonScreenBrightnessIncrease = (Button) ((Activity) _context)
                 .findViewById(R.id.buttonScreenBrightnessIncrease);
-        buttonScreenBrightnessIncrease.setOnClickListener(new OnClickListener() {
+        buttonScreenBrightnessIncrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonScreenBrightnessIncrease onClick");
@@ -104,17 +103,21 @@ public class ScreenViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(),
+                        "");
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        "");
             }
         });
 
         Button buttonScreenBrightnessDecrease = (Button) ((Activity) _context)
                 .findViewById(R.id.buttonScreenBrightnessDecrease);
-        buttonScreenBrightnessDecrease.setOnClickListener(new OnClickListener() {
+        buttonScreenBrightnessDecrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonScreenBrightnessDecrease onClick");
@@ -123,11 +126,15 @@ public class ScreenViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.DECREASE_SCREEN_BRIGHTNESS.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.DECREASE_SCREEN_BRIGHTNESS.toString(),
+                        "");
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        "");
             }
         });
     }

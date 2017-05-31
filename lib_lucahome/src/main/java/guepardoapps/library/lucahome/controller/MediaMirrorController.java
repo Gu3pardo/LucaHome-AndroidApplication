@@ -12,8 +12,8 @@ import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
 import guepardoapps.library.lucahome.common.dto.PlayedYoutubeVideoDto;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
 import guepardoapps.library.toolset.controller.BroadcastController;
@@ -98,7 +98,7 @@ public class MediaMirrorController {
         String[] responseData = response.split("\\:");
 
         if (responseData.length > 1) {
-            ServerAction responseAction = ServerAction.GetByString(responseData[0]);
+            MediaServerAction responseAction = MediaServerAction.GetByString(responseData[0]);
             if (responseAction != null) {
                 _logger.Info("ResponseAction: " + responseAction.toString());
 
@@ -171,7 +171,7 @@ public class MediaMirrorController {
                         String[] mediaMirrorData = mediaMirrorDataString.split("\\|");
                         if (mediaMirrorData.length == 14) {
                             String serverIp = mediaMirrorData[0];
-                            MediaMirrorSelection mediaMirrorSelection = MediaMirrorSelection.GetByIp(serverIp);
+                            MediaServerSelection mediaServerSelection = MediaServerSelection.GetByIp(serverIp);
 
                             String batteryLevelString = mediaMirrorData[1];
                             int batteryLevel = -1;
@@ -251,7 +251,7 @@ public class MediaMirrorController {
                                 _logger.Error(ex.toString());
                             }
 
-                            MediaMirrorViewDto mediaMirrorDto = new MediaMirrorViewDto(mediaMirrorSelection,
+                            MediaMirrorViewDto mediaMirrorDto = new MediaMirrorViewDto(mediaServerSelection,
                                     batteryLevel, socketName, socketState, volume, youtubeId, youtubeIsPlaying,
                                     youtubeVideoCurrentPlayTime, youtubeVideoDuration, alreadyPlayedYoutubeVideos,
                                     isSeaSSoundPlaying, seaSoundCountdownSec, serverVersion, screenBrightness);

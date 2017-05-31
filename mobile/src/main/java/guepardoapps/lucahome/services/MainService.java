@@ -8,18 +8,20 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
+
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.constants.Constants;
 import guepardoapps.library.lucahome.common.constants.IDs;
-import guepardoapps.library.lucahome.common.constants.ServerActions;
 import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.constants.Timeouts;
 import guepardoapps.library.lucahome.common.dto.ActionDto;
@@ -38,15 +40,14 @@ import guepardoapps.library.lucahome.common.dto.TemperatureDto;
 import guepardoapps.library.lucahome.common.dto.TimerDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.enums.Command;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.enums.NavigateData;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
+import guepardoapps.library.lucahome.common.enums.LucaServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.common.enums.TemperatureType;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.DatabaseController;
+import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 import guepardoapps.library.lucahome.controller.MenuController;
@@ -65,12 +66,14 @@ import guepardoapps.library.lucahome.converter.json.JsonDataToSocketConverter;
 import guepardoapps.library.lucahome.converter.json.JsonDataToTemperatureConverter;
 import guepardoapps.library.lucahome.converter.json.JsonDataToTimerConverter;
 import guepardoapps.library.lucahome.services.sockets.SocketActionService;
+
 import guepardoapps.library.openweather.common.OWBroadcasts;
 import guepardoapps.library.openweather.common.OWBundles;
 import guepardoapps.library.openweather.common.OWIds;
 import guepardoapps.library.openweather.common.model.ForecastModel;
 import guepardoapps.library.openweather.common.model.WeatherModel;
 import guepardoapps.library.openweather.controller.OpenWeatherController;
+
 import guepardoapps.library.toolset.beacon.BeaconController;
 import guepardoapps.library.toolset.common.classes.NotificationContent;
 import guepardoapps.library.toolset.common.classes.SerializableList;
@@ -80,13 +83,17 @@ import guepardoapps.library.toolset.controller.NetworkController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.library.toolset.scheduler.ScheduleService;
+
 import guepardoapps.lucahome.R;
+import guepardoapps.lucahome.common.enums.NavigationData;
 import guepardoapps.lucahome.views.BirthdayView;
 import guepardoapps.lucahome.views.ForecastWeatherView;
 import guepardoapps.lucahome.views.SecurityView;
 import guepardoapps.lucahome.views.SensorTemperatureView;
 
 public class MainService extends Service {
+
+    public enum MainServiceAction implements Serializable {BOOT}
 
     private static final String TAG = MainService.class.getSimpleName();
     private LucaHomeLogger _logger;
@@ -146,74 +153,50 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_actionReceiver onReceive");
-            MainServiceAction action = (MainServiceAction) intent.getSerializableExtra(Bundles.MAIN_SERVICE_ACTION);
+            HomeAutomationAction action = (HomeAutomationAction) intent.getSerializableExtra(Bundles.HOME_AUTOMATION_ACTION);
             if (action != null) {
                 _logger.Debug(String.format("Action is %s", action.toString()));
                 _progress = 0;
                 switch (action) {
-                    case DOWNLOAD_ALL:
-                        _downloadCount = Constants.DOWNLOAD_STEPS;
-                        prepareDownloadAll();
-                        startDownloadLucaHomeAll();
-                        startDownloadOtherAll();
-                        break;
-                    case DOWNLOAD_SOCKETS:
-                        _downloadCount = 1;
-                        _downloadSocketRunnable.run();
-                        break;
-                    case DOWNLOAD_TEMPERATURE:
-                        _downloadCount = 1;
-                        _downloadTemperatureRunnable.run();
-                        break;
-                    case DOWNLOAD_WEATHER_CURRENT:
-                        _downloadCount = 1;
-                        _downloadCurrentWeatherRunnable.run();
-                        break;
-                    case DOWNLOAD_SHOPPING_LIST:
-                        _downloadCount = 1;
-                        _downloadShoppingListRunnable.run();
-                        break;
-                    case DOWNLOAD_MENU:
-                        _downloadCount = 2;
-                        _downloadMenuRunnable.run();
-                        _downloadListedMenuRunnable.run();
-                        break;
-                    case DOWNLOAD_MOTION_CAMERA_DTO:
-                        _downloadCount = 1;
-                        _downloadMotionCameraDtoRunnable.run();
-                        break;
                     case GET_ALL:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_MAP_CONTENT_VIEW,
                                 new String[]{Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST, Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU, Bundles.LISTED_MENU, Bundles.MOTION_CAMERA_DTO},
                                 new Object[]{_mapContentList, _wirelessSocketList, _scheduleList, _timerList, _temperatureList, _shoppingList, _menu, _listedMenu, _motionCameraDto});
                         break;
-                    case GET_BIRTHDAYS:
+                    case GET_BIRTHDAY_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_BIRTHDAY,
                                 new String[]{Bundles.BIRTHDAY_LIST},
                                 new Object[]{_birthdayList});
                         sendBirthdaysToWear();
                         break;
-                    case GET_CHANGES:
+                    case GET_CHANGE_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_CHANGE,
                                 new String[]{Bundles.CHANGE_LIST},
                                 new Object[]{_changeList});
                         break;
-                    case GET_INFORMATIONS:
-                        _logger.Debug("GET_INFORMATIONS");
-                        if (_information != null) {
-                            _logger.Debug(_information.toString());
-                            _broadcastController.SendSerializableArrayBroadcast(
-                                    Broadcasts.UPDATE_INFORMATION,
-                                    new String[]{Bundles.INFORMATION_SINGLE},
-                                    new Object[]{_information});
-                        } else {
-                            _logger.Warn("Information is null!");
-                        }
+                    case GET_INFORMATION_LIST:
+                        _broadcastController.SendSerializableArrayBroadcast(
+                                Broadcasts.UPDATE_INFORMATION,
+                                new String[]{Bundles.INFORMATION_SINGLE},
+                                new Object[]{_information});
                         break;
-                    case GET_MENU:
+                    case GET_MAP_DATA:
+                        _broadcastController.SendSerializableArrayBroadcast(
+                                Broadcasts.UPDATE_MAP_CONTENT_VIEW,
+                                new String[]{Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST, Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU, Bundles.LISTED_MENU, Bundles.MOTION_CAMERA_DTO},
+                                new Object[]{_mapContentList, _wirelessSocketList, _scheduleList, _timerList, _temperatureList, _shoppingList, _menu, _listedMenu, _motionCameraDto});
+                        break;
+                    case GET_MEDIA_MIRROR_DATA:
+                        _broadcastController.SendSerializableArrayBroadcast(
+                                Broadcasts.UPDATE_MEDIAMIRROR,
+                                new String[]{Bundles.MEDIAMIRROR},
+                                new Object[]{_mediaMirrorList});
+                        sendMediaMirrorToWear();
+                        break;
+                    case GET_MENU_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_MENU_VIEW,
                                 new String[]{Bundles.MENU},
@@ -224,40 +207,40 @@ public class MainService extends Service {
                                 new Object[]{_listedMenu});
                         sendMenuToWear();
                         break;
-                    case GET_MOTION_CAMERA_DTO:
+                    case GET_MOTION_CAMERA_DATA:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_MOTION_CAMERA_DTO,
                                 new String[]{Bundles.MOTION_CAMERA_DTO},
                                 new Object[]{_motionCameraDto});
                         break;
-                    case GET_MOVIES:
+                    case GET_MOVIE_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_MOVIE,
                                 new String[]{Bundles.MOVIE_LIST},
                                 new Object[]{_movieList});
                         break;
-                    case GET_SCHEDULES:
+                    case GET_SCHEDULE_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_SCHEDULE,
                                 new String[]{Bundles.SCHEDULE_LIST, Bundles.SOCKET_LIST},
                                 new Object[]{_scheduleList, _wirelessSocketList});
                         sendSchedulesToWear();
                         break;
-                    case GET_SOCKETS:
+                    case GET_SHOPPING_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
-                                Broadcasts.UPDATE_SOCKET,
-                                new String[]{Bundles.SOCKET_LIST},
-                                new Object[]{_wirelessSocketList});
-                        sendSocketsToWear();
+                                Broadcasts.UPDATE_SHOPPING_LIST,
+                                new String[]{Bundles.SHOPPING_LIST},
+                                new Object[]{_shoppingList});
+                        sendShoppingListToWear();
                         break;
-                    case GET_TEMPERATURE:
+                    case GET_TEMPERATURE_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_TEMPERATURE,
                                 new String[]{Bundles.TEMPERATURE_LIST},
                                 new Object[]{_temperatureList});
                         sendTemperatureToWear();
                         break;
-                    case GET_TIMER:
+                    case GET_TIMER_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.UPDATE_TIMER,
                                 new String[]{Bundles.TIMER_LIST, Bundles.SOCKET_LIST},
@@ -277,26 +260,28 @@ public class MainService extends Service {
                                 new String[]{Bundles.WEATHER_FORECAST},
                                 new Object[]{_forecastWeather});
                         break;
-                    case GET_MAP_CONTENT:
-                        _broadcastController.SendSerializableArrayBroadcast(
-                                Broadcasts.UPDATE_MAP_CONTENT_VIEW,
-                                new String[]{Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST, Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU, Bundles.LISTED_MENU, Bundles.MOTION_CAMERA_DTO},
-                                new Object[]{_mapContentList, _wirelessSocketList, _scheduleList, _timerList, _temperatureList, _shoppingList, _menu, _listedMenu, _motionCameraDto});
+
+                    case ENABLE_HEATING:
+                        enableHeatingSocket(false);
                         break;
-                    case GET_SHOPPING_LIST:
-                        _broadcastController.SendSerializableArrayBroadcast(
-                                Broadcasts.UPDATE_SHOPPING_LIST,
-                                new String[]{Bundles.SHOPPING_LIST},
-                                new Object[]{_shoppingList});
-                        sendShoppingListToWear();
+                    case ENABLE_HEATING_AND_SOUND:
+                        enableHeatingSocket(true);
                         break;
-                    case GET_MEDIAMIRROR:
-                        _broadcastController.SendSerializableArrayBroadcast(
-                                Broadcasts.UPDATE_MEDIAMIRROR,
-                                new String[]{Bundles.MEDIAMIRROR},
-                                new Object[]{_mediaMirrorList});
-                        sendMediaMirrorToWear();
+                    case ENABLE_SEA_SOUND:
+                        enableSoundSchedule(30);
                         break;
+                    case DISABLE_SEA_SOUND:
+                        for (MediaServerSelection entry : MediaServerSelection.values()) {
+                            if (entry.IsSleepingMirror()) {
+                                _mediaMirrorController.SendCommand(
+                                        entry.GetIp(),
+                                        MediaServerAction.STOP_SEA_SOUND.toString(),
+                                        "");
+                                break;
+                            }
+                        }
+                        break;
+
                     case SHOW_NOTIFICATION_SOCKET:
                         if (_wirelessSocketList != null) {
                             _notificationController.CreateSocketNotification(_wirelessSocketList);
@@ -313,40 +298,21 @@ public class MainService extends Service {
                     case SHOW_NOTIFICATION_WEATHER:
                         _downloadForecastWeatherRunnable.run();
                         break;
-                    case ENABLE_HEATING:
-                        enableHeatingSocket(false);
+
+                    case DISABLE_SECURITY_CAMERA:
+                        _serviceController.StartRestService(
+                                Bundles.MOTION_CAMERA_DTO,
+                                LucaServerAction.STOP_MOTION.toString(),
+                                Broadcasts.RELOAD_MOTION_CAMERA_DTO);
                         break;
-                    case ENABLE_HEATING_AND_SOUND:
-                        enableHeatingSocket(true);
-                        break;
-                    case ENABLE_SEA_SOUND:
-                        enableSoundSchedule(30);
-                        break;
-                    case DISABLE_SEA_SOUND:
-                        for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
-                            if (entry.IsSleepingMirror()) {
-                                _mediaMirrorController.SendCommand(
-                                        entry.GetIp(),
-                                        ServerAction.STOP_SEA_SOUND.toString(),
-                                        "");
-                                break;
-                            }
-                        }
-                        break;
+
                     case BEACON_SCANNING_START:
                         _beaconController.StartScanning();
                         break;
                     case BEACON_SCANNING_STOP:
                         _beaconController.StopScanning();
                         break;
-                    case DISABLE_SECURITY_CAMERA:
-                        _serviceController.StartRestService(
-                                Bundles.MOTION_CAMERA_DTO,
-                                ServerActions.STOP_MOTION,
-                                Broadcasts.RELOAD_MOTION_CAMERA_DTO,
-                                LucaObject.MOTION_CAMERA_DTO,
-                                RaspberrySelection.BOTH);
-                        break;
+
                     default:
                         _logger.Warn("action is not supported! " + action.toString());
                         break;
@@ -414,18 +380,19 @@ public class MainService extends Service {
                 currentDay -= 7;
             }
 
-            String addHeatingTimerAction = ServerActions.ADD_SCHEDULE + socketName + "_" + String.valueOf(scheduleHour)
-                    + "_" + String.valueOf(scheduleMinute) + "&socket=" + socketName + "&gpio=&weekday=" + currentDay
-                    + "&hour=" + scheduleHour + "&minute=" + scheduleMinute
+            String addHeatingTimerAction = LucaServerAction.ADD_SCHEDULE.toString()
+                    + socketName + "_" + String.valueOf(scheduleHour) + "_" + String.valueOf(scheduleMinute)
+                    + "&socket=" + socketName
+                    + "&gpio=&weekday=" + currentDay
+                    + "&hour=" + scheduleHour
+                    + "&minute=" + scheduleMinute
                     + "&onoff=0&isTimer=1&playSound=0&playRaspberry=1";
-            _logger.Debug(String.format("Heating action is %s", addHeatingTimerAction));
+            _logger.Debug(String.format(Locale.getDefault(), "Heating action is %s", addHeatingTimerAction));
 
             _serviceController.StartRestService(
                     "",
                     addHeatingTimerAction,
-                    Broadcasts.RELOAD_TIMER,
-                    LucaObject.TIMER,
-                    RaspberrySelection.BOTH);
+                    Broadcasts.RELOAD_TIMER);
 
             if (enableSound) {
                 enableSoundSchedule(30);
@@ -438,11 +405,11 @@ public class MainService extends Service {
         private void enableSoundSchedule(int playLength) {
             _logger.Debug("enableSoundSchedule");
 
-            for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+            for (MediaServerSelection entry : MediaServerSelection.values()) {
                 if (entry.IsSleepingMirror()) {
                     _mediaMirrorController.SendCommand(
                             entry.GetIp(),
-                            ServerAction.PLAY_SEA_SOUND.toString(),
+                            MediaServerAction.PLAY_SEA_SOUND.toString(),
                             String.valueOf(playLength));
                     break;
                 }
@@ -450,17 +417,211 @@ public class MainService extends Service {
         }
     };
 
-    // Receiver used for receiving the current battery state of the phone and sending the state to the watch
-    private BroadcastReceiver _batteryChangedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _addReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_batteryChangedReceiver onReceive");
+            _logger.Debug("_addReceiver onReceive");
 
-            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
-            if (level != -1) {
-                _logger.Debug("new battery level: " + String.valueOf(level));
-                String message = "PhoneBattery:" + String.valueOf(level) + "%";
-                _serviceController.SendMessageToWear(message);
+            String action = intent.getStringExtra(Bundles.ACTION);
+            if (action == null) {
+                _logger.Error("_addReceiver received data with null action!");
+                return;
+            }
+
+            String bundle;
+            String broadcast;
+
+            if (action.contains(LucaServerAction.ADD_BIRTHDAY.toString())) {
+                bundle = Bundles.BIRTHDAY_DOWNLOAD;
+                broadcast = Broadcasts.ADD_BIRTHDAY;
+            } else if (action.contains(LucaServerAction.ADD_MOVIE.toString())) {
+                bundle = Bundles.MOVIE_DOWNLOAD;
+                broadcast = Broadcasts.ADD_MOVIE;
+            } else if (action.contains(LucaServerAction.ADD_SCHEDULE.toString())) {
+                bundle = Bundles.SCHEDULE_DOWNLOAD;
+                broadcast = Broadcasts.ADD_SCHEDULE;
+            } else if (action.contains(LucaServerAction.ADD_SOCKET.toString())) {
+                bundle = Bundles.SOCKET_DOWNLOAD;
+                broadcast = Broadcasts.ADD_SOCKET;
+            } else {
+                _logger.Error(String.format(Locale.getDefault(), "Invalid action %s!", action));
+                return;
+            }
+
+            _serviceController.StartRestService(
+                    bundle,
+                    action,
+                    broadcast);
+        }
+    };
+
+    private BroadcastReceiver _startDownloadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_startDownloadReceiver onReceive");
+
+            LucaDialogController.LucaObject lucaObject = (LucaDialogController.LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
+            if (lucaObject == null) {
+                _logger.Error("_downloadReceiver received data with null lucaObject!");
+                return;
+            }
+
+            String action = intent.getStringExtra(Bundles.ACTION);
+            if (action != null) {
+                _logger.Error("_startDownloadReceiver received data with action! Not performing download!");
+                return;
+            }
+
+            switch (lucaObject) {
+                case BIRTHDAY:
+                    String[] birthdayAnswerArray = intent.getStringArrayExtra(Bundles.BIRTHDAY_DOWNLOAD);
+                    if (birthdayAnswerArray == null) {
+                        _logger.Error("birthdayAnswerArray is null!");
+                        return;
+                    }
+
+                    if (actionWasSuccessful(birthdayAnswerArray)) {
+                        _downloadBirthdayRunnable.run();
+                    } else {
+                        _logger.Warn("Add of birthday failed!");
+                        Toasty.error(_context, "Add of birthday failed!", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+
+                case MENU:
+                    String[] menuAnswerArray = intent.getStringArrayExtra(Bundles.MENU_DOWNLOAD);
+                    if (menuAnswerArray == null) {
+                        _logger.Error("menuAnswerArray is null!");
+                        return;
+                    }
+
+                    if (actionWasSuccessful(menuAnswerArray)) {
+                        _downloadMenuRunnable.run();
+                    } else {
+                        _logger.Warn("Add of menu failed!");
+                        Toasty.error(_context, "Add of menu failed!", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+
+                case MOVIE:
+                    String[] movieAnswerArray = intent.getStringArrayExtra(Bundles.MOVIE_DOWNLOAD);
+                    if (movieAnswerArray == null) {
+                        _logger.Error("movieAnswerArray is null!");
+                        return;
+                    }
+
+                    if (actionWasSuccessful(movieAnswerArray)) {
+                        _downloadMovieRunnable.run();
+                    } else {
+                        _logger.Warn("Add of movie failed!");
+                        Toasty.error(_context, "Add of movie failed!", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+
+                case SCHEDULE:
+                case TIMER:
+                    String[] scheduleAnswerArray = intent.getStringArrayExtra(Bundles.SCHEDULE_DOWNLOAD);
+                    if (scheduleAnswerArray == null) {
+                        _logger.Error("scheduleAnswerArray is null!");
+                        return;
+                    }
+
+                    if (actionWasSuccessful(scheduleAnswerArray)) {
+                        _downloadScheduleRunnable.run();
+                    } else {
+                        _logger.Warn("Add of schedule failed!");
+                        Toasty.error(_context, "Add of schedule failed!", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+
+                case SOCKET:
+                    String[] socketAnswerArray = intent.getStringArrayExtra(Bundles.SOCKET_DOWNLOAD);
+                    if (socketAnswerArray == null) {
+                        _logger.Error("socketAnswerArray is null!");
+                        return;
+                    }
+
+                    if (actionWasSuccessful(socketAnswerArray)) {
+                        _downloadSocketRunnable.run();
+                    } else {
+                        _logger.Warn("Add of socket failed!");
+                        Toasty.error(_context, "Add of socket failed!", Toast.LENGTH_LONG).show();
+                    }
+                    break;
+
+                default:
+                    _logger.Error("Cannot start download object: " + lucaObject.toString());
+                    break;
+            }
+        }
+
+        private boolean actionWasSuccessful(@NonNull String[] answerArray) {
+            boolean actionSuccess = true;
+
+            for (String answer : answerArray) {
+                _logger.Debug(answer);
+                if (!answer.endsWith("1")) {
+                    actionSuccess = false;
+                    break;
+                }
+            }
+
+            return actionSuccess;
+        }
+    };
+
+    private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_updateReceiver onReceive");
+
+            LucaDialogController.LucaObject lucaServerObject = (LucaDialogController.LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
+            if (lucaServerObject == null) {
+                _logger.Error("_updateReceiver received data with null lucaServerObject!");
+                return;
+            }
+
+            String action = intent.getStringExtra(Bundles.ACTION);
+            if (action == null) {
+                _logger.Error("_updateReceiver received data with null action!");
+                return;
+            }
+
+            switch (lucaServerObject) {
+                case BIRTHDAY:
+                    _serviceController.StartRestService(
+                            Bundles.BIRTHDAY_DOWNLOAD,
+                            action,
+                            Broadcasts.UPDATE_BIRTHDAY);
+                    break;
+                case MENU:
+                    _serviceController.StartRestService(
+                            Bundles.MENU_DOWNLOAD,
+                            action,
+                            Broadcasts.UPDATE_MENU);
+                    break;
+                case MOVIE:
+                    _serviceController.StartRestService(
+                            Bundles.MOVIE_DOWNLOAD,
+                            action,
+                            Broadcasts.UPDATE_MOVIE);
+                    break;
+                case SCHEDULE:
+                case TIMER:
+                    _serviceController.StartRestService(
+                            Bundles.SCHEDULE_DOWNLOAD,
+                            action,
+                            Broadcasts.UPDATE_SCHEDULE);
+                    break;
+                case SOCKET:
+                    _serviceController.StartRestService(
+                            Bundles.SOCKET_DOWNLOAD,
+                            action,
+                            Broadcasts.UPDATE_SOCKET_LIST);
+                    break;
+                default:
+                    _logger.Error("Cannot update object: " + lucaServerObject.toString());
+                    break;
             }
         }
     };
@@ -536,17 +697,40 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _forecastReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _currentWeatherDownloadModelReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _receiverController.UnregisterReceiver(_forecastReceiver);
+            _logger.Debug("_weatherModelReceiver onReceive");
 
-            ForecastModel forecastModel = (ForecastModel) intent.getSerializableExtra(OWBundles.EXTRA_FORECAST_MODEL);
-            if (forecastModel != null) {
-                _logger.Debug(forecastModel.toString());
+            WeatherModel newWeather = (WeatherModel) intent.getSerializableExtra(OWBundles.EXTRA_WEATHER_MODEL);
+            if (newWeather != null) {
+                _currentWeather = newWeather;
+                sendWeatherToWear();
+            }
 
-                NotificationContent _message = forecastModel.TellForecastWeather();
+            if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION)) {
+                _notificationController.CreateTemperatureNotification(SensorTemperatureView.class, _temperatureList, _currentWeather);
+            }
 
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_WEATHER_VIEW,
+                    new String[]{Bundles.WEATHER_CURRENT},
+                    new Object[]{_currentWeather});
+
+            updateDownloadCount();
+        }
+    };
+
+    private BroadcastReceiver _forecastWeatherDownloadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_forecastModelReceiver onReceive");
+
+            ForecastModel newForecastWeather = (ForecastModel) intent.getSerializableExtra(OWBundles.EXTRA_FORECAST_MODEL);
+            if (newForecastWeather != null) {
+                _forecastWeather = newForecastWeather;
+
+                NotificationContent _message = _forecastWeather.TellForecastWeather();
                 if (_message != null) {
                     _notificationController.CreateForecastWeatherNotification(
                             ForecastWeatherView.class,
@@ -558,20 +742,6 @@ public class MainService extends Service {
                 } else {
                     _logger.Error("_message is null!");
                 }
-            } else {
-                _logger.Error("_forecastModel is null!");
-            }
-        }
-    };
-
-    private BroadcastReceiver _forecastModelReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_forecastModelReceiver onReceive");
-
-            ForecastModel newForecastWeather = (ForecastModel) intent.getSerializableExtra(OWBundles.EXTRA_FORECAST_MODEL);
-            if (newForecastWeather != null) {
-                _forecastWeather = newForecastWeather;
             } else {
                 _logger.Warn("newForecastWeather is null");
             }
@@ -680,7 +850,7 @@ public class MainService extends Service {
                 _logger.Debug("New Dto is: " + mediaMirrorViewDto.toString());
                 boolean foundEntry = false;
                 for (int index = 0; index < _mediaMirrorList.getSize(); index++) {
-                    if (_mediaMirrorList.getValue(index).GetMediaMirrorSelection().GetId() == mediaMirrorViewDto.GetMediaMirrorSelection().GetId()) {
+                    if (_mediaMirrorList.getValue(index).GetMediaServerSelection().GetId() == mediaMirrorViewDto.GetMediaServerSelection().GetId()) {
                         _mediaMirrorList.setValue(index, mediaMirrorViewDto);
                         foundEntry = true;
                         break;
@@ -882,7 +1052,7 @@ public class MainService extends Service {
 
                 if (_wirelessSocketList != null) {
                     _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_SOCKET,
+                            Broadcasts.UPDATE_SOCKET_LIST,
                             new String[]{Bundles.SOCKET_LIST},
                             new Object[]{_wirelessSocketList});
 
@@ -947,131 +1117,11 @@ public class MainService extends Service {
         }
     };
 
-    // Receiver used for receiving the current time and check if time is ready
-    // to display sleep notification or set a flag if not or to delete this flag
-    private BroadcastReceiver _timeTickReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _reloadAllReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            _logger.Debug("action: " + action);
-
-            if (action.equals(Intent.ACTION_TIME_TICK)) {
-                Calendar calendar = Calendar.getInstance();
-
-                // Check, if the time is ready for displaying the notification
-                // time needs to be NOTIFICATION_HOUR:NOTIFICATION_MINUTE
-                if ((int) calendar.get(Calendar.HOUR_OF_DAY) == SLEEP_NOTIFICATION_HOUR) {
-                    if (calendar.get(Calendar.MINUTE) > SLEEP_NOTIFICATION_MINUTE - SLEEP_NOTIFICATION_TIME_SPAN_MINUTE
-                            && calendar.get(Calendar.MINUTE) < SLEEP_NOTIFICATION_MINUTE + SLEEP_NOTIFICATION_TIME_SPAN_MINUTE) {
-                        _logger.Debug("We are in the timeSpan!");
-
-                        // Check also if we are in the home network, otherwise
-                        // it's senseless to display the notification, but we
-                        // set a flag to display notification later
-                        if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
-                            _logger.Debug("Showing notification go to sleep!");
-                            _notificationController.CreateSleepHeatingNotification();
-                        } else {
-                            _logger.Debug("Saving flag to display notification later!");
-                            _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, true);
-                        }
-                    } else {
-                        _logger.Debug("We are NOT in the timeSpan!");
-                    }
-                }
-                // Check if time is ready to delete the flag to display the
-                // sleep notification
-                else if ((int) calendar.get(Calendar.HOUR_OF_DAY) == CLEAR_NOTIFICATION_DISPLAY_HOUR) {
-                    if ((int) calendar.get(Calendar.MINUTE) == CLEAR_NOTIFICATION_DISPLAY_MINUTE) {
-                        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
-                            _logger.Debug("We entered home and flag is active to display sleep notification");
-                            _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
-                        }
-                    }
-                }
-            }
-        }
-    };
-
-    private BroadcastReceiver _weatherModelReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_weatherModelReceiver onReceive");
-
-            WeatherModel newWeather = (WeatherModel) intent.getSerializableExtra(OWBundles.EXTRA_WEATHER_MODEL);
-            if (newWeather != null) {
-                _currentWeather = newWeather;
-                sendWeatherToWear();
-            }
-
-            if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION)) {
-                _notificationController.CreateTemperatureNotification(SensorTemperatureView.class, _temperatureList, _currentWeather);
-            }
-
-            _broadcastController.SendSerializableArrayBroadcast(
-                    Broadcasts.UPDATE_WEATHER_VIEW,
-                    new String[]{Bundles.WEATHER_CURRENT},
-                    new Object[]{_currentWeather});
-
-            updateDownloadCount();
-        }
-    };
-
-    private BroadcastReceiver _addReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addReceiver onReceive");
-
-            LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
-            if (lucaObject == null) {
-                _logger.Error("_addReceiver received data with null lucaObject!");
-                return;
-            }
-
-            String action = intent.getStringExtra(Bundles.ACTION);
-            if (action == null) {
-                _logger.Error("_addReceiver received data with null action!");
-                return;
-            }
-
-            switch (lucaObject) {
-                case BIRTHDAY:
-                    _serviceController.StartRestService(
-                            Bundles.BIRTHDAY_DOWNLOAD,
-                            action,
-                            Broadcasts.ADD_BIRTHDAY,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case MOVIE:
-                    _serviceController.StartRestService(
-                            Bundles.MOVIE_DOWNLOAD,
-                            action,
-                            Broadcasts.ADD_MOVIE,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case SCHEDULE:
-                case TIMER:
-                    _serviceController.StartRestService(
-                            Bundles.SCHEDULE_DOWNLOAD,
-                            action,
-                            Broadcasts.ADD_SCHEDULE,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case WIRELESS_SOCKET:
-                    _serviceController.StartRestService(
-                            Bundles.SOCKET_DOWNLOAD,
-                            action,
-                            Broadcasts.ADD_SOCKET,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                default:
-                    _logger.Error("Cannot add object: " + lucaObject.toString());
-                    break;
-            }
+            _logger.Debug("_reloadAllReceiver onReceive");
+            download();
         }
     };
 
@@ -1083,11 +1133,27 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _reloadMediaMirrorReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _reloadChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadMediaMirrorReceiver onReceive");
-            _downloadMediaMirrorRunnable.run();
+            _logger.Debug("_reloadChangeReceiver onReceive");
+            _downloadChangeRunnable.run();
+        }
+    };
+
+    private BroadcastReceiver _reloadCurrentWeatherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadCurrentWeatherReceiver onReceive");
+            _downloadCurrentWeatherRunnable.run();
+        }
+    };
+
+    private BroadcastReceiver _reloadForecastWeatherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadForecastWeatherReceiver onReceive");
+            _downloadForecastWeatherRunnable.run();
         }
     };
 
@@ -1096,6 +1162,14 @@ public class MainService extends Service {
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_reloadListedMenuReceiver onReceive");
             _downloadListedMenuRunnable.run();
+        }
+    };
+
+    private BroadcastReceiver _reloadMediaMirrorReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadMediaMirrorReceiver onReceive");
+            _downloadMediaMirrorRunnable.run();
         }
     };
 
@@ -1131,22 +1205,6 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _reloadSocketReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadSocketReceiver onReceive");
-            _downloadSocketRunnable.run();
-        }
-    };
-
-    private BroadcastReceiver _reloadChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadChangeReceiver onReceive");
-            _downloadChangeRunnable.run();
-        }
-    };
-
     private BroadcastReceiver _reloadShoppingListReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1155,130 +1213,19 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _reloadCurrentWeatherReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _reloadSocketReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadCurrentWeatherReceiver onReceive");
-            _downloadCurrentWeatherRunnable.run();
+            _logger.Debug("_reloadSocketReceiver onReceive");
+            _downloadSocketRunnable.run();
         }
     };
 
-    private BroadcastReceiver _reloadForecastWeatherReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _reloadTemperatureReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadForecastWeatherReceiver onReceive");
-            _downloadForecastWeatherRunnable.run();
-        }
-    };
-
-    private BroadcastReceiver _startDownloadReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_startDownloadReceiver onReceive");
-
-            LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
-            if (lucaObject == null) {
-                _logger.Error("_downloadReceiver received data with null lucaObject!");
-                return;
-            }
-
-            String action = intent.getStringExtra(Bundles.ACTION);
-            if (action != null) {
-                _logger.Error("_startDownloadReceiver received data with action! Not performing download!");
-                return;
-            }
-
-            switch (lucaObject) {
-                case BIRTHDAY:
-                    String[] birthdayAnswerArray = intent.getStringArrayExtra(Bundles.BIRTHDAY_DOWNLOAD);
-                    boolean addBirthdaySuccess = true;
-                    for (String answer : birthdayAnswerArray) {
-                        _logger.Debug(answer);
-                        if (!answer.endsWith("1")) {
-                            addBirthdaySuccess = false;
-                            break;
-                        }
-                    }
-                    if (addBirthdaySuccess) {
-                        _downloadBirthdayRunnable.run();
-                    } else {
-                        _logger.Warn("Add of birthday failed!");
-                        Toasty.error(_context, "Add of birthday failed!", Toast.LENGTH_LONG).show();
-                    }
-                    break;
-                case MENU:
-                    String[] menuAnswerArray = intent.getStringArrayExtra(Bundles.MENU_DOWNLOAD);
-                    boolean addMenuSuccess = true;
-                    for (String answer : menuAnswerArray) {
-                        _logger.Debug(answer);
-                        if (!answer.endsWith("1")) {
-                            addMenuSuccess = false;
-                            break;
-                        }
-                    }
-                    if (addMenuSuccess) {
-                        _downloadMenuRunnable.run();
-                    } else {
-                        _logger.Warn("Add of menu failed!");
-                        Toasty.error(_context, "Add of menu failed!", Toast.LENGTH_LONG).show();
-                    }
-                    break;
-                case MOVIE:
-                    String[] movieAnswerArray = intent.getStringArrayExtra(Bundles.MOVIE_DOWNLOAD);
-                    boolean addMovieSuccess = true;
-                    for (String answer : movieAnswerArray) {
-                        _logger.Debug(answer);
-                        if (!answer.endsWith("1")) {
-                            addMovieSuccess = false;
-                            break;
-                        }
-                    }
-                    if (addMovieSuccess) {
-                        _downloadMovieRunnable.run();
-                    } else {
-                        _logger.Warn("Add of movie failed!");
-                        Toasty.error(_context, "Add of movie failed!", Toast.LENGTH_LONG).show();
-                    }
-                    break;
-                case SCHEDULE:
-                case TIMER:
-                    String[] scheduleAnswerArray = intent.getStringArrayExtra(Bundles.SCHEDULE_DOWNLOAD);
-                    boolean addScheduleSuccess = true;
-                    for (String answer : scheduleAnswerArray) {
-                        _logger.Debug(answer);
-                        if (!answer.endsWith("1")) {
-                            addScheduleSuccess = false;
-                            break;
-                        }
-                    }
-                    if (addScheduleSuccess) {
-                        _downloadScheduleRunnable.run();
-                    } else {
-                        _logger.Warn("Add of schedule failed!");
-                        Toasty.error(_context, "Add of schedule failed!", Toast.LENGTH_LONG).show();
-                    }
-                    break;
-                case WIRELESS_SOCKET:
-                    String[] socketAnswerArray = intent.getStringArrayExtra(Bundles.SOCKET_DOWNLOAD);
-                    boolean addSocketSuccess = true;
-                    for (String answer : socketAnswerArray) {
-                        _logger.Debug(answer);
-                        if (!answer.endsWith("1")) {
-                            addSocketSuccess = false;
-                            break;
-                        }
-                    }
-                    if (addSocketSuccess) {
-                        _downloadSocketRunnable.run();
-                    } else {
-                        _logger.Warn("Add of socket failed!");
-                        Toasty.error(_context, "Add of socket failed!", Toast.LENGTH_LONG).show();
-                    }
-                    break;
-                default:
-                    _logger.Error("Cannot start download object: " + lucaObject.toString());
-                    break;
-            }
+            _logger.Debug("_reloadTemperatureReceiver onReceive");
+            _downloadTemperatureRunnable.run();
         }
     };
 
@@ -1332,68 +1279,63 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
+    // Receiver used for receiving the current battery state of the phone and sending the state to the watch
+    private BroadcastReceiver _batteryChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateReceiver onReceive");
+            _logger.Debug("_batteryChangedReceiver onReceive");
 
-            LucaObject lucaObject = (LucaObject) intent.getSerializableExtra(Bundles.LUCA_OBJECT);
-            if (lucaObject == null) {
-                _logger.Error("_updateReceiver received data with null lucaObject!");
-                return;
+            int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+            if (level != -1) {
+                _logger.Debug("new battery level: " + String.valueOf(level));
+                String message = "PhoneBattery:" + String.valueOf(level) + "%";
+                _serviceController.SendMessageToWear(message);
             }
+        }
+    };
 
-            String action = intent.getStringExtra(Bundles.ACTION);
-            if (action == null) {
-                _logger.Error("_updateReceiver received data with null action!");
-                return;
-            }
+    // Receiver used for receiving the current time and check if time is ready
+    // to display sleep notification or set a flag if not or to delete this flag
+    private BroadcastReceiver _timeTickReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            _logger.Debug("action: " + action);
 
-            switch (lucaObject) {
-                case BIRTHDAY:
-                    _serviceController.StartRestService(
-                            Bundles.BIRTHDAY_DOWNLOAD,
-                            action,
-                            Broadcasts.UPDATE_BIRTHDAY,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case MENU:
-                    _serviceController.StartRestService(
-                            Bundles.MENU_DOWNLOAD,
-                            action,
-                            Broadcasts.UPDATE_MENU,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case MOVIE:
-                    _serviceController.StartRestService(
-                            Bundles.MOVIE_DOWNLOAD,
-                            action,
-                            Broadcasts.UPDATE_MOVIE,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case SCHEDULE:
-                case TIMER:
-                    _serviceController.StartRestService(
-                            Bundles.SCHEDULE_DOWNLOAD,
-                            action,
-                            Broadcasts.UPDATE_SCHEDULE,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                case WIRELESS_SOCKET:
-                    _serviceController.StartRestService(
-                            Bundles.SOCKET_DOWNLOAD,
-                            action,
-                            Broadcasts.UPDATE_SOCKET,
-                            lucaObject,
-                            RaspberrySelection.BOTH);
-                    break;
-                default:
-                    _logger.Error("Cannot update object: " + lucaObject.toString());
-                    break;
+            if (action.equals(Intent.ACTION_TIME_TICK)) {
+                Calendar calendar = Calendar.getInstance();
+
+                // Check, if the time is ready for displaying the notification
+                // time needs to be NOTIFICATION_HOUR:NOTIFICATION_MINUTE
+                if ((int) calendar.get(Calendar.HOUR_OF_DAY) == SLEEP_NOTIFICATION_HOUR) {
+                    if (calendar.get(Calendar.MINUTE) > SLEEP_NOTIFICATION_MINUTE - SLEEP_NOTIFICATION_TIME_SPAN_MINUTE
+                            && calendar.get(Calendar.MINUTE) < SLEEP_NOTIFICATION_MINUTE + SLEEP_NOTIFICATION_TIME_SPAN_MINUTE) {
+                        _logger.Debug("We are in the timeSpan!");
+
+                        // Check also if we are in the home network, otherwise
+                        // it's senseless to display the notification, but we
+                        // set a flag to display notification later
+                        if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
+                            _logger.Debug("Showing notification go to sleep!");
+                            _notificationController.CreateSleepHeatingNotification();
+                        } else {
+                            _logger.Debug("Saving flag to display notification later!");
+                            _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, true);
+                        }
+                    } else {
+                        _logger.Debug("We are NOT in the timeSpan!");
+                    }
+                }
+                // Check if time is ready to delete the flag to display the
+                // sleep notification
+                else if ((int) calendar.get(Calendar.HOUR_OF_DAY) == CLEAR_NOTIFICATION_DISPLAY_HOUR) {
+                    if ((int) calendar.get(Calendar.MINUTE) == CLEAR_NOTIFICATION_DISPLAY_MINUTE) {
+                        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE)) {
+                            _logger.Debug("We entered home and flag is active to display sleep notification");
+                            _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION_ACTIVE, false);
+                        }
+                    }
+                }
             }
         }
     };
@@ -1415,10 +1357,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.BIRTHDAY_DOWNLOAD,
-                    ServerActions.GET_BIRTHDAYS,
-                    Broadcasts.DOWNLOAD_BIRTHDAY_FINISHED,
-                    LucaObject.BIRTHDAY,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_BIRTHDAYS.toString(),
+                    Broadcasts.DOWNLOAD_BIRTHDAY_FINISHED);
         }
     };
 
@@ -1439,10 +1379,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.CHANGE_DOWNLOAD,
-                    ServerActions.GET_CHANGES,
-                    Broadcasts.DOWNLOAD_CHANGE_FINISHED,
-                    LucaObject.CHANGE,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_CHANGES.toString(),
+                    Broadcasts.DOWNLOAD_CHANGE_FINISHED);
         }
     };
 
@@ -1493,10 +1431,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.INFORMATION_DOWNLOAD,
-                    ServerActions.GET_INFORMATIONS,
-                    Broadcasts.DOWNLOAD_INFORMATION_FINISHED,
-                    LucaObject.INFORMATION,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_INFORMATIONS.toString(),
+                    Broadcasts.DOWNLOAD_INFORMATION_FINISHED);
         }
     };
 
@@ -1519,10 +1455,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.LISTED_MENU_DOWNLOAD,
-                    ServerActions.GET_LISTED_MENU,
-                    Broadcasts.DOWNLOAD_LISTED_MENU_FINISHED,
-                    LucaObject.LISTEDMENU,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_LISTED_MENU.toString(),
+                    Broadcasts.DOWNLOAD_LISTED_MENU_FINISHED);
         }
 
         private void loadFromDatabase() {
@@ -1552,10 +1486,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.MAP_CONTENT_DOWNLOAD,
-                    ServerActions.GET_MAP_CONTENTS,
-                    Broadcasts.DOWNLOAD_MAP_CONTENT_FINISHED,
-                    LucaObject.MAP_CONTENT,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_MAP_CONTENTS.toString(),
+                    Broadcasts.DOWNLOAD_MAP_CONTENT_FINISHED);
         }
     };
 
@@ -1574,13 +1506,13 @@ public class MainService extends Service {
                 return;
             }
 
-            for (final MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+            for (final MediaServerSelection entry : MediaServerSelection.values()) {
                 if (entry.GetId() == 0) {
                     continue;
                 }
 
-                _logger.Debug(String.format(Locale.GERMAN, "Trying serverIp %s", entry.GetIp()));
-                _mediaMirrorController.SendCommand(entry.GetIp(), ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _logger.Debug(String.format(Locale.getDefault(), "Trying serverIp %s", entry.GetIp()));
+                _mediaMirrorController.SendCommand(entry.GetIp(), MediaServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
             }
         }
     };
@@ -1604,10 +1536,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.MENU_DOWNLOAD,
-                    ServerActions.GET_MENU,
-                    Broadcasts.DOWNLOAD_MENU_FINISHED,
-                    LucaObject.MENU,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_MENU.toString(),
+                    Broadcasts.DOWNLOAD_MENU_FINISHED);
         }
 
         private void loadFromDatabase() {
@@ -1637,10 +1567,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.MOTION_CAMERA_DTO_DOWNLOAD,
-                    ServerActions.GET_MOTION_DATA,
-                    Broadcasts.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED,
-                    LucaObject.MOTION_CAMERA_DTO,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_MOTION_DATA.toString(),
+                    Broadcasts.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED);
         }
     };
 
@@ -1661,10 +1589,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.MOVIE_DOWNLOAD,
-                    ServerActions.GET_MOVIES,
-                    Broadcasts.DOWNLOAD_MOVIE_FINISHED,
-                    LucaObject.MOVIE,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_MOVIES.toString(),
+                    Broadcasts.DOWNLOAD_MOVIE_FINISHED);
         }
     };
 
@@ -1685,10 +1611,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.SCHEDULE_DOWNLOAD,
-                    ServerActions.GET_SCHEDULES,
-                    Broadcasts.DOWNLOAD_SCHEDULE_FINISHED,
-                    LucaObject.SCHEDULE,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_SCHEDULES.toString(),
+                    Broadcasts.DOWNLOAD_SCHEDULE_FINISHED);
         }
     };
 
@@ -1716,19 +1640,15 @@ public class MainService extends Service {
                         _serviceController.StartRestService(
                                 Bundles.SHOPPING_LIST,
                                 entry.GetCommandDelete(),
-                                "",
-                                LucaObject.SHOPPING_ENTRY,
-                                RaspberrySelection.BOTH);
+                                "");
                     }
                 }
             }
 
             _serviceController.StartRestService(
                     Bundles.SHOPPING_LIST_DOWNLOAD,
-                    ServerActions.GET_SHOPPING_LIST,
-                    Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED,
-                    LucaObject.SHOPPING_ENTRY,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_SHOPPING_LIST.toString(),
+                    Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED);
         }
 
         private void loadFromDatabase() {
@@ -1760,10 +1680,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.SOCKET_DOWNLOAD,
-                    ServerActions.GET_SOCKETS,
-                    Broadcasts.DOWNLOAD_SOCKET_FINISHED,
-                    LucaObject.WIRELESS_SOCKET,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_SOCKETS.toString(),
+                    Broadcasts.DOWNLOAD_SOCKET_FINISHED);
         }
 
         private void loadFromDatabase() {
@@ -1773,6 +1691,7 @@ public class MainService extends Service {
                     Broadcasts.UPDATE_SOCKET_LIST,
                     new String[]{Bundles.SOCKET_LIST},
                     new Object[]{_wirelessSocketList});
+            sendSocketsToWear();
         }
     };
 
@@ -1795,10 +1714,8 @@ public class MainService extends Service {
 
             _serviceController.StartRestService(
                     Bundles.TEMPERATURE_DOWNLOAD,
-                    ServerActions.GET_TEMPERATURES,
-                    Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED,
-                    LucaObject.TEMPERATURE,
-                    RaspberrySelection.BOTH);
+                    LucaServerAction.GET_TEMPERATURES.toString(),
+                    Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED);
         }
     };
 
@@ -1808,7 +1725,7 @@ public class MainService extends Service {
             _broadcastController.SendSerializableArrayBroadcast(
                     Broadcasts.COMMAND,
                     new String[]{Bundles.COMMAND, Bundles.NAVIGATE_DATA},
-                    new Object[]{Command.NAVIGATE, NavigateData.FINISH});
+                    new Object[]{Command.NAVIGATE, NavigationData.FINISH});
         }
     };
 
@@ -1842,7 +1759,11 @@ public class MainService extends Service {
             _mediaMirrorController = new MediaMirrorController(_context);
             _mediaMirrorController.Initialize();
             _menuController = new MenuController(_context);
-            _networkController = new NetworkController(_context, new DialogController(_context, ContextCompat.getColor(_context, R.color.TextIcon), ContextCompat.getColor(_context, R.color.Background)));
+            _networkController = new NetworkController(_context,
+                    new DialogController(
+                            _context,
+                            ContextCompat.getColor(_context, R.color.TextIcon),
+                            ContextCompat.getColor(_context, R.color.Background)));
             _notificationController = new LucaNotificationController(_context);
             _openWeatherController = new OpenWeatherController(_context, Constants.CITY);
             _receiverController = new ReceiverController(_context);
@@ -1874,15 +1795,18 @@ public class MainService extends Service {
 
         try {
             Bundle data = intent.getExtras();
-            MainServiceAction action = (MainServiceAction) data.getSerializable(Bundles.MAIN_SERVICE_ACTION);
+            MainServiceAction action = (MainServiceAction) data.getSerializable(Bundles.ACTION);
+
             if (action != null) {
                 _logger.Debug("Received action is: " + action.toString());
+
                 switch (action) {
                     case BOOT:
                         _progress = 0;
                         _downloadCount = Constants.DOWNLOAD_STEPS;
                         boot();
                         break;
+
                     default:
                         _logger.Warn("Action not supported! " + action.toString());
                         break;
@@ -1927,10 +1851,32 @@ public class MainService extends Service {
     }
 
     private void registerReceiver() {
-        _receiverController.RegisterReceiver(_actionReceiver, new String[]{Broadcasts.MAIN_SERVICE_COMMAND});
+        _receiverController.RegisterReceiver(_actionReceiver, new String[]{Broadcasts.HOME_AUTOMATION_COMMAND});
+        _receiverController.RegisterReceiver(_addReceiver, new String[]{
+                Broadcasts.ADD_BIRTHDAY,
+                Broadcasts.ADD_MOVIE,
+                Broadcasts.ADD_SCHEDULE,
+                Broadcasts.ADD_SOCKET});
+        _receiverController.RegisterReceiver(_updateReceiver, new String[]{
+                Broadcasts.UPDATE_BIRTHDAY,
+                Broadcasts.UPDATE_MOVIE,
+                Broadcasts.UPDATE_SCHEDULE,
+                Broadcasts.UPDATE_SOCKET_LIST});
+        _receiverController.RegisterReceiver(_startDownloadReceiver, new String[]{
+                Broadcasts.ADD_BIRTHDAY,
+                Broadcasts.ADD_MOVIE,
+                Broadcasts.ADD_SCHEDULE,
+                Broadcasts.ADD_SOCKET,
+                Broadcasts.UPDATE_BIRTHDAY,
+                Broadcasts.UPDATE_MENU,
+                Broadcasts.UPDATE_MOVIE,
+                Broadcasts.UPDATE_SCHEDULE,
+                Broadcasts.UPDATE_SOCKET_LIST});
+
         _receiverController.RegisterReceiver(_birthdayDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_BIRTHDAY_FINISHED});
         _receiverController.RegisterReceiver(_changeDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_CHANGE_FINISHED});
-        _receiverController.RegisterReceiver(_forecastModelReceiver, new String[]{OWBroadcasts.FORECAST_WEATHER_JSON_FINISHED});
+        _receiverController.RegisterReceiver(_currentWeatherDownloadModelReceiver, new String[]{OWBroadcasts.CURRENT_WEATHER_JSON_FINISHED});
+        _receiverController.RegisterReceiver(_forecastWeatherDownloadReceiver, new String[]{OWBroadcasts.FORECAST_WEATHER_JSON_FINISHED});
         _receiverController.RegisterReceiver(_informationDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_INFORMATION_FINISHED});
         _receiverController.RegisterReceiver(_mapContentDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_MAP_CONTENT_FINISHED});
         _receiverController.RegisterReceiver(_mediaMirrorViewDtoDownloadReceiver, new String[]{Broadcasts.MEDIAMIRROR_VIEW_DTO});
@@ -1939,34 +1885,34 @@ public class MainService extends Service {
         _receiverController.RegisterReceiver(_motionCameraDtoDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED});
         _receiverController.RegisterReceiver(_movieDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_MOVIE_FINISHED});
         _receiverController.RegisterReceiver(_scheduleDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_SCHEDULE_FINISHED});
+        _receiverController.RegisterReceiver(_shoppingListDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED});
         _receiverController.RegisterReceiver(_socketDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_SOCKET_FINISHED});
         _receiverController.RegisterReceiver(_temperatureDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED});
-        _receiverController.RegisterReceiver(_weatherModelReceiver, new String[]{OWBroadcasts.CURRENT_WEATHER_JSON_FINISHED});
-        _receiverController.RegisterReceiver(_shoppingListDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED});
 
-        _receiverController.RegisterReceiver(_addReceiver, new String[]{Broadcasts.ADD_BIRTHDAY, Broadcasts.ADD_MOVIE, Broadcasts.ADD_SCHEDULE, Broadcasts.ADD_SOCKET});
-        _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_BIRTHDAY, Broadcasts.UPDATE_MOVIE, Broadcasts.UPDATE_SCHEDULE, Broadcasts.UPDATE_SOCKET});
-        _receiverController.RegisterReceiver(_startDownloadReceiver, new String[]{Broadcasts.ADD_BIRTHDAY, Broadcasts.ADD_MOVIE, Broadcasts.ADD_SCHEDULE, Broadcasts.ADD_SOCKET, Broadcasts.UPDATE_BIRTHDAY, Broadcasts.UPDATE_MENU, Broadcasts.UPDATE_MOVIE, Broadcasts.UPDATE_SCHEDULE, Broadcasts.UPDATE_SOCKET});
-
+        _receiverController.RegisterReceiver(_reloadAllReceiver, new String[]{Broadcasts.RELOAD_ALL});
         _receiverController.RegisterReceiver(_reloadBirthdayReceiver, new String[]{Broadcasts.RELOAD_BIRTHDAY});
-        _receiverController.RegisterReceiver(_reloadMediaMirrorReceiver, new String[]{Broadcasts.RELOAD_MEDIAMIRROR});
+        _receiverController.RegisterReceiver(_reloadChangeReceiver, new String[]{
+                Broadcasts.RELOAD_BIRTHDAY,
+                Broadcasts.RELOAD_MOVIE,
+                Broadcasts.RELOAD_SCHEDULE,
+                Broadcasts.RELOAD_SOCKETS,
+                Broadcasts.RELOAD_TIMER});
+        _receiverController.RegisterReceiver(_reloadCurrentWeatherReceiver, new String[]{Broadcasts.RELOAD_CURRENT_WEATHER});
+        _receiverController.RegisterReceiver(_reloadForecastWeatherReceiver, new String[]{Broadcasts.RELOAD_FORECAST_WEATHER});
         _receiverController.RegisterReceiver(_reloadListedMenuReceiver, new String[]{Broadcasts.RELOAD_LISTED_MENU});
+        _receiverController.RegisterReceiver(_reloadMediaMirrorReceiver, new String[]{Broadcasts.RELOAD_MEDIAMIRROR});
         _receiverController.RegisterReceiver(_reloadMenuReceiver, new String[]{Broadcasts.RELOAD_MENU});
         _receiverController.RegisterReceiver(_reloadMotionCameraDtoReceiver, new String[]{Broadcasts.RELOAD_MOTION_CAMERA_DTO});
         _receiverController.RegisterReceiver(_reloadMovieReceiver, new String[]{Broadcasts.RELOAD_MOVIE});
         _receiverController.RegisterReceiver(_reloadScheduleReceiver, new String[]{Broadcasts.RELOAD_SCHEDULE, Broadcasts.RELOAD_TIMER});
-        _receiverController.RegisterReceiver(_reloadSocketReceiver, new String[]{Broadcasts.RELOAD_SOCKETS});
-        _receiverController.RegisterReceiver(_reloadChangeReceiver, new String[]{Broadcasts.RELOAD_BIRTHDAY, Broadcasts.RELOAD_MOVIE, Broadcasts.RELOAD_SCHEDULE, Broadcasts.RELOAD_TIMER, Broadcasts.RELOAD_SOCKETS});
         _receiverController.RegisterReceiver(_reloadShoppingListReceiver, new String[]{Broadcasts.RELOAD_SHOPPING_LIST});
-        _receiverController.RegisterReceiver(_reloadCurrentWeatherReceiver, new String[]{Broadcasts.RELOAD_CURRENT_WEATHER});
-        _receiverController.RegisterReceiver(_reloadForecastWeatherReceiver, new String[]{Broadcasts.RELOAD_FORECAST_WEATHER});
+        _receiverController.RegisterReceiver(_reloadSocketReceiver, new String[]{Broadcasts.RELOAD_SOCKETS});
+        _receiverController.RegisterReceiver(_reloadTemperatureReceiver, new String[]{Broadcasts.RELOAD_TEMPERATURE});
 
         _receiverController.RegisterReceiver(_updateBoughtShoppingListReceiver, new String[]{Broadcasts.UPDATE_BOUGHT_SHOPPING_LIST});
 
         _receiverController.RegisterReceiver(_batteryChangedReceiver, new String[]{Intent.ACTION_BATTERY_CHANGED});
         _receiverController.RegisterReceiver(_timeTickReceiver, new String[]{Intent.ACTION_TIME_TICK});
-
-        _receiverController.RegisterReceiver(_forecastReceiver, new String[]{OWBroadcasts.FORECAST_WEATHER_JSON_FINISHED});
     }
 
     private void addSchedules() {
@@ -2007,7 +1953,7 @@ public class MainService extends Service {
                         _broadcastController.SendSerializableArrayBroadcast(
                                 Broadcasts.COMMAND,
                                 new String[]{Bundles.COMMAND, Bundles.NAVIGATE_DATA},
-                                new Object[]{Command.NAVIGATE, NavigateData.HOME});
+                                new Object[]{Command.NAVIGATE, NavigationData.MAIN});
 
                         return;
                     }
@@ -2018,25 +1964,22 @@ public class MainService extends Service {
                     addSchedules();
                 }
 
-                prepareDownloadAll();
-                startDownloadLucaHomeAll();
-                startDownloadOtherAll();
+                download();
             }
         }
     }
 
-    private void prepareDownloadAll() {
-        _logger.Debug("prepareDownloadAll");
+    private void download() {
+        _logger.Debug("download");
 
         _downloadingData = true;
         _progress = 0;
         _downloadCount = Constants.DOWNLOAD_STEPS;
 
         startTimeout();
-    }
 
-    private void startDownloadLucaHomeAll() {
-        _logger.Debug("startDownloadLucaHomeAll");
+        _downloadCurrentWeatherRunnable.run();
+        _downloadForecastWeatherRunnable.run();
 
         _downloadBirthdayRunnable.run();
         _downloadChangeRunnable.run();
@@ -2050,13 +1993,6 @@ public class MainService extends Service {
         _downloadShoppingListRunnable.run();
         _downloadSocketRunnable.run();
         _downloadTemperatureRunnable.run();
-    }
-
-    private void startDownloadOtherAll() {
-        _logger.Debug("startDownloadOtherAll");
-
-        _downloadCurrentWeatherRunnable.run();
-        _downloadForecastWeatherRunnable.run();
     }
 
     private void updateDownloadCount() {
@@ -2073,7 +2009,7 @@ public class MainService extends Service {
             _broadcastController.SendSerializableArrayBroadcast(
                     Broadcasts.COMMAND,
                     new String[]{Bundles.COMMAND, Bundles.NAVIGATE_DATA},
-                    new Object[]{Command.NAVIGATE, NavigateData.HOME});
+                    new Object[]{Command.NAVIGATE, NavigationData.MAIN});
         }
     }
 
@@ -2153,7 +2089,7 @@ public class MainService extends Service {
 
         String messageText = "MediaMirror:";
         for (int index = 0; index < _mediaMirrorList.getSize(); index++) {
-            messageText += _mediaMirrorList.getValue(index).GetMediaMirrorSelection().GetIp() + ":"
+            messageText += _mediaMirrorList.getValue(index).GetMediaServerSelection().GetIp() + ":"
                     + String.valueOf(_mediaMirrorList.getValue(index).GetBatteryLevel()) + ":"
                     + String.valueOf(_mediaMirrorList.getValue(index).GetVolume()) + ":"
                     + _mediaMirrorList.getValue(index).GetYoutubeId() + ":"
@@ -2320,9 +2256,7 @@ public class MainService extends Service {
                 _serviceController.StartRestService(
                         entry.GetName(),
                         entry.GetAction(),
-                        entry.GetBroadcast(),
-                        LucaObject.WIRELESS_SOCKET,
-                        RaspberrySelection.BOTH);
+                        entry.GetBroadcast());
             }
         } else {
             _logger.Debug("No actions stored!");

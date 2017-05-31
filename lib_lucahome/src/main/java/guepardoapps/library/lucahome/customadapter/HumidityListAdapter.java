@@ -19,8 +19,9 @@ public class HumidityListAdapter extends BaseAdapter {
     private SerializableList<HumidityDto> _humidityList;
     private static LayoutInflater _inflater = null;
 
-    public HumidityListAdapter(@NonNull Context context,
-                               @NonNull SerializableList<HumidityDto> humidityList) {
+    public HumidityListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<HumidityDto> humidityList) {
         _humidityList = humidityList;
         _inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }

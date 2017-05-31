@@ -18,7 +18,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 import android.webkit.CookieManager;
@@ -27,7 +26,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -39,7 +37,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
-import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -66,11 +63,9 @@ import guepardoapps.library.lucahome.common.dto.TimerDto;
 import guepardoapps.library.lucahome.common.dto.UserDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.dto.YoutubeVideoDto;
-import guepardoapps.library.lucahome.common.enums.LucaObject;
-import guepardoapps.library.lucahome.common.enums.MainServiceAction;
-import guepardoapps.library.lucahome.common.enums.MediaMirrorSelection;
-import guepardoapps.library.lucahome.common.enums.RaspberrySelection;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
+import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
+import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.library.lucahome.common.enums.ShoppingEntryGroup;
 import guepardoapps.library.lucahome.common.enums.YoutubeId;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -85,7 +80,6 @@ import guepardoapps.library.toolset.common.classes.SerializableTime;
 import guepardoapps.library.toolset.common.enums.Weekday;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.DialogController;
-
 import guepardoapps.library.toolset.controller.MailController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 import guepardoapps.library.toolset.controller.SharedPrefController;
@@ -93,9 +87,13 @@ import guepardoapps.library.toolset.runnable.EditDialogRunnable;
 
 public class LucaDialogController extends DialogController {
 
+    public enum LucaObject {NULL, BIRTHDAY, MENU, MOVIE, SCHEDULE, SOCKET, TIMER}
+
     private static final String TAG = LucaDialogController.class.getSimpleName();
 
-    private LucaObject _lucaObject;
+    private LucaObject _lucaObject = LucaObject.NULL;
+    private HomeAutomationAction _homeAutomationAction = HomeAutomationAction.NULL;
+
     private BirthdayDto _birthday;
     private MovieDto _movie;
     private WirelessSocketDto _socket;
@@ -113,7 +111,6 @@ public class LucaDialogController extends DialogController {
     private String _scheduleActionString;
     private SerializableTime _scheduleTime;
     private boolean _schedulePlaySound;
-    private RaspberrySelection _schedulePlayRaspberry;
 
     private String _timerName;
     private String _timerSocketString;
@@ -139,8 +136,6 @@ public class LucaDialogController extends DialogController {
     private BroadcastReceiver _menuReceiver = null;
     private BroadcastReceiver _shoppingListReceiver = null;
 
-    private MainServiceAction _mainServiceAction = MainServiceAction.NULL;
-
     private EditDialogRunnable _searchYoutubeRunnable = new EditDialogRunnable() {
 
         private int _searchIndex = 0;
@@ -149,7 +144,7 @@ public class LucaDialogController extends DialogController {
         @Override
         public void SetData(@NonNull String[] data) {
             for (String entry : data) {
-                _logger.Debug(String.format(Locale.GERMAN, "SetData with entry %s in data", entry));
+                _logger.Debug(String.format(Locale.getDefault(), "SetData with entry %s in data", entry));
             }
             _data = data;
         }
@@ -180,8 +175,8 @@ public class LucaDialogController extends DialogController {
         public void run() {
             checkOpenDialog();
 
-            if (_lucaObject == null) {
-                _logger.Error("_lucaObject is null!");
+            if (_lucaObject == null || _lucaObject == LucaObject.NULL) {
+                _logger.Error("_dialogType is null!");
                 CloseDialogCallback.run();
                 resetValues();
                 return;
@@ -189,30 +184,55 @@ public class LucaDialogController extends DialogController {
 
             switch (_lucaObject) {
                 case BIRTHDAY:
-                    ShowDialogDouble("Delete Birthday", "Do you really want to delete the birthday?", "Yes",
-                            _deleteRunnable, "Cancel", CloseDialogCallback, false);
+                    ShowDialogDouble(
+                            "Delete Birthday",
+                            "Do you really want to delete the birthday?",
+                            "Yes", _deleteRunnable,
+                            "Cancel", CloseDialogCallback,
+                            false);
                     _isDialogOpen = true;
                     break;
+
                 case MOVIE:
-                    ShowDialogDouble("Delete Movie", "Do you really want to delete the movie?", "Yes", _deleteRunnable,
-                            "Cancel", CloseDialogCallback, false);
+                    ShowDialogDouble(
+                            "Delete Movie",
+                            "Do you really want to delete the movie?",
+                            "Yes", _deleteRunnable,
+                            "Cancel", CloseDialogCallback,
+                            false);
                     _isDialogOpen = true;
                     break;
-                case WIRELESS_SOCKET:
-                    ShowDialogDouble("Delete Socket", "Do you really want to delete the socket?", "Yes", _deleteRunnable,
-                            "Cancel", CloseDialogCallback, false);
-                    _isDialogOpen = true;
-                    break;
+
                 case SCHEDULE:
-                    ShowDialogDouble("Delete Schedule", "Do you really want to delete the schedule?", "Yes",
-                            _deleteRunnable, "Cancel", CloseDialogCallback, false);
+                    ShowDialogDouble(
+                            "Delete Schedule",
+                            "Do you really want to delete the schedule?",
+                            "Yes", _deleteRunnable,
+                            "Cancel", CloseDialogCallback,
+                            false);
                     _isDialogOpen = true;
                     break;
+
+                case SOCKET:
+                    ShowDialogDouble(
+                            "Delete Socket",
+                            "Do you really want to delete the socket?",
+                            "Yes", _deleteRunnable,
+                            "Cancel", CloseDialogCallback,
+                            false);
+                    _isDialogOpen = true;
+                    break;
+
                 case TIMER:
-                    ShowDialogDouble("Delete Timer", "Do you really want to delete the timer?", "Yes", _deleteRunnable,
-                            "Cancel", CloseDialogCallback, false);
+                    ShowDialogDouble(
+                            "Delete Timer",
+                            "Do you really want to delete the timer?",
+                            "Yes", _deleteRunnable,
+                            "Cancel", CloseDialogCallback,
+                            false);
                     _isDialogOpen = true;
                     break;
+
                 default:
                     _logger.Warn("Not possible to delete object " + _lucaObject.toString());
                     break;
@@ -224,7 +244,7 @@ public class LucaDialogController extends DialogController {
         @Override
         public void run() {
             if (_lucaObject == null) {
-                _logger.Error("_lucaObject is null");
+                _logger.Error("_dialogType is null");
                 CloseDialogCallback.run();
                 resetValues();
                 return;
@@ -236,40 +256,58 @@ public class LucaDialogController extends DialogController {
                         _logger.Error("_birthday is null!");
                         return;
                     }
-                    _serviceController.StartRestService(_birthday.GetName(), _birthday.GetCommandDelete(),
-                            Broadcasts.RELOAD_BIRTHDAY, _lucaObject, RaspberrySelection.BOTH);
+
+                    _serviceController.StartRestService(
+                            _birthday.GetName(),
+                            _birthday.GetCommandDelete(),
+                            Broadcasts.RELOAD_BIRTHDAY);
                     break;
+
                 case MOVIE:
                     if (_movie == null) {
                         _logger.Error("_movie is null!");
                         return;
                     }
-                    _serviceController.StartRestService(_movie.GetTitle(), _movie.GetCommandDelete(),
-                            Broadcasts.RELOAD_MOVIE, _lucaObject, RaspberrySelection.BOTH);
+
+                    _serviceController.StartRestService(
+                            _movie.GetTitle(),
+                            _movie.GetCommandDelete(),
+                            Broadcasts.RELOAD_MOVIE);
                     break;
-                case WIRELESS_SOCKET:
-                    if (_socket == null) {
-                        _logger.Error("_socket is null!");
-                        return;
-                    }
-                    _socketController.DeleteSocket(_socket);
-                    break;
+
                 case SCHEDULE:
                     if (_schedule == null) {
                         _logger.Error("_schedule is null!");
                         return;
                     }
-                    _serviceController.StartRestService(_schedule.GetName(), _schedule.GetCommandDelete(),
-                            Broadcasts.RELOAD_SCHEDULE, _lucaObject, RaspberrySelection.BOTH);
+
+                    _serviceController.StartRestService(
+                            _schedule.GetName(),
+                            _schedule.GetCommandDelete(),
+                            Broadcasts.RELOAD_SCHEDULE);
                     break;
+
+                case SOCKET:
+                    if (_socket == null) {
+                        _logger.Error("_socket is null!");
+                        return;
+                    }
+
+                    _socketController.DeleteSocket(_socket);
+                    break;
+
                 case TIMER:
                     if (_timer == null) {
                         _logger.Error("_timer is null!");
                         return;
                     }
-                    _serviceController.StartRestService(_timer.GetName(), _timer.GetCommandDelete(),
-                            Broadcasts.RELOAD_TIMER, _lucaObject, RaspberrySelection.BOTH);
+
+                    _serviceController.StartRestService(
+                            _timer.GetName(),
+                            _timer.GetCommandDelete(),
+                            Broadcasts.RELOAD_TIMER);
                     break;
+
                 default:
                     _logger.Warn("Still not possible to delete object " + _lucaObject.toString());
                     break;
@@ -309,14 +347,6 @@ public class LucaDialogController extends DialogController {
                         _logger.Warn("_movie is null!");
                     }
                     break;
-                case WIRELESS_SOCKET:
-                    if (_socket != null) {
-                        ShowAddSocketDialog(-1, null, null, _socket, false);
-                    } else {
-                        Toasty.error(_context, "_socket is null!", Toast.LENGTH_LONG).show();
-                        _logger.Warn("_socket is null!");
-                    }
-                    break;
                 case SCHEDULE:
                     if (_schedule != null) {
                         if (_socketList != null) {
@@ -328,6 +358,14 @@ public class LucaDialogController extends DialogController {
                     } else {
                         Toasty.error(_context, "_schedule is null!", Toast.LENGTH_LONG).show();
                         _logger.Warn("_schedule is null!");
+                    }
+                    break;
+                case SOCKET:
+                    if (_socket != null) {
+                        ShowAddSocketDialog(-1, null, null, _socket, false);
+                    } else {
+                        Toasty.error(_context, "_socket is null!", Toast.LENGTH_LONG).show();
+                        _logger.Warn("_socket is null!");
                     }
                     break;
                 case TIMER:
@@ -410,7 +448,7 @@ public class LucaDialogController extends DialogController {
         if (!_socketListInitialized) {
             _socketListInitialized = true;
             _socketList = socketList;
-            _logger.Info(String.format(Locale.GERMAN, "_socketList: %s", _socketList));
+            _logger.Info(String.format(Locale.getDefault(), "_socketList: %s", _socketList));
         }
     }
 
@@ -441,9 +479,9 @@ public class LucaDialogController extends DialogController {
         });
 
         Button btnOk = (Button) _dialog.findViewById(R.id.temperature_dialog_button);
-        btnOk.setOnClickListener(new OnClickListener() {
+        btnOk.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 CloseDialogCallback.run();
             }
         });
@@ -469,9 +507,9 @@ public class LucaDialogController extends DialogController {
         }
 
         Button btnSave = (Button) _dialog.findViewById(R.id.dialog_user_save_button);
-        btnSave.setOnClickListener(new OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 String userName = userNameEdit.getText().toString();
                 if (userName.length() < 3
                         || userName.contains(_context.getResources().getString(R.string.enterValidUser))
@@ -513,18 +551,18 @@ public class LucaDialogController extends DialogController {
         passwordTextView.setText(user.GetPassword());
 
         Button btnClose = (Button) _dialog.findViewById(R.id.dialog_user_close_button);
-        btnClose.setOnClickListener(new OnClickListener() {
+        btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 CloseDialogCallback.run();
                 resetValues();
             }
         });
 
         Button btnUpdate = (Button) _dialog.findViewById(R.id.dialog_user_update_button);
-        btnUpdate.setOnClickListener(new OnClickListener() {
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 CloseDialogCallback.run();
                 resetValues();
 
@@ -564,9 +602,9 @@ public class LucaDialogController extends DialogController {
         }
 
         Button btnSave = (Button) _dialog.findViewById(R.id.dialog_birthday_save_button);
-        btnSave.setOnClickListener(new OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 String name = birthdayNameEdit.getText().toString();
                 if (name.length() < 3) {
                     Toasty.warning(_context, "Name too short!", Toast.LENGTH_LONG).show();
@@ -589,9 +627,9 @@ public class LucaDialogController extends DialogController {
                 }
 
                 if (add) {
-                    sendBroadCast(Broadcasts.ADD_BIRTHDAY, LucaObject.BIRTHDAY, newBirthday.GetCommandAdd());
+                    sendBroadCast(Broadcasts.ADD_BIRTHDAY, newBirthday.GetCommandAdd());
                 } else {
-                    sendBroadCast(Broadcasts.UPDATE_BIRTHDAY, LucaObject.BIRTHDAY, newBirthday.GetCommandUpdate());
+                    sendBroadCast(Broadcasts.UPDATE_BIRTHDAY, newBirthday.GetCommandUpdate());
                 }
 
                 CloseDialogCallback.run();
@@ -624,9 +662,9 @@ public class LucaDialogController extends DialogController {
         }
 
         Button btnSave = (Button) _dialog.findViewById(R.id.dialog_movie_save_button);
-        btnSave.setOnClickListener(new OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 String title = movieTitleEdit.getText().toString();
                 if (title.length() < 3) {
                     Toasty.error(_context, "Title too short!", Toast.LENGTH_LONG).show();
@@ -646,9 +684,9 @@ public class LucaDialogController extends DialogController {
                 }
 
                 if (add) {
-                    sendBroadCast(Broadcasts.ADD_MOVIE, LucaObject.MOVIE, newMovie.GetCommandAdd());
+                    sendBroadCast(Broadcasts.ADD_MOVIE, newMovie.GetCommandAdd());
                 } else {
-                    sendBroadCast(Broadcasts.UPDATE_MOVIE, LucaObject.MOVIE, newMovie.GetCommandUpdate());
+                    sendBroadCast(Broadcasts.UPDATE_MOVIE, newMovie.GetCommandUpdate());
                 }
 
                 CloseDialogCallback.run();
@@ -680,9 +718,9 @@ public class LucaDialogController extends DialogController {
         }
 
         Button btnSave = (Button) _dialog.findViewById(R.id.dialog_socket_save_button);
-        btnSave.setOnClickListener(new OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 String name = socketNameEdit.getText().toString();
                 if (name.length() < 3) {
                     Toasty.error(_context, "Name too short!", Toast.LENGTH_LONG).show();
@@ -712,11 +750,11 @@ public class LucaDialogController extends DialogController {
 
                 String message;
                 if (add) {
-                    sendBroadCast(Broadcasts.ADD_SOCKET, LucaObject.WIRELESS_SOCKET, newSocket.GetCommandAdd());
-                    message = String.format(Locale.GERMAN, "trying to add socket %s", newSocket.GetName());
+                    sendBroadCast(Broadcasts.ADD_SOCKET, newSocket.GetCommandAdd());
+                    message = String.format(Locale.getDefault(), "trying to add socket %s", newSocket.GetName());
                 } else {
-                    sendBroadCast(Broadcasts.UPDATE_SOCKET, LucaObject.WIRELESS_SOCKET, newSocket.GetCommandUpdate());
-                    message = String.format(Locale.GERMAN, "trying to update socket %s", newSocket.GetName());
+                    sendBroadCast(Broadcasts.UPDATE_SOCKET_LIST, newSocket.GetCommandUpdate());
+                    message = String.format(Locale.getDefault(), "trying to update socket %s", newSocket.GetName());
                 }
 
                 _logger.Debug(message);
@@ -822,40 +860,6 @@ public class LucaDialogController extends DialogController {
         scheduleTimePicker.setCurrentHour(hour);
         scheduleTimePicker.setCurrentMinute(minute);
 
-        CheckBox playSoundCheckbox = (CheckBox) _dialog.findViewById(R.id.dialog_schedule_playsound_select);
-        playSoundCheckbox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                _schedulePlaySound = isChecked;
-            }
-        });
-
-        final Spinner schedulePlayRaspberrySelect = (Spinner) _dialog
-                .findViewById(R.id.dialog_schedule_playraspberry_select);
-        List<String> raspberryServer = new ArrayList<>();
-        raspberryServer.add("Living Room");
-        raspberryServer.add("Sleeping Room");
-        ArrayAdapter<String> raspberryServerDataAdapter = new ArrayAdapter<>(_context,
-                android.R.layout.simple_spinner_item, raspberryServer);
-        raspberryServerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        schedulePlayRaspberrySelect.setAdapter(raspberryServerDataAdapter);
-        schedulePlayRaspberrySelect.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (parent.getItemAtPosition(position).toString().contains("Living Room")) {
-                    _schedulePlayRaspberry = RaspberrySelection.RASPBERRY_1;
-                } else if (parent.getItemAtPosition(position).toString().contains("Sleeping Room")) {
-                    _schedulePlayRaspberry = RaspberrySelection.RASPBERRY_2;
-                } else {
-                    _schedulePlayRaspberry = RaspberrySelection.DUMMY;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
-
         if (schedule != null) {
             scheduleNameEdit.setText(schedule.GetName());
             for (int socketIndex = 0; socketIndex < socketList.getSize(); socketIndex++) {
@@ -872,16 +876,12 @@ public class LucaDialogController extends DialogController {
             }
             scheduleTimePicker.setCurrentHour(schedule.GetTime().Hour());
             scheduleTimePicker.setCurrentMinute(schedule.GetTime().Minute());
-            if (schedule.GetPlaySound()) {
-                playSoundCheckbox.setChecked(true);
-            }
-            schedulePlayRaspberrySelect.setSelection(schedule.GetPlayRaspberry().GetInt() - 1, true);
         }
 
         Button btnSave = (Button) _dialog.findViewById(R.id.dialog_schedule_save_button);
-        btnSave.setOnClickListener(new OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _scheduleName = scheduleNameEdit.getText().toString();
                 if (_scheduleName.length() < 3) {
                     Toasty.error(_context, "Name too short!", Toast.LENGTH_LONG).show();
@@ -897,10 +897,6 @@ public class LucaDialogController extends DialogController {
                 }
                 if (_scheduleActionString == null || _scheduleActionString.length() == 0) {
                     Toasty.error(_context, "Please select an action!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                if (_schedulePlayRaspberry == null || _schedulePlayRaspberry == RaspberrySelection.DUMMY) {
-                    Toasty.error(_context, "Please select a valid raspberry!", Toast.LENGTH_LONG).show();
                     return;
                 }
 
@@ -941,8 +937,14 @@ public class LucaDialogController extends DialogController {
                     isActive = schedule.IsActive();
                 }
 
-                ScheduleDto newSchedule = new ScheduleDto(_scheduleName, socket, weekday, _scheduleTime, action, false,
-                        _schedulePlaySound, _schedulePlayRaspberry, isActive);
+                ScheduleDto newSchedule = new ScheduleDto(
+                        _scheduleName,
+                        socket,
+                        weekday,
+                        _scheduleTime,
+                        action,
+                        _schedulePlaySound,
+                        isActive);
                 _logger.Debug("new Schedule: " + newSchedule.toString());
 
                 if (runnable != null) {
@@ -951,11 +953,11 @@ public class LucaDialogController extends DialogController {
 
                 String message;
                 if (add) {
-                    sendBroadCast(Broadcasts.ADD_SCHEDULE, LucaObject.SCHEDULE, newSchedule.GetCommandAdd());
-                    message = String.format(Locale.GERMAN, "trying to add schedule %s", newSchedule.GetName());
+                    sendBroadCast(Broadcasts.ADD_SCHEDULE, newSchedule.GetCommandAdd());
+                    message = String.format(Locale.getDefault(), "trying to add schedule %s", newSchedule.GetName());
                 } else {
-                    sendBroadCast(Broadcasts.UPDATE_SCHEDULE, LucaObject.SCHEDULE, newSchedule.GetCommandUpdate());
-                    message = String.format(Locale.GERMAN, "trying to update schedule %s", newSchedule.GetName());
+                    sendBroadCast(Broadcasts.UPDATE_SCHEDULE, newSchedule.GetCommandUpdate());
+                    message = String.format(Locale.getDefault(), "trying to update schedule %s", newSchedule.GetName());
                 }
 
                 _logger.Debug(message);
@@ -1021,37 +1023,6 @@ public class LucaDialogController extends DialogController {
         timerTimePicker.setCurrentHour(currentHour);
         timerTimePicker.setCurrentMinute(currentMinute);
 
-        CheckBox timerPlaySoundCheckbox = (CheckBox) _dialog.findViewById(R.id.dialog_timer_playsound_select);
-        timerPlaySoundCheckbox.setEnabled(false);
-        timerPlaySoundCheckbox.setVisibility(View.GONE);
-
-        final Spinner timerPlayRaspberrySelect = (Spinner) _dialog.findViewById(R.id.dialog_timer_playraspberry_select);
-        List<String> raspberryServer = new ArrayList<>();
-        raspberryServer.add("Living Room");
-        raspberryServer.add("Sleeping Room");
-        ArrayAdapter<String> raspberryServerDataAdapter = new ArrayAdapter<>(_context,
-                android.R.layout.simple_spinner_item, raspberryServer);
-        raspberryServerDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        timerPlayRaspberrySelect.setAdapter(raspberryServerDataAdapter);
-        timerPlayRaspberrySelect.setOnItemSelectedListener(new OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (parent.getItemAtPosition(position).toString().contains("Living Room")) {
-                    _logger.Debug(RaspberrySelection.RASPBERRY_1.toString());
-                } else if (parent.getItemAtPosition(position).toString().contains("Sleeping Room")) {
-                    _logger.Debug(RaspberrySelection.RASPBERRY_2.toString());
-                } else {
-                    _logger.Debug(RaspberrySelection.DUMMY.toString());
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-            }
-        });
-        timerPlayRaspberrySelect.setEnabled(false);
-        timerPlayRaspberrySelect.setVisibility(View.GONE);
-
         if (timer != null) {
             timerNameEdit.setText(timer.GetName());
             for (int socketIndex = 0; socketIndex < socketList.getSize(); socketIndex++) {
@@ -1062,16 +1033,12 @@ public class LucaDialogController extends DialogController {
             }
             timerTimePicker.setCurrentHour(timer.GetTime().Hour());
             timerTimePicker.setCurrentMinute(timer.GetTime().Minute());
-            if (timer.GetPlaySound()) {
-                timerPlaySoundCheckbox.setChecked(true);
-            }
-            timerPlayRaspberrySelect.setSelection(timer.GetPlayRaspberry().GetInt() - 1, true);
         }
 
         Button btnSave = (Button) _dialog.findViewById(R.id.dialog_timer_save_button);
-        btnSave.setOnClickListener(new OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _timerName = timerNameEdit.getText().toString();
 
                 if (_timerName.length() < 3) {
@@ -1118,9 +1085,7 @@ public class LucaDialogController extends DialogController {
                 _serviceController.StartRestService(
                         socket.GetName(),
                         socket.GetCommandSet(true),
-                        Broadcasts.RELOAD_SOCKETS,
-                        LucaObject.WIRELESS_SOCKET,
-                        RaspberrySelection.BOTH);
+                        Broadcasts.RELOAD_SOCKETS);
 
                 TimerDto newTimer = new TimerDto(
                         _timerName,
@@ -1129,10 +1094,9 @@ public class LucaDialogController extends DialogController {
                         _timerTime,
                         false,
                         false,
-                        RaspberrySelection.DUMMY,
                         true);
 
-                _logger.Debug(String.format(Locale.GERMAN, "new Timer: %s", _timerName));
+                _logger.Debug(String.format(Locale.getDefault(), "new Timer: %s", _timerName));
 
                 if (runnable != null) {
                     runnable.run();
@@ -1140,11 +1104,11 @@ public class LucaDialogController extends DialogController {
 
                 String message;
                 if (add) {
-                    sendBroadCast(Broadcasts.ADD_SCHEDULE, LucaObject.TIMER, newTimer.GetCommandAdd());
-                    message = String.format(Locale.GERMAN, "trying to add timer %s", newTimer.GetName());
+                    sendBroadCast(Broadcasts.ADD_SCHEDULE, newTimer.GetCommandAdd());
+                    message = String.format(Locale.getDefault(), "trying to add timer %s", newTimer.GetName());
                 } else {
-                    sendBroadCast(Broadcasts.UPDATE_SCHEDULE, LucaObject.TIMER, newTimer.GetCommandUpdate());
-                    message = String.format(Locale.GERMAN, "trying to update timer %s", newTimer.GetName());
+                    sendBroadCast(Broadcasts.UPDATE_SCHEDULE, newTimer.GetCommandUpdate());
+                    message = String.format(Locale.getDefault(), "trying to update timer %s", newTimer.GetName());
                 }
 
                 _logger.Debug(message);
@@ -1223,9 +1187,9 @@ public class LucaDialogController extends DialogController {
         entryCount.setText("1");
 
         Button btnCountIncrease = (Button) _dialog.findViewById(R.id.dialog_shopping_entry_button_Count_Increase);
-        btnCountIncrease.setOnClickListener(new OnClickListener() {
+        btnCountIncrease.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 String countString = entryCount.getText().toString();
                 int count = Integer.parseInt(countString);
                 count++;
@@ -1234,9 +1198,9 @@ public class LucaDialogController extends DialogController {
         });
 
         Button btnCountDecrease = (Button) _dialog.findViewById(R.id.dialog_shopping_entry_button_Count_Decrease);
-        btnCountDecrease.setOnClickListener(new OnClickListener() {
+        btnCountDecrease.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
+            public void onClick(View view) {
                 String countString = entryCount.getText().toString();
                 int count = Integer.parseInt(countString);
                 count--;
@@ -1248,9 +1212,9 @@ public class LucaDialogController extends DialogController {
         });
 
         Button btnSave = (Button) _dialog.findViewById(R.id.dialog_shopping_entry_save_button);
-        btnSave.setOnClickListener(new OnClickListener() {
+        btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 String name = entryName.getText().toString();
                 if (name.length() < 3) {
                     Toasty.error(_context, "Name too short!", Toast.LENGTH_LONG).show();
@@ -1283,13 +1247,17 @@ public class LucaDialogController extends DialogController {
 
                 String message;
                 if (add) {
-                    _serviceController.StartRestService(newEntry.GetName(), newEntry.GetCommandAdd(),
-                            Broadcasts.RELOAD_SHOPPING_LIST, LucaObject.SHOPPING_ENTRY, RaspberrySelection.BOTH);
-                    message = String.format(Locale.GERMAN, "trying to add entry %s", newEntry.GetName());
+                    _serviceController.StartRestService(
+                            newEntry.GetName(),
+                            newEntry.GetCommandAdd(),
+                            Broadcasts.RELOAD_SHOPPING_LIST);
+                    message = String.format(Locale.getDefault(), "trying to add entry %s", newEntry.GetName());
                 } else {
-                    _serviceController.StartRestService(newEntry.GetName(), newEntry.GetCommandUpdate(),
-                            Broadcasts.RELOAD_SHOPPING_LIST, LucaObject.SHOPPING_ENTRY, RaspberrySelection.BOTH);
-                    message = String.format(Locale.GERMAN, "trying to update entry %s", newEntry.GetName());
+                    _serviceController.StartRestService(
+                            newEntry.GetName(),
+                            newEntry.GetCommandUpdate(),
+                            Broadcasts.RELOAD_SHOPPING_LIST);
+                    message = String.format(Locale.getDefault(), "trying to update entry %s", newEntry.GetName());
                 }
 
                 _logger.Debug(message);
@@ -1318,16 +1286,29 @@ public class LucaDialogController extends DialogController {
     public void ShowUpdateBirthdayDialog(@NonNull BirthdayDto value) {
         _lucaObject = LucaObject.BIRTHDAY;
         _birthday = value;
-        ShowDialogTriple("Birthday", _birthday.GetName(), "Update", _updateRunnable, "Delete", _deletePromptRunnable,
-                "Cancel", CloseDialogCallback, false);
+
+        ShowDialogTriple(
+                "Birthday", _birthday.GetName(),
+                "Update", _updateRunnable,
+                "Delete", _deletePromptRunnable,
+                "Cancel", CloseDialogCallback,
+                false);
+
         _isDialogOpen = true;
     }
 
     public void ShowUpdateMovieDialog(@NonNull MovieDto value) {
         _lucaObject = LucaObject.MOVIE;
         _movie = value;
-        ShowDialogTriple("Movie", _movie.GetTitle(), "Update", _updateRunnable, "Delete", _deletePromptRunnable,
-                "Cancel", CloseDialogCallback, false);
+
+        ShowDialogTriple(
+                "Movie", _movie.GetTitle(),
+                "Update", _updateRunnable,
+                "Delete", _deletePromptRunnable,
+                "Cancel", CloseDialogCallback,
+                false);
+
+        _isDialogOpen = true;
     }
 
     public void ShowUpdateScheduleDialog(@NonNull ScheduleDto value) {
@@ -1336,17 +1317,32 @@ public class LucaDialogController extends DialogController {
             _logger.Warn("SocketList not initialized!");
             return;
         }
+
         _lucaObject = LucaObject.SCHEDULE;
         _schedule = value;
-        ShowDialogTriple("Schedule", _schedule.GetName(), "Update", _updateRunnable, "Delete", _deletePromptRunnable,
-                "Cancel", CloseDialogCallback, false);
+
+        ShowDialogTriple(
+                "Schedule", _schedule.GetName(),
+                "Update", _updateRunnable,
+                "Delete", _deletePromptRunnable,
+                "Cancel", CloseDialogCallback,
+                false);
+
+        _isDialogOpen = true;
     }
 
     public void ShowUpdateSocketDialog(@NonNull WirelessSocketDto value) {
-        _lucaObject = LucaObject.WIRELESS_SOCKET;
+        _lucaObject = LucaObject.SOCKET;
         _socket = value;
-        ShowDialogTriple("Socket", _socket.GetName(), "Update", _updateRunnable, "Delete", _deletePromptRunnable,
-                "Cancel", CloseDialogCallback, false);
+
+        ShowDialogTriple(
+                "Socket", _socket.GetName(),
+                "Update", _updateRunnable,
+                "Delete", _deletePromptRunnable,
+                "Cancel", CloseDialogCallback,
+                false);
+
+        _isDialogOpen = true;
     }
 
     public void ShowUpdateTimerDialog(@NonNull TimerDto value) {
@@ -1355,10 +1351,18 @@ public class LucaDialogController extends DialogController {
             _logger.Warn("SocketList not initialized!");
             return;
         }
+
         _lucaObject = LucaObject.TIMER;
         _timer = value;
-        ShowDialogTriple("Timer", _timer.GetName(), "Update", _updateRunnable, "Delete", _deletePromptRunnable,
-                "Cancel", CloseDialogCallback, false);
+
+        ShowDialogTriple(
+                "Timer", _timer.GetName(),
+                "Update", _updateRunnable,
+                "Delete", _deletePromptRunnable,
+                "Cancel", CloseDialogCallback,
+                false);
+
+        _isDialogOpen = true;
     }
 
     public void ShowUpdateMenuDialog(
@@ -1412,7 +1416,7 @@ public class LucaDialogController extends DialogController {
         }
 
         Button update = (Button) _dialog.findViewById(R.id.dialog_menu_save_button);
-        update.setOnClickListener(new OnClickListener() {
+        update.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String title = titleInput.getText().toString();
@@ -1428,8 +1432,10 @@ public class LucaDialogController extends DialogController {
                 menu.SetTitle(title);
                 menu.SetDescription(description);
 
-                _serviceController.StartRestService(Bundles.MENU, menu.GetCommandUpdate(), Broadcasts.RELOAD_MENU,
-                        LucaObject.MENU, RaspberrySelection.BOTH);
+                _serviceController.StartRestService(
+                        Bundles.MENU,
+                        menu.GetCommandUpdate(),
+                        Broadcasts.RELOAD_MENU);
 
                 CloseDialogCallback.run();
             }
@@ -1460,19 +1466,19 @@ public class LucaDialogController extends DialogController {
 
         final RatingBar menuRatingBar = (RatingBar) _dialog.findViewById(R.id.randomMenuRatingBar);
         menuRatingBar.setProgress(0);
-        menuRatingBar.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
+        menuRatingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
             public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                _logger.Debug(String.format(Locale.GERMAN, "menuRatingBar onRatingChanged %f", rating));
+                _logger.Debug(String.format(Locale.getDefault(), "menuRatingBar onRatingChanged %f", rating));
 
                 if (!fromUser) {
-                    _logger.Warn(String.format(Locale.GERMAN, "Selection %f was not performed by user! Abort!", rating));
+                    _logger.Warn(String.format(Locale.getDefault(), "Selection %f was not performed by user! Abort!", rating));
                 }
             }
         });
 
         Button randomize = (Button) _dialog.findViewById(R.id.dialog_random_menu_random_button);
-        randomize.setOnClickListener(new OnClickListener() {
+        randomize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 int minRating = menuRatingBar.getProgress();
@@ -1504,7 +1510,7 @@ public class LucaDialogController extends DialogController {
         });
 
         Button ok = (Button) _dialog.findViewById(R.id.dialog_random_menu_ok_button);
-        ok.setOnClickListener(new OnClickListener() {
+        ok.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (_randomMenu == null) {
@@ -1516,8 +1522,10 @@ public class LucaDialogController extends DialogController {
                 menu.SetTitle(_randomMenu.GetDescription());
                 menu.SetDescription("-");
 
-                _serviceController.StartRestService(Bundles.MENU, menu.GetCommandUpdate(), Broadcasts.RELOAD_MENU,
-                        LucaObject.MENU, RaspberrySelection.BOTH);
+                _serviceController.StartRestService(
+                        Bundles.MENU,
+                        menu.GetCommandUpdate(),
+                        Broadcasts.RELOAD_MENU);
 
                 _randomMenu = null;
 
@@ -1538,6 +1546,8 @@ public class LucaDialogController extends DialogController {
         createDialog("ShowMapSocketDialog", R.layout.dialog_map_socket);
         _logger.Debug("For socket: " + socket.GetName());
 
+        _homeAutomationAction = HomeAutomationAction.NULL;
+
         TextView socketNameTextView = (TextView) _dialog.findViewById(R.id.dialog_map_socket_name);
         socketNameTextView.setText(socket.GetName());
         TextView socketAreaTextView = (TextView) _dialog.findViewById(R.id.dialog_map_socket_area);
@@ -1547,7 +1557,7 @@ public class LucaDialogController extends DialogController {
 
         Switch socketState = (Switch) _dialog.findViewById(R.id.dialog_map_socket_switch);
         socketState.setChecked(socket.IsActivated());
-        socketState.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        socketState.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _socketController.SetSocket(socket, isChecked);
@@ -1556,7 +1566,7 @@ public class LucaDialogController extends DialogController {
                 if (activity != null) {
                     Snacky.builder()
                             .setActivty(activity)
-                            .setText(String.format(Locale.GERMAN, "Trying to set socket %s to %s", socket.GetName(), (isChecked ? "on" : "off")))
+                            .setText(String.format(Locale.getDefault(), "Trying to set socket %s to %s", socket.GetName(), (isChecked ? "on" : "off")))
                             .setDuration(Snacky.LENGTH_LONG)
                             .setActionText(_context.getResources().getString(android.R.string.ok))
                             .info()
@@ -1594,9 +1604,9 @@ public class LucaDialogController extends DialogController {
         });
 
         Button btnScheduleSelectedGo = (Button) _dialog.findViewById(R.id.dialog_map_schedule_SelectButton);
-        btnScheduleSelectedGo.setOnClickListener(new OnClickListener() {
+        btnScheduleSelectedGo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _logger.Debug("btnScheduleSelectedGo onClick");
 
                 if (_selectedSchedule != null) {
@@ -1639,9 +1649,9 @@ public class LucaDialogController extends DialogController {
         });
 
         Button btnTimerSelectedGo = (Button) _dialog.findViewById(R.id.dialog_map_timer_SelectButton);
-        btnTimerSelectedGo.setOnClickListener(new OnClickListener() {
+        btnTimerSelectedGo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _logger.Debug("btnTimerSelectedGo onClick");
 
                 if (_selectedTimer != null) {
@@ -1669,17 +1679,17 @@ public class LucaDialogController extends DialogController {
                 _logger.Info(String.format("Item at position %s selected!", position));
 
                 if (position == 0) {
-                    _mainServiceAction = MainServiceAction.ENABLE_HEATING;
+                    _homeAutomationAction = HomeAutomationAction.ENABLE_HEATING;
                 } else if (position == 1) {
-                    _mainServiceAction = MainServiceAction.ENABLE_SEA_SOUND;
+                    _homeAutomationAction = HomeAutomationAction.ENABLE_SEA_SOUND;
                 } else if (position == 2) {
-                    _mainServiceAction = MainServiceAction.ENABLE_HEATING_AND_SOUND;
+                    _homeAutomationAction = HomeAutomationAction.ENABLE_HEATING_AND_SOUND;
                 } else {
                     _logger.Error("Position contains errors: " + position);
                     Toasty.error(_context, "Position contains errors: " + position, Toast.LENGTH_LONG).show();
                     return;
                 }
-                _logger.Info(String.format("mainServiceAction is %s!", _mainServiceAction));
+                _logger.Info(String.format("_homeAutomationAction is %s!", _homeAutomationAction));
             }
 
             @Override
@@ -1688,15 +1698,17 @@ public class LucaDialogController extends DialogController {
         });
 
         Button btnSpecialTaskGo = (Button) _dialog.findViewById(R.id.dialog_map_socket_specialTask_StartButton);
-        btnSpecialTaskGo.setOnClickListener(new OnClickListener() {
+        btnSpecialTaskGo.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _logger.Debug("btnSpecialTaskGo onClick");
 
-                if (_mainServiceAction != MainServiceAction.NULL) {
-                    _logger.Info(String.format("Running mainServiceAction %s", _mainServiceAction));
-                    _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                            new String[]{Bundles.MAIN_SERVICE_ACTION}, new Object[]{_mainServiceAction});
+                if (_homeAutomationAction != HomeAutomationAction.NULL) {
+                    _logger.Info(String.format("Running mainServiceAction %s", _homeAutomationAction));
+                    _broadcastController.SendSerializableArrayBroadcast(
+                            Broadcasts.HOME_AUTOMATION_COMMAND,
+                            new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                            new Object[]{_homeAutomationAction});
                 }
             }
         });
@@ -1711,9 +1723,9 @@ public class LucaDialogController extends DialogController {
         }
 
         Button btnClose = (Button) _dialog.findViewById(R.id.dialog_map_socket_button_close);
-        btnClose.setOnClickListener(new OnClickListener() {
+        btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 CloseDialogCallback.run();
             }
         });
@@ -1755,27 +1767,27 @@ public class LucaDialogController extends DialogController {
 
         Button buttonState = (Button) _dialog.findViewById(R.id.dialog_map_schedule_state);
         buttonState.setText(selectedSchedule.GetIsActiveString());
-        buttonState.setOnClickListener(new OnClickListener() {
+        buttonState.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _scheduleController.SetSchedule(selectedSchedule, !selectedSchedule.IsActive());
                 CloseDialogCallback.run();
             }
         });
 
         Button buttonDelete = (Button) _dialog.findViewById(R.id.dialog_map_schedule_delete);
-        buttonDelete.setOnClickListener(new OnClickListener() {
+        buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _scheduleController.DeleteSchedule(selectedSchedule);
                 CloseDialogCallback.run();
             }
         });
 
         Button buttonClose = (Button) _dialog.findViewById(R.id.dialog_map_schedule_button_close);
-        buttonClose.setOnClickListener(new OnClickListener() {
+        buttonClose.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 CloseDialogCallback.run();
             }
         });
@@ -1816,18 +1828,18 @@ public class LucaDialogController extends DialogController {
         }
 
         Button buttonDelete = (Button) _dialog.findViewById(R.id.dialog_map_timer_delete);
-        buttonDelete.setOnClickListener(new OnClickListener() {
+        buttonDelete.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _timerController.Delete(selectedTimer);
                 CloseDialogCallback.run();
             }
         });
 
         Button buttonClose = (Button) _dialog.findViewById(R.id.dialog_map_timer_button_close);
-        buttonClose.setOnClickListener(new OnClickListener() {
+        buttonClose.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 CloseDialogCallback.run();
             }
         });
@@ -1837,7 +1849,7 @@ public class LucaDialogController extends DialogController {
 
     public void ShowMapMediaMirrorDialog(
             final Activity activity,
-            @NonNull final MediaMirrorSelection selection,
+            @NonNull final MediaServerSelection selection,
             final WirelessSocketDto socket) {
         checkOpenDialog();
 
@@ -1861,7 +1873,7 @@ public class LucaDialogController extends DialogController {
         Switch socketState = (Switch) _dialog.findViewById(R.id.dialog_map_mediamirror_switch);
         if (socket != null) {
             socketState.setChecked(socket.IsActivated());
-            socketState.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+            socketState.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     _socketController.SetSocket(socket, isChecked);
@@ -1869,7 +1881,7 @@ public class LucaDialogController extends DialogController {
                     if (activity != null) {
                         Snacky.builder()
                                 .setActivty(activity)
-                                .setText(String.format(Locale.GERMAN, "Trying to set socket %s to %s", socket.GetName(), (isChecked ? "on" : "off")))
+                                .setText(String.format(Locale.getDefault(), "Trying to set socket %s to %s", socket.GetName(), (isChecked ? "on" : "off")))
                                 .setDuration(Snacky.LENGTH_LONG)
                                 .setActionText(_context.getResources().getString(android.R.string.ok))
                                 .info()
@@ -1882,76 +1894,88 @@ public class LucaDialogController extends DialogController {
         }
 
         Button btnPlay = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_play);
-        btnPlay.setOnClickListener(new OnClickListener() {
+        btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_COMMAND, Bundles.MEDIAMIRROR_COMMAND,
-                        String.format("IP:%s&CMD:%s", selection.GetIp(), "PLAY"));
+            public void onClick(View view) {
+                _broadcastController.SendStringBroadcast(
+                        Broadcasts.MEDIAMIRROR_COMMAND,
+                        Bundles.MEDIAMIRROR_COMMAND,
+                        String.format(Locale.getDefault(), "IP:%s&CMD:%s", selection.GetIp(), "PLAY"));
             }
         });
 
         Button btnPause = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_pause);
-        btnPause.setOnClickListener(new OnClickListener() {
+        btnPause.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_COMMAND, Bundles.MEDIAMIRROR_COMMAND,
-                        String.format("IP:%s&CMD:%s", selection.GetIp(), "PAUSE"));
+            public void onClick(View view) {
+                _broadcastController.SendStringBroadcast(
+                        Broadcasts.MEDIAMIRROR_COMMAND,
+                        Bundles.MEDIAMIRROR_COMMAND,
+                        String.format(Locale.getDefault(), "IP:%s&CMD:%s", selection.GetIp(), "PAUSE"));
             }
         });
 
         Button btnStop = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_stop);
-        btnStop.setOnClickListener(new OnClickListener() {
+        btnStop.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_COMMAND, Bundles.MEDIAMIRROR_COMMAND,
-                        String.format("IP:%s&CMD:%s", selection.GetIp(), "STOP"));
+            public void onClick(View view) {
+                _broadcastController.SendStringBroadcast(
+                        Broadcasts.MEDIAMIRROR_COMMAND,
+                        Bundles.MEDIAMIRROR_COMMAND,
+                        String.format(Locale.getDefault(), "IP:%s&CMD:%s", selection.GetIp(), "STOP"));
             }
         });
 
         Button btnVolumeIncrease = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_vol_increase);
-        btnVolumeIncrease.setOnClickListener(new OnClickListener() {
+        btnVolumeIncrease.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_COMMAND, Bundles.MEDIAMIRROR_COMMAND,
-                        String.format("IP:%s&CMD:%s", selection.GetIp(), "VOL_INCREASE"));
+            public void onClick(View view) {
+                _broadcastController.SendStringBroadcast(
+                        Broadcasts.MEDIAMIRROR_COMMAND,
+                        Bundles.MEDIAMIRROR_COMMAND,
+                        String.format(Locale.getDefault(), "IP:%s&CMD:%s", selection.GetIp(), "VOL_INCREASE"));
             }
         });
 
         Button btnVolumeDecrease = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_vol_decrease);
-        btnVolumeDecrease.setOnClickListener(new OnClickListener() {
+        btnVolumeDecrease.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                _broadcastController.SendStringBroadcast(Broadcasts.MEDIAMIRROR_COMMAND, Bundles.MEDIAMIRROR_COMMAND,
-                        String.format("IP:%s&CMD:%s", selection.GetIp(), "VOL_DECREASE"));
+            public void onClick(View view) {
+                _broadcastController.SendStringBroadcast(
+                        Broadcasts.MEDIAMIRROR_COMMAND,
+                        Bundles.MEDIAMIRROR_COMMAND,
+                        String.format(Locale.getDefault(), "IP:%s&CMD:%s", selection.GetIp(), "VOL_DECREASE"));
             }
         });
 
         Button btnSleepStart = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_sleep_start);
-        btnSleepStart.setOnClickListener(new OnClickListener() {
+        btnSleepStart.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                _logger.Info(String.format("Running mainServiceAction %s", MainServiceAction.ENABLE_SEA_SOUND));
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION},
-                        new Object[]{MainServiceAction.ENABLE_SEA_SOUND});
+            public void onClick(View view) {
+                _logger.Info(String.format(Locale.getDefault(), "Running homeAutomationAction %s", HomeAutomationAction.ENABLE_SEA_SOUND));
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.HOME_AUTOMATION_COMMAND,
+                        new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                        new Object[]{HomeAutomationAction.ENABLE_SEA_SOUND});
             }
         });
 
         Button btnSleepStop = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_sleep_stop);
-        btnSleepStop.setOnClickListener(new OnClickListener() {
+        btnSleepStop.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                _logger.Info(String.format("Running mainServiceAction %s", MainServiceAction.DISABLE_SEA_SOUND));
-                _broadcastController.SendSerializableArrayBroadcast(Broadcasts.MAIN_SERVICE_COMMAND,
-                        new String[]{Bundles.MAIN_SERVICE_ACTION},
-                        new Object[]{MainServiceAction.DISABLE_SEA_SOUND});
+            public void onClick(View view) {
+                _logger.Info(String.format(Locale.getDefault(), "Running homeAutomationAction %s", HomeAutomationAction.DISABLE_SEA_SOUND));
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.HOME_AUTOMATION_COMMAND,
+                        new String[]{Bundles.HOME_AUTOMATION_ACTION},
+                        new Object[]{HomeAutomationAction.DISABLE_SEA_SOUND});
             }
         });
 
         Button btnClose = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_button_close);
-        btnClose.setOnClickListener(new OnClickListener() {
+        btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 CloseDialogCallback.run();
             }
         });
@@ -2074,12 +2098,16 @@ public class LucaDialogController extends DialogController {
         final CheckBox playOnAllMirror = (CheckBox) _dialog.findViewById(R.id.dialog_select_youtube_play_on_all_mirror);
 
         ImageButton youtubeSearchButton = (ImageButton) _dialog.findViewById(R.id.dialog_enter_youtube_search_button);
-        youtubeSearchButton.setOnClickListener(new OnClickListener() {
+        youtubeSearchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 CloseDialogCallback.run();
                 _searchYoutubeRunnable.SetData(new String[]{"", ip});
-                ShowDialogEditText("Search youtube", "Enter your search below", "Search", _searchYoutubeRunnable, true);
+                ShowDialogEditText(
+                        "Search youtube",
+                        "Enter your search below",
+                        "Search", _searchYoutubeRunnable,
+                        true);
             }
         });
 
@@ -2134,9 +2162,9 @@ public class LucaDialogController extends DialogController {
         });
 
         Button btnPlay = (Button) _dialog.findViewById(R.id.dialog_select_youtube_play);
-        btnPlay.setOnClickListener(new OnClickListener() {
+        btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 String youtubeId = youtubeIdEditText.getText().toString();
                 if (youtubeId.length() < 6) {
                     Toasty.error(_context, "YoutubeId invalid!", Toast.LENGTH_LONG).show();
@@ -2145,17 +2173,17 @@ public class LucaDialogController extends DialogController {
                 youtubeId = youtubeId.replace(" ", "");
 
                 if (playOnAllMirror.isChecked()) {
-                    for (MediaMirrorSelection entry : MediaMirrorSelection.values()) {
+                    for (MediaServerSelection entry : MediaServerSelection.values()) {
                         if (entry.GetId() > 0) {
                             _mediaMirrorController.SendCommand(entry.GetIp(),
-                                    ServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                                    MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
                         }
                     }
                 } else {
-                    _mediaMirrorController.SendCommand(ip, ServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                    _mediaMirrorController.SendCommand(ip, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
                 }
 
-                _mediaMirrorController.SendCommand(ip, ServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+                _mediaMirrorController.SendCommand(ip, MediaServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
 
                 CloseDialogCallback.run();
             }
@@ -2182,7 +2210,7 @@ public class LucaDialogController extends DialogController {
     protected void createDialog(
             @NonNull String dialogType,
             int layout) {
-        _logger.Debug(String.format(Locale.GERMAN, "createDialog %s with layout %d", dialogType, layout));
+        _logger.Debug(String.format(Locale.getDefault(), "createDialog %s with layout %d", dialogType, layout));
 
         _dialog = new Dialog(_context);
 
@@ -2192,7 +2220,7 @@ public class LucaDialogController extends DialogController {
 
     @SuppressWarnings("deprecation")
     protected void showDialog(boolean isCancelable) {
-        _logger.Debug(String.format(Locale.GERMAN, "showDialog and isCancelable: %s", isCancelable));
+        _logger.Debug(String.format(Locale.getDefault(), "showDialog and isCancelable: %s", isCancelable));
 
         _dialog.setCancelable(isCancelable);
         _dialog.show();
@@ -2208,7 +2236,6 @@ public class LucaDialogController extends DialogController {
     }
 
     private void resetValues() {
-        _lucaObject = null;
         _birthday = null;
         _movie = null;
         _socket = null;
@@ -2218,12 +2245,10 @@ public class LucaDialogController extends DialogController {
 
     private void sendBroadCast(
             @NonNull String broadcast,
-            @NonNull LucaObject lucaObject,
             @NonNull String action) {
         Intent broadcastIntent = new Intent(broadcast);
 
         Bundle broadcastData = new Bundle();
-        broadcastData.putSerializable(Bundles.LUCA_OBJECT, lucaObject);
         broadcastData.putString(Bundles.ACTION, action);
         broadcastIntent.putExtras(broadcastData);
 

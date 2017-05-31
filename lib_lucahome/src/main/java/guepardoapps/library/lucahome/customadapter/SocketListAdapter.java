@@ -7,11 +7,9 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -45,10 +43,11 @@ public class SocketListAdapter extends BaseAdapter {
 
     private static LayoutInflater _inflater = null;
 
-    public SocketListAdapter(@NonNull Context context,
-                             @NonNull SerializableList<WirelessSocketDto> socketList,
-                             boolean isOnWear,
-                             Class<?> phoneMessageService) {
+    public SocketListAdapter(
+            @NonNull Context context,
+            @NonNull SerializableList<WirelessSocketDto> socketList,
+            boolean isOnWear,
+            Class<?> phoneMessageService) {
         _logger = new LucaHomeLogger(TAG);
 
         _socketList = socketList;
@@ -109,9 +108,9 @@ public class SocketListAdapter extends BaseAdapter {
 
         holder._name = (Button) rowView.findViewById(R.id.socket_item_name);
         holder._name.setText(_socketList.getValue(index).GetName());
-        holder._name.setOnLongClickListener(new OnLongClickListener() {
+        holder._name.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View arg0) {
+            public boolean onLongClick(View view) {
                 _logger.Debug("onLongClick _name button: " + _socketList.getValue(index).GetName());
                 if (!_isOnWear) {
                     _dialogController.ShowUpdateSocketDialog(_socketList.getValue(index));
@@ -130,7 +129,7 @@ public class SocketListAdapter extends BaseAdapter {
 
         holder._state = (Switch) rowView.findViewById(R.id.socket_item_switch);
         holder._state.setChecked(_socketList.getValue(index).IsActivated());
-        holder._state.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+        holder._state.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 _logger.Debug("onCheckedChanged _name button: " + _socketList.getValue(index).GetName());
@@ -142,7 +141,7 @@ public class SocketListAdapter extends BaseAdapter {
 
                     Snacky.builder()
                             .setActivty((Activity) _context)
-                            .setText(String.format(Locale.GERMAN,
+                            .setText(String.format(Locale.getDefault(),
                                     "Trying to set socket %s to %s",
                                     _socketList.getValue(index).GetName(),
                                     (isChecked ? "on" : "off")))

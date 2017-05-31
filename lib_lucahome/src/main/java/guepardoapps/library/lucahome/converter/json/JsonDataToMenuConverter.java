@@ -101,7 +101,7 @@ public final class JsonDataToMenuConverter {
                 }
 
                 MenuDto newValue = new MenuDto(id, weekday, day, month, year, title, description);
-                _logger.Debug(String.format(Locale.GERMAN, "New MenuDto %s", newValue));
+                _logger.Debug(String.format(Locale.getDefault(), "New MenuDto %s", newValue));
 
                 return newValue;
             }

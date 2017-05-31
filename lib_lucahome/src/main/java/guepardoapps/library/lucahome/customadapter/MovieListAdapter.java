@@ -7,8 +7,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.View.OnClickListener;
-import android.view.View.OnLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
@@ -89,9 +87,9 @@ public class MovieListAdapter extends BaseAdapter {
 
         holder._title = (Button) rowView.findViewById(R.id.movie_item_title);
         holder._title.setText(_movieList.getValue(index).GetTitle());
-        holder._title.setOnLongClickListener(new OnLongClickListener() {
+        holder._title.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public boolean onLongClick(View arg0) {
+            public boolean onLongClick(View view) {
                 _logger.Debug("onLongClick _title button: " + _movieList.getValue(index).GetTitle());
                 _dialogController.ShowUpdateMovieDialog(_movieList.getValue(index));
                 return true;
@@ -108,9 +106,9 @@ public class MovieListAdapter extends BaseAdapter {
         holder._rating.setText(String.format(Locale.GERMAN, "%d/%d", _movieList.getValue(index).GetRating(), MAX_MOVIE_RATING));
 
         holder._play = (Button) rowView.findViewById(R.id.movie_item_play);
-        holder._play.setOnClickListener(new OnClickListener() {
+        holder._play.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View view) {
                 _movieController.StartMovie(_movieList.getValue(index));
 
                 Snacky.builder()

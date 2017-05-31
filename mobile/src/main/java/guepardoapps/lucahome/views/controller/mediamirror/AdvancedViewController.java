@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -13,8 +12,8 @@ import android.widget.TextView;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
-import guepardoapps.library.lucahome.common.enums.ServerAction;
 import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
+import guepardoapps.library.lucahome.common.enums.MediaServerAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 
@@ -66,7 +65,7 @@ public class AdvancedViewController {
         _logger.Debug("onCreate");
 
         _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowAdvanced);
-        _showContent.setOnClickListener(new OnClickListener() {
+        _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (_contentVisible) {
@@ -86,7 +85,7 @@ public class AdvancedViewController {
         _advancedLinearLayout = (LinearLayout) ((Activity) _context).findViewById(R.id.advancedLinearLayout);
 
         Button buttonReboot = (Button) ((Activity) _context).findViewById(R.id.buttonReboot);
-        buttonReboot.setOnClickListener(new OnClickListener() {
+        buttonReboot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonReboot onClick");
@@ -96,13 +95,15 @@ public class AdvancedViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.SYSTEM_REBOOT.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.SYSTEM_REBOOT.toString(),
+                        "");
             }
         });
 
         Button buttonShutdown = (Button) ((Activity) _context).findViewById(R.id.buttonShutdown);
-        buttonShutdown.setOnClickListener(new OnClickListener() {
+        buttonShutdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 _logger.Debug("buttonShutdown onClick");
@@ -112,8 +113,10 @@ public class AdvancedViewController {
                     return;
                 }
 
-                _mediaMirrorController.SendCommand(_mediaMirrorViewDto.GetMediaMirrorSelection().GetIp(),
-                        ServerAction.SYSTEM_SHUTDOWN.toString(), "");
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.SYSTEM_SHUTDOWN.toString(),
+                        "");
             }
         });
     }
