@@ -641,7 +641,7 @@ public class LucaDialogController extends DialogController {
 
     public void ShowAddMovieDialog(
             final Runnable runnable,
-            MovieDto movie,
+            final MovieDto movie,
             final boolean add) {
         checkOpenDialog();
 
@@ -676,7 +676,12 @@ public class LucaDialogController extends DialogController {
 
                 int rating = Math.round(movieRatingBar.getRating());
 
-                MovieDto newMovie = new MovieDto(title, genre, description, rating, 0, null);
+                int id = -1;
+                if (movie != null) {
+                    id = movie.GetId();
+                }
+
+                MovieDto newMovie = new MovieDto(id, title, genre, description, rating, 0, null);
                 _logger.Debug("new Movie: " + newMovie.toString());
 
                 if (runnable != null) {

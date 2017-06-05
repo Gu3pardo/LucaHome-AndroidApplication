@@ -15,6 +15,8 @@ public class MovieDto implements Serializable {
 
     private static final int MAX_RATING = 5;
 
+    private int _id;
+
     private String _title;
     private String _genre;
     private String _description;
@@ -23,18 +25,24 @@ public class MovieDto implements Serializable {
     private String[] _sockets;
 
     public MovieDto(
+            int id,
             @NonNull String title,
             @NonNull String genre,
             @NonNull String description,
             int rating,
             int watched,
             String[] sockets) {
+        _id = id;
         _title = title;
         _genre = genre;
         _description = description;
         _rating = rating;
         _watched = watched;
         _sockets = sockets;
+    }
+
+    public int GetId() {
+        return _id;
     }
 
     public String GetTitle() {
@@ -65,6 +73,17 @@ public class MovieDto implements Serializable {
         return _sockets;
     }
 
+    public String GetSocketsString() {
+        String socketsString = "";
+        if (_sockets != null) {
+            for (String socket : _sockets) {
+                socketsString += socket + "|";
+            }
+            socketsString = socketsString.substring(0, socketsString.length() - 1);
+        }
+        return socketsString;
+    }
+
     public String GetCommandAdd() {
         return LucaServerAction.ADD_MOVIE.toString() + _title
                 + "&genre=" + _genre
@@ -89,22 +108,12 @@ public class MovieDto implements Serializable {
 
     public String toString() {
         return "{" + TAG
-                + ": {Title: " + _title
+                + ": {Id: " + String.valueOf(_id)
+                + "};{Title: " + _title
                 + "};{Genre: " + _genre
                 + "};{Description: " + _description
                 + "};{Rating: " + String.valueOf(_rating)
                 + "};{Watched: " + String.valueOf(_watched)
                 + "};{Sockets: " + GetSocketsString() + "}}";
-    }
-
-    private String GetSocketsString() {
-        String socketsString = "";
-        if (_sockets != null) {
-            for (String socket : _sockets) {
-                socketsString += socket + "|";
-            }
-            socketsString = socketsString.substring(0, socketsString.length() - 1);
-        }
-        return socketsString;
     }
 }

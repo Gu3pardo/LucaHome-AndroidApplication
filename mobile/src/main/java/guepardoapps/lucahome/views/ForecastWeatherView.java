@@ -25,13 +25,14 @@ import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
 import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
-import guepardoapps.library.lucahome.customadapter.*;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
 import guepardoapps.library.openweather.common.enums.WeatherCondition;
 import guepardoapps.library.openweather.common.model.ForecastModel;
 
 import guepardoapps.library.openweather.common.model.ForecastWeatherModel;
+import guepardoapps.library.openweather.customadapter.ForecastListAdapter;
+
 import guepardoapps.library.toolset.common.classes.NotificationContent;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;

@@ -3,8 +3,12 @@ package guepardoapps.library.lucahome.controller;
 import android.content.Context;
 
 import guepardoapps.library.lucahome.common.dto.ActionDto;
+import guepardoapps.library.lucahome.common.dto.BirthdayDto;
+import guepardoapps.library.lucahome.common.dto.ChangeDto;
 import guepardoapps.library.lucahome.common.dto.ListedMenuDto;
+import guepardoapps.library.lucahome.common.dto.MapContentDto;
 import guepardoapps.library.lucahome.common.dto.MenuDto;
+import guepardoapps.library.lucahome.common.dto.MovieDto;
 import guepardoapps.library.lucahome.common.dto.ShoppingEntryDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -22,8 +26,12 @@ public class DatabaseController {
     private boolean _isInitialized;
 
     private DatabaseActionStore _databaseActionStore;
+    private DatabaseBirthdayList _databaseBirthdayList;
+    private DatabaseChangeList _databaseChangeList;
     private DatabaseListedMenuList _databaseListedMenuList;
+    private DatabaseMapContentList _databaseMapContentList;
     private DatabaseMenuList _databaseMenuList;
+    private DatabaseMovieList _databaseMovieList;
     private DatabaseShoppingList _databaseShoppingList;
     private DatabaseSocketList _databaseSocketList;
 
@@ -45,14 +53,22 @@ public class DatabaseController {
         }
 
         _databaseActionStore = new DatabaseActionStore(context);
+        _databaseBirthdayList = new DatabaseBirthdayList(context);
+        _databaseChangeList = new DatabaseChangeList(context);
         _databaseListedMenuList = new DatabaseListedMenuList(context);
+        _databaseMapContentList = new DatabaseMapContentList(context);
         _databaseMenuList = new DatabaseMenuList(context);
+        _databaseMovieList = new DatabaseMovieList(context);
         _databaseShoppingList = new DatabaseShoppingList(context);
         _databaseSocketList = new DatabaseSocketList(context);
 
         _databaseActionStore.Open();
+        _databaseBirthdayList.Open();
+        _databaseChangeList.Open();
         _databaseListedMenuList.Open();
+        _databaseMapContentList.Open();
         _databaseMenuList.Open();
+        _databaseMovieList.Open();
         _databaseShoppingList.Open();
         _databaseSocketList.Open();
 
@@ -63,8 +79,12 @@ public class DatabaseController {
         _logger.Debug("Dispose");
 
         _databaseActionStore.Close();
+        _databaseBirthdayList.Close();
+        _databaseChangeList.Close();
         _databaseListedMenuList.Close();
+        _databaseMapContentList.Close();
         _databaseMenuList.Close();
+        _databaseMovieList.Close();
         _databaseShoppingList.Close();
         _databaseSocketList.Close();
 
@@ -145,6 +165,96 @@ public class DatabaseController {
     }
 
 	/*
+    Methods for BirthdayDto
+	 */
+
+    public SerializableList<BirthdayDto> GetBirthdayList() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return new SerializableList<>();
+        }
+
+        return _databaseBirthdayList.GetBirthdayList();
+    }
+
+    public boolean SaveBirthday(BirthdayDto newEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseBirthdayList.CreateEntry(newEntry);
+        return true;
+    }
+
+    public boolean DeleteBirthday(BirthdayDto deleteEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseBirthdayList.Delete(deleteEntry);
+        return true;
+    }
+
+    public void ClearDatabaseBirthday() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return;
+        }
+
+        SerializableList<BirthdayDto> birthdayList = GetBirthdayList();
+        for (int index = 0; index < birthdayList.getSize(); index++) {
+            DeleteBirthday(birthdayList.getValue(index));
+        }
+    }
+
+	/*
+    Methods for ChangeDto
+	 */
+
+    public SerializableList<ChangeDto> GetChangeList() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return new SerializableList<>();
+        }
+
+        return _databaseChangeList.GetChangeList();
+    }
+
+    public boolean SaveChange(ChangeDto newEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseChangeList.CreateEntry(newEntry);
+        return true;
+    }
+
+    public boolean DeleteChange(ChangeDto deleteEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseChangeList.Delete(deleteEntry);
+        return true;
+    }
+
+    public void ClearDatabaseChange() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return;
+        }
+
+        SerializableList<ChangeDto> changeList = GetChangeList();
+        for (int index = 0; index < changeList.getSize(); index++) {
+            DeleteChange(changeList.getValue(index));
+        }
+    }
+
+	/*
     Methods for ListedMenuDto
 	 */
 
@@ -190,6 +300,51 @@ public class DatabaseController {
     }
 
 	/*
+    Methods for MapContentDto
+	 */
+
+    public SerializableList<MapContentDto> GetMapContent() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return new SerializableList<>();
+        }
+
+        return _databaseMapContentList.GetMapContent();
+    }
+
+    public boolean SaveMapContent(MapContentDto newEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseMapContentList.CreateEntry(newEntry);
+        return true;
+    }
+
+    public boolean DeleteMapContent(MapContentDto deleteEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseMapContentList.Delete(deleteEntry);
+        return true;
+    }
+
+    public void ClearDatabaseMapContent() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return;
+        }
+
+        SerializableList<MapContentDto> mapContent = GetMapContent();
+        for (int index = 0; index < mapContent.getSize(); index++) {
+            DeleteMapContent(mapContent.getValue(index));
+        }
+    }
+
+	/*
     Methods for MenuDto
 	 */
 
@@ -231,6 +386,51 @@ public class DatabaseController {
         SerializableList<MenuDto> menuList = GetMenuList();
         for (int index = 0; index < menuList.getSize(); index++) {
             DeleteMenu(menuList.getValue(index));
+        }
+    }
+
+	/*
+    Methods for MovieDto
+	 */
+
+    public SerializableList<MovieDto> GetMovieList() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return new SerializableList<>();
+        }
+
+        return _databaseMovieList.GetMovieList();
+    }
+
+    public boolean SaveMovie(MovieDto newEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseMovieList.CreateEntry(newEntry);
+        return true;
+    }
+
+    public boolean DeleteMovie(MovieDto deleteEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseMovieList.Delete(deleteEntry);
+        return true;
+    }
+
+    public void ClearDatabaseMovie() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return;
+        }
+
+        SerializableList<MovieDto> movieList = GetMovieList();
+        for (int index = 0; index < movieList.getSize(); index++) {
+            DeleteMovie(movieList.getValue(index));
         }
     }
 

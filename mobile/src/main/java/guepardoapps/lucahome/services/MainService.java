@@ -642,6 +642,11 @@ public class MainService extends Service {
                             new String[]{Bundles.BIRTHDAY_LIST},
                             new Object[]{_birthdayList});
 
+                    _databaseController.ClearDatabaseBirthday();
+                    for (int index = 0; index < _birthdayList.getSize(); index++) {
+                        _databaseController.SaveBirthday(_birthdayList.getValue(index));
+                    }
+
                     checkForBirthday();
                     sendBirthdaysToWear();
                 } else {
@@ -686,6 +691,11 @@ public class MainService extends Service {
                             Broadcasts.UPDATE_CHANGE,
                             new String[]{Bundles.CHANGE_LIST},
                             new Object[]{_changeList});
+
+                    _databaseController.ClearDatabaseChange();
+                    for (int index = 0; index < _changeList.getSize(); index++) {
+                        _databaseController.SaveChange(_changeList.getValue(index));
+                    }
                 } else {
                     _logger.Warn("newChangeList is null");
                 }
@@ -792,14 +802,11 @@ public class MainService extends Service {
                 SerializableList<MapContentDto> newMapContentList = JsonDataToMapContentConverter.GetList(mapContentStringArray);
                 if (newMapContentList != null) {
                     _mapContentList = newMapContentList;
-                }
 
-                if (_mapContentList != null) {
+                    _databaseController.ClearDatabaseMapContent();
                     for (int index = 0; index < _mapContentList.getSize(); index++) {
-                        _logger.Info(_mapContentList.getValue(index).toString());
+                        _databaseController.SaveMapContent(_mapContentList.getValue(index));
                     }
-                } else {
-                    _logger.Warn("_mapContentList is null!");
                 }
             } else {
                 _logger.Warn("mapContentStringArray is null!");
@@ -954,6 +961,11 @@ public class MainService extends Service {
                             Broadcasts.UPDATE_MOVIE,
                             new String[]{Bundles.MOVIE_LIST},
                             new Object[]{_movieList});
+
+                    _databaseController.ClearDatabaseMovie();
+                    for (int index = 0; index < _movieList.getSize(); index++) {
+                        _databaseController.SaveMovie(_movieList.getValue(index));
+                    }
                 } else {
                     _logger.Warn("newMovieList is null");
                 }
@@ -1347,11 +1359,13 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
+                loadFromDatabase();
                 return;
             }
 
@@ -1359,6 +1373,18 @@ public class MainService extends Service {
                     Bundles.BIRTHDAY_DOWNLOAD,
                     LucaServerAction.GET_BIRTHDAYS.toString(),
                     Broadcasts.DOWNLOAD_BIRTHDAY_FINISHED);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+
+            _birthdayList = _databaseController.GetBirthdayList();
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_BIRTHDAY,
+                    new String[]{Bundles.BIRTHDAY_LIST},
+                    new Object[]{_birthdayList});
+
+            updateDownloadCount();
         }
     };
 
@@ -1369,11 +1395,13 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
+                loadFromDatabase();
                 return;
             }
 
@@ -1381,6 +1409,18 @@ public class MainService extends Service {
                     Bundles.CHANGE_DOWNLOAD,
                     LucaServerAction.GET_CHANGES.toString(),
                     Broadcasts.DOWNLOAD_CHANGE_FINISHED);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+
+            _changeList = _databaseController.GetChangeList();
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_CHANGE,
+                    new String[]{Bundles.CHANGE_LIST},
+                    new Object[]{_changeList});
+
+            updateDownloadCount();
         }
     };
 
@@ -1461,11 +1501,14 @@ public class MainService extends Service {
 
         private void loadFromDatabase() {
             _logger.Debug("loadFromDatabase");
+
             _listedMenu = _databaseController.GetListedMenuList();
             _broadcastController.SendSerializableArrayBroadcast(
                     Broadcasts.UPDATE_LISTED_MENU_VIEW,
                     new String[]{Bundles.LISTED_MENU},
                     new Object[]{_listedMenu});
+
+            updateDownloadCount();
         }
     };
 
@@ -1476,11 +1519,13 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
+                loadFromDatabase();
                 return;
             }
 
@@ -1488,6 +1533,18 @@ public class MainService extends Service {
                     Bundles.MAP_CONTENT_DOWNLOAD,
                     LucaServerAction.GET_MAP_CONTENTS.toString(),
                     Broadcasts.DOWNLOAD_MAP_CONTENT_FINISHED);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+
+            _mapContentList = _databaseController.GetMapContent();
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_MAP_CONTENT_VIEW,
+                    new String[]{Bundles.MAP_CONTENT_LIST},
+                    new Object[]{_mapContentList});
+
+            updateDownloadCount();
         }
     };
 
@@ -1542,11 +1599,14 @@ public class MainService extends Service {
 
         private void loadFromDatabase() {
             _logger.Debug("loadFromDatabase");
+
             _menu = _databaseController.GetMenuList();
             _broadcastController.SendSerializableArrayBroadcast(
                     Broadcasts.UPDATE_MENU_VIEW,
                     new String[]{Bundles.MENU},
                     new Object[]{_menu});
+
+            updateDownloadCount();
         }
     };
 
@@ -1579,11 +1639,13 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
+                loadFromDatabase();
                 return;
             }
 
@@ -1591,6 +1653,18 @@ public class MainService extends Service {
                     Bundles.MOVIE_DOWNLOAD,
                     LucaServerAction.GET_MOVIES.toString(),
                     Broadcasts.DOWNLOAD_MOVIE_FINISHED);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+
+            _movieList = _databaseController.GetMovieList();
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_MOVIE,
+                    new String[]{Bundles.MOVIE_LIST},
+                    new Object[]{_movieList});
+
+            updateDownloadCount();
         }
     };
 
@@ -1653,11 +1727,14 @@ public class MainService extends Service {
 
         private void loadFromDatabase() {
             _logger.Debug("loadFromDatabase");
+
             _shoppingList = _databaseController.GetShoppingList();
             _broadcastController.SendSerializableArrayBroadcast(
                     Broadcasts.UPDATE_SHOPPING_LIST,
                     new String[]{Bundles.SHOPPING_LIST},
                     new Object[]{_shoppingList});
+
+            updateDownloadCount();
         }
     };
 
@@ -1687,11 +1764,20 @@ public class MainService extends Service {
         private void loadFromDatabase() {
             _logger.Debug("loadFromDatabase");
             _wirelessSocketList = _databaseController.GetSocketList();
+
             _broadcastController.SendSerializableArrayBroadcast(
                     Broadcasts.UPDATE_SOCKET_LIST,
                     new String[]{Bundles.SOCKET_LIST},
                     new Object[]{_wirelessSocketList});
+
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_MAP_CONTENT_VIEW,
+                    new String[]{Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST, Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU, Bundles.LISTED_MENU, Bundles.MOTION_CAMERA_DTO},
+                    new Object[]{_mapContentList, _wirelessSocketList, _scheduleList, _timerList, _temperatureList, _shoppingList, _menu, _listedMenu, _motionCameraDto});
+
             sendSocketsToWear();
+
+            updateDownloadCount();
         }
     };
 
@@ -2044,10 +2130,10 @@ public class MainService extends Service {
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
             String key = _wirelessSocketList.getValue(index).GetNotificationVisibilitySharedPrefKey();
             if (!_sharedPrefController.Contains(key)) {
-                _logger.Info(String.format(Locale.GERMAN, "Installing key %s", key));
+                _logger.Info(String.format(Locale.getDefault(), "Installing key %s", key));
                 _sharedPrefController.SaveBooleanValue(key, true);
             } else {
-                _logger.Info(String.format(Locale.GERMAN, "Key %s already exists and is %s", key,
+                _logger.Info(String.format(Locale.getDefault(), "Key %s already exists and is %s", key,
                         _sharedPrefController.LoadBooleanValueFromSharedPreferences(key)));
             }
         }

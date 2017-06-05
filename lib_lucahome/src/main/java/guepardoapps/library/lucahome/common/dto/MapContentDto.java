@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.enums.DrawingType;
 import guepardoapps.library.lucahome.common.enums.LucaServerAction;
@@ -80,7 +81,11 @@ public class MapContentDto implements Serializable {
         return _visibility;
     }
 
-    private String getSchedulesString() {
+    public String GetPositionString() {
+        return String.format(Locale.getDefault(), "%d|%d", _position[0], _position[1]);
+    }
+
+    public String GetSchedulesString() {
         String string = "";
         if (_schedules != null) {
             for (String entry : _schedules) {
@@ -90,7 +95,7 @@ public class MapContentDto implements Serializable {
         return string;
     }
 
-    private String getSocketsString() {
+    public String GetSocketsString() {
         String string = "";
         if (_sockets != null) {
             for (String entry : _sockets) {
@@ -101,15 +106,21 @@ public class MapContentDto implements Serializable {
     }
 
     public String GetCommandAdd() {
-        return LucaServerAction.ADD_MAP_CONTENT.toString() + String.valueOf(_id) + "&position=" + String.valueOf(_position[0]) + "|"
-                + String.valueOf(_position[1]) + "&type=" + String.valueOf(_drawingType.GetId()) + "&schedules="
-                + getSchedulesString() + "&sockets=" + getSocketsString() + "&temperature=" + _temperatureArea;
+        return LucaServerAction.ADD_MAP_CONTENT.toString() + String.valueOf(_id)
+                + "&position=" + GetPositionString()
+                + "&type=" + String.valueOf(_drawingType.GetId())
+                + "&schedules=" + GetSchedulesString()
+                + "&sockets=" + GetSocketsString()
+                + "&temperature=" + _temperatureArea;
     }
 
     public String GetCommandUpdate() {
-        return LucaServerAction.UPDATE_MAP_CONTENT.toString() + String.valueOf(_id) + "&position=" + String.valueOf(_position[0])
-                + "|" + String.valueOf(_position[1]) + "&type=" + String.valueOf(_drawingType.GetId()) + "&schedules="
-                + getSchedulesString() + "&sockets=" + getSocketsString() + "&temperature=" + _temperatureArea;
+        return LucaServerAction.UPDATE_MAP_CONTENT.toString() + String.valueOf(_id)
+                + "&position=" + GetPositionString()
+                + "&type=" + String.valueOf(_drawingType.GetId())
+                + "&schedules=" + GetSchedulesString()
+                + "&sockets=" + GetSocketsString()
+                + "&temperature=" + _temperatureArea;
     }
 
     public String GetCommandDelete() {
@@ -119,10 +130,10 @@ public class MapContentDto implements Serializable {
     @Override
     public String toString() {
         return "{" + TAG + ": {Id: " + String.valueOf(_id)
-                + "}{Position: " + String.valueOf(_position[0]) + "|" + String.valueOf(_position[1])
+                + "}{Position: " + GetPositionString()
                 + "}{DrawingType: " + _drawingType.toString()
-                + "}{Schedules: " + getSchedulesString()
-                + "}{Sockets: " + getSocketsString()
+                + "}{Schedules: " + GetSchedulesString()
+                + "}{Sockets: " + GetSocketsString()
                 + "}{Temperature: " + _temperatureArea
                 + "}{MediaServerIp: " + _mediaServerIp
                 + "}{Visibility: " + String.valueOf(_visibility) + "}";

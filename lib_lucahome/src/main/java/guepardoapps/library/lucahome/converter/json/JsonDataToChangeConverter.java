@@ -26,38 +26,18 @@ public final class JsonDataToChangeConverter {
         }
     }
 
-    public static ChangeDto Get(String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
-            if (value.contains(_searchParameter)) {
-                value = value.replace(_searchParameter, "").replace("};};", "");
-
-                String[] data = value.split("\\};");
-                ChangeDto newValue = ParseStringToValue(data);
-                if (newValue != null) {
-                    return newValue;
-                }
-            }
-        }
-
-        if (_logger == null) {
-            _logger = new LucaHomeLogger(TAG);
-        }
-        _logger.Error(value + " has an error!");
-
-        return null;
-    }
-
     private static SerializableList<ChangeDto> ParseStringToList(String value) {
         if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
             if (value.contains(_searchParameter)) {
                 SerializableList<ChangeDto> list = new SerializableList<>();
 
                 String[] entries = value.split("\\" + _searchParameter);
-                for (String entry : entries) {
+                for (int index = 0; index < entries.length; index++) {
+                    String entry = entries[index];
                     entry = entry.replace(_searchParameter, "").replace("};};", "");
 
                     String[] data = entry.split("\\};");
-                    ChangeDto newValue = ParseStringToValue(data);
+                    ChangeDto newValue = ParseStringToValue(index, data);
                     if (newValue != null) {
                         list.addValue(newValue);
                     }
@@ -74,10 +54,14 @@ public final class JsonDataToChangeConverter {
         return new SerializableList<>();
     }
 
-    private static ChangeDto ParseStringToValue(String[] data) {
+    private static ChangeDto ParseStringToValue(int id, String[] data) {
         if (data.length == 7) {
-            if (data[0].contains("{Type:") && data[1].contains("{Hour:") && data[2].contains("{Minute:")
-                    && data[3].contains("{Day:") && data[4].contains("{Month:") && data[5].contains("{Year:")
+            if (data[0].contains("{Type:")
+                    && data[1].contains("{Hour:")
+                    && data[2].contains("{Minute:")
+                    && data[3].contains("{Day:")
+                    && data[4].contains("{Month:")
+                    && data[5].contains("{Year:")
                     && data[6].contains("{User:")) {
 
                 String type = data[0].replace("{Type:", "").replace("};", "");
@@ -99,7 +83,7 @@ public final class JsonDataToChangeConverter {
 
                 String user = data[6].replace("{User:", "").replace("};", "");
 
-                ChangeDto newValue = new ChangeDto(type, date, time, user);
+                ChangeDto newValue = new ChangeDto(id, type, date, time, user);
                 _logger.Debug(String.format(Locale.getDefault(), "New ChangeDto %s", newValue));
 
                 return newValue;

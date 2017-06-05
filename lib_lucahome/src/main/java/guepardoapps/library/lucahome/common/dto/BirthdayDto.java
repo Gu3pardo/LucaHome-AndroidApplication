@@ -15,41 +15,40 @@ public class BirthdayDto implements Serializable {
 
     private static final String TAG = BirthdayDto.class.getSimpleName();
 
-    private int _drawable;
+    private int _id;
 
     private String _name;
     private Calendar _birthday;
 
-    private int _id;
+    private int _drawable;
     private int _notificationId;
-    private boolean _notifyMe;
+
+    public BirthdayDto(
+            int id,
+            @NonNull String name,
+            @NonNull Calendar birthday,
+            int drawable) {
+        _id = id;
+        _notificationId = IDs.NOTIFICATION_BIRTHDAY + _id;
+
+        _name = name;
+        _birthday = birthday;
+
+        _drawable = drawable;
+    }
 
     public BirthdayDto(
             @NonNull String name,
             @NonNull Calendar birthday,
             int id) {
-        _drawable = -1;
-
-        _name = name;
-        _birthday = birthday;
-
-        _id = id;
-        _notificationId = IDs.NOTIFICATION_BIRTHDAY + _id;
-        _notifyMe = true;
+        this(id, name, birthday, -1);
     }
 
     public BirthdayDto(
             int drawable,
             @NonNull String name,
             @NonNull Calendar birthday) {
-        _drawable = drawable;
-
-        _name = name;
-        _birthday = birthday;
-
-        _id = -1;
-        _notificationId = IDs.NOTIFICATION_BIRTHDAY + _id;
-        _notifyMe = true;
+        this(-1, name, birthday, drawable);
     }
 
     public int GetDrawable() {
@@ -120,10 +119,6 @@ public class BirthdayDto implements Serializable {
         return "It is " + _name + "'s " + String.valueOf(age) + "th birthday!";
     }
 
-    public boolean NotifyMe() {
-        return _notifyMe;
-    }
-
     public String GetCommandAdd() {
         return LucaServerAction.ADD_BIRTHDAY.toString() + String.valueOf(_id)
                 + "&name=" + _name
@@ -147,7 +142,6 @@ public class BirthdayDto implements Serializable {
     public String toString() {
         return "{" + TAG + ": {Name: " + _name
                 + "};{Birthday: " + _birthday.toString()
-                + "};{NotifyMe: " + String.valueOf(_notifyMe)
                 + "};{Id: " + String.valueOf(_id)
                 + "};{NotificationId: " + String.valueOf(_notificationId) + "}}";
     }

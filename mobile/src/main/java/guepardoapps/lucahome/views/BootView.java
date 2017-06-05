@@ -183,8 +183,7 @@ public class BootView extends Activity {
 
         if (!_isInitialized) {
             _receiverController.RegisterReceiver(_commandReceiver, new String[]{Broadcasts.COMMAND});
-            _receiverController.RegisterReceiver(_updateProgressBarReceiver,
-                    new String[]{Broadcasts.UPDATE_PROGRESSBAR});
+            _receiverController.RegisterReceiver(_updateProgressBarReceiver, new String[]{Broadcasts.UPDATE_PROGRESSBAR});
             _isInitialized = true;
         }
     }
