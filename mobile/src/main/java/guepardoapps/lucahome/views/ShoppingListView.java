@@ -203,9 +203,8 @@ public class ShoppingListView extends AppCompatActivity {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
+                _receiverController.RegisterReceiver(_updateListReceiver, new String[]{Broadcasts.UPDATE_SHOPPING_LIST});
                 _isInitialized = true;
-                _receiverController.RegisterReceiver(_updateListReceiver,
-                        new String[]{Broadcasts.UPDATE_SHOPPING_LIST});
                 _getDataRunnable.run();
             }
         }

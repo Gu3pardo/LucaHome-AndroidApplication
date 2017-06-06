@@ -134,7 +134,7 @@ public class WIFIReceiver extends BroadcastReceiver {
 
     private void checkDatabase() {
         _logger.Debug("checkDatabase");
-        DatabaseController databaseController = DatabaseController.getInstance();
+        DatabaseController databaseController = DatabaseController.getSingleton();
 
         SerializableList<ActionDto> storedActions = databaseController.GetActions();
         if (storedActions.getSize() > 0) {
@@ -150,7 +150,6 @@ public class WIFIReceiver extends BroadcastReceiver {
         } else {
             _logger.Debug("No actions stored!");
         }
-        databaseController.Dispose();
     }
 
     private void checkSleepNotificationFlag() {

@@ -152,8 +152,8 @@ public class BirthdayView extends AppCompatActivity {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
-                _isInitialized = true;
                 _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_BIRTHDAY});
+                _isInitialized = true;
                 _getDataRunnable.run();
             }
         }

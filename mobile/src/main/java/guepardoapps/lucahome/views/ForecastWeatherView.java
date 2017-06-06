@@ -150,8 +150,8 @@ public class ForecastWeatherView extends AppCompatActivity {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
-                _isInitialized = true;
                 _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_FORECAST_VIEW});
+                _isInitialized = true;
                 _getDataRunnable.run();
             }
         }

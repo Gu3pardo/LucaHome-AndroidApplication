@@ -197,10 +197,9 @@ public class MenuView extends AppCompatActivity {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
-                _isInitialized = true;
-                _receiverController.RegisterReceiver(_updateListedMenuReceiver,
-                        new String[]{Broadcasts.UPDATE_LISTED_MENU_VIEW});
+                _receiverController.RegisterReceiver(_updateListedMenuReceiver, new String[]{Broadcasts.UPDATE_LISTED_MENU_VIEW});
                 _receiverController.RegisterReceiver(_updateMenuReceiver, new String[]{Broadcasts.UPDATE_MENU_VIEW});
+                _isInitialized = true;
                 _getDataRunnable.run();
             }
         }

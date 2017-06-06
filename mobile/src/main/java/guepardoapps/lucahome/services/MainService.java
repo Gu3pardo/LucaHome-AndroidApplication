@@ -1081,7 +1081,13 @@ public class MainService extends Service {
 
                     _databaseController.ClearDatabaseSocket();
                     for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
-                        _databaseController.SaveSocket(_wirelessSocketList.getValue(index));
+                        if (!_databaseController.SaveSocket(_wirelessSocketList.getValue(index))) {
+                            _logger.Warn(
+                                    String.format(
+                                            Locale.getDefault(),
+                                            "Failed to save socket %s to database!",
+                                            _wirelessSocketList.getValue(index).GetName()));
+                        }
                     }
                 } else {
                     _logger.Warn("_wirelessSocketList is null");
@@ -1840,7 +1846,7 @@ public class MainService extends Service {
 
             _beaconController = new BeaconController(_context);
             _broadcastController = new BroadcastController(_context);
-            _databaseController = DatabaseController.getInstance();
+            _databaseController = DatabaseController.getSingleton();
             _databaseController.Initialize(_context);
             _mediaMirrorController = new MediaMirrorController(_context);
             _mediaMirrorController.Initialize();

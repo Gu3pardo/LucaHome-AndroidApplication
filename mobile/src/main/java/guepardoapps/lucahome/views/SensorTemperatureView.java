@@ -239,11 +239,10 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
-                _isInitialized = true;
                 _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_TEMPERATURE});
+                _receiverController.RegisterReceiver(_temperatureReceiver, new String[]{Broadcasts.UPDATE_TEMPERATURE});
+                _isInitialized = true;
                 _hasTemperatureSensor = checkSensorAvailability();
-                _receiverController.RegisterReceiver(_temperatureReceiver,
-                        new String[]{Broadcasts.UPDATE_TEMPERATURE});
                 _getDataRunnable.run();
             }
         }

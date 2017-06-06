@@ -185,8 +185,8 @@ public class SocketViewController {
                     _dialogController = new LucaDialogController(_context);
                 }
                 _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_SOCKET_LIST});
-                ReloadSockets();
                 _isInitialized = true;
+                ReloadSockets();
             }
         }
     }

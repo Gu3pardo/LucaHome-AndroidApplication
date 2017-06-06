@@ -153,8 +153,8 @@ public class MovieView extends AppCompatActivity {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
-                _isInitialized = true;
                 _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_MOVIE});
+                _isInitialized = true;
                 _getDataRunnable.run();
             }
         }

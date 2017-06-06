@@ -197,8 +197,8 @@ public class TimerView extends AppCompatActivity {
                     _dialogController = new LucaDialogController(_context);
                 }
                 _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_TIMER});
-                _getDataRunnable.run();
                 _isInitialized = true;
+                _getDataRunnable.run();
             }
         }
     }

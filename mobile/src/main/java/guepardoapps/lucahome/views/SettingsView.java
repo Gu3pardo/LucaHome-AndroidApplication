@@ -132,7 +132,7 @@ public class SettingsView extends Activity {
         _context = this;
 
         _broadcastController = new BroadcastController(_context);
-        _databaseController = DatabaseController.getInstance();
+        _databaseController = DatabaseController.getSingleton();
         _navigationService = new NavigationService(_context);
         _networkController = new NetworkController(_context);
         _notificationController = new LucaNotificationController(_context);

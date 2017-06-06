@@ -197,8 +197,8 @@ public class ScheduleView extends AppCompatActivity {
                     _dialogController = new LucaDialogController(_context);
                 }
                 _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.UPDATE_SCHEDULE});
-                _getDataRunnable.run();
                 _isInitialized = true;
+                _getDataRunnable.run();
             }
         }
     }

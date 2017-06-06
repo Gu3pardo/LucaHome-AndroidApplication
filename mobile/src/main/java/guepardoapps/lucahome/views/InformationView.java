@@ -120,8 +120,7 @@ public class InformationView extends AppCompatActivity {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             if (_receiverController != null && _broadcastController != null) {
-                _receiverController.RegisterReceiver(_updateInformationReceiver,
-                        new String[]{Broadcasts.UPDATE_INFORMATION});
+                _receiverController.RegisterReceiver(_updateInformationReceiver, new String[]{Broadcasts.UPDATE_INFORMATION});
                 _isInitialized = true;
                 _getDataRunnable.run();
             }
