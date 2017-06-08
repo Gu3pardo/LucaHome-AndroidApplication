@@ -2,25 +2,41 @@ package guepardoapps.library.lucahome.customadapter;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
 import guepardoapps.library.lucahome.R;
+import guepardoapps.library.lucahome.common.constants.Broadcasts;
+import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.constants.Constants;
+import guepardoapps.library.lucahome.common.constants.Keys;
 import guepardoapps.library.lucahome.common.dto.MovieDto;
+import guepardoapps.library.lucahome.common.dto.YoutubeVideoDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.MovieController;
 
+import guepardoapps.library.lucahome.tasks.DownloadYoutubeVideoTask;
 import guepardoapps.library.toolset.common.classes.SerializableList;
+import guepardoapps.library.toolset.controller.BroadcastController;
+import guepardoapps.library.toolset.controller.NetworkController;
+import guepardoapps.library.toolset.controller.ReceiverController;
 
 public class MovieListAdapter extends BaseAdapter {
 
@@ -35,6 +51,7 @@ public class MovieListAdapter extends BaseAdapter {
 
     private MovieController _movieController;
     private LucaDialogController _dialogController;
+    private NetworkController _networkController;
 
     private static LayoutInflater _inflater = null;
 
@@ -52,6 +69,7 @@ public class MovieListAdapter extends BaseAdapter {
 
         _movieController = new MovieController(_context);
         _dialogController = new LucaDialogController(_context);
+        _networkController = new NetworkController(_context, _dialogController);
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -72,18 +90,30 @@ public class MovieListAdapter extends BaseAdapter {
     }
 
     public class Holder {
+        private ImageView _image;
         private Button _title;
+
         private TextView _genre;
         private TextView _watched;
         private TextView _rating;
+
         private Button _play;
+
+        private ImageButton _youtubeTrailer;
+        private ImageButton _imdb;
+        private ImageButton _wikipedia;
+
+        private ReceiverController _receiverController;
+        private BroadcastReceiver _youtubeInformationReceiver;
     }
 
     @SuppressLint({"InflateParams", "ViewHolder"})
     @Override
     public View getView(final int index, View convertView, ViewGroup parent) {
-        Holder holder = new Holder();
+        final Holder holder = new Holder();
         View rowView = _inflater.inflate(R.layout.list_movie_item, null);
+
+        holder._image = (ImageView) rowView.findViewById(R.id.movie_item_image);
 
         holder._title = (Button) rowView.findViewById(R.id.movie_item_title);
         holder._title.setText(_movieList.getValue(index).GetTitle());
@@ -122,6 +152,85 @@ public class MovieListAdapter extends BaseAdapter {
                         .show();
             }
         });
+
+        holder._youtubeTrailer = (ImageButton) rowView.findViewById(R.id.movie_item_button_trailer);
+        holder._youtubeTrailer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = String.format(
+                        Locale.getDefault(),
+                        "https://www.youtube.com/results?search_query=%s+trailer",
+                        _movieList.getValue(index).GetTitle()).replace(" ", "+");
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                _context.startActivity(intent);
+            }
+        });
+
+        holder._imdb = (ImageButton) rowView.findViewById(R.id.movie_item_button_imdb);
+        holder._imdb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = String.format(
+                        Locale.getDefault(),
+                        "http://www.imdb.com/find?ref_=nv_sr_fn&q=%s&s=all",
+                        _movieList.getValue(index).GetTitle()).replace(" ", "+");
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                _context.startActivity(intent);
+            }
+        });
+
+        holder._wikipedia = (ImageButton) rowView.findViewById(R.id.movie_item_button_wikipedia);
+        holder._wikipedia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String url = String.format(
+                        Locale.getDefault(),
+                        "https://de.wikipedia.org/wiki/%s",
+                        _movieList.getValue(index).GetTitle()).replace(" ", "_");
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                _context.startActivity(intent);
+            }
+        });
+
+        holder._receiverController = new ReceiverController(_context);
+        holder._youtubeInformationReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                _logger.Debug("_currentYoutubeVideoReceiver");
+                YoutubeVideoDto currentYoutubeId = (YoutubeVideoDto) intent.getSerializableExtra(Bundles.YOUTUBE_VIDEO);
+                if (currentYoutubeId != null) {
+                    Picasso.with(context).load(currentYoutubeId.GetMediumImageUrl()).into(holder._image);
+                } else {
+                    _logger.Warn("currentYoutubeId is null");
+                }
+            }
+        };
+
+        if (!_networkController.IsWifiConnected()) {
+            _logger.Warn("We are not in a wifi area! Not downloading images!");
+            return rowView;
+        }
+
+        String broadcast = String.format(
+                Locale.getDefault(),
+                "%s_%s",
+                Broadcasts.YOUTUBE_VIDEO, _movieList.getValue(index).GetTitle());
+        _logger.Debug(String.format(Locale.getDefault(), "Alternative broadcast is %s", broadcast));
+
+        holder._receiverController.RegisterReceiver(
+                holder._youtubeInformationReceiver,
+                new String[]{broadcast});
+
+        String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, 1, _movieList.getValue(index).GetTitle() + "+movie", Keys.YOUTUBE_API_KEY);
+        DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(
+                _context,
+                new BroadcastController(_context));
+        task.SetSendFirstEntry(true);
+        task.SetAlternativeBroadcast(broadcast);
+        task.execute(url);
 
         return rowView;
     }

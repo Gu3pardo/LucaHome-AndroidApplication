@@ -7,8 +7,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 30101
-        versionName "3.1.1.170605"
+        versionCode 30200
+        versionName "3.2.0.170608"
         multiDexEnabled true
     }
     buildTypes {
@@ -34,9 +34,9 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:support-compat:25.3.1'
-    compile 'com.google.android.support:wearable:2.0.2'
-    provided 'com.google.android.wearable:wearable:2.0.2'
-    compile 'com.google.android.gms:play-services-wearable:10.2.6'
+    compile 'com.google.android.support:wearable:2.0.3'
+    provided 'com.google.android.wearable:wearable:2.0.3'
+    compile 'com.google.android.gms:play-services-wearable:11.0.0'
     compile 'com.github.GrenderG:Toasty:1.2.5'
     compile 'com.github.matecode:Snacky:1.0.2'
     compile project(':lib_openweather')

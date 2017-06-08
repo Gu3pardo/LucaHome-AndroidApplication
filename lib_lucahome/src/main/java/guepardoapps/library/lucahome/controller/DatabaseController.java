@@ -1,6 +1,7 @@
 package guepardoapps.library.lucahome.controller;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import guepardoapps.library.lucahome.common.dto.ActionDto;
 import guepardoapps.library.lucahome.common.dto.BirthdayDto;
@@ -40,11 +41,11 @@ public class DatabaseController {
         _logger.Debug("DatabaseController created...");
     }
 
-    public static DatabaseController getInstance() {
+    public static DatabaseController getSingleton() {
         return SINGLETON;
     }
 
-    public void Initialize(Context context) {
+    public void Initialize(@NonNull Context context) {
         _logger.Debug("Initialize");
 
         if (_isInitialized) {

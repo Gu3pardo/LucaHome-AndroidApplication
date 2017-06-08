@@ -1,9 +1,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="125dp"
     android:background="@color/TextIcon">
 
     <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_margin="5dp"
@@ -51,13 +53,48 @@
             android:id="@+id/movie_item_genre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:layout_alignStart="@+id/movie_item_title"
-            android:layout_margin="5dp"
-            android:background="@xml/button_blank"
+            android:layout_below="@+id/movie_item_title"
+            android:layout_marginStart="5dp"
             android:text="@string/example"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/TextIcon" />
+
+        <ImageButton
+            android:id="@+id/movie_item_button_trailer"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignStart="@+id/movie_item_title"
+            android:layout_below="@+id/movie_item_genre"
+            android:layout_marginStart="5dp"
+            android:background="@xml/button_blank"
+            android:contentDescription="@string/contentDescription"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/youtube_icon" />
+
+        <ImageButton
+            android:id="@+id/movie_item_button_imdb"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_below="@+id/movie_item_genre"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/movie_item_button_trailer"
+            android:background="@xml/button_blank"
+            android:contentDescription="@string/contentDescription"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/imdb_icon" />
+
+        <ImageButton
+            android:id="@+id/movie_item_button_wikipedia"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_below="@+id/movie_item_genre"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@+id/movie_item_button_imdb"
+            android:background="@xml/button_blank"
+            android:contentDescription="@string/contentDescription"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/wikipedia_icon" />
 
         <TextView
             android:id="@+id/movie_item_rating"
@@ -66,7 +103,6 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
             android:layout_margin="5dp"
-            android:background="@xml/button_blank"
             android:text="@string/example"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/TextIcon" />
@@ -77,7 +113,6 @@
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/movie_item_rating"
             android:layout_below="@+id/movie_item_rating"
-            android:background="@xml/button_blank"
             android:text="@string/example"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/TextIcon" />

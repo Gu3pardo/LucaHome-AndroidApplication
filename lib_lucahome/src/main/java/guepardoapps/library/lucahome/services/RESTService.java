@@ -90,7 +90,7 @@ public class RESTService extends Service {
         _logger.Debug("Broadcast is: " + broadcast);
 
         if (_databaseController == null) {
-            _databaseController = DatabaseController.getInstance();
+            _databaseController = DatabaseController.getSingleton();
         }
 
         if (!_networkController.IsNetworkAvailable()) {
@@ -136,10 +136,6 @@ public class RESTService extends Service {
         task.setValues(name, broadcast, actions.length);
         task.execute(actions);
 
-        if (_databaseController != null) {
-            _databaseController.Dispose();
-        }
-
         return Service.START_NOT_STICKY;
     }
 
@@ -153,8 +149,7 @@ public class RESTService extends Service {
 
         ActionDto storeAction = new ActionDto(-1, name, action, broadcast);
         if (_databaseController.SaveAction(storeAction)) {
-            _scheduleService.AddSchedule(name, new DeleteStoredActionRunnable(name, _databaseController),
-                    Timeouts.DELETE_STORED_ACTION, false);
+            _scheduleService.AddSchedule(name, new DeleteStoredActionRunnable(name, _databaseController), Timeouts.DELETE_STORED_ACTION, false);
             Toasty.success(_context, "Saved action!", Toast.LENGTH_SHORT).show();
         } else {
             Toasty.error(_context, "Could not save action!", Toast.LENGTH_SHORT).show();

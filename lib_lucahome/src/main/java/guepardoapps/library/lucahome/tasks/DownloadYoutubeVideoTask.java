@@ -2,6 +2,7 @@ package guepardoapps.library.lucahome.tasks;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +40,7 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
     private boolean _sendFirstEntry = false;
 
     private String _serverIp;
+    private String _alternativeBroadcast;
     private ArrayList<YoutubeVideoDto> _youtubeVideoList;
 
     public DownloadYoutubeVideoTask(
@@ -48,6 +50,7 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
             ProgressDialog loadingVideosDialog,
             @NonNull String serverIp) {
         _logger = new LucaHomeLogger(TAG);
+        _logger.Debug("Created new " + TAG);
 
         _context = context;
 
@@ -78,9 +81,14 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
         _sendFirstEntry = sendFirstEntry;
     }
 
+    public void SetAlternativeBroadcast(String alternativeBroadcast) {
+        _logger.Debug("SetAlternativeBroadcast to " + alternativeBroadcast);
+        _alternativeBroadcast = alternativeBroadcast;
+    }
+
     @Override
     protected String doInBackground(String... urls) {
-        _logger.Debug("doInBackground");
+        _logger.Debug(String.format(Locale.getDefault(), "doInBackground with urls: %s", urls));
 
         if (!_isInitialized) {
             _logger.Error(TAG + " is not initialized!");
@@ -107,10 +115,12 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
 
         if (document != null) {
             String getJson = document.text();
+            _logger.Debug("getJson: " + getJson);
 
             JSONObject jsonObject = null;
             try {
                 jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
+                _logger.Debug(String.format(Locale.getDefault(), "jsonObject: %s", jsonObject));
             } catch (JSONException e) {
                 _logger.Error(e.toString());
             }
@@ -171,6 +181,8 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
                 } catch (JSONException e) {
                     _logger.Error(e.toString());
                 }
+            } else {
+                _logger.Warn("JsonObject is null!");
             }
         }
 
@@ -205,11 +217,32 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
                     Broadcasts.YOUTUBE_ID,
                     Bundles.YOUTUBE_ID,
                     _youtubeVideoList.get(0).GetYoutubeId());
+            _logger.Debug(String.format(
+                    Locale.getDefault(),
+                    "Send broadcast %s with bundle %s and data %s",
+                    Broadcasts.YOUTUBE_ID, Bundles.YOUTUBE_ID, _youtubeVideoList.get(0).GetYoutubeId()));
 
-            _broadcastController.SendSerializableBroadcast(
-                    Broadcasts.YOUTUBE_VIDEO,
-                    Bundles.YOUTUBE_VIDEO,
-                    _youtubeVideoList.get(0));
+            if (_alternativeBroadcast != null) {
+                _broadcastController.SendSerializableBroadcast(
+                        _alternativeBroadcast,
+                        Bundles.YOUTUBE_VIDEO,
+                        _youtubeVideoList.get(0));
+
+                _logger.Debug(String.format(
+                        Locale.getDefault(),
+                        "Send _alternativeBroadcast broadcast %s with bundle %s and data %s",
+                        _alternativeBroadcast, Bundles.YOUTUBE_ID, _youtubeVideoList.get(0)));
+            } else {
+                _broadcastController.SendSerializableBroadcast(
+                        Broadcasts.YOUTUBE_VIDEO,
+                        Bundles.YOUTUBE_VIDEO,
+                        _youtubeVideoList.get(0));
+
+                _logger.Debug(String.format(
+                        Locale.getDefault(),
+                        "Send _alternativeBroadcast broadcast %s with bundle %s and data %s",
+                        Broadcasts.YOUTUBE_VIDEO, Bundles.YOUTUBE_VIDEO, _youtubeVideoList.get(0)));
+            }
         }
     }
 }

@@ -9,7 +9,8 @@ Part of the LucaHome-Project
 Containing the shared library LucaHome, a wearable project and the main android client application.
 
 Android client to remotely control sockets, mediaserver, view temperature, share your shoppinglist, plan your menu and much more...
-___________________________________
+
+# Screenshots
 
 ![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_001.png)
 ___________________________________
@@ -27,3 +28,6 @@ ___________________________________
 ___________________________________
 
 ![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_006.png)
+___________________________________
+
+![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_007.png)
