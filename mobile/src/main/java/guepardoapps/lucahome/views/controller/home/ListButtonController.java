@@ -2,6 +2,7 @@ package guepardoapps.lucahome.views.controller.home;
 
 import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -53,7 +54,7 @@ public class ListButtonController {
     private LinearLayout _linearLayoutButtonLiving;
     private LinearLayout _linearLayoutButtonSocial;
 
-    public ListButtonController(Context context) {
+    public ListButtonController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _context = context;
         _navigationService = new NavigationService(_context);
@@ -273,7 +274,7 @@ public class ListButtonController {
         });
     }
 
-    private void handleLinearLayout(LinearLayout linearLayout) {
+    private void handleLinearLayout(@NonNull LinearLayout linearLayout) {
         _logger.Debug(String.format(Locale.getDefault(), "handleLinearLayout with linearLayout %s", linearLayout));
 
         for (int index = 0; index < LINEAR_LAYOUT_COUNT; index++) {

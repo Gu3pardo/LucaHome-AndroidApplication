@@ -224,7 +224,7 @@ public class WirelessSocketDto implements Serializable {
                 return R.drawable.gameconsole_off;
             }
         }
-        return -1;
+        return R.drawable.socket;
     }
 
     private String createShortName(String name) {

@@ -7,8 +7,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 25
-        versionCode 30200
-        versionName "3.2.0.170608"
+        versionCode 30201
+        versionName "3.2.1.170611"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -50,11 +50,12 @@ dependencies {
     compile 'com.baoyz.pullrefreshlayout:library:1.2.0'
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.synnapps:carouselview:0.1.4'
+    compile 'com.github.matthiasrobbers:shortbread:1.0.1'
+    annotationProcessor 'com.github.matthiasrobbers:shortbread-compiler:1.0.1'
+    compile 'com.flaviofaria:kenburnsview:1.0.7'
     compile('com.mikepenz:aboutlibraries:5.9.6@aar') {
         transitive = true
     }
-    compile 'com.github.matthiasrobbers:shortbread:1.0.1'
-    annotationProcessor 'com.github.matthiasrobbers:shortbread-compiler:1.0.1'
     testCompile 'junit:junit:4.12'
     compile project(':lib_openweather')
     compile project(':lib_toolset')

@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -76,7 +77,9 @@ import guepardoapps.library.openweather.controller.OpenWeatherController;
 
 import guepardoapps.library.toolset.beacon.BeaconController;
 import guepardoapps.library.toolset.common.classes.NotificationContent;
+import guepardoapps.library.toolset.common.classes.SerializableDate;
 import guepardoapps.library.toolset.common.classes.SerializableList;
+import guepardoapps.library.toolset.common.classes.SerializableTime;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.DialogController;
 import guepardoapps.library.toolset.controller.NetworkController;
@@ -232,6 +235,13 @@ public class MainService extends Service {
                                 new String[]{Bundles.SHOPPING_LIST},
                                 new Object[]{_shoppingList});
                         sendShoppingListToWear();
+                        break;
+                    case GET_SOCKET_LIST:
+                        _broadcastController.SendSerializableArrayBroadcast(
+                                Broadcasts.UPDATE_SOCKET_LIST,
+                                new String[]{Bundles.SOCKET_LIST},
+                                new Object[]{_wirelessSocketList});
+                        sendSocketsToWear();
                         break;
                     case GET_TEMPERATURE_LIST:
                         _broadcastController.SendSerializableArrayBroadcast(
@@ -649,6 +659,12 @@ public class MainService extends Service {
 
                     checkForBirthday();
                     sendBirthdaysToWear();
+
+                    SerializableTime time = new SerializableTime();
+                    SerializableDate date = new SerializableDate();
+                    _sharedPrefController.SaveStringValue(
+                            SharedPrefConstants.LAST_LOADED_BIRTHDAY_TIME,
+                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
                 } else {
                     _logger.Warn("GetList is null");
                 }
@@ -696,6 +712,8 @@ public class MainService extends Service {
                     for (int index = 0; index < _changeList.getSize(); index++) {
                         _databaseController.SaveChange(_changeList.getValue(index));
                     }
+
+                    checkLastLoadedData();
                 } else {
                     _logger.Warn("newChangeList is null");
                 }
@@ -704,6 +722,197 @@ public class MainService extends Service {
             }
 
             updateDownloadCount();
+        }
+
+        private void checkLastLoadedData() {
+            _logger.Debug("checkLastLoadedData");
+
+            check(SharedPrefConstants.LAST_LOADED_BIRTHDAY_TIME,
+                    "Birthdays",
+                    new Runnable[]{_downloadBirthdayRunnable});
+
+            check(SharedPrefConstants.LAST_LOADED_MAP_CONTENT_TIME,
+                    "MapContent",
+                    new Runnable[]{_downloadMapContentRunnable});
+
+            check(SharedPrefConstants.LAST_LOADED_MENU_TIME,
+                    "Menu",
+                    new Runnable[]{_downloadListedMenuRunnable, _downloadMenuRunnable});
+
+            check(SharedPrefConstants.LAST_LOADED_MOVIE_TIME,
+                    "Movies",
+                    new Runnable[]{_downloadMovieRunnable});
+
+            check(SharedPrefConstants.LAST_LOADED_SETTINGS_TIME,
+                    "Settings",
+                    new Runnable[]{_downloadSocketRunnable});
+
+            check(SharedPrefConstants.LAST_LOADED_SHOPPING_LIST_TIME,
+                    "ShoppingList",
+                    new Runnable[]{_downloadShoppingListRunnable});
+        }
+
+        private void check(
+                @NonNull String sharedPrefKey,
+                @NonNull String changeEntry,
+                @NonNull Runnable[] runnableArray) {
+            _logger.Debug(String.format(Locale.getDefault(), "Checking key %s with changeEntry %s and runnableArray %s", sharedPrefKey, changeEntry, runnableArray));
+
+            String savedData = _sharedPrefController.LoadStringValueFromSharedPreferences(sharedPrefKey);
+            String[] savedDataArray = savedData.split("\\-");
+            if (savedDataArray.length == 5) {
+                SerializableTime time = convertDataToTime(savedDataArray);
+                _logger.Debug(String.format(Locale.getDefault(), "Converted time is %s", time));
+
+                Date date = convertDataToDate(savedDataArray);
+                _logger.Debug(String.format(Locale.getDefault(), "Converted date is %s", date));
+
+                boolean found = false;
+                boolean needsUpdate = false;
+
+                _logger.Debug("Checking changeList");
+                for (int index = 0; index < _changeList.getSize(); index++) {
+                    ChangeDto entry = _changeList.getValue(index);
+                    _logger.Debug(String.format(Locale.getDefault(), "Checking changeEntry %s", entry));
+
+                    if (entry.GetType().contains(changeEntry)) {
+                        _logger.Debug(String.format(Locale.getDefault(), "Found entry %s", entry));
+
+                        if (entry.GetDate().after(date)) {
+                            _logger.Debug(String.format(Locale.getDefault(), "Date %s of entry %s is after date %s", entry.GetDate(), entry, date));
+
+                            needsUpdate = true;
+                            for (Runnable runnable : runnableArray) {
+                                runnable.run();
+                            }
+                        } else {
+                            if (entry.GetDate().compareTo(date) >= 0) {
+                                if (time.isAfter(entry.GetTime())) {
+                                    _logger.Debug(String.format(Locale.getDefault(), "Time %s of entry %s is after time %s", entry.GetTime(), entry, time));
+
+                                    needsUpdate = true;
+                                    for (Runnable runnable : runnableArray) {
+                                        runnable.run();
+                                    }
+                                }
+                            }
+                        }
+
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found) {
+                    _logger.Warn(String.format(Locale.getDefault(), "Did not found entry %s in _changeList! Performing update!", changeEntry));
+                    for (Runnable runnable : runnableArray) {
+                        runnable.run();
+                    }
+                    needsUpdate = true;
+                }
+
+                if (!needsUpdate) {
+                    switch (changeEntry) {
+                        case "Birthdays":
+                            _birthdayList = _databaseController.GetBirthdayList();
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_BIRTHDAY,
+                                    new String[]{Bundles.BIRTHDAY_LIST},
+                                    new Object[]{_birthdayList});
+                            sendBirthdaysToWear();
+                            break;
+                        case "MapContent":
+                            _mapContentList = _databaseController.GetMapContent();
+                            break;
+                        case "Menu":
+                            _listedMenu = _databaseController.GetListedMenuList();
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_LISTED_MENU_VIEW,
+                                    new String[]{Bundles.LISTED_MENU},
+                                    new Object[]{_listedMenu});
+                            _menu = _databaseController.GetMenuList();
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_MENU_VIEW,
+                                    new String[]{Bundles.MENU},
+                                    new Object[]{_menu});
+                            sendMenuToWear();
+                            break;
+                        case "Movies":
+                            _movieList = _databaseController.GetMovieList();
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_MOVIE,
+                                    new String[]{Bundles.MOVIE_LIST},
+                                    new Object[]{_movieList});
+                            break;
+                        case "Settings":
+                            _wirelessSocketList = _databaseController.GetSocketList();
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_SOCKET_LIST,
+                                    new String[]{Bundles.SOCKET_LIST},
+                                    new Object[]{_wirelessSocketList});
+                            sendSocketsToWear();
+
+                            _scheduleList = _databaseController.GetScheduleList(_wirelessSocketList);
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_SCHEDULE_LIST,
+                                    new String[]{Bundles.SCHEDULE_LIST},
+                                    new Object[]{_scheduleList});
+                            sendSchedulesToWear();
+
+                            _timerList = _databaseController.GetTimerList(_wirelessSocketList);
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_TIMER_LIST,
+                                    new String[]{Bundles.TIMER_LIST},
+                                    new Object[]{_timerList});
+                            sendTimerToWear();
+
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_MAP_CONTENT_VIEW,
+                                    new String[]{Bundles.MAP_CONTENT_LIST, Bundles.SOCKET_LIST, Bundles.SCHEDULE_LIST, Bundles.TIMER_LIST, Bundles.TEMPERATURE_LIST, Bundles.SHOPPING_LIST, Bundles.MENU, Bundles.LISTED_MENU, Bundles.MOTION_CAMERA_DTO},
+                                    new Object[]{_mapContentList, _wirelessSocketList, _scheduleList, _timerList, _temperatureList, _shoppingList, _menu, _listedMenu, _motionCameraDto});
+
+                            break;
+                        case "ShoppingList":
+                            _shoppingList = _databaseController.GetShoppingList();
+                            _broadcastController.SendSerializableArrayBroadcast(
+                                    Broadcasts.UPDATE_SHOPPING_LIST,
+                                    new String[]{Bundles.SHOPPING_LIST},
+                                    new Object[]{_shoppingList});
+                            sendShoppingListToWear();
+                            break;
+                        default:
+                            _logger.Warn(String.format(Locale.getDefault(), "ChangeEntry %s is not supported", changeEntry));
+                            break;
+                    }
+                    updateDownloadCount();
+                }
+            } else {
+                _logger.Warn(String.format(Locale.getDefault(), "savedDataArray has invalid length %d", savedDataArray.length));
+            }
+        }
+
+        private SerializableTime convertDataToTime(@NonNull String[] stringArray) {
+            _logger.Debug(String.format(Locale.getDefault(), "convertDataToTime with  stringArray %s", stringArray));
+
+            String hourString = stringArray[0].replace("-", "");
+            int hour = Integer.parseInt(hourString);
+            String minuteString = stringArray[1].replace("-", "");
+            int minute = Integer.parseInt(minuteString);
+
+            return new SerializableTime(hour, minute, 0, 0);
+        }
+
+        private Date convertDataToDate(@NonNull String[] stringArray) {
+            _logger.Debug(String.format(Locale.getDefault(), "convertDataToDate with  stringArray %s", stringArray));
+
+            String dayString = stringArray[2].replace("-", "");
+            int day = Integer.parseInt(dayString);
+            String monthString = stringArray[3].replace("-", "");
+            int month = Integer.parseInt(monthString) - 1;
+            String yearString = stringArray[4].replace("-", "");
+            int year = Integer.parseInt(yearString) - 1900;
+
+            return new Date(year, month, day);
         }
     };
 
@@ -807,6 +1016,12 @@ public class MainService extends Service {
                     for (int index = 0; index < _mapContentList.getSize(); index++) {
                         _databaseController.SaveMapContent(_mapContentList.getValue(index));
                     }
+
+                    SerializableTime time = new SerializableTime();
+                    SerializableDate date = new SerializableDate();
+                    _sharedPrefController.SaveStringValue(
+                            SharedPrefConstants.LAST_LOADED_MAP_CONTENT_TIME,
+                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
                 }
             } else {
                 _logger.Warn("mapContentStringArray is null!");
@@ -897,6 +1112,12 @@ public class MainService extends Service {
                     for (int index = 0; index < _menu.getSize(); index++) {
                         _databaseController.SaveMenu(_menu.getValue(index));
                     }
+
+                    SerializableTime time = new SerializableTime();
+                    SerializableDate date = new SerializableDate();
+                    _sharedPrefController.SaveStringValue(
+                            SharedPrefConstants.LAST_LOADED_MENU_TIME,
+                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
                 } else {
                     _logger.Warn("newMenuList is null");
                 }
@@ -966,6 +1187,12 @@ public class MainService extends Service {
                     for (int index = 0; index < _movieList.getSize(); index++) {
                         _databaseController.SaveMovie(_movieList.getValue(index));
                     }
+
+                    SerializableTime time = new SerializableTime();
+                    SerializableDate date = new SerializableDate();
+                    _sharedPrefController.SaveStringValue(
+                            SharedPrefConstants.LAST_LOADED_MOVIE_TIME,
+                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
                 } else {
                     _logger.Warn("newMovieList is null");
                 }
@@ -993,6 +1220,11 @@ public class MainService extends Service {
                             new String[]{Bundles.SCHEDULE_LIST, Bundles.SOCKET_LIST},
                             new Object[]{_scheduleList, _wirelessSocketList});
 
+                    _databaseController.ClearDatabaseSchedule();
+                    for (int index = 0; index < _scheduleList.getSize(); index++) {
+                        _databaseController.SaveSchedule(_scheduleList.getValue(index));
+                    }
+
                     sendSchedulesToWear();
                 } else {
                     _logger.Warn("newScheduleList is null");
@@ -1005,6 +1237,11 @@ public class MainService extends Service {
                             Broadcasts.UPDATE_TIMER,
                             new String[]{Bundles.TIMER_LIST, Bundles.SOCKET_LIST},
                             new Object[]{_timerList, _wirelessSocketList});
+
+                    _databaseController.ClearDatabaseTimer();
+                    for (int index = 0; index < _timerList.getSize(); index++) {
+                        _databaseController.SaveTimer(_timerList.getValue(index));
+                    }
                 } else {
                     _logger.Warn("newTimerList is null");
                 }
@@ -1035,6 +1272,12 @@ public class MainService extends Service {
                     }
 
                     sendShoppingListToWear();
+
+                    SerializableTime time = new SerializableTime();
+                    SerializableDate date = new SerializableDate();
+                    _sharedPrefController.SaveStringValue(
+                            SharedPrefConstants.LAST_LOADED_SHOPPING_LIST_TIME,
+                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
                 } else {
                     _logger.Warn("newShoppingList is null");
                 }
@@ -1089,6 +1332,12 @@ public class MainService extends Service {
                                             _wirelessSocketList.getValue(index).GetName()));
                         }
                     }
+
+                    SerializableTime time = new SerializableTime();
+                    SerializableDate date = new SerializableDate();
+                    _sharedPrefController.SaveStringValue(
+                            SharedPrefConstants.LAST_LOADED_SETTINGS_TIME,
+                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
                 } else {
                     _logger.Warn("_wirelessSocketList is null");
                 }
@@ -1391,6 +1640,7 @@ public class MainService extends Service {
                     new Object[]{_birthdayList});
 
             updateDownloadCount();
+            sendBirthdaysToWear();
         }
     };
 
@@ -1613,6 +1863,7 @@ public class MainService extends Service {
                     new Object[]{_menu});
 
             updateDownloadCount();
+            sendMenuToWear();
         }
     };
 
@@ -1681,11 +1932,13 @@ public class MainService extends Service {
 
             if (!_networkController.IsNetworkAvailable()) {
                 _logger.Warn("No network available!");
+                loadFromDatabase();
                 return;
             }
 
             if (!_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)) {
                 _logger.Warn("No LucaHome network! ...");
+                loadFromDatabase();
                 return;
             }
 
@@ -1693,6 +1946,26 @@ public class MainService extends Service {
                     Bundles.SCHEDULE_DOWNLOAD,
                     LucaServerAction.GET_SCHEDULES.toString(),
                     Broadcasts.DOWNLOAD_SCHEDULE_FINISHED);
+        }
+
+        private void loadFromDatabase() {
+            _logger.Debug("loadFromDatabase");
+
+            _scheduleList = _databaseController.GetScheduleList(_wirelessSocketList);
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_SCHEDULE_LIST,
+                    new String[]{Bundles.SCHEDULE_LIST},
+                    new Object[]{_scheduleList});
+            sendSchedulesToWear();
+
+            _timerList = _databaseController.GetTimerList(_wirelessSocketList);
+            _broadcastController.SendSerializableArrayBroadcast(
+                    Broadcasts.UPDATE_TIMER_LIST,
+                    new String[]{Bundles.TIMER_LIST},
+                    new Object[]{_timerList});
+            sendTimerToWear();
+
+            updateDownloadCount();
         }
     };
 
@@ -1741,6 +2014,7 @@ public class MainService extends Service {
                     new Object[]{_shoppingList});
 
             updateDownloadCount();
+            sendShoppingListToWear();
         }
     };
 
@@ -2073,17 +2347,10 @@ public class MainService extends Service {
         _downloadCurrentWeatherRunnable.run();
         _downloadForecastWeatherRunnable.run();
 
-        _downloadBirthdayRunnable.run();
         _downloadChangeRunnable.run();
         _downloadInformationRunnable.run();
-        _downloadListedMenuRunnable.run();
-        _downloadMapContentRunnable.run();
         _downloadMediaMirrorRunnable.run();
-        _downloadMenuRunnable.run();
         _downloadMotionCameraDtoRunnable.run();
-        _downloadMovieRunnable.run();
-        _downloadShoppingListRunnable.run();
-        _downloadSocketRunnable.run();
         _downloadTemperatureRunnable.run();
     }
 
@@ -2108,21 +2375,43 @@ public class MainService extends Service {
     private void install() {
         _logger.Debug("install");
 
-        _broadcastController.SendSerializableBroadcast(Broadcasts.COMMAND, Bundles.COMMAND, Command.SHOW_USER_LOGIN_DIALOG);
+        if (!_sharedPrefController.Contains(SharedPrefConstants.USER_NAME)
+                || !_sharedPrefController.Contains(SharedPrefConstants.USER_PASSPHRASE)) {
+            _broadcastController.SendSerializableBroadcast(Broadcasts.COMMAND, Bundles.COMMAND, Command.SHOW_USER_LOGIN_DIALOG);
+        }
 
         _sharedPrefController.SaveBooleanValue(SharedPrefConstants.SHARED_PREF_INSTALLED, true);
 
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION, true);
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION, true);
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION, true);
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION, true);
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION, true);
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.DISPLAY_CAMERA_NOTIFICATION, true);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION, true);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION, true);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION, true);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION, true);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION, true);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.DISPLAY_CAMERA_NOTIFICATION, true);
 
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_AUDIO_APP, true);
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.START_OSMC_APP, true);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.START_AUDIO_APP, true);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.START_OSMC_APP, true);
 
-        _sharedPrefController.SaveBooleanValue(SharedPrefConstants.USE_BEACONS, false);
+        checkInstallSharedPrefBoolean(SharedPrefConstants.USE_BEACONS, false);
+
+        checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_BIRTHDAY_TIME, "00-00-00-00-0000");
+        checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_MAP_CONTENT_TIME, "00-00-00-00-0000");
+        checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_MENU_TIME, "00-00-00-00-0000");
+        checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_MOVIE_TIME, "00-00-00-00-0000");
+        checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_SETTINGS_TIME, "00-00-00-00-0000");
+        checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_SHOPPING_LIST_TIME, "00-00-00-00-0000");
+    }
+
+    private void checkInstallSharedPrefBoolean(String key, boolean value) {
+        if (!_sharedPrefController.Contains(key)) {
+            _sharedPrefController.SaveBooleanValue(key, value);
+        }
+    }
+
+    private void checkInstallSharedPrefString(String key, String value) {
+        if (!_sharedPrefController.Contains(key)) {
+            _sharedPrefController.SaveStringValue(key, value);
+        }
     }
 
     private void installNotificationSettings() {

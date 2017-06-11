@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.converter.wear;
 
+import android.support.annotation.NonNull;
+
 import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.dto.ScheduleDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -17,7 +19,7 @@ public class MessageToScheduleConverter {
         _logger = new LucaHomeLogger(TAG);
     }
 
-    public SerializableList<ScheduleDto> ConvertMessageToScheduleList(String message) {
+    public SerializableList<ScheduleDto> ConvertMessageToScheduleList(@NonNull String message) {
         if (message.startsWith(SCHEDULES)) {
             _logger.Debug("message starts with " + SCHEDULES + "! replacing!");
             message = message.replace(SCHEDULES, "");
@@ -37,8 +39,12 @@ public class MessageToScheduleConverter {
 
                 if (data.length == 5) {
                     if (data[0] != null && data[1] != null && data[2] != null && data[3] != null && data[4] != null) {
-                        ScheduleDto item = new ScheduleDto(R.drawable.scheduler, data[0],
-                                data[1] + ":" + data[2] + ":" + data[3], (data[4].contains("1")));
+                        ScheduleDto item = new ScheduleDto(
+                                -1,
+                                R.drawable.scheduler,
+                                data[0],
+                                data[1] + ":" + data[2] + ":" + data[3],
+                                data[4].contains("1"));
                         list.addValue(item);
                     } else {
                         _logger.Warn("data[0] or data[1] or data[2] or data[3] or data[4] is null!");

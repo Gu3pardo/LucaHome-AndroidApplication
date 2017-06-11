@@ -15,7 +15,7 @@ public enum ShoppingEntryGroup implements Serializable {
 	NOODLES("Noodles", 6, R.drawable.noodles), 
 	BREAD("Bread", 7, R.drawable.bread), 
 	SPREAD("Spread", 8, R.drawable.spread), 
-	MILK_PRODUCT("Milk_product", 9, R.drawable.milk), 
+	MILK_PRODUCT("Milk_product", 9, R.drawable.milk),
 	CANDY("Candy", 10, R.drawable.candy), 
 	CLEANING_MATERIAL("Cleaning_material", 11, R.drawable.cleaning), 
 	BATH_UTILITY("Bath_utility", 12, R.drawable.bath), 

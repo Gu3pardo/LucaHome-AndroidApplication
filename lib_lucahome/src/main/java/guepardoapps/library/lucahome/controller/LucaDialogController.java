@@ -943,6 +943,7 @@ public class LucaDialogController extends DialogController {
                 }
 
                 ScheduleDto newSchedule = new ScheduleDto(
+                        -1,
                         _scheduleName,
                         socket,
                         weekday,
@@ -1093,6 +1094,7 @@ public class LucaDialogController extends DialogController {
                         Broadcasts.RELOAD_SOCKETS);
 
                 TimerDto newTimer = new TimerDto(
+                        -1,
                         _timerName,
                         socket,
                         weekday,
@@ -2014,8 +2016,7 @@ public class LucaDialogController extends DialogController {
             @Override
             public void onReceive(Context context, Intent intent) {
                 @SuppressWarnings("unchecked")
-                SerializableList<ShoppingEntryDto> receivedShoppingList = (SerializableList<ShoppingEntryDto>) intent
-                        .getSerializableExtra(Bundles.SHOPPING_LIST);
+                SerializableList<ShoppingEntryDto> receivedShoppingList = (SerializableList<ShoppingEntryDto>) intent.getSerializableExtra(Bundles.SHOPPING_LIST);
                 if (receivedShoppingList != null) {
                     ShoppingListAdapter listAdapter = new ShoppingListAdapter(_context, receivedShoppingList, false, null);
                     listView.setAdapter(listAdapter);

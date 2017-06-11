@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.converter.wear;
 
+import android.support.annotation.NonNull;
+
 import guepardoapps.library.lucahome.R;
 import guepardoapps.library.lucahome.common.dto.TimerDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -17,7 +19,7 @@ public class MessageToTimerConverter {
         _logger = new LucaHomeLogger(TAG);
     }
 
-    public SerializableList<TimerDto> ConvertMessageToTimerList(String message) {
+    public SerializableList<TimerDto> ConvertMessageToTimerList(@NonNull String message) {
         if (message.startsWith(TIMER)) {
             _logger.Debug("message starts with " + TIMER + "! replacing!");
             message = message.replace(TIMER, "");
@@ -37,8 +39,11 @@ public class MessageToTimerConverter {
 
                 if (data.length == 5) {
                     if (data[0] != null && data[1] != null && data[2] != null && data[3] != null && data[4] != null) {
-                        TimerDto item = new TimerDto(R.drawable.timer, data[0], data[1] + ":" + data[2] + ":" + data[3],
-                                (data[4].contains("1")));
+                        TimerDto item = new TimerDto(
+                                -1,
+                                R.drawable.timer,
+                                data[0], data[1] + ":" + data[2] + ":" + data[3],
+                                data[4].contains("1"));
                         list.addValue(item);
                     } else {
                         _logger.Warn("data[0] or data[1] or data[2] or data[3] or data[4] is null!");

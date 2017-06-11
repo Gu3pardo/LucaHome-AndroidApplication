@@ -10,7 +10,9 @@ import guepardoapps.library.lucahome.common.dto.ListedMenuDto;
 import guepardoapps.library.lucahome.common.dto.MapContentDto;
 import guepardoapps.library.lucahome.common.dto.MenuDto;
 import guepardoapps.library.lucahome.common.dto.MovieDto;
+import guepardoapps.library.lucahome.common.dto.ScheduleDto;
 import guepardoapps.library.lucahome.common.dto.ShoppingEntryDto;
+import guepardoapps.library.lucahome.common.dto.TimerDto;
 import guepardoapps.library.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.database.*;
@@ -33,8 +35,10 @@ public class DatabaseController {
     private DatabaseMapContentList _databaseMapContentList;
     private DatabaseMenuList _databaseMenuList;
     private DatabaseMovieList _databaseMovieList;
+    private DatabaseScheduleList _databaseScheduleList;
     private DatabaseShoppingList _databaseShoppingList;
     private DatabaseSocketList _databaseSocketList;
+    private DatabaseTimerList _databaseTimerList;
 
     private DatabaseController() {
         _logger = new LucaHomeLogger(TAG);
@@ -60,8 +64,10 @@ public class DatabaseController {
         _databaseMapContentList = new DatabaseMapContentList(context);
         _databaseMenuList = new DatabaseMenuList(context);
         _databaseMovieList = new DatabaseMovieList(context);
+        _databaseScheduleList = new DatabaseScheduleList(context);
         _databaseShoppingList = new DatabaseShoppingList(context);
         _databaseSocketList = new DatabaseSocketList(context);
+        _databaseTimerList = new DatabaseTimerList(context);
 
         _databaseActionStore.Open();
         _databaseBirthdayList.Open();
@@ -70,8 +76,10 @@ public class DatabaseController {
         _databaseMapContentList.Open();
         _databaseMenuList.Open();
         _databaseMovieList.Open();
+        _databaseScheduleList.Open();
         _databaseShoppingList.Open();
         _databaseSocketList.Open();
+        _databaseTimerList.Open();
 
         _isInitialized = true;
     }
@@ -86,8 +94,10 @@ public class DatabaseController {
         _databaseMapContentList.Close();
         _databaseMenuList.Close();
         _databaseMovieList.Close();
+        _databaseScheduleList.Close();
         _databaseShoppingList.Close();
         _databaseSocketList.Close();
+        _databaseTimerList.Close();
 
         _isInitialized = false;
     }
@@ -105,7 +115,7 @@ public class DatabaseController {
         return _databaseActionStore.GetStoredActions();
     }
 
-    public boolean SaveAction(ActionDto newEntry) {
+    public boolean SaveAction(@NonNull ActionDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -116,7 +126,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteAction(ActionDto deleteEntry) {
+    public boolean DeleteAction(@NonNull ActionDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -126,7 +136,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteActionByName(String deleteActionName) {
+    public boolean DeleteActionByName(@NonNull String deleteActionName) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -147,7 +157,7 @@ public class DatabaseController {
         }
     }
 
-    private boolean removeActionNameIfExists(String actionName) {
+    private boolean removeActionNameIfExists(@NonNull String actionName) {
         SerializableList<ActionDto> savedActions = GetActions();
 
         if (savedActions != null) {
@@ -178,7 +188,7 @@ public class DatabaseController {
         return _databaseBirthdayList.GetBirthdayList();
     }
 
-    public boolean SaveBirthday(BirthdayDto newEntry) {
+    public boolean SaveBirthday(@NonNull BirthdayDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -188,7 +198,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteBirthday(BirthdayDto deleteEntry) {
+    public boolean DeleteBirthday(@NonNull BirthdayDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -223,7 +233,7 @@ public class DatabaseController {
         return _databaseChangeList.GetChangeList();
     }
 
-    public boolean SaveChange(ChangeDto newEntry) {
+    public boolean SaveChange(@NonNull ChangeDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -233,7 +243,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteChange(ChangeDto deleteEntry) {
+    public boolean DeleteChange(@NonNull ChangeDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -268,7 +278,7 @@ public class DatabaseController {
         return _databaseListedMenuList.GetListedMenuList();
     }
 
-    public boolean SaveListedMenu(ListedMenuDto newEntry) {
+    public boolean SaveListedMenu(@NonNull ListedMenuDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -278,7 +288,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteListedMenu(ListedMenuDto deleteEntry) {
+    public boolean DeleteListedMenu(@NonNull ListedMenuDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -313,7 +323,7 @@ public class DatabaseController {
         return _databaseMapContentList.GetMapContent();
     }
 
-    public boolean SaveMapContent(MapContentDto newEntry) {
+    public boolean SaveMapContent(@NonNull MapContentDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -323,7 +333,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteMapContent(MapContentDto deleteEntry) {
+    public boolean DeleteMapContent(@NonNull MapContentDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -358,7 +368,7 @@ public class DatabaseController {
         return _databaseMenuList.GetMenuList();
     }
 
-    public boolean SaveMenu(MenuDto newEntry) {
+    public boolean SaveMenu(@NonNull MenuDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -368,7 +378,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteMenu(MenuDto deleteEntry) {
+    public boolean DeleteMenu(@NonNull MenuDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -403,7 +413,7 @@ public class DatabaseController {
         return _databaseMovieList.GetMovieList();
     }
 
-    public boolean SaveMovie(MovieDto newEntry) {
+    public boolean SaveMovie(@NonNull MovieDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -413,7 +423,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteMovie(MovieDto deleteEntry) {
+    public boolean DeleteMovie(@NonNull MovieDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -436,6 +446,51 @@ public class DatabaseController {
     }
 
 	/*
+    Methods for ScheduleDto
+	 */
+
+    public SerializableList<ScheduleDto> GetScheduleList(@NonNull SerializableList<WirelessSocketDto> socketList) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return new SerializableList<>();
+        }
+
+        return _databaseScheduleList.GetScheduleList(socketList);
+    }
+
+    public boolean SaveSchedule(@NonNull ScheduleDto newEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseScheduleList.CreateEntry(newEntry);
+        return true;
+    }
+
+    public boolean DeleteSchedule(@NonNull ScheduleDto deleteEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseScheduleList.Delete(deleteEntry);
+        return true;
+    }
+
+    public void ClearDatabaseSchedule() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return;
+        }
+
+        SerializableList<ScheduleDto> scheduleList = GetScheduleList(new SerializableList<WirelessSocketDto>());
+        for (int index = 0; index < scheduleList.getSize(); index++) {
+            DeleteSchedule(scheduleList.getValue(index));
+        }
+    }
+
+	/*
     Methods for ShoppingEntryDto
 	 */
 
@@ -448,7 +503,7 @@ public class DatabaseController {
         return _databaseShoppingList.GetShoppingList();
     }
 
-    public boolean SaveShoppingEntry(ShoppingEntryDto newEntry) {
+    public boolean SaveShoppingEntry(@NonNull ShoppingEntryDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -458,7 +513,7 @@ public class DatabaseController {
         return true;
     }
 
-    public void DeleteShoppingEntry(ShoppingEntryDto deleteEntry) {
+    public void DeleteShoppingEntry(@NonNull ShoppingEntryDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return;
@@ -492,7 +547,7 @@ public class DatabaseController {
         return _databaseSocketList.GetSocketList();
     }
 
-    public boolean SaveSocket(WirelessSocketDto newEntry) {
+    public boolean SaveSocket(@NonNull WirelessSocketDto newEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -502,7 +557,7 @@ public class DatabaseController {
         return true;
     }
 
-    public boolean DeleteSocket(WirelessSocketDto deleteEntry) {
+    public boolean DeleteSocket(@NonNull WirelessSocketDto deleteEntry) {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
             return false;
@@ -521,6 +576,51 @@ public class DatabaseController {
         SerializableList<WirelessSocketDto> socketList = GetSocketList();
         for (int index = 0; index < socketList.getSize(); index++) {
             DeleteSocket(socketList.getValue(index));
+        }
+    }
+
+	/*
+    Methods for TimerDto
+	 */
+
+    public SerializableList<TimerDto> GetTimerList(@NonNull SerializableList<WirelessSocketDto> socketList) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return new SerializableList<>();
+        }
+
+        return _databaseTimerList.GetTimerList(socketList);
+    }
+
+    public boolean SaveTimer(@NonNull TimerDto newEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseTimerList.CreateEntry(newEntry);
+        return true;
+    }
+
+    public boolean DeleteTimer(@NonNull TimerDto deleteEntry) {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return false;
+        }
+
+        _databaseTimerList.Delete(deleteEntry);
+        return true;
+    }
+
+    public void ClearDatabaseTimer() {
+        if (!_isInitialized) {
+            _logger.Error("Not initialized!");
+            return;
+        }
+
+        SerializableList<TimerDto> timerList = GetTimerList(new SerializableList<WirelessSocketDto>());
+        for (int index = 0; index < timerList.getSize(); index++) {
+            DeleteTimer(timerList.getValue(index));
         }
     }
 }

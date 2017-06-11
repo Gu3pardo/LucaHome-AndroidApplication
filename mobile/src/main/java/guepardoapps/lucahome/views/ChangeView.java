@@ -10,12 +10,12 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.baoyz.widget.PullRefreshLayout;
+import com.flaviofaria.kenburnsview.KenBurnsView;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
@@ -109,7 +109,7 @@ public class ChangeView extends AppCompatActivity {
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);
         _noDataFallback = (TextView) findViewById(R.id.skeletonList_fallBackTextView);
 
-        ImageView mainBackground = (ImageView) findViewById(R.id.skeletonList_backdrop);
+        KenBurnsView mainBackground = (KenBurnsView) findViewById(R.id.skeletonList_backdrop);
         mainBackground.setImageResource(R.drawable.main_image_changes);
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);

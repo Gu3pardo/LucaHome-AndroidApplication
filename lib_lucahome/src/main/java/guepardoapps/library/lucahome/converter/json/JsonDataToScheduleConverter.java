@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.converter.json;
 
+import android.support.annotation.NonNull;
+
 import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.dto.ScheduleDto;
@@ -18,8 +20,9 @@ public final class JsonDataToScheduleConverter {
 
     private static String _searchParameter = "{schedule:";
 
-    public static SerializableList<ScheduleDto> GetList(String[] stringArray,
-                                                        SerializableList<WirelessSocketDto> socketList) {
+    public static SerializableList<ScheduleDto> GetList(
+            @NonNull String[] stringArray,
+            @NonNull SerializableList<WirelessSocketDto> socketList) {
         if (_logger == null) {
             _logger = new LucaHomeLogger(TAG);
         }
@@ -35,31 +38,9 @@ public final class JsonDataToScheduleConverter {
         }
     }
 
-    public static ScheduleDto Get(String value, SerializableList<WirelessSocketDto> socketList) {
-        if (_logger == null) {
-            _logger = new LucaHomeLogger(TAG);
-        }
-
-        if (StringHelper.GetStringCount(value, _searchParameter) >= 1) {
-            if (value.contains(_searchParameter)) {
-                value = value.replace(_searchParameter, "").replace("};};", "");
-                _logger.Info(String.format("Schedule value is %s", value));
-
-                String[] data = value.split("\\};");
-                ScheduleDto newValue = ParseStringToValue(data, socketList);
-                if (newValue != null) {
-                    return newValue;
-                }
-            }
-        }
-
-        _logger.Error("Get: " + value + " has an error!");
-
-        return null;
-    }
-
-    private static SerializableList<ScheduleDto> ParseStringToList(String value,
-                                                                   SerializableList<WirelessSocketDto> socketList) {
+    private static SerializableList<ScheduleDto> ParseStringToList(
+            @NonNull String value,
+            @NonNull SerializableList<WirelessSocketDto> socketList) {
         if (_logger == null) {
             _logger = new LucaHomeLogger(TAG);
         }
@@ -70,7 +51,8 @@ public final class JsonDataToScheduleConverter {
 
                 String[] entries = value.split("\\" + _searchParameter);
                 _logger.Info(String.format("Found %s entries!", entries.length));
-                for (String entry : entries) {
+                for (int index = 0; index < entries.length; index++) {
+                    String entry = entries[index];
                     if (entry == null) {
                         _logger.Error("Entry is null!");
                         continue;
@@ -81,7 +63,7 @@ public final class JsonDataToScheduleConverter {
 
                     String[] data = entry.split("\\};");
                     _logger.Info(String.format("Split data %s has size is %s", data, data.length));
-                    ScheduleDto newValue = ParseStringToValue(data, socketList);
+                    ScheduleDto newValue = ParseStringToValue(index, data, socketList);
                     if (newValue != null) {
                         _logger.Info(String.format("Adding new value %s to list %s", newValue, list));
                         list.addValue(newValue);
@@ -103,7 +85,10 @@ public final class JsonDataToScheduleConverter {
         return new SerializableList<>();
     }
 
-    private static ScheduleDto ParseStringToValue(String[] data, SerializableList<WirelessSocketDto> socketList) {
+    private static ScheduleDto ParseStringToValue(
+            int id,
+            @NonNull String[] data,
+            @NonNull SerializableList<WirelessSocketDto> socketList) {
         if (_logger == null) {
             _logger = new LucaHomeLogger(TAG);
         }
@@ -151,6 +136,7 @@ public final class JsonDataToScheduleConverter {
 
                 if (!isTimer) {
                     ScheduleDto newValue = new ScheduleDto(
+                            id,
                             name,
                             socket,
                             weekday,

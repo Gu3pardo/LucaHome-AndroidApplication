@@ -86,12 +86,12 @@ public class TopViewController {
                 int playHour = _youtubePlayTimeSec / 3600;
                 int playMin = (_youtubePlayTimeSec / 60) - (playHour * 60);
                 int playSec = _youtubePlayTimeSec % 60;
-                String playTime = String.format("%02d:%02d:%02d", playHour, playMin, playSec);
+                String playTime = String.format(Locale.getDefault(), "%02d:%02d:%02d", playHour, playMin, playSec);
 
                 int durationHour = _youtubeDurationSec / 3600;
                 int durationMinute = (_youtubeDurationSec / 60) - (durationHour * 60);
                 int durationSecond = _youtubeDurationSec % 60;
-                String durationTime = String.format("%02d:%02d:%02d", durationHour, durationMinute, durationSecond);
+                String durationTime = String.format(Locale.getDefault(), "%02d:%02d:%02d", durationHour, durationMinute, durationSecond);
 
                 _youtubeVideoTimeTextView.setText(String.format("%s / %s", playTime, durationTime));
 
@@ -195,7 +195,7 @@ public class TopViewController {
                     _seekBarYoutubeDuration.setProgress(progress);
                     _seekBarEnabled = true;
 
-                    _youtubePlayTimeHandler.postDelayed(_youtubePlayTimeRunnable, Timeouts.COUNTDOWN);
+                    _youtubePlayTimeHandler.postDelayed(_youtubePlayTimeRunnable, 15 * Timeouts.COUNTDOWN);
                 } else {
                     _seekBarYoutubeDuration.setVisibility(View.INVISIBLE);
                     _youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);

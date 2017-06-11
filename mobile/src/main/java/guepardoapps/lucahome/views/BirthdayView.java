@@ -12,12 +12,12 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.baoyz.widget.PullRefreshLayout;
+import com.flaviofaria.kenburnsview.KenBurnsView;
 
 import java.util.Locale;
 
@@ -133,7 +133,7 @@ public class BirthdayView extends AppCompatActivity {
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);
         _noDataFallback = (TextView) findViewById(R.id.skeletonList_fallBackTextView);
 
-        ImageView mainBackground = (ImageView) findViewById(R.id.skeletonList_backdrop);
+        KenBurnsView mainBackground = (KenBurnsView) findViewById(R.id.skeletonList_backdrop);
         mainBackground.setImageResource(R.drawable.main_image_birthday);
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);

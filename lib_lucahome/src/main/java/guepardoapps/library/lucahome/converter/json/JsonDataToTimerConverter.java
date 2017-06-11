@@ -1,5 +1,7 @@
 package guepardoapps.library.lucahome.converter.json;
 
+import android.support.annotation.NonNull;
+
 import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.dto.TimerDto;
@@ -18,8 +20,9 @@ public final class JsonDataToTimerConverter {
 
     private static String _searchParameter = "{schedule:";
 
-    public static SerializableList<TimerDto> GetList(String[] stringArray,
-                                                     SerializableList<WirelessSocketDto> socketList) {
+    public static SerializableList<TimerDto> GetList(
+            @NonNull String[] stringArray,
+            @NonNull SerializableList<WirelessSocketDto> socketList) {
         if (_logger == null) {
             _logger = new LucaHomeLogger(TAG);
         }
@@ -35,31 +38,9 @@ public final class JsonDataToTimerConverter {
         }
     }
 
-    public static TimerDto Get(String value, SerializableList<WirelessSocketDto> socketList) {
-        if (_logger == null) {
-            _logger = new LucaHomeLogger(TAG);
-        }
-
-        if (StringHelper.GetStringCount(value, _searchParameter) >= 1) {
-            if (value.contains(_searchParameter)) {
-                value = value.replace(_searchParameter, "").replace("};};", "");
-                _logger.Info(String.format("Timer value is %s", value));
-
-                String[] data = value.split("\\};");
-                TimerDto newValue = ParseStringToValue(data, socketList);
-                if (newValue != null) {
-                    return newValue;
-                }
-            }
-        }
-
-        _logger.Error("Get: " + value + " has an error!");
-
-        return null;
-    }
-
-    private static SerializableList<TimerDto> ParseStringToList(String value,
-                                                                SerializableList<WirelessSocketDto> socketList) {
+    private static SerializableList<TimerDto> ParseStringToList(
+            @NonNull String value,
+            @NonNull SerializableList<WirelessSocketDto> socketList) {
         if (_logger == null) {
             _logger = new LucaHomeLogger(TAG);
         }
@@ -70,7 +51,8 @@ public final class JsonDataToTimerConverter {
 
                 String[] entries = value.split("\\" + _searchParameter);
                 _logger.Info(String.format("Found %s entries!", entries.length));
-                for (String entry : entries) {
+                for (int index = 0; index < entries.length; index++) {
+                    String entry = entries[index];
                     if (entry == null) {
                         _logger.Error("Entry is null!");
                         continue;
@@ -81,7 +63,7 @@ public final class JsonDataToTimerConverter {
 
                     String[] data = entry.split("\\};");
                     _logger.Info(String.format("Split data %s has size is %s", data, data.length));
-                    TimerDto newValue = ParseStringToValue(data, socketList);
+                    TimerDto newValue = ParseStringToValue(index, data, socketList);
                     if (newValue != null) {
                         _logger.Info(String.format("Adding new value %s to list %s", newValue, list));
                         list.addValue(newValue);
@@ -103,7 +85,10 @@ public final class JsonDataToTimerConverter {
         return new SerializableList<>();
     }
 
-    private static TimerDto ParseStringToValue(String[] data, SerializableList<WirelessSocketDto> socketList) {
+    private static TimerDto ParseStringToValue(
+            int id,
+            @NonNull String[] data,
+            @NonNull SerializableList<WirelessSocketDto> socketList) {
         if (_logger == null) {
             _logger = new LucaHomeLogger(TAG);
         }
@@ -154,6 +139,7 @@ public final class JsonDataToTimerConverter {
                     return null;
                 } else {
                     TimerDto newValue = new TimerDto(
+                            id,
                             name,
                             socket,
                             weekday,

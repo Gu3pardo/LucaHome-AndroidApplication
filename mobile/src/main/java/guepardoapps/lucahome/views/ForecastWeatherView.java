@@ -12,12 +12,12 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.baoyz.widget.PullRefreshLayout;
+import com.flaviofaria.kenburnsview.KenBurnsView;
 
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class ForecastWeatherView extends AppCompatActivity {
 
     private ProgressBar _progressBar;
     private ListView _listView;
-    private ImageView _mainBackground;
+    private KenBurnsView _mainBackground;
     private TextView _noDataFallback;
 
     private Context _context;
@@ -137,7 +137,7 @@ public class ForecastWeatherView extends AppCompatActivity {
         _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView);
         _noDataFallback = (TextView) findViewById(R.id.skeletonList_fallBackTextView);
 
-        _mainBackground = (ImageView) findViewById(R.id.skeletonList_backdrop);
+        _mainBackground = (KenBurnsView) findViewById(R.id.skeletonList_backdrop);
         _mainBackground.setImageResource(R.drawable.wallpaper);
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);

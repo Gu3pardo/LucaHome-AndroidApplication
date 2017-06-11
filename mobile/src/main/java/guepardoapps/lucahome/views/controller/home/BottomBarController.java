@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -35,7 +36,7 @@ public class BottomBarController {
     private NavigationService _navigationService;
     private UserService _userService;
 
-    public BottomBarController(Context context) {
+    public BottomBarController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _context = context;
 

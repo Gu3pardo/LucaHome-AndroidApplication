@@ -5,10 +5,13 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+
+import com.flaviofaria.kenburnsview.KenBurnsView;
 
 import java.util.Locale;
 
@@ -41,7 +44,7 @@ public class WeatherController {
     private ReceiverController _receiverController;
 
     private Button _buttonCenterWeather;
-    private ImageView _imageViewWeatherCondition;
+    private KenBurnsView _imageViewWeatherCondition;
 
     private BroadcastReceiver _updateWeatherViewReceiver = new BroadcastReceiver() {
         @SuppressWarnings("deprecation")
@@ -70,7 +73,7 @@ public class WeatherController {
         }
     };
 
-    public WeatherController(Context context) {
+    public WeatherController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _context = context;
         _broadcastController = new BroadcastController(_context);
@@ -97,7 +100,7 @@ public class WeatherController {
             }
         });
 
-        _imageViewWeatherCondition = (ImageView) ((Activity) _context).findViewById(R.id.imageViewWeatherCondition);
+        _imageViewWeatherCondition = (KenBurnsView) ((Activity) _context).findViewById(R.id.imageViewWeatherCondition);
     }
 
     public void onResume() {

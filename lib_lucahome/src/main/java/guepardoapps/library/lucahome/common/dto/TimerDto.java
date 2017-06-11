@@ -15,6 +15,21 @@ public class TimerDto extends ScheduleDto {
     private static final String TAG = TimerDto.class.getSimpleName();
 
     public TimerDto(
+            int id,
+            @NonNull String name,
+            @NonNull String information,
+            @NonNull WirelessSocketDto socket,
+            @NonNull Weekday weekday,
+            @NonNull SerializableTime time,
+            boolean action,
+            boolean playSound,
+            boolean isActive,
+            int drawable) {
+        super(id, name, information, socket, weekday, time, action, playSound, isActive, drawable);
+    }
+
+    public TimerDto(
+            int id,
             @NonNull String name,
             @NonNull WirelessSocketDto socket,
             @NonNull Weekday weekday,
@@ -22,15 +37,16 @@ public class TimerDto extends ScheduleDto {
             boolean action,
             boolean playSound,
             boolean isActive) {
-        super(name, socket, weekday, time, action, playSound, isActive);
+        super(id, name, socket, weekday, time, action, playSound, isActive);
     }
 
     public TimerDto(
+            int id,
             int drawable,
             @NonNull String name,
             @NonNull String information,
             boolean isActive) {
-        super(drawable, name, information, isActive);
+        super(id, drawable, name, information, isActive);
     }
 
     @Override
@@ -65,7 +81,8 @@ public class TimerDto extends ScheduleDto {
     @Override
     public String toString() {
         return "{" + TAG
-                + ": {Name: " + _name
+                + ": {Id: " + String.valueOf(_id)
+                + "};{Name: " + _name
                 + "};{WirelessSocket: " + (_socket == null ? "" : _socket.toString())
                 + "};{Weekday: " + _weekday.toString()
                 + "};{Time: " + _time.toString()

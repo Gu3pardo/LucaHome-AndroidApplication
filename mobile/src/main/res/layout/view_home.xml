@@ -393,13 +393,13 @@
         </LinearLayout>
     </ScrollView>
 
-    <ImageView
+    <com.flaviofaria.kenburnsview.KenBurnsView
         android:id="@+id/imageViewWeatherCondition"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/relativeLayoutButtonBar"
         android:layout_below="@+id/textViewCenter"
-        android:layout_margin="5dp"
+        android:layout_margin="10dp"
         android:layout_toEndOf="@+id/textViewCenter"
         android:contentDescription="@string/contentDescription"
         android:padding="5dp"

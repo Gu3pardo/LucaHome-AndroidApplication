@@ -19,6 +19,8 @@ public class ScheduleDto implements Serializable {
 
     protected int _drawable;
 
+    protected int _id;
+
     protected String _name;
     protected String _information;
     protected WirelessSocketDto _socket;
@@ -29,17 +31,22 @@ public class ScheduleDto implements Serializable {
     protected boolean _isActive;
 
     public ScheduleDto(
+            int id,
             @NonNull String name,
+            @NonNull String information,
             @NonNull WirelessSocketDto socket,
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             boolean action,
             boolean playSound,
-            boolean isActive) {
-        _drawable = -1;
+            boolean isActive,
+            int drawable) {
+        _id = id;
+
+        _drawable = drawable;
 
         _name = name;
-        _information = "";
+        _information = information;
         _socket = socket;
         _weekday = weekday;
         _time = time;
@@ -49,20 +56,48 @@ public class ScheduleDto implements Serializable {
     }
 
     public ScheduleDto(
+            int id,
+            @NonNull String name,
+            @NonNull WirelessSocketDto socket,
+            @NonNull Weekday weekday,
+            @NonNull SerializableTime time,
+            boolean action,
+            boolean playSound,
+            boolean isActive) {
+        this(
+                id,
+                name,
+                "",
+                socket,
+                weekday,
+                time,
+                action,
+                playSound,
+                isActive,
+                -1);
+    }
+
+    public ScheduleDto(
+            int id,
             int drawable,
             @NonNull String name,
             @NonNull String information,
             boolean isActive) {
-        _drawable = drawable;
+        this(
+                id,
+                name,
+                information,
+                new WirelessSocketDto(),
+                Weekday.NULL,
+                new SerializableTime(),
+                false,
+                false,
+                isActive,
+                drawable);
+    }
 
-        _name = name;
-        _information = information;
-        _socket = new WirelessSocketDto();
-        _weekday = Weekday.NULL;
-        _time = new SerializableTime();
-        _action = false;
-        _playSound = false;
-        _isActive = isActive;
+    public int GetId() {
+        return _id;
     }
 
     public int GetDrawable() {
@@ -146,7 +181,8 @@ public class ScheduleDto implements Serializable {
 
     public String toString() {
         return "{" + TAG
-                + ": {Name: " + _name
+                + ": {Id: " + String.valueOf(_id)
+                + "};{Name: " + _name
                 + "};{WirelessSocket: " + (_socket == null ? "" : _socket.toString())
                 + "};{Weekday: " + _weekday.toString()
                 + "};{Time: " + _time.toString()

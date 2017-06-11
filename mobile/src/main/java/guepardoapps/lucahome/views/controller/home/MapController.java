@@ -70,32 +70,40 @@ public class MapController {
         @SuppressWarnings("unchecked")
         @Override
         public void onReceive(Context context, Intent intent) {
-            SerializableList<MapContentDto> mapContentList = (SerializableList<MapContentDto>) intent
-                    .getSerializableExtra(Bundles.MAP_CONTENT_LIST);
-            SerializableList<WirelessSocketDto> wirelessSocketList = (SerializableList<WirelessSocketDto>) intent
-                    .getSerializableExtra(Bundles.SOCKET_LIST);
-            SerializableList<ScheduleDto> scheduleAllList = (SerializableList<ScheduleDto>) intent
-                    .getSerializableExtra(Bundles.SCHEDULE_LIST);
-            SerializableList<TimerDto> timerAllList = (SerializableList<TimerDto>) intent
-                    .getSerializableExtra(Bundles.TIMER_LIST);
-            SerializableList<TemperatureDto> temperatureList = (SerializableList<TemperatureDto>) intent
-                    .getSerializableExtra(Bundles.TEMPERATURE_LIST);
-            SerializableList<ShoppingEntryDto> shoppingList = (SerializableList<ShoppingEntryDto>) intent
-                    .getSerializableExtra(Bundles.SHOPPING_LIST);
-            SerializableList<ListedMenuDto> listedMenu = (SerializableList<ListedMenuDto>) intent
-                    .getSerializableExtra(Bundles.LISTED_MENU);
+            SerializableList<MapContentDto> mapContentList = (SerializableList<MapContentDto>) intent.getSerializableExtra(Bundles.MAP_CONTENT_LIST);
+            SerializableList<WirelessSocketDto> wirelessSocketList = (SerializableList<WirelessSocketDto>) intent.getSerializableExtra(Bundles.SOCKET_LIST);
+            SerializableList<ScheduleDto> scheduleAllList = (SerializableList<ScheduleDto>) intent.getSerializableExtra(Bundles.SCHEDULE_LIST);
+            SerializableList<TimerDto> timerAllList = (SerializableList<TimerDto>) intent.getSerializableExtra(Bundles.TIMER_LIST);
+            SerializableList<TemperatureDto> temperatureList = (SerializableList<TemperatureDto>) intent.getSerializableExtra(Bundles.TEMPERATURE_LIST);
+            SerializableList<ShoppingEntryDto> shoppingList = (SerializableList<ShoppingEntryDto>) intent.getSerializableExtra(Bundles.SHOPPING_LIST);
+            SerializableList<ListedMenuDto> listedMenu = (SerializableList<ListedMenuDto>) intent.getSerializableExtra(Bundles.LISTED_MENU);
             SerializableList<MenuDto> menu = (SerializableList<MenuDto>) intent.getSerializableExtra(Bundles.MENU);
             MotionCameraDto motionCameraDto = (MotionCameraDto) intent.getSerializableExtra(Bundles.MOTION_CAMERA_DTO);
 
-            if (mapContentList != null && wirelessSocketList != null && scheduleAllList != null && timerAllList != null
-                    && temperatureList != null && shoppingList != null && menu != null && listedMenu != null
+            if (mapContentList != null
+                    && wirelessSocketList != null
+                    && scheduleAllList != null
+                    && timerAllList != null
+                    && temperatureList != null
+                    && shoppingList != null
+                    && menu != null
+                    && listedMenu != null
                     && motionCameraDto != null) {
+
                 _callForDataHandler.removeCallbacks(_callForDataRunnable);
+                _relativeLayoutMapPaint.removeAllViews();
 
                 for (int index = 0; index < mapContentList.getSize(); index++) {
-                    MapContentDto entry = mapContentList.getValue(index);
-                    addView(entry, wirelessSocketList, scheduleAllList, timerAllList, temperatureList, shoppingList,
-                            menu, listedMenu, motionCameraDto);
+                    addView(
+                            mapContentList.getValue(index),
+                            wirelessSocketList,
+                            scheduleAllList,
+                            timerAllList,
+                            temperatureList,
+                            shoppingList,
+                            menu,
+                            listedMenu,
+                            motionCameraDto);
                 }
             } else {
                 if (mapContentList == null) {
@@ -130,8 +138,8 @@ public class MapController {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_mediaMirrorDataReceiver onReceive");
-            String commandBundle = intent
-                    .getStringExtra(guepardoapps.library.lucahome.common.constants.Bundles.MEDIAMIRROR_COMMAND);
+            String commandBundle = intent.getStringExtra(guepardoapps.library.lucahome.common.constants.Bundles.MEDIAMIRROR_COMMAND);
+
             if (commandBundle != null) {
                 String[] data = commandBundle.split("\\&");
                 if (data.length == 2) {
@@ -167,7 +175,7 @@ public class MapController {
         }
     };
 
-    public MapController(Context context) {
+    public MapController(@NonNull Context context) {
         _logger = new LucaHomeLogger(TAG);
         _context = context;
 
@@ -181,7 +189,6 @@ public class MapController {
 
     public void onCreate() {
         _logger.Debug("onCreate");
-
         initializeView();
         getSizeOfMapLayout();
     }
@@ -197,6 +204,7 @@ public class MapController {
                         Broadcasts.HOME_AUTOMATION_COMMAND,
                         new String[]{Bundles.HOME_AUTOMATION_ACTION},
                         new Object[]{HomeAutomationAction.GET_MAP_DATA});
+
                 _callForDataHandler.postDelayed(_callForDataRunnable, Timeouts.CALL_FOR_DATA);
 
                 _isInitialized = true;
@@ -242,12 +250,15 @@ public class MapController {
         });
     }
 
-    private void addView(final MapContentDto newMapContent,
-                         final SerializableList<WirelessSocketDto> wirelessSocketList,
-                         final SerializableList<ScheduleDto> scheduleAllList, final SerializableList<TimerDto> timerAllList,
-                         final SerializableList<TemperatureDto> temperatureList,
-                         final SerializableList<ShoppingEntryDto> shoppingList, final SerializableList<MenuDto> menu,
-                         final SerializableList<ListedMenuDto> listedMenu, final MotionCameraDto motionCameraDto) {
+    private void addView(@NonNull final MapContentDto newMapContent,
+                         @NonNull final SerializableList<WirelessSocketDto> wirelessSocketList,
+                         @NonNull final SerializableList<ScheduleDto> scheduleAllList,
+                         @NonNull final SerializableList<TimerDto> timerAllList,
+                         @NonNull final SerializableList<TemperatureDto> temperatureList,
+                         @NonNull final SerializableList<ShoppingEntryDto> shoppingList,
+                         @NonNull final SerializableList<MenuDto> menu,
+                         @NonNull final SerializableList<ListedMenuDto> listedMenu,
+                         @NonNull final MotionCameraDto motionCameraDto) {
         final TextView newTextView = _mapContentController.CreateEntry(newMapContent, newMapContent.GetPosition(),
                 wirelessSocketList, temperatureList, _size, true);
         newTextView.setOnClickListener(new OnClickListener() {
@@ -257,11 +268,14 @@ public class MapController {
                         listedMenu, motionCameraDto);
             }
 
-            private void showInformation(SerializableList<WirelessSocketDto> wirelessSocketList,
-                                         SerializableList<ScheduleDto> scheduleAllList, SerializableList<TimerDto> timerAllList,
-                                         SerializableList<TemperatureDto> temperatureList, SerializableList<ShoppingEntryDto> shoppingList,
-                                         SerializableList<MenuDto> menu, SerializableList<ListedMenuDto> listedMenu,
-                                         MotionCameraDto motionCameraDto) {
+            private void showInformation(@NonNull SerializableList<WirelessSocketDto> wirelessSocketList,
+                                         @NonNull SerializableList<ScheduleDto> scheduleAllList,
+                                         @NonNull SerializableList<TimerDto> timerAllList,
+                                         @NonNull SerializableList<TemperatureDto> temperatureList,
+                                         @NonNull SerializableList<ShoppingEntryDto> shoppingList,
+                                         @NonNull SerializableList<MenuDto> menu,
+                                         @NonNull SerializableList<ListedMenuDto> listedMenu,
+                                         @NonNull MotionCameraDto motionCameraDto) {
                 _logger.Debug("onClick showInformation");
 
                 switch (newMapContent.GetDrawingType()) {
@@ -300,12 +314,12 @@ public class MapController {
                 }
             }
 
-            private void showCameraDialog(MotionCameraDto motionCameraDto) {
+            private void showCameraDialog(@NonNull MotionCameraDto motionCameraDto) {
                 _dialogController.ShowAlertDialogWebView("Security camera", motionCameraDto.GetCameraUrl());
             }
 
-            private void showMediaServerDetailsDialog(MapContentDto newMapContent,
-                                                      SerializableList<WirelessSocketDto> wirelessSocketList) {
+            private void showMediaServerDetailsDialog(@NonNull MapContentDto newMapContent,
+                                                      @NonNull SerializableList<WirelessSocketDto> wirelessSocketList) {
                 ArrayList<String> socketList = newMapContent.GetSockets();
 
                 MediaServerSelection selection = MediaServerSelection.GetByIp(newMapContent.GetMediaServerIp());
@@ -337,17 +351,25 @@ public class MapController {
                 }
             }
 
-            private void showMenuDialog(SerializableList<MenuDto> menu, SerializableList<ListedMenuDto> listedMenu) {
+            private void showMenuDialog(@NonNull SerializableList<MenuDto> menu,
+                                        @NonNull SerializableList<ListedMenuDto> listedMenu) {
                 _dialogController.ShowMenuDialog(menu, listedMenu);
             }
 
             private void showShoppingListDialog(@NonNull SerializableList<ShoppingEntryDto> shoppingList) {
+                if (shoppingList.getSize() <= 0) {
+                    _logger.Info("No entries in shoppingList!");
+                    Toasty.info(_context, "No entries in shoppingList!", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 _dialogController.ShowShoppingListDialog(shoppingList);
             }
 
-            private void showSocketDetailsDialog(MapContentDto newMapContent,
-                                                 SerializableList<WirelessSocketDto> wirelessSocketList,
-                                                 SerializableList<ScheduleDto> scheduleAllList, SerializableList<TimerDto> timerAllList) {
+            private void showSocketDetailsDialog(@NonNull MapContentDto newMapContent,
+                                                 @NonNull SerializableList<WirelessSocketDto> wirelessSocketList,
+                                                 @NonNull SerializableList<ScheduleDto> scheduleAllList,
+                                                 @NonNull SerializableList<TimerDto> timerAllList) {
                 ArrayList<String> socketList = newMapContent.GetSockets();
 
                 WirelessSocketDto socket = null;
@@ -401,8 +423,8 @@ public class MapController {
                 }
             }
 
-            private void showTemperatureDetailsDialog(MapContentDto newMapContent,
-                                                      SerializableList<TemperatureDto> temperatureList) {
+            private void showTemperatureDetailsDialog(@NonNull MapContentDto newMapContent,
+                                                      @NonNull SerializableList<TemperatureDto> temperatureList) {
                 String temperatureArea = newMapContent.GetTemperatureArea();
                 for (int index = 0; index < temperatureList.getSize(); index++) {
                     if (temperatureList.getValue(index).GetArea().contains(temperatureArea)) {
