@@ -820,6 +820,7 @@ public class MainService extends Service {
                                     new String[]{Bundles.BIRTHDAY_LIST},
                                     new Object[]{_birthdayList});
                             sendBirthdaysToWear();
+                            updateDownloadCount();
                             break;
                         case "MapContent":
                             _mapContentList = _databaseController.GetMapContent();
@@ -830,12 +831,14 @@ public class MainService extends Service {
                                     Broadcasts.UPDATE_LISTED_MENU_VIEW,
                                     new String[]{Bundles.LISTED_MENU},
                                     new Object[]{_listedMenu});
+                            updateDownloadCount();
                             _menu = _databaseController.GetMenuList();
                             _broadcastController.SendSerializableArrayBroadcast(
                                     Broadcasts.UPDATE_MENU_VIEW,
                                     new String[]{Bundles.MENU},
                                     new Object[]{_menu});
                             sendMenuToWear();
+                            updateDownloadCount();
                             break;
                         case "Movies":
                             _movieList = _databaseController.GetMovieList();
@@ -843,6 +846,7 @@ public class MainService extends Service {
                                     Broadcasts.UPDATE_MOVIE,
                                     new String[]{Bundles.MOVIE_LIST},
                                     new Object[]{_movieList});
+                            updateDownloadCount();
                             break;
                         case "Settings":
                             _wirelessSocketList = _databaseController.GetSocketList();
@@ -851,6 +855,7 @@ public class MainService extends Service {
                                     new String[]{Bundles.SOCKET_LIST},
                                     new Object[]{_wirelessSocketList});
                             sendSocketsToWear();
+                            updateDownloadCount();
 
                             _scheduleList = _databaseController.GetScheduleList(_wirelessSocketList);
                             _broadcastController.SendSerializableArrayBroadcast(
@@ -858,6 +863,7 @@ public class MainService extends Service {
                                     new String[]{Bundles.SCHEDULE_LIST},
                                     new Object[]{_scheduleList});
                             sendSchedulesToWear();
+                            updateDownloadCount();
 
                             _timerList = _databaseController.GetTimerList(_wirelessSocketList);
                             _broadcastController.SendSerializableArrayBroadcast(
@@ -865,6 +871,7 @@ public class MainService extends Service {
                                     new String[]{Bundles.TIMER_LIST},
                                     new Object[]{_timerList});
                             sendTimerToWear();
+                            updateDownloadCount();
 
                             _broadcastController.SendSerializableArrayBroadcast(
                                     Broadcasts.UPDATE_MAP_CONTENT_VIEW,
@@ -879,12 +886,12 @@ public class MainService extends Service {
                                     new String[]{Bundles.SHOPPING_LIST},
                                     new Object[]{_shoppingList});
                             sendShoppingListToWear();
+                            updateDownloadCount();
                             break;
                         default:
                             _logger.Warn(String.format(Locale.getDefault(), "ChangeEntry %s is not supported", changeEntry));
                             break;
                     }
-                    updateDownloadCount();
                 }
             } else {
                 _logger.Warn(String.format(Locale.getDefault(), "savedDataArray has invalid length %d", savedDataArray.length));
