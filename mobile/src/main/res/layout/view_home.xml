@@ -9,8 +9,10 @@
         android:layout_above="@+id/buttonCenterWeather"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="10dp"
+        android:layout_margin="9dp"
+        android:background="@xml/white_background_dark_border"
         android:contentDescription="@string/contentDescription"
+        android:padding="1dp"
         android:scaleType="fitXY"
         android:src="@drawable/map" />
 
@@ -70,7 +72,9 @@
         android:layout_below="@+id/textViewCenter"
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:layout_toStartOf="@+id/textViewCenter">
+        android:layout_toStartOf="@+id/textViewCenter"
+        android:background="@xml/white_background_dark_border"
+        android:padding="5dp">
 
         <LinearLayout
             android:layout_width="match_parent"

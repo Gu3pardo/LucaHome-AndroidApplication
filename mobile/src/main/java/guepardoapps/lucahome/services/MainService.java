@@ -53,16 +53,7 @@ import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
 import guepardoapps.library.lucahome.controller.MenuController;
 import guepardoapps.library.lucahome.controller.ServiceController;
-import guepardoapps.library.lucahome.converter.json.JsonDataToBirthdayConverter;
-import guepardoapps.library.lucahome.converter.json.JsonDataToChangeConverter;
-import guepardoapps.library.lucahome.converter.json.JsonDataToInformationConverter;
-import guepardoapps.library.lucahome.converter.json.JsonDataToListedMenuConverter;
-import guepardoapps.library.lucahome.converter.json.JsonDataToMapContentConverter;
-import guepardoapps.library.lucahome.converter.json.JsonDataToMenuConverter;
-import guepardoapps.library.lucahome.converter.json.JsonDataToMotionCameraDtoConverter;
-import guepardoapps.library.lucahome.converter.json.JsonDataToMovieConverter;
 import guepardoapps.library.lucahome.converter.json.JsonDataToScheduleConverter;
-import guepardoapps.library.lucahome.converter.json.JsonDataToShoppingListConverter;
 import guepardoapps.library.lucahome.converter.json.JsonDataToSocketConverter;
 import guepardoapps.library.lucahome.converter.json.JsonDataToTemperatureConverter;
 import guepardoapps.library.lucahome.converter.json.JsonDataToTimerConverter;
@@ -89,6 +80,7 @@ import guepardoapps.library.toolset.scheduler.ScheduleService;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.common.enums.NavigationData;
+import guepardoapps.lucahome.tasks.ConverterTask;
 import guepardoapps.lucahome.views.BirthdayView;
 import guepardoapps.lucahome.views.ForecastWeatherView;
 import guepardoapps.lucahome.views.SecurityView;
@@ -363,7 +355,7 @@ public class MainService extends Service {
             _logger.Debug("createDeactivatingSchedule");
 
             int timerMinute = _sharedPrefController.LoadIntegerValueFromSharedPreferences(SharedPrefConstants.TIMER_MIN);
-            _logger.Debug(String.format(Locale.GERMAN, "Loaded time value is %d sec", timerMinute));
+            _logger.Debug(String.format(Locale.getDefault(), "Loaded time value is %d sec", timerMinute));
 
             if (timerMinute == 0) {
                 _logger.Error(String.format("timerMinute and timerHour is 0! Setting timerMinute to default %s!", SharedPrefConstants.DEFAULT_TIMER_MIN));
@@ -636,43 +628,24 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _birthdayDownloadReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _birthdayConvertedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_birthdayDownloadReceiver onReceive");
+            _logger.Debug("_birthdayConvertedReceiver onReceive");
 
-            String[] birthdayStringArray = intent.getStringArrayExtra(Bundles.BIRTHDAY_DOWNLOAD);
-            if (birthdayStringArray != null) {
+            SerializableList<BirthdayDto> newBirthdayList = (SerializableList<BirthdayDto>) intent.getSerializableExtra(Bundles.BIRTHDAY_LIST);
+            if (newBirthdayList != null) {
+                _birthdayList = newBirthdayList;
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.UPDATE_BIRTHDAY,
+                        new String[]{Bundles.BIRTHDAY_LIST},
+                        new Object[]{_birthdayList});
 
-                SerializableList<BirthdayDto> newBirthdayList = JsonDataToBirthdayConverter.GetList(birthdayStringArray);
-                if (newBirthdayList != null) {
-                    _birthdayList = newBirthdayList;
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_BIRTHDAY,
-                            new String[]{Bundles.BIRTHDAY_LIST},
-                            new Object[]{_birthdayList});
-
-                    _databaseController.ClearDatabaseBirthday();
-                    for (int index = 0; index < _birthdayList.getSize(); index++) {
-                        _databaseController.SaveBirthday(_birthdayList.getValue(index));
-                    }
-
-                    checkForBirthday();
-                    sendBirthdaysToWear();
-
-                    SerializableTime time = new SerializableTime();
-                    SerializableDate date = new SerializableDate();
-                    _sharedPrefController.SaveStringValue(
-                            SharedPrefConstants.LAST_LOADED_BIRTHDAY_TIME,
-                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
-                } else {
-                    _logger.Warn("GetList is null");
-                }
+                checkForBirthday();
+                sendBirthdaysToWear();
             } else {
                 _logger.Warn("birthdayStringArray is null");
             }
-
-            updateDownloadCount();
         }
 
         private void checkForBirthday() {
@@ -692,36 +665,52 @@ public class MainService extends Service {
         }
     };
 
-    private BroadcastReceiver _changeDownloadReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _birthdayDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_changeDownloadReceiver onReceive");
+            _logger.Debug("_birthdayDownloadReceiver onReceive");
 
-            String[] changeStringArray = intent.getStringArrayExtra(Bundles.CHANGE_DOWNLOAD);
-            if (changeStringArray != null) {
-
-                SerializableList<ChangeDto> newChangeList = JsonDataToChangeConverter.GetList(changeStringArray);
-                if (newChangeList != null) {
-                    _changeList = newChangeList;
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_CHANGE,
-                            new String[]{Bundles.CHANGE_LIST},
-                            new Object[]{_changeList});
-
-                    _databaseController.ClearDatabaseChange();
-                    for (int index = 0; index < _changeList.getSize(); index++) {
-                        _databaseController.SaveChange(_changeList.getValue(index));
-                    }
-
-                    checkLastLoadedData();
-                } else {
-                    _logger.Warn("newChangeList is null");
-                }
+            String[] birthdayStringArray = intent.getStringArrayExtra(Bundles.BIRTHDAY_DOWNLOAD);
+            if (birthdayStringArray != null) {
+                ConverterTask converterTask = new ConverterTask(
+                        birthdayStringArray,
+                        Bundles.BIRTHDAY_LIST,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
             } else {
-                _logger.Warn("changeStringArray is null");
+                _logger.Warn("birthdayStringArray is null");
             }
 
             updateDownloadCount();
+        }
+    };
+
+    private BroadcastReceiver _changeConvertedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_changeConvertedReceiver onReceive");
+
+            SerializableList<ChangeDto> newChangeList = (SerializableList<ChangeDto>) intent.getSerializableExtra(Bundles.CHANGE_LIST);
+            if (newChangeList != null) {
+                _changeList = newChangeList;
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.UPDATE_CHANGE,
+                        new String[]{Bundles.CHANGE_LIST},
+                        new Object[]{_changeList});
+
+                _databaseController.ClearDatabaseChange();
+                for (int index = 0; index < _changeList.getSize(); index++) {
+                    _databaseController.SaveChange(_changeList.getValue(index));
+                }
+
+                checkLastLoadedData();
+            } else {
+                _logger.Warn("newChangeList is null");
+            }
         }
 
         private void checkLastLoadedData() {
@@ -923,6 +912,30 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _changeDownloadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_changeDownloadReceiver onReceive");
+
+            String[] changeStringArray = intent.getStringArrayExtra(Bundles.CHANGE_DOWNLOAD);
+            if (changeStringArray != null) {
+                ConverterTask converterTask = new ConverterTask(
+                        changeStringArray,
+                        Bundles.CHANGE_LIST,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
+            } else {
+                _logger.Warn("changeStringArray is null");
+            }
+
+            updateDownloadCount();
+        }
+    };
+
     private BroadcastReceiver _currentWeatherDownloadModelReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -981,6 +994,24 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _informationConvertedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_informationConvertedReceiver onReceive");
+
+            InformationDto newInformation = (InformationDto) intent.getSerializableExtra(Bundles.INFORMATION_SINGLE);
+            if (newInformation != null) {
+                _information = newInformation;
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.UPDATE_INFORMATION,
+                        new String[]{Bundles.INFORMATION_SINGLE},
+                        new Object[]{_information});
+            } else {
+                _logger.Warn("newInformation is null");
+            }
+        }
+    };
+
     private BroadcastReceiver _informationDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -988,22 +1019,32 @@ public class MainService extends Service {
 
             String[] informationStringArray = intent.getStringArrayExtra(Bundles.INFORMATION_DOWNLOAD);
             if (informationStringArray != null) {
-
-                InformationDto newInformation = JsonDataToInformationConverter.Get(informationStringArray);
-                if (newInformation != null) {
-                    _information = newInformation;
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_INFORMATION,
-                            new String[]{Bundles.INFORMATION_SINGLE},
-                            new Object[]{_information});
-                } else {
-                    _logger.Warn("newInformation is null");
-                }
+                ConverterTask converterTask = new ConverterTask(
+                        informationStringArray,
+                        Bundles.INFORMATION_SINGLE,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
             } else {
                 _logger.Warn("informationStringArray is null");
             }
 
             updateDownloadCount();
+        }
+    };
+
+    private BroadcastReceiver _mapContentConvertedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_mapContentConvertedReceiver onReceive");
+
+            SerializableList<MapContentDto> newMapContentList = (SerializableList<MapContentDto>) intent.getSerializableExtra(Bundles.MAP_CONTENT_LIST);
+            if (newMapContentList != null) {
+                _mapContentList = newMapContentList;
+            }
         }
     };
 
@@ -1014,26 +1055,34 @@ public class MainService extends Service {
 
             String[] mapContentStringArray = intent.getStringArrayExtra(Bundles.MAP_CONTENT_DOWNLOAD);
             if (mapContentStringArray != null) {
-
-                SerializableList<MapContentDto> newMapContentList = JsonDataToMapContentConverter.GetList(mapContentStringArray);
-                if (newMapContentList != null) {
-                    _mapContentList = newMapContentList;
-
-                    _databaseController.ClearDatabaseMapContent();
-                    for (int index = 0; index < _mapContentList.getSize(); index++) {
-                        _databaseController.SaveMapContent(_mapContentList.getValue(index));
-                    }
-
-                    SerializableTime time = new SerializableTime();
-                    SerializableDate date = new SerializableDate();
-                    _sharedPrefController.SaveStringValue(
-                            SharedPrefConstants.LAST_LOADED_MAP_CONTENT_TIME,
-                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
-                }
+                ConverterTask converterTask = new ConverterTask(
+                        mapContentStringArray,
+                        Bundles.MAP_CONTENT_LIST,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
             } else {
                 _logger.Warn("mapContentStringArray is null!");
             }
+
             updateDownloadCount();
+        }
+    };
+
+    private BroadcastReceiver _listedMenuDtoConvertedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_listedMenuDtoConvertedReceiver onReceive");
+
+            SerializableList<ListedMenuDto> newListedMenuList = (SerializableList<ListedMenuDto>) intent.getSerializableExtra(Bundles.LISTED_MENU);
+            if (newListedMenuList != null) {
+                _listedMenu = newListedMenuList;
+            } else {
+                _logger.Warn("newListedMenuList is null");
+            }
         }
     };
 
@@ -1044,22 +1093,15 @@ public class MainService extends Service {
 
             String[] listedMenuStringArray = intent.getStringArrayExtra(Bundles.LISTED_MENU_DOWNLOAD);
             if (listedMenuStringArray != null) {
-
-                SerializableList<ListedMenuDto> newListedMenuList = JsonDataToListedMenuConverter.GetList(listedMenuStringArray);
-                if (newListedMenuList != null) {
-                    _listedMenu = newListedMenuList;
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_LISTED_MENU_VIEW,
-                            new String[]{Bundles.LISTED_MENU},
-                            new Object[]{_listedMenu});
-
-                    _databaseController.ClearDatabaseListedMenu();
-                    for (int index = 0; index < _listedMenu.getSize(); index++) {
-                        _databaseController.SaveListedMenu(_listedMenu.getValue(index));
-                    }
-                } else {
-                    _logger.Warn("newListedMenuList is null");
-                }
+                ConverterTask converterTask = new ConverterTask(
+                        listedMenuStringArray,
+                        Bundles.LISTED_MENU,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
             } else {
                 _logger.Warn("listedMenuStringArray is null");
             }
@@ -1098,6 +1140,23 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _menuDtoConvertedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_menuDtoConvertedReceiver onReceive");
+
+            SerializableList<MenuDto> newMenuList = (SerializableList<MenuDto>) intent.getSerializableExtra(Bundles.MENU);
+            if (newMenuList != null) {
+                _menu = newMenuList;
+                _menuController.CheckMenuDto(_menu);
+            } else {
+                _logger.Warn("newMenuList is null");
+            }
+
+            sendMenuToWear();
+        }
+    };
+
     private BroadcastReceiver _menuDtoDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1105,35 +1164,49 @@ public class MainService extends Service {
 
             String[] menuStringArray = intent.getStringArrayExtra(Bundles.MENU_DOWNLOAD);
             if (menuStringArray != null) {
-
-                SerializableList<MenuDto> newMenuList = JsonDataToMenuConverter.GetList(menuStringArray);
-                if (newMenuList != null) {
-                    _menu = newMenuList;
-                    _menuController.CheckMenuDto(_menu);
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_MENU_VIEW,
-                            new String[]{Bundles.MENU},
-                            new Object[]{_menu});
-
-                    _databaseController.ClearDatabaseMenu();
-                    for (int index = 0; index < _menu.getSize(); index++) {
-                        _databaseController.SaveMenu(_menu.getValue(index));
-                    }
-
-                    SerializableTime time = new SerializableTime();
-                    SerializableDate date = new SerializableDate();
-                    _sharedPrefController.SaveStringValue(
-                            SharedPrefConstants.LAST_LOADED_MENU_TIME,
-                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
-                } else {
-                    _logger.Warn("newMenuList is null");
-                }
+                ConverterTask converterTask = new ConverterTask(
+                        menuStringArray,
+                        Bundles.MENU,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
             } else {
                 _logger.Warn("menuStringArray is null");
             }
 
             updateDownloadCount();
-            sendMenuToWear();
+        }
+    };
+
+    private BroadcastReceiver _motionCameraDtoConvertedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_motionCameraDtoConvertedReceiver onReceive");
+
+            SerializableList<MotionCameraDto> motionCameraDtoList = (SerializableList<MotionCameraDto>) intent.getSerializableExtra(Bundles.MOTION_CAMERA_DTO);
+            if (motionCameraDtoList != null) {
+                if (motionCameraDtoList.getSize() != 1) {
+                    _logger.Error(String.format(Locale.getDefault(), "MotionCameraDtoList has wrong size %d!", motionCameraDtoList.getSize()));
+                    return;
+                }
+
+                _motionCameraDto = motionCameraDtoList.getValue(0);
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.UPDATE_MOTION_CAMERA_DTO,
+                        new String[]{Bundles.MOTION_CAMERA_DTO},
+                        new Object[]{_motionCameraDto});
+
+                if (_motionCameraDto.GetCameraState()) {
+                    _notificationController.CreateCameraNotification(SecurityView.class);
+                } else {
+                    _notificationController.CloseNotification(IDs.NOTIFICATION_CAMERA);
+                }
+            } else {
+                _logger.Warn("motionCameraDtoList is null");
+            }
         }
     };
 
@@ -1144,33 +1217,38 @@ public class MainService extends Service {
 
             String[] motionCameraDtoStringArray = intent.getStringArrayExtra(Bundles.MOTION_CAMERA_DTO_DOWNLOAD);
             if (motionCameraDtoStringArray != null) {
-
-                SerializableList<MotionCameraDto> motionCameraDtoList = JsonDataToMotionCameraDtoConverter.GetList(motionCameraDtoStringArray);
-                if (motionCameraDtoList != null) {
-                    if (motionCameraDtoList.getSize() != 1) {
-                        _logger.Error(String.format(Locale.GERMAN, "MotionCameraDtoList has wrong size %d!", motionCameraDtoList.getSize()));
-                        return;
-                    }
-
-                    _motionCameraDto = motionCameraDtoList.getValue(0);
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_MOTION_CAMERA_DTO,
-                            new String[]{Bundles.MOTION_CAMERA_DTO},
-                            new Object[]{_motionCameraDto});
-
-                    if (_motionCameraDto.GetCameraState()) {
-                        _notificationController.CreateCameraNotification(SecurityView.class);
-                    } else {
-                        _notificationController.CloseNotification(IDs.NOTIFICATION_CAMERA);
-                    }
-                } else {
-                    _logger.Warn("motionCameraDtoList is null");
-                }
+                ConverterTask converterTask = new ConverterTask(
+                        motionCameraDtoStringArray,
+                        Bundles.MOTION_CAMERA_DTO,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
             } else {
                 _logger.Warn("motionCameraDtoStringArray is null");
             }
 
             updateDownloadCount();
+        }
+    };
+
+    private BroadcastReceiver _movieConvertedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_movieConvertedReceiver onReceive");
+
+            SerializableList<MovieDto> newMovieList = (SerializableList<MovieDto>) intent.getSerializableExtra(Bundles.MOVIE_LIST);
+            if (newMovieList != null) {
+                _movieList = newMovieList;
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.UPDATE_MOVIE,
+                        new String[]{Bundles.MOVIE_LIST},
+                        new Object[]{_movieList});
+            } else {
+                _logger.Warn("newMovieList is null");
+            }
         }
     };
 
@@ -1181,28 +1259,15 @@ public class MainService extends Service {
 
             String[] movieStringArray = intent.getStringArrayExtra(Bundles.MOVIE_DOWNLOAD);
             if (movieStringArray != null) {
-
-                SerializableList<MovieDto> newMovieList = JsonDataToMovieConverter.GetList(movieStringArray);
-                if (newMovieList != null) {
-                    _movieList = newMovieList;
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_MOVIE,
-                            new String[]{Bundles.MOVIE_LIST},
-                            new Object[]{_movieList});
-
-                    _databaseController.ClearDatabaseMovie();
-                    for (int index = 0; index < _movieList.getSize(); index++) {
-                        _databaseController.SaveMovie(_movieList.getValue(index));
-                    }
-
-                    SerializableTime time = new SerializableTime();
-                    SerializableDate date = new SerializableDate();
-                    _sharedPrefController.SaveStringValue(
-                            SharedPrefConstants.LAST_LOADED_MOVIE_TIME,
-                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
-                } else {
-                    _logger.Warn("newMovieList is null");
-                }
+                ConverterTask converterTask = new ConverterTask(
+                        movieStringArray,
+                        Bundles.MOVIE_LIST,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
             } else {
                 _logger.Warn("movieStringArray is null");
             }
@@ -1257,6 +1322,26 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _shoppingListConvertedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_shoppingListConvertedReceiver onReceive");
+
+            SerializableList<ShoppingEntryDto> newShoppingList = (SerializableList<ShoppingEntryDto>) intent.getSerializableExtra(Bundles.SHOPPING_LIST);
+            if (newShoppingList != null) {
+                _shoppingList = newShoppingList;
+                _broadcastController.SendSerializableArrayBroadcast(
+                        Broadcasts.UPDATE_SHOPPING_LIST,
+                        new String[]{Bundles.SHOPPING_LIST},
+                        new Object[]{_shoppingList});
+
+                sendShoppingListToWear();
+            } else {
+                _logger.Warn("newShoppingList is null");
+            }
+        }
+    };
+
     private BroadcastReceiver _shoppingListDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1264,30 +1349,15 @@ public class MainService extends Service {
 
             String[] shoppingListStringArray = intent.getStringArrayExtra(Bundles.SHOPPING_LIST_DOWNLOAD);
             if (shoppingListStringArray != null) {
-
-                SerializableList<ShoppingEntryDto> newShoppingList = JsonDataToShoppingListConverter.GetList(shoppingListStringArray);
-                if (newShoppingList != null) {
-                    _shoppingList = newShoppingList;
-                    _broadcastController.SendSerializableArrayBroadcast(
-                            Broadcasts.UPDATE_SHOPPING_LIST,
-                            new String[]{Bundles.SHOPPING_LIST},
-                            new Object[]{_shoppingList});
-
-                    _databaseController.ClearDatabaseShoppingList();
-                    for (int index = 0; index < _shoppingList.getSize(); index++) {
-                        _databaseController.SaveShoppingEntry(_shoppingList.getValue(index));
-                    }
-
-                    sendShoppingListToWear();
-
-                    SerializableTime time = new SerializableTime();
-                    SerializableDate date = new SerializableDate();
-                    _sharedPrefController.SaveStringValue(
-                            SharedPrefConstants.LAST_LOADED_SHOPPING_LIST_TIME,
-                            String.format(Locale.getDefault(), "%s-%s-%s-%s-%s", time.HH(), time.MM(), date.DD(), date.MM(), date.YYYY()));
-                } else {
-                    _logger.Warn("newShoppingList is null");
-                }
+                ConverterTask converterTask = new ConverterTask(
+                        shoppingListStringArray,
+                        Bundles.SHOPPING_LIST,
+                        null,
+                        _broadcastController,
+                        _databaseController,
+                        _sharedPrefController
+                );
+                converterTask.execute();
             } else {
                 _logger.Warn("shoppingListStringArray is null");
             }
@@ -1543,9 +1613,9 @@ public class MainService extends Service {
                             break;
                         }
                     }
-                    _logger.Warn(String.format(Locale.GERMAN, "Found no matching entry with name %s to update!", name));
+                    _logger.Warn(String.format(Locale.getDefault(), "Found no matching entry with name %s to update!", name));
                 } else {
-                    _logger.Warn(String.format(Locale.GERMAN, "Invalid length %s for content %s", content.length, content));
+                    _logger.Warn(String.format(Locale.getDefault(), "Invalid length %s for content %s", content.length, content));
                 }
             } else {
                 _logger.Warn("Received null data in _updateBoughtShoppingListReceiver");
@@ -2064,6 +2134,10 @@ public class MainService extends Service {
 
             sendSocketsToWear();
 
+            if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
+                _notificationController.CreateSocketNotification(_wirelessSocketList);
+            }
+
             updateDownloadCount();
         }
     };
@@ -2245,6 +2319,16 @@ public class MainService extends Service {
                 Broadcasts.UPDATE_MOVIE,
                 Broadcasts.UPDATE_SCHEDULE,
                 Broadcasts.UPDATE_SOCKET_LIST});
+
+        _receiverController.RegisterReceiver(_birthdayConvertedReceiver, new String[]{Broadcasts.CONVERT_BIRTHDAY_FINISHED});
+        _receiverController.RegisterReceiver(_changeConvertedReceiver, new String[]{Broadcasts.CONVERT_CHANGE_FINISHED});
+        _receiverController.RegisterReceiver(_informationConvertedReceiver, new String[]{Broadcasts.CONVERT_INFORMATION_FINISHED});
+        _receiverController.RegisterReceiver(_mapContentConvertedReceiver, new String[]{Broadcasts.CONVERT_MAP_CONTENT_FINISHED});
+        _receiverController.RegisterReceiver(_listedMenuDtoConvertedReceiver, new String[]{Broadcasts.CONVERT_LISTED_MENU_FINISHED});
+        _receiverController.RegisterReceiver(_menuDtoConvertedReceiver, new String[]{Broadcasts.CONVERT_MENU_FINISHED});
+        _receiverController.RegisterReceiver(_motionCameraDtoConvertedReceiver, new String[]{Broadcasts.CONVERT_MOTION_CAMERA_DTO_FINISHED});
+        _receiverController.RegisterReceiver(_movieConvertedReceiver, new String[]{Broadcasts.CONVERT_MOVIE_FINISHED});
+        _receiverController.RegisterReceiver(_shoppingListConvertedReceiver, new String[]{Broadcasts.CONVERT_SHOPPING_LIST_FINISHED});
 
         _receiverController.RegisterReceiver(_birthdayDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_BIRTHDAY_FINISHED});
         _receiverController.RegisterReceiver(_changeDownloadReceiver, new String[]{Broadcasts.DOWNLOAD_CHANGE_FINISHED});

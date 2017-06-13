@@ -6,10 +6,12 @@ public class Broadcasts {
     public static final String UPDATE_BIRTHDAY = "guepardoapps.lucahome.broadcast.update.birthday";
     public static final String UPDATE_BIRTHDAY_LIST = "guepardoapps.lucahome.watchface.broadcast.update.birthday_list";
     public static final String RELOAD_BIRTHDAY = "guepardoapps.lucahome.broadcast.reload.birthday";
+    public static final String CONVERT_BIRTHDAY_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_BIRTHDAY_FINISHED";
     public static final String DOWNLOAD_BIRTHDAY_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_BIRTHDAY_FINISHED";
 
     // Change
     public static final String UPDATE_CHANGE = "guepardoapps.lucahome.broadcast.UPDATE_CHANGE";
+    public static final String CONVERT_CHANGE_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_CHANGE_FINISHED";
     public static final String DOWNLOAD_CHANGE_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_CHANGE_FINISHED";
 
     // Command MainService
@@ -19,11 +21,13 @@ public class Broadcasts {
 
     // Information
     public static final String UPDATE_INFORMATION = "guepardoapps.lucahome.broadcast.UPDATE_INFORMATION";
+    public static final String CONVERT_INFORMATION_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_INFORMATION_FINISHED";
     public static final String DOWNLOAD_INFORMATION_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_INFORMATION_FINISHED";
 
     // MapContent
     public static final String UPDATE_MAP_CONTENT_VIEW = "guepardoapps.lucahome.broadcast.update.mapcontent.view";
     public static final String RELOAD_MAP_CONTENT = "guepardoapps.lucahome.broadcast.reload.mapcontent";
+    public static final String CONVERT_MAP_CONTENT_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_MAP_CONTENT_FINISHED";
     public static final String DOWNLOAD_MAP_CONTENT_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MAP_CONTENT_FINISHED";
 
     // MediaMirror
@@ -40,20 +44,24 @@ public class Broadcasts {
     public static final String RELOAD_MENU = "guepardoapps.lucahome.broadcast.reload.menu";
     public static final String UPDATE_MENU = "guepardoapps.lucahome.broadcast.UPDATE_MENU";
     public static final String UPDATE_MENU_VIEW = "guepardoapps.lucahome.broadcast.UPDATE_MENU_VIEW";
+    public static final String CONVERT_MENU_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_MENU_FINISHED";
     public static final String DOWNLOAD_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MENU_FINISHED";
     public static final String RELOAD_LISTED_MENU = "guepardoapps.lucahome.broadcast.reload.listedmenu";
     public static final String UPDATE_LISTED_MENU_VIEW = "guepardoapps.lucahome.broadcast.UPDATE_LISTED_MENU_VIEW";
+    public static final String CONVERT_LISTED_MENU_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_LISTED_MENU_FINISHED";
     public static final String DOWNLOAD_LISTED_MENU_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_LISTED_MENU_FINISHED";
 
     // Motion Camera Dto
     public static final String RELOAD_MOTION_CAMERA_DTO = "guepardoapps.lucahome.broadcast.RELOAD_MOTION_CAMERA_DTO";
     public static final String UPDATE_MOTION_CAMERA_DTO = "guepardoapps.lucahome.broadcast.UPDATE_MOTION_CAMERA_DTO";
+    public static final String CONVERT_MOTION_CAMERA_DTO_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_MOTION_CAMERA_DTO_FINISHED";
     public static final String DOWNLOAD_MOTION_CAMERA_DTO_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MOTION_CAMERA_DTO_FINISHED";
 
     // Movie
     public static final String ADD_MOVIE = "guepardoapps.lucahome.broadcast.add.movie";
     public static final String UPDATE_MOVIE = "guepardoapps.lucahome.broadcast.update.movie";
     public static final String RELOAD_MOVIE = "guepardoapps.lucahome.broadcast.reload.movie";
+    public static final String CONVERT_MOVIE_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_MOVIE_FINISHED";
     public static final String DOWNLOAD_MOVIE_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_MOVIE_FINISHED";
 
     // Socket
@@ -74,6 +82,7 @@ public class Broadcasts {
     public static final String RELOAD_SHOPPING_LIST = "guepardoapps.lucahome.broadcast.reload.shopping_list";
     public static final String UPDATE_SHOPPING_LIST = "guepardoapps.lucahome.broadcast.update.shopping_list";
     public static final String UPDATE_BOUGHT_SHOPPING_LIST = "guepardoapps.lucahome.broadcast.update.shopping_list_bought";
+    public static final String CONVERT_SHOPPING_LIST_FINISHED = "guepardoapps.lucahome.broadcast.CONVERT_SHOPPING_LIST_FINISHED";
     public static final String DOWNLOAD_SHOPPING_LIST_FINISHED = "guepardoapps.lucahome.broadcast.DOWNLOAD_SHOPPING_LIST_FINISHED";
     public static final String RELOAD_SHOPPING_LIST_FROM_DB = "guepardoapps.lucahome.broadcast.reload.shopping_list.db";
 
