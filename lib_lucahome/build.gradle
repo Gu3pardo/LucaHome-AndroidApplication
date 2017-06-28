@@ -39,7 +39,7 @@ dependencies {
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:percent:25.3.1'
-    compile 'com.google.android.gms:play-services-wearable:11.0.0'
+    compile 'com.google.android.gms:play-services-wearable:11.0.1'
     testCompile 'junit:junit:4.12'
     compile 'com.github.GrenderG:Toasty:1.2.5'
     compile 'com.github.matecode:Snacky:1.0.2'

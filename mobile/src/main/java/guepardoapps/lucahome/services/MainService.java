@@ -2134,7 +2134,8 @@ public class MainService extends Service {
 
             sendSocketsToWear();
 
-            if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
+            if (_networkController.IsHomeNetwork(Constants.LUCAHOME_SSID)
+                    && _sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
                 _notificationController.CreateSocketNotification(_wirelessSocketList);
             }
 
