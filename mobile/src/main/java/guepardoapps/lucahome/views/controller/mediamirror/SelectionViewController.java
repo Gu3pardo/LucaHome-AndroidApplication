@@ -88,7 +88,7 @@ public class SelectionViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        Spinner mediaMirrorSelectionSpinner = (Spinner) ((Activity) _context).findViewById(R.id.mediaMirrorSelectionSpinner);
+        Spinner mediaMirrorSelectionSpinner = ((Activity) _context).findViewById(R.id.mediaMirrorSelectionSpinner);
         final ArrayList<String> serverLocations = new ArrayList<>();
         for (MediaServerSelection entry : MediaServerSelection.values()) {
             if (entry.GetId() > 0) {

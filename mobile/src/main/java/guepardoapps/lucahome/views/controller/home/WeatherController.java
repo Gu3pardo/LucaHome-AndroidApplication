@@ -9,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 import com.flaviofaria.kenburnsview.KenBurnsView;
 
@@ -17,6 +16,7 @@ import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
@@ -27,6 +27,7 @@ import guepardoapps.library.openweather.common.model.WeatherModel;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
+import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.views.ForecastWeatherView;
 
@@ -84,7 +85,7 @@ public class WeatherController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _buttonCenterWeather = (Button) ((Activity) _context).findViewById(R.id.buttonCenterWeather);
+        _buttonCenterWeather = ((Activity) _context).findViewById(R.id.buttonCenterWeather);
         _buttonCenterWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,7 +93,7 @@ public class WeatherController {
             }
         });
 
-        ImageButton imageButtonReloadWeather = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonReloadWeather);
+        ImageButton imageButtonReloadWeather = ((Activity) _context).findViewById(R.id.imageButtonReloadWeather);
         imageButtonReloadWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,7 +101,10 @@ public class WeatherController {
             }
         });
 
-        _imageViewWeatherCondition = (KenBurnsView) ((Activity) _context).findViewById(R.id.imageViewWeatherCondition);
+        _imageViewWeatherCondition = ((Activity) _context).findViewById(R.id.imageViewWeatherCondition);
+        if (!new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME).LoadBooleanValueFromSharedPreferences(SharedPrefConstants.MOVE_IMAGES)) {
+            _imageViewWeatherCondition.pause();
+        }
     }
 
     public void onResume() {

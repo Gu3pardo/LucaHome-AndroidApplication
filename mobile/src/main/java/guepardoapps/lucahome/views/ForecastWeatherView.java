@@ -23,20 +23,22 @@ import java.util.List;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
+import guepardoapps.library.openweather.common.classes.NotificationContent;
 import guepardoapps.library.openweather.common.enums.WeatherCondition;
 import guepardoapps.library.openweather.common.model.ForecastModel;
 
 import guepardoapps.library.openweather.common.model.ForecastWeatherModel;
 import guepardoapps.library.openweather.customadapter.ForecastListAdapter;
 
-import guepardoapps.library.toolset.common.classes.NotificationContent;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
+import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.lucahome.R;
 
 public class ForecastWeatherView extends AppCompatActivity {
@@ -139,6 +141,9 @@ public class ForecastWeatherView extends AppCompatActivity {
 
         _mainBackground = (KenBurnsView) findViewById(R.id.skeletonList_backdrop);
         _mainBackground.setImageResource(R.drawable.wallpaper);
+        if (!new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME).LoadBooleanValueFromSharedPreferences(SharedPrefConstants.MOVE_IMAGES)) {
+            _mainBackground.pause();
+        }
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);
         buttonAdd.setVisibility(View.GONE);

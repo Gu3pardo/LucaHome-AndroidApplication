@@ -4,8 +4,10 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
+import guepardoapps.library.lucahome.common.enums.RadioStreams;
 
 public class MediaMirrorViewDto implements Serializable {
 
@@ -28,6 +30,9 @@ public class MediaMirrorViewDto implements Serializable {
     private int _youtubeVideoDuration;
     private ArrayList<PlayedYoutubeVideoDto> _playedYoutubeIds;
 
+    private boolean _radioStreamIsPlaying;
+    private int _radioStreamId;
+
     private boolean _sleepTimerEnabled;
     private int _countDownSec;
 
@@ -46,6 +51,8 @@ public class MediaMirrorViewDto implements Serializable {
             int youtubeVideoCurrentPlayTime,
             int youtubeVideoDuration,
             @NonNull ArrayList<PlayedYoutubeVideoDto> playedYoutubeIds,
+            boolean radioStreamIsPlaying,
+            int radioStreamId,
             boolean sleepTimerEnabled,
             int countDownSec,
             String serverVersion,
@@ -64,6 +71,9 @@ public class MediaMirrorViewDto implements Serializable {
         _youtubeVideoCurrentPlayTime = youtubeVideoCurrentPlayTime;
         _youtubeVideoDuration = youtubeVideoDuration;
         _playedYoutubeIds = playedYoutubeIds;
+
+        _radioStreamIsPlaying = radioStreamIsPlaying;
+        _radioStreamId = radioStreamId;
 
         _sleepTimerEnabled = sleepTimerEnabled;
         _countDownSec = countDownSec;
@@ -89,6 +99,8 @@ public class MediaMirrorViewDto implements Serializable {
                 -1,
                 -1,
                 new ArrayList<PlayedYoutubeVideoDto>(),
+                false,
+                RadioStreams.NULL.GetId(),
                 false,
                 -1,
                 serverVersion,
@@ -135,6 +147,14 @@ public class MediaMirrorViewDto implements Serializable {
         return _playedYoutubeIds;
     }
 
+    public boolean IsRadioStreamPlaying() {
+        return _radioStreamIsPlaying;
+    }
+
+    public int GetRadioStreamId() {
+        return _radioStreamId;
+    }
+
     public boolean GetSleepTimerEnabled() {
         return _sleepTimerEnabled;
     }
@@ -154,7 +174,8 @@ public class MediaMirrorViewDto implements Serializable {
     @Override
     public String toString() {
         return String.format(
-                "{%s:{MediaServerSelection:%s}{BatteryLevel:%s}{Socket:{Name:%s}{State:%s}}{Volume:%s}{YoutubeId:%s}{IsYoutubePlaying:%s}{YoutubeVideoCurrentPlayTime:%s}{YoutubeVideoDuration:%s}{PlayedYoutubeIds:%s}{SleepTimer:{State:%s}{Countdown:%s}}{ServerVersion:%s}{ScreenBrightness:%s}}",
+                Locale.getDefault(),
+                "{%s:{MediaServerSelection:%s}{BatteryLevel:%s}{Socket:{Name:%s}{State:%s}}{Volume:%s}{YoutubeId:%s}{IsYoutubePlaying:%s}{YoutubeVideoCurrentPlayTime:%s}{YoutubeVideoDuration:%s}{PlayedYoutubeIds:%s}{IsRadioStreamPlaying:%s}{RadioStreamId:%d}{SleepTimer:{State:%s}{Countdown:%s}}{ServerVersion:%s}{ScreenBrightness:%s}}",
                 TAG,
                 _mediaServerSelection,
                 _batteryLevel,
@@ -166,6 +187,8 @@ public class MediaMirrorViewDto implements Serializable {
                 _youtubeVideoCurrentPlayTime,
                 _youtubeVideoDuration,
                 _playedYoutubeIds,
+                _radioStreamIsPlaying,
+                _radioStreamId,
                 _sleepTimerEnabled,
                 _countDownSec,
                 _serverVersion,

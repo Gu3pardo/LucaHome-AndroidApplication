@@ -161,6 +161,12 @@ public class MapController {
                         case "VOL_DECREASE":
                             _mediaMirrorController.SendCommand(ip, MediaServerAction.DECREASE_VOLUME.toString(), "");
                             break;
+                        case "PLAY_RADIO":
+                            _mediaMirrorController.SendCommand(ip, MediaServerAction.PLAY_RADIO_STREAM.toString(), "");
+                            break;
+                        case "STOP_RADIO":
+                            _mediaMirrorController.SendCommand(ip, MediaServerAction.STOP_RADIO_STREAM.toString(), "");
+                            break;
                         default:
                             _logger.Error(String.format("Cannot perform command %s", command));
                             Toasty.error(_context, "Command failed!", Toast.LENGTH_LONG).show();
@@ -214,10 +220,6 @@ public class MapController {
 
     public void onPause() {
         _logger.Debug("onPause");
-        _dialogController.Dispose();
-        _mediaMirrorController.Dispose();
-        _receiverController.Dispose();
-        _isInitialized = false;
     }
 
     public void onDestroy() {
@@ -230,7 +232,7 @@ public class MapController {
 
     private void initializeView() {
         _logger.Debug("initializeView");
-        _relativeLayoutMapPaint = (RelativeLayout) ((Activity) _context).findViewById(R.id.relativeLayoutMapPaint);
+        _relativeLayoutMapPaint = ((Activity) _context).findViewById(R.id.relativeLayoutMapPaint);
     }
 
     private void getSizeOfMapLayout() {

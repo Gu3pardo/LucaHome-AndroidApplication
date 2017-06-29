@@ -19,6 +19,7 @@ import com.flaviofaria.kenburnsview.KenBurnsView;
 
 import guepardoapps.library.lucahome.common.constants.Broadcasts;
 import guepardoapps.library.lucahome.common.constants.Bundles;
+import guepardoapps.library.lucahome.common.constants.SharedPrefConstants;
 import guepardoapps.library.lucahome.common.dto.InformationDto;
 import guepardoapps.library.lucahome.common.enums.HomeAutomationAction;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
@@ -28,6 +29,7 @@ import guepardoapps.library.lucahome.services.helper.NavigationService;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
+import guepardoapps.library.toolset.controller.SharedPrefController;
 import guepardoapps.lucahome.R;
 
 public class InformationView extends AppCompatActivity {
@@ -109,6 +111,9 @@ public class InformationView extends AppCompatActivity {
 
         KenBurnsView mainBackground = (KenBurnsView) findViewById(R.id.skeletonList_backdrop);
         mainBackground.setImageResource(R.drawable.main_image_informations);
+        if (!new SharedPrefController(_context, SharedPrefConstants.SHARED_PREF_NAME).LoadBooleanValueFromSharedPreferences(SharedPrefConstants.MOVE_IMAGES)) {
+            mainBackground.pause();
+        }
 
         FloatingActionButton buttonAdd = (FloatingActionButton) findViewById(R.id.skeletonList_addButton);
         buttonAdd.setVisibility(View.GONE);

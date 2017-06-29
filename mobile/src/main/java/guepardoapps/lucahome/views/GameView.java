@@ -97,7 +97,7 @@ public class GameView extends Activity {
     private void initializeSpinner() {
         _logger.Debug("initializeSpinner");
 
-        Spinner selectServerSpinner = (Spinner) findViewById(R.id.selectServerSpinner);
+        Spinner selectServerSpinner = findViewById(R.id.selectServerSpinner);
         final ArrayList<String> serverLocations = new ArrayList<>();
         for (MediaServerSelection entry : MediaServerSelection.values()) {
             if (entry.GetId() > 0) {
@@ -129,7 +129,7 @@ public class GameView extends Activity {
     private void initializeButtonControl() {
         _logger.Debug("initializeButtonControl");
 
-        Button buttonLeft = (Button) findViewById(R.id.buttonLeft);
+        Button buttonLeft = findViewById(R.id.buttonLeft);
         buttonLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,7 +143,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonRight = (Button) findViewById(R.id.buttonRight);
+        Button buttonRight = findViewById(R.id.buttonRight);
         buttonRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -157,7 +157,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonUp = (Button) findViewById(R.id.buttonUp);
+        Button buttonUp = findViewById(R.id.buttonUp);
         buttonUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -165,7 +165,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonDown = (Button) findViewById(R.id.buttonDown);
+        Button buttonDown = findViewById(R.id.buttonDown);
         buttonDown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,7 +173,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonRotate = (Button) findViewById(R.id.buttonRotate);
+        Button buttonRotate = findViewById(R.id.buttonRotate);
         buttonRotate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -185,7 +185,7 @@ public class GameView extends Activity {
     private void initializeButtonPong() {
         _logger.Debug("initializeButtonPong");
 
-        Spinner selectPongPlayerSpinner = (Spinner) findViewById(R.id.selectPongPlayerSpinner);
+        Spinner selectPongPlayerSpinner = findViewById(R.id.selectPongPlayerSpinner);
         ArrayAdapter<String> serverDataAdapter = new ArrayAdapter<>(_context,
                 android.R.layout.simple_spinner_item, Constants.MEDIAMIRROR_PLAYER);
         serverDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -201,7 +201,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonPongPlay = (Button) findViewById(R.id.buttonPongPlay);
+        Button buttonPongPlay = findViewById(R.id.buttonPongPlay);
         buttonPongPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -210,7 +210,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonPongRestart = (Button) findViewById(R.id.buttonPongRestart);
+        Button buttonPongRestart = findViewById(R.id.buttonPongRestart);
         buttonPongRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -218,7 +218,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonPongStop = (Button) findViewById(R.id.buttonPongStop);
+        Button buttonPongStop = findViewById(R.id.buttonPongStop);
         buttonPongStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -227,7 +227,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonPongPause = (Button) findViewById(R.id.buttonPongPause);
+        Button buttonPongPause = findViewById(R.id.buttonPongPause);
         buttonPongPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -236,7 +236,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonPongResume = (Button) findViewById(R.id.buttonPongResume);
+        Button buttonPongResume = findViewById(R.id.buttonPongResume);
         buttonPongResume.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -249,7 +249,7 @@ public class GameView extends Activity {
     private void initializeButtonSnake() {
         _logger.Debug("initializeButtonSnake");
 
-        Button buttonSnakePlay = (Button) findViewById(R.id.buttonSnakePlay);
+        Button buttonSnakePlay = findViewById(R.id.buttonSnakePlay);
         buttonSnakePlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -257,7 +257,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonSnakeStop = (Button) findViewById(R.id.buttonSnakeStop);
+        Button buttonSnakeStop = findViewById(R.id.buttonSnakeStop);
         buttonSnakeStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -269,7 +269,7 @@ public class GameView extends Activity {
     private void initializeButtonTetris() {
         _logger.Debug("initializeButtonTetris");
 
-        Button buttonTetrisPlay = (Button) findViewById(R.id.buttonTetrisPlay);
+        Button buttonTetrisPlay = findViewById(R.id.buttonTetrisPlay);
         buttonTetrisPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -277,7 +277,7 @@ public class GameView extends Activity {
             }
         });
 
-        Button buttonTetrisStop = (Button) findViewById(R.id.buttonTetrisStop);
+        Button buttonTetrisStop = findViewById(R.id.buttonTetrisStop);
         buttonTetrisStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

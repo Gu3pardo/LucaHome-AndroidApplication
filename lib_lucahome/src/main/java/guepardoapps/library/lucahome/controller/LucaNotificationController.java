@@ -416,8 +416,13 @@ public class LucaNotificationController extends NotificationController {
             }
         }
 
-        TemperatureDto currentTemperature = new TemperatureDto(currentWeather.GetTemperature(),
-                currentWeather.GetCity(), currentWeather.GetLastUpdate(), "n.a.", TemperatureType.CITY, "n.a.");
+        TemperatureDto currentTemperature = new TemperatureDto(
+                currentWeather.GetTemperature(),
+                currentWeather.GetCity(),
+                currentWeather.GetLastUpdate(),
+                "n.a.",
+                TemperatureType.CITY,
+                "n.a.");
         temperatureList.addValue(currentTemperature);
 
         String title = "Temperatures";

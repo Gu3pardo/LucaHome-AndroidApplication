@@ -169,7 +169,7 @@ public class MediaMirrorController {
                     case GET_MEDIAMIRROR_DTO:
                         String mediaMirrorDataString = responseData[responseData.length - 1];
                         String[] mediaMirrorData = mediaMirrorDataString.split("\\|");
-                        if (mediaMirrorData.length == 14) {
+                        if (mediaMirrorData.length == 16) {
                             String serverIp = mediaMirrorData[0];
                             MediaServerSelection mediaServerSelection = MediaServerSelection.GetByIp(serverIp);
 
@@ -231,9 +231,20 @@ public class MediaMirrorController {
                                 }
                             }
 
-                            String isSeaSSoundPlayingString = mediaMirrorData[10];
+                            String radioStreamIdString = mediaMirrorData[10];
+                            int radioStreamId = -1;
+                            try {
+                                radioStreamId = Integer.parseInt(radioStreamIdString);
+                            } catch (Exception exception) {
+                                _logger.Error(exception.toString());
+                            }
+
+                            String isRadioStreamPlayingString = mediaMirrorData[11];
+                            boolean isRadioStreamPlaying = isRadioStreamPlayingString.contains("1");
+
+                            String isSeaSSoundPlayingString = mediaMirrorData[12];
                             boolean isSeaSSoundPlaying = isSeaSSoundPlayingString.contains("1");
-                            String seaSoundCountdownString = mediaMirrorData[11];
+                            String seaSoundCountdownString = mediaMirrorData[13];
                             int seaSoundCountdownSec = -1;
                             try {
                                 seaSoundCountdownSec = Integer.parseInt(seaSoundCountdownString);
@@ -241,9 +252,9 @@ public class MediaMirrorController {
                                 _logger.Error(ex.toString());
                             }
 
-                            String serverVersion = mediaMirrorData[12];
+                            String serverVersion = mediaMirrorData[14];
 
-                            String screenBrightnessString = mediaMirrorData[13];
+                            String screenBrightnessString = mediaMirrorData[15];
                             int screenBrightness = -1;
                             try {
                                 screenBrightness = Integer.parseInt(screenBrightnessString);
@@ -251,10 +262,23 @@ public class MediaMirrorController {
                                 _logger.Error(ex.toString());
                             }
 
-                            MediaMirrorViewDto mediaMirrorDto = new MediaMirrorViewDto(mediaServerSelection,
-                                    batteryLevel, socketName, socketState, volume, youtubeId, youtubeIsPlaying,
-                                    youtubeVideoCurrentPlayTime, youtubeVideoDuration, alreadyPlayedYoutubeVideos,
-                                    isSeaSSoundPlaying, seaSoundCountdownSec, serverVersion, screenBrightness);
+                            MediaMirrorViewDto mediaMirrorDto = new MediaMirrorViewDto(
+                                    mediaServerSelection,
+                                    batteryLevel,
+                                    socketName,
+                                    socketState,
+                                    volume,
+                                    youtubeId,
+                                    youtubeIsPlaying,
+                                    youtubeVideoCurrentPlayTime,
+                                    youtubeVideoDuration,
+                                    alreadyPlayedYoutubeVideos,
+                                    isRadioStreamPlaying,
+                                    radioStreamId,
+                                    isSeaSSoundPlaying,
+                                    seaSoundCountdownSec,
+                                    serverVersion,
+                                    screenBrightness);
 
                             _broadcastController.SendSerializableBroadcast(
                                     Broadcasts.MEDIAMIRROR_VIEW_DTO,

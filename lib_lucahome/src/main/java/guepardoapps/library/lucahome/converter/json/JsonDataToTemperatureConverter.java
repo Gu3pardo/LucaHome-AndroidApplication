@@ -7,8 +7,8 @@ import guepardoapps.library.lucahome.common.dto.TemperatureDto;
 import guepardoapps.library.lucahome.common.enums.TemperatureType;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 
+import guepardoapps.library.openweather.common.classes.SerializableTime;
 import guepardoapps.library.toolset.common.classes.SerializableList;
-import guepardoapps.library.toolset.common.classes.SerializableTime;
 
 public final class JsonDataToTemperatureConverter {
 
@@ -80,8 +80,13 @@ public final class JsonDataToTemperatureConverter {
 
                 String graphPath = data[3].replace("{graphPath:", "").replace("};", "");
 
-                TemperatureDto newValue = new TemperatureDto(temperature, area, time, sensorPath,
-                        TemperatureType.RASPBERRY, graphPath);
+                TemperatureDto newValue = new TemperatureDto(
+                        temperature,
+                        area,
+                        time,
+                        sensorPath,
+                        TemperatureType.RASPBERRY,
+                        graphPath);
                 _logger.Debug(String.format(Locale.getDefault(), "New TemperatureDto %s", newValue));
 
                 return newValue;

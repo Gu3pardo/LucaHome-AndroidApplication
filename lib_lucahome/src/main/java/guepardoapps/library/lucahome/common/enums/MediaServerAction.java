@@ -66,6 +66,11 @@ public enum MediaServerAction implements Serializable {
 
     GET_MEDIAMIRROR_DTO(100, "Get_MediaMirror_Dto", 1),
 
+    SHOW_RADIO_STREAM(110, "Show_Radio_Stream", 1),
+    PLAY_RADIO_STREAM(111, "Play_Radio_Stream", 1),
+    STOP_RADIO_STREAM(112, "Stop_Radio_Stream", 1),
+    IS_RADIO_STREAM_PLAYING(113, "Is_Radio_Stream_Playing", 1),
+
     PING(1000, "PING", 1);
 
     private int _id;

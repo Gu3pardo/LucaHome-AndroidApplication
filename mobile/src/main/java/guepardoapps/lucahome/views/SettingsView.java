@@ -127,7 +127,7 @@ public class SettingsView extends Activity {
             _logger.Error("ActionBar is null!");
         }
 
-        _socketLayout = (LinearLayout) findViewById(R.id.notificationSocketLayout);
+        _socketLayout = findViewById(R.id.notificationSocketLayout);
 
         _context = this;
 
@@ -141,6 +141,7 @@ public class SettingsView extends Activity {
 
         initializeSwitches();
         initializeAppCheckboxes();
+        initializeMovingImagesCheckbox();
         initializeBeaconCheckbox();
         initializeSocketNotificationCheckboxes();
         initializeStoredActions();
@@ -193,7 +194,7 @@ public class SettingsView extends Activity {
     }
 
     private void initializeSwitches() {
-        Switch displayNotification = (Switch) findViewById(R.id.switch_display_socket_notification);
+        Switch displayNotification = findViewById(R.id.switch_display_socket_notification);
         displayNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION));
         displayNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -217,7 +218,7 @@ public class SettingsView extends Activity {
             }
         });
 
-        Switch weatherNotification = (Switch) findViewById(R.id.switch_display_weather_notification);
+        Switch weatherNotification = findViewById(R.id.switch_display_weather_notification);
         weatherNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_WEATHER_NOTIFICATION));
         weatherNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -235,7 +236,7 @@ public class SettingsView extends Activity {
             }
         });
 
-        Switch temperatureNotification = (Switch) findViewById(R.id.switch_display_temperature_notification);
+        Switch temperatureNotification = findViewById(R.id.switch_display_temperature_notification);
         temperatureNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_TEMPERATURE_NOTIFICATION));
         temperatureNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -253,7 +254,7 @@ public class SettingsView extends Activity {
             }
         });
 
-        Switch birthdayNotification = (Switch) findViewById(R.id.switch_display_birthday_notification);
+        Switch birthdayNotification = findViewById(R.id.switch_display_birthday_notification);
         birthdayNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_BIRTHDAY_NOTIFICATION));
         birthdayNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -268,7 +269,7 @@ public class SettingsView extends Activity {
             }
         });
 
-        Switch sleepNotification = (Switch) findViewById(R.id.switch_display_sleep_notification);
+        Switch sleepNotification = findViewById(R.id.switch_display_sleep_notification);
         sleepNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SLEEP_NOTIFICATION));
         sleepNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -302,7 +303,7 @@ public class SettingsView extends Activity {
             }
         });
 
-        Switch cameraNotification = (Switch) findViewById(R.id.switch_display_camera_notification);
+        Switch cameraNotification = findViewById(R.id.switch_display_camera_notification);
         cameraNotification.setChecked(_sharedPrefController
                 .LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_CAMERA_NOTIFICATION));
         cameraNotification.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -322,8 +323,19 @@ public class SettingsView extends Activity {
         cameraNotification.setVisibility(View.GONE);
     }
 
+    private void initializeMovingImagesCheckbox() {
+        CheckBox movingImages = findViewById(R.id.movingImagesCheckbox);
+        movingImages.setChecked(_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.MOVE_IMAGES));
+        movingImages.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                _sharedPrefController.SaveBooleanValue(SharedPrefConstants.MOVE_IMAGES, isChecked);
+            }
+        });
+    }
+
     private void initializeAppCheckboxes() {
-        CheckBox audioStart = (CheckBox) findViewById(R.id.startAudioAppCheckbox);
+        CheckBox audioStart = findViewById(R.id.startAudioAppCheckbox);
         audioStart.setChecked(_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.START_AUDIO_APP));
         audioStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -332,7 +344,7 @@ public class SettingsView extends Activity {
             }
         });
 
-        CheckBox osmcStart = (CheckBox) findViewById(R.id.startOsmcAppCheckbox);
+        CheckBox osmcStart = findViewById(R.id.startOsmcAppCheckbox);
         osmcStart.setChecked(_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.START_OSMC_APP));
         osmcStart.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -343,7 +355,7 @@ public class SettingsView extends Activity {
     }
 
     private void initializeBeaconCheckbox() {
-        CheckBox beaconActivate = (CheckBox) findViewById(R.id.startBeaconsCheckbox);
+        CheckBox beaconActivate = findViewById(R.id.startBeaconsCheckbox);
         beaconActivate.setChecked(_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USE_BEACONS));
         beaconActivate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -405,7 +417,7 @@ public class SettingsView extends Activity {
     }
 
     private void initializeStoredActions() {
-        _deleteActionDatabase = (Button) findViewById(R.id.btnDeleteDatabaseEntries);
+        _deleteActionDatabase = findViewById(R.id.btnDeleteDatabaseEntries);
         _deleteActionDatabase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -416,7 +428,7 @@ public class SettingsView extends Activity {
 
         _storedActions = _databaseController.GetActions();
 
-        _storedActionsListView = (ListView) findViewById(R.id.storedActionListView);
+        _storedActionsListView = findViewById(R.id.storedActionListView);
         _storedActionListAdapter = new StoredActionListAdapter(
                 _context,
                 _storedActions,

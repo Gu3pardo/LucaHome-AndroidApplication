@@ -5,8 +5,7 @@ import java.util.Calendar;
 import guepardoapps.library.lucahome.common.dto.TemperatureDto;
 import guepardoapps.library.lucahome.common.enums.TemperatureType;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
-
-import guepardoapps.library.toolset.common.classes.SerializableTime;
+import guepardoapps.library.openweather.common.classes.SerializableTime;
 
 public class MessageToRaspberryConverter {
 
@@ -30,7 +29,7 @@ public class MessageToRaspberryConverter {
         if (entries.length == 3) {
             String temperatureString = entries[0];
             temperatureString = temperatureString.replace("TEMPERATURE", "");
-            temperatureString = temperatureString.replace("°C", "");
+            temperatureString = temperatureString.replace("ï¿½C", "");
             temperatureString = temperatureString.replace(":", "");
             temperatureString = temperatureString.replace(" ", "");
             _logger.Debug("temperatureString is: " + temperatureString);
@@ -52,7 +51,12 @@ public class MessageToRaspberryConverter {
             int second = calendar.get(Calendar.SECOND);
             SerializableTime time = new SerializableTime(hour, minute, second, 0);
 
-            TemperatureDto raspberryTemperature = new TemperatureDto(temperature, area, time, "", TemperatureType.NULL,
+            TemperatureDto raspberryTemperature = new TemperatureDto(
+                    temperature,
+                    area,
+                    time,
+                    "",
+                    TemperatureType.NULL,
                     "");
             _logger.Debug("Received raspberryTemperature: " + raspberryTemperature.toString());
             return raspberryTemperature;

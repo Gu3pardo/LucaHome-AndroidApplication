@@ -76,6 +76,9 @@
     <string name="useBeacons">Use beacons to get your location in the flat. Used for automation of sockets and other stuff!</string>
     <string name="activateBeacons">Activate beacon scanner</string>
 
+    <string name="useMovingImages">Shall the images in the top view move?</string>
+    <string name="moveImages">Move images</string>
+
     <string name="control">Control</string>
     <string name="media">Media</string>
     <string name="movies">Movies</string>

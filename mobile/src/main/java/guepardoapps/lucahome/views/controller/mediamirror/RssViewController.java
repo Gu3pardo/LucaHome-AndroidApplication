@@ -73,7 +73,7 @@ public class RssViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowRSS);
+        _showContent = ((Activity) _context).findViewById(R.id.imageButtonShowRSS);
         _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,9 +90,9 @@ public class RssViewController {
             }
         });
 
-        _dividerRSSTextView = (TextView) ((Activity) _context).findViewById(R.id.dividerRSS);
+        _dividerRSSTextView = ((Activity) _context).findViewById(R.id.dividerRSS);
 
-        _rssSelectionSpinner = (Spinner) ((Activity) _context).findViewById(R.id.rssSelectionSpinner);
+        _rssSelectionSpinner = ((Activity) _context).findViewById(R.id.rssSelectionSpinner);
         List<String> rssFeeds = new ArrayList<>();
         for (int index = 0; index < RSSFeed.values().length; index++) {
             rssFeeds.add(RSSFeed.values()[index].GetTitle());

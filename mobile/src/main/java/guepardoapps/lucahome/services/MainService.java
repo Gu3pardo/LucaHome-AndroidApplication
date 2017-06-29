@@ -62,12 +62,12 @@ import guepardoapps.library.lucahome.services.sockets.SocketActionService;
 import guepardoapps.library.openweather.common.OWBroadcasts;
 import guepardoapps.library.openweather.common.OWBundles;
 import guepardoapps.library.openweather.common.OWIds;
+import guepardoapps.library.openweather.common.classes.NotificationContent;
 import guepardoapps.library.openweather.common.model.ForecastModel;
 import guepardoapps.library.openweather.common.model.WeatherModel;
 import guepardoapps.library.openweather.controller.OpenWeatherController;
 
 import guepardoapps.library.toolset.beacon.BeaconController;
-import guepardoapps.library.toolset.common.classes.NotificationContent;
 import guepardoapps.library.toolset.common.classes.SerializableDate;
 import guepardoapps.library.toolset.common.classes.SerializableList;
 import guepardoapps.library.toolset.common.classes.SerializableTime;
@@ -2492,6 +2492,8 @@ public class MainService extends Service {
         checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_MOVIE_TIME, "00-00-00-00-0000");
         checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_SETTINGS_TIME, "00-00-00-00-0000");
         checkInstallSharedPrefString(SharedPrefConstants.LAST_LOADED_SHOPPING_LIST_TIME, "00-00-00-00-0000");
+
+        checkInstallSharedPrefBoolean(SharedPrefConstants.MOVE_IMAGES, true);
     }
 
     private void checkInstallSharedPrefBoolean(String key, boolean value) {

@@ -42,10 +42,10 @@ import guepardoapps.library.lucahome.controller.LucaNotificationController;
 import guepardoapps.library.lucahome.customadapter.TemperatureListAdapter;
 import guepardoapps.library.lucahome.services.helper.NavigationService;
 
+import guepardoapps.library.openweather.common.classes.SerializableTime;
 import guepardoapps.library.openweather.common.model.WeatherModel;
 
 import guepardoapps.library.toolset.common.classes.SerializableList;
-import guepardoapps.library.toolset.common.classes.SerializableTime;
 import guepardoapps.library.toolset.controller.BroadcastController;
 import guepardoapps.library.toolset.controller.ReceiverController;
 
@@ -290,8 +290,13 @@ public class SensorTemperatureView extends AppCompatActivity implements SensorEv
             int second = calendar.get(Calendar.SECOND);
             SerializableTime time = new SerializableTime(hour, minute, second, 0);
 
-            TemperatureDto newEntry = new TemperatureDto(temperature, "Ambient temperature", time, "n.a.",
-                    TemperatureType.SMARTPHONE_SENSOR, "n.a.");
+            TemperatureDto newEntry = new TemperatureDto(
+                    temperature,
+                    "Ambient temperature",
+                    time,
+                    "n.a.",
+                    TemperatureType.SMARTPHONE_SENSOR,
+                    "n.a.");
 
             if (_temperatureList != null) {
                 for (int index = 0; index < _temperatureList.getSize(); index++) {

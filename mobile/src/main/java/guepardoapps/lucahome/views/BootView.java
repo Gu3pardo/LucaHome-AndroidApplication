@@ -147,11 +147,11 @@ public class BootView extends Activity {
             _logger.Error("ActionBar is null!");
         }
 
-        _percentProgressBar = (ProgressBar) findViewById(R.id.percentProgressBar);
+        _percentProgressBar = findViewById(R.id.percentProgressBar);
         _percentProgressBar.setMax(_progressBarMax);
         _percentProgressBar.setProgress(0);
 
-        _progressTextView = (TextView) findViewById(R.id.percentProgressTextView);
+        _progressTextView = findViewById(R.id.percentProgressTextView);
         _progressTextView.setText("0 %");
 
         _context = this;

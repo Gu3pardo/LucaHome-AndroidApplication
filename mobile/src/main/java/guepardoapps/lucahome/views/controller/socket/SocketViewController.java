@@ -123,11 +123,11 @@ public class SocketViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _collapsingToolbar = (CollapsingToolbarLayout) ((Activity) _context).findViewById(R.id.skeletonList_collapsing);
+        _collapsingToolbar = ((Activity) _context).findViewById(R.id.skeletonList_collapsing);
         _collapsingToolbar.setExpandedTitleColor(ContextCompat.getColor(_context, R.color.TextIcon));
         _collapsingToolbar.setCollapsedTitleTextColor(Color.argb(0, 0, 0, 0));
 
-        _pullRefreshLayout = (PullRefreshLayout) ((Activity) _context).findViewById(R.id.skeletonList_pullRefreshLayout);
+        _pullRefreshLayout = ((Activity) _context).findViewById(R.id.skeletonList_pullRefreshLayout);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -136,11 +136,11 @@ public class SocketViewController {
             }
         });
 
-        _listView = (ListView) ((Activity) _context).findViewById(R.id.skeletonList_listView);
-        _progressBar = (ProgressBar) ((Activity) _context).findViewById(R.id.skeletonList_progressBarListView);
-        _noDataFallback = (TextView) ((Activity) _context).findViewById(R.id.skeletonList_fallBackTextView);
+        _listView = ((Activity) _context).findViewById(R.id.skeletonList_listView);
+        _progressBar = ((Activity) _context).findViewById(R.id.skeletonList_progressBarListView);
+        _noDataFallback = ((Activity) _context).findViewById(R.id.skeletonList_fallBackTextView);
 
-        CarouselView carouselView = (CarouselView) ((Activity) _context).findViewById(R.id.skeletonList_carouselView);
+        CarouselView carouselView = ((Activity) _context).findViewById(R.id.skeletonList_carouselView);
         carouselView.setPageCount(_images.length);
         carouselView.setCurrentItem(_startImageIndex);
         carouselView.setImageListener(_imageListener);
@@ -167,7 +167,7 @@ public class SocketViewController {
             }
         });
 
-        FloatingActionButton buttonAdd = (FloatingActionButton) ((Activity) _context).findViewById(R.id.skeletonList_addButton);
+        FloatingActionButton buttonAdd = ((Activity) _context).findViewById(R.id.skeletonList_addButton);
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

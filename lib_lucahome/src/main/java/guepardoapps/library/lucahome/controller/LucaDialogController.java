@@ -1955,6 +1955,28 @@ public class LucaDialogController extends DialogController {
             }
         });
 
+        Button btnPlayRadio = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_play_radio);
+        btnPlayRadio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _broadcastController.SendStringBroadcast(
+                        Broadcasts.MEDIAMIRROR_COMMAND,
+                        Bundles.MEDIAMIRROR_COMMAND,
+                        String.format(Locale.getDefault(), "IP:%s&CMD:%s", selection.GetIp(), "PLAY_RADIO"));
+            }
+        });
+
+        Button btnStopRadio = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_stop_radio);
+        btnStopRadio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _broadcastController.SendStringBroadcast(
+                        Broadcasts.MEDIAMIRROR_COMMAND,
+                        Bundles.MEDIAMIRROR_COMMAND,
+                        String.format(Locale.getDefault(), "IP:%s&CMD:%s", selection.GetIp(), "STOP_RADIO"));
+            }
+        });
+
         Button btnSleepStart = (Button) _dialog.findViewById(R.id.dialog_map_mediamirror_sleep_start);
         btnSleepStart.setOnClickListener(new View.OnClickListener() {
             @Override

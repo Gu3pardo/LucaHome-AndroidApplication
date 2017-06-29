@@ -62,7 +62,7 @@ public class ListButtonController {
 
     public void onCreate() {
         _logger.Debug("onCreate");
-        _buttonScrollView = (ScrollView) ((Activity) _context).findViewById(R.id.buttonScrollView);
+        _buttonScrollView = ((Activity) _context).findViewById(R.id.buttonScrollView);
 
         initializeLinearLayout();
 
@@ -90,15 +90,15 @@ public class ListButtonController {
     private void initializeLinearLayout() {
         _logger.Debug("initializeLinearLayout");
 
-        _linearLayoutButtonControl = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutButtonControl);
+        _linearLayoutButtonControl = ((Activity) _context).findViewById(R.id.linearLayoutButtonControl);
         _linearLayout[_controlIndex] = _linearLayoutButtonControl;
-        _linearLayoutButtonMedia = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutButtonMedia);
+        _linearLayoutButtonMedia = ((Activity) _context).findViewById(R.id.linearLayoutButtonMedia);
         _linearLayout[_mediaIndex] = _linearLayoutButtonMedia;
-        _linearLayoutButtonSensors = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutButtonSensors);
+        _linearLayoutButtonSensors = ((Activity) _context).findViewById(R.id.linearLayoutButtonSensors);
         _linearLayout[_sensorIndex] = _linearLayoutButtonSensors;
-        _linearLayoutButtonLiving = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutLiving);
+        _linearLayoutButtonLiving = ((Activity) _context).findViewById(R.id.linearLayoutLiving);
         _linearLayout[_livingIndex] = _linearLayoutButtonLiving;
-        _linearLayoutButtonSocial = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutButtonSocial);
+        _linearLayoutButtonSocial = ((Activity) _context).findViewById(R.id.linearLayoutButtonSocial);
         _linearLayout[_socialIndex] = _linearLayoutButtonSocial;
 
         for (int index = 0; index < LINEAR_LAYOUT_COUNT; index++) {
@@ -109,7 +109,7 @@ public class ListButtonController {
     private void initializeButtonMain() {
         _logger.Debug("initializeButtonMain");
 
-        Button buttonControl = (Button) ((Activity) _context).findViewById(R.id.buttonControl);
+        Button buttonControl = ((Activity) _context).findViewById(R.id.buttonControl);
         buttonControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -117,7 +117,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonMedia = (Button) ((Activity) _context).findViewById(R.id.buttonMedia);
+        Button buttonMedia = ((Activity) _context).findViewById(R.id.buttonMedia);
         buttonMedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -125,7 +125,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonLiving = (Button) ((Activity) _context).findViewById(R.id.buttonLiving);
+        Button buttonLiving = ((Activity) _context).findViewById(R.id.buttonLiving);
         buttonLiving.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -133,7 +133,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonSocial = (Button) ((Activity) _context).findViewById(R.id.buttonSocial);
+        Button buttonSocial = ((Activity) _context).findViewById(R.id.buttonSocial);
         buttonSocial.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -141,7 +141,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonSecurity = (Button) ((Activity) _context).findViewById(R.id.buttonSecurity);
+        Button buttonSecurity = ((Activity) _context).findViewById(R.id.buttonSecurity);
         buttonSecurity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -149,7 +149,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonSensors = (Button) ((Activity) _context).findViewById(R.id.buttonSensors);
+        Button buttonSensors = ((Activity) _context).findViewById(R.id.buttonSensors);
         buttonSensors.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -161,7 +161,7 @@ public class ListButtonController {
     private void initializeButtonControl() {
         _logger.Debug("initializeButtonControl");
 
-        Button buttonSockets = (Button) ((Activity) _context).findViewById(R.id.buttonSockets);
+        Button buttonSockets = ((Activity) _context).findViewById(R.id.buttonSockets);
         buttonSockets.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -169,7 +169,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonSchedules = (Button) ((Activity) _context).findViewById(R.id.buttonSchedules);
+        Button buttonSchedules = ((Activity) _context).findViewById(R.id.buttonSchedules);
         buttonSchedules.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,7 +177,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonTimer = (Button) ((Activity) _context).findViewById(R.id.buttonTimer);
+        Button buttonTimer = ((Activity) _context).findViewById(R.id.buttonTimer);
         buttonTimer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -189,7 +189,7 @@ public class ListButtonController {
     private void initializeButtonMedia() {
         _logger.Debug("initializeButtonMedia");
 
-        Button buttonMovies = (Button) ((Activity) _context).findViewById(R.id.buttonMovies);
+        Button buttonMovies = ((Activity) _context).findViewById(R.id.buttonMovies);
         buttonMovies.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -197,7 +197,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonMediaServer = (Button) ((Activity) _context).findViewById(R.id.buttonMediaServer);
+        Button buttonMediaServer = ((Activity) _context).findViewById(R.id.buttonMediaServer);
         buttonMediaServer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -209,7 +209,7 @@ public class ListButtonController {
     private void initializeButtonSensor() {
         _logger.Debug("initializeButtonSensor");
 
-        Button buttonTemperature = (Button) ((Activity) _context).findViewById(R.id.buttonTemperature);
+        Button buttonTemperature = ((Activity) _context).findViewById(R.id.buttonTemperature);
         buttonTemperature.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -217,7 +217,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonHumidity = (Button) ((Activity) _context).findViewById(R.id.buttonHumidity);
+        Button buttonHumidity = ((Activity) _context).findViewById(R.id.buttonHumidity);
         buttonHumidity.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -225,7 +225,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonAirPressure = (Button) ((Activity) _context).findViewById(R.id.buttonAirPressure);
+        Button buttonAirPressure = ((Activity) _context).findViewById(R.id.buttonAirPressure);
         buttonAirPressure.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -237,7 +237,7 @@ public class ListButtonController {
     private void initializeButtonLiving() {
         _logger.Debug("initializeButtonLiving");
 
-        Button buttonMenu = (Button) ((Activity) _context).findViewById(R.id.buttonMenu);
+        Button buttonMenu = ((Activity) _context).findViewById(R.id.buttonMenu);
         buttonMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -245,7 +245,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonShoppingList = (Button) ((Activity) _context).findViewById(R.id.buttonShoppingList);
+        Button buttonShoppingList = ((Activity) _context).findViewById(R.id.buttonShoppingList);
         buttonShoppingList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -257,7 +257,7 @@ public class ListButtonController {
     private void initializeButtonSocial() {
         _logger.Debug("initializeButtonSocial");
 
-        Button buttonBirthdays = (Button) ((Activity) _context).findViewById(R.id.buttonBirthdays);
+        Button buttonBirthdays = ((Activity) _context).findViewById(R.id.buttonBirthdays);
         buttonBirthdays.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -265,7 +265,7 @@ public class ListButtonController {
             }
         });
 
-        Button buttonGames = (Button) ((Activity) _context).findViewById(R.id.buttonGames);
+        Button buttonGames = ((Activity) _context).findViewById(R.id.buttonGames);
         buttonGames.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

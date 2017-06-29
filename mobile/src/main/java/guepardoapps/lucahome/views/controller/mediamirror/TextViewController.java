@@ -68,7 +68,7 @@ public class TextViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowText);
+        _showContent = ((Activity) _context).findViewById(R.id.imageButtonShowText);
         _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,9 +87,9 @@ public class TextViewController {
             }
         });
 
-        _textDividerTextView = (TextView) ((Activity) _context).findViewById(R.id.dividerText);
-        _editTextSendText = (EditText) ((Activity) _context).findViewById(R.id.editTextSendText);
-        _buttonSendText = (Button) ((Activity) _context).findViewById(R.id.buttonSendText);
+        _textDividerTextView = ((Activity) _context).findViewById(R.id.dividerText);
+        _editTextSendText = ((Activity) _context).findViewById(R.id.editTextSendText);
+        _buttonSendText = ((Activity) _context).findViewById(R.id.buttonSendText);
         _buttonSendText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

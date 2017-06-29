@@ -81,7 +81,7 @@
             android:layout_marginEnd="5dp"
             android:layout_marginStart="5dp"
             android:gravity="start"
-            android:text="Video and volume actions"
+            android:text="Video, radio and volume actions"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/TextIcon" />
 
@@ -153,6 +153,32 @@
                 android:background="@xml/button_blank_white"
                 android:padding="3dp"
                 android:text="-"
+                android:textColor="@color/TextIcon" />
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_play_radio"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="35dp"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="Play_R"
+                android:textColor="@color/TextIcon" />
+
+            <Button
+                android:id="@+id/dialog_map_mediamirror_stop_radio"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:background="@xml/button_blank_white"
+                android:padding="3dp"
+                android:text="Stop_R"
                 android:textColor="@color/TextIcon" />
         </LinearLayout>
 

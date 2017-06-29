@@ -6,8 +6,7 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 import guepardoapps.library.lucahome.common.enums.TemperatureType;
-
-import guepardoapps.library.toolset.common.classes.SerializableTime;
+import guepardoapps.library.openweather.common.classes.SerializableTime;
 
 public class TemperatureDto implements Serializable {
 

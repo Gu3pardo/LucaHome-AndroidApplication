@@ -78,7 +78,7 @@ public class BottomBarController {
             version = "Error loading version...";
         }
 
-        Button buttonVersionInformation = (Button) ((Activity) _context).findViewById(R.id.buttonVersionInformation);
+        Button buttonVersionInformation = ((Activity) _context).findViewById(R.id.buttonVersionInformation);
         buttonVersionInformation.setText(version);
         buttonVersionInformation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +91,7 @@ public class BottomBarController {
     private void initializeImageButton() {
         _logger.Debug("initializeImageButton");
 
-        ImageButton imageButtonChanges = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonChanges);
+        ImageButton imageButtonChanges = ((Activity) _context).findViewById(R.id.imageButtonChanges);
         imageButtonChanges.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -99,7 +99,7 @@ public class BottomBarController {
             }
         });
 
-        ImageButton imageButtonUser = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonUser);
+        ImageButton imageButtonUser = ((Activity) _context).findViewById(R.id.imageButtonUser);
         imageButtonUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,7 +115,7 @@ public class BottomBarController {
             }
         });
 
-        ImageButton imageButtonSettings = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonSettings);
+        ImageButton imageButtonSettings = ((Activity) _context).findViewById(R.id.imageButtonSettings);
         imageButtonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -123,7 +123,7 @@ public class BottomBarController {
             }
         });
 
-        ImageButton imageButtonAbout = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonAbout);
+        ImageButton imageButtonAbout = ((Activity) _context).findViewById(R.id.imageButtonAbout);
         imageButtonAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -71,9 +71,9 @@ public class BottomViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _mediaMirrorBatteryTextView = (TextView) ((Activity) _context).findViewById(R.id.mediaMirrorBatteryTextView);
+        _mediaMirrorBatteryTextView = ((Activity) _context).findViewById(R.id.mediaMirrorBatteryTextView);
 
-        _mediaMirrorSocketSwitch = (Switch) ((Activity) _context).findViewById(R.id.mediaMirrorSocketSwitch);
+        _mediaMirrorSocketSwitch = ((Activity) _context).findViewById(R.id.mediaMirrorSocketSwitch);
         _mediaMirrorSocketSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -99,7 +99,7 @@ public class BottomViewController {
             }
         });
 
-        _versionTextView = (TextView) ((Activity) _context).findViewById(R.id.versionTextView);
+        _versionTextView = ((Activity) _context).findViewById(R.id.versionTextView);
     }
 
     public void onResume() {

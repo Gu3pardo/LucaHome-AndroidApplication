@@ -64,7 +64,7 @@ public class AdvancedViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowAdvanced);
+        _showContent = ((Activity) _context).findViewById(R.id.imageButtonShowAdvanced);
         _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -81,10 +81,10 @@ public class AdvancedViewController {
             }
         });
 
-        _advancedDividerTextView = (TextView) ((Activity) _context).findViewById(R.id.dividerAdvanced);
-        _advancedLinearLayout = (LinearLayout) ((Activity) _context).findViewById(R.id.advancedLinearLayout);
+        _advancedDividerTextView = ((Activity) _context).findViewById(R.id.dividerAdvanced);
+        _advancedLinearLayout = ((Activity) _context).findViewById(R.id.advancedLinearLayout);
 
-        Button buttonReboot = (Button) ((Activity) _context).findViewById(R.id.buttonReboot);
+        Button buttonReboot = ((Activity) _context).findViewById(R.id.buttonReboot);
         buttonReboot.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -102,7 +102,7 @@ public class AdvancedViewController {
             }
         });
 
-        Button buttonShutdown = (Button) ((Activity) _context).findViewById(R.id.buttonShutdown);
+        Button buttonShutdown = ((Activity) _context).findViewById(R.id.buttonShutdown);
         buttonShutdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

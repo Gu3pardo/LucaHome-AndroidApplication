@@ -63,7 +63,7 @@ public class UpdateViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowUpdate);
+        _showContent = ((Activity) _context).findViewById(R.id.imageButtonShowUpdate);
         _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -82,11 +82,11 @@ public class UpdateViewController {
             }
         });
 
-        _updateDividerTextView = (TextView) ((Activity) _context).findViewById(R.id.dividerUpdate);
-        _updateLinearLayoutI = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutUpdateI);
-        _updateLinearLayoutII = (LinearLayout) ((Activity) _context).findViewById(R.id.linearLayoutUpdateII);
+        _updateDividerTextView = ((Activity) _context).findViewById(R.id.dividerUpdate);
+        _updateLinearLayoutI = ((Activity) _context).findViewById(R.id.linearLayoutUpdateI);
+        _updateLinearLayoutII = ((Activity) _context).findViewById(R.id.linearLayoutUpdateII);
 
-        Button buttonUpdateCurrentWeather = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateCurrentWeather);
+        Button buttonUpdateCurrentWeather = ((Activity) _context).findViewById(R.id.buttonUpdateCurrentWeather);
         buttonUpdateCurrentWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -104,7 +104,7 @@ public class UpdateViewController {
             }
         });
 
-        Button buttonUpdateForecastWeather = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateForecastWeather);
+        Button buttonUpdateForecastWeather = ((Activity) _context).findViewById(R.id.buttonUpdateForecastWeather);
         buttonUpdateForecastWeather.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -122,7 +122,7 @@ public class UpdateViewController {
             }
         });
 
-        Button buttonUpdateRaspberryTemperature = (Button) ((Activity) _context)
+        Button buttonUpdateRaspberryTemperature = ((Activity) _context)
                 .findViewById(R.id.buttonUpdateRaspberryTemperature);
         buttonUpdateRaspberryTemperature.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,7 +141,7 @@ public class UpdateViewController {
             }
         });
 
-        Button buttonUpdateIp = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateIp);
+        Button buttonUpdateIp = ((Activity) _context).findViewById(R.id.buttonUpdateIp);
         buttonUpdateIp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -159,7 +159,7 @@ public class UpdateViewController {
             }
         });
 
-        Button buttonUpdateBirthdays = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateBirthdays);
+        Button buttonUpdateBirthdays = ((Activity) _context).findViewById(R.id.buttonUpdateBirthdays);
         buttonUpdateBirthdays.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -177,7 +177,7 @@ public class UpdateViewController {
             }
         });
 
-        Button buttonUpdateCalendar = (Button) ((Activity) _context).findViewById(R.id.buttonUpdateCalendar);
+        Button buttonUpdateCalendar = ((Activity) _context).findViewById(R.id.buttonUpdateCalendar);
         buttonUpdateCalendar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

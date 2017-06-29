@@ -68,7 +68,7 @@ public class WebsiteViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowWebsite);
+        _showContent = ((Activity) _context).findViewById(R.id.imageButtonShowWebsite);
         _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,9 +87,9 @@ public class WebsiteViewController {
             }
         });
 
-        _websiteDividerTextView = (TextView) ((Activity) _context).findViewById(R.id.dividerWebsite);
-        _editTextWebsite = (EditText) ((Activity) _context).findViewById(R.id.editTextSendWebsite);
-        _buttonSendWebsite = (Button) ((Activity) _context).findViewById(R.id.buttonSendWebsite);
+        _websiteDividerTextView = ((Activity) _context).findViewById(R.id.dividerWebsite);
+        _editTextWebsite = ((Activity) _context).findViewById(R.id.editTextSendWebsite);
+        _buttonSendWebsite = ((Activity) _context).findViewById(R.id.buttonSendWebsite);
         _buttonSendWebsite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

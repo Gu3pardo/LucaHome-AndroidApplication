@@ -2,7 +2,7 @@ package guepardoapps.library.lucahome.common.constants;
 
 public class SharedPrefConstants {
     public static final String SHARED_PREF_NAME = "LUCA_HOME";
-    public static final String SHARED_PREF_INSTALLED = "APP_VERSION_3.2.1.170611_INSTALLED";
+    public static final String SHARED_PREF_INSTALLED = "APP_VERSION_3.3.0.170629_INSTALLED";
 
     public static final String DISPLAY_SOCKET_NOTIFICATION = "DISPLAY_SOCKET_NOTIFICATION";
     public static final String DISPLAY_WEATHER_NOTIFICATION = "DISPLAY_WEATHER_NOTIFICATION";
@@ -31,4 +31,6 @@ public class SharedPrefConstants {
     public static final String LAST_LOADED_MOVIE_TIME = "LAST_LOADED_MOVIE_TIME";
     public static final String LAST_LOADED_SETTINGS_TIME = "LAST_LOADED_SETTINGS_TIME";
     public static final String LAST_LOADED_SHOPPING_LIST_TIME = "LAST_LOADED_SHOPPING_LIST_TIME";
+
+    public static final String MOVE_IMAGES = "MOVE_IMAGES";
 }

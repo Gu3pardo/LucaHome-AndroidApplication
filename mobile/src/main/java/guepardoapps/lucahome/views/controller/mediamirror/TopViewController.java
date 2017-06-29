@@ -36,6 +36,7 @@ import guepardoapps.library.lucahome.common.dto.MediaMirrorViewDto;
 import guepardoapps.library.lucahome.common.dto.YoutubeVideoDto;
 import guepardoapps.library.lucahome.common.enums.MediaServerAction;
 import guepardoapps.library.lucahome.common.enums.MediaServerSelection;
+import guepardoapps.library.lucahome.common.enums.RadioStreams;
 import guepardoapps.library.lucahome.common.tools.LucaHomeLogger;
 import guepardoapps.library.lucahome.controller.LucaDialogController;
 import guepardoapps.library.lucahome.controller.MediaMirrorController;
@@ -100,6 +101,11 @@ public class TopViewController {
         }
     };
 
+    private boolean _sendNewRadioStream = true;
+    private Spinner _radioStreamSelection;
+    private ArrayAdapter<String> _radioStreamDataAdapter;
+    private OnItemSelectedListener _radioStreamOnItemSelectedListener;
+
     private TextView _sleepTimerTextView;
     private int _sleepTimerSec = -1;
     private Handler _sleepTimerHandler = new Handler();
@@ -135,6 +141,7 @@ public class TopViewController {
         @Override
         public void onReceive(Context context, Intent intent) {
             MediaMirrorViewDto mediaMirrorViewDto = (MediaMirrorViewDto) intent.getSerializableExtra(Bundles.MEDIAMIRROR_VIEW_DTO);
+            _sendNewRadioStream = false;
 
             _youtubePlayTimeHandler.removeCallbacks(_youtubePlayTimeRunnable);
 
@@ -152,6 +159,8 @@ public class TopViewController {
                 task.execute(url);
 
                 boolean isYoutubePlaying = _mediaMirrorViewDto.IsYoutubePlaying();
+                boolean isRadioStreamPlaying = _mediaMirrorViewDto.IsRadioStreamPlaying();
+
                 if (isYoutubePlaying) {
                     int youtubeCurrentTimeSec = _mediaMirrorViewDto.GetYoutubeVideoCurrentPlayTime();
                     if (youtubeCurrentTimeSec == -1) {
@@ -196,6 +205,14 @@ public class TopViewController {
                     _seekBarEnabled = true;
 
                     _youtubePlayTimeHandler.postDelayed(_youtubePlayTimeRunnable, 15 * Timeouts.COUNTDOWN);
+                } else if (isRadioStreamPlaying) {
+                    RadioStreams radioStream = RadioStreams.GetById(_mediaMirrorViewDto.GetRadioStreamId());
+                    _radioStreamSelection.setOnItemSelectedListener(null);
+                    _radioStreamSelection.setSelection(_radioStreamDataAdapter.getPosition(radioStream.GetTitle()));
+                    _radioStreamSelection.setOnItemSelectedListener(_radioStreamOnItemSelectedListener);
+
+                    _seekBarYoutubeDuration.setVisibility(View.INVISIBLE);
+                    _youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);
                 } else {
                     _seekBarYoutubeDuration.setVisibility(View.INVISIBLE);
                     _youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);
@@ -221,6 +238,8 @@ public class TopViewController {
                 _logger.Warn("Received null MediaMirrorViewDto...!");
                 Toasty.warning(_context, "Received null MediaMirrorViewDto...!", Toast.LENGTH_LONG).show();
             }
+
+            _sendNewRadioStream = true;
         }
     };
 
@@ -236,7 +255,7 @@ public class TopViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        Spinner mediaMirrorSelectionSpinner = (Spinner) ((Activity) _context).findViewById(R.id.mediaMirrorSelectionSpinner);
+        Spinner mediaMirrorSelectionSpinner = ((Activity) _context).findViewById(R.id.mediaMirrorSelectionSpinner);
         final ArrayList<String> serverLocations = new ArrayList<>();
         for (MediaServerSelection entry : MediaServerSelection.values()) {
             if (entry.GetId() > 0) {
@@ -262,10 +281,10 @@ public class TopViewController {
             }
         });
 
-        _youtubeImageView = (ImageView) ((Activity) _context).findViewById(R.id.youtubeVideoImageView);
-        _youtubeIdTextView = (TextView) ((Activity) _context).findViewById(R.id.youtubeIdTextView);
+        _youtubeImageView = ((Activity) _context).findViewById(R.id.youtubeVideoImageView);
+        _youtubeIdTextView = ((Activity) _context).findViewById(R.id.youtubeIdTextView);
 
-        _seekBarYoutubeDuration = (SeekBar) ((Activity) _context).findViewById(R.id.seekBarYoutubeDuration);
+        _seekBarYoutubeDuration = ((Activity) _context).findViewById(R.id.seekBarYoutubeDuration);
         _seekBarYoutubeDuration.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
@@ -301,9 +320,9 @@ public class TopViewController {
             }
         });
 
-        _youtubeVideoTimeTextView = (TextView) ((Activity) _context).findViewById(R.id.youtubeVideoTimeTextView);
+        _youtubeVideoTimeTextView = ((Activity) _context).findViewById(R.id.youtubeVideoTimeTextView);
 
-        ImageButton imageButtonVideoPlay = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonVideoPlay);
+        ImageButton imageButtonVideoPlay = ((Activity) _context).findViewById(R.id.imageButtonVideoPlay);
         imageButtonVideoPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -325,7 +344,7 @@ public class TopViewController {
                         "");
             }
         });
-        ImageButton imageButtonVideoPause = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonVideoPause);
+        ImageButton imageButtonVideoPause = ((Activity) _context).findViewById(R.id.imageButtonVideoPause);
         imageButtonVideoPause.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -347,7 +366,7 @@ public class TopViewController {
                         "");
             }
         });
-        ImageButton imageButtonVideoStop = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonVideoStop);
+        ImageButton imageButtonVideoStop = ((Activity) _context).findViewById(R.id.imageButtonVideoStop);
         imageButtonVideoStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -370,9 +389,85 @@ public class TopViewController {
             }
         });
 
-        _volumeTextView = (TextView) ((Activity) _context).findViewById(R.id.volumeTextView);
+        _sendNewRadioStream = false;
+        _radioStreamSelection = ((Activity) _context).findViewById(R.id.radioStreamSelectionSpinner);
+        final ArrayList<String> radioStreams = new ArrayList<>();
+        for (RadioStreams entry : RadioStreams.values()) {
+            if (entry.GetId() > 1) {
+                radioStreams.add(entry.GetTitle());
+            }
+        }
+        _radioStreamDataAdapter = new ArrayAdapter<>(
+                _context,
+                android.R.layout.simple_spinner_item,
+                radioStreams);
+        _radioStreamDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        _radioStreamSelection.setAdapter(_radioStreamDataAdapter);
+        _radioStreamOnItemSelectedListener = new OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedRadioStream = radioStreams.get(position);
+                _logger.Debug("selectedRadioStream is " + selectedRadioStream);
 
-        Button buttonVolumeIncrease = (Button) ((Activity) _context).findViewById(R.id.buttonVolumeIncrease);
+                RadioStreams radioStream = RadioStreams.GetByTitle(selectedRadioStream);
+                _logger.Debug("Found radioStream is " + radioStream.toString());
+
+                if (radioStream == RadioStreams.NULL || radioStream == RadioStreams.DEFAULT) {
+                    radioStream = RadioStreams.BAYERN_3;
+                }
+                _logger.Debug(String.format("Selected Radio Stream is %s", radioStream));
+
+                if (!_sendNewRadioStream) {
+                    _logger.Debug("Not sending new radio stream yet!");
+                    return;
+                }
+
+                try {
+                    _mediaMirrorController.SendCommand(
+                            _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                            MediaServerAction.SHOW_RADIO_STREAM.toString(),
+                            String.valueOf(radioStream.GetId()));
+                } catch (Exception exception) {
+                    _logger.Error(exception.toString());
+                    Toasty.error(_context, "An error appeared!", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        };
+        _radioStreamSelection.setOnItemSelectedListener(_radioStreamOnItemSelectedListener);
+        _sendNewRadioStream = true;
+
+        ImageButton radioStreamPlay = ((Activity) _context).findViewById(R.id.imageButtonRadioStreamPlay);
+        radioStreamPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _logger.Debug("_radioStreamPlay onClick");
+
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.PLAY_RADIO_STREAM.toString(),
+                        "");
+            }
+        });
+        ImageButton radioStreamStop = ((Activity) _context).findViewById(R.id.imageButtonRadioStreamStop);
+        radioStreamStop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _logger.Debug("_radioStreamStop onClick");
+
+                _mediaMirrorController.SendCommand(
+                        _mediaMirrorViewDto.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.STOP_RADIO_STREAM.toString(),
+                        "");
+            }
+        });
+
+        _volumeTextView = ((Activity) _context).findViewById(R.id.volumeTextView);
+
+        Button buttonVolumeIncrease = ((Activity) _context).findViewById(R.id.buttonVolumeIncrease);
         buttonVolumeIncrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -395,7 +490,7 @@ public class TopViewController {
             }
         });
 
-        Button buttonVolumeDecrease = (Button) ((Activity) _context).findViewById(R.id.buttonVolumeDecrease);
+        Button buttonVolumeDecrease = ((Activity) _context).findViewById(R.id.buttonVolumeDecrease);
         buttonVolumeDecrease.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -418,7 +513,7 @@ public class TopViewController {
             }
         });
 
-        _sleepTimerTextView = (TextView) ((Activity) _context).findViewById(R.id.sleepTimerTextView);
+        _sleepTimerTextView = ((Activity) _context).findViewById(R.id.sleepTimerTextView);
     }
 
     public void onResume() {

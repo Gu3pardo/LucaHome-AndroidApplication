@@ -141,9 +141,9 @@ public class SecurityView extends Activity {
         _receiverController = new ReceiverController(_context);
         _serviceController = new ServiceController(_context);
 
-        _motionCameraState = (TextView) findViewById(R.id.motionStateText);
+        _motionCameraState = findViewById(R.id.motionStateText);
 
-        _motionCamera = (WebView) findViewById(R.id.webViewCamera);
+        _motionCamera = findViewById(R.id.webViewCamera);
         final Activity activity = this;
         _motionCamera.setWebChromeClient(new WebChromeClient() {
             @SuppressWarnings("deprecation")
@@ -162,9 +162,9 @@ public class SecurityView extends Activity {
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(false);
 
-        _listView = (ListView) findViewById(R.id.motionActionsListView);
+        _listView = findViewById(R.id.motionActionsListView);
 
-        _buttonMotionHandle = (Button) findViewById(R.id.buttonMotionHandle);
+        _buttonMotionHandle = findViewById(R.id.buttonMotionHandle);
         _buttonMotionHandle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -196,7 +196,7 @@ public class SecurityView extends Activity {
             }
         });
 
-        _buttonSetMotionControl = (Button) findViewById(R.id.buttonSetMotionControl);
+        _buttonSetMotionControl = findViewById(R.id.buttonSetMotionControl);
         _buttonSetMotionControl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -70,7 +70,7 @@ public class ScreenViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
-        _showContent = (ImageButton) ((Activity) _context).findViewById(R.id.imageButtonShowScreen);
+        _showContent = ((Activity) _context).findViewById(R.id.imageButtonShowScreen);
         _showContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,12 +87,12 @@ public class ScreenViewController {
             }
         });
 
-        _screenBrightnessTextView = (TextView) ((Activity) _context).findViewById(R.id.textViewBrightnessPercent);
+        _screenBrightnessTextView = ((Activity) _context).findViewById(R.id.textViewBrightnessPercent);
 
-        _dividerBrightnessTextView = (TextView) ((Activity) _context).findViewById(R.id.dividerScreen);
-        _brightnessLinearLayout = (LinearLayout) ((Activity) _context).findViewById(R.id.brightnessLinearLayout);
+        _dividerBrightnessTextView = ((Activity) _context).findViewById(R.id.dividerScreen);
+        _brightnessLinearLayout = ((Activity) _context).findViewById(R.id.brightnessLinearLayout);
 
-        Button buttonScreenBrightnessIncrease = (Button) ((Activity) _context)
+        Button buttonScreenBrightnessIncrease = ((Activity) _context)
                 .findViewById(R.id.buttonScreenBrightnessIncrease);
         buttonScreenBrightnessIncrease.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,7 +115,7 @@ public class ScreenViewController {
             }
         });
 
-        Button buttonScreenBrightnessDecrease = (Button) ((Activity) _context)
+        Button buttonScreenBrightnessDecrease = ((Activity) _context)
                 .findViewById(R.id.buttonScreenBrightnessDecrease);
         buttonScreenBrightnessDecrease.setOnClickListener(new View.OnClickListener() {
             @Override
