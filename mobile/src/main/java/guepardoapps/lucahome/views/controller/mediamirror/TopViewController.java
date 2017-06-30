@@ -207,9 +207,11 @@ public class TopViewController {
                     _youtubePlayTimeHandler.postDelayed(_youtubePlayTimeRunnable, 15 * Timeouts.COUNTDOWN);
                 } else if (isRadioStreamPlaying) {
                     RadioStreams radioStream = RadioStreams.GetById(_mediaMirrorViewDto.GetRadioStreamId());
+                    _sendNewRadioStream = false;
                     _radioStreamSelection.setOnItemSelectedListener(null);
                     _radioStreamSelection.setSelection(_radioStreamDataAdapter.getPosition(radioStream.GetTitle()));
                     _radioStreamSelection.setOnItemSelectedListener(_radioStreamOnItemSelectedListener);
+                    _sendNewRadioStream = true;
 
                     _seekBarYoutubeDuration.setVisibility(View.INVISIBLE);
                     _youtubeVideoTimeTextView.setVisibility(View.INVISIBLE);

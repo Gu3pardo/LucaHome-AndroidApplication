@@ -7,8 +7,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 30300
-        versionName "3.3.0.170629"
+        versionCode 30301
+        versionName "3.3.1.170630"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -45,7 +45,7 @@ dependencies {
     compile 'com.android.support:support-compat:26+'
     compile 'com.google.android.support:wearable:2.0.3'
     provided 'com.google.android.wearable:wearable:2.0.3'
-    compile 'com.google.android.gms:play-services-wearable:11.0.1'
+    compile 'com.google.android.gms:play-services-wearable:11.0.2'
     compile 'com.github.GrenderG:Toasty:1.2.5'
     compile 'com.github.matecode:Snacky:1.0.2'
     compile 'com.baoyz.pullrefreshlayout:library:1.2.0'

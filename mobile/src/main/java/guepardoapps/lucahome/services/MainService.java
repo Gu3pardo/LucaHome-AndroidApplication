@@ -846,6 +846,10 @@ public class MainService extends Service {
                             sendSocketsToWear();
                             updateDownloadCount();
 
+                            if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.DISPLAY_SOCKET_NOTIFICATION)) {
+                                _notificationController.CreateSocketNotification(_wirelessSocketList);
+                            }
+
                             _scheduleList = _databaseController.GetScheduleList(_wirelessSocketList);
                             _broadcastController.SendSerializableArrayBroadcast(
                                     Broadcasts.UPDATE_SCHEDULE_LIST,
@@ -870,12 +874,33 @@ public class MainService extends Service {
                             break;
                         case "ShoppingList":
                             _shoppingList = _databaseController.GetShoppingList();
-                            _broadcastController.SendSerializableArrayBroadcast(
-                                    Broadcasts.UPDATE_SHOPPING_LIST,
-                                    new String[]{Bundles.SHOPPING_LIST},
-                                    new Object[]{_shoppingList});
-                            sendShoppingListToWear();
-                            updateDownloadCount();
+                            boolean shoppingNeedsUpdate = false;
+
+                            if (_shoppingList != null) {
+                                for (int index = 0; index < _shoppingList.getSize(); index++) {
+                                    ShoppingEntryDto entry = _shoppingList.getValue(index);
+                                    if (entry.IsBought()) {
+                                        _serviceController.StartRestService(
+                                                Bundles.SHOPPING_LIST,
+                                                entry.GetCommandDelete(),
+                                                "");
+                                        shoppingNeedsUpdate = true;
+                                    }
+                                }
+                            }
+
+                            if (shoppingNeedsUpdate) {
+                                _downloadShoppingListRunnable.run();
+                            } else {
+                                _broadcastController.SendSerializableArrayBroadcast(
+                                        Broadcasts.UPDATE_SHOPPING_LIST,
+                                        new String[]{Bundles.SHOPPING_LIST},
+                                        new Object[]{_shoppingList});
+
+                                sendShoppingListToWear();
+                                updateDownloadCount();
+                            }
+
                             break;
                         default:
                             _logger.Warn(String.format(Locale.getDefault(), "ChangeEntry %s is not supported", changeEntry));
@@ -2174,6 +2199,7 @@ public class MainService extends Service {
                     Broadcasts.COMMAND,
                     new String[]{Bundles.COMMAND, Bundles.NAVIGATE_DATA},
                     new Object[]{Command.NAVIGATE, NavigationData.FINISH});
+            stopSelf();
         }
     };
 
@@ -2183,6 +2209,14 @@ public class MainService extends Service {
         if (_logger != null) {
             _logger.Debug("onCreate");
         }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (_logger == null) {
+            _logger = new LucaHomeLogger(TAG);
+        }
+        _logger.Debug("onStartCommand");
 
         if (!_isInitialized) {
             _logger = new LucaHomeLogger(TAG);
@@ -2224,22 +2258,8 @@ public class MainService extends Service {
             _progress = 0;
             _downloadCount = Constants.DOWNLOAD_STEPS;
 
-            boot();
-
-            if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USE_BEACONS)) {
-                _beaconController.StartScanning();
-            }
-
             _isInitialized = true;
         }
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (_logger == null) {
-            _logger = new LucaHomeLogger(TAG);
-        }
-        _logger.Debug("onStartCommand");
 
         try {
             Bundle data = intent.getExtras();
@@ -2268,6 +2288,10 @@ public class MainService extends Service {
 
         checkDatabase();
         checkSleepNotificationFlag();
+
+        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.USE_BEACONS)) {
+            _beaconController.StartScanning();
+        }
 
         return Service.START_STICKY;
     }
