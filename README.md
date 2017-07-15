@@ -5,8 +5,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
-[![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/Gu3pardo/LucaHome-AndroidApplication)
-[![Version](https://img.shields.io/badge/version-v3.3.1.170630-blue.svg)](https://github.com/Gu3pardo/LucaHome-AndroidApplication)
+[![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
+[![Version](https://img.shields.io/badge/version-v3.3.1.170630-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
 
 Part of the LucaHome-Project
 Containing the shared library LucaHome, a wearable project and the main android client application.
@@ -15,22 +15,22 @@ Android client to remotely control sockets, mediaserver, view temperature, share
 
 # Screenshots
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_001.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_001.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_002.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_002.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_003.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_003.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_004.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_004.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_005.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_005.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_006.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_006.png)
 ___________________________________
 
-![alt tag](https://github.com/Gu3pardo/LucaHome-AndroidApplication/blob/master/screenshots/view_007.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_007.png)
