@@ -1,62 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="guepardoapps.lucahome">
-
-    <uses-permission android:name="com.google.android.permission.PROVIDE_BACKGROUND" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
-    <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-
     <application
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="guepardoapps.lucahome.views.BootView"
-            android:label="@string/app_name">
+            android:name=".views.BirthdayActivity"
+            android:label="@string/title_activity_birthday"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.BirthdayEditActivity"
+            android:label="@string/title_activity_birthday_edit"
+            android:parentActivityName=".views.BirthdayActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.BirthdayActivity" />
+        </activity>
+        <activity android:name=".views.BootActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="guepardoapps.lucahome.views.BirthdayView" />
-        <activity android:name="guepardoapps.lucahome.views.ChangeView" />
-        <activity android:name="guepardoapps.lucahome.views.ForecastWeatherView" />
-        <activity android:name="guepardoapps.lucahome.views.GameView" />
-        <activity android:name="guepardoapps.lucahome.views.HomeView" />
-        <activity android:name="guepardoapps.lucahome.views.InformationView" />
-        <activity android:name="guepardoapps.lucahome.views.MenuView" />
-        <activity android:name="guepardoapps.lucahome.views.MovieView" />
-        <activity android:name="guepardoapps.lucahome.views.ScheduleView" />
-        <activity android:name="guepardoapps.lucahome.views.SettingsView" />
-        <activity android:name="guepardoapps.lucahome.views.MediaMirrorView" />
-        <activity android:name="guepardoapps.lucahome.views.SecurityView" />
-        <activity android:name="guepardoapps.lucahome.views.SensorAirPressureView" />
-        <activity android:name="guepardoapps.lucahome.views.SensorHumidityView" />
-        <activity android:name="guepardoapps.lucahome.views.SensorTemperatureView" />
-        <activity android:name="guepardoapps.lucahome.views.ShoppingListView" />
-        <activity android:name="guepardoapps.lucahome.views.SocketView" />
-        <activity android:name="guepardoapps.lucahome.views.TimerView" />
+        <activity
+            android:name=".views.CoinActivity"
+            android:label="@string/title_activity_coin"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.CoinEditActivity"
+            android:label="@string/title_activity_coin_edit"
+            android:parentActivityName=".views.CoinActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.CoinActivity" />
+        </activity>
+        <activity
+            android:name=".views.ForecastWeatherActivity"
+            android:label="@string/title_activity_forecast_weather"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.LibraryActivity"
+            android:label="@string/title_activity_library"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity android:name=".views.LoginActivity" />
+        <activity android:name=".views.MainActivity" />
+        <activity
+            android:name=".views.MediaMirrorActivity"
+            android:label="@string/title_activity_mediamirror"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.MenuActivity"
+            android:label="@string/title_activity_menu"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.MenuEditActivity"
+            android:label="@string/title_activity_menu_edit"
+            android:parentActivityName=".views.MenuActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MenuActivity" />
+        </activity>
+        <activity
+            android:name=".views.MovieActivity"
+            android:label="@string/title_activity_movie"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.MovieEditActivity"
+            android:label="@string/title_activity_movie_edit"
+            android:parentActivityName=".views.MovieActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MovieActivity" />
+        </activity>
+        <activity
+            android:name=".views.ScheduleActivity"
+            android:label="@string/title_activity_schedule"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.ScheduleEditActivity"
+            android:label="@string/title_activity_schedule_edit"
+            android:parentActivityName=".views.ScheduleActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.ScheduleActivity" />
+        </activity>
+        <activity
+            android:name=".views.SecurityActivity"
+            android:label="@string/title_activity_security"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.ShoppingListActivity"
+            android:label="@string/title_activity_shopping_list"
+            android:parentActivityName=".views.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.ShoppingListEditActivity"
+            android:label="@string/title_activity_shopping_list_edit"
+            android:parentActivityName=".views.ShoppingListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.ShoppingListActivity" />
+        </activity>
+        <activity
+            android:name=".views.TimerActivity"
+            android:label="@string/title_activity_timer"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.TimerEditActivity"
+            android:label="@string/title_activity_timer_edit"
+            android:parentActivityName=".views.TimerActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.TimerActivity" />
+        </activity>
+        <activity
+            android:name=".views.WirelessSocketActivity"
+            android:label="@string/title_activity_wireless_socket"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.WirelessSocketEditActivity"
+            android:label="@string/title_activity_wireless_socket_edit"
+            android:parentActivityName=".views.WirelessSocketActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.WirelessSocketActivity" />
+        </activity>
 
         <receiver
-            android:name="guepardoapps.lucahome.receiver.BootReceiver"
+            android:name=".receiver.BootReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -64,70 +207,22 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name="guepardoapps.lucahome.receiver.WIFIReceiver"
+            android:name=".receiver.SocketActionReceiver"
+            android:enabled="true"
+            android:exported="false" />
+        <receiver
+            android:name=".receiver.WIFIReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.net.wifi.supplicant.CONNECTION_CHANGE" />
             </intent-filter>
         </receiver>
-        <receiver
-            android:name="guepardoapps.library.lucahome.receiver.notifications.CameraReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name="guepardoapps.library.lucahome.receiver.notifications.HeatingReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name="guepardoapps.library.lucahome.receiver.notifications.SocketActionReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver android:name="org.altbeacon.beacon.startup.StartupBroadcastReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
-                <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
-            </intent-filter>
-        </receiver>
 
         <service
-            android:name="org.altbeacon.beacon.service.BeaconService"
+            android:name=".service.MainService"
             android:enabled="true"
-            android:exported="false"
-            android:isolatedProcess="false"
-            android:label="beacon" />
-        <service
-            android:name="org.altbeacon.beacon.BeaconIntentProcessor"
-            android:enabled="true"
-            android:exported="false" />
-        <service
-            android:name="guepardoapps.library.toolset.beacon.BeaconService"
-            android:enabled="true" />
-        <service
-            android:name="guepardoapps.library.lucahome.services.RESTService"
-            android:enabled="true" />
-        <service
-            android:name="guepardoapps.library.lucahome.services.sockets.SocketActionService"
-            android:enabled="true" />
-        <service android:name="guepardoapps.library.lucahome.services.wearcontrol.PhoneMessageListenerService">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-            </intent-filter>
-        </service>
-        <service
-            android:name="guepardoapps.library.lucahome.services.wearcontrol.WearMessageService"
-            android:enabled="true" />
-        <service
-            android:name="guepardoapps.lucahome.services.ControlServiceStateService"
-            android:enabled="true" />
-        <service
-            android:name="guepardoapps.lucahome.services.MainService"
-            android:enabled="true" />
-
-        <meta-data
-            android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:exported="true" />
     </application>
 
 </manifest>

@@ -1,3 +1,2 @@
-include ':mobile', ':wear', ':lib_lucahome', ':lib_openweather', ':lib_toolset'
+include ':mobile', ':common', ':basic', ':data', ':lib_openweather'
 project(':lib_openweather').projectDir = new File(settingsDir, '../OpenWeather/lib_openweather')
-project(':lib_toolset').projectDir = new File(settingsDir, '../Toolset/lib_toolset')

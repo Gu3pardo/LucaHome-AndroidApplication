@@ -1,0 +1,30 @@
+<preference-headers xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- These settings headers are only used on tablets. -->
+
+    <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$UserPreferenceFragment"
+        android:icon="@mipmap/ic_account_circle_black_48dp"
+        android:title="@string/pref_header_user" />
+
+    <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$NetworkPreferenceFragment"
+        android:icon="@mipmap/ic_network_check_black_48dp"
+        android:title="@string/pref_header_network" />
+
+    <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$NotificationPreferenceFragment"
+        android:icon="@mipmap/ic_notifications_black_48dp"
+        android:title="@string/pref_header_notifications" />
+
+    <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$OpenWeatherPreferenceFragment"
+        android:icon="@mipmap/ic_satellite_black_48dp"
+        android:title="@string/pref_header_open_weather" />
+
+    <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$WirelessSocketPreferenceFragment"
+        android:icon="@mipmap/ic_lightbulb_outline_black_48dp"
+        android:title="@string/pref_header_wireless_socket" />
+
+</preference-headers>

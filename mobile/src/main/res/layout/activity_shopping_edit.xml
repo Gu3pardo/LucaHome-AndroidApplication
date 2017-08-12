@@ -1,0 +1,120 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardview_shadow_start_color"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="10dp"
+    tools:context="guepardoapps.lucahome.views.ShoppingListEditActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/cardview_light_background"
+            card_view:cardCornerRadius="5dp">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@color/colorPrimary"
+                android:padding="5dp">
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/shoppingName_TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/shopping_edit_name_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_shopping_name"
+                        android:inputType="textAutoComplete"
+                        android:maxLines="1"
+                        android:nextFocusDown="@+id/shopping_entry_group_select"
+                        android:nextFocusRight="@+id/shopping_entry_group_select"
+                        android:textColor="@color/Black" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <Spinner
+                    android:id="@+id/shopping_entry_group_select"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/shoppingName_TextInputLayout"
+                    android:nextFocusDown="@+id/floating_action_button_increase_quantity"
+                    android:nextFocusRight="@+id/floating_action_button_increase_quantity" />
+
+                <TextView
+                    android:id="@+id/shopping_entry_quantity_textview"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/shopping_entry_group_select"
+                    android:textColor="@color/Black" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/floating_action_button_increase_quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/shopping_entry_quantity_textview"
+                    android:layout_margin="5dp"
+                    android:layout_toStartOf="@+id/floating_action_button_decrease_quantity"
+                    android:nextFocusDown="@+id/floating_action_button_decrease_quantity"
+                    android:nextFocusRight="@+id/floating_action_button_decrease_quantity"
+                    app:layout_anchor="@id/shopping_entry_quantity_textview"
+                    app:layout_anchorGravity="bottom"
+                    app:srcCompat="@mipmap/ic_add_white_48dp" />
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/floating_action_button_decrease_quantity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/shopping_entry_quantity_textview"
+                    android:layout_margin="5dp"
+                    android:nextFocusDown="@+id/save_shopping_edit_button"
+                    android:nextFocusRight="@+id/save_shopping_edit_button"
+                    app:layout_anchor="@id/shopping_entry_quantity_textview"
+                    app:layout_anchorGravity="bottom|right|end"
+                    app:srcCompat="@mipmap/ic_remove_circle_outline_white_48dp" />
+
+                <com.rey.material.widget.Button
+                    android:id="@+id/save_shopping_edit_button"
+                    style="?android:textAppearanceSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_marginTop="16dp"
+                    android:text="@string/save"
+                    android:textColor="@color/colorTextIcon"
+                    android:textStyle="bold" />
+
+            </RelativeLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_shopping_edit"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+    </android.support.design.widget.AppBarLayout>
+
+</android.support.design.widget.CoordinatorLayout>
