@@ -13,12 +13,15 @@ import android.widget.TextView;
 
 import java.util.Locale;
 
+import com.rey.material.app.Dialog;
+import com.rey.material.app.ThemeManager;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
-import guepardoapps.lucahome.data.service.BirthdayService;
+import guepardoapps.lucahome.common.service.BirthdayService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.BirthdayEditActivity;
 
@@ -36,6 +39,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
 
     private Context _context;
 
+    private BirthdayService _birthdayService;
     private NavigationService _navigationService;
 
     private static LayoutInflater _inflater = null;
@@ -50,6 +54,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
 
         _listViewItems = listViewItems;
 
+        _birthdayService = BirthdayService.getInstance();
         _navigationService = NavigationService.getInstance();
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -90,7 +95,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
 
         holder._titleText.setText(birthday.GetName());
         holder._dateText.setText(birthday.GetDate().DDMMYYYY());
-        holder._ageTextView.setText(birthday.GetAge());
+        holder._ageTextView.setText(String.format(Locale.getDefault(), "%d years", birthday.GetAge()));
 
         if (birthday.HasBirthday()) {
             holder._titleText.setBackgroundColor(_context.getResources().getColor(R.color.LightRed));
@@ -110,7 +115,33 @@ public class BirthdayListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 _logger.Debug("_deleteButton setOnClickListener onClick");
-                /*TODO handle delete birthday*/
+
+                boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
+
+                final Dialog deleteDialog = new Dialog(_context);
+                deleteDialog
+                        .title(String.format(Locale.getDefault(), "Delete %s?", birthday.GetName()))
+                        .positiveAction("Delete")
+                        .negativeAction("Cancel")
+                        .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
+                        .setCancelable(true);
+
+                deleteDialog.positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        _birthdayService.DeleteBirthday(birthday);
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.show();
             }
         });
 

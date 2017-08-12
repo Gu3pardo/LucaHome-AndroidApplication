@@ -30,8 +30,8 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.ShoppingEntry;
 import guepardoapps.lucahome.common.dto.ShoppingEntryDto;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
-import guepardoapps.lucahome.data.service.ShoppingListService;
-import guepardoapps.lucahome.data.service.broadcasts.content.ObjectChangeFinishedContent;
+import guepardoapps.lucahome.common.service.ShoppingListService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class ShoppingListEditActivity extends AppCompatActivity {

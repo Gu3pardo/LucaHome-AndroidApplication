@@ -214,8 +214,7 @@ public final class JsonDataToMapContentConverter {
                         socket,
                         scheduleList,
                         temperature,
-                        visibility,
-                        null);
+                        visibility);
                 _logger.Debug(String.format(Locale.getDefault(), "New MapContentDto %s", newValue));
 
                 return newValue;

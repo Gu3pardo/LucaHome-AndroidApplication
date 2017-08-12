@@ -10,13 +10,16 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.rey.material.app.Dialog;
+import com.rey.material.app.ThemeManager;
+
 import java.util.Locale;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaTimer;
-import guepardoapps.lucahome.data.service.ScheduleService;
+import guepardoapps.lucahome.common.service.ScheduleService;
 
 public class TimerListViewAdapter extends BaseAdapter {
     private class Holder {
@@ -31,6 +34,8 @@ public class TimerListViewAdapter extends BaseAdapter {
     private static final String TAG = TimerListViewAdapter.class.getSimpleName();
     private Logger _logger;
 
+    private Context _context;
+
     private ScheduleService _scheduleService;
 
     private static LayoutInflater _inflater = null;
@@ -42,6 +47,8 @@ public class TimerListViewAdapter extends BaseAdapter {
         _logger.Debug("Created...");
 
         _listViewItems = listViewItems;
+
+        _context = context;
 
         _scheduleService = ScheduleService.getInstance();
 
@@ -92,7 +99,33 @@ public class TimerListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 _logger.Debug("setOnClickListener onClick");
-                _scheduleService.DeleteTimer(timer);
+
+                boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
+
+                final Dialog deleteDialog = new Dialog(_context);
+                deleteDialog
+                        .title(String.format(Locale.getDefault(), "Delete %s?", timer.GetName()))
+                        .positiveAction("Delete")
+                        .negativeAction("Cancel")
+                        .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
+                        .setCancelable(true);
+
+                deleteDialog.positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        _scheduleService.DeleteTimer(timer);
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.show();
             }
         });
 

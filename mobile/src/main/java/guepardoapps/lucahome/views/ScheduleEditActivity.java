@@ -35,9 +35,9 @@ import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.dto.ScheduleDto;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
-import guepardoapps.lucahome.data.service.ScheduleService;
-import guepardoapps.lucahome.data.service.WirelessSocketService;
-import guepardoapps.lucahome.data.service.broadcasts.content.ObjectChangeFinishedContent;
+import guepardoapps.lucahome.common.service.ScheduleService;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class ScheduleEditActivity extends AppCompatActivity {

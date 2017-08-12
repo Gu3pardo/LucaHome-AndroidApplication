@@ -59,13 +59,11 @@
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/mediamirror_off.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/mediamirror_on.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/milk.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/movie_hd.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/noodles.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/oil_vinegar.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/printer_off.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/printer_on.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/salad.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/scheduler_hd.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/shopping.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/socket.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/sound_off.png" charset="windows-1251" />
@@ -78,9 +76,10 @@
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/vegetables.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/watering_off.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/watering_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/xbt.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/xmr.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/zec.png" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/dialog_list.xml" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/dialog_webview.xml" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/data/src/main/java/guepardoapps/lucahome/data/controller/DownloadController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/guepardoapps/lucahome/receiver/SocketActionReceiver.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/common/classes/SerializableList.java" charset="windows-1251" />

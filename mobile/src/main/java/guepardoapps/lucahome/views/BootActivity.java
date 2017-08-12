@@ -18,7 +18,7 @@ import de.mateware.snacky.Snacky;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.data.service.UserService;
+import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.service.MainService;
 import guepardoapps.lucahome.service.NavigationService;
 
@@ -100,7 +100,7 @@ public class BootActivity extends AppCompatActivity {
 
             if (progress != null) {
                 _percentProgressBar.setProgress((int) progress.DownloadProgress);
-                _percentProgressTextView.setText(String.format(Locale.getDefault(), "%.2f %%", progress.DownloadProgress));
+                _percentProgressTextView.setText(String.format(Locale.getDefault(), "%.0f %%", progress.DownloadProgress));
 
                 if (progress.DownloadFinished) {
                     NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(BootActivity.this, MainActivity.class);

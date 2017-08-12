@@ -7,13 +7,13 @@ import java.io.Serializable;
 public enum Weekday implements Serializable {
 
     NULL("NULL", -1, "", ""),
-    SU("SU", 0, "Sunday", "Sonntag"),
-    MO("MO", 1, "Monday", "Montag"),
-    TU("TU", 2, "Tuesday", "Dienstag"),
-    WE("WE", 3, "Wednesday", "Mittwoch"),
-    TH("TH", 4, "Thursday", "Donnerstag"),
-    FR("FR", 5, "Friday", "Freitag"),
-    SA("SA", 6, "Saturday", "Samstag");
+    SU("SU", 0, "sunday", "Sonntag"),
+    MO("MO", 1, "monday", "Montag"),
+    TU("TU", 2, "tuesday", "Dienstag"),
+    WE("WE", 3, "wednesday", "Mittwoch"),
+    TH("TH", 4, "thursday", "Donnerstag"),
+    FR("FR", 5, "friday", "Freitag"),
+    SA("SA", 6, "saturday", "Samstag");
 
     private String _shortStringDay;
     private int _intDay;
@@ -59,7 +59,7 @@ public enum Weekday implements Serializable {
 
     public static Weekday GetByEnglishString(String day) {
         for (Weekday e : values()) {
-            if (e._englishStringDay.contains(day)) {
+            if (e._englishStringDay.contentEquals(day)) {
                 return e;
             }
         }
@@ -68,7 +68,7 @@ public enum Weekday implements Serializable {
 
     public static Weekday GetByGermanString(String day) {
         for (Weekday e : values()) {
-            if (e._germanStringDay.contains(day)) {
+            if (e._germanStringDay.contentEquals(day)) {
                 return e;
             }
         }

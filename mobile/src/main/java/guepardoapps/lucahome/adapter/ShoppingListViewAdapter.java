@@ -18,7 +18,7 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.ShoppingEntry;
-import guepardoapps.lucahome.data.service.ShoppingListService;
+import guepardoapps.lucahome.common.service.ShoppingListService;
 
 public class ShoppingListViewAdapter extends BaseAdapter {
     private class Holder {

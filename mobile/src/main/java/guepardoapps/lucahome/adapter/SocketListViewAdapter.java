@@ -14,6 +14,9 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.rey.material.app.Dialog;
+import com.rey.material.app.ThemeManager;
+
 import java.util.Locale;
 
 import guepardoapps.lucahome.R;
@@ -21,7 +24,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
-import guepardoapps.lucahome.data.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.WirelessSocketEditActivity;
 
@@ -133,7 +136,33 @@ public class SocketListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 _logger.Debug("_deleteButton setOnClickListener onClick");
-                /*TODO handle delete socket*/
+
+                boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
+
+                final Dialog deleteDialog = new Dialog(_context);
+                deleteDialog
+                        .title(String.format(Locale.getDefault(), "Delete %s?", wirelessSocket.GetName()))
+                        .positiveAction("Delete")
+                        .negativeAction("Cancel")
+                        .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
+                        .setCancelable(true);
+
+                deleteDialog.positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        _wirelessSocketService.DeleteWirelessSocket(wirelessSocket);
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.show();
             }
         });
 

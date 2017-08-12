@@ -35,7 +35,7 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaTimer;
-import guepardoapps.lucahome.data.service.ScheduleService;
+import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class TimerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +52,7 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
     private ListView _listView;
     private TextView _noDataFallback;
     private CollapsingToolbarLayout _collapsingToolbar;
+    private PullRefreshLayout _pullRefreshLayout;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -85,6 +86,7 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
+            _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
                 if (result.TimerList != null) {
@@ -213,8 +215,8 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_timer);
         navigationView.setNavigationItemSelectedListener(this);
 
-        PullRefreshLayout pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_timer);
-        pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_timer);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);
@@ -238,7 +240,21 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
     protected void onResume() {
         super.onResume();
         _logger.Debug("onResume");
+
         _receiverController.RegisterReceiver(_timerUpdateReceiver, new String[]{ScheduleService.TimerDownloadFinishedBroadcast});
+
+        SerializableList<LucaTimer> timerList = _scheduleService.GetTimerList();
+        if (timerList.getSize() > 0) {
+            _timerListViewAdapter = new TimerListViewAdapter(_context, timerList);
+            _listView.setAdapter(_timerListViewAdapter);
+
+            _noDataFallback.setVisibility(View.GONE);
+            _listView.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.VISIBLE);
+
+            _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d timer", timerList.getSize()));
+        }
+        _progressBar.setVisibility(View.GONE);
     }
 
     @Override

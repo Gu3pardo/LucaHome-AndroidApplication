@@ -29,9 +29,9 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Coin;
 import guepardoapps.lucahome.common.dto.CoinDto;
-import guepardoapps.lucahome.data.service.CoinService;
-import guepardoapps.lucahome.data.service.UserService;
-import guepardoapps.lucahome.data.service.broadcasts.content.ObjectChangeFinishedContent;
+import guepardoapps.lucahome.common.service.CoinService;
+import guepardoapps.lucahome.common.service.UserService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class CoinEditActivity extends AppCompatActivity {

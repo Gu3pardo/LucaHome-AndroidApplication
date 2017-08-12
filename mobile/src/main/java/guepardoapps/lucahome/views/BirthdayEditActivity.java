@@ -28,8 +28,8 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
-import guepardoapps.lucahome.data.service.BirthdayService;
-import guepardoapps.lucahome.data.service.broadcasts.content.ObjectChangeFinishedContent;
+import guepardoapps.lucahome.common.service.BirthdayService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class BirthdayEditActivity extends AppCompatActivity {

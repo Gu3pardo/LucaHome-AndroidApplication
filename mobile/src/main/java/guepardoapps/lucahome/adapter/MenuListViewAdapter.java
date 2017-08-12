@@ -11,6 +11,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import com.rey.material.app.Dialog;
+import com.rey.material.app.ThemeManager;
+
 import java.util.Locale;
 
 import guepardoapps.lucahome.R;
@@ -18,7 +21,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.dto.MenuDto;
-import guepardoapps.lucahome.data.service.MenuService;
+import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.MenuEditActivity;
 
@@ -27,6 +30,7 @@ public class MenuListViewAdapter extends BaseAdapter {
         private TextView _titleText;
         private TextView _descriptionText;
         private TextView _dateText;
+        private FloatingActionButton _clearButton;
         private FloatingActionButton _updateButton;
     }
 
@@ -35,6 +39,7 @@ public class MenuListViewAdapter extends BaseAdapter {
 
     private Context _context;
 
+    private MenuService _menuService;
     private NavigationService _navigationService;
 
     private static LayoutInflater _inflater = null;
@@ -49,6 +54,7 @@ public class MenuListViewAdapter extends BaseAdapter {
 
         _listViewItems = listViewItems;
 
+        _menuService = MenuService.getInstance();
         _navigationService = NavigationService.getInstance();
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -82,6 +88,7 @@ public class MenuListViewAdapter extends BaseAdapter {
         holder._titleText = rowView.findViewById(R.id.menuCardTitleText);
         holder._descriptionText = rowView.findViewById(R.id.menuDescriptionText);
         holder._dateText = rowView.findViewById(R.id.menuDateText);
+        holder._clearButton = rowView.findViewById(R.id.menuCardClearButton);
         holder._updateButton = rowView.findViewById(R.id.menuCardUpdateButton);
 
         final LucaMenu menu = _listViewItems.getValue(index);
@@ -90,12 +97,46 @@ public class MenuListViewAdapter extends BaseAdapter {
         holder._descriptionText.setText(menu.GetDescription());
         holder._dateText.setText(menu.GetDate().DDMMYYYY());
 
+        holder._clearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _logger.Debug("_clearButton setOnClickListener onClick");
+
+                boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
+
+                final Dialog deleteDialog = new Dialog(_context);
+                deleteDialog
+                        .title(String.format(Locale.getDefault(), "Clear menu for %s?", menu.GetDateString()))
+                        .positiveAction("Clear")
+                        .negativeAction("Cancel")
+                        .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
+                        .setCancelable(true);
+
+                deleteDialog.positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        _menuService.ClearMenu(menu);
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.show();
+            }
+        });
+
         holder._updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                _logger.Debug("setOnClickListener onClick");
+                _logger.Debug(String.format(Locale.getDefault(), "setOnClickListener onClick for menu %s", menu));
                 Bundle data = new Bundle();
-                data.putSerializable(MenuService.MenuIntent, new MenuDto(menu.GetId(), menu.GetTitle(), menu.GetDescription(), menu.GetWeekday(),menu.GetDate()));
+                data.putSerializable(MenuService.MenuIntent, new MenuDto(menu.GetId(), menu.GetTitle(), menu.GetDescription(), menu.GetWeekday(), menu.GetDate()));
                 _navigationService.NavigateToActivityWithData(_context, MenuEditActivity.class, data);
             }
         });

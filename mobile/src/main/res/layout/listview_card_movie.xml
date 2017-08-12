@@ -98,8 +98,9 @@
         android:id="@+id/movieCardUpdateButton"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
         android:layout_margin="5dp"
-        android:src="@mipmap/ic_build_white_48dp" />
+        android:scaleType="center"
+        android:src="@android:drawable/ic_menu_preferences" />
 </RelativeLayout>

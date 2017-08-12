@@ -29,12 +29,12 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.controller.SharedPrefController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.data.controller.SettingsController;
-import guepardoapps.lucahome.data.service.BirthdayService;
-import guepardoapps.lucahome.data.service.TemperatureService;
-import guepardoapps.lucahome.data.service.UserService;
-import guepardoapps.lucahome.data.service.WirelessSocketService;
-import guepardoapps.lucahome.data.service.broadcasts.content.ObjectChangeFinishedContent;
+import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.service.BirthdayService;
+import guepardoapps.lucahome.common.service.TemperatureService;
+import guepardoapps.lucahome.common.service.UserService;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 import java.util.List;
@@ -197,7 +197,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
                     PreferenceManager
                             .getDefaultSharedPreferences(preference.getContext())
-                            .getBoolean(preference.getKey(), true));
+                            .getBoolean(preference.getKey(), false));
 
         } else {
             // Trigger the listener immediately with the preference's current value.
@@ -491,7 +491,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 preference.setTitle(wirelessSocket.GetName());
                 preference.setKey(wirelessSocket.GetSettingsKey());
-                preference.setDefaultValue(true);
+                preference.setDefaultValue(false);
 
                 preferenceCategory.addPreference(preference);
 

@@ -35,7 +35,8 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Coin;
-import guepardoapps.lucahome.data.service.CoinService;
+import guepardoapps.lucahome.common.dto.CoinDto;
+import guepardoapps.lucahome.common.service.CoinService;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class CoinActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +53,7 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
     private ListView _listView;
     private TextView _noDataFallback;
     private CollapsingToolbarLayout _collapsingToolbar;
+    private PullRefreshLayout _pullRefreshLayout;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -85,6 +87,7 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
+            _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
                 if (result.CoinList != null) {
@@ -190,7 +193,10 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(_context, CoinEditActivity.class);
+                Bundle data = new Bundle();
+                data.putSerializable(CoinService.CoinIntent, new CoinDto(-1, "", "", 0, CoinDto.Action.Add));
+
+                NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, CoinEditActivity.class, data);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
 
@@ -213,8 +219,8 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_coin);
         navigationView.setNavigationItemSelectedListener(this);
 
-        PullRefreshLayout pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_coin);
-        pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_coin);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);
@@ -238,7 +244,21 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         _logger.Debug("onResume");
+
         _receiverController.RegisterReceiver(_coinUpdateReceiver, new String[]{CoinService.CoinDownloadFinishedBroadcast});
+
+        SerializableList<Coin> coinList = _coinService.GetCoinList();
+        if (coinList.getSize() > 0) {
+            _coinListViewAdapter = new CoinListViewAdapter(_context, coinList);
+            _listView.setAdapter(_coinListViewAdapter);
+
+            _noDataFallback.setVisibility(View.GONE);
+            _listView.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.VISIBLE);
+
+            _collapsingToolbar.setTitle(_coinService.AllCoinsValue());
+        }
+        _progressBar.setVisibility(View.GONE);
     }
 
     @Override

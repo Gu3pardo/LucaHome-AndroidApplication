@@ -31,11 +31,14 @@ import de.mateware.snacky.Snacky;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.adapter.ScheduleListViewAdapter;
 import guepardoapps.lucahome.basic.classes.SerializableList;
+import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Schedule;
-import guepardoapps.lucahome.data.service.ScheduleService;
+import guepardoapps.lucahome.common.dto.ScheduleDto;
+import guepardoapps.lucahome.common.enums.SocketAction;
+import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class ScheduleActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +55,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
     private ListView _listView;
     private TextView _noDataFallback;
     private CollapsingToolbarLayout _collapsingToolbar;
+    private PullRefreshLayout _pullRefreshLayout;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -85,6 +89,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
+            _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
                 if (result.ScheduleList != null) {
@@ -190,7 +195,10 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(_context, ScheduleEditActivity.class);
+                Bundle data = new Bundle();
+                data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(-1, "", null, null, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
+
+                NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
 
@@ -213,8 +221,8 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_schedules);
         navigationView.setNavigationItemSelectedListener(this);
 
-        PullRefreshLayout pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_schedule);
-        pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_schedule);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);
@@ -238,7 +246,21 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
     protected void onResume() {
         super.onResume();
         _logger.Debug("onResume");
+
         _receiverController.RegisterReceiver(_scheduleUpdateReceiver, new String[]{ScheduleService.ScheduleDownloadFinishedBroadcast});
+
+        SerializableList<Schedule> scheduleList = _scheduleService.GetScheduleList();
+        if (scheduleList.getSize() > 0) {
+            _scheduleListViewAdapter = new ScheduleListViewAdapter(_context, scheduleList);
+            _listView.setAdapter(_scheduleListViewAdapter);
+
+            _noDataFallback.setVisibility(View.GONE);
+            _listView.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.VISIBLE);
+
+            _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d schedules", scheduleList.getSize()));
+        }
+        _progressBar.setVisibility(View.GONE);
     }
 
     @Override

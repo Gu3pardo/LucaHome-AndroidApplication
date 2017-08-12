@@ -366,8 +366,21 @@ public class NavigationService {
             return NavigationResult.PERMITTED;
 
         } else if (startActivityContext.getClass() == SettingsActivity.class) {
-            if (endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(LoginActivity.class)) {
+            if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(CoinActivity.class)
+                    || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
+                    || endActivity.getClass().isInstance(LibraryActivity.class)
+                    || endActivity.getClass().isInstance(LoginActivity.class)
+                    || endActivity.getClass().isInstance(MainActivity.class)
+                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(ScheduleActivity.class)
+                    || endActivity.getClass().isInstance(SecurityActivity.class)
+                    || endActivity.getClass().isInstance(SettingsActivity.class)
+                    || endActivity.getClass().isInstance(ShoppingListActivity.class)
+                    || endActivity.getClass().isInstance(TimerActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 

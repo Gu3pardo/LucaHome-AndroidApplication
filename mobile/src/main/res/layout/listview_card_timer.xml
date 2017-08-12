@@ -101,5 +101,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_margin="5dp"
+        android:scaleType="center"
         android:src="@android:drawable/ic_menu_delete" />
 </RelativeLayout>

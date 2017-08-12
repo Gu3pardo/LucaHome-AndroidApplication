@@ -12,11 +12,14 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.baoyz.widget.PullRefreshLayout;
+import com.mikepenz.aboutlibraries.Libs;
+import com.mikepenz.aboutlibraries.LibsBuilder;
 
 import java.util.Locale;
 
@@ -28,8 +31,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.builders.MainListViewBuilder;
 import guepardoapps.lucahome.builders.MapContentViewBuilder;
 import guepardoapps.lucahome.classes.MainListViewItem;
-import guepardoapps.lucahome.data.service.MapContentService;
-import guepardoapps.lucahome.data.service.TemperatureService;
+import guepardoapps.lucahome.common.service.MapContentService;
 import guepardoapps.lucahome.service.MainService;
 import guepardoapps.lucahome.service.NavigationService;
 
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private ProgressBar _progressBar;
     private ListView _listView;
+    private PullRefreshLayout _pullRefreshLayout;
 
     /**
      * Builder for the entries of the listView and the map
@@ -73,7 +76,6 @@ public class MainActivity extends AppCompatActivity {
      * Services to handle data
      */
     private OpenWeatherService _openWeatherService;
-    private TemperatureService _temperatureService;
 
     /**
      * Binder for MainService
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
 
                     _listView.setVisibility(View.VISIBLE);
                     _progressBar.setVisibility(View.GONE);
+                    _pullRefreshLayout.setRefreshing(false);
 
                     _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetMapContentList());
                     _mapContentViewBuilder.AddViewsToMap();
@@ -144,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
         _mapContentService = MapContentService.getInstance();
         _navigationService = NavigationService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
-        _temperatureService = TemperatureService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -166,8 +168,8 @@ public class MainActivity extends AppCompatActivity {
         collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
-        PullRefreshLayout pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout_main);
-        pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout_main);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);
@@ -176,6 +178,24 @@ public class MainActivity extends AppCompatActivity {
                 _progressBar.setVisibility(View.VISIBLE);
 
                 _mainServiceBinder.StartDownloadAll("pullRefreshLayout setOnRefreshListener");
+            }
+        });
+
+        ImageButton imageButtonSettings = (ImageButton) findViewById(R.id.image_button_settings);
+        imageButtonSettings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                _navigationService.NavigateToActivity(MainActivity.this, SettingsActivity.class);
+            }
+        });
+
+        ImageButton imageButtonAbout = (ImageButton) findViewById(R.id.image_button_about);
+        imageButtonAbout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new LibsBuilder()
+                        .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                        .start(MainActivity.this);
             }
         });
     }

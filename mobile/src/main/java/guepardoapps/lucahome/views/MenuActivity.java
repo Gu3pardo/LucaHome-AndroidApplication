@@ -34,7 +34,7 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaMenu;
-import guepardoapps.lucahome.data.service.MenuService;
+import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class MenuActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -50,6 +50,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private PullRefreshLayout _pullRefreshLayout;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -83,6 +84,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
+            _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
                 if (result.MenuList != null) {
@@ -186,8 +188,8 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_menu);
         navigationView.setNavigationItemSelectedListener(this);
 
-        PullRefreshLayout pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_menu);
-        pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_menu);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);
@@ -211,7 +213,19 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
         _logger.Debug("onResume");
+
         _receiverController.RegisterReceiver(_menuUpdateReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
+
+        SerializableList<LucaMenu> menuList = _menuService.GetMenuList();
+        if (menuList.getSize() > 0) {
+            _menuListViewAdapter = new MenuListViewAdapter(_context, menuList);
+            _listView.setAdapter(_menuListViewAdapter);
+
+            _noDataFallback.setVisibility(View.GONE);
+            _listView.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.VISIBLE);
+        }
+        _progressBar.setVisibility(View.GONE);
     }
 
     @Override

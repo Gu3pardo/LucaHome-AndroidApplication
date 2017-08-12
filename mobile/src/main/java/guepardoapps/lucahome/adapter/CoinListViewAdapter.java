@@ -12,6 +12,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.rey.material.app.Dialog;
+import com.rey.material.app.ThemeManager;
+
 import java.util.Locale;
 
 import guepardoapps.lucahome.R;
@@ -19,7 +22,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.Coin;
 import guepardoapps.lucahome.common.dto.CoinDto;
-import guepardoapps.lucahome.data.service.CoinService;
+import guepardoapps.lucahome.common.service.CoinService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.CoinEditActivity;
 
@@ -39,6 +42,7 @@ public class CoinListViewAdapter extends BaseAdapter {
 
     private Context _context;
 
+    private CoinService _coinService;
     private NavigationService _navigationService;
 
     private static LayoutInflater _inflater = null;
@@ -53,6 +57,7 @@ public class CoinListViewAdapter extends BaseAdapter {
 
         _listViewItems = listViewItems;
 
+        _coinService = CoinService.getInstance();
         _navigationService = NavigationService.getInstance();
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -114,7 +119,33 @@ public class CoinListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 _logger.Debug("_deleteButton setOnClickListener onClick");
-                /*TODO handle delete coin*/
+
+                boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
+
+                final Dialog deleteDialog = new Dialog(_context);
+                deleteDialog
+                        .title(String.format(Locale.getDefault(), "Delete %s?", coin.GetType()))
+                        .positiveAction("Delete")
+                        .negativeAction("Cancel")
+                        .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
+                        .setCancelable(true);
+
+                deleteDialog.positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        _coinService.DeleteCoin(coin);
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.show();
             }
         });
 

@@ -8,10 +8,11 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 
 import guepardoapps.lucahome.basic.controller.AndroidSystemController;
+import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.data.controller.SettingsController;
-import guepardoapps.lucahome.data.service.WirelessSocketService;
+import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.service.MainService;
 
 public class WIFIReceiver extends BroadcastReceiver {
@@ -21,6 +22,7 @@ public class WIFIReceiver extends BroadcastReceiver {
     private Context _context;
 
     private AndroidSystemController _androidSystemController;
+    private BroadcastController _broadcastController;
     private NetworkController _networkController;
     private SettingsController _settingsController;
 
@@ -55,6 +57,7 @@ public class WIFIReceiver extends BroadcastReceiver {
         _context = context;
 
         _androidSystemController = new AndroidSystemController(_context);
+        _broadcastController = new BroadcastController(_context);
         _networkController = new NetworkController(_context);
         _settingsController = SettingsController.getInstance();
 
@@ -74,9 +77,8 @@ public class WIFIReceiver extends BroadcastReceiver {
             if (!_androidSystemController.IsServiceRunning(MainService.class)) {
                 _context.startService(new Intent(_context, MainService.class));
             }
+            _broadcastController.SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
 
-            // check if actions are stored to perform after entering home wifi
-            checkSavedActionsDatabase();
         } else {
             _logger.Warning("We are NOT in the homeNetwork!");
 
@@ -84,13 +86,8 @@ public class WIFIReceiver extends BroadcastReceiver {
 
             if (_checkConnectionEnabled) {
                 Handler checkConnectionHandler = new Handler();
-                checkConnectionHandler.postDelayed(_checkConnectionRunnable, 3000);
+                checkConnectionHandler.postDelayed(_checkConnectionRunnable, 5000);
             }
         }
-    }
-
-    private void checkSavedActionsDatabase() {
-        _logger.Debug("checkSavedActionsDatabase");
-        /*TODO*/
     }
 }

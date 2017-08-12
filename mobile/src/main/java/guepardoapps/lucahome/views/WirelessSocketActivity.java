@@ -35,7 +35,8 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.data.service.WirelessSocketService;
+import guepardoapps.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class WirelessSocketActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -52,6 +53,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
     private ListView _listView;
     private TextView _noDataFallback;
     private CollapsingToolbarLayout _collapsingToolbar;
+    private PullRefreshLayout _pullRefreshLayout;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -85,6 +87,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
+            _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
                 if (result.WirelessSocketList != null) {
@@ -190,7 +193,10 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(_context, WirelessSocketEditActivity.class);
+                Bundle data = new Bundle();
+                data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(-1, "", "", "", false, WirelessSocketDto.Action.Add));
+
+                NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, WirelessSocketEditActivity.class, data);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
 
@@ -213,8 +219,8 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_sockets);
         navigationView.setNavigationItemSelectedListener(this);
 
-        PullRefreshLayout pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_sockets);
-        pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_sockets);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);
@@ -237,7 +243,21 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
     protected void onResume() {
         super.onResume();
         _logger.Debug("onResume");
+
         _receiverController.RegisterReceiver(_wirelessSocketUpdateReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
+
+        SerializableList<WirelessSocket> wirelessSocketList = _wirelessSocketService.GetWirelessSocketList();
+        if (wirelessSocketList.getSize() > 0) {
+            _socketListViewAdapter = new SocketListViewAdapter(_context, wirelessSocketList);
+            _listView.setAdapter(_socketListViewAdapter);
+
+            _noDataFallback.setVisibility(View.GONE);
+            _listView.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.VISIBLE);
+
+            _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d sockets", wirelessSocketList.getSize()));
+        }
+        _progressBar.setVisibility(View.GONE);
     }
 
     @Override

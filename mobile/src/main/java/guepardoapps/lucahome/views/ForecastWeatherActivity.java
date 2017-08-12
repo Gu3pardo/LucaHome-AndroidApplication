@@ -51,6 +51,7 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
     private ListView _listView;
     private TextView _noDataFallback;
     private KenBurnsView _mainImageView;
+    private PullRefreshLayout _pullRefreshLayout;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -84,6 +85,7 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
+            _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
                 if (result.ForecastWeather != null) {
@@ -192,8 +194,8 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_forecast_weather);
         navigationView.setNavigationItemSelectedListener(this);
 
-        PullRefreshLayout pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_forecast_weather);
-        pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_forecast_weather);
+        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 _logger.Debug("onRefresh " + TAG);

@@ -21,11 +21,11 @@ import guepardoapps.lucahome.common.dto.ShoppingEntryDto;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
 import guepardoapps.lucahome.common.enums.SocketAction;
-import guepardoapps.lucahome.data.service.BirthdayService;
-import guepardoapps.lucahome.data.service.CoinService;
-import guepardoapps.lucahome.data.service.ScheduleService;
-import guepardoapps.lucahome.data.service.ShoppingListService;
-import guepardoapps.lucahome.data.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.BirthdayService;
+import guepardoapps.lucahome.common.service.CoinService;
+import guepardoapps.lucahome.common.service.ScheduleService;
+import guepardoapps.lucahome.common.service.ShoppingListService;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.*;
 
@@ -197,17 +197,6 @@ public class MainListViewBuilder {
                 MainListViewItem.Type.Security
         );
 
-        MainListViewItem settingsItem = new MainListViewItem(
-                "Settings", "Configure your application", R.drawable.main_image_settings,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(SettingsActivity.class);
-                    }
-                },
-                MainListViewItem.Type.Settings
-        );
-
         MainListViewItem shoppingItem = new MainListViewItem(
                 "Shopping List", "What do we need to buy?", R.drawable.main_image_shopping,
                 new Runnable() {
@@ -287,7 +276,6 @@ public class MainListViewBuilder {
         //_mainListViewItems.addValue(mediaMirrorItem);
         //_mainListViewItems.addValue(libraryItem);
         //_mainListViewItems.addValue(securityItem);
-        _mainListViewItems.addValue(settingsItem);
     }
 
     private void navigateTo(@NonNull Class<?> targetActivity) {

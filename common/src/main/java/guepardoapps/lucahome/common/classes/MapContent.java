@@ -1,12 +1,13 @@
 package guepardoapps.lucahome.common.classes;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.common.R;
+import guepardoapps.lucahome.common.builder.MapContentBuilder;
 
 public class MapContent implements Serializable {
     private static final long serialVersionUID = 8796770534384442492L;
@@ -23,8 +24,6 @@ public class MapContent implements Serializable {
     private Temperature _temperature;
     private boolean _visibility;
 
-    private Runnable _runnable;
-
     public MapContent(
             int id,
             int[] position,
@@ -33,8 +32,7 @@ public class MapContent implements Serializable {
             WirelessSocket socket,
             SerializableList<Schedule> scheduleList,
             Temperature temperature,
-            boolean visibility,
-            @NonNull Runnable runnable) {
+            boolean visibility) {
         _id = id;
         _position = position;
         _drawingType = drawingType;
@@ -43,7 +41,6 @@ public class MapContent implements Serializable {
         _scheduleList = scheduleList;
         _temperature = temperature;
         _visibility = visibility;
-        _runnable = runnable;
     }
 
     public int GetId() {
@@ -52,6 +49,10 @@ public class MapContent implements Serializable {
 
     public int[] GetPosition() {
         return _position;
+    }
+
+    public String GetPositionString() {
+        return String.format(Locale.getDefault(), "%d|%d", _position[0], _position[1]);
     }
 
     public void SetPosition(int[] position) {
@@ -102,81 +103,16 @@ public class MapContent implements Serializable {
         return _visibility;
     }
 
-    public Runnable GetButtonClick() {
-        return _runnable;
-    }
-
-    public void SetButtonClick(@NonNull Runnable runnable) {
-        _runnable = runnable;
+    public Runnable GetButtonClick(@NonNull Context context) {
+        return MapContentBuilder.GetRunnable(_drawingType, _socket, _temperature, context);
     }
 
     public String ButtonText() {
-        switch (_drawingType) {
-            case MediaServer:
-            case Socket:
-                return (_socket != null ? _socket.GetShortName() : "");
-            case Temperature:
-                return (_temperature != null ? _temperature.GetTemperatureString() : "T");
-            case ShoppingList:
-                return "S";
-            case Menu:
-                return "M";
-            case Camera:
-                return "C";
-            case PuckJS:
-                return "P";
-            case Raspberry:
-                return "R";
-            case Arduino:
-                return "A";
-            case Null:
-            default:
-                return "";
-        }
+        return MapContentBuilder.GetButtonText(_drawingType, _socket, _temperature);
     }
 
     public int Drawable() {
-        switch (_drawingType) {
-            case Socket:
-                if (_socket == null) {
-                    return R.drawable.drawing_socket_off;
-                }
-
-                if (_socket.IsActivated()) {
-                    return R.drawable.drawing_socket_on;
-                } else {
-                    return R.drawable.drawing_socket_off;
-                }
-
-            case MediaServer:
-                if (_socket == null) {
-                    return R.drawable.drawing_mediamirror_off;
-                }
-
-                if (_socket.IsActivated()) {
-                    return R.drawable.drawing_mediamirror_on;
-                } else {
-                    return R.drawable.drawing_mediamirror_off;
-                }
-
-            case Temperature:
-                return (_temperature != null ? _temperature.GetDrawable() : R.drawable.drawing_temperature);
-            case Raspberry:
-                return R.drawable.drawing_raspberry;
-            case Arduino:
-                return R.drawable.drawing_arduino;
-            case ShoppingList:
-                return R.drawable.drawing_shoppinglist;
-            case Menu:
-                return R.drawable.drawing_menu;
-            case Camera:
-                return R.drawable.drawing_camera;
-            case PuckJS:
-                return R.drawable.drawing_puckjs;
-            case Null:
-            default:
-                return R.drawable.drawing_socket_off;
-        }
+        return MapContentBuilder.GetDrawable(_drawingType, _socket, _temperature);
     }
 
     @Override

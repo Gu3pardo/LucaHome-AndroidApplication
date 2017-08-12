@@ -110,7 +110,8 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="5dp"
         android:layout_toStartOf="@+id/schedule_card_delete_button"
-        android:src="@mipmap/ic_build_white_48dp" />
+        android:scaleType="center"
+        android:src="@android:drawable/ic_menu_preferences" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/schedule_card_delete_button"
@@ -119,5 +120,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_margin="5dp"
+        android:scaleType="center"
         android:src="@android:drawable/ic_menu_delete" />
 </RelativeLayout>

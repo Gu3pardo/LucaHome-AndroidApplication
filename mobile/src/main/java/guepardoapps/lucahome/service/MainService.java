@@ -20,8 +20,8 @@ import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.data.controller.SettingsController;
-import guepardoapps.lucahome.data.service.*;
+import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.service.*;
 import guepardoapps.lucahome.receiver.SocketActionReceiver;
 import guepardoapps.lucahome.views.BirthdayActivity;
 
@@ -43,6 +43,9 @@ public class MainService extends Service {
             DownloadFinished = downloadFinished;
         }
     }
+
+    public static final String MainServiceStartDownloadAllBroadcast = "guepardoapps.lucahome.main.service.download.all.start";
+    public static final String MainServiceStartDownloadAllBBundle = "MainServiceStartDownloadAllBBundle";
 
     public static final String MainServiceDownloadCountBroadcast = "guepardoapps.lucahome.main.service.download.count";
     public static final String MainServiceDownloadCountBundle = "MainServiceDownloadCountBundle";

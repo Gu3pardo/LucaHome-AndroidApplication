@@ -78,5 +78,6 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
         android:layout_margin="5dp"
-        android:src="@mipmap/ic_add_white_48dp" />
+        android:src="@mipmap/ic_add_white_48dp"
+        app:fab_iconSize="30dp" />
 </RelativeLayout>

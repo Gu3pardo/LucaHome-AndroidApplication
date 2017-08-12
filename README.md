@@ -13,10 +13,6 @@ Containing the shared library LucaHome, a wearable project and the main android 
 
 Android client to remotely control sockets, mediaserver, view temperature, share your shoppinglist, plan your menu and much more...
 
-# v4
-is in testing and strong development
-contains some known bugs in view of coins and birthdays, crashes on entering/leaving home wifi...
-
 # Screenshots
 
 ![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_001.png)
@@ -32,3 +28,9 @@ ___________________________________
 ___________________________________
 
 ![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_005.png)
+___________________________________
+
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_006.png)
+___________________________________
+
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_007.png)

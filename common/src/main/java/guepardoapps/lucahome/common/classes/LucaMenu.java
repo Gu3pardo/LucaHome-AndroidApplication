@@ -70,16 +70,20 @@ public class LucaMenu implements Serializable {
         _date = date;
     }
 
+    public String GetDateString() {
+        return String.format(Locale.getDefault(), "%s, %s", _weekday, _date.DDMMYYYY());
+    }
+
     public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%d&day=%d&month=%d&year=%d&title=%s&description=%s", LucaServerAction.UPDATE_MENU.toString(), _weekday.GetInt(), _date.DayOfMonth(), _date.Month(), _date.Year(), _title, _description);
+        return String.format(Locale.getDefault(), "%s%s&day=%d&month=%d&year=%d&title=%s&description=%s", LucaServerAction.UPDATE_MENU.toString(), _weekday.GetEnglishDay(), _date.DayOfMonth(), _date.Month(), _date.Year(), _title, _description);
     }
 
     public String CommandClear() {
-        return String.format(Locale.getDefault(), "%s%s", LucaServerAction.UPDATE_MENU.toString(), _weekday.GetInt());
+        return String.format(Locale.getDefault(), "%s%s", LucaServerAction.UPDATE_MENU.toString(), _weekday.GetEnglishDay());
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Title: %s );(Description: %s );(Date: %s ))", TAG, _id, _title, _description, _date);
+        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Title: %s );(Description: %s );(Weekday: %s );(Date: %s ))", TAG, _id, _title, _description, _weekday, _date);
     }
 }

@@ -11,8 +11,8 @@ import java.util.Locale;
 import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.data.controller.NotificationController;
-import guepardoapps.lucahome.data.service.WirelessSocketService;
+import guepardoapps.lucahome.common.controller.NotificationController;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
 
 public class SocketActionReceiver extends BroadcastReceiver {
     private static final String TAG = SocketActionReceiver.class.getSimpleName();

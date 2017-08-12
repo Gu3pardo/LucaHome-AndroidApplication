@@ -54,6 +54,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/birthday_TextInputLayout"
+                    android:background="@color/colorPrimary"
                     android:nextFocusDown="@+id/save_birthday_edit_button"
                     android:nextFocusRight="@+id/save_birthday_edit_button" />
 

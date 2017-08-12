@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary">
+
+    <TextView
+        android:id="@+id/dialog_title_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text=""
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="@color/TextIcon"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dialog_list_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/dialog_title_text_view"
+        android:layout_margin="3dp"
+        android:background="@color/TextIcon" />
+
+    <WebView
+        android:id="@+id/dialog_webview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/dialog_button_close"
+        android:layout_below="@+id/dialog_list_separator"
+        android:layout_margin="10dp" />
+
+    <com.rey.material.widget.Button
+        android:id="@+id/dialog_button_close"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_margin="5dp"
+        android:gravity="center"
+        android:text="Close" />
+
+</RelativeLayout>

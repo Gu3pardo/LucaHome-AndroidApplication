@@ -18,7 +18,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.Movie;
 import guepardoapps.lucahome.common.dto.MovieDto;
-import guepardoapps.lucahome.data.service.MovieService;
+import guepardoapps.lucahome.common.service.MovieService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.MovieEditActivity;
 

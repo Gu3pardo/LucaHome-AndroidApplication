@@ -93,8 +93,8 @@ public class MapContentViewBuilder {
                 @Override
                 public void onClick(View view) {
                     _logger.Debug(String.format(Locale.getDefault(), "onClick %s", mapContent.ButtonText()));
-                    if (mapContent.GetButtonClick() != null) {
-                        mapContent.GetButtonClick().run();
+                    if (mapContent.GetButtonClick(_context) != null) {
+                        mapContent.GetButtonClick(_context).run();
                     } else {
                         Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.ButtonText()), Toast.LENGTH_LONG).show();
                     }
@@ -102,7 +102,7 @@ public class MapContentViewBuilder {
             });
 
             int positionX = _size.x - (_size.x * mapContent.GetPosition()[1] / 100) - 50;
-            int positionY = (_size.y * mapContent.GetPosition()[0] / 100) - 50;
+            int positionY = (_size.y * mapContent.GetPosition()[0] / 100) - 25;
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.WRAP_CONTENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT);

@@ -45,9 +45,10 @@
                     android:id="@+id/socketCardImage"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:contentDescription="@string/contentDescription"
-                    app:layout_heightPercent="100%"
-                    app:layout_widthPercent="50%"
+                    app:layout_heightPercent="50%"
+                    app:layout_widthPercent="25%"
                     app:srcCompat="@drawable/main_image_sockets" />
 
                 <LinearLayout
@@ -102,7 +103,8 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="5dp"
         android:layout_toStartOf="@+id/socket_card_delete_button"
-        android:src="@mipmap/ic_build_white_48dp" />
+        android:src="@android:drawable/ic_menu_preferences"
+        android:scaleType="center" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/socket_card_delete_button"
@@ -111,5 +113,6 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_margin="5dp"
-        android:src="@android:drawable/ic_menu_delete" />
+        android:src="@android:drawable/ic_menu_delete"
+        android:scaleType="center" />
 </RelativeLayout>

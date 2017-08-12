@@ -13,6 +13,9 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.rey.material.app.Dialog;
+import com.rey.material.app.ThemeManager;
+
 import java.util.Locale;
 
 import guepardoapps.lucahome.R;
@@ -20,7 +23,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.Schedule;
 import guepardoapps.lucahome.common.dto.ScheduleDto;
-import guepardoapps.lucahome.data.service.ScheduleService;
+import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.ScheduleEditActivity;
 
@@ -130,7 +133,33 @@ public class ScheduleListViewAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 _logger.Debug("_deleteButton setOnClickListener onClick");
-                /*TODO handle delete schedule*/
+
+                boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
+
+                final Dialog deleteDialog = new Dialog(_context);
+                deleteDialog
+                        .title(String.format(Locale.getDefault(), "Delete %s?", schedule.GetName()))
+                        .positiveAction("Delete")
+                        .negativeAction("Cancel")
+                        .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
+                        .setCancelable(true);
+
+                deleteDialog.positiveActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        _scheduleService.DeleteSchedule(schedule);
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.negativeActionClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        deleteDialog.dismiss();
+                    }
+                });
+
+                deleteDialog.show();
             }
         });
 
