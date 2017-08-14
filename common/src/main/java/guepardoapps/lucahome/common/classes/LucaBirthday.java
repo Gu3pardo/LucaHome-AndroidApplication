@@ -58,12 +58,8 @@ public class LucaBirthday implements Serializable {
         return "It is " + _name + "'s " + String.valueOf(GetAge()) + "th birthday!";
     }
 
-    public int Icon() {
-        if (HasBirthday()) {
-            return R.drawable.main_image_birthday;
-        } else {
-            return R.drawable.birthday;
-        }
+    public int GetIcon() {
+        return R.drawable.birthday;
     }
 
     public int GetAge() {

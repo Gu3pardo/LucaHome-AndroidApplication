@@ -61,14 +61,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.MainActivity" />
         </activity>
-        <activity
-            android:name=".views.LibraryActivity"
-            android:label="@string/title_activity_library"
-            android:parentActivityName=".views.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="guepardoapps.lucahome.views.MainActivity" />
-        </activity>
         <activity android:name=".views.LoginActivity" />
         <activity android:name=".views.MainActivity" />
         <activity

@@ -427,7 +427,7 @@ public class BirthdayService {
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
             if (birthday.HasBirthday() && _settingsController.IsBirthdayNotificationEnabled()) {
-                _notificationController.CreateBirthdayNotification(birthday.GetNotificationId(), _receiverActivity, birthday.Icon(), birthday.GetName(), birthday.GetNotificationBody(), true);
+                _notificationController.CreateBirthdayNotification(birthday.GetNotificationId(), _receiverActivity, birthday.GetIcon(), birthday.GetName(), birthday.GetNotificationBody(), true);
             }
         }
     }

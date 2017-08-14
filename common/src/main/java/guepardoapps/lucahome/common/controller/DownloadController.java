@@ -28,6 +28,7 @@ public class DownloadController {
         Menu, MenuUpdate, MenuClear,
         Movie, MovieUpdate,
         Schedule, ScheduleSet, ScheduleAdd, ScheduleUpdate, ScheduleDelete,
+        Security, SecurityCamera, SecurityMotionControl,
         ShoppingList, ShoppingListAdd, ShoppingListDelete, ShoppingListUpdate,
         Temperature,
         TimerAdd, TimerUpdate, TimerDelete,

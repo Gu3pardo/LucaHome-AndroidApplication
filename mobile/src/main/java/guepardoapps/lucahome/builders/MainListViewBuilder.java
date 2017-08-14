@@ -123,17 +123,6 @@ public class MainListViewBuilder {
                 MainListViewItem.Type.Coin
         );
 
-        MainListViewItem libraryItem = new MainListViewItem(
-                "Library", "Read some papers?", R.drawable.main_image_magazine,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(LibraryActivity.class);
-                    }
-                },
-                MainListViewItem.Type.Library
-        );
-
         MainListViewItem mediaMirrorItem = new MainListViewItem(
                 "MediaMirror", "Control your local media mirror", R.drawable.main_image_mediamirror,
                 new Runnable() {
@@ -274,8 +263,7 @@ public class MainListViewBuilder {
         _mainListViewItems.addValue(movieItem);
         /*TODO reactivate*/
         //_mainListViewItems.addValue(mediaMirrorItem);
-        //_mainListViewItems.addValue(libraryItem);
-        //_mainListViewItems.addValue(securityItem);
+        _mainListViewItems.addValue(securityItem);
     }
 
     private void navigateTo(@NonNull Class<?> targetActivity) {

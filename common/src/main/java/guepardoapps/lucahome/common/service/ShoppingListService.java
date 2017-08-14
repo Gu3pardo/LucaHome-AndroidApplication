@@ -56,7 +56,7 @@ public class ShoppingListService {
     private static final String TAG = ShoppingListService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int TIMEOUT_MS = 15 * 60 * 1000;
+    private static final int TIMEOUT_MS = 30 * 60 * 1000;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
         @Override

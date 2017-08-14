@@ -26,8 +26,6 @@ public class WIFIReceiver extends BroadcastReceiver {
     private NetworkController _networkController;
     private SettingsController _settingsController;
 
-    private WirelessSocketService _wirelessSocketService;
-
     private boolean _checkConnectionEnabled;
     private Runnable _checkConnectionRunnable = new Runnable() {
         @Override
@@ -61,8 +59,6 @@ public class WIFIReceiver extends BroadcastReceiver {
         _networkController = new NetworkController(_context);
         _settingsController = SettingsController.getInstance();
 
-        _wirelessSocketService = WirelessSocketService.getInstance();
-
         _checkConnectionEnabled = true;
 
         checkConnection();
@@ -77,12 +73,13 @@ public class WIFIReceiver extends BroadcastReceiver {
             if (!_androidSystemController.IsServiceRunning(MainService.class)) {
                 _context.startService(new Intent(_context, MainService.class));
             }
+
             _broadcastController.SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
 
         } else {
             _logger.Warning("We are NOT in the homeNetwork!");
 
-            _wirelessSocketService.CloseNotification();
+            WirelessSocketService.getInstance().CloseNotification();
 
             if (_checkConnectionEnabled) {
                 Handler checkConnectionHandler = new Handler();

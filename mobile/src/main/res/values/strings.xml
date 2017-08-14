@@ -37,6 +37,11 @@
     <string name="noData">There is no data!</string>
     <string name="title_activity_settings">Settings</string>
 
+    <!-- String for security -->
+    <string name="cameraNotActive">Camera is not active</string>
+    <string name="activateCamera">Activate camera</string>
+    <string name="activateMotionControl">Activate motion control</string>
+
     <!-- String for socketStates -->
     <string name="socketEnabled">Enabled</string>
     <string name="socketDisabled">Disabled</string>
@@ -99,7 +104,6 @@
     <string name="title_activity_shopping_list">Shopping List</string>
     <string name="title_activity_shopping_list_edit">Edit Shopping List</string>
     <string name="title_activity_forecast_weather">Forecast weather</string>
-    <string name="title_activity_library">Library</string>
     <string name="title_activity_mediamirror">Media mirror</string>
     <string name="title_activity_security">Security</string>
 

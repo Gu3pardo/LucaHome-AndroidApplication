@@ -27,9 +27,14 @@
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToTimerConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/dto/MovieDto.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/LucaServerAction.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/MediaServerAction.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/MediaServerSelection.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/RSSFeed.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/RadioStreams.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/ShoppingEntryGroup.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/SocketAction.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/Weekday.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/YoutubeId.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/all_power_off.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/baking.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bath.png" charset="windows-1251" />
@@ -78,7 +83,6 @@
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/watering_on.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/xmr.png" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/zec.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/dialog_list.xml" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/res/layout/dialog_webview.xml" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/data/src/main/java/guepardoapps/lucahome/data/controller/DownloadController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/guepardoapps/lucahome/receiver/SocketActionReceiver.java" charset="windows-1251" />
@@ -87,6 +91,6 @@
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/BroadcastController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/NotificationController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/ReceiverController.java" charset="windows-1251" />
-    <file url="PROJECT" charset="windows-1251" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

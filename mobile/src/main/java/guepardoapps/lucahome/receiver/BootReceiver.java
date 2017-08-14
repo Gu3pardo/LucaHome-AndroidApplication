@@ -28,8 +28,9 @@ public class BootReceiver extends BroadcastReceiver {
 
             if (!androidSystemController.IsServiceRunning(MainService.class)) {
                 context.startService(new Intent(context, MainService.class));
-                broadcastController.SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
             }
+
+            broadcastController.SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
         }
     }
 }

@@ -61,7 +61,6 @@ public class BootActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             _logger.Debug("onServiceConnected");
             _mainServiceBinder = ((MainService.MainServiceBinder) binder).getService();
-            _mainServiceBinder.Initialize();
 
             if (!_userService.IsAnUserSaved()) {
                 _loginAttempt = true;
@@ -172,7 +171,11 @@ public class BootActivity extends AppCompatActivity {
         _receiverController.Dispose();
         if (_mainServiceBinder != null) {
             _logger.Debug("Unbinding from server");
-            unbindService(_mainServiceConnection);
+            try {
+                unbindService(_mainServiceConnection);
+            } catch (Exception exception) {
+                _logger.Error(exception.getMessage());
+            }
         }
     }
 

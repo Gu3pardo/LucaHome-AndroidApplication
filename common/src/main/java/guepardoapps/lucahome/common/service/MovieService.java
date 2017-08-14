@@ -47,7 +47,7 @@ public class MovieService {
     private static final String TAG = MovieService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int TIMEOUT_MS = 30 * 60 * 1000;
+    private static final int TIMEOUT_MS = 3 * 60 * 60 * 1000;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
         @Override

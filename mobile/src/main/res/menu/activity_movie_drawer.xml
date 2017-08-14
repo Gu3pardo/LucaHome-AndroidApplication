@@ -6,10 +6,6 @@
                 android:id="@+id/nav_mediamirror"
                 android:icon="@mipmap/ic_photo_library_black_48dp"
                 android:title="MediaMirror" />
-            <item
-                android:id="@+id/nav_library"
-                android:icon="@mipmap/ic_library_books_black_48dp"
-                android:title="Library" />
         </menu>
     </item>
 

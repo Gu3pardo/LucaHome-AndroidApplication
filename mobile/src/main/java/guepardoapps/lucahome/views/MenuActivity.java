@@ -269,8 +269,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             navigationResult = _navigationService.NavigateToActivity(_context, MovieActivity.class);
         } else if (id == R.id.nav_mediamirror) {
             navigationResult = _navigationService.NavigateToActivity(_context, MediaMirrorActivity.class);
-        } else if (id == R.id.nav_library) {
-            navigationResult = _navigationService.NavigateToActivity(_context, LibraryActivity.class);
         } else if (id == R.id.nav_coins) {
             navigationResult = _navigationService.NavigateToActivity(_context, CoinActivity.class);
         } else if (id == R.id.nav_shopping) {

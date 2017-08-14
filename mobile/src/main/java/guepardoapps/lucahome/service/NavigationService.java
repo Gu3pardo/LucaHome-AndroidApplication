@@ -115,7 +115,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayEditActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -150,7 +149,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinEditActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -177,7 +175,6 @@ public class NavigationService {
         } else if (startActivityContext.getClass() == ForecastWeatherActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -201,31 +198,10 @@ public class NavigationService {
 
             return NavigationResult.PERMITTED;
 
-        } else if (startActivityContext.getClass() == LibraryActivity.class) {
-            if (endActivity.getClass().isInstance(BirthdayActivity.class)
-                    || endActivity.getClass().isInstance(CoinActivity.class)
-                    || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LoginActivity.class)
-                    || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
-                    || endActivity.getClass().isInstance(MenuActivity.class)
-                    || endActivity.getClass().isInstance(MovieActivity.class)
-                    || endActivity.getClass().isInstance(ScheduleActivity.class)
-                    || endActivity.getClass().isInstance(SecurityActivity.class)
-                    || endActivity.getClass().isInstance(SettingsActivity.class)
-                    || endActivity.getClass().isInstance(ShoppingListActivity.class)
-                    || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
-                return NavigationResult.POSSIBLE;
-            }
-
-            return NavigationResult.PERMITTED;
-
         } else if (startActivityContext.getClass() == MainActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
@@ -245,7 +221,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -273,7 +248,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
@@ -293,7 +267,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -321,7 +294,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -349,7 +321,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -369,7 +340,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -390,7 +360,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -418,7 +387,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)
@@ -446,7 +414,6 @@ public class NavigationService {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
-                    || endActivity.getClass().isInstance(LibraryActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaMirrorActivity.class)

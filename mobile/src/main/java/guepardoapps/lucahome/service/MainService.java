@@ -45,8 +45,6 @@ public class MainService extends Service {
     }
 
     public static final String MainServiceStartDownloadAllBroadcast = "guepardoapps.lucahome.main.service.download.all.start";
-    public static final String MainServiceStartDownloadAllBBundle = "MainServiceStartDownloadAllBBundle";
-
     public static final String MainServiceDownloadCountBroadcast = "guepardoapps.lucahome.main.service.download.count";
     public static final String MainServiceDownloadCountBundle = "MainServiceDownloadCountBundle";
 
@@ -59,12 +57,12 @@ public class MainService extends Service {
 
     private BirthdayService _birthdayService;
     private CoinService _coinService;
-    private LibraryService _libraryService;
     private MapContentService _mapContentService;
     private MenuService _menuService;
     private MovieService _movieService;
     private OpenWeatherService _openWeatherService;
     private ScheduleService _scheduleService;
+    private SecurityService _securityService;
     private ShoppingListService _shoppingListService;
     private TemperatureService _temperatureService;
     private UserService _userService;
@@ -77,6 +75,14 @@ public class MainService extends Service {
     private int _currentDownloadCount;
     private SerializableList<SerializablePair> _downloadResultList;
     private boolean _downloading;
+
+    private BroadcastReceiver _startDownloadAllReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_birthdayDownloadFinishedReceiver");
+            StartDownloadAll("_birthdayDownloadFinishedReceiver onReceive");
+        }
+    };
 
     private BroadcastReceiver _birthdayDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
@@ -115,20 +121,6 @@ public class MainService extends Service {
                 _downloadResultList.addValue(new SerializablePair("Coin", result.Success));
             } else {
                 _downloadResultList.addValue(new SerializablePair("Coin", false));
-            }
-            broadcastDownloadCount();
-        }
-    };
-
-    private BroadcastReceiver _libraryDownloadFinishedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_libraryDownloadFinishedReceiver");
-            LibraryService.MagazinDownloadFinishedContent result = (LibraryService.MagazinDownloadFinishedContent) intent.getSerializableExtra(LibraryService.MagazinDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("Library", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("Library", false));
             }
             broadcastDownloadCount();
         }
@@ -238,6 +230,20 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _securityDownloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_securityDownloadFinishedReceiver");
+            SecurityService.SecurityDownloadFinishedContent result = (SecurityService.SecurityDownloadFinishedContent) intent.getSerializableExtra(SecurityService.SecurityDownloadFinishedBroadcast);
+            if (result != null) {
+                _downloadResultList.addValue(new SerializablePair("Security", result.Success));
+            } else {
+                _downloadResultList.addValue(new SerializablePair("Security", false));
+            }
+            broadcastDownloadCount();
+        }
+    };
+
     private BroadcastReceiver _shoppingListDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -286,44 +292,6 @@ public class MainService extends Service {
         }
     };
 
-    public void Initialize() {
-        if (_logger == null) {
-            _logger = new Logger(TAG);
-        }
-        _logger.Debug("Initialize");
-
-        _receiverController.RegisterReceiver(_birthdayDownloadFinishedReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_coinConversionDownloadFinishedReceiver, new String[]{CoinService.CoinConversionDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_coinDownloadFinishedReceiver, new String[]{CoinService.CoinDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_libraryDownloadFinishedReceiver, new String[]{LibraryService.MagazinDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_mapContentDownloadFinishedReceiver, new String[]{MapContentService.MapContentDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_listedMenuDownloadFinishedReceiver, new String[]{MenuService.ListedMenuDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_menuDownloadFinishedReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_movieDownloadFinishedReceiver, new String[]{MovieService.MovieDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_openWeatherCurrentWeatherDownloadFinishedReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_openWeatherForecastWeatherDownloadFinishedReceiver, new String[]{OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_scheduleDownloadFinishedReceiver, new String[]{ScheduleService.ScheduleDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_shoppingListDownloadFinishedReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_temperatureDownloadFinishedReceiver, new String[]{TemperatureService.TemperatureDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_wirelessSocketDownloadFinishedReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
-
-        _birthdayService.Initialize(_context, BirthdayActivity.class);
-        _coinService.Initialize(_context);
-        _libraryService.Initialize(_context);
-        _mapContentService.Initialize(_context);
-        _menuService.Initialize(_context);
-        _movieService.Initialize(_context);
-        _openWeatherService.Initialize(_context, _settingsController.GetOpenWeatherCity());
-        _scheduleService.Initialize(_context);
-        _shoppingListService.Initialize(_context);
-        _temperatureService.Initialize(_context);
-        _userService.Initialize(_context);
-        _wirelessSocketService.Initialize(_context, SocketActionReceiver.class);
-
-        _currentDownloadCount = 0;
-        _downloadResultList = new SerializableList<>();
-    }
-
     public void StartDownloadAll(@NonNull String caller) {
         _logger.Debug("StartDownloadAll with " + caller);
 
@@ -338,12 +306,12 @@ public class MainService extends Service {
 
         _birthdayService.LoadBirthdayList();
         _coinService.LoadCoinConversionList();
-        _libraryService.LoadMagazinList();
         _menuService.LoadListedMenuList();
         _menuService.LoadMenuList();
         _movieService.LoadMovieList();
         _openWeatherService.LoadCurrentWeather();
         _openWeatherService.LoadForecastWeather();
+        _securityService.LoadSecurityList();
         _shoppingListService.LoadShoppingList();
         _wirelessSocketService.LoadWirelessSocketList();
     }
@@ -398,18 +366,50 @@ public class MainService extends Service {
         _settingsController = SettingsController.getInstance();
         _settingsController.Initialize(_context);
 
+        _receiverController.RegisterReceiver(_startDownloadAllReceiver, new String[]{MainServiceStartDownloadAllBroadcast});
+        _receiverController.RegisterReceiver(_birthdayDownloadFinishedReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_coinConversionDownloadFinishedReceiver, new String[]{CoinService.CoinConversionDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_coinDownloadFinishedReceiver, new String[]{CoinService.CoinDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_mapContentDownloadFinishedReceiver, new String[]{MapContentService.MapContentDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuDownloadFinishedReceiver, new String[]{MenuService.ListedMenuDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_menuDownloadFinishedReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_movieDownloadFinishedReceiver, new String[]{MovieService.MovieDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_openWeatherCurrentWeatherDownloadFinishedReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_openWeatherForecastWeatherDownloadFinishedReceiver, new String[]{OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_scheduleDownloadFinishedReceiver, new String[]{ScheduleService.ScheduleDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_securityDownloadFinishedReceiver, new String[]{SecurityService.SecurityDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_shoppingListDownloadFinishedReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_temperatureDownloadFinishedReceiver, new String[]{TemperatureService.TemperatureDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_wirelessSocketDownloadFinishedReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
+
         _birthdayService = BirthdayService.getInstance();
         _coinService = CoinService.getInstance();
-        _libraryService = LibraryService.getInstance();
         _mapContentService = MapContentService.getInstance();
         _menuService = MenuService.getInstance();
         _movieService = MovieService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
         _scheduleService = ScheduleService.getInstance();
+        _securityService = SecurityService.getInstance();
         _shoppingListService = ShoppingListService.getInstance();
         _temperatureService = TemperatureService.getInstance();
         _userService = UserService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
+
+        _birthdayService.Initialize(_context, BirthdayActivity.class);
+        _coinService.Initialize(_context);
+        _mapContentService.Initialize(_context);
+        _menuService.Initialize(_context);
+        _movieService.Initialize(_context);
+        _openWeatherService.Initialize(_context, _settingsController.GetOpenWeatherCity());
+        _scheduleService.Initialize(_context);
+        _securityService.Initialize(_context);
+        _shoppingListService.Initialize(_context);
+        _temperatureService.Initialize(_context);
+        _userService.Initialize(_context);
+        _wirelessSocketService.Initialize(_context, SocketActionReceiver.class);
+
+        _currentDownloadCount = 0;
+        _downloadResultList = new SerializableList<>();
     }
 
     @Override
