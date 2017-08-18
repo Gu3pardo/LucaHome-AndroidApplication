@@ -6,8 +6,7 @@ public enum MediaServerSelection implements Serializable {
 
     NULL(0, "", "", "", false),
     MEDIAMIRROR_1(1, "192.168.178.147", "MediaMirror1", "Workspace Jonas", false),
-    MEDIAMIRROR_2(2, "192.168.178.20", "MediaMirror2", "Sleeping Room", true),
-    MEDIAMIRROR_3(3, "192.168.178.26", "MediaMirror3", "Kitchen", false);
+    MEDIAMIRROR_2(2, "192.168.178.20", "MediaMirror2", "Sleeping Room", true);
 
     private int _id;
     private String _ip;

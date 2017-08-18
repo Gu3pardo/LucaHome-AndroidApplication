@@ -23,7 +23,9 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp">
+                android:layout_margin="5dp"
+                android:background="@color/colorPrimary"
+                android:padding="5dp">
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/coinUser_TextInputLayout"
@@ -42,7 +44,7 @@
                         android:maxLines="1"
                         android:nextFocusDown="@+id/coin_edit_type_textview"
                         android:nextFocusRight="@+id/coin_edit_type_textview"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/TextIcon" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -63,7 +65,7 @@
                         android:maxLines="1"
                         android:nextFocusDown="@+id/coin_edit_amount_textview"
                         android:nextFocusRight="@+id/coin_edit_amount_textview"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/TextIcon" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -84,7 +86,7 @@
                         android:maxLines="1"
                         android:nextFocusDown="@+id/save_coin_edit_button"
                         android:nextFocusRight="@+id/save_coin_edit_button"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/TextIcon" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -99,7 +101,11 @@
                     android:layout_marginTop="16dp"
                     android:text="@string/save"
                     android:textColor="@color/colorTextIcon"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:rd_delayClick="none"
+                    app:rd_enable="true"
+                    app:rd_rippleColor="@color/colorPrimary"
+                    app:rd_rippleType="touch" />
 
             </RelativeLayout>
         </android.support.v7.widget.CardView>

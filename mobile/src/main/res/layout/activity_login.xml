@@ -83,7 +83,11 @@
                     android:layout_marginTop="16dp"
                     android:text="@string/action_sign_in"
                     android:textColor="@color/colorTextIcon"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:rd_delayClick="none"
+                    app:rd_enable="true"
+                    app:rd_rippleColor="@color/colorPrimary"
+                    app:rd_rippleType="touch" />
 
             </LinearLayout>
         </ScrollView>

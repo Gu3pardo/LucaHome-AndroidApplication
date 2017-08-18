@@ -61,7 +61,8 @@ public class WirelessSocketService {
     private static final String TAG = WirelessSocketService.class.getSimpleName();
     private Logger _logger;
 
-    private Class<?> _receiverActivity;
+    private boolean _displayNotification;
+    private Class<?> _receiverClass;
 
     private static final int TIMEOUT_MS = 5 * 60 * 1000;
     private Handler _reloadHandler = new Handler();
@@ -292,7 +293,7 @@ public class WirelessSocketService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity) {
+    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverClass, boolean displayNotification) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
@@ -300,7 +301,8 @@ public class WirelessSocketService {
             return;
         }
 
-        _receiverActivity = receiverActivity;
+        _receiverClass = receiverClass;
+        _displayNotification = displayNotification;
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
@@ -382,7 +384,7 @@ public class WirelessSocketService {
         return null;
     }
 
-    public WirelessSocket GetSocketByName(String name) {
+    public WirelessSocket GetSocketByName(@NonNull String name) {
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
             WirelessSocket entry = _wirelessSocketList.getValue(index);
 
@@ -442,7 +444,7 @@ public class WirelessSocketService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocket, true);
     }
 
-    public void ChangeWirelessSocketState(WirelessSocket entry) {
+    public void ChangeWirelessSocketState(@NonNull WirelessSocket entry) {
         _logger.Debug(String.format(Locale.getDefault(), "ChangeWirelessSocketState: Changing state of entry %s", entry));
 
         LucaUser user = _settingsController.GetUser();
@@ -459,7 +461,7 @@ public class WirelessSocketService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketSet, true);
     }
 
-    public void SetWirelessSocketState(WirelessSocket entry, boolean newState) {
+    public void SetWirelessSocketState(@NonNull WirelessSocket entry, boolean newState) {
         _logger.Debug(String.format(Locale.getDefault(), "SetWirelessSocketState: Setting state of entry %s to %s", entry, newState));
 
         LucaUser user = _settingsController.GetUser();
@@ -494,7 +496,7 @@ public class WirelessSocketService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketSet, true);
     }
 
-    public void AddWirelessSocket(WirelessSocket entry) {
+    public void AddWirelessSocket(@NonNull WirelessSocket entry) {
         _logger.Debug(String.format(Locale.getDefault(), "AddWirelessSocket: Adding new entry %s", entry));
 
         LucaUser user = _settingsController.GetUser();
@@ -511,7 +513,7 @@ public class WirelessSocketService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketAdd, true);
     }
 
-    public void UpdateWirelessSocket(WirelessSocket entry) {
+    public void UpdateWirelessSocket(@NonNull WirelessSocket entry) {
         _logger.Debug(String.format(Locale.getDefault(), "UpdateWirelessSocket: Updating entry %s", entry));
 
         LucaUser user = _settingsController.GetUser();
@@ -528,7 +530,7 @@ public class WirelessSocketService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketUpdate, true);
     }
 
-    public void DeleteWirelessSocket(WirelessSocket entry) {
+    public void DeleteWirelessSocket(@NonNull WirelessSocket entry) {
         _logger.Debug(String.format(Locale.getDefault(), "DeleteWirelessSocket: Deleting entry %s", entry));
 
         LucaUser user = _settingsController.GetUser();
@@ -545,12 +547,39 @@ public class WirelessSocketService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketDelete, true);
     }
 
-    public void SetReceiverActivity(@NonNull Class<?> receiverActivity) {
-        _receiverActivity = receiverActivity;
+    public void ShowNotification() {
+        _logger.Debug("ShowNotification");
+        if (!_displayNotification) {
+            _logger.Warning("_displayNotification is false!");
+            return;
+        }
+        _notificationController.CreateSocketNotification(NOTIFICATION_ID, _wirelessSocketList, _receiverClass);
     }
 
-    public Class<?> GetReceiverActivity() {
-        return _receiverActivity;
+    public void CloseNotification() {
+        _logger.Debug("CloseNotification");
+        _notificationController.CloseNotification(NOTIFICATION_ID);
+    }
+
+    public boolean GetDisplayNotification() {
+        return _displayNotification;
+    }
+
+    public void SetDisplayNotification(boolean displayNotification) {
+        _displayNotification = displayNotification;
+        if (!_displayNotification) {
+            CloseNotification();
+        } else {
+            ShowNotification();
+        }
+    }
+
+    public void SetReceiverClass(@NonNull Class<?> receiverClass) {
+        _receiverClass = receiverClass;
+    }
+
+    public Class<?> GetReceiverClass() {
+        return _receiverClass;
     }
 
     private void clearSocketListFromDatabase() {
@@ -570,16 +599,6 @@ public class WirelessSocketService {
             WirelessSocket socket = _wirelessSocketList.getValue(index);
             _databaseSocketList.CreateEntry(socket);
         }
-    }
-
-    public void ShowNotification() {
-        _logger.Debug("ShowNotification");
-        _notificationController.CreateSocketNotification(NOTIFICATION_ID, _wirelessSocketList, _receiverActivity);
-    }
-
-    public void CloseNotification() {
-        _logger.Debug("CloseNotification");
-        _notificationController.CloseNotification(NOTIFICATION_ID);
     }
 
     private void sendFailedSocketDownloadBroadcast(@NonNull String response) {

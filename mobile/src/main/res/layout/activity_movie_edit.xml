@@ -44,7 +44,7 @@
                         android:maxLines="1"
                         android:nextFocusDown="@+id/movie_edit_genre_textview"
                         android:nextFocusRight="@+id/movie_edit_genre_textview"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/TextIcon" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -66,7 +66,7 @@
                         android:maxLines="1"
                         android:nextFocusDown="@+id/movie_edit_description_textview"
                         android:nextFocusRight="@+id/movie_edit_description_textview"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/TextIcon" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -88,7 +88,7 @@
                         android:maxLines="1"
                         android:nextFocusDown="@+id/movieRating_Bar"
                         android:nextFocusRight="@+id/movieRating_Bar"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/TextIcon" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -114,7 +114,11 @@
                     android:layout_marginTop="16dp"
                     android:text="@string/save"
                     android:textColor="@color/colorTextIcon"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:rd_delayClick="none"
+                    app:rd_enable="true"
+                    app:rd_rippleColor="@color/colorPrimary"
+                    app:rd_rippleType="touch" />
 
             </RelativeLayout>
         </android.support.v7.widget.CardView>

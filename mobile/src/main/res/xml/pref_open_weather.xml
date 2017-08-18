@@ -12,4 +12,9 @@
         android:singleLine="true"
         android:title="@string/pref_title_enter_open_weather_city" />
 
+    <SwitchPreference
+        android:defaultValue="false"
+        android:key="change_weather_wallpaper"
+        android:title="@string/pref_title_change_weather_wallpaper" />
+
 </PreferenceScreen>

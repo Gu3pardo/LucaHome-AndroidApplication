@@ -44,7 +44,7 @@
                         android:maxLines="1"
                         android:nextFocusDown="@+id/shopping_entry_group_select"
                         android:nextFocusRight="@+id/shopping_entry_group_select"
-                        android:textColor="@color/Black" />
+                        android:textColor="@color/TextIcon" />
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -65,7 +65,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/shopping_entry_group_select"
-                    android:textColor="@color/Black" />
+                    android:textColor="@color/TextIcon" />
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/floating_action_button_increase_quantity"
@@ -76,7 +76,11 @@
                     android:layout_toStartOf="@+id/floating_action_button_decrease_quantity"
                     android:nextFocusDown="@+id/floating_action_button_decrease_quantity"
                     android:nextFocusRight="@+id/floating_action_button_decrease_quantity"
-                    app:srcCompat="@mipmap/ic_add_white_48dp" />
+                    app:srcCompat="@mipmap/ic_add_white_48dp"
+                    app:rd_delayClick="none"
+                    app:rd_enable="true"
+                    app:rd_rippleColor="@color/colorPrimary"
+                    app:rd_rippleType="touch" />
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/floating_action_button_decrease_quantity"
@@ -87,7 +91,11 @@
                     android:layout_margin="5dp"
                     android:nextFocusDown="@+id/save_shopping_edit_button"
                     android:nextFocusRight="@+id/save_shopping_edit_button"
-                    app:srcCompat="@mipmap/ic_remove_circle_outline_white_48dp" />
+                    app:srcCompat="@mipmap/ic_remove_circle_outline_white_48dp"
+                    app:rd_delayClick="none"
+                    app:rd_enable="true"
+                    app:rd_rippleColor="@color/colorPrimary"
+                    app:rd_rippleType="touch" />
 
                 <com.rey.material.widget.Button
                     android:id="@+id/save_shopping_edit_button"
@@ -100,7 +108,11 @@
                     android:layout_marginTop="16dp"
                     android:text="@string/save"
                     android:textColor="@color/colorTextIcon"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    app:rd_delayClick="none"
+                    app:rd_enable="true"
+                    app:rd_rippleColor="@color/colorPrimary"
+                    app:rd_rippleType="touch" />
 
             </RelativeLayout>
         </android.support.v7.widget.CardView>

@@ -79,5 +79,9 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="5dp"
         android:src="@mipmap/ic_add_white_48dp"
-        app:fab_iconSize="30dp" />
+        app:fab_iconSize="30dp"
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 </RelativeLayout>

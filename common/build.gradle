@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 40100
-        versionName "4.1.0.170814"
+        versionCode 40200
+        versionName "4.2.0.170818"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -32,6 +32,8 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile project(':basic')
+    compile project(':lib_openweather')
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
     compile 'com.android.support:cardview-v7:26.0.0-alpha1'
@@ -45,6 +47,5 @@ dependencies {
     compile 'com.github.GrenderG:Toasty:1.2.5'
     compile 'com.github.rey5137:material:1.2.4'
     testCompile 'junit:junit:4.12'
-    compile project(':basic')
-    compile project(':lib_openweather')
+    compile 'org.jsoup:jsoup:1.10.3'
 }

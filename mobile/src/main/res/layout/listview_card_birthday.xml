@@ -88,8 +88,12 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="5dp"
         android:layout_toStartOf="@+id/birthday_card_delete_button"
+        android:scaleType="center"
         android:src="@android:drawable/ic_menu_preferences"
-        android:scaleType="center" />
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/birthday_card_delete_button"
@@ -98,6 +102,10 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
         android:layout_margin="5dp"
+        android:scaleType="center"
         android:src="@android:drawable/ic_menu_delete"
-        android:scaleType="center"/>
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 </RelativeLayout>

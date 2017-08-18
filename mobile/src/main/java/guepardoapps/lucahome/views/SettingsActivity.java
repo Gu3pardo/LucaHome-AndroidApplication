@@ -31,6 +31,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.BirthdayService;
+import guepardoapps.lucahome.common.service.SecurityService;
 import guepardoapps.lucahome.common.service.TemperatureService;
 import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
@@ -63,6 +64,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static BirthdayService _birthdayService;
     private static OpenWeatherService _openWeatherService;
+    private static SecurityService _securityService;
     private static TemperatureService _temperatureService;
     private static UserService _userService;
     private static WirelessSocketService _wirelessSocketService;
@@ -132,13 +134,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         if (_settingsController.IsSocketNotificationEnabled()) {
                             _wirelessSocketService.ShowNotification();
                         }
+                        if (_settingsController.IsCameraNotificationEnabled()) {
+                            _securityService.ShowNotification();
+                        }
                     } else {
                         _birthdayService.CloseNotifications();
                         _openWeatherService.SetDisplayCurrentWeatherNotification(false);
                         _openWeatherService.SetDisplayForecastWeatherNotification(false);
+                        _securityService.CloseNotification();
                         _temperatureService.CloseNotification();
                         _wirelessSocketService.CloseNotification();
                     }
+
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_BIRTHDAY)) {
                     if ((boolean) value) {
                         _birthdayService.CheckForBirthdays();
@@ -161,6 +168,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     } else {
                         _temperatureService.CloseNotification();
                     }
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_CAMERA)) {
+                    _securityService.SetDisplayNotification((boolean) value);
+
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_CHANGE_WEATHER_WALLPAPER)) {
+                    _openWeatherService.SetChangeWallpaper((boolean) value);
+
                 } else if (preference.getKey().contains(WirelessSocket.SETTINGS_HEADER)) {
                     _wirelessSocketService.ShowNotification();
                 }
@@ -247,6 +260,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         _birthdayService = BirthdayService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
+        _securityService = SecurityService.getInstance();
         _temperatureService = TemperatureService.getInstance();
         _userService = UserService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
@@ -423,6 +437,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_BIRTHDAY));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_CAMERA));
         }
 
         @Override
@@ -453,6 +468,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_OPEN_WEATHER_CITY));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_CHANGE_WEATHER_WALLPAPER));
         }
 
         @Override

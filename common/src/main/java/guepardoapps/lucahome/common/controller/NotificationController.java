@@ -83,6 +83,42 @@ public class NotificationController {
         notificationManager.notify(notificationId, notification);
     }
 
+    public void CreateCameraNotification(
+            int notificationId,
+            @NonNull Class<?> receiverActivity) {
+
+        if (!_settingsController.IsCameraNotificationEnabled()) {
+            _logger.Warning("Not allowed to display camera notification!");
+            return;
+        }
+
+        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), R.drawable.camera);
+        NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender().setHintHideIcon(true).setBackground(bitmap);
+        RemoteViews remoteViews = new RemoteViews(_context.getPackageName(), R.layout.notification_camera);
+
+        // Action for button show camera
+        Intent goToSecurityIntent = new Intent(_context, receiverActivity);
+        PendingIntent goToSecurityPendingIntent = PendingIntent.getActivity(_context, 34678743, goToSecurityIntent, 0);
+        NotificationCompat.Action goToSecurityWearAction = new NotificationCompat.Action.Builder(R.drawable.camera, "Go to security", goToSecurityPendingIntent).build();
+
+        remoteViews.setOnClickPendingIntent(R.id.goToSecurity, goToSecurityPendingIntent);
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context);
+        builder.setSmallIcon(R.drawable.camera)
+                .setContentTitle("Camera is active!")
+                .setContentText("Go to security!")
+                .setTicker("")
+                .extend(wearableExtender)
+                .addAction(goToSecurityWearAction);
+
+        Notification notification = builder.build();
+        notification.contentView = remoteViews;
+        notification.bigContentView = remoteViews;
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
+        notificationManager.notify(notificationId, notification);
+    }
+
     public void CreateSocketNotification(int notificationId, @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull Class<?> receiverClass) {
         _logger.Debug("CreateSocketNotification");
 

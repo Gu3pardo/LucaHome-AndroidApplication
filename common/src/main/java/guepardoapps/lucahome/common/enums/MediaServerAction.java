@@ -18,7 +18,7 @@ public enum MediaServerAction implements Serializable {
     IS_SEA_SOUND_PLAYING(8, "Is_Sea_Sound_Playing", 1),
     GET_SEA_SOUND_COUNTDOWN(9, "Get_Sea_Sound_Countdown", 1),
 
-    SHOW_WEBVIEW(10, "Show_Webview", 1),
+    //SHOW_WEBVIEW(10, "Show_Webview", 1),
     SHOW_CENTER_TEXT(11, "Show_Center_Text", 1),
 
     SET_RSS_FEED(20, "Set_Rss_Feed", 1),
@@ -40,7 +40,7 @@ public enum MediaServerAction implements Serializable {
     PLAY_ALARM(50, "Play_Alarm", 4),
     STOP_ALARM(51, "Stop_Alarm", 4),
 
-    GAME_COMMAND(60, "GAME_COMMAND", 1),
+    /*GAME_COMMAND(60, "GAME_COMMAND", 1),
     GAME_PONG_START(61, "GAME_PONG_START", 1),
     GAME_PONG_STOP(62, "GAME_PONG_STOP", 1),
     GAME_PONG_PAUSE(63, "GAME_PONG_PAUSE", 1),
@@ -49,7 +49,7 @@ public enum MediaServerAction implements Serializable {
     GAME_SNAKE_START(66, "GAME_SNAKE_START", 1),
     GAME_SNAKE_STOP(67, "GAME_SNAKE_STOP", 1),
     GAME_TETRIS_START(68, "GAME_TETRIS_START", 1),
-    GAME_TETRIS_STOP(69, "GAME_TETRIS_STOP", 1),
+    GAME_TETRIS_STOP(69, "GAME_TETRIS_STOP", 1),*/
 
     INCREASE_SCREEN_BRIGHTNESS(70, "Increase_Screen_Brightness", 3),
     DECREASE_SCREEN_BRIGHTNESS(71, "Decrease_Screen_Brightness", 3),
@@ -58,8 +58,8 @@ public enum MediaServerAction implements Serializable {
     SCREEN_OFF(74, "SCREEN_OFF", 3),
     SCREEN_NORMAL(75, "SCREEN_NORMAL", 3),
 
-    SYSTEM_REBOOT(80, "SYSTEM_REBOOT", 5),
-    SYSTEM_SHUTDOWN(81, "SYSTEM_SHUTDOWN", 5),
+    //SYSTEM_REBOOT(80, "SYSTEM_REBOOT", 5),
+    //SYSTEM_SHUTDOWN(81, "SYSTEM_SHUTDOWN", 5),
 
     GET_BATTERY_LEVEL(90, "Get_Battery_Level", 1),
     GET_SERVER_VERSION(91, "Get_Server_Version", 1),
@@ -69,9 +69,9 @@ public enum MediaServerAction implements Serializable {
     SHOW_RADIO_STREAM(110, "Show_Radio_Stream", 1),
     PLAY_RADIO_STREAM(111, "Play_Radio_Stream", 1),
     STOP_RADIO_STREAM(112, "Stop_Radio_Stream", 1),
-    IS_RADIO_STREAM_PLAYING(113, "Is_Radio_Stream_Playing", 1),
+    IS_RADIO_STREAM_PLAYING(113, "Is_Radio_Stream_Playing", 1);
 
-    PING(1000, "PING", 1);
+    //PING(1000, "PING", 1);
 
     private int _id;
     private String _action;
@@ -113,4 +113,4 @@ public enum MediaServerAction implements Serializable {
         }
         return NULL;
     }
-}
+    }

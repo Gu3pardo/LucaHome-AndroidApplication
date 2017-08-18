@@ -6,7 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
 import java.util.Locale;
@@ -27,14 +29,26 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mediamirror);
 
         _logger = new Logger(TAG);
         _logger.Debug("onCreate");
 
-        _context = this;
+        setContentView(R.layout.activity_mediamirror);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_media_mirror);
+        //setSupportActionBar(toolbar);
+
+        _context = this;
         _navigationService = NavigationService.getInstance();
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_mediamirror);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_mediamirror);
+        navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -63,7 +77,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_security);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_mediamirror);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -114,7 +128,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
                     .show();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_security);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_mediamirror);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

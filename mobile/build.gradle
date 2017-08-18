@@ -7,8 +7,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 40100
-        versionName "4.1.0.170814"
+        versionCode 40200
+        versionName "4.2.0.170818"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -53,5 +53,6 @@ dependencies {
     compile('com.mikepenz:aboutlibraries:5.9.6@aar') {
         transitive = true
     }
+    compile 'org.jsoup:jsoup:1.10.3'
     testCompile 'junit:junit:4.12'
 }

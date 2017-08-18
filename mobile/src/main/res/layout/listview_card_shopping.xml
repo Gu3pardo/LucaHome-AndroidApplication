@@ -105,7 +105,11 @@
         android:layout_marginBottom="5dp"
         android:layout_toStartOf="@+id/shoppingCardDecreaseButton"
         android:scaleType="center"
-        android:src="@android:drawable/ic_menu_add" />
+        android:src="@android:drawable/ic_menu_add"
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/shoppingCardDecreaseButton"
@@ -115,7 +119,11 @@
         android:layout_alignParentEnd="true"
         android:layout_margin="5dp"
         android:scaleType="center"
-        android:src="@mipmap/ic_remove_circle_outline_white_48dp" />
+        android:src="@mipmap/ic_remove_circle_outline_white_48dp"
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/shoppingCardDeleteButton"
@@ -125,5 +133,9 @@
         android:layout_alignParentTop="true"
         android:layout_margin="5dp"
         android:scaleType="center"
-        android:src="@android:drawable/ic_menu_delete" />
+        android:src="@android:drawable/ic_menu_delete"
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 </RelativeLayout>

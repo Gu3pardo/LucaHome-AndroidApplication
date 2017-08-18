@@ -30,6 +30,7 @@ import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
 import guepardoapps.library.openweather.customadapter.ForecastListAdapter;
+import guepardoapps.library.openweather.models.ForecastModel;
 import guepardoapps.library.openweather.models.ForecastPartModel;
 import guepardoapps.library.openweather.service.OpenWeatherService;
 import guepardoapps.lucahome.R;
@@ -152,9 +153,10 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                List<ForecastPartModel> filteredList = _openWeatherService.FoundForcastItem(charSequence.toString());
-                _forecastListAdapter = new ForecastListAdapter(_context, filteredList);
+                ForecastModel foundForecastModel = _openWeatherService.FoundForecastItem(charSequence.toString());
+                _forecastListAdapter = new ForecastListAdapter(_context, foundForecastModel.GetList());
                 _listView.setAdapter(_forecastListAdapter);
+                _mainImageView.setImageResource(foundForecastModel.GetWallpaper());
             }
 
             @Override

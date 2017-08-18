@@ -24,6 +24,7 @@ import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.*;
 import guepardoapps.lucahome.receiver.SocketActionReceiver;
 import guepardoapps.lucahome.views.BirthdayActivity;
+import guepardoapps.lucahome.views.SecurityActivity;
 
 public class MainService extends Service {
     public class MainServiceBinder extends Binder {
@@ -58,6 +59,7 @@ public class MainService extends Service {
     private BirthdayService _birthdayService;
     private CoinService _coinService;
     private MapContentService _mapContentService;
+    private MediaMirrorService _mediaMirrorService;
     private MenuService _menuService;
     private MovieService _movieService;
     private OpenWeatherService _openWeatherService;
@@ -385,6 +387,7 @@ public class MainService extends Service {
         _birthdayService = BirthdayService.getInstance();
         _coinService = CoinService.getInstance();
         _mapContentService = MapContentService.getInstance();
+        _mediaMirrorService = MediaMirrorService.getInstance();
         _menuService = MenuService.getInstance();
         _movieService = MovieService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
@@ -398,15 +401,27 @@ public class MainService extends Service {
         _birthdayService.Initialize(_context, BirthdayActivity.class);
         _coinService.Initialize(_context);
         _mapContentService.Initialize(_context);
+        _mediaMirrorService.Initialize(_context);
         _menuService.Initialize(_context);
         _movieService.Initialize(_context);
-        _openWeatherService.Initialize(_context, _settingsController.GetOpenWeatherCity());
+        _openWeatherService.Initialize(
+                _context,
+                _settingsController.GetOpenWeatherCity(),
+                _settingsController.IsCurrentWeatherNotificationEnabled(),
+                _settingsController.IsForecastWeatherNotificationEnabled(),
+                _settingsController.IsChangeWeatherWallpaperActive());
         _scheduleService.Initialize(_context);
-        _securityService.Initialize(_context);
+        _securityService.Initialize(
+                _context,
+                SecurityActivity.class,
+                _settingsController.IsCameraNotificationEnabled());
         _shoppingListService.Initialize(_context);
         _temperatureService.Initialize(_context);
         _userService.Initialize(_context);
-        _wirelessSocketService.Initialize(_context, SocketActionReceiver.class);
+        _wirelessSocketService.Initialize(
+                _context,
+                SocketActionReceiver.class,
+                _settingsController.IsSocketNotificationEnabled());
 
         _currentDownloadCount = 0;
         _downloadResultList = new SerializableList<>();
@@ -417,5 +432,19 @@ public class MainService extends Service {
         super.onDestroy();
         _logger.Debug("onDestroy");
         _receiverController.Dispose();
+
+        _birthdayService.Dispose();
+        _coinService.Dispose();
+        _mapContentService.Dispose();
+        _mediaMirrorService.Dispose();
+        _menuService.Dispose();
+        _movieService.Dispose();
+        _openWeatherService.Dispose();
+        _scheduleService.Dispose();
+        _securityService.Dispose();
+        _shoppingListService.Dispose();
+        _temperatureService.Dispose();
+        _userService.Dispose();
+        _wirelessSocketService.Dispose();
     }
 }

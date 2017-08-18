@@ -17,6 +17,7 @@ import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.classes.Security;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.DownloadController;
+import guepardoapps.lucahome.common.controller.NotificationController;
 import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.converter.JsonDataToSecurityConverter;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
@@ -31,6 +32,8 @@ public class SecurityService {
             SecurityList = securityList;
         }
     }
+
+    public static final int NOTIFICATION_ID = 94802738;
 
     public static final String SecurityDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.security.download.finished";
     public static final String SecurityDownloadFinishedBundle = "SecurityDownloadFinishedBundle";
@@ -47,6 +50,9 @@ public class SecurityService {
     private static final String TAG = SecurityService.class.getSimpleName();
     private Logger _logger;
 
+    private boolean _displayNotification;
+    private Class<?> _receiverActivity;
+
     private static final int TIMEOUT_MS = 15 * 60 * 1000;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
@@ -60,6 +66,7 @@ public class SecurityService {
 
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
+    private NotificationController _notificationController;
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
 
@@ -103,6 +110,15 @@ public class SecurityService {
             }
 
             _securityList = securityList;
+
+            if (_securityList.getSize() > 0) {
+                Security security = _securityList.getValue(0);
+                if (security.IsCameraActive()) {
+                    ShowNotification();
+                } else {
+                    CloseNotification();
+                }
+            }
 
             _broadcastController.SendSerializableBroadcast(
                     SecurityDownloadFinishedBroadcast,
@@ -194,7 +210,7 @@ public class SecurityService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context) {
+    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
@@ -202,8 +218,12 @@ public class SecurityService {
             return;
         }
 
+        _receiverActivity = receiverActivity;
+        _displayNotification = displayNotification;
+
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
+        _notificationController = new NotificationController(context);
         _receiverController = new ReceiverController(context);
         _settingsController = SettingsController.getInstance();
 
@@ -285,6 +305,51 @@ public class SecurityService {
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.SecurityMotionControl, true);
     }
+
+    public void ShowNotification() {
+        _logger.Debug("ShowNotification");
+        if (!_displayNotification) {
+            _logger.Warning("_displayNotification is false!");
+            return;
+        }
+        _notificationController.CreateCameraNotification(NOTIFICATION_ID, _receiverActivity);
+    }
+
+    public void CloseNotification() {
+        _logger.Debug("CloseNotification");
+        _notificationController.CloseNotification(NOTIFICATION_ID);
+    }
+
+    public boolean GetDisplayNotification() {
+        return _displayNotification;
+    }
+
+    public void SetDisplayNotification(boolean displayNotification) {
+        _displayNotification = displayNotification;
+
+        if (!_displayNotification) {
+            CloseNotification();
+        } else {
+
+            if (_securityList != null) {
+                if (_securityList.getSize() > 0) {
+                    Security security = _securityList.getValue(0);
+                    if (security.IsCameraActive()) {
+                        ShowNotification();
+                    }
+                }
+            }
+        }
+    }
+
+    public void SetReceiverActivity(@NonNull Class<?> receiverActivity) {
+        _receiverActivity = receiverActivity;
+    }
+
+    public Class<?> GetReceiverActivity() {
+        return _receiverActivity;
+    }
+
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {
         _broadcastController.SendSerializableBroadcast(

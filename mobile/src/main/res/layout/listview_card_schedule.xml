@@ -111,7 +111,11 @@
         android:layout_marginTop="5dp"
         android:layout_toStartOf="@+id/schedule_card_delete_button"
         android:scaleType="center"
-        android:src="@android:drawable/ic_menu_preferences" />
+        android:src="@android:drawable/ic_menu_preferences"
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/schedule_card_delete_button"
@@ -121,5 +125,9 @@
         android:layout_alignParentTop="true"
         android:layout_margin="5dp"
         android:scaleType="center"
-        android:src="@android:drawable/ic_menu_delete" />
+        android:src="@android:drawable/ic_menu_delete"
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 </RelativeLayout>

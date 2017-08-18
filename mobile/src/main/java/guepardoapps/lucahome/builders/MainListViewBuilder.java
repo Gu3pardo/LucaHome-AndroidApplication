@@ -254,6 +254,7 @@ public class MainListViewBuilder {
 
         _mainListViewItems.addValue(wirelessSocketItem);
         _mainListViewItems.addValue(scheduleItem);
+        /*TODO reactivate*/
         //_mainListViewItems.addValue(timerItem);
         _mainListViewItems.addValue(weatherItem);
         _mainListViewItems.addValue(coinItem);
@@ -261,8 +262,7 @@ public class MainListViewBuilder {
         _mainListViewItems.addValue(shoppingItem);
         _mainListViewItems.addValue(birthdayItem);
         _mainListViewItems.addValue(movieItem);
-        /*TODO reactivate*/
-        //_mainListViewItems.addValue(mediaMirrorItem);
+        _mainListViewItems.addValue(mediaMirrorItem);
         _mainListViewItems.addValue(securityItem);
     }
 

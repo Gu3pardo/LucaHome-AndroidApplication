@@ -102,5 +102,9 @@
         android:layout_alignParentTop="true"
         android:layout_margin="5dp"
         android:scaleType="center"
-        android:src="@android:drawable/ic_menu_delete" />
+        android:src="@android:drawable/ic_menu_delete"
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
 </RelativeLayout>

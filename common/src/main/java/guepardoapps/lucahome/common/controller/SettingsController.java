@@ -24,6 +24,7 @@ public class SettingsController {
     public static final String PREF_SSID = "ssid";
 
     public static final String PREF_OPEN_WEATHER_CITY = "open_weather_city";
+    public static final String PREF_CHANGE_WEATHER_WALLPAPER = "change_weather_wallpaper";
 
     public static final String PREF_NOTIFICATION_MESSAGE = "notifications_message";
     public static final String PREF_NOTIFICATION_MESSAGE_SOCKETS = "notifications_message_sockets";
@@ -31,6 +32,7 @@ public class SettingsController {
     public static final String PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER = "notifications_message_current_weather";
     public static final String PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER = "notifications_message_forecast_weather";
     public static final String PREF_NOTIFICATION_MESSAGE_TEMPERATURE = "notifications_message_temperature";
+    public static final String PREF_NOTIFICATION_MESSAGE_CAMERA = "notifications_message_camera";
 
     private Context _context;
     private SharedPrefController _sharedPrefController;
@@ -152,5 +154,16 @@ public class SettingsController {
 
     public boolean IsWirelessSocketVisible(@NonNull WirelessSocket wirelessSocket) {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(wirelessSocket.GetSettingsKey());
+    }
+
+    public boolean IsCameraNotificationEnabled() {
+        if (!AreNotificationsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_CAMERA);
+    }
+
+    public boolean IsChangeWeatherWallpaperActive() {
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_CHANGE_WEATHER_WALLPAPER);
     }
 }
