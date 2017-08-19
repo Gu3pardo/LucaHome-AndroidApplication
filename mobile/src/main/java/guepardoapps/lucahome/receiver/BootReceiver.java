@@ -4,6 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import java.util.Locale;
+
 import guepardoapps.lucahome.basic.controller.AndroidSystemController;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
@@ -17,20 +19,33 @@ public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Logger logger = new Logger(TAG);
-        logger.Debug("WIFIReceiver onReceive.\nContext is " + context.toString());
+        logger.Debug("BootReceiver onReceive.\nContext is " + context.toString());
 
-        AndroidSystemController androidSystemController = new AndroidSystemController(context);
-        BroadcastController broadcastController = new BroadcastController(context);
-        NetworkController networkController = new NetworkController(context);
+        String action = intent.getAction();
+        if (action == null) {
+            logger.Warning("action is null!");
+            return;
+        }
 
-        if (networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
+        if (!action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+            logger.Warning(String.format(Locale.getDefault(), "Action is invalid : %s", action));
+            return;
+        }
+
+        if (new NetworkController(context).IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             logger.Debug("We are in the homeNetwork!");
 
-            if (!androidSystemController.IsServiceRunning(MainService.class)) {
-                context.startService(new Intent(context, MainService.class));
-            }
+            if (!new AndroidSystemController(context).IsServiceRunning(MainService.class)) {
+                logger.Debug("MainService not running! Starting...");
 
-            broadcastController.SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
+                Intent startMainServiceIntent = new Intent(context, MainService.class);
+                startMainServiceIntent.putExtra(MainService.MainServiceOnStartCommandBundle, true);
+
+                context.startService(startMainServiceIntent);
+            } else {
+                logger.Debug("MainService running! Sending broadcast...");
+                new BroadcastController(context).SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
+            }
         }
     }
 }

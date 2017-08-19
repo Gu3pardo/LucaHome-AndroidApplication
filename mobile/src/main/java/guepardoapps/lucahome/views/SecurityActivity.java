@@ -80,25 +80,12 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
                 if (result.SecurityList != null) {
                     if (result.SecurityList.getSize() > 0) {
                         setUI(result.SecurityList.getValue(0));
+                        return;
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(SecurityActivity.this)
-                            .setText(Tools.DecompressByteArrayToString(result.Response))
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(SecurityActivity.this)
-                        .setText(Tools.DecompressByteArrayToString(result.Response))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
             }
+
+            displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
         }
     };
 
@@ -112,7 +99,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
 
         setContentView(R.layout.activity_security);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_security);
+        Toolbar toolbar = findViewById(R.id.toolbar_security);
 
         _context = this;
 
@@ -121,11 +108,11 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         _navigationService = NavigationService.getInstance();
         _securityService = SecurityService.getInstance();
 
-        _cameraStateTextView = (TextView) findViewById(R.id.cameraStateTextView);
-        _cameraWebView = (WebView) findViewById(R.id.cameraWebView);
-        _registeredEventsListView = (ListView) findViewById(R.id.registeredEventsListView);
-        _setCameraButton = (Button) findViewById(R.id.setCameraButton);
-        _setMotionControlButton = (Button) findViewById(R.id.setMotionControlButton);
+        _cameraStateTextView = findViewById(R.id.cameraStateTextView);
+        _cameraWebView = findViewById(R.id.cameraWebView);
+        _registeredEventsListView = findViewById(R.id.registeredEventsListView);
+        _setCameraButton = findViewById(R.id.setCameraButton);
+        _setMotionControlButton = findViewById(R.id.setMotionControlButton);
 
         _cameraWebView.getSettings().setUseWideViewPort(true);
         _cameraWebView.getSettings().setBuiltInZoomControls(true);
@@ -143,7 +130,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
             public void onClick(View view) {
                 _logger.Debug("_setCameraButton onClick");
 
-                SerializableList<Security> securityList = _securityService.GetSecurityList();
+                SerializableList<Security> securityList = _securityService.GetDataList();
                 if (securityList != null) {
                     if (securityList.getSize() > 0) {
                         boolean newState = !securityList.getValue(0).IsCameraActive();
@@ -157,13 +144,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
 
                 String message = "Could not activate camera!";
                 _logger.Warning(message);
-                Snacky.builder()
-                        .setActivty(SecurityActivity.this)
-                        .setText(message)
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .warning()
-                        .show();
+                displayWarningSnackBar(message);
             }
         });
         _setMotionControlButton.setOnClickListener(new View.OnClickListener() {
@@ -171,7 +152,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
             public void onClick(View view) {
                 _logger.Debug("_setMotionControlButton onClick");
 
-                SerializableList<Security> securityList = _securityService.GetSecurityList();
+                SerializableList<Security> securityList = _securityService.GetDataList();
                 if (securityList != null) {
                     if (securityList.getSize() > 0) {
                         _securityService.SetMotionState(!securityList.getValue(0).IsMotionControlActive());
@@ -181,22 +162,16 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
 
                 String message = "Could not activate camera!";
                 _logger.Warning(message);
-                Snacky.builder()
-                        .setActivty(SecurityActivity.this)
-                        .setText(message)
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .warning()
-                        .show();
+                displayWarningSnackBar(message);
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_security);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_security);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_security);
+        NavigationView navigationView = findViewById(R.id.nav_view_security);
         navigationView.setNavigationItemSelectedListener(this);
     }
 
@@ -213,7 +188,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
 
         _receiverController.RegisterReceiver(_securityUpdateReceiver, new String[]{SecurityService.SecurityDownloadFinishedBroadcast});
 
-        SerializableList<Security> securityList = _securityService.GetSecurityList();
+        SerializableList<Security> securityList = _securityService.GetDataList();
         if (securityList != null) {
             if (securityList.getSize() > 0) {
                 setUI(securityList.getValue(0));
@@ -237,7 +212,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_security);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_security);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -278,17 +253,10 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-            Snacky.builder()
-                    .setActivty(SecurityActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_security);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_security);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
@@ -322,5 +290,25 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         _setCameraButton.setText(security.IsCameraActive() ? "Deactivate camera" : "Activate camera");
         _setMotionControlButton.setEnabled(security.IsCameraActive());
         _setMotionControlButton.setText(security.IsMotionControlActive() ? "Deactivate motion control" : "Activate motion control");
+    }
+
+    private void displayWarningSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(SecurityActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .warning()
+                .show();
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(SecurityActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

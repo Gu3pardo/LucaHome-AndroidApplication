@@ -60,13 +60,13 @@ public class TimerEditActivity extends AppCompatActivity {
             if (result != null) {
                 if (result.Success) {
                     navigateBack("Added new timer!");
-                    _wirelessSocketService.LoadWirelessSocketList();
+                    _wirelessSocketService.LoadData();
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to add timer!");
+                displayErrorSnackBar("Failed to add timer!");
                 _saveButton.setEnabled(true);
             }
         }
@@ -86,11 +86,11 @@ public class TimerEditActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
-        final AutoCompleteTextView timerNameEditTextView = (AutoCompleteTextView) findViewById(R.id.timer_edit_name_textview);
-        final Spinner timerSocketSelect = (Spinner) findViewById(R.id.timer_socket_select);
-        final Spinner timerCountdownSelect = (Spinner) findViewById(R.id.timer_countdown_select);
+        final AutoCompleteTextView timerNameEditTextView = findViewById(R.id.timer_edit_name_textview);
+        final Spinner timerSocketSelect = findViewById(R.id.timer_socket_select);
+        final Spinner timerCountdownSelect = findViewById(R.id.timer_countdown_select);
 
-        _saveButton = (com.rey.material.widget.Button) findViewById(R.id.save_timer_edit_button);
+        _saveButton = findViewById(R.id.save_timer_edit_button);
 
         timerNameEditTextView.setAdapter(new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_dropdown_item_1line, _scheduleService.GetTimerNameList()));
         timerNameEditTextView.addTextChangedListener(new TextWatcher() {
@@ -147,7 +147,7 @@ public class TimerEditActivity extends AppCompatActivity {
                 }
 
                 int socketId = timerSocketSelect.getSelectedItemPosition();
-                WirelessSocket wirelessSocket = _wirelessSocketService.GetWirelessSocketList().getValue(socketId);
+                WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
 
                 int countdownId = timerCountdownSelect.getSelectedItemPosition();
 
@@ -246,7 +246,7 @@ public class TimerEditActivity extends AppCompatActivity {
         return spannableStringBuilder;
     }
 
-    private void displayFailSnacky(@NonNull String message) {
+    private void displayErrorSnackBar(@NonNull String message) {
         Snacky.builder()
                 .setActivty(TimerEditActivity.this)
                 .setText(message)
@@ -270,7 +270,7 @@ public class TimerEditActivity extends AppCompatActivity {
                 NavigationService.NavigationResult navigationResult = _navigationService.GoBack(TimerEditActivity.this);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
+                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
                 }
             }
         }, 1500);

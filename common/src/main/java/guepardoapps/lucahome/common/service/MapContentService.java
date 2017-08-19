@@ -22,9 +22,10 @@ import guepardoapps.lucahome.common.database.DatabaseMapContentList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-public class MapContentService {
+public class MapContentService implements IDataService {
     public static class MapContentDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<MapContent> MapContentList;
 
@@ -43,14 +44,21 @@ public class MapContentService {
     private static final String TAG = MapContentService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int TIMEOUT_MS = 3 * 60 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MS = 4 * 60 * 60 * 1000;
+    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+
+    private boolean _reloadEnabled;
+    private int _reloadTimeout;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
             _logger.Debug("_reloadListRunnable run");
-            LoadMapContentList();
-            _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+            LoadData();
+
+            if (_reloadEnabled) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
         }
     };
 
@@ -102,7 +110,7 @@ public class MapContentService {
                     contentResponse,
                     _temperatureService.GetTemperatureList(),
                     _wirelessSocketService.GetWirelessSocketList(),
-                    _scheduleService.GetScheduleList());
+                    _scheduleService.GetDataList());
             if (mapContentList == null) {
                 _logger.Error("Converted mapContentList is null!");
                 sendFailedDownloadBroadcast(contentResponse);
@@ -130,13 +138,16 @@ public class MapContentService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context) {
+    @Override
+    public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _reloadEnabled = reloadEnabled;
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
@@ -155,11 +166,12 @@ public class MapContentService {
 
         _jsonDataToMapContentConverter = new JsonDataToMapContentConverter();
 
-        _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+        SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
     }
 
+    @Override
     public void Dispose() {
         _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
@@ -168,7 +180,8 @@ public class MapContentService {
         _isInitialized = false;
     }
 
-    public SerializableList<MapContent> GetMapContentList() {
+    @Override
+    public SerializableList<MapContent> GetDataList() {
         return _mapContentList;
     }
 
@@ -184,7 +197,8 @@ public class MapContentService {
         return null;
     }
 
-    public SerializableList<MapContent> FoundMapContents(@NonNull String searchKey) {
+    @Override
+    public SerializableList<MapContent> SearchDataList(@NonNull String searchKey) {
         SerializableList<MapContent> foundMapContents = new SerializableList<>();
 
         for (int index = 0; index < _mapContentList.getSize(); index++) {
@@ -204,8 +218,9 @@ public class MapContentService {
         return foundMapContents;
     }
 
-    public void LoadMapContentList() {
-        _logger.Debug("LoadMapContentList");
+    @Override
+    public void LoadData() {
+        _logger.Debug("LoadData");
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _mapContentList = _databaseMapContentList.GetMapContent(_wirelessSocketService.GetWirelessSocketList(), _temperatureService.GetTemperatureList());
@@ -230,6 +245,43 @@ public class MapContentService {
         _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.MapContent, true);
+    }
+
+    @Override
+    public boolean GetReloadEnabled() {
+        return _reloadEnabled;
+    }
+
+    @Override
+    public void SetReloadEnabled(boolean reloadEnabled) {
+        _reloadEnabled = reloadEnabled;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
+    }
+
+    @Override
+    public int GetReloadTimeout() {
+        return _reloadTimeout;
+    }
+
+    @Override
+    public void SetReloadTimeout(int reloadTimeout) {
+        if (reloadTimeout < MIN_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
+            reloadTimeout = MIN_TIMEOUT_MS;
+        }
+        if (reloadTimeout > MAX_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
+            reloadTimeout = MAX_TIMEOUT_MS;
+        }
+
+        _reloadTimeout = reloadTimeout;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
     }
 
     private void clearMapContentListFromDatabase() {

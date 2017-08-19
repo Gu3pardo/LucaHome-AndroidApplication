@@ -106,28 +106,14 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(BirthdayActivity.this)
-                            .setText(Tools.DecompressByteArrayToString(result.Response))
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
-                    _noDataFallback.setVisibility(View.VISIBLE);
-                    _searchField.setVisibility(View.INVISIBLE);
+
+                    return;
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(BirthdayActivity.this)
-                        .setText(Tools.DecompressByteArrayToString(result.Response))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
-                _noDataFallback.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
             }
+
+            displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
+            _noDataFallback.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -140,14 +126,14 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
 
         setContentView(R.layout.activity_birthday);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_birthday);
+        Toolbar toolbar = findViewById(R.id.toolbar_birthday);
         //setSupportActionBar(toolbar);
 
-        _listView = (ListView) findViewById(R.id.listView_birthday);
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar_birthday);
-        _noDataFallback = (TextView) findViewById(R.id.fallBackTextView_birthday);
+        _listView = findViewById(R.id.listView_birthday);
+        _progressBar = findViewById(R.id.progressBar_birthday);
+        _noDataFallback = findViewById(R.id.fallBackTextView_birthday);
 
-        _searchField = (EditText) findViewById(R.id.search_birthday);
+        _searchField = findViewById(R.id.search_birthday);
         _searchField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -155,7 +141,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                SerializableList<LucaBirthday> filteredBirthdayList = _birthdayService.FoundBirthdays(charSequence.toString());
+                SerializableList<LucaBirthday> filteredBirthdayList = _birthdayService.SearchDataList(charSequence.toString());
                 _birthdayListViewAdapter = new BirthdayListViewAdapter(_context, filteredBirthdayList);
                 _listView.setAdapter(_birthdayListViewAdapter);
                 _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d birthdays", filteredBirthdayList.getSize()));
@@ -166,7 +152,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
             }
         });
 
-        _collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_birthday);
+        _collapsingToolbar = findViewById(R.id.collapsing_toolbar_birthday);
         _collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         _collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
@@ -177,7 +163,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
         _navigationService = NavigationService.getInstance();
         _birthdayService = BirthdayService.getInstance();
 
-        SerializableList<LucaBirthday> birthdayList = _birthdayService.GetBirthdayList();
+        SerializableList<LucaBirthday> birthdayList = _birthdayService.GetDataList();
         if (birthdayList.getSize() > 0) {
             _birthdayListViewAdapter = new BirthdayListViewAdapter(_context, birthdayList);
             _listView.setAdapter(_birthdayListViewAdapter);
@@ -190,7 +176,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
         }
         _progressBar.setVisibility(View.GONE);
 
-        FloatingActionButton addButton = (FloatingActionButton) findViewById(R.id.floating_action_button_add_birthday);
+        FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_birthday);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -200,27 +186,20 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
                 NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-                    Snacky.builder()
-                            .setActivty(BirthdayActivity.this)
-                            .setText("Failed to navigate! Please contact LucaHome support!")
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
+                    displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
                 }
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_birthday);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_birthday);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_birthday);
+        NavigationView navigationView = findViewById(R.id.nav_view_birthday);
         navigationView.setNavigationItemSelectedListener(this);
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_birthday);
+        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_birthday);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -230,7 +209,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
                 _progressBar.setVisibility(View.VISIBLE);
                 _searchField.setVisibility(View.INVISIBLE);
 
-                _birthdayService.LoadBirthdayList();
+                _birthdayService.LoadData();
             }
         });
     }
@@ -248,7 +227,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
 
         _receiverController.RegisterReceiver(_birthdayUpdateReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
 
-        SerializableList<LucaBirthday> birthdayList = _birthdayService.GetBirthdayList();
+        SerializableList<LucaBirthday> birthdayList = _birthdayService.GetDataList();
         if (birthdayList.getSize() > 0) {
             _birthdayListViewAdapter = new BirthdayListViewAdapter(_context, birthdayList);
             _listView.setAdapter(_birthdayListViewAdapter);
@@ -278,7 +257,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_birthday);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_birthday);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -320,17 +299,21 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
 
-            Snacky.builder()
-                    .setActivty(BirthdayActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_birthday);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_birthday);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(BirthdayActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

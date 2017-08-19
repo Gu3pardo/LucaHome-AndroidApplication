@@ -106,28 +106,14 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(ShoppingListActivity.this)
-                            .setText(Tools.DecompressByteArrayToString(result.Response))
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
-                    _noDataFallback.setVisibility(View.VISIBLE);
-                    _searchField.setVisibility(View.INVISIBLE);
+
+                    return;
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(ShoppingListActivity.this)
-                        .setText(Tools.DecompressByteArrayToString(result.Response))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
-                _noDataFallback.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
             }
+
+            displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
+            _noDataFallback.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -140,14 +126,14 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
 
         setContentView(R.layout.activity_shopping);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_shoppingList);
+        Toolbar toolbar = findViewById(R.id.toolbar_shoppingList);
         //setSupportActionBar(toolbar);
 
-        _listView = (ListView) findViewById(R.id.listView_shoppingList);
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar_shoppingList);
-        _noDataFallback = (TextView) findViewById(R.id.fallBackTextView_shoppingList);
+        _listView = findViewById(R.id.listView_shoppingList);
+        _progressBar = findViewById(R.id.progressBar_shoppingList);
+        _noDataFallback = findViewById(R.id.fallBackTextView_shoppingList);
 
-        _searchField = (EditText) findViewById(R.id.search_shoppingList);
+        _searchField = findViewById(R.id.search_shoppingList);
         _searchField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -155,7 +141,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                SerializableList<ShoppingEntry> filteredShoppingList = _shoppingListService.FoundShoppingEntries(charSequence.toString());
+                SerializableList<ShoppingEntry> filteredShoppingList = _shoppingListService.SearchDataList(charSequence.toString());
                 _shoppingListViewAdapter = new ShoppingListViewAdapter(_context, filteredShoppingList);
                 _listView.setAdapter(_shoppingListViewAdapter);
                 _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d entries", filteredShoppingList.getSize()));
@@ -166,7 +152,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
             }
         });
 
-        _collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_shoppingList);
+        _collapsingToolbar = findViewById(R.id.collapsing_toolbar_shoppingList);
         _collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         _collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
@@ -177,7 +163,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
         _navigationService = NavigationService.getInstance();
         _shoppingListService = ShoppingListService.getInstance();
 
-        SerializableList<ShoppingEntry> shoppingList = _shoppingListService.GetShoppingList();
+        SerializableList<ShoppingEntry> shoppingList = _shoppingListService.GetDataList();
         if (shoppingList.getSize() > 0) {
             _shoppingListViewAdapter = new ShoppingListViewAdapter(_context, shoppingList);
             _listView.setAdapter(_shoppingListViewAdapter);
@@ -190,7 +176,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
         }
         _progressBar.setVisibility(View.GONE);
 
-        FloatingActionButton addButton = (FloatingActionButton) findViewById(R.id.floating_action_button_add_shoppingList);
+        FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_shoppingList);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -200,27 +186,20 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
                 NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, ShoppingListEditActivity.class, data);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-                    Snacky.builder()
-                            .setActivty(ShoppingListActivity.this)
-                            .setText("Failed to navigate! Please contact LucaHome support!")
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
+                    displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
                 }
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_shopping);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_shopping);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_shopping);
+        NavigationView navigationView = findViewById(R.id.nav_view_shopping);
         navigationView.setNavigationItemSelectedListener(this);
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_shoppingList);
+        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_shoppingList);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -230,7 +209,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
                 _progressBar.setVisibility(View.VISIBLE);
                 _searchField.setVisibility(View.INVISIBLE);
 
-                _shoppingListService.LoadShoppingList();
+                _shoppingListService.LoadData();
             }
         });
     }
@@ -248,7 +227,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
 
         _receiverController.RegisterReceiver(_shoppingListUpdateReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
 
-        SerializableList<ShoppingEntry> shoppingList = _shoppingListService.GetShoppingList();
+        SerializableList<ShoppingEntry> shoppingList = _shoppingListService.GetDataList();
         if (shoppingList.getSize() > 0) {
             _shoppingListViewAdapter = new ShoppingListViewAdapter(_context, shoppingList);
             _listView.setAdapter(_shoppingListViewAdapter);
@@ -278,7 +257,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_shopping);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_shopping);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -319,18 +298,21 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-            Snacky.builder()
-                    .setActivty(ShoppingListActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_shopping);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_shopping);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(ShoppingListActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

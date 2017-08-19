@@ -64,11 +64,11 @@ public class ScheduleEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Added new entry!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to add entry!");
+                displayErrorSnackBar("Failed to add entry!");
                 _saveButton.setEnabled(true);
             }
         }
@@ -83,11 +83,11 @@ public class ScheduleEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Updated entry!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to update entry!");
+                displayErrorSnackBar("Failed to update entry!");
                 _saveButton.setEnabled(true);
             }
         }
@@ -109,13 +109,13 @@ public class ScheduleEditActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
-        final AutoCompleteTextView scheduleNameEditTextView = (AutoCompleteTextView) findViewById(R.id.schedule_edit_name_textview);
-        final Spinner scheduleSocketSelect = (Spinner) findViewById(R.id.schedule_socket_select);
-        final Spinner scheduleWeekdaySelect = (Spinner) findViewById(R.id.schedule_weekday_select);
-        final TimePicker scheduleTimePicker = (TimePicker) findViewById(R.id.schedule_timePicker);
-        final Spinner scheduleActionSelect = (Spinner) findViewById(R.id.schedule_action_select);
+        final AutoCompleteTextView scheduleNameEditTextView = findViewById(R.id.schedule_edit_name_textview);
+        final Spinner scheduleSocketSelect = findViewById(R.id.schedule_socket_select);
+        final Spinner scheduleWeekdaySelect = findViewById(R.id.schedule_weekday_select);
+        final TimePicker scheduleTimePicker = findViewById(R.id.schedule_timePicker);
+        final Spinner scheduleActionSelect = findViewById(R.id.schedule_action_select);
 
-        _saveButton = (com.rey.material.widget.Button) findViewById(R.id.save_schedule_edit_button);
+        _saveButton = findViewById(R.id.save_schedule_edit_button);
 
         scheduleNameEditTextView.setAdapter(new ArrayAdapter<>(ScheduleEditActivity.this, android.R.layout.simple_dropdown_item_1line, _scheduleService.GetScheduleNameList()));
         scheduleNameEditTextView.addTextChangedListener(new TextWatcher() {
@@ -182,7 +182,7 @@ public class ScheduleEditActivity extends AppCompatActivity {
             scheduleTimePicker.setCurrentMinute(_scheduleDto.GetTime().Minute());
             scheduleActionSelect.setSelection(_scheduleDto.GetSocketAction().GetId());
         } else {
-            displayFailSnacky("Cannot work with data! Is corrupt! Please try again!");
+            displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
 
         _saveButton.setEnabled(false);
@@ -208,7 +208,7 @@ public class ScheduleEditActivity extends AppCompatActivity {
                 }
 
                 int socketId = scheduleSocketSelect.getSelectedItemPosition();
-                WirelessSocket wirelessSocket = _wirelessSocketService.GetWirelessSocketList().getValue(socketId);
+                WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
 
                 int weekdayId = scheduleWeekdaySelect.getSelectedItemPosition();
                 Weekday weekday = Weekday.GetById(weekdayId);
@@ -278,7 +278,7 @@ public class ScheduleEditActivity extends AppCompatActivity {
         return spannableStringBuilder;
     }
 
-    private void displayFailSnacky(@NonNull String message) {
+    private void displayErrorSnackBar(@NonNull String message) {
         Snacky.builder()
                 .setActivty(ScheduleEditActivity.this)
                 .setText(message)
@@ -302,7 +302,7 @@ public class ScheduleEditActivity extends AppCompatActivity {
                 NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ScheduleEditActivity.this);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
+                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
                 }
             }
         }, 1500);

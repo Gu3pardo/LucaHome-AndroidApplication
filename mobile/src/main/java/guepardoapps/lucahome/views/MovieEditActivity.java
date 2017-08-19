@@ -54,11 +54,11 @@ public class MovieEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Updated movie!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to update movie!");
+                displayErrorSnackBar("Failed to update movie!");
                 _saveButton.setEnabled(true);
             }
 
@@ -80,12 +80,12 @@ public class MovieEditActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
-        final AutoCompleteTextView movieTitleTypeTextView = (AutoCompleteTextView) findViewById(R.id.movie_edit_title_textview);
-        final AutoCompleteTextView movieGenreTypeTextView = (AutoCompleteTextView) findViewById(R.id.movie_edit_genre_textview);
-        final AutoCompleteTextView movieDescriptionTypeTextView = (AutoCompleteTextView) findViewById(R.id.movie_edit_description_textview);
-        final RatingBar movieRatingBar = (RatingBar) findViewById(R.id.movieRating_Bar);
+        final AutoCompleteTextView movieTitleTypeTextView = findViewById(R.id.movie_edit_title_textview);
+        final AutoCompleteTextView movieGenreTypeTextView = findViewById(R.id.movie_edit_genre_textview);
+        final AutoCompleteTextView movieDescriptionTypeTextView = findViewById(R.id.movie_edit_description_textview);
+        final RatingBar movieRatingBar = findViewById(R.id.movieRating_Bar);
 
-        _saveButton = (com.rey.material.widget.Button) findViewById(R.id.save_movie_edit_button);
+        _saveButton = findViewById(R.id.save_movie_edit_button);
 
         TextWatcher sharedTextWatcher = new TextWatcher() {
             @Override
@@ -119,7 +119,7 @@ public class MovieEditActivity extends AppCompatActivity {
             movieDescriptionTypeTextView.setText(_movieDto.GetDescription());
             movieRatingBar.setRating(_movieDto.GetRating());
         } else {
-            displayFailSnacky("Cannot work with data! Is corrupt! Please try again!");
+            displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
 
         _saveButton.setEnabled(false);
@@ -214,7 +214,7 @@ public class MovieEditActivity extends AppCompatActivity {
         return spannableStringBuilder;
     }
 
-    private void displayFailSnacky(@NonNull String message) {
+    private void displayErrorSnackBar(@NonNull String message) {
         Snacky.builder()
                 .setActivty(MovieEditActivity.this)
                 .setText(message)
@@ -238,7 +238,7 @@ public class MovieEditActivity extends AppCompatActivity {
                 NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MovieEditActivity.this);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
+                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
                 }
             }
         }, 1500);

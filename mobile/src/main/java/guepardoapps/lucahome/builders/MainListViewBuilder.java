@@ -72,18 +72,8 @@ public class MainListViewBuilder {
         }
     }
 
-    public void ResetList() {
-        _logger.Debug("ResetList");
-        createDefaultList();
-    }
-
-    public void ClearList() {
-        _logger.Debug("ClearList");
-        _mainListViewItems.clear();
-    }
-
     private void createDefaultList() {
-        ClearList();
+        _mainListViewItems.clear();
 
         MainListViewItem birthdayItem = new MainListViewItem(
                 "Birthdays", "Who's next for birthday", R.drawable.main_image_birthday,
@@ -254,8 +244,7 @@ public class MainListViewBuilder {
 
         _mainListViewItems.addValue(wirelessSocketItem);
         _mainListViewItems.addValue(scheduleItem);
-        /*TODO reactivate*/
-        //_mainListViewItems.addValue(timerItem);
+        _mainListViewItems.addValue(timerItem);
         _mainListViewItems.addValue(weatherItem);
         _mainListViewItems.addValue(coinItem);
         _mainListViewItems.addValue(menuItem);

@@ -96,7 +96,7 @@ public class ShoppingListViewAdapter extends BaseAdapter {
         holder._boughtCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                _shoppingListService.GetShoppingList().getValue(index).SetBought(checked);
+                _shoppingListService.GetDataList().getValue(index).SetBought(checked);
             }
         });
 

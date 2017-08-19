@@ -24,6 +24,8 @@ import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.*;
 import guepardoapps.lucahome.receiver.SocketActionReceiver;
 import guepardoapps.lucahome.views.BirthdayActivity;
+import guepardoapps.lucahome.views.ForecastWeatherActivity;
+import guepardoapps.lucahome.views.MainActivity;
 import guepardoapps.lucahome.views.SecurityActivity;
 
 public class MainService extends Service {
@@ -47,14 +49,15 @@ public class MainService extends Service {
 
     public static final String MainServiceStartDownloadAllBroadcast = "guepardoapps.lucahome.main.service.download.all.start";
     public static final String MainServiceDownloadCountBroadcast = "guepardoapps.lucahome.main.service.download.count";
+
     public static final String MainServiceDownloadCountBundle = "MainServiceDownloadCountBundle";
+    public static final String MainServiceOnStartCommandBundle = "MainServiceOnStartCommandBundle";
 
     private static final String TAG = MainService.class.getSimpleName();
     private Logger _logger;
 
     private final IBinder _mainServiceBinder = new MainServiceBinder();
     private Messenger _messenger;
-    private Context _context;
 
     private BirthdayService _birthdayService;
     private CoinService _coinService;
@@ -196,7 +199,7 @@ public class MainService extends Service {
             }
             broadcastDownloadCount();
 
-            _temperatureService.LoadTemperatureList();
+            _temperatureService.LoadData();
         }
     };
 
@@ -226,8 +229,8 @@ public class MainService extends Service {
             }
             broadcastDownloadCount();
 
-            if (_temperatureService.GetTemperatureList() != null) {
-                _mapContentService.LoadMapContentList();
+            if (_temperatureService.GetDataList() != null) {
+                _mapContentService.LoadData();
             }
         }
     };
@@ -272,8 +275,8 @@ public class MainService extends Service {
             }
             broadcastDownloadCount();
 
-            if (_scheduleService.GetScheduleList() != null) {
-                _mapContentService.LoadMapContentList();
+            if (_scheduleService.GetDataList() != null) {
+                _mapContentService.LoadData();
             }
         }
     };
@@ -290,7 +293,7 @@ public class MainService extends Service {
             }
             broadcastDownloadCount();
 
-            _scheduleService.LoadScheduleList();
+            _scheduleService.LoadData();
         }
     };
 
@@ -306,16 +309,16 @@ public class MainService extends Service {
         _downloadResultList = new SerializableList<>();
         _downloading = true;
 
-        _birthdayService.LoadBirthdayList();
+        _birthdayService.LoadData();
         _coinService.LoadCoinConversionList();
         _menuService.LoadListedMenuList();
-        _menuService.LoadMenuList();
-        _movieService.LoadMovieList();
+        _menuService.LoadData();
+        _movieService.LoadData();
         _openWeatherService.LoadCurrentWeather();
         _openWeatherService.LoadForecastWeather();
-        _securityService.LoadSecurityList();
-        _shoppingListService.LoadShoppingList();
-        _wirelessSocketService.LoadWirelessSocketList();
+        _securityService.LoadData();
+        _shoppingListService.LoadData();
+        _wirelessSocketService.LoadData();
     }
 
     private void broadcastDownloadCount() {
@@ -338,6 +341,12 @@ public class MainService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
         _logger.Debug("onStartCommand");
+
+        boolean downloadAll = intent.getBooleanExtra(MainServiceOnStartCommandBundle, false);
+        if (downloadAll) {
+            StartDownloadAll("onStartCommand");
+        }
+
         return START_STICKY;
     }
 
@@ -361,12 +370,10 @@ public class MainService extends Service {
         _logger = new Logger(TAG);
         _logger.Debug("onCreate");
 
-        _context = this;
-
-        _broadcastController = new BroadcastController(_context);
-        _receiverController = new ReceiverController(_context);
+        _broadcastController = new BroadcastController(this);
+        _receiverController = new ReceiverController(this);
         _settingsController = SettingsController.getInstance();
-        _settingsController.Initialize(_context);
+        _settingsController.Initialize(this);
 
         _receiverController.RegisterReceiver(_startDownloadAllReceiver, new String[]{MainServiceStartDownloadAllBroadcast});
         _receiverController.RegisterReceiver(_birthdayDownloadFinishedReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
@@ -398,30 +405,81 @@ public class MainService extends Service {
         _userService = UserService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
 
-        _birthdayService.Initialize(_context, BirthdayActivity.class);
-        _coinService.Initialize(_context);
-        _mapContentService.Initialize(_context);
-        _mediaMirrorService.Initialize(_context);
-        _menuService.Initialize(_context);
-        _movieService.Initialize(_context);
+        _birthdayService.Initialize(
+                this,
+                BirthdayActivity.class,
+                _settingsController.IsBirthdayNotificationEnabled(),
+                _settingsController.IsReloadBirthdayEnabled(),
+                _settingsController.GetReloadBirthdayTimeout());
+
+        _coinService.Initialize(
+                this,
+                _settingsController.IsReloadCoinEnabled(),
+                _settingsController.GetReloadCoinTimeout());
+
+        _mapContentService.Initialize(
+                this,
+                _settingsController.IsReloadMapContentEnabled(),
+                _settingsController.GetReloadMapContentTimeout());
+
+        _mediaMirrorService.Initialize(
+                this,
+                _settingsController.IsReloadMediaMirrorEnabled(),
+                _settingsController.GetReloadMediaMirrorTimeout());
+
+        _menuService.Initialize(
+                this,
+                _settingsController.IsReloadMenuEnabled(),
+                _settingsController.GetReloadMenuTimeout());
+
+        _movieService.Initialize(
+                this,
+                _settingsController.IsReloadMovieEnabled(),
+                _settingsController.GetReloadMovieTimeout());
+
         _openWeatherService.Initialize(
-                _context,
+                this,
                 _settingsController.GetOpenWeatherCity(),
                 _settingsController.IsCurrentWeatherNotificationEnabled(),
                 _settingsController.IsForecastWeatherNotificationEnabled(),
-                _settingsController.IsChangeWeatherWallpaperActive());
-        _scheduleService.Initialize(_context);
+                MainActivity.class,
+                ForecastWeatherActivity.class,
+                _settingsController.IsChangeWeatherWallpaperActive(),
+                _settingsController.IsReloadWeatherEnabled(),
+                _settingsController.GetReloadWeatherTimeout());
+
+        _scheduleService.Initialize(
+                this,
+                _settingsController.IsReloadScheduleEnabled(),
+                _settingsController.GetReloadScheduleTimeout());
+
         _securityService.Initialize(
-                _context,
+                this,
                 SecurityActivity.class,
-                _settingsController.IsCameraNotificationEnabled());
-        _shoppingListService.Initialize(_context);
-        _temperatureService.Initialize(_context);
-        _userService.Initialize(_context);
+                _settingsController.IsCameraNotificationEnabled(),
+                _settingsController.IsReloadSecurityEnabled(),
+                _settingsController.GetReloadSecurityTimeout());
+
+        _shoppingListService.Initialize(
+                this,
+                _settingsController.IsReloadShoppingEnabled(),
+                _settingsController.GetReloadShoppingTimeout());
+
+        _temperatureService.Initialize(
+                this,
+                MainActivity.class,
+                _settingsController.IsTemperatureNotificationEnabled(),
+                _settingsController.IsReloadTemperatureEnabled(),
+                _settingsController.GetReloadTemperatureTimeout());
+
+        _userService.Initialize(this);
+
         _wirelessSocketService.Initialize(
-                _context,
+                this,
                 SocketActionReceiver.class,
-                _settingsController.IsSocketNotificationEnabled());
+                _settingsController.IsSocketNotificationEnabled(),
+                _settingsController.IsReloadWirelessSocketEnabled(),
+                _settingsController.GetReloadWirelessSocketTimeout());
 
         _currentDownloadCount = 0;
         _downloadResultList = new SerializableList<>();

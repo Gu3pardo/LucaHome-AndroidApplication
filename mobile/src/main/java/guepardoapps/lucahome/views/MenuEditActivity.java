@@ -54,11 +54,11 @@ public class MenuEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Updated menu!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to update menu!");
+                displayErrorSnackBar("Failed to update menu!");
                 _saveButton.setEnabled(true);
             }
 
@@ -80,11 +80,11 @@ public class MenuEditActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
-        final TextView dateTextView = (TextView) findViewById(R.id.menuDateTextView);
-        final AutoCompleteTextView menuTitleTypeTextView = (AutoCompleteTextView) findViewById(R.id.menu_edit_title_textview);
-        final AutoCompleteTextView menuDescriptionTypeTextView = (AutoCompleteTextView) findViewById(R.id.menu_edit_description_textview);
+        final TextView dateTextView = findViewById(R.id.menuDateTextView);
+        final AutoCompleteTextView menuTitleTypeTextView = findViewById(R.id.menu_edit_title_textview);
+        final AutoCompleteTextView menuDescriptionTypeTextView = findViewById(R.id.menu_edit_description_textview);
 
-        _saveButton = (com.rey.material.widget.Button) findViewById(R.id.save_menu_edit_button);
+        _saveButton = findViewById(R.id.save_menu_edit_button);
 
         TextWatcher sharedTextWatcher = new TextWatcher() {
             @Override
@@ -113,7 +113,7 @@ public class MenuEditActivity extends AppCompatActivity {
             menuTitleTypeTextView.setText(_menuDto.GetTitle());
             menuDescriptionTypeTextView.setText(_menuDto.GetDescription());
         } else {
-            displayFailSnacky("Cannot work with data! Is corrupt! Please try again!");
+            displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
 
         _saveButton.setEnabled(false);
@@ -199,7 +199,7 @@ public class MenuEditActivity extends AppCompatActivity {
         return spannableStringBuilder;
     }
 
-    private void displayFailSnacky(@NonNull String message) {
+    private void displayErrorSnackBar(@NonNull String message) {
         Snacky.builder()
                 .setActivty(MenuEditActivity.this)
                 .setText(message)
@@ -223,7 +223,7 @@ public class MenuEditActivity extends AppCompatActivity {
                 NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MenuEditActivity.this);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
+                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
                 }
             }
         }, 1500);

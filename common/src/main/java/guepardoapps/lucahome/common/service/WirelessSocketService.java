@@ -24,9 +24,10 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.NotificationController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-public class WirelessSocketService {
+public class WirelessSocketService implements IDataNotificationService {
     public static class WirelessSocketDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<WirelessSocket> WirelessSocketList;
 
@@ -64,14 +65,22 @@ public class WirelessSocketService {
     private boolean _displayNotification;
     private Class<?> _receiverClass;
 
-    private static final int TIMEOUT_MS = 5 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MS = 15 * 60 * 1000;
+    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+
+    private boolean _reloadEnabled;
+    private int _reloadTimeout;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
             _logger.Debug("_reloadListRunnable run");
-            LoadWirelessSocketList();
-            _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+
+            LoadData();
+
+            if (_reloadEnabled) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
         }
     };
 
@@ -169,7 +178,7 @@ public class WirelessSocketService {
                     WirelessSocketSetFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadWirelessSocketList();
+            LoadData();
         }
     };
 
@@ -206,7 +215,7 @@ public class WirelessSocketService {
                     WirelessSocketAddFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadWirelessSocketList();
+            LoadData();
         }
     };
 
@@ -243,7 +252,7 @@ public class WirelessSocketService {
                     WirelessSocketUpdateFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadWirelessSocketList();
+            LoadData();
         }
     };
 
@@ -280,7 +289,7 @@ public class WirelessSocketService {
                     WirelessSocketDeleteFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadWirelessSocketList();
+            LoadData();
         }
     };
 
@@ -293,7 +302,8 @@ public class WirelessSocketService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverClass, boolean displayNotification) {
+    @Override
+    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverClass, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
@@ -303,6 +313,7 @@ public class WirelessSocketService {
 
         _receiverClass = receiverClass;
         _displayNotification = displayNotification;
+        _reloadEnabled = reloadEnabled;
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
@@ -322,11 +333,12 @@ public class WirelessSocketService {
 
         _jsonDataToWirelessSocketConverter = new JsonDataToSocketConverter();
 
-        _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+        SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
     }
 
+    @Override
     public void Dispose() {
         _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
@@ -335,7 +347,8 @@ public class WirelessSocketService {
         _isInitialized = false;
     }
 
-    public SerializableList<WirelessSocket> GetWirelessSocketList() {
+    @Override
+    public SerializableList<WirelessSocket> GetDataList() {
         return _wirelessSocketList;
     }
 
@@ -396,7 +409,8 @@ public class WirelessSocketService {
         return null;
     }
 
-    public SerializableList<WirelessSocket> FoundWirelessSockets(@NonNull String searchKey) {
+    @Override
+    public SerializableList<WirelessSocket> SearchDataList(@NonNull String searchKey) {
         SerializableList<WirelessSocket> foundWirelessSockets = new SerializableList<>();
 
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
@@ -416,8 +430,9 @@ public class WirelessSocketService {
         return foundWirelessSockets;
     }
 
-    public void LoadWirelessSocketList() {
-        _logger.Debug("LoadWirelessSocketList");
+    @Override
+    public void LoadData() {
+        _logger.Debug("LoadData");
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _wirelessSocketList = _databaseSocketList.GetSocketList();
@@ -547,6 +562,7 @@ public class WirelessSocketService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketDelete, true);
     }
 
+    @Override
     public void ShowNotification() {
         _logger.Debug("ShowNotification");
         if (!_displayNotification) {
@@ -556,15 +572,18 @@ public class WirelessSocketService {
         _notificationController.CreateSocketNotification(NOTIFICATION_ID, _wirelessSocketList, _receiverClass);
     }
 
+    @Override
     public void CloseNotification() {
         _logger.Debug("CloseNotification");
         _notificationController.CloseNotification(NOTIFICATION_ID);
     }
 
+    @Override
     public boolean GetDisplayNotification() {
         return _displayNotification;
     }
 
+    @Override
     public void SetDisplayNotification(boolean displayNotification) {
         _displayNotification = displayNotification;
         if (!_displayNotification) {
@@ -580,6 +599,55 @@ public class WirelessSocketService {
 
     public Class<?> GetReceiverClass() {
         return _receiverClass;
+    }
+
+    @Override
+    public void SetReceiverActivity(@NonNull Class<?> receiverActivity) {
+        _logger.Error("Please use SetReceiverClass instead of SetReceiverActivity!");
+        throw new UnsupportedOperationException("Please use SetReceiverClass instead of SetReceiverActivity!");
+    }
+
+    @Override
+    public Class<?> GetReceiverActivity() {
+        _logger.Error("Please use GetReceiverClass instead of GetReceiverActivity!");
+        throw new UnsupportedOperationException("Please use GetReceiverClass instead of GetReceiverActivity!");
+    }
+
+    @Override
+    public boolean GetReloadEnabled() {
+        return _reloadEnabled;
+    }
+
+    @Override
+    public void SetReloadEnabled(boolean reloadEnabled) {
+        _reloadEnabled = reloadEnabled;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
+    }
+
+    @Override
+    public int GetReloadTimeout() {
+        return _reloadTimeout;
+    }
+
+    @Override
+    public void SetReloadTimeout(int reloadTimeout) {
+        if (reloadTimeout < MIN_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
+            reloadTimeout = MIN_TIMEOUT_MS;
+        }
+        if (reloadTimeout > MAX_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
+            reloadTimeout = MAX_TIMEOUT_MS;
+        }
+
+        _reloadTimeout = reloadTimeout;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
     }
 
     private void clearSocketListFromDatabase() {

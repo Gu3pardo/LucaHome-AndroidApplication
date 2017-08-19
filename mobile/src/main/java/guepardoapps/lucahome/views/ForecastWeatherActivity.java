@@ -99,32 +99,15 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
                         _noDataFallback.setVisibility(View.GONE);
                         _listView.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.VISIBLE);
-                    } else {
-                        _noDataFallback.setVisibility(View.VISIBLE);
-                        _searchField.setVisibility(View.INVISIBLE);
+
+                        return;
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(ForecastWeatherActivity.this)
-                            .setText(result.Response)
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
-                    _noDataFallback.setVisibility(View.VISIBLE);
-                    _searchField.setVisibility(View.INVISIBLE);
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(ForecastWeatherActivity.this)
-                        .setText(result.Response)
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
-                _noDataFallback.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
             }
+
+            displayErrorSnackBar(result.Response);
+            _noDataFallback.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -137,15 +120,15 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
 
         setContentView(R.layout.activity_forecast_weather);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_forecast_weather);
+        Toolbar toolbar = findViewById(R.id.toolbar_forecast_weather);
         //setSupportActionBar(toolbar);
 
-        _listView = (ListView) findViewById(R.id.listView_forecast_weather);
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar_forecast_weather);
-        _noDataFallback = (TextView) findViewById(R.id.fallBackTextView_forecast_weather);
-        _mainImageView = (KenBurnsView) findViewById(R.id.kenBurnsView_forecast_weather);
+        _listView = findViewById(R.id.listView_forecast_weather);
+        _progressBar = findViewById(R.id.progressBar_forecast_weather);
+        _noDataFallback = findViewById(R.id.fallBackTextView_forecast_weather);
+        _mainImageView = findViewById(R.id.kenBurnsView_forecast_weather);
 
-        _searchField = (EditText) findViewById(R.id.search_forecast_weather);
+        _searchField = findViewById(R.id.search_forecast_weather);
         _searchField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -184,19 +167,19 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
         }
         _progressBar.setVisibility(View.GONE);
 
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_forecast_weather);
+        CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar_forecast_weather);
         collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_forecast_weather);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_forecast_weather);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_forecast_weather);
+        NavigationView navigationView = findViewById(R.id.nav_view_forecast_weather);
         navigationView.setNavigationItemSelectedListener(this);
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_forecast_weather);
+        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_forecast_weather);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -240,7 +223,7 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_forecast_weather);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_forecast_weather);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -281,18 +264,21 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-            Snacky.builder()
-                    .setActivty(ForecastWeatherActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_forecast_weather);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_forecast_weather);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(ForecastWeatherActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

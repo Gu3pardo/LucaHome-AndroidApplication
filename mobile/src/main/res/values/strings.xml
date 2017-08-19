@@ -78,6 +78,59 @@
     <string name="pref_title_notification_temperature">Display temperature notification</string>
     <string name="pref_title_notification_camera">Display notification whenever camera is active</string>
 
+    <!-- Settings for Reload data -->
+    <string name="pref_header_reload_data">Reload Data</string>
+
+    <string name="pref_title_reload_data">Activate/Deactivate reloading data</string>
+
+    <string name="pref_title_reload_birthday">Reload birthday data</string>
+    <string name="pref_title_reload_birthday_timeout">Enter birthday reload timeout in min</string>
+    <integer name="pref_default_birthday_timeout_min">240</integer>
+
+    <string name="pref_title_reload_coin">Reload coin data</string>
+    <string name="pref_title_reload_coin_timeout">Enter coin reload timeout in min</string>
+    <integer name="pref_default_coin_timeout_min">30</integer>
+
+    <string name="pref_title_reload_mapcontent">Reload mapcontent data</string>
+    <string name="pref_title_reload_mapcontent_timeout">Enter mapcontent reload timeout in min</string>
+    <integer name="pref_default_mapcontent_timeout_min">240</integer>
+
+    <string name="pref_title_reload_mediamirror">Reload mediamirror data</string>
+    <string name="pref_title_reload_mediamirror_timeout">Enter mediamirror reload timeout in min</string>
+    <integer name="pref_default_mediamirror_timeout_min">30</integer>
+
+    <string name="pref_title_reload_menu">Reload menu data</string>
+    <string name="pref_title_reload_menu_timeout">Enter menu reload timeout in min</string>
+    <integer name="pref_default_menu_timeout_min">120</integer>
+
+    <string name="pref_title_reload_movie">Reload movie data</string>
+    <string name="pref_title_reload_movie_timeout">Enter movie reload timeout in min</string>
+    <integer name="pref_default_movie_timeout_min">60</integer>
+
+    <string name="pref_title_reload_schedule">Reload schedule data</string>
+    <string name="pref_title_reload_schedule_timeout">Enter schedule reload timeout in min</string>
+    <integer name="pref_default_schedule_timeout_min">60</integer>
+
+    <string name="pref_title_reload_security">Reload security data</string>
+    <string name="pref_title_reload_security_timeout">Enter security reload timeout in min</string>
+    <integer name="pref_default_security_timeout_min">15</integer>
+
+    <string name="pref_title_reload_shopping">Reload shopping data</string>
+    <string name="pref_title_reload_shopping_timeout">Enter shopping reload timeout in min</string>
+    <integer name="pref_default_shopping_timeout_min">60</integer>
+
+    <string name="pref_title_reload_temperature">Reload temperature data</string>
+    <string name="pref_title_reload_temperature_timeout">Enter temperature reload timeout in min</string>
+    <integer name="pref_default_temperature_timeout_min">15</integer>
+
+    <string name="pref_title_reload_weather">Reload weather data</string>
+    <string name="pref_title_reload_weather_timeout">Enter weather reload timeout in min</string>
+    <integer name="pref_default_weather_timeout_min">15</integer>
+
+    <string name="pref_title_reload_wireless_socket">Reload wireless socket data</string>
+    <string name="pref_title_reload_wireless_socket_timeout">Enter wireless socket reload timeout in min</string>
+    <integer name="pref_default_wireless_socket_timeout_min">15</integer>
+
     <!-- Settings for Open Weather -->
     <string name="pref_header_open_weather">Open Weather</string>
 

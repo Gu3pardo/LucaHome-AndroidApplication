@@ -116,10 +116,10 @@ public final class JsonDataToListedMenuConverter implements IJsonDataConverter {
 
                 return newValue;
             } else {
-                _logger.Error(String.format(Locale.getDefault(), "Data %s has invalid entry!", data));
+                _logger.Error("Data has invalid entry!");
             }
         } else {
-            _logger.Error(String.format(Locale.getDefault(), "Data %s has wrong length %d!", data, data.length));
+            _logger.Error(String.format(Locale.getDefault(), "Data has wrong length %d!", data.length));
         }
 
         _logger.Error("Data has an error!");

@@ -102,11 +102,11 @@ public class CoinEditActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
-        final AutoCompleteTextView coinEditUserTextView = (AutoCompleteTextView) findViewById(R.id.coin_edit_user_textview);
-        final AutoCompleteTextView coinEditTypeTextView = (AutoCompleteTextView) findViewById(R.id.coin_edit_type_textview);
-        final EditText coinAmountEditText = (EditText) findViewById(R.id.coin_edit_amount_textview);
+        final AutoCompleteTextView coinEditUserTextView = findViewById(R.id.coin_edit_user_textview);
+        final AutoCompleteTextView coinEditTypeTextView = findViewById(R.id.coin_edit_type_textview);
+        final EditText coinAmountEditText = findViewById(R.id.coin_edit_amount_textview);
 
-        _saveButton = (com.rey.material.widget.Button) findViewById(R.id.save_coin_edit_button);
+        _saveButton = findViewById(R.id.save_coin_edit_button);
 
         TextWatcher sharedTextWatcher = new TextWatcher() {
             @Override

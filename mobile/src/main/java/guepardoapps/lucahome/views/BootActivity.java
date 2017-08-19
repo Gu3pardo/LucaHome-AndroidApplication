@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.widget.ProgressBar;
@@ -68,14 +69,7 @@ public class BootActivity extends AppCompatActivity {
 
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-                    Snacky.builder()
-                            .setActivty(BootActivity.this)
-                            .setText("Failed to navigate to LoginActivity! Please contact LucaHome support!")
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
+                    displayErrorSnackBar("Failed to navigate to LoginActivity! Please contact LucaHome support!");
                 }
             } else {
                 _mainServiceBinder.StartDownloadAll("_mainServiceConnection onServiceConnected");
@@ -105,13 +99,7 @@ public class BootActivity extends AppCompatActivity {
                     NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(BootActivity.this, MainActivity.class);
                     if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                         _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                        Snacky.builder()
-                                .setActivty(BootActivity.this)
-                                .setText("Failed to navigate back to MainActivity! Please contact LucaHome support!")
-                                .setDuration(Snacky.LENGTH_INDEFINITE)
-                                .setActionText(android.R.string.ok)
-                                .error()
-                                .show();
+                        displayErrorSnackBar("Failed to navigate back to MainActivity! Please contact LucaHome support!");
                     } else {
                         finish();
                     }
@@ -128,9 +116,9 @@ public class BootActivity extends AppCompatActivity {
         _logger = new Logger(TAG);
         _logger.Debug("onCreate");
 
-        _percentProgressBar = (ProgressBar) findViewById(R.id.percentProgressBar);
+        _percentProgressBar = findViewById(R.id.percentProgressBar);
         _percentProgressBar.setProgress(0);
-        _percentProgressTextView = (TextView) findViewById(R.id.percentProgressTextView);
+        _percentProgressTextView = findViewById(R.id.percentProgressTextView);
         _percentProgressTextView.setText("0%");
 
         _receiverController = new ReceiverController(this);
@@ -203,5 +191,15 @@ public class BootActivity extends AppCompatActivity {
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(BootActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

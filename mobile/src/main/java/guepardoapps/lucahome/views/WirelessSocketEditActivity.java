@@ -53,11 +53,11 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Added socket!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to add socket!");
+                displayErrorSnackBar("Failed to add socket!");
                 _saveButton.setEnabled(true);
             }
         }
@@ -72,11 +72,11 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Updated socket!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to update socket!");
+                displayErrorSnackBar("Failed to update socket!");
                 _saveButton.setEnabled(true);
             }
         }
@@ -97,11 +97,11 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
-        final AutoCompleteTextView socketNameTypeTextView = (AutoCompleteTextView) findViewById(R.id.socket_edit_name_textview);
-        final AutoCompleteTextView socketAreaTypeTextView = (AutoCompleteTextView) findViewById(R.id.socket_edit_area_textview);
-        final AutoCompleteTextView socketCodeTypeTextView = (AutoCompleteTextView) findViewById(R.id.socket_edit_code_textview);
+        final AutoCompleteTextView socketNameTypeTextView = findViewById(R.id.socket_edit_name_textview);
+        final AutoCompleteTextView socketAreaTypeTextView = findViewById(R.id.socket_edit_area_textview);
+        final AutoCompleteTextView socketCodeTypeTextView = findViewById(R.id.socket_edit_code_textview);
 
-        _saveButton = (com.rey.material.widget.Button) findViewById(R.id.save_socket_edit_button);
+        _saveButton = findViewById(R.id.save_socket_edit_button);
 
         TextWatcher sharedTextWatcher = new TextWatcher() {
             @Override
@@ -133,7 +133,7 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
             socketAreaTypeTextView.setText(_wirelessSocketDto.GetArea());
             socketCodeTypeTextView.setText(_wirelessSocketDto.GetCode());
         } else {
-            displayFailSnacky("Cannot work with data! Is corrupt! Please try again!");
+            displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
 
         _saveButton.setEnabled(false);
@@ -236,7 +236,7 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
         return spannableStringBuilder;
     }
 
-    private void displayFailSnacky(@NonNull String message) {
+    private void displayErrorSnackBar(@NonNull String message) {
         Snacky.builder()
                 .setActivty(WirelessSocketEditActivity.this)
                 .setText(message)
@@ -260,7 +260,7 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
                 NavigationService.NavigationResult navigationResult = _navigationService.GoBack(WirelessSocketEditActivity.this);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
+                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
                 }
             }
         }, 1500);

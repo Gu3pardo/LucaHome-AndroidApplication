@@ -105,28 +105,14 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(WirelessSocketActivity.this)
-                            .setText(Tools.DecompressByteArrayToString(result.Response))
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
-                    _noDataFallback.setVisibility(View.VISIBLE);
-                    _searchField.setVisibility(View.INVISIBLE);
+
+                    return;
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(WirelessSocketActivity.this)
-                        .setText(Tools.DecompressByteArrayToString(result.Response))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
-                _noDataFallback.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
             }
+
+            displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
+            _noDataFallback.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -139,14 +125,14 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
 
         setContentView(R.layout.activity_wireless_socket);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_sockets);
+        Toolbar toolbar = findViewById(R.id.toolbar_sockets);
         //setSupportActionBar(toolbar);
 
-        _listView = (ListView) findViewById(R.id.listView_sockets);
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar_sockets);
-        _noDataFallback = (TextView) findViewById(R.id.fallBackTextView_sockets);
+        _listView = findViewById(R.id.listView_sockets);
+        _progressBar = findViewById(R.id.progressBar_sockets);
+        _noDataFallback = findViewById(R.id.fallBackTextView_sockets);
 
-        _searchField = (EditText) findViewById(R.id.search_wireless_socket);
+        _searchField = findViewById(R.id.search_wireless_socket);
         _searchField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -154,7 +140,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                SerializableList<WirelessSocket> filteredWirelessSocketList = _wirelessSocketService.FoundWirelessSockets(charSequence.toString());
+                SerializableList<WirelessSocket> filteredWirelessSocketList = _wirelessSocketService.SearchDataList(charSequence.toString());
                 _socketListViewAdapter = new SocketListViewAdapter(_context, filteredWirelessSocketList);
                 _listView.setAdapter(_socketListViewAdapter);
                 _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d sockets", filteredWirelessSocketList.getSize()));
@@ -165,7 +151,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
             }
         });
 
-        _collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_sockets);
+        _collapsingToolbar = findViewById(R.id.collapsing_toolbar_sockets);
         _collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         _collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
@@ -176,7 +162,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
         _navigationService = NavigationService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
 
-        SerializableList<WirelessSocket> wirelessSocketList = _wirelessSocketService.GetWirelessSocketList();
+        SerializableList<WirelessSocket> wirelessSocketList = _wirelessSocketService.GetDataList();
         if (wirelessSocketList.getSize() > 0) {
             _socketListViewAdapter = new SocketListViewAdapter(_context, wirelessSocketList);
             _listView.setAdapter(_socketListViewAdapter);
@@ -189,7 +175,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
         }
         _progressBar.setVisibility(View.GONE);
 
-        FloatingActionButton addButton = (FloatingActionButton) findViewById(R.id.floating_action_button_add_wireless_socket);
+        FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_wireless_socket);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -199,27 +185,20 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
                 NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, WirelessSocketEditActivity.class, data);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-                    Snacky.builder()
-                            .setActivty(WirelessSocketActivity.this)
-                            .setText("Failed to navigate! Please contact LucaHome support!")
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
+                    displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
                 }
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_sockets);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_sockets);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_sockets);
+        NavigationView navigationView = findViewById(R.id.nav_view_sockets);
         navigationView.setNavigationItemSelectedListener(this);
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_sockets);
+        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_sockets);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -228,7 +207,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
                 _listView.setVisibility(View.GONE);
                 _progressBar.setVisibility(View.VISIBLE);
 
-                _wirelessSocketService.LoadWirelessSocketList();
+                _wirelessSocketService.LoadData();
             }
         });
     }
@@ -246,7 +225,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
 
         _receiverController.RegisterReceiver(_wirelessSocketUpdateReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
 
-        SerializableList<WirelessSocket> wirelessSocketList = _wirelessSocketService.GetWirelessSocketList();
+        SerializableList<WirelessSocket> wirelessSocketList = _wirelessSocketService.GetDataList();
         if (wirelessSocketList.getSize() > 0) {
             _socketListViewAdapter = new SocketListViewAdapter(_context, wirelessSocketList);
             _listView.setAdapter(_socketListViewAdapter);
@@ -276,7 +255,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_sockets);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_sockets);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -317,18 +296,22 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-            Snacky.builder()
-                    .setActivty(WirelessSocketActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_sockets);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_sockets);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(WirelessSocketActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
+    }
+
 }

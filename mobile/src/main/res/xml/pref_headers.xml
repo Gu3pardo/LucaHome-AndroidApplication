@@ -18,6 +18,11 @@
         android:title="@string/pref_header_notifications" />
 
     <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$ReloadPreferenceFragment"
+        android:icon="@mipmap/ic_autorenew_black_48dp"
+        android:title="@string/pref_header_reload_data" />
+
+    <header
         android:fragment="guepardoapps.lucahome.views.SettingsActivity$OpenWeatherPreferenceFragment"
         android:icon="@mipmap/ic_satellite_black_48dp"
         android:title="@string/pref_header_open_weather" />

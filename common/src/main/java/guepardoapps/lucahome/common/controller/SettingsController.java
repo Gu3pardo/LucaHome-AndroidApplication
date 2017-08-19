@@ -34,6 +34,33 @@ public class SettingsController {
     public static final String PREF_NOTIFICATION_MESSAGE_TEMPERATURE = "notifications_message_temperature";
     public static final String PREF_NOTIFICATION_MESSAGE_CAMERA = "notifications_message_camera";
 
+    public static final String PREF_RELOAD_DATA_ENABLED = "reload_data_enabled";
+    public static final String PREF_RELOAD_BIRTHDAY_ENABLED = "reload_birthday_enabled";
+    public static final String PREF_RELOAD_COIN_ENABLED = "reload_coin_enabled";
+    public static final String PREF_RELOAD_MAPCONTENT_ENABLED = "reload_mapcontent_enabled";
+    public static final String PREF_RELOAD_MEDIAMIRROR_ENABLED = "reload_mediamirror_enabled";
+    public static final String PREF_RELOAD_MENU_ENABLED = "reload_menu_enabled";
+    public static final String PREF_RELOAD_MOVIE_ENABLED = "reload_movie_enabled";
+    public static final String PREF_RELOAD_SCHEDULE_ENABLED = "reload_schedule_enabled";
+    public static final String PREF_RELOAD_SECURITY_ENABLED = "reload_security_enabled";
+    public static final String PREF_RELOAD_SHOPPING_ENABLED = "reload_shopping_enabled";
+    public static final String PREF_RELOAD_TEMPERATURE_ENABLED = "reload_temperature_enabled";
+    public static final String PREF_RELOAD_WEATHER_ENABLED = "reload_weather_enabled";
+    public static final String PREF_RELOAD_WIRELESSSOCKET_ENABLED = "reload_wirelesssocket_enabled";
+
+    public static final String PREF_RELOAD_BIRTHDAY_TIMEOUT = "reload_birthday_timeout";
+    public static final String PREF_RELOAD_COIN_TIMEOUT = "reload_coin_timeout";
+    public static final String PREF_RELOAD_MAPCONTENT_TIMEOUT = "reload_mapcontent_timeout";
+    public static final String PREF_RELOAD_MEDIAMIRROR_TIMEOUT = "reload_mediamirror_timeout";
+    public static final String PREF_RELOAD_MENU_TIMEOUT = "reload_menu_timeout";
+    public static final String PREF_RELOAD_MOVIE_TIMEOUT = "reload_movie_timeout";
+    public static final String PREF_RELOAD_SCHEDULE_TIMEOUT = "reload_schedule_timeout";
+    public static final String PREF_RELOAD_SECURITY_TIMEOUT = "reload_security_timeout";
+    public static final String PREF_RELOAD_SHOPPING_TIMEOUT = "reload_shopping_timeout";
+    public static final String PREF_RELOAD_TEMPERATURE_TIMEOUT = "reload_temperature_timeout";
+    public static final String PREF_RELOAD_WEATHER_TIMEOUT = "reload_weather_timeout";
+    public static final String PREF_RELOAD_WIRELESSSOCKET_TIMEOUT = "reload_wirelesssocket_timeout";
+
     private Context _context;
     private SharedPrefController _sharedPrefController;
 
@@ -165,5 +192,141 @@ public class SettingsController {
 
     public boolean IsChangeWeatherWallpaperActive() {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_CHANGE_WEATHER_WALLPAPER);
+    }
+
+    public boolean AreReloadsEnabled() {
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_DATA_ENABLED);
+    }
+
+    public boolean IsReloadBirthdayEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_ENABLED);
+    }
+
+    public boolean IsReloadCoinEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_COIN_ENABLED);
+    }
+
+    public boolean IsReloadMapContentEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MAPCONTENT_ENABLED);
+    }
+
+    public boolean IsReloadMediaMirrorEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MEDIAMIRROR_ENABLED);
+    }
+
+    public boolean IsReloadMenuEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MENU_ENABLED);
+    }
+
+    public boolean IsReloadMovieEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MOVIE_ENABLED);
+    }
+
+    public boolean IsReloadScheduleEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_SCHEDULE_ENABLED);
+    }
+
+    public boolean IsReloadSecurityEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_SECURITY_ENABLED);
+    }
+
+    public boolean IsReloadShoppingEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_SHOPPING_ENABLED);
+    }
+
+    public boolean IsReloadTemperatureEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_TEMPERATURE_ENABLED);
+    }
+
+    public boolean IsReloadWeatherEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WEATHER_ENABLED);
+    }
+
+    public boolean IsReloadWirelessSocketEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_ENABLED);
+    }
+
+    public int GetReloadBirthdayTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_TIMEOUT);
+    }
+
+    public int GetReloadCoinTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_COIN_TIMEOUT);
+    }
+
+    public int GetReloadMapContentTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MAPCONTENT_TIMEOUT);
+    }
+
+    public int GetReloadMediaMirrorTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MEDIAMIRROR_TIMEOUT);
+    }
+
+    public int GetReloadMenuTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MENU_TIMEOUT);
+    }
+
+    public int GetReloadMovieTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MOVIE_TIMEOUT);
+    }
+
+    public int GetReloadScheduleTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_SCHEDULE_TIMEOUT);
+    }
+
+    public int GetReloadSecurityTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_SECURITY_TIMEOUT);
+    }
+
+    public int GetReloadShoppingTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_SHOPPING_TIMEOUT);
+    }
+
+    public int GetReloadTemperatureTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_TEMPERATURE_TIMEOUT);
+    }
+
+    public int GetReloadWeatherTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_WEATHER_TIMEOUT);
+    }
+
+    public int GetReloadWirelessSocketTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT);
     }
 }

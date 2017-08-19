@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 40200
-        versionName "4.2.0.170818"
+        versionCode 40300
+        versionName "4.3.0.170819"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -19,11 +19,17 @@ android {
     }
 }
 
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+    google()
+}
+
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:26.0.1'
 }

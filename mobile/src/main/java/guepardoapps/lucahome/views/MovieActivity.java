@@ -103,28 +103,14 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(MovieActivity.this)
-                            .setText(Tools.DecompressByteArrayToString(result.Response))
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
-                    _noDataFallback.setVisibility(View.VISIBLE);
-                    _searchField.setVisibility(View.INVISIBLE);
+
+                    return;
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(MovieActivity.this)
-                        .setText(Tools.DecompressByteArrayToString(result.Response))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
-                _noDataFallback.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
             }
+
+            displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
+            _noDataFallback.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -137,14 +123,14 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
 
         setContentView(R.layout.activity_movie);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_movie);
+        Toolbar toolbar = findViewById(R.id.toolbar_movie);
         //setSupportActionBar(toolbar);
 
-        _listView = (ListView) findViewById(R.id.listView_movie);
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar_movie);
-        _noDataFallback = (TextView) findViewById(R.id.fallBackTextView_movie);
+        _listView = findViewById(R.id.listView_movie);
+        _progressBar = findViewById(R.id.progressBar_movie);
+        _noDataFallback = findViewById(R.id.fallBackTextView_movie);
 
-        _searchField = (EditText) findViewById(R.id.search_movie);
+        _searchField = findViewById(R.id.search_movie);
         _searchField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -152,7 +138,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                SerializableList<Movie> filteredMovieList = _movieService.FoundMovies(charSequence.toString());
+                SerializableList<Movie> filteredMovieList = _movieService.SearchDataList(charSequence.toString());
                 _movieListViewAdapter = new MovieListViewAdapter(_context, filteredMovieList);
                 _listView.setAdapter(_movieListViewAdapter);
                 _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d movies", filteredMovieList.getSize()));
@@ -163,7 +149,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
             }
         });
 
-        _collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_movie);
+        _collapsingToolbar = findViewById(R.id.collapsing_toolbar_movie);
         _collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         _collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
@@ -174,7 +160,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
         _navigationService = NavigationService.getInstance();
         _movieService = MovieService.getInstance();
 
-        SerializableList<Movie> movieList = _movieService.GetMovieList();
+        SerializableList<Movie> movieList = _movieService.GetDataList();
         if (movieList.getSize() > 0) {
             _movieListViewAdapter = new MovieListViewAdapter(_context, movieList);
             _listView.setAdapter(_movieListViewAdapter);
@@ -187,15 +173,15 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
         }
         _progressBar.setVisibility(View.GONE);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_movie);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_movie);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_movie);
+        NavigationView navigationView = findViewById(R.id.nav_view_movie);
         navigationView.setNavigationItemSelectedListener(this);
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_movie);
+        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_movie);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -205,7 +191,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
                 _progressBar.setVisibility(View.VISIBLE);
                 _searchField.setVisibility(View.INVISIBLE);
 
-                _movieService.LoadMovieList();
+                _movieService.LoadData();
             }
         });
     }
@@ -223,7 +209,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
 
         _receiverController.RegisterReceiver(_movieUpdateReceiver, new String[]{MovieService.MovieDownloadFinishedBroadcast});
 
-        SerializableList<Movie> movieList = _movieService.GetMovieList();
+        SerializableList<Movie> movieList = _movieService.GetDataList();
         if (movieList.getSize() > 0) {
             _movieListViewAdapter = new MovieListViewAdapter(_context, movieList);
             _listView.setAdapter(_movieListViewAdapter);
@@ -253,7 +239,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_movie);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_movie);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -294,18 +280,21 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-            Snacky.builder()
-                    .setActivty(MovieActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_movie);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_movie);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(MovieActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

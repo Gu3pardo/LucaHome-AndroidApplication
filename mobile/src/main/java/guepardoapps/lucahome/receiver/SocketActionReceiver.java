@@ -23,12 +23,15 @@ public class SocketActionReceiver extends BroadcastReceiver {
         logger.Debug("Received new socket change!");
 
         Bundle details = intent.getExtras();
+        if (details == null) {
+            logger.Warning("Details is null!");
+            return;
+        }
+
         String action = details.getString(NotificationController.ACTION);
         if (action == null) {
-            logger.Warning("Action is NULL!");
-            action = "";
-        } else {
-            logger.Debug("Action is: " + action);
+            logger.Warning("Action is null!");
+            return;
         }
 
         if (action.contains(NotificationController.SOCKET_ALL)) {

@@ -261,6 +261,41 @@ public class NotificationController {
         notificationManager.notify(notificationId, notification);
     }
 
+    public void CreateTemperatureNotification(
+            int notificationId,
+            @NonNull Class<?> temperatureActivity,
+            int icon,
+            @NonNull String title,
+            @NonNull String body,
+            boolean autoCancelable) {
+        _logger.Debug("CreateTemperatureNotification");
+
+        if (!_settingsController.IsTemperatureNotificationEnabled()) {
+            _logger.Warning("Not allowed to display temperature notification!");
+            return;
+        }
+
+        NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
+        Notification.Builder builder = new Notification.Builder(_context);
+
+        Intent intent = new Intent(_context, temperatureActivity);
+        PendingIntent pendingIntent = PendingIntent.getActivity(_context, notificationId, intent, 0);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), R.drawable.weather_wallpaper_dummy);
+        bitmap = Tools.GetCircleBitmap(bitmap);
+
+        builder.setSmallIcon(icon)
+                .setLargeIcon(bitmap)
+                .setContentTitle(title)
+                .setContentText(body)
+                .setTicker(body)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(autoCancelable);
+
+        Notification notification = builder.build();
+        notificationManager.notify(notificationId, notification);
+    }
+
     public void CloseNotification(int notificationId) {
         _notificationManager.cancel(notificationId);
     }

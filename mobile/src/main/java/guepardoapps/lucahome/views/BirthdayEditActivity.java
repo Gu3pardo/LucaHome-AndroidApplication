@@ -55,11 +55,11 @@ public class BirthdayEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Added new birthday!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to add birthday!");
+                displayErrorSnackBar("Failed to add birthday!");
                 _saveButton.setEnabled(true);
             }
         }
@@ -74,11 +74,11 @@ public class BirthdayEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Updated birthday!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to update birthday!");
+                displayErrorSnackBar("Failed to update birthday!");
                 _saveButton.setEnabled(true);
             }
 
@@ -100,10 +100,10 @@ public class BirthdayEditActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
-        final AutoCompleteTextView birthdayEditTextView = (AutoCompleteTextView) findViewById(R.id.birthday_edit_textview);
-        final DatePicker birthdayEditDatePicker = (DatePicker) findViewById(R.id.birthday_edit_datePicker);
+        final AutoCompleteTextView birthdayEditTextView = findViewById(R.id.birthday_edit_textview);
+        final DatePicker birthdayEditDatePicker = findViewById(R.id.birthday_edit_datePicker);
 
-        _saveButton = (com.rey.material.widget.Button) findViewById(R.id.save_birthday_edit_button);
+        _saveButton = findViewById(R.id.save_birthday_edit_button);
 
         birthdayEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, _birthdayService.GetBirthdayNameList()));
         birthdayEditTextView.addTextChangedListener(new TextWatcher() {
@@ -134,7 +134,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
             birthdayEditTextView.setText(_birthdayDto.GetName());
             birthdayEditDatePicker.updateDate(_birthdayDto.GetDate().Year(), _birthdayDto.GetDate().Month(), _birthdayDto.GetDate().DayOfMonth());
         } else {
-            displayFailSnacky("Cannot work with data! Is corrupt! Please try again!");
+            displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
 
         _saveButton.setEnabled(false);
@@ -230,7 +230,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
         return spannableStringBuilder;
     }
 
-    private void displayFailSnacky(@NonNull String message) {
+    private void displayErrorSnackBar(@NonNull String message) {
         Snacky.builder()
                 .setActivty(BirthdayEditActivity.this)
                 .setText(message)
@@ -254,7 +254,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
                 NavigationService.NavigationResult navigationResult = _navigationService.GoBack(BirthdayEditActivity.this);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
+                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
                 }
             }
         }, 1500);

@@ -76,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(UserService.UserCheckedFinishedBundle);
 
             if (!result.Success) {
-                _logger.Error(String.format(Locale.getDefault(), "Login failed: %s!", result.Response));
+                _logger.Error(String.format(Locale.getDefault(), "Login failed: %s!", Tools.DecompressByteArrayToString(result.Response)));
 
                 displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
 
@@ -124,9 +124,9 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         // Set up the login form.
-        _userView = (AutoCompleteTextView) findViewById(R.id.user);
+        _userView = findViewById(R.id.user);
 
-        _passwordView = (EditText) findViewById(R.id.password);
+        _passwordView = findViewById(R.id.password);
         _passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
@@ -138,7 +138,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        com.rey.material.widget.Button userSignInButton = (com.rey.material.widget.Button) findViewById(R.id.user_sign_in_button);
+        com.rey.material.widget.Button userSignInButton = findViewById(R.id.user_sign_in_button);
         userSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {

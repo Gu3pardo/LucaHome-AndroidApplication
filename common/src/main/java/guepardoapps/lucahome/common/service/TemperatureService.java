@@ -17,16 +17,19 @@ import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
+import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.controller.NotificationController;
 import guepardoapps.lucahome.common.converter.JsonDataToTemperatureConverter;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-public class TemperatureService {
+public class TemperatureService implements IDataNotificationService {
     public static class TemperatureDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Temperature> TemperatureList;
 
@@ -35,6 +38,8 @@ public class TemperatureService {
             TemperatureList = temperatureList;
         }
     }
+
+    public static final int NOTIFICATION_ID = 64371930;
 
     public static final String TemperatureDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.temperature.download.finished";
     public static final String TemperatureDownloadFinishedBundle = "TemperatureDownloadFinishedBundle";
@@ -45,19 +50,31 @@ public class TemperatureService {
     private static final String TAG = TemperatureService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int TIMEOUT_MS = 5 * 60 * 1000;
+    private boolean _displayNotification;
+    private Class<?> _receiverActivity;
+
+    private static final int MIN_TIMEOUT_MS = 15 * 60 * 1000;
+    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+
+    private boolean _reloadEnabled;
+    private int _reloadTimeout;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
             _logger.Debug("_reloadListRunnable run");
-            LoadTemperatureList();
-            _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+
+            LoadData();
+
+            if (_reloadEnabled) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
         }
     };
 
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
+    private NotificationController _notificationController;
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
     private OpenWeatherService _openWeatherService;
@@ -131,7 +148,8 @@ public class TemperatureService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context) {
+    @Override
+    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
@@ -139,8 +157,13 @@ public class TemperatureService {
             return;
         }
 
+        _receiverActivity = receiverActivity;
+        _displayNotification = displayNotification;
+        _reloadEnabled = reloadEnabled;
+
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
+        _notificationController = new NotificationController(context);
         _receiverController = new ReceiverController(context);
         _settingsController = SettingsController.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
@@ -149,11 +172,12 @@ public class TemperatureService {
 
         _jsonDataToTemperatureConverter = new JsonDataToTemperatureConverter();
 
-        _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+        SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
     }
 
+    @Override
     public void Dispose() {
         _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
@@ -161,7 +185,8 @@ public class TemperatureService {
         _isInitialized = false;
     }
 
-    public SerializableList<Temperature> GetTemperatureList() {
+    @Override
+    public SerializableList<Temperature> GetDataList() {
         return _temperatureList;
     }
 
@@ -189,7 +214,8 @@ public class TemperatureService {
         return null;
     }
 
-    public SerializableList<Temperature> FoundTemperatures(@NonNull String searchKey) {
+    @Override
+    public SerializableList<Temperature> SearchDataList(@NonNull String searchKey) {
         SerializableList<Temperature> foundTemperatures = new SerializableList<>();
 
         for (int index = 0; index < _temperatureList.getSize(); index++) {
@@ -216,8 +242,9 @@ public class TemperatureService {
         _openWeatherService.SetCity(city);
     }
 
-    public void LoadTemperatureList() {
-        _logger.Debug("LoadTemperatureList");
+    @Override
+    public void LoadData() {
+        _logger.Debug("LoadData");
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -235,14 +262,94 @@ public class TemperatureService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Temperature, true);
     }
 
-    public void ShowNotification() {
-        _logger.Debug("ShowNotification");
-        /*TODO Show notification*/
+    @Override
+    public void SetReceiverActivity(@NonNull Class<?> receiverActivity) {
+        _receiverActivity = receiverActivity;
     }
 
+    @Override
+    public Class<?> GetReceiverActivity() {
+        return _receiverActivity;
+    }
+
+    @Override
+    public void ShowNotification() {
+        _logger.Debug("ShowNotification");
+
+        if (_temperatureList == null) {
+            _logger.Error("_temperatureList is null!");
+            return;
+        }
+
+        if (_temperatureList.getSize() < 1) {
+            _logger.Error("_temperatureList is empty!");
+            return;
+        }
+
+        Temperature temperature = _temperatureList.getValue(0);
+        String title = String.format(Locale.getDefault(), "%s", temperature.GetTime().HHMM());
+        String body = String.format(Locale.getDefault(), "%s: %s", temperature.GetArea(), temperature.GetTemperatureString());
+
+        _notificationController.CreateTemperatureNotification(NOTIFICATION_ID, _receiverActivity, R.drawable.weather_dummy, title, body, true);
+    }
+
+    @Override
     public void CloseNotification() {
         _logger.Debug("CloseNotification");
-        /*TODO Close notification*/
+        _notificationController.CloseNotification(NOTIFICATION_ID);
+    }
+
+    @Override
+    public boolean GetDisplayNotification() {
+        return _displayNotification;
+    }
+
+    @Override
+    public void SetDisplayNotification(boolean displayNotification) {
+        _displayNotification = displayNotification;
+
+        if (!_displayNotification) {
+            CloseNotification();
+        } else {
+            ShowNotification();
+        }
+    }
+
+    @Override
+    public boolean GetReloadEnabled() {
+        return _reloadEnabled;
+    }
+
+    @Override
+    public void SetReloadEnabled(boolean reloadEnabled) {
+        _reloadEnabled = reloadEnabled;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
+    }
+
+    @Override
+    public int GetReloadTimeout() {
+        return _reloadTimeout;
+    }
+
+    @Override
+    public void SetReloadTimeout(int reloadTimeout) {
+        if (reloadTimeout < MIN_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
+            reloadTimeout = MIN_TIMEOUT_MS;
+        }
+        if (reloadTimeout > MAX_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
+            reloadTimeout = MAX_TIMEOUT_MS;
+        }
+
+        _reloadTimeout = reloadTimeout;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
     }
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {

@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -58,6 +59,23 @@ public class MediaMirrorService {
     private static final String TAG = MediaMirrorService.class.getSimpleName();
     private Logger _logger;
 
+    private static final int MIN_TIMEOUT_MS = 30 * 60 * 1000;
+    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+
+    private boolean _reloadEnabled;
+    private int _reloadTimeout;
+    private Handler _reloadHandler = new Handler();
+    private Runnable _reloadListRunnable = new Runnable() {
+        @Override
+        public void run() {
+            _logger.Debug("_reloadListRunnable run");
+            //TODO reload method
+            if (_reloadEnabled) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
+        }
+    };
+
     private BroadcastController _broadcastController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
@@ -92,13 +110,15 @@ public class MediaMirrorService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context) {
+    public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _reloadEnabled = reloadEnabled;
 
         _context = context;
 
@@ -108,6 +128,8 @@ public class MediaMirrorService {
         _settingsController = SettingsController.getInstance();
 
         _receiverController.RegisterReceiver(_mediaMirrorDownloadFinishedReceiver, new String[]{ClientTask.ClientTaskBroadcast});
+
+        SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
     }
@@ -146,6 +168,39 @@ public class MediaMirrorService {
                 Constants.MEDIAMIRROR_SERVERPORT,
                 communication);
         clientTask.execute();
+    }
+
+    public boolean GetReloadEnabled() {
+        return _reloadEnabled;
+    }
+
+    public void SetReloadEnabled(boolean reloadEnabled) {
+        _reloadEnabled = reloadEnabled;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
+    }
+
+    public int GetReloadTimeout() {
+        return _reloadTimeout;
+    }
+
+    public void SetReloadTimeout(int reloadTimeout) {
+        if (reloadTimeout < MIN_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
+            reloadTimeout = MIN_TIMEOUT_MS;
+        }
+        if (reloadTimeout > MAX_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
+            reloadTimeout = MAX_TIMEOUT_MS;
+        }
+
+        _reloadTimeout = reloadTimeout;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
     }
 
     private void handleResponse(@NonNull String response) {

@@ -7,8 +7,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 40200
-        versionName "4.2.0.170818"
+        versionCode 40300
+        versionName "4.3.0.170819"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -16,6 +16,8 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    productFlavors {
     }
     aaptOptions {
         cruncherEnabled = false
@@ -25,34 +27,35 @@ android {
 repositories {
     jcenter()
     maven { url "https://jitpack.io" }
+    google()
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile project(':basic')
-    compile project(':common')
-    compile project(':lib_openweather')
-    compile 'com.android.support:multidex:1.0.1'
-    compile 'com.android.support:appcompat-v7:26.0.0-alpha1'
-    compile 'com.android.support:cardview-v7:26.0.0-alpha1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:26.0.0-alpha1'
-    compile 'com.android.support:percent:26.0.0-alpha1'
-    compile 'com.android.support:recyclerview-v7:26.0.0-alpha1'
-    compile 'com.android.support:support-annotations:26.0.0-alpha1'
-    compile 'com.android.support:support-compat:26.0.0-alpha1'
-    compile 'com.android.support:support-v4:26.0.0-alpha1'
-    compile 'com.baoyz.pullrefreshlayout:library:1.2.0'
-    compile 'com.flaviofaria:kenburnsview:1.0.7'
-    compile 'com.github.GrenderG:Toasty:1.2.5'
-    compile 'com.github.matecode:Snacky:1.0.2'
-    compile 'com.github.rey5137:material:1.2.4'
-    compile('com.mikepenz:aboutlibraries:5.9.6@aar') {
+    implementation project(':basic')
+    implementation project(':common')
+    implementation project(':lib_openweather')
+    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.android.support:appcompat-v7:26.0.1'
+    implementation 'com.android.support:cardview-v7:26.0.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'com.android.support:design:26.0.1'
+    implementation 'com.android.support:percent:26.0.1'
+    implementation 'com.android.support:recyclerview-v7:26.0.1'
+    implementation 'com.android.support:support-annotations:26.0.1'
+    implementation 'com.android.support:support-compat:26.0.1'
+    implementation 'com.android.support:support-v4:26.0.1'
+    implementation 'com.baoyz.pullrefreshlayout:library:1.2.0'
+    implementation 'com.flaviofaria:kenburnsview:1.0.7'
+    implementation 'com.github.GrenderG:Toasty:1.2.5'
+    implementation 'com.github.matecode:Snacky:1.0.2'
+    implementation 'com.github.rey5137:material:1.2.4'
+    implementation('com.mikepenz:aboutlibraries:5.9.6@aar') {
         transitive = true
     }
-    compile 'org.jsoup:jsoup:1.10.3'
-    testCompile 'junit:junit:4.12'
+    implementation 'org.jsoup:jsoup:1.10.3'
+    testImplementation 'junit:junit:4.12'
 }

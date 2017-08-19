@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiManager;
-import android.os.Handler;
 
 import guepardoapps.lucahome.basic.controller.AndroidSystemController;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -17,74 +16,41 @@ import guepardoapps.lucahome.service.MainService;
 
 public class WIFIReceiver extends BroadcastReceiver {
     private static final String TAG = WIFIReceiver.class.getSimpleName();
-    private Logger _logger;
-
-    private Context _context;
-
-    private AndroidSystemController _androidSystemController;
-    private BroadcastController _broadcastController;
-    private NetworkController _networkController;
-    private SettingsController _settingsController;
-
-    private boolean _checkConnectionEnabled;
-    private Runnable _checkConnectionRunnable = new Runnable() {
-        @Override
-        public void run() {
-            _logger.Information("_checkConnectionRunnable run");
-            _checkConnectionEnabled = false;
-            checkConnection();
-        }
-    };
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        _logger = new Logger(TAG);
-        _logger.Debug("WIFIReceiver onReceive.\nContext is " + context.toString());
+        Logger logger = new Logger(TAG);
+        logger.Debug("WIFIReceiver onReceive.\nContext is " + context.toString());
 
         String action = intent.getAction();
         if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(action)) {
             SupplicantState state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
 
             if (!(SupplicantState.isValidState(state) && state == SupplicantState.COMPLETED)) {
-                _logger.Warning("Not yet a valid connection!");
+                logger.Warning("Not yet a valid connection!");
                 return;
             }
         }
-        _logger.Information("valid connection!");
 
-        _context = context;
+        logger.Information("valid connection!");
 
-        _androidSystemController = new AndroidSystemController(_context);
-        _broadcastController = new BroadcastController(_context);
-        _networkController = new NetworkController(_context);
-        _settingsController = SettingsController.getInstance();
+        if (new NetworkController(context).IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
+            logger.Debug("We are in the homeNetwork!");
 
-        _checkConnectionEnabled = true;
+            if (!new AndroidSystemController(context).IsServiceRunning(MainService.class)) {
+                logger.Debug("MainService not running! Starting...");
 
-        checkConnection();
-    }
+                Intent startMainServiceIntent = new Intent(context, MainService.class);
+                startMainServiceIntent.putExtra(MainService.MainServiceOnStartCommandBundle, true);
 
-    private void checkConnection() {
-        _logger.Debug("checkConnection");
-
-        if (_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
-            _logger.Debug("We are in the homeNetwork!");
-
-            if (!_androidSystemController.IsServiceRunning(MainService.class)) {
-                _context.startService(new Intent(_context, MainService.class));
+                context.startService(startMainServiceIntent);
+            } else {
+                logger.Debug("MainService running! Sending broadcast...");
+                new BroadcastController(context).SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
             }
-
-            _broadcastController.SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
-
         } else {
-            _logger.Warning("We are NOT in the homeNetwork!");
-
+            logger.Debug("We are NOT in the homeNetwork!");
             WirelessSocketService.getInstance().CloseNotification();
-
-            if (_checkConnectionEnabled) {
-                Handler checkConnectionHandler = new Handler();
-                checkConnectionHandler.postDelayed(_checkConnectionRunnable, 5000);
-            }
         }
     }
 }

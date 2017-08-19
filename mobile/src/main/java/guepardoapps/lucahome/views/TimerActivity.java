@@ -104,28 +104,14 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(TimerActivity.this)
-                            .setText(Tools.DecompressByteArrayToString(result.Response))
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
-                    _noDataFallback.setVisibility(View.VISIBLE);
-                    _searchField.setVisibility(View.INVISIBLE);
+
+                    return;
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(TimerActivity.this)
-                        .setText(Tools.DecompressByteArrayToString(result.Response))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
-                _noDataFallback.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
             }
+
+            displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
+            _noDataFallback.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -138,14 +124,14 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
 
         setContentView(R.layout.activity_timer);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_timer);
+        Toolbar toolbar = findViewById(R.id.toolbar_timer);
         //setSupportActionBar(toolbar);
 
-        _listView = (ListView) findViewById(R.id.listView_timer);
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar_timer);
-        _noDataFallback = (TextView) findViewById(R.id.fallBackTextView_timer);
+        _listView = findViewById(R.id.listView_timer);
+        _progressBar = findViewById(R.id.progressBar_timer);
+        _noDataFallback = findViewById(R.id.fallBackTextView_timer);
 
-        _searchField = (EditText) findViewById(R.id.search_timer);
+        _searchField = findViewById(R.id.search_timer);
         _searchField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -164,7 +150,7 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
             }
         });
 
-        _collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_timer);
+        _collapsingToolbar = findViewById(R.id.collapsing_toolbar_timer);
         _collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         _collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
@@ -188,34 +174,27 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
         }
         _progressBar.setVisibility(View.GONE);
 
-        FloatingActionButton addButton = (FloatingActionButton) findViewById(R.id.floating_action_button_add_timer);
+        FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_timer);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(_context, TimerEditActivity.class);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-                    Snacky.builder()
-                            .setActivty(TimerActivity.this)
-                            .setText("Failed to navigate! Please contact LucaHome support!")
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
+                    displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
                 }
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_timer);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_timer);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_timer);
+        NavigationView navigationView = findViewById(R.id.nav_view_timer);
         navigationView.setNavigationItemSelectedListener(this);
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_timer);
+        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_timer);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -225,7 +204,7 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
                 _progressBar.setVisibility(View.VISIBLE);
                 _searchField.setVisibility(View.INVISIBLE);
 
-                _scheduleService.LoadScheduleList();
+                _scheduleService.LoadData();
             }
         });
     }
@@ -273,7 +252,7 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_timer);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_timer);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -314,18 +293,21 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-            Snacky.builder()
-                    .setActivty(TimerActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_timer);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_timer);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(TimerActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

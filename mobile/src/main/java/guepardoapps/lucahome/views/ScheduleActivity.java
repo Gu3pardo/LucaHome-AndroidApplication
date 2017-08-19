@@ -107,28 +107,14 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(ScheduleActivity.this)
-                            .setText(Tools.DecompressByteArrayToString(result.Response))
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
-                    _noDataFallback.setVisibility(View.VISIBLE);
-                    _searchField.setVisibility(View.INVISIBLE);
+
+                    return;
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(ScheduleActivity.this)
-                        .setText(Tools.DecompressByteArrayToString(result.Response))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
-                _noDataFallback.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
             }
+
+            displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
+            _noDataFallback.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -141,14 +127,14 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
         setContentView(R.layout.activity_schedule);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_schedule);
+        Toolbar toolbar = findViewById(R.id.toolbar_schedule);
         //setSupportActionBar(toolbar);
 
-        _listView = (ListView) findViewById(R.id.listView_schedule);
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar_schedule);
-        _noDataFallback = (TextView) findViewById(R.id.fallBackTextView_schedule);
+        _listView = findViewById(R.id.listView_schedule);
+        _progressBar = findViewById(R.id.progressBar_schedule);
+        _noDataFallback = findViewById(R.id.fallBackTextView_schedule);
 
-        _searchField = (EditText) findViewById(R.id.search_schedule);
+        _searchField = findViewById(R.id.search_schedule);
         _searchField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -156,7 +142,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                SerializableList<Schedule> filteredScheduleList = _scheduleService.FoundSchedules(charSequence.toString());
+                SerializableList<Schedule> filteredScheduleList = _scheduleService.SearchDataList(charSequence.toString());
                 _scheduleListViewAdapter = new ScheduleListViewAdapter(_context, filteredScheduleList);
                 _listView.setAdapter(_scheduleListViewAdapter);
                 _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d schedules", filteredScheduleList.getSize()));
@@ -167,7 +153,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
             }
         });
 
-        _collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_schedule);
+        _collapsingToolbar = findViewById(R.id.collapsing_toolbar_schedule);
         _collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         _collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
@@ -178,7 +164,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
         _navigationService = NavigationService.getInstance();
         _scheduleService = ScheduleService.getInstance();
 
-        SerializableList<Schedule> scheduleList = _scheduleService.GetScheduleList();
+        SerializableList<Schedule> scheduleList = _scheduleService.GetDataList();
         if (scheduleList.getSize() > 0) {
             _scheduleListViewAdapter = new ScheduleListViewAdapter(_context, scheduleList);
             _listView.setAdapter(_scheduleListViewAdapter);
@@ -191,7 +177,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
         }
         _progressBar.setVisibility(View.GONE);
 
-        FloatingActionButton addButton = (FloatingActionButton) findViewById(R.id.floating_action_button_add_schedule);
+        FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_schedule);
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -201,27 +187,20 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
                 NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-                    Snacky.builder()
-                            .setActivty(ScheduleActivity.this)
-                            .setText("Failed to navigate! Please contact LucaHome support!")
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
+                    displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
                 }
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_schedule);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_schedule);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_schedules);
+        NavigationView navigationView = findViewById(R.id.nav_view_schedules);
         navigationView.setNavigationItemSelectedListener(this);
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_schedule);
+        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_schedule);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -231,7 +210,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
                 _progressBar.setVisibility(View.VISIBLE);
                 _searchField.setVisibility(View.INVISIBLE);
 
-                _scheduleService.LoadScheduleList();
+                _scheduleService.LoadData();
             }
         });
     }
@@ -249,7 +228,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
         _receiverController.RegisterReceiver(_scheduleUpdateReceiver, new String[]{ScheduleService.ScheduleDownloadFinishedBroadcast});
 
-        SerializableList<Schedule> scheduleList = _scheduleService.GetScheduleList();
+        SerializableList<Schedule> scheduleList = _scheduleService.GetDataList();
         if (scheduleList.getSize() > 0) {
             _scheduleListViewAdapter = new ScheduleListViewAdapter(_context, scheduleList);
             _listView.setAdapter(_scheduleListViewAdapter);
@@ -279,7 +258,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_schedule);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_schedule);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -320,18 +299,21 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-            Snacky.builder()
-                    .setActivty(ScheduleActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_schedule);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_schedule);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(ScheduleActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

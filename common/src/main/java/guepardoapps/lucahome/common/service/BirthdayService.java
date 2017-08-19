@@ -24,9 +24,10 @@ import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.converter.JsonDataToBirthdayConverter;
 import guepardoapps.lucahome.common.database.DatabaseBirthdayList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
+import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-public class BirthdayService {
+public class BirthdayService implements IDataNotificationService {
     public static class BirthdayDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<LucaBirthday> BirthdayList;
 
@@ -56,16 +57,23 @@ public class BirthdayService {
     private static final String TAG = BirthdayService.class.getSimpleName();
     private Logger _logger;
 
+    private boolean _displayNotification;
     private Class<?> _receiverActivity;
 
-    private static final int TIMEOUT_MS = 60 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MS = 4 * 60 * 60 * 1000;
+    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+
+    private boolean _reloadEnabled;
+    private int _reloadTimeout;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
             _logger.Debug("_reloadListRunnable run");
-            LoadBirthdayList();
-            _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+            LoadData();
+            if (_reloadEnabled) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
         }
     };
 
@@ -119,7 +127,7 @@ public class BirthdayService {
 
             _birthdayList = birthdayList;
 
-            CheckForBirthdays();
+            ShowNotification();
 
             clearBirthdayListFromDatabase();
             saveBirthdayListToDatabase();
@@ -164,7 +172,7 @@ public class BirthdayService {
                     BirthdayAddFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadBirthdayList();
+            LoadData();
         }
     };
 
@@ -201,7 +209,7 @@ public class BirthdayService {
                     BirthdayUpdateFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadBirthdayList();
+            LoadData();
         }
     };
 
@@ -238,7 +246,7 @@ public class BirthdayService {
                     BirthdayDeleteFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadBirthdayList();
+            LoadData();
         }
     };
 
@@ -251,7 +259,8 @@ public class BirthdayService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity) {
+    @Override
+    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
@@ -260,6 +269,8 @@ public class BirthdayService {
         }
 
         _receiverActivity = receiverActivity;
+        _displayNotification = displayNotification;
+        _reloadEnabled = reloadEnabled;
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
@@ -278,11 +289,12 @@ public class BirthdayService {
 
         _jsonDataToBirthdayConverter = new JsonDataToBirthdayConverter();
 
-        _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+        SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
     }
 
+    @Override
     public void Dispose() {
         _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
@@ -291,7 +303,8 @@ public class BirthdayService {
         _isInitialized = false;
     }
 
-    public SerializableList<LucaBirthday> GetBirthdayList() {
+    @Override
+    public SerializableList<LucaBirthday> GetDataList() {
         return _birthdayList;
     }
 
@@ -317,7 +330,8 @@ public class BirthdayService {
         return null;
     }
 
-    public SerializableList<LucaBirthday> FoundBirthdays(@NonNull String searchKey) {
+    @Override
+    public SerializableList<LucaBirthday> SearchDataList(@NonNull String searchKey) {
         SerializableList<LucaBirthday> foundBirthdays = new SerializableList<>();
 
         for (int index = 0; index < _birthdayList.getSize(); index++) {
@@ -334,8 +348,9 @@ public class BirthdayService {
         return foundBirthdays;
     }
 
-    public void LoadBirthdayList() {
-        _logger.Debug("LoadBirthdayList");
+    @Override
+    public void LoadData() {
+        _logger.Debug("LoadData");
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _birthdayList = _databaseBirthdayList.GetBirthdayList();
@@ -413,22 +428,92 @@ public class BirthdayService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.BirthdayDelete, true);
     }
 
+    @Override
     public void SetReceiverActivity(@NonNull Class<?> receiverActivity) {
         _receiverActivity = receiverActivity;
     }
 
+    @Override
     public Class<?> GetReceiverActivity() {
         return _receiverActivity;
     }
 
-    public void CheckForBirthdays() {
-        _logger.Debug("CheckForBirthdays");
+    @Override
+    public void ShowNotification() {
+        _logger.Debug("ShowNotification");
+
+        if (!_displayNotification) {
+            _logger.Warning("_displayNotification is false!");
+            return;
+        }
 
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
             if (birthday.HasBirthday() && _settingsController.IsBirthdayNotificationEnabled()) {
                 _notificationController.CreateBirthdayNotification(birthday.GetNotificationId(), _receiverActivity, birthday.GetIcon(), birthday.GetName(), birthday.GetNotificationBody(), true);
             }
+        }
+    }
+
+    @Override
+    public void CloseNotification() {
+        _logger.Debug("CloseNotification");
+        for (int index = 0; index < _birthdayList.getSize(); index++) {
+            LucaBirthday birthday = _birthdayList.getValue(index);
+            _notificationController.CloseNotification(birthday.GetNotificationId());
+        }
+    }
+
+    @Override
+    public boolean GetDisplayNotification() {
+        return _displayNotification;
+    }
+
+    @Override
+    public void SetDisplayNotification(boolean displayNotification) {
+        _displayNotification = displayNotification;
+
+        if (!_displayNotification) {
+            CloseNotification();
+        } else {
+            ShowNotification();
+        }
+    }
+
+    @Override
+    public boolean GetReloadEnabled() {
+        return _reloadEnabled;
+    }
+
+    @Override
+    public void SetReloadEnabled(boolean reloadEnabled) {
+        _reloadEnabled = reloadEnabled;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
+    }
+
+    @Override
+    public int GetReloadTimeout() {
+        return _reloadTimeout;
+    }
+
+    @Override
+    public void SetReloadTimeout(int reloadTimeout) {
+        if (reloadTimeout < MIN_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
+            reloadTimeout = MIN_TIMEOUT_MS;
+        }
+        if (reloadTimeout > MAX_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
+            reloadTimeout = MAX_TIMEOUT_MS;
+        }
+
+        _reloadTimeout = reloadTimeout;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
     }
 
@@ -448,14 +533,6 @@ public class BirthdayService {
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
             _databaseBirthdayList.CreateEntry(birthday);
-        }
-    }
-
-    public void CloseNotifications() {
-        _logger.Debug("CloseNotifications");
-        for (int index = 0; index < _birthdayList.getSize(); index++) {
-            LucaBirthday birthday = _birthdayList.getValue(index);
-            _notificationController.CloseNotification(birthday.GetNotificationId());
         }
     }
 

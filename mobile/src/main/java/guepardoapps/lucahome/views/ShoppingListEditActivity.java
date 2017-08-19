@@ -39,7 +39,6 @@ public class ShoppingListEditActivity extends AppCompatActivity {
     private Logger _logger;
 
     private boolean _propertyChanged;
-    private ShoppingEntryDto _shoppingEntryDto;
     private int _quantity = 1;
 
     private NavigationService _navigationService;
@@ -58,11 +57,11 @@ public class ShoppingListEditActivity extends AppCompatActivity {
                 if (result.Success) {
                     navigateBack("Added new entry!");
                 } else {
-                    displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
                 }
             } else {
-                displayFailSnacky("Failed to add entry!");
+                displayErrorSnackBar("Failed to add entry!");
                 _saveButton.setEnabled(true);
             }
         }
@@ -76,20 +75,20 @@ public class ShoppingListEditActivity extends AppCompatActivity {
         _logger = new Logger(TAG);
         _logger.Debug("onCreate");
 
-        _shoppingEntryDto = (ShoppingEntryDto) getIntent().getSerializableExtra(ShoppingListService.ShoppingIntent);
+        ShoppingEntryDto shoppingEntryDto = (ShoppingEntryDto) getIntent().getSerializableExtra(ShoppingListService.ShoppingIntent);
 
         _navigationService = NavigationService.getInstance();
         _shoppingListService = ShoppingListService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
-        final Spinner entryGroupSelect = (Spinner) findViewById(R.id.shopping_entry_group_select);
-        final TextView quantityTextView = (TextView) findViewById(R.id.shopping_entry_quantity_textview);
-        FloatingActionButton increaseQuantityButton = (FloatingActionButton) findViewById(R.id.floating_action_button_increase_quantity);
-        FloatingActionButton decreaseQuantityButton = (FloatingActionButton) findViewById(R.id.floating_action_button_decrease_quantity);
-        final AutoCompleteTextView shoppingNameEditTextView = (AutoCompleteTextView) findViewById(R.id.shopping_edit_name_textview);
+        final Spinner entryGroupSelect = findViewById(R.id.shopping_entry_group_select);
+        final TextView quantityTextView = findViewById(R.id.shopping_entry_quantity_textview);
+        FloatingActionButton increaseQuantityButton = findViewById(R.id.floating_action_button_increase_quantity);
+        FloatingActionButton decreaseQuantityButton = findViewById(R.id.floating_action_button_decrease_quantity);
+        final AutoCompleteTextView shoppingNameEditTextView = findViewById(R.id.shopping_edit_name_textview);
 
-        _saveButton = (com.rey.material.widget.Button) findViewById(R.id.save_shopping_edit_button);
+        _saveButton = findViewById(R.id.save_shopping_edit_button);
 
         shoppingNameEditTextView.setAdapter(new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, _shoppingListService.GetShoppingNameList()));
         shoppingNameEditTextView.addTextChangedListener(new TextWatcher() {
@@ -131,13 +130,13 @@ public class ShoppingListEditActivity extends AppCompatActivity {
             }
         });
 
-        if (_shoppingEntryDto != null) {
-            shoppingNameEditTextView.setText(_shoppingEntryDto.GetName());
-            entryGroupSelect.setSelection(_shoppingEntryDto.GetGroup().GetInt());
-            _quantity = _shoppingEntryDto.GetQuantity();
+        if (shoppingEntryDto != null) {
+            shoppingNameEditTextView.setText(shoppingEntryDto.GetName());
+            entryGroupSelect.setSelection(shoppingEntryDto.GetGroup().GetInt());
+            _quantity = shoppingEntryDto.GetQuantity();
             quantityTextView.setText(String.valueOf(_quantity));
         } else {
-            displayFailSnacky("Cannot work with data! Is corrupt! Please try again!");
+            displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
 
         _saveButton.setEnabled(false);
@@ -217,7 +216,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
         return spannableStringBuilder;
     }
 
-    private void displayFailSnacky(@NonNull String message) {
+    private void displayErrorSnackBar(@NonNull String message) {
         Snacky.builder()
                 .setActivty(ShoppingListEditActivity.this)
                 .setText(message)
@@ -241,7 +240,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
                 NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ShoppingListEditActivity.this);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
+                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
                 }
             }
         }, 1500);

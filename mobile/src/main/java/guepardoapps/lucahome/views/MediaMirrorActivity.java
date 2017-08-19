@@ -35,18 +35,18 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
         setContentView(R.layout.activity_mediamirror);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_media_mirror);
+        Toolbar toolbar = findViewById(R.id.toolbar_media_mirror);
         //setSupportActionBar(toolbar);
 
         _context = this;
         _navigationService = NavigationService.getInstance();
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_mediamirror);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_mediamirror);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_mediamirror);
+        NavigationView navigationView = findViewById(R.id.nav_view_mediamirror);
         navigationView.setNavigationItemSelectedListener(this);
 
     }
@@ -77,7 +77,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_mediamirror);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_mediamirror);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -128,7 +128,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
                     .show();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_mediamirror);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_mediamirror);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

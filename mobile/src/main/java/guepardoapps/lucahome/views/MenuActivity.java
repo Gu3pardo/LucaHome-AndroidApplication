@@ -99,28 +99,14 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
                     }
-                } else {
-                    Snacky.builder()
-                            .setActivty(MenuActivity.this)
-                            .setText(Tools.DecompressByteArrayToString(result.Response))
-                            .setDuration(Snacky.LENGTH_INDEFINITE)
-                            .setActionText(android.R.string.ok)
-                            .error()
-                            .show();
-                    _noDataFallback.setVisibility(View.VISIBLE);
-                    _searchField.setVisibility(View.INVISIBLE);
+
+                    return;
                 }
-            } else {
-                Snacky.builder()
-                        .setActivty(MenuActivity.this)
-                        .setText(Tools.DecompressByteArrayToString(result.Response))
-                        .setDuration(Snacky.LENGTH_INDEFINITE)
-                        .setActionText(android.R.string.ok)
-                        .error()
-                        .show();
-                _noDataFallback.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
             }
+
+            displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
+            _noDataFallback.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
         }
     };
 
@@ -133,14 +119,14 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
         setContentView(R.layout.activity_menu);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_menu);
+        Toolbar toolbar = findViewById(R.id.toolbar_menu);
         //setSupportActionBar(toolbar);
 
-        _listView = (ListView) findViewById(R.id.listView_menu);
-        _progressBar = (ProgressBar) findViewById(R.id.progressBar_menu);
-        _noDataFallback = (TextView) findViewById(R.id.fallBackTextView_menu);
+        _listView = findViewById(R.id.listView_menu);
+        _progressBar = findViewById(R.id.progressBar_menu);
+        _noDataFallback = findViewById(R.id.fallBackTextView_menu);
 
-        _searchField = (EditText) findViewById(R.id.search_menu);
+        _searchField = findViewById(R.id.search_menu);
         _searchField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -148,7 +134,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                SerializableList<LucaMenu> filteredMenuList = _menuService.FoundMenus(charSequence.toString());
+                SerializableList<LucaMenu> filteredMenuList = _menuService.SearchDataList(charSequence.toString());
                 _menuListViewAdapter = new MenuListViewAdapter(_context, filteredMenuList);
                 _listView.setAdapter(_menuListViewAdapter);
             }
@@ -165,7 +151,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         _navigationService = NavigationService.getInstance();
         _menuService = MenuService.getInstance();
 
-        SerializableList<LucaMenu> menuList = _menuService.GetMenuList();
+        SerializableList<LucaMenu> menuList = _menuService.GetDataList();
         if (menuList.getSize() > 0) {
             _menuListViewAdapter = new MenuListViewAdapter(_context, menuList);
             _listView.setAdapter(_menuListViewAdapter);
@@ -176,19 +162,19 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         }
         _progressBar.setVisibility(View.GONE);
 
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar_menu);
+        CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsing_toolbar_menu);
         collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_menu);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_menu);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_menu);
+        NavigationView navigationView = findViewById(R.id.nav_view_menu);
         navigationView.setNavigationItemSelectedListener(this);
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.pullRefreshLayout_menu);
+        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_menu);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -198,7 +184,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                 _progressBar.setVisibility(View.VISIBLE);
                 _searchField.setVisibility(View.INVISIBLE);
 
-                _menuService.LoadMenuList();
+                _menuService.LoadData();
             }
         });
     }
@@ -216,7 +202,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
         _receiverController.RegisterReceiver(_menuUpdateReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
 
-        SerializableList<LucaMenu> menuList = _menuService.GetMenuList();
+        SerializableList<LucaMenu> menuList = _menuService.GetDataList();
         if (menuList.getSize() > 0) {
             _menuListViewAdapter = new MenuListViewAdapter(_context, menuList);
             _listView.setAdapter(_menuListViewAdapter);
@@ -244,7 +230,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_menu);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_menu);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -285,18 +271,21 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
             _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
-            Snacky.builder()
-                    .setActivty(MenuActivity.this)
-                    .setText("Failed to navigate! Please contact LucaHome support!")
-                    .setDuration(Snacky.LENGTH_INDEFINITE)
-                    .setActionText(android.R.string.ok)
-                    .error()
-                    .show();
+            displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_menu);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_menu);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(MenuActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

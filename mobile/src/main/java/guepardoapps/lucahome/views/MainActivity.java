@@ -53,11 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private MapContentViewBuilder _mapContentViewBuilder;
 
     /**
-     * Adapter for the cards of the listView
-     */
-    private MainListViewAdapter _mainListViewAdapter;
-
-    /**
      * MapContentService manages data for mapContent
      */
     private MapContentService _mapContentService;
@@ -117,7 +112,9 @@ public class MainActivity extends AppCompatActivity {
                     _progressBar.setVisibility(View.GONE);
                     _pullRefreshLayout.setRefreshing(false);
 
-                    _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetMapContentList());
+                    _listView.setAdapter(new MainListViewAdapter(MainActivity.this, _mainListViewBuilder.GetList()));
+
+                    _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
                     _mapContentViewBuilder.AddViewsToMap();
                 }
             }
@@ -131,7 +128,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_mapContentUpdateReceiver");
-            _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetMapContentList());
+            _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
             _mapContentViewBuilder.AddViewsToMap();
         }
     };
@@ -150,25 +147,24 @@ public class MainActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
-        _listView = (ListView) findViewById(R.id.skeletonList_listView_main);
-        _progressBar = (ProgressBar) findViewById(R.id.skeletonList_progressBarListView_main);
-        TextView noDataFallback = (TextView) findViewById(R.id.skeletonList_fallBackTextView_main);
+        _listView = findViewById(R.id.skeletonList_listView_main);
+        _progressBar = findViewById(R.id.skeletonList_progressBarListView_main);
+        TextView noDataFallback = findViewById(R.id.skeletonList_fallBackTextView_main);
 
         _mainListViewBuilder = new MainListViewBuilder(this);
         _mapContentViewBuilder = new MapContentViewBuilder(this);
 
-        _mainListViewAdapter = new MainListViewAdapter(this, _mainListViewBuilder.GetList());
-        _listView.setAdapter(_mainListViewAdapter);
+        _listView.setAdapter(new MainListViewAdapter(this, _mainListViewBuilder.GetList()));
 
         _listView.setVisibility(View.VISIBLE);
         _progressBar.setVisibility(View.GONE);
         noDataFallback.setVisibility(View.GONE);
 
-        CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(R.id.skeletonList_collapsing_main);
+        CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.skeletonList_collapsing_main);
         collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
-        _pullRefreshLayout = (PullRefreshLayout) findViewById(R.id.skeletonList_pullRefreshLayout_main);
+        _pullRefreshLayout = findViewById(R.id.skeletonList_pullRefreshLayout_main);
         _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -181,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton imageButtonSettings = (ImageButton) findViewById(R.id.image_button_settings);
+        ImageButton imageButtonSettings = findViewById(R.id.image_button_settings);
         imageButtonSettings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -189,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        ImageButton imageButtonAbout = (ImageButton) findViewById(R.id.image_button_about);
+        ImageButton imageButtonAbout = findViewById(R.id.image_button_about);
         imageButtonAbout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -221,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         _mapContentViewBuilder.Initialize();
-        _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetMapContentList());
+        _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
         _mapContentViewBuilder.AddViewsToMap();
     }
 

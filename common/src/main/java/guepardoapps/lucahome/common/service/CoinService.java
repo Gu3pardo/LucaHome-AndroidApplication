@@ -25,9 +25,10 @@ import guepardoapps.lucahome.common.database.DatabaseCoinList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-public class CoinService {
+public class CoinService implements IDataService {
     public static class CoinConversionDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<SerializablePair<String, Double>> CoinConversionList;
 
@@ -69,7 +70,11 @@ public class CoinService {
     private static final String TAG = CoinService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int TIMEOUT_MS = 30 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MS = 30 * 60 * 1000;
+    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+
+    private boolean _reloadEnabled;
+    private int _reloadTimeout;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
@@ -77,9 +82,11 @@ public class CoinService {
             _logger.Debug("_reloadListRunnable run");
 
             LoadCoinConversionList();
-            LoadCoinList();
+            LoadData();
 
-            _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+            if (_reloadEnabled) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
         }
     };
 
@@ -142,7 +149,7 @@ public class CoinService {
                     CoinConversionDownloadFinishedBundle,
                     new CoinConversionDownloadFinishedContent(_coinConversionList, true, content.Response));
 
-            LoadCoinList();
+            LoadData();
         }
     };
 
@@ -227,7 +234,7 @@ public class CoinService {
                     CoinAddFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadCoinList();
+            LoadData();
         }
     };
 
@@ -264,7 +271,7 @@ public class CoinService {
                     CoinUpdateFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadCoinList();
+            LoadData();
         }
     };
 
@@ -301,7 +308,7 @@ public class CoinService {
                     CoinDeleteFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadCoinList();
+            LoadData();
         }
     };
 
@@ -314,13 +321,16 @@ public class CoinService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context) {
+    @Override
+    public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _reloadEnabled = reloadEnabled;
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
@@ -340,11 +350,12 @@ public class CoinService {
         _jsonDataToCoinConverter = new JsonDataToCoinConverter();
         _jsonDataToCoinConversionConverter = new JsonDataToCoinConversionConverter();
 
-        _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+        SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
     }
 
+    @Override
     public void Dispose() {
         _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
@@ -353,7 +364,8 @@ public class CoinService {
         _isInitialized = false;
     }
 
-    public SerializableList<Coin> GetCoinList() {
+    @Override
+    public SerializableList<Coin> GetDataList() {
         return _coinList;
     }
 
@@ -379,7 +391,8 @@ public class CoinService {
         return null;
     }
 
-    public SerializableList<Coin> FoundCoins(@NonNull String searchKey) {
+    @Override
+    public SerializableList<Coin> SearchDataList(@NonNull String searchKey) {
         _filteredCoinList = new SerializableList<>();
 
         for (int index = 0; index < _coinList.getSize(); index++) {
@@ -430,8 +443,9 @@ public class CoinService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.CoinConversion, false);
     }
 
-    public void LoadCoinList() {
-        _logger.Debug("LoadCoinList");
+    @Override
+    public void LoadData() {
+        _logger.Debug("LoadData");
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _coinList = _databaseCoinList.GetCoinList();
@@ -508,6 +522,43 @@ public class CoinService {
                 entry.CommandDelete());
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.CoinDelete, true);
+    }
+
+    @Override
+    public boolean GetReloadEnabled() {
+        return _reloadEnabled;
+    }
+
+    @Override
+    public void SetReloadEnabled(boolean reloadEnabled) {
+        _reloadEnabled = reloadEnabled;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
+    }
+
+    @Override
+    public int GetReloadTimeout() {
+        return _reloadTimeout;
+    }
+
+    @Override
+    public void SetReloadTimeout(int reloadTimeout) {
+        if (reloadTimeout < MIN_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
+            reloadTimeout = MIN_TIMEOUT_MS;
+        }
+        if (reloadTimeout > MAX_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
+            reloadTimeout = MAX_TIMEOUT_MS;
+        }
+
+        _reloadTimeout = reloadTimeout;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
     }
 
     private void clearCoinListFromDatabase() {

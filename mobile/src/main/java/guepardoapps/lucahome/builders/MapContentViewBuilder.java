@@ -43,7 +43,7 @@ public class MapContentViewBuilder {
     }
 
     public void Initialize() {
-        _relativeLayoutMapPaint = (RelativeLayout) ((AppCompatActivity) _context).findViewById(R.id.skeletonList_backdrop_relativeLayoutPaint_main);
+        _relativeLayoutMapPaint = ((AppCompatActivity) _context).findViewById(R.id.skeletonList_backdrop_relativeLayoutPaint_main);
 
         ViewTreeObserver viewTreeObserver = _relativeLayoutMapPaint.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -66,13 +66,14 @@ public class MapContentViewBuilder {
         });
     }
 
-    public List<TextView> CreateMapContentViewList(@NonNull SerializableList<MapContent> mapContentList) {
-        Clear();
+    public void CreateMapContentViewList(@NonNull SerializableList<MapContent> mapContentList) {
+        _mapContentViewList.clear();
+        _relativeLayoutMapPaint.removeAllViews();
 
         if (_size == null) {
             _logger.Error("_size is null!");
             _tempMapContentList = mapContentList;
-            return _mapContentViewList;
+            return;
         }
 
         for (int index = 0; index < mapContentList.getSize(); index++) {
@@ -115,33 +116,6 @@ public class MapContentViewBuilder {
         }
 
         _tempMapContentList = null;
-
-        return _mapContentViewList;
-    }
-
-    public void UpdateMapContentEntry(@NonNull MapContent updateMapContent) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateMapContentEntry: %s", updateMapContent));
-
-        if (_size == null) {
-            _logger.Error("_size is null!");
-            return;
-        }
-
-        for (TextView mapContentView : _mapContentViewList) {
-            if ((int) mapContentView.getTag() == updateMapContent.GetId()) {
-                mapContentView.setVisibility(updateMapContent.IsVisible() ? View.VISIBLE : View.GONE);
-                mapContentView.setText(updateMapContent.ButtonText());
-                mapContentView.setBackgroundResource(updateMapContent.Drawable());
-
-                int positionX = _size.x - (_size.x * updateMapContent.GetPosition()[1] / 100) - 50;
-                int positionY = (_size.y * updateMapContent.GetPosition()[0] / 100) - 50;
-                RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(positionX, positionY, 0, 0);
-                mapContentView.setLayoutParams(layoutParams);
-            }
-        }
     }
 
     public void AddViewsToMap() {
@@ -149,10 +123,5 @@ public class MapContentViewBuilder {
         for (TextView mapContentView : _mapContentViewList) {
             _relativeLayoutMapPaint.addView(mapContentView);
         }
-    }
-
-    public void Clear() {
-        _mapContentViewList.clear();
-        _relativeLayoutMapPaint.removeAllViews();
     }
 }

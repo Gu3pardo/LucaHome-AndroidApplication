@@ -24,9 +24,10 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-public class ShoppingListService {
+public class ShoppingListService implements IDataService {
     public static class ShoppingListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<ShoppingEntry> ShoppingList;
 
@@ -56,14 +57,22 @@ public class ShoppingListService {
     private static final String TAG = ShoppingListService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int TIMEOUT_MS = 30 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MS = 60 * 60 * 1000;
+    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+
+    private boolean _reloadEnabled;
+    private int _reloadTimeout;
     private Handler _reloadHandler = new Handler();
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
             _logger.Debug("_reloadListRunnable run");
-            LoadShoppingList();
-            _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+
+            LoadData();
+
+            if (_reloadEnabled) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
         }
     };
 
@@ -159,7 +168,7 @@ public class ShoppingListService {
                     ShoppingListAddFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadShoppingList();
+            LoadData();
         }
     };
 
@@ -196,7 +205,7 @@ public class ShoppingListService {
                     ShoppingListUpdateFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadShoppingList();
+            LoadData();
         }
     };
 
@@ -233,7 +242,7 @@ public class ShoppingListService {
                     ShoppingListDeleteFinishedBundle,
                     new ObjectChangeFinishedContent(true, content.Response));
 
-            LoadShoppingList();
+            LoadData();
         }
     };
 
@@ -246,13 +255,16 @@ public class ShoppingListService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context) {
+    @Override
+    public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _reloadEnabled = reloadEnabled;
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
@@ -270,11 +282,12 @@ public class ShoppingListService {
 
         _jsonDataToShoppingListConverter = new JsonDataToShoppingListConverter();
 
-        _reloadHandler.postDelayed(_reloadListRunnable, TIMEOUT_MS);
+        SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
     }
 
+    @Override
     public void Dispose() {
         _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
@@ -283,7 +296,8 @@ public class ShoppingListService {
         _isInitialized = false;
     }
 
-    public SerializableList<ShoppingEntry> GetShoppingList() {
+    @Override
+    public SerializableList<ShoppingEntry> GetDataList() {
         return _shoppingList;
     }
 
@@ -333,7 +347,8 @@ public class ShoppingListService {
         return null;
     }
 
-    public SerializableList<ShoppingEntry> FoundShoppingEntries(@NonNull String searchKey) {
+    @Override
+    public SerializableList<ShoppingEntry> SearchDataList(@NonNull String searchKey) {
         SerializableList<ShoppingEntry> foundShoppingEntries = new SerializableList<>();
 
         for (int index = 0; index < _shoppingList.getSize(); index++) {
@@ -350,8 +365,9 @@ public class ShoppingListService {
         return foundShoppingEntries;
     }
 
-    public void LoadShoppingList() {
-        _logger.Debug("LoadShoppingList");
+    @Override
+    public void LoadData() {
+        _logger.Debug("LoadData");
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _shoppingList = _databaseShoppingList.GetShoppingList();
@@ -427,6 +443,43 @@ public class ShoppingListService {
                 entry.CommandDelete());
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingListDelete, true);
+    }
+
+    @Override
+    public boolean GetReloadEnabled() {
+        return _reloadEnabled;
+    }
+
+    @Override
+    public void SetReloadEnabled(boolean reloadEnabled) {
+        _reloadEnabled = reloadEnabled;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
+    }
+
+    @Override
+    public int GetReloadTimeout() {
+        return _reloadTimeout;
+    }
+
+    @Override
+    public void SetReloadTimeout(int reloadTimeout) {
+        if (reloadTimeout < MIN_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
+            reloadTimeout = MIN_TIMEOUT_MS;
+        }
+        if (reloadTimeout > MAX_TIMEOUT_MS) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
+            reloadTimeout = MAX_TIMEOUT_MS;
+        }
+
+        _reloadTimeout = reloadTimeout;
+        if (_reloadEnabled) {
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+        }
     }
 
     private void clearShoppingListFromDatabase() {
