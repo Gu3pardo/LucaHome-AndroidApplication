@@ -10,6 +10,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
+import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
@@ -54,8 +55,8 @@ public class SecurityService implements IDataNotificationService {
     private boolean _displayNotification;
     private Class<?> _receiverActivity;
 
-    private static final int MIN_TIMEOUT_MS = 15 * 60 * 1000;
-    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MIN = 15;
+    private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -67,7 +68,7 @@ public class SecurityService implements IDataNotificationService {
 
             LoadData();
 
-            if (_reloadEnabled) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -75,6 +76,7 @@ public class SecurityService implements IDataNotificationService {
 
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
+    private NetworkController _networkController;
     private NotificationController _notificationController;
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
@@ -210,6 +212,25 @@ public class SecurityService implements IDataNotificationService {
         }
     };
 
+    private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
+        }
+    };
+
+    private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+        }
+    };
+
     private SecurityService() {
         _logger = new Logger(TAG);
         _logger.Debug("Created...");
@@ -234,6 +255,7 @@ public class SecurityService implements IDataNotificationService {
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
+        _networkController = new NetworkController(context);
         _notificationController = new NotificationController(context);
         _receiverController = new ReceiverController(context);
         _settingsController = SettingsController.getInstance();
@@ -241,6 +263,9 @@ public class SecurityService implements IDataNotificationService {
         _receiverController.RegisterReceiver(_securityDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_cameraStateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_motionStateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+
+        _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
+        _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
         _jsonDataToSecurityConverter = new JsonDataToSecurityConverter();
 
@@ -397,16 +422,16 @@ public class SecurityService implements IDataNotificationService {
 
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
-        if (reloadTimeout < MIN_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
-            reloadTimeout = MIN_TIMEOUT_MS;
+        if (reloadTimeout < MIN_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
+            reloadTimeout = MIN_TIMEOUT_MIN;
         }
-        if (reloadTimeout > MAX_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
-            reloadTimeout = MAX_TIMEOUT_MS;
+        if (reloadTimeout > MAX_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
+            reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
-        _reloadTimeout = reloadTimeout;
+        _reloadTimeout = reloadTimeout * 60 * 1000;
         if (_reloadEnabled) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);

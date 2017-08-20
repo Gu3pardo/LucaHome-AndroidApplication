@@ -283,50 +283,62 @@ public class SettingsController {
     }
 
     public int GetReloadBirthdayTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadCoinTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_COIN_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_COIN_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadMapContentTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MAPCONTENT_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MAPCONTENT_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadMediaMirrorTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MEDIAMIRROR_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MEDIAMIRROR_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadMenuTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MENU_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MENU_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadMovieTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MOVIE_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MOVIE_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadScheduleTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_SCHEDULE_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_SCHEDULE_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadSecurityTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_SECURITY_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_SECURITY_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadShoppingTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_SHOPPING_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_SHOPPING_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadTemperatureTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_TEMPERATURE_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_TEMPERATURE_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadWeatherTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_WEATHER_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WEATHER_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 
     public int GetReloadWirelessSocketTimeout() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT);
+        return Integer.parseInt(stringValue);
     }
 }

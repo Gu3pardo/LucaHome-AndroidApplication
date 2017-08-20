@@ -8,7 +8,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 26
         versionCode 40300
-        versionName "4.3.0.170819"
+        versionName "4.3.0.170820"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -57,5 +57,6 @@ dependencies {
         transitive = true
     }
     implementation 'org.jsoup:jsoup:1.10.3'
+    implementation 'com.squareup.picasso:picasso:2.5.2'
     testImplementation 'junit:junit:4.12'
 }

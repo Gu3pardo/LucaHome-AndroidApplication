@@ -154,7 +154,7 @@ public class MediaMirrorData implements Serializable {
         return _radioStreamId;
     }
 
-    public boolean GetSleepTimerEnabled() {
+    public boolean IsSleepTimerEnabled() {
         return _sleepTimerEnabled;
     }
 

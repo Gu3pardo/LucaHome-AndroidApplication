@@ -53,14 +53,17 @@ public class MediaMirrorService {
     public static final String MediaMirrorServerVersionBroadcast = "guepardoapps.lucahome.data.service.mediamirror.serverversion";
     public static final String MediaMirrorServerVersionBundle = "MediaMirrorServerVersionBundle";
 
+    public static final String MediaMirrorYoutubeVideoBroadcast = "guepardoapps.lucahome.data.service.mediamirror.youtubevideo";
+    public static final String MediaMirrorYoutubeVideoBundle = "MediaMirrorYoutubeVideoBundle";
+
     private static final MediaMirrorService SINGLETON = new MediaMirrorService();
     private boolean _isInitialized;
 
     private static final String TAG = MediaMirrorService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int MIN_TIMEOUT_MS = 30 * 60 * 1000;
-    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MIN = 30;
+    private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -69,8 +72,10 @@ public class MediaMirrorService {
         @Override
         public void run() {
             _logger.Debug("_reloadListRunnable run");
+
             //TODO reload method
-            if (_reloadEnabled) {
+
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -101,6 +106,25 @@ public class MediaMirrorService {
         }
     };
 
+    private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
+        }
+    };
+
+    private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+        }
+    };
+
     private MediaMirrorService() {
         _logger = new Logger(TAG);
         _logger.Debug("Created...");
@@ -128,6 +152,9 @@ public class MediaMirrorService {
         _settingsController = SettingsController.getInstance();
 
         _receiverController.RegisterReceiver(_mediaMirrorDownloadFinishedReceiver, new String[]{ClientTask.ClientTaskBroadcast});
+
+        _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
+        _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
         SetReloadTimeout(reloadTimeout);
 
@@ -187,16 +214,16 @@ public class MediaMirrorService {
     }
 
     public void SetReloadTimeout(int reloadTimeout) {
-        if (reloadTimeout < MIN_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
-            reloadTimeout = MIN_TIMEOUT_MS;
+        if (reloadTimeout < MIN_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
+            reloadTimeout = MIN_TIMEOUT_MIN;
         }
-        if (reloadTimeout > MAX_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
-            reloadTimeout = MAX_TIMEOUT_MS;
+        if (reloadTimeout > MAX_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
+            reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
-        _reloadTimeout = reloadTimeout;
+        _reloadTimeout = reloadTimeout * 60 * 1000;
         if (_reloadEnabled) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);

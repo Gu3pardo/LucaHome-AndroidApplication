@@ -11,6 +11,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
+import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
@@ -81,8 +82,8 @@ public class ScheduleService implements IDataService {
     private static final String TAG = ScheduleService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int MIN_TIMEOUT_MS = 60 * 60 * 1000;
-    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MIN = 60;
+    private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -94,7 +95,7 @@ public class ScheduleService implements IDataService {
 
             LoadData();
 
-            if (_reloadEnabled) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -102,6 +103,7 @@ public class ScheduleService implements IDataService {
 
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
+    private NetworkController _networkController;
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
 
@@ -143,8 +145,8 @@ public class ScheduleService implements IDataService {
                 return;
             }
 
-            SerializableList<Schedule> scheduleList = _jsonDataToScheduleConverter.GetList(contentResponse, _wirelessSocketService.GetWirelessSocketList());
-            SerializableList<LucaTimer> timerList = _jsonDataToTimerConverter.GetList(contentResponse, _wirelessSocketService.GetWirelessSocketList());
+            SerializableList<Schedule> scheduleList = _jsonDataToScheduleConverter.GetList(contentResponse, _wirelessSocketService.GetDataList());
+            SerializableList<LucaTimer> timerList = _jsonDataToTimerConverter.GetList(contentResponse, _wirelessSocketService.GetDataList());
             if (scheduleList == null) {
                 _logger.Error("Converted scheduleList is null!");
                 sendFailedTimerDownloadBroadcast(contentResponse);
@@ -426,6 +428,25 @@ public class ScheduleService implements IDataService {
         }
     };
 
+    private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
+        }
+    };
+
+    private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+        }
+    };
+
     private ScheduleService() {
         _logger = new Logger(TAG);
         _logger.Debug("Created...");
@@ -448,6 +469,7 @@ public class ScheduleService implements IDataService {
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
+        _networkController = new NetworkController(context);
         _receiverController = new ReceiverController(context);
         _settingsController = SettingsController.getInstance();
 
@@ -462,6 +484,9 @@ public class ScheduleService implements IDataService {
         _receiverController.RegisterReceiver(_timerAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_timerUpdateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_timerDeleteFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+
+        _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
+        _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
         _jsonDataToScheduleConverter = new JsonDataToScheduleConverter();
         _jsonDataToTimerConverter = new JsonDataToTimerConverter();
@@ -775,16 +800,16 @@ public class ScheduleService implements IDataService {
 
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
-        if (reloadTimeout < MIN_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
-            reloadTimeout = MIN_TIMEOUT_MS;
+        if (reloadTimeout < MIN_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
+            reloadTimeout = MIN_TIMEOUT_MIN;
         }
-        if (reloadTimeout > MAX_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
-            reloadTimeout = MAX_TIMEOUT_MS;
+        if (reloadTimeout > MAX_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
+            reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
-        _reloadTimeout = reloadTimeout;
+        _reloadTimeout = reloadTimeout * 60 * 1000;
         if (_reloadEnabled) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);

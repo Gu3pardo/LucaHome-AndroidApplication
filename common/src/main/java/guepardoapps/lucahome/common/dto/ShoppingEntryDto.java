@@ -43,10 +43,6 @@ public class ShoppingEntryDto implements Serializable {
         return _quantity;
     }
 
-    public int Icon() {
-        return _group.GetDrawable();
-    }
-
     @Override
     public String toString() {
         return String.format(Locale.getDefault(), "( %s: (Id: %d );(Name: %s );(Group: %s );(Quantity: %d ))", TAG, _id, _name, _group, _quantity);

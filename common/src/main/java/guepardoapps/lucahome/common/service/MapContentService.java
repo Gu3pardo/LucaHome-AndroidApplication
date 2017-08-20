@@ -44,8 +44,8 @@ public class MapContentService implements IDataService {
     private static final String TAG = MapContentService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int MIN_TIMEOUT_MS = 4 * 60 * 60 * 1000;
-    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MIN = 4 * 60;
+    private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -54,9 +54,10 @@ public class MapContentService implements IDataService {
         @Override
         public void run() {
             _logger.Debug("_reloadListRunnable run");
+
             LoadData();
 
-            if (_reloadEnabled) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -108,8 +109,8 @@ public class MapContentService implements IDataService {
 
             SerializableList<MapContent> mapContentList = _jsonDataToMapContentConverter.GetList(
                     contentResponse,
-                    _temperatureService.GetTemperatureList(),
-                    _wirelessSocketService.GetWirelessSocketList(),
+                    _temperatureService.GetDataList(),
+                    _wirelessSocketService.GetDataList(),
                     _scheduleService.GetDataList());
             if (mapContentList == null) {
                 _logger.Error("Converted mapContentList is null!");
@@ -126,6 +127,25 @@ public class MapContentService implements IDataService {
                     MapContentDownloadFinishedBroadcast,
                     MapContentDownloadFinishedBundle,
                     new MapContentDownloadFinishedContent(_mapContentList, true, content.Response));
+        }
+    };
+
+    private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
+        }
+    };
+
+    private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
@@ -163,6 +183,9 @@ public class MapContentService implements IDataService {
         _wirelessSocketService = WirelessSocketService.getInstance();
 
         _receiverController.RegisterReceiver(_mapContentDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+
+        _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
+        _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
         _jsonDataToMapContentConverter = new JsonDataToMapContentConverter();
 
@@ -207,7 +230,6 @@ public class MapContentService implements IDataService {
             if (entry.GetTemperatureArea().contains(searchKey)
                     || String.valueOf(entry.GetId()).contains(searchKey)
                     || entry.GetTemperature().toString().contains(searchKey)
-                    || entry.GetPosition().toString().contains(searchKey)
                     || entry.GetDrawingType().toString().contains(searchKey)
                     || entry.GetScheduleList().toString().contains(searchKey)
                     || entry.GetSocket().toString().contains(searchKey)) {
@@ -223,7 +245,7 @@ public class MapContentService implements IDataService {
         _logger.Debug("LoadData");
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
-            _mapContentList = _databaseMapContentList.GetMapContent(_wirelessSocketService.GetWirelessSocketList(), _temperatureService.GetTemperatureList());
+            _mapContentList = _databaseMapContentList.GetMapContent(_wirelessSocketService.GetDataList(), _temperatureService.GetDataList());
             _broadcastController.SendSerializableBroadcast(
                     MapContentDownloadFinishedBroadcast,
                     MapContentDownloadFinishedBundle,
@@ -268,16 +290,16 @@ public class MapContentService implements IDataService {
 
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
-        if (reloadTimeout < MIN_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
-            reloadTimeout = MIN_TIMEOUT_MS;
+        if (reloadTimeout < MIN_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
+            reloadTimeout = MIN_TIMEOUT_MIN;
         }
-        if (reloadTimeout > MAX_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
-            reloadTimeout = MAX_TIMEOUT_MS;
+        if (reloadTimeout > MAX_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
+            reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
-        _reloadTimeout = reloadTimeout;
+        _reloadTimeout = reloadTimeout * 60 * 1000;
         if (_reloadEnabled) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);

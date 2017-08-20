@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/cardview_shadow_start_color"
-    android:padding="@dimen/activity_horizontal_margin"
     tools:context="guepardoapps.lucahome.views.MediaMirrorActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -35,18 +33,519 @@
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="@color/cardview_light_background"
+        android:background="@color/cardview_shadow_start_color"
         android:fillViewport="true"
-        card_view:cardCornerRadius="4dp">
+        android:padding="@dimen/activity_horizontal_margin"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/media_mirror_selection_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <Spinner
+                        android:id="@+id/media_mirror_selection_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="3dp" />
+
+                    <TextView
+                        android:id="@+id/media_mirror_battery_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_below="@+id/media_mirror_selection_spinner"
+                        android:layout_margin="5dp"
+                        android:text="@string/battery_example"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/PrimaryText" />
+
+                    <TextView
+                        android:id="@+id/media_mirror_version_text_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:layout_below="@+id/media_mirror_selection_spinner"
+                        android:layout_margin="5dp"
+                        android:text="@string/media_mirror_version_example"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/PrimaryText" />
+
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/media_mirror_youtube_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/media_mirror_selection_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="2dp"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/youtube_video_image_view"
+                        android:layout_width="75dp"
+                        android:layout_height="75dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginStart="5dp"
+                        android:contentDescription="@string/contentDescription"
+                        android:src="@drawable/youtube_icon" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="2dp"
+                        android:orientation="vertical">
+
+                        <com.rey.material.widget.Button
+                            android:id="@+id/youtube_id_button"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="3dp"
+                            android:text="@string/youtube_id_example"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:textColor="@color/PrimaryText"
+                            android:textStyle="bold"
+                            app:rd_delayClick="none"
+                            app:rd_enable="true"
+                            app:rd_rippleColor="@color/colorPrimary"
+                            app:rd_rippleType="touch" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_margin="2dp"
+                            android:gravity="center">
+
+                            <com.rey.material.widget.FloatingActionButton
+                                android:id="@+id/youtube_play_image_button"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:layout_marginEnd="5dp"
+                                android:contentDescription="@string/contentDescription"
+                                app:fab_iconSrc="@android:drawable/ic_media_play"
+                                app:rd_delayClick="none"
+                                app:rd_enable="true"
+                                app:rd_rippleColor="@color/colorPrimary"
+                                app:rd_rippleType="touch" />
+
+                            <com.rey.material.widget.FloatingActionButton
+                                android:id="@+id/youtube_pause_image_button"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:layout_marginEnd="5dp"
+                                android:contentDescription="@string/contentDescription"
+                                app:fab_iconSrc="@android:drawable/ic_media_pause"
+                                app:rd_delayClick="none"
+                                app:rd_enable="true"
+                                app:rd_rippleColor="@color/colorPrimary"
+                                app:rd_rippleType="touch" />
+
+                            <com.rey.material.widget.FloatingActionButton
+                                android:id="@+id/youtube_stop_image_button"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:contentDescription="@string/contentDescription"
+                                app:fab_iconSrc="@android:drawable/editbox_dropdown_light_frame"
+                                app:rd_delayClick="none"
+                                app:rd_enable="true"
+                                app:rd_rippleColor="@color/colorPrimary"
+                                app:rd_rippleType="touch" />
+                        </LinearLayout>
+
+                        <SeekBar
+                            android:id="@+id/youtube_duration_seek_bar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:max="100" />
+
+                        <TextView
+                            android:id="@+id/youtube_video_time_text_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginStart="5dp"
+                            android:gravity="end|center"
+                            android:padding="5dp"
+                            android:text="@string/youtube_play_time_example"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textColor="@color/PrimaryText" />
+
+                        <com.rey.material.widget.Button
+                            android:id="@+id/sleep_timer_button"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="5dp"
+                            android:layout_marginStart="5dp"
+                            android:gravity="center"
+                            android:padding="5dp"
+                            android:text="@string/sleep_timer_example"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:textColor="@color/PrimaryText"
+                            android:textStyle="bold"
+                            app:rd_delayClick="none"
+                            app:rd_enable="true"
+                            app:rd_rippleColor="@color/colorPrimary"
+                            app:rd_rippleType="touch" />
+                    </LinearLayout>
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/media_mirror_radio_stream_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/media_mirror_youtube_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <android.support.percent.PercentRelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
+
+                    <Spinner
+                        android:id="@+id/radio_stream_selection_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        android:layout_marginEnd="5dp"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="55%" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/radio_stream_play_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toEndOf="@+id/radio_stream_selection_spinner"
+                        android:contentDescription="@string/contentDescription"
+                        app:fab_iconSrc="@android:drawable/ic_media_play"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="15%"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/radio_stream_stop_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_toEndOf="@+id/radio_stream_play_button"
+                        android:contentDescription="@string/contentDescription"
+                        app:fab_iconSrc="@android:drawable/editbox_dropdown_light_frame"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="15%"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+                </android.support.percent.PercentRelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/rss_selection_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/media_mirror_radio_stream_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <Spinner
+                    android:id="@+id/rss_selection_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center"
+                    android:layout_margin="3dp" />
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/set_text_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/rss_selection_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <android.support.percent.PercentRelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
+
+                    <EditText
+                        android:id="@+id/text_edit_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginEnd="5dp"
+                        android:inputType="text"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="67%" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/send_text_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toEndOf="@+id/text_edit_view"
+                        app:fab_iconSrc="@android:drawable/ic_menu_send"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="15%"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+                </android.support.percent.PercentRelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/media_mirror_volume_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/set_text_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <android.support.percent.PercentRelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/volume_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:gravity="center"
+                        android:text="@string/volume_example"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/PrimaryText"
+                        android:textStyle="bold"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="55%" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/volume_increase_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toEndOf="@+id/volume_text_view"
+                        app:fab_iconSrc="@mipmap/ic_add_white_48dp"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="15%"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/volume_decrease_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_toEndOf="@+id/volume_increase_button"
+                        app:fab_iconSrc="@mipmap/ic_remove_circle_outline_white_48dp"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="15%"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+                </android.support.percent.PercentRelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/screen_brightness_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/media_mirror_volume_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <android.support.percent.PercentRelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/brightness_text_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:gravity="center"
+                        android:text="@string/brightness_example"
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@color/PrimaryText"
+                        android:textStyle="bold"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="55%" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/brightness_increase_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toEndOf="@+id/brightness_text_view"
+                        app:fab_iconSrc="@mipmap/ic_add_white_48dp"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="15%"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/brightness_decrease_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_toEndOf="@+id/brightness_increase_button"
+                        app:fab_iconSrc="@mipmap/ic_remove_circle_outline_white_48dp"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="15%"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+                </android.support.percent.PercentRelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/update_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/screen_brightness_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <android.support.percent.PercentRelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="140dp"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <com.rey.material.widget.Button
+                        android:id="@+id/update_current_weather_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:padding="5dp"
+                        android:text="@string/update_current_weather"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="45%"
+                        app:layout_widthPercent="30%" />
+
+                    <com.rey.material.widget.Button
+                        android:id="@+id/update_forecast_weather_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toEndOf="@+id/update_current_weather_button"
+                        android:padding="5dp"
+                        android:text="@string/update_forecast_weather"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="45%"
+                        app:layout_widthPercent="30%" />
+
+                    <com.rey.material.widget.Button
+                        android:id="@+id/update_temperature_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/update_forecast_weather_button"
+                        android:padding="5dp"
+                        android:text="@string/update_temperature"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="45%"
+                        app:layout_widthPercent="30%" />
+
+                    <com.rey.material.widget.Button
+                        android:id="@+id/update_ip_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/update_current_weather_button"
+                        android:layout_marginEnd="5dp"
+                        android:padding="5dp"
+                        android:text="@string/update_ip"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="45%"
+                        app:layout_widthPercent="30%" />
+
+                    <com.rey.material.widget.Button
+                        android:id="@+id/update_birthdays_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/update_current_weather_button"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toEndOf="@+id/update_ip_button"
+                        android:padding="5dp"
+                        android:text="@string/update_birthdays"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="45%"
+                        app:layout_widthPercent="30%" />
+
+                    <com.rey.material.widget.Button
+                        android:id="@+id/update_calendar_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/update_current_weather_button"
+                        android:layout_toEndOf="@+id/update_birthdays_button"
+                        android:padding="5dp"
+                        android:text="@string/update_calendar"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="45%"
+                        app:layout_widthPercent="30%" />
+                </android.support.percent.PercentRelativeLayout>
+            </android.support.v7.widget.CardView>
 
         </RelativeLayout>
-    </android.support.v7.widget.CardView>
-</RelativeLayout>
+    </ScrollView>
+</android.support.design.widget.CoordinatorLayout>

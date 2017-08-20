@@ -117,41 +117,41 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     preference.setSummary(value.toString());
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_BIRTHDAY_TIMEOUT)) {
-                    _birthdayService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _birthdayService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_COIN_TIMEOUT)) {
-                    _coinService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _coinService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MAPCONTENT_TIMEOUT)) {
-                    _mapContentService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _mapContentService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MEDIAMIRROR_TIMEOUT)) {
-                    _mediaMirrorService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _mediaMirrorService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MENU_TIMEOUT)) {
-                    _menuService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _menuService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MOVIE_TIMEOUT)) {
-                    _movieService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _movieService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_SCHEDULE_TIMEOUT)) {
-                    _scheduleService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _scheduleService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_SECURITY_TIMEOUT)) {
-                    _securityService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _securityService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_SHOPPING_TIMEOUT)) {
-                    _shoppingListService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _shoppingListService.SetReloadTimeout(Integer.parseInt((String) value));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_TEMPERATURE_TIMEOUT)) {
-                    _temperatureService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _temperatureService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_WEATHER_TIMEOUT)) {
-                    _openWeatherService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _openWeatherService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_WIRELESSSOCKET_TIMEOUT)) {
-                    _wirelessSocketService.SetReloadTimeout((int) value);
-                    preference.setSummary((int) value);
+                    _wirelessSocketService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 }
 
             } else {

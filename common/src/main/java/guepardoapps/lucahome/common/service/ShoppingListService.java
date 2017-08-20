@@ -57,8 +57,8 @@ public class ShoppingListService implements IDataService {
     private static final String TAG = ShoppingListService.class.getSimpleName();
     private Logger _logger;
 
-    private static final int MIN_TIMEOUT_MS = 60 * 60 * 1000;
-    private static final int MAX_TIMEOUT_MS = 24 * 60 * 60 * 1000;
+    private static final int MIN_TIMEOUT_MIN = 60;
+    private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -70,7 +70,7 @@ public class ShoppingListService implements IDataService {
 
             LoadData();
 
-            if (_reloadEnabled) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -246,6 +246,25 @@ public class ShoppingListService implements IDataService {
         }
     };
 
+    private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+                _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
+            }
+        }
+    };
+
+    private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
+            _reloadHandler.removeCallbacks(_reloadListRunnable);
+        }
+    };
+
     private ShoppingListService() {
         _logger = new Logger(TAG);
         _logger.Debug("Created...");
@@ -279,6 +298,9 @@ public class ShoppingListService implements IDataService {
         _receiverController.RegisterReceiver(_shoppingListAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_shoppingListUpdateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_shoppingListDeleteFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+
+        _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
+        _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
         _jsonDataToShoppingListConverter = new JsonDataToShoppingListConverter();
 
@@ -466,16 +488,16 @@ public class ShoppingListService implements IDataService {
 
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
-        if (reloadTimeout < MIN_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MS %d! Setting to MIN_TIMEOUT_MS!", reloadTimeout, MIN_TIMEOUT_MS));
-            reloadTimeout = MIN_TIMEOUT_MS;
+        if (reloadTimeout < MIN_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
+            reloadTimeout = MIN_TIMEOUT_MIN;
         }
-        if (reloadTimeout > MAX_TIMEOUT_MS) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MS!", reloadTimeout, MAX_TIMEOUT_MS));
-            reloadTimeout = MAX_TIMEOUT_MS;
+        if (reloadTimeout > MAX_TIMEOUT_MIN) {
+            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
+            reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
-        _reloadTimeout = reloadTimeout;
+        _reloadTimeout = reloadTimeout * 60 * 1000;
         if (_reloadEnabled) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
