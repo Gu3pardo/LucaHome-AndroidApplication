@@ -6,7 +6,7 @@
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
 [![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
-[![Version](https://img.shields.io/badge/version-v4.3.0.170819-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
+[![Version](https://img.shields.io/badge/version-v4.3.0.170820-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
 
 Part of the LucaHome-Project
 Containing the shared library LucaHome, a wearable project and the main android client application.
@@ -37,3 +37,6 @@ ___________________________________
 ___________________________________
 
 ![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_008.png)
+___________________________________
+
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_009.png)
