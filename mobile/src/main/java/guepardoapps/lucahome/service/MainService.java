@@ -9,10 +9,12 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.support.annotation.NonNull;
+import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.Locale;
 
+import es.dmoral.toasty.Toasty;
 import guepardoapps.library.openweather.service.OpenWeatherService;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializablePair;
@@ -342,9 +344,14 @@ public class MainService extends Service {
         super.onStartCommand(intent, flags, startId);
         _logger.Debug("onStartCommand");
 
-        boolean downloadAll = intent.getBooleanExtra(MainServiceOnStartCommandBundle, false);
-        if (downloadAll) {
-            StartDownloadAll("onStartCommand");
+        try {
+            boolean downloadAll = intent.getBooleanExtra(MainServiceOnStartCommandBundle, false);
+            if (downloadAll) {
+                StartDownloadAll("onStartCommand");
+            }
+        } catch (Exception exception) {
+            _logger.Error(exception.getMessage());
+            Toasty.error(this, exception.getMessage(), Toast.LENGTH_LONG).show();
         }
 
         return START_STICKY;
