@@ -14,7 +14,6 @@ import guepardoapps.lucahome.common.classes.ShoppingEntry;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
 
 public class DatabaseShoppingList {
-
     private static final String TAG = DatabaseShoppingList.class.getSimpleName();
     private Logger _logger;
 

@@ -15,7 +15,6 @@ import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.enums.Weekday;
 
 public class DatabaseMenuList {
-
     private static final String TAG = DatabaseMenuList.class.getSimpleName();
     private Logger _logger;
 

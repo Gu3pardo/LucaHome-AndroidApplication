@@ -1,5 +1,6 @@
 package guepardoapps.lucahome.views;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -12,10 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
+import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -124,6 +134,23 @@ public class BootActivity extends AppCompatActivity {
         _receiverController = new ReceiverController(this);
         _navigationService = NavigationService.getInstance();
         _userService = UserService.getInstance();
+
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.READ_CONTACTS)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        Toasty.success(BootActivity.this, "Permission READ_CONTACTS granted! Thanks!", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        displayErrorSnackBar("Read contacts is necessary for birthday list!");
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                }).check();
     }
 
 

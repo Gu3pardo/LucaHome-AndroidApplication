@@ -6,15 +6,17 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 
 public class DatabaseBirthdayList {
-
     private static final String TAG = DatabaseBirthdayList.class.getSimpleName();
     private Logger _logger;
 
@@ -121,10 +123,14 @@ public class DatabaseBirthdayList {
                 _logger.Error("Size of birthdayStringArray has invalid size " + String.valueOf(dateStringArray.length));
             }
 
-            LucaBirthday entry = new LucaBirthday(
-                    id,
-                    name,
-                    date);
+            Bitmap photo = BitmapFactory.decodeResource(_context.getResources(), guepardoapps.lucahome.basic.R.mipmap.ic_face_white_48dp);
+            try {
+                photo = Tools.RetrieveContactPhoto(_context, name, 250, 250, true);
+            } catch (Exception exception) {
+                _logger.Error(exception.getMessage());
+            }
+
+            LucaBirthday entry = new LucaBirthday(id, name, date, photo);
             result.addValue(entry);
         }
 

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,12 +15,12 @@ import android.widget.TextView;
 
 import com.rey.material.app.Dialog;
 import com.rey.material.app.ThemeManager;
+import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
@@ -38,56 +37,75 @@ public class SocketListViewAdapter extends BaseAdapter {
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
         private View _stateView;
+
+        private void displayDeleteDialog(@NonNull final WirelessSocket wirelessSocket) {
+            final Dialog deleteDialog = new Dialog(_context);
+
+            deleteDialog
+                    .title(String.format(Locale.getDefault(), "Delete %s?", wirelessSocket.GetName()))
+                    .positiveAction("Delete")
+                    .negativeAction("Cancel")
+                    .applyStyle(_isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
+                    .setCancelable(true);
+
+            deleteDialog.positiveActionClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    _wirelessSocketService.DeleteWirelessSocket(wirelessSocket);
+                    deleteDialog.dismiss();
+                }
+            });
+
+            deleteDialog.negativeActionClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    deleteDialog.dismiss();
+                }
+            });
+
+            deleteDialog.show();
+        }
     }
 
-    private static final String TAG = SocketListViewAdapter.class.getSimpleName();
-    private Logger _logger;
-
     private Context _context;
-
     private NavigationService _navigationService;
     private WirelessSocketService _wirelessSocketService;
 
-    private static LayoutInflater _inflater = null;
-
     private SerializableList<WirelessSocket> _listViewItems;
 
+    private static LayoutInflater _inflater = null;
+    private boolean _isLightTheme;
+
     public SocketListViewAdapter(@NonNull Context context, @NonNull SerializableList<WirelessSocket> listViewItems) {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
-
         _context = context;
-
-        _listViewItems = listViewItems;
-
         _navigationService = NavigationService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
 
+        _listViewItems = listViewItems;
+
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        _isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
     }
 
     @Override
     public int getCount() {
-        _logger.Debug(String.format(Locale.getDefault(), "getCount: %d", _listViewItems.getSize()));
         return _listViewItems.getSize();
     }
 
     @Override
     public Object getItem(int position) {
-        _logger.Debug(String.format(Locale.getDefault(), "getItem: %d", position));
         return position;
     }
 
     @Override
     public long getItemId(int position) {
-        _logger.Debug(String.format(Locale.getDefault(), "getItemId: %d", position));
         return position;
     }
 
     @SuppressLint({"InflateParams", "ViewHolder"})
     @Override
     public View getView(final int index, View convertView, ViewGroup parent) {
-        Holder holder = new Holder();
+        final Holder holder = new Holder();
 
         View rowView = _inflater.inflate(R.layout.listview_card_socket, null);
 
@@ -114,10 +132,6 @@ public class SocketListViewAdapter extends BaseAdapter {
         holder._cardSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean value) {
-                _logger.Debug(String.format(
-                        Locale.getDefault(),
-                        "setOnCheckedChangeListener onCheckedChanged on CompoundButton %s with value %s",
-                        compoundButton, value));
                 _wirelessSocketService.SetWirelessSocketState(wirelessSocket, value);
             }
         });
@@ -125,7 +139,6 @@ public class SocketListViewAdapter extends BaseAdapter {
         holder._updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                _logger.Debug("_updateButton setOnClickListener onClick");
                 Bundle data = new Bundle();
                 data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(wirelessSocket.GetId(), wirelessSocket.GetName(), wirelessSocket.GetArea(), wirelessSocket.GetCode(), wirelessSocket.IsActivated(), WirelessSocketDto.Action.Update));
                 _navigationService.NavigateToActivityWithData(_context, WirelessSocketEditActivity.class, data);
@@ -135,34 +148,7 @@ public class SocketListViewAdapter extends BaseAdapter {
         holder._deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                _logger.Debug("_deleteButton setOnClickListener onClick");
-
-                boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
-
-                final Dialog deleteDialog = new Dialog(_context);
-                deleteDialog
-                        .title(String.format(Locale.getDefault(), "Delete %s?", wirelessSocket.GetName()))
-                        .positiveAction("Delete")
-                        .negativeAction("Cancel")
-                        .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
-                        .setCancelable(true);
-
-                deleteDialog.positiveActionClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        _wirelessSocketService.DeleteWirelessSocket(wirelessSocket);
-                        deleteDialog.dismiss();
-                    }
-                });
-
-                deleteDialog.negativeActionClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        deleteDialog.dismiss();
-                    }
-                });
-
-                deleteDialog.show();
+                holder.displayDeleteDialog(wirelessSocket);
             }
         });
 

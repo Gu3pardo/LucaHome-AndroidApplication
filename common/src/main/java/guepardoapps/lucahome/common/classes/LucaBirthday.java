@@ -1,12 +1,12 @@
 package guepardoapps.lucahome.common.classes;
 
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableDate;
-import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 
 public class LucaBirthday implements Serializable {
@@ -18,15 +18,18 @@ public class LucaBirthday implements Serializable {
     private int _id;
     private String _name;
     private SerializableDate _date;
+    private transient Bitmap _photo;
     private int _notificationId;
 
     public LucaBirthday(
             int id,
             @NonNull String name,
-            @NonNull SerializableDate date) {
+            @NonNull SerializableDate date,
+            @NonNull Bitmap photo) {
         _id = id;
         _name = name;
         _date = date;
+        _photo = photo;
         _notificationId = _id * _date.DayOfMonth() + _date.Month() * _date.Year();
     }
 
@@ -58,8 +61,12 @@ public class LucaBirthday implements Serializable {
         return "It is " + _name + "'s " + String.valueOf(GetAge()) + "th birthday!";
     }
 
-    public int GetIcon() {
-        return R.drawable.birthday;
+    public Bitmap GetPhoto() {
+        return _photo;
+    }
+
+    public void SetPhoto(@NonNull Bitmap photo) {
+        _photo = photo;
     }
 
     public int GetAge() {

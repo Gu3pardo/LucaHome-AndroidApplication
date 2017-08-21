@@ -7,6 +7,9 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
@@ -113,8 +116,8 @@ public class MovieService implements IDataService {
                 return;
             }
 
-            _logger.Debug("Successfully converted movieList! Now broadcasting!");
-            _movieList = movieList;
+            _logger.Debug("Successfully converted movieList! Now sorting and then broadcasting!");
+            _movieList = sortListAlphabetically(movieList);
 
             _broadcastController.SendSerializableBroadcast(
                     MovieDownloadFinishedBroadcast,
@@ -284,13 +287,12 @@ public class MovieService implements IDataService {
                     || entry.GetTitle().contains(searchKey)
                     || entry.GetGenre().contains(searchKey)
                     || entry.GetDescription().contains(searchKey)
-                    //|| String.valueOf(entry.GetWatched()).contains(searchKey)
                     || String.valueOf(entry.GetRating()).contains(searchKey)) {
                 foundMovies.addValue(entry);
             }
         }
 
-        return foundMovies;
+        return sortListAlphabetically(foundMovies);
     }
 
     @Override
@@ -379,5 +381,26 @@ public class MovieService implements IDataService {
                 MovieUpdateFinishedBroadcast,
                 MovieUpdateFinishedBundle,
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private SerializableList<Movie> sortListAlphabetically(SerializableList<Movie> movieList) {
+        List<Movie> tmpMovieList = new ArrayList<>();
+        for (int index = 0; index < movieList.getSize(); index++) {
+            tmpMovieList.add(movieList.getValue(index));
+        }
+
+        Collections.sort(tmpMovieList, new Comparator<Movie>() {
+            @Override
+            public int compare(final Movie object1, final Movie object2) {
+                return object1.GetTitle().compareTo(object2.GetTitle());
+            }
+        });
+
+        SerializableList<Movie> returnMovieList = new SerializableList<>();
+        for (Movie returnMovie : tmpMovieList) {
+            returnMovieList.addValue(returnMovie);
+        }
+
+        return returnMovieList;
     }
 }

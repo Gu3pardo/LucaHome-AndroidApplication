@@ -1,12 +1,12 @@
 package guepardoapps.lucahome.views;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -22,12 +22,21 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.baoyz.widget.PullRefreshLayout;
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionDeniedResponse;
+import com.karumi.dexter.listener.PermissionGrantedResponse;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.single.PermissionListener;
+import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
+import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.adapter.BirthdayListViewAdapter;
 import guepardoapps.lucahome.basic.classes.SerializableDate;
@@ -212,6 +221,24 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
                 _birthdayService.LoadData();
             }
         });
+
+        Dexter.withActivity(this)
+                .withPermission(Manifest.permission.READ_CONTACTS)
+                .withListener(new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        Toasty.success(BirthdayActivity.this, "Permission READ_CONTACTS granted! Thanks!", Toast.LENGTH_LONG).show();
+                        _birthdayService.RetrieveContactPhotos();
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+                        displayErrorSnackBar("Read contacts is necessary for birthday list!");
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
+                }).check();
     }
 
     @Override

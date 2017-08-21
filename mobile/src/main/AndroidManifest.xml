@@ -18,6 +18,7 @@
             android:name=".views.BirthdayActivity"
             android:label="@string/title_activity_birthday"
             android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -27,7 +28,7 @@
             android:name=".views.BirthdayEditActivity"
             android:label="@string/title_activity_birthday_edit"
             android:parentActivityName=".views.BirthdayActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.BirthdayActivity" />
@@ -43,6 +44,7 @@
             android:name=".views.CoinActivity"
             android:label="@string/title_activity_coin"
             android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -52,7 +54,7 @@
             android:name=".views.CoinEditActivity"
             android:label="@string/title_activity_coin_edit"
             android:parentActivityName=".views.CoinActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.CoinActivity" />
@@ -61,6 +63,7 @@
             android:name=".views.ForecastWeatherActivity"
             android:label="@string/title_activity_forecast_weather"
             android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -82,6 +85,7 @@
             android:name=".views.MenuActivity"
             android:label="@string/title_activity_menu"
             android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -91,7 +95,7 @@
             android:name=".views.MenuEditActivity"
             android:label="@string/title_activity_menu_edit"
             android:parentActivityName=".views.MenuActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.MenuActivity" />
@@ -100,6 +104,7 @@
             android:name=".views.MovieActivity"
             android:label="@string/title_activity_movie"
             android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -109,7 +114,7 @@
             android:name=".views.MovieEditActivity"
             android:label="@string/title_activity_movie_edit"
             android:parentActivityName=".views.MovieActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.MovieActivity" />
@@ -128,8 +133,7 @@
             android:name=".views.ScheduleEditActivity"
             android:label="@string/title_activity_schedule_edit"
             android:parentActivityName=".views.ScheduleActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.ScheduleActivity" />
@@ -155,6 +159,7 @@
             android:name=".views.ShoppingListActivity"
             android:label="@string/title_activity_shopping_list"
             android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -164,7 +169,7 @@
             android:name=".views.ShoppingListEditActivity"
             android:label="@string/title_activity_shopping_list_edit"
             android:parentActivityName=".views.ShoppingListActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.ShoppingListActivity" />
@@ -183,8 +188,7 @@
             android:name=".views.TimerEditActivity"
             android:label="@string/title_activity_timer_edit"
             android:parentActivityName=".views.TimerActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.TimerActivity" />
@@ -203,7 +207,7 @@
             android:name=".views.WirelessSocketEditActivity"
             android:label="@string/title_activity_wireless_socket_edit"
             android:parentActivityName=".views.WirelessSocketActivity"
-            android:windowSoftInputMode="stateHidden|adjustResize">
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.WirelessSocketActivity" />

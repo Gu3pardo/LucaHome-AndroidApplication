@@ -243,16 +243,16 @@ public class MainListViewBuilder {
         );
 
         _mainListViewItems.addValue(wirelessSocketItem);
-        _mainListViewItems.addValue(scheduleItem);
-        _mainListViewItems.addValue(timerItem);
         _mainListViewItems.addValue(weatherItem);
         _mainListViewItems.addValue(coinItem);
-        _mainListViewItems.addValue(menuItem);
         _mainListViewItems.addValue(shoppingItem);
-        _mainListViewItems.addValue(birthdayItem);
-        _mainListViewItems.addValue(movieItem);
+        _mainListViewItems.addValue(menuItem);
         _mainListViewItems.addValue(mediaMirrorItem);
+        _mainListViewItems.addValue(movieItem);
+        _mainListViewItems.addValue(birthdayItem);
         _mainListViewItems.addValue(securityItem);
+        _mainListViewItems.addValue(scheduleItem);
+        _mainListViewItems.addValue(timerItem);
     }
 
     private void navigateTo(@NonNull Class<?> targetActivity) {

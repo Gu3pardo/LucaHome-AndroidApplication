@@ -174,10 +174,10 @@ public class BirthdayEditActivity extends AppCompatActivity {
                     focusView.requestFocus();
                 } else {
                     if (_birthdayDto.GetAction() == BirthdayDto.Action.Add) {
-                        _birthdayService.AddBirthday(new LucaBirthday(-1, birthdayName, birthdayDate));
+                        _birthdayService.AddBirthday(new LucaBirthday(-1, birthdayName, birthdayDate, null));
                         _saveButton.setEnabled(false);
                     } else if (_birthdayDto.GetAction() == BirthdayDto.Action.Update) {
-                        _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate));
+                        _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, null));
                         _saveButton.setEnabled(false);
                     } else {
                         birthdayEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _birthdayDto.GetAction())));

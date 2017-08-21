@@ -79,7 +79,8 @@
             android:id="@+id/pullRefreshLayout_forecast_weather"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/search_forecast_weather">
+            android:layout_below="@id/search_forecast_weather"
+            android:layout_marginBottom="?attr/actionBarSize">
 
             <ListView
                 android:id="@+id/listView_forecast_weather"

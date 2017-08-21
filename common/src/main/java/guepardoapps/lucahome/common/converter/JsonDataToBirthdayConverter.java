@@ -1,5 +1,8 @@
 package guepardoapps.lucahome.common.converter;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 
 import java.util.Locale;
@@ -8,10 +11,10 @@ import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
+import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
-import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
-public class JsonDataToBirthdayConverter implements IJsonDataConverter {
+public class JsonDataToBirthdayConverter {
     private static final String TAG = JsonDataToBirthdayConverter.class.getSimpleName();
     private Logger _logger;
 
@@ -21,22 +24,20 @@ public class JsonDataToBirthdayConverter implements IJsonDataConverter {
         _logger = new Logger(TAG);
     }
 
-    @Override
-    public SerializableList<LucaBirthday> GetList(@NonNull String[] stringArray) {
+    public SerializableList<LucaBirthday> GetList(@NonNull String[] stringArray, @NonNull Context context) {
         if (StringHelper.StringsAreEqual(stringArray)) {
-            return parseStringToList(stringArray[0]);
+            return parseStringToList(stringArray[0], context);
         } else {
             String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
-            return parseStringToList(usedEntry);
+            return parseStringToList(usedEntry, context);
         }
     }
 
-    @Override
-    public SerializableList<LucaBirthday> GetList(@NonNull String responseString) {
-        return parseStringToList(responseString);
+    public SerializableList<LucaBirthday> GetList(@NonNull String responseString, @NonNull Context context) {
+        return parseStringToList(responseString, context);
     }
 
-    private SerializableList<LucaBirthday> parseStringToList(@NonNull String value) {
+    private SerializableList<LucaBirthday> parseStringToList(@NonNull String value, @NonNull Context context) {
         if (!value.contains("Error")) {
             if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
                 if (value.contains(_searchParameter)) {
@@ -47,7 +48,7 @@ public class JsonDataToBirthdayConverter implements IJsonDataConverter {
                         entry = entry.replace(_searchParameter, "").replace("};};", "");
 
                         String[] data = entry.split("\\};");
-                        LucaBirthday newValue = parseStringToValue(data);
+                        LucaBirthday newValue = parseStringToValue(data, context);
                         if (newValue != null) {
                             list.addValue(newValue);
                         }
@@ -63,7 +64,7 @@ public class JsonDataToBirthdayConverter implements IJsonDataConverter {
         return new SerializableList<>();
     }
 
-    private LucaBirthday parseStringToValue(@NonNull String[] data) {
+    private LucaBirthday parseStringToValue(@NonNull String[] data, @NonNull Context context) {
         if (data.length == 5) {
             if (data[0].contains("{id:")
                     && data[1].contains("{name:")
@@ -85,7 +86,15 @@ public class JsonDataToBirthdayConverter implements IJsonDataConverter {
 
                 SerializableDate birthday = new SerializableDate(year, month, day);
 
-                LucaBirthday newValue = new LucaBirthday(id, name, birthday);
+                Bitmap photo = BitmapFactory.decodeResource(context.getResources(), guepardoapps.lucahome.basic.R.mipmap.ic_face_white_48dp);
+                try {
+                    photo = Tools.RetrieveContactPhoto(context, name, 250, 250, true);
+                    _logger.Debug(String.format(Locale.getDefault(), "Retrieved photo is %s", photo));
+                } catch (Exception exception) {
+                    _logger.Error(String.format(Locale.getDefault(), "Exception in RetrieveContactPhoto: %s", exception.getMessage()));
+                }
+
+                LucaBirthday newValue = new LucaBirthday(id, name, birthday, photo);
                 _logger.Debug(String.format(Locale.getDefault(), "New BirthdayDto %s", newValue));
 
                 return newValue;

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -24,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.baoyz.widget.PullRefreshLayout;
+import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
@@ -101,7 +101,7 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
 
                         _collapsingToolbar.setTitle(_coinService.AllCoinsValue());
                     } else {
-                        _collapsingToolbar.setTitle("0�");
+                        _collapsingToolbar.setTitle("0€");
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
                     }

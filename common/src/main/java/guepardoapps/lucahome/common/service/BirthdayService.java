@@ -3,6 +3,8 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -79,6 +81,8 @@ public class BirthdayService implements IDataNotificationService {
         }
     };
 
+    private Context _context;
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -120,7 +124,7 @@ public class BirthdayService implements IDataNotificationService {
                 return;
             }
 
-            SerializableList<LucaBirthday> birthdayList = _jsonDataToBirthdayConverter.GetList(contentResponse);
+            SerializableList<LucaBirthday> birthdayList = _jsonDataToBirthdayConverter.GetList(contentResponse, _context);
             if (birthdayList == null) {
                 _logger.Error("Converted birthdayList is null!");
                 sendFailedDownloadBroadcast(contentResponse);
@@ -293,14 +297,16 @@ public class BirthdayService implements IDataNotificationService {
         _displayNotification = displayNotification;
         _reloadEnabled = reloadEnabled;
 
-        _broadcastController = new BroadcastController(context);
-        _downloadController = new DownloadController(context);
-        _networkController = new NetworkController(context);
-        _notificationController = new NotificationController(context);
-        _receiverController = new ReceiverController(context);
+        _context = context;
+
+        _broadcastController = new BroadcastController(_context);
+        _downloadController = new DownloadController(_context);
+        _networkController = new NetworkController(_context);
+        _notificationController = new NotificationController(_context);
+        _receiverController = new ReceiverController(_context);
         _settingsController = SettingsController.getInstance();
 
-        _databaseBirthdayList = new DatabaseBirthdayList(context);
+        _databaseBirthdayList = new DatabaseBirthdayList(_context);
         _databaseBirthdayList.Open();
 
         _receiverController.RegisterReceiver(_birthdayDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -452,6 +458,28 @@ public class BirthdayService implements IDataNotificationService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.BirthdayDelete, true);
     }
 
+    public void RetrieveContactPhotos() {
+        _logger.Debug("RetrieveContactPhotos");
+
+        for (int index = 0; index < _birthdayList.getSize(); index++) {
+            LucaBirthday birthday = _birthdayList.getValue(index);
+
+            Bitmap photo = BitmapFactory.decodeResource(_context.getResources(), guepardoapps.lucahome.basic.R.mipmap.ic_face_white_48dp);
+            try {
+                photo = Tools.RetrieveContactPhoto(_context, birthday.GetName(), 100, 100, true);
+            } catch (Exception exception) {
+                _logger.Error(exception.getMessage());
+            }
+
+            birthday.SetPhoto(photo);
+        }
+
+        _broadcastController.SendSerializableBroadcast(
+                BirthdayDownloadFinishedBroadcast,
+                BirthdayDownloadFinishedBundle,
+                new BirthdayDownloadFinishedContent(_birthdayList, true, Tools.CompressStringToByteArray("Updated photos!")));
+    }
+
     @Override
     public void SetReceiverActivity(@NonNull Class<?> receiverActivity) {
         _receiverActivity = receiverActivity;
@@ -474,7 +502,7 @@ public class BirthdayService implements IDataNotificationService {
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
             if (birthday.HasBirthday() && _settingsController.IsBirthdayNotificationEnabled()) {
-                _notificationController.CreateBirthdayNotification(birthday.GetNotificationId(), _receiverActivity, birthday.GetIcon(), birthday.GetName(), birthday.GetNotificationBody(), true);
+                _notificationController.CreateBirthdayNotification(birthday.GetNotificationId(), _receiverActivity, birthday.GetPhoto(), birthday.GetName(), birthday.GetNotificationBody(), true);
             }
         }
     }

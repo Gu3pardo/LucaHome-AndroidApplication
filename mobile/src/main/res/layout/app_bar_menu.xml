@@ -79,7 +79,8 @@
             android:id="@+id/pullRefreshLayout_menu"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/search_menu">
+            android:layout_below="@id/search_menu"
+            android:layout_marginBottom="?attr/actionBarSize">
 
             <ListView
                 android:id="@+id/listView_menu"

@@ -138,7 +138,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="2dp"
-                            android:gravity="center">
+                            android:gravity="end">
 
                             <com.rey.material.widget.FloatingActionButton
                                 android:id="@+id/youtube_play_image_button"
@@ -227,7 +227,7 @@
                 android:background="@color/cardview_light_background"
                 card_view:cardCornerRadius="4dp">
 
-                <android.support.percent.PercentRelativeLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
                     android:orientation="horizontal">
@@ -236,20 +236,19 @@
                         android:id="@+id/radio_stream_selection_spinner"
                         android:layout_width="wrap_content"
                         android:layout_height="45dp"
-                        android:layout_marginEnd="5dp"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="55%" />
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="5dp"
+                        android:layout_toStartOf="@+id/radio_stream_play_button" />
 
                     <com.rey.material.widget.FloatingActionButton
                         android:id="@+id/radio_stream_play_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_toEndOf="@+id/radio_stream_selection_spinner"
+                        android:layout_toStartOf="@+id/radio_stream_stop_button"
                         android:contentDescription="@string/contentDescription"
                         app:fab_iconSrc="@android:drawable/ic_media_play"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="15%"
                         app:rd_delayClick="none"
                         app:rd_enable="true"
                         app:rd_rippleColor="@color/colorPrimary"
@@ -259,16 +258,15 @@
                         android:id="@+id/radio_stream_stop_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
-                        android:layout_toEndOf="@+id/radio_stream_play_button"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="5dp"
                         android:contentDescription="@string/contentDescription"
                         app:fab_iconSrc="@android:drawable/editbox_dropdown_light_frame"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="15%"
                         app:rd_delayClick="none"
                         app:rd_enable="true"
                         app:rd_rippleColor="@color/colorPrimary"
                         app:rd_rippleType="touch" />
-                </android.support.percent.PercentRelativeLayout>
+                </RelativeLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -299,7 +297,7 @@
                 android:background="@color/cardview_light_background"
                 card_view:cardCornerRadius="4dp">
 
-                <android.support.percent.PercentRelativeLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
                     android:orientation="horizontal">
@@ -308,27 +306,26 @@
                         android:id="@+id/text_edit_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
                         android:layout_gravity="center"
-                        android:layout_marginEnd="5dp"
+                        android:layout_margin="5dp"
+                        android:layout_toStartOf="@+id/send_text_button"
                         android:inputType="text"
-                        android:textColor="@color/PrimaryText"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="67%" />
+                        android:textColor="@color/PrimaryText" />
 
                     <com.rey.material.widget.FloatingActionButton
                         android:id="@+id/send_text_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
+                        android:layout_alignParentEnd="true"
                         android:layout_marginEnd="5dp"
-                        android:layout_toEndOf="@+id/text_edit_view"
                         app:fab_iconSrc="@android:drawable/ic_menu_send"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="15%"
                         app:rd_delayClick="none"
                         app:rd_enable="true"
                         app:rd_rippleColor="@color/colorPrimary"
                         app:rd_rippleType="touch" />
-                </android.support.percent.PercentRelativeLayout>
+                </RelativeLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -341,7 +338,7 @@
                 android:background="@color/cardview_light_background"
                 card_view:cardCornerRadius="4dp">
 
-                <android.support.percent.PercentRelativeLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
                     android:orientation="horizontal">
@@ -350,24 +347,22 @@
                         android:id="@+id/volume_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:gravity="center"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="5dp"
+                        android:layout_toStartOf="@+id/volume_increase_button"
                         android:text="@string/volume_example"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="@color/PrimaryText"
-                        android:textStyle="bold"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="55%" />
+                        android:textStyle="bold" />
 
                     <com.rey.material.widget.FloatingActionButton
                         android:id="@+id/volume_increase_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_toEndOf="@+id/volume_text_view"
+                        android:layout_toStartOf="@+id/volume_decrease_button"
                         app:fab_iconSrc="@mipmap/ic_add_white_48dp"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="15%"
                         app:rd_delayClick="none"
                         app:rd_enable="true"
                         app:rd_rippleColor="@color/colorPrimary"
@@ -377,15 +372,14 @@
                         android:id="@+id/volume_decrease_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
-                        android:layout_toEndOf="@+id/volume_increase_button"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="5dp"
                         app:fab_iconSrc="@mipmap/ic_remove_circle_outline_white_48dp"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="15%"
                         app:rd_delayClick="none"
                         app:rd_enable="true"
                         app:rd_rippleColor="@color/colorPrimary"
                         app:rd_rippleType="touch" />
-                </android.support.percent.PercentRelativeLayout>
+                </RelativeLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -398,7 +392,7 @@
                 android:background="@color/cardview_light_background"
                 card_view:cardCornerRadius="4dp">
 
-                <android.support.percent.PercentRelativeLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
                     android:orientation="horizontal">
@@ -407,24 +401,22 @@
                         android:id="@+id/brightness_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="5dp"
-                        android:gravity="center"
+                        android:layout_alignParentStart="true"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="5dp"
+                        android:layout_toStartOf="@+id/brightness_increase_button"
                         android:text="@string/brightness_example"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="@color/PrimaryText"
-                        android:textStyle="bold"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="55%" />
+                        android:textStyle="bold" />
 
                     <com.rey.material.widget.FloatingActionButton
                         android:id="@+id/brightness_increase_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_toEndOf="@+id/brightness_text_view"
+                        android:layout_toStartOf="@+id/brightness_decrease_button"
                         app:fab_iconSrc="@mipmap/ic_add_white_48dp"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="15%"
                         app:rd_delayClick="none"
                         app:rd_enable="true"
                         app:rd_rippleColor="@color/colorPrimary"
@@ -434,15 +426,14 @@
                         android:id="@+id/brightness_decrease_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
-                        android:layout_toEndOf="@+id/brightness_increase_button"
+                        android:layout_alignParentEnd="true"
+                        android:layout_marginEnd="5dp"
                         app:fab_iconSrc="@mipmap/ic_remove_circle_outline_white_48dp"
-                        app:layout_heightPercent="100%"
-                        app:layout_widthPercent="15%"
                         app:rd_delayClick="none"
                         app:rd_enable="true"
                         app:rd_rippleColor="@color/colorPrimary"
                         app:rd_rippleType="touch" />
-                </android.support.percent.PercentRelativeLayout>
+                </RelativeLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"

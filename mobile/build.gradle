@@ -7,8 +7,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 40301
-        versionName "4.3.1.170820"
+        versionCode 40400
+        versionName "4.4.0.170821"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -53,6 +53,7 @@ dependencies {
     implementation 'com.github.GrenderG:Toasty:1.2.5'
     implementation 'com.github.matecode:Snacky:1.0.2'
     implementation 'com.github.rey5137:material:1.2.4'
+    implementation 'com.karumi:dexter:4.1.0'
     implementation('com.mikepenz:aboutlibraries:5.9.6@aar') {
         transitive = true
     }

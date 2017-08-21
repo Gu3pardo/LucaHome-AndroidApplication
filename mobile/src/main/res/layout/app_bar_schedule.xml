@@ -79,7 +79,8 @@
             android:id="@+id/pullRefreshLayout_schedule"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/search_schedule">
+            android:layout_below="@id/search_schedule"
+            android:layout_marginBottom="?attr/actionBarSize">
 
             <ListView
                 android:id="@+id/listView_schedule"
@@ -89,14 +90,14 @@
         </com.baoyz.widget.PullRefreshLayout>
     </RelativeLayout>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.rey.material.widget.FloatingActionButton
         android:id="@+id/floating_action_button_add_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
+        app:fab_iconSrc="@mipmap/ic_add_white_48dp"
         app:layout_anchor="@id/appbar_schedule"
         app:layout_anchorGravity="bottom|right|end"
-        android:src="@mipmap/ic_add_white_48dp"
         app:rd_delayClick="none"
         app:rd_enable="true"
         app:rd_rippleColor="@color/colorPrimary"

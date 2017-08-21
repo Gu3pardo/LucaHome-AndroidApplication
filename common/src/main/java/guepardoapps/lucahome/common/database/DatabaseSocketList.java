@@ -13,7 +13,6 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 
 public class DatabaseSocketList {
-
     private static final String TAG = DatabaseSocketList.class.getSimpleName();
     private Logger _logger;
 

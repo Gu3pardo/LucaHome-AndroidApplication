@@ -10,10 +10,10 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.Coin;
 
 public class DatabaseCoinList {
-
     private static final String TAG = DatabaseCoinList.class.getSimpleName();
     private Logger _logger;
 
@@ -112,7 +112,38 @@ public class DatabaseCoinList {
                 _logger.Error(ex.toString());
             }
 
-            Coin entry = new Coin(id, user, type, amount, currentConversion);
+
+            int icon;
+            switch (type) {
+                case "BCH":
+                    icon = R.drawable.bch;
+                    break;
+                case "BTC":
+                    icon = R.drawable.btc;
+                    break;
+                case "DASH":
+                    icon = R.drawable.dash;
+                    break;
+                case "ETC":
+                    icon = R.drawable.etc;
+                    break;
+                case "ETH":
+                    icon = R.drawable.eth;
+                    break;
+                case "LTC":
+                    icon = R.drawable.ltc;
+                    break;
+                case "XMR":
+                    icon = R.drawable.xmr;
+                    break;
+                case "ZEC":
+                    icon = R.drawable.zec;
+                    break;
+                default:
+                    icon = R.drawable.btc;
+            }
+
+            Coin entry = new Coin(id, user, type, amount, currentConversion, icon);
             result.addValue(entry);
         }
 

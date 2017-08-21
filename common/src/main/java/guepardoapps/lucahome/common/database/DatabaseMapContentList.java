@@ -15,7 +15,6 @@ import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 
 public class DatabaseMapContentList {
-
     private static final String TAG = DatabaseMapContentList.class.getSimpleName();
     private Logger _logger;
 
@@ -124,8 +123,12 @@ public class DatabaseMapContentList {
                 position[0] = Integer.parseInt(positionStringArray[0].replace("|", ""));
                 position[1] = Integer.parseInt(positionStringArray[1].replace("|", ""));
 
-                int drawingTypeId = Integer.parseInt(drawingTypeString);
-                drawingType = MapContent.DrawingType.values()[drawingTypeId];
+                for (MapContent.DrawingType drawingTypeEntry : MapContent.DrawingType.values()) {
+                    if (drawingTypeEntry.toString().contentEquals(drawingTypeString)) {
+                        drawingType = drawingTypeEntry;
+                        break;
+                    }
+                }
             } catch (Exception ex) {
                 _logger.Error(ex.toString());
             }

@@ -13,7 +13,6 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.ListedMenu;
 
 public class DatabaseListedMenuList {
-
     private static final String TAG = DatabaseListedMenuList.class.getSimpleName();
     private Logger _logger;
 

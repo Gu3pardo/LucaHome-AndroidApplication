@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 
 public class Coin implements Serializable {
@@ -19,18 +18,23 @@ public class Coin implements Serializable {
 
     private double _currentConversion;
 
+    private int _icon;
+
     public Coin(
             int id,
             @NonNull String user,
             @NonNull String type,
             double amount,
-            double currentConversion) {
+            double currentConversion,
+            int icon) {
         _id = id;
         _user = user;
         _type = type;
         _amount = amount;
 
         _currentConversion = currentConversion;
+
+        _icon = icon;
     }
 
     public int GetId() {
@@ -82,26 +86,7 @@ public class Coin implements Serializable {
     }
 
     public int GetIcon() {
-        switch (_type) {
-            case "BCH":
-                return R.drawable.bch;
-            case "BTC":
-                return R.drawable.btc;
-            case "DASH":
-                return R.drawable.dash;
-            case "ETC":
-                return R.drawable.etc;
-            case "ETH":
-                return R.drawable.eth;
-            case "LTC":
-                return R.drawable.ltc;
-            case "XMR":
-                return R.drawable.xmr;
-            case "ZEC":
-                return R.drawable.zec;
-            default:
-                return R.drawable.btc;
-        }
+        return _icon;
     }
 
     public String CommandAdd() {

@@ -51,7 +51,7 @@ public class NotificationController {
     public void CreateBirthdayNotification(
             int notificationId,
             @NonNull Class<?> birthdayActivity,
-            int icon,
+            Bitmap photo,
             @NonNull String title,
             @NonNull String body,
             boolean autoCancelable) {
@@ -68,11 +68,8 @@ public class NotificationController {
         Intent intent = new Intent(_context, birthdayActivity);
         PendingIntent pendingIntent = PendingIntent.getActivity(_context, notificationId, intent, 0);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), R.drawable.main_image_birthday);
-        bitmap = Tools.GetCircleBitmap(bitmap);
-
-        builder.setSmallIcon(icon)
-                .setLargeIcon(bitmap)
+        builder.setSmallIcon(R.drawable.birthday)
+                .setLargeIcon(photo)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setTicker(body)
