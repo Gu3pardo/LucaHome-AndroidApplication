@@ -15,28 +15,14 @@ Android client to remotely control sockets, mediaserver, view temperature, share
 
 # Screenshots
 
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_001.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/header_001.png)
 ___________________________________
 
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_002.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/header_002.png)
 ___________________________________
 
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_003.png)
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/header_003.png)
 ___________________________________
 
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_004.png)
-___________________________________
+![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/header_004.png)
 
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_005.png)
-___________________________________
-
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_006.png)
-___________________________________
-
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_007.png)
-___________________________________
-
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_008.png)
-___________________________________
-
-![alt tag](https://github.com/GuepardoApps/LucaHome-AndroidApplication/blob/master/screenshots/view_009.png)
