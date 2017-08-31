@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager.LayoutParams;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -103,7 +104,6 @@ public class MapContentBuilder {
     public static Runnable GetRunnable(@NonNull MapContent.DrawingType drawingType, WirelessSocket wirelessSocket, Temperature temperature, @NonNull Context context) {
         switch (drawingType) {
             case MediaServer:
-                return null;
             case Socket:
                 return (wirelessSocket != null ? createSocketRunnable(context, wirelessSocket) : null);
             case Temperature:
@@ -206,6 +206,11 @@ public class MapContentBuilder {
 
                     dialog.setCancelable(true);
                     dialog.show();
+
+                    Window window = dialog.getWindow();
+                    if (window != null) {
+                        window.setLayout(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+                    }
                 } else {
                     Toasty.info(context, String.format(Locale.getDefault(), "No action for temperature in area %s", temperature.GetArea()), Toast.LENGTH_LONG).show();
                 }
@@ -262,5 +267,10 @@ public class MapContentBuilder {
 
         dialog.setCancelable(true);
         dialog.show();
+
+        Window window = dialog.getWindow();
+        if (window != null) {
+            window.setLayout(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+        }
     }
 }

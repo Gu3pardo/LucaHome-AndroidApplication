@@ -131,18 +131,7 @@ public class CoinService implements IDataService {
 
             _coinConversionList = coinConversionList;
 
-            for (int index = 0; index < _coinList.getSize(); index++) {
-                Coin entry = _coinList.getValue(index);
-
-                for (int conversionIndex = 0; conversionIndex < _coinConversionList.getSize(); conversionIndex++) {
-                    SerializablePair<String, Double> conversionEntry = _coinConversionList.getValue(conversionIndex);
-
-                    if (entry.GetType().contains(conversionEntry.GetKey())) {
-                        entry.SetCurrentConversion(conversionEntry.GetValue());
-                        break;
-                    }
-                }
-            }
+            mergeCoinConversionWithCoinList();
 
             _broadcastController.SendSerializableBroadcast(
                     CoinConversionDownloadFinishedBroadcast,
@@ -472,6 +461,7 @@ public class CoinService implements IDataService {
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _coinList = _databaseCoinList.GetCoinList();
             _filteredCoinList = new SerializableList<>();
+            mergeCoinConversionWithCoinList();
             _broadcastController.SendSerializableBroadcast(
                     CoinDownloadFinishedBroadcast,
                     CoinDownloadFinishedBundle,
@@ -628,5 +618,30 @@ public class CoinService implements IDataService {
                 CoinDeleteFinishedBroadcast,
                 CoinDeleteFinishedBundle,
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private void mergeCoinConversionWithCoinList() {
+        if (_coinList == null) {
+            _logger.Error("_coinList is null!");
+            return;
+        }
+
+        if (_coinConversionList == null) {
+            _logger.Error("_coinConversionList is null!");
+            return;
+        }
+
+        for (int index = 0; index < _coinList.getSize(); index++) {
+            Coin entry = _coinList.getValue(index);
+
+            for (int conversionIndex = 0; conversionIndex < _coinConversionList.getSize(); conversionIndex++) {
+                SerializablePair<String, Double> conversionEntry = _coinConversionList.getValue(conversionIndex);
+
+                if (entry.GetType().contains(conversionEntry.GetKey())) {
+                    entry.SetCurrentConversion(conversionEntry.GetValue());
+                    break;
+                }
+            }
+        }
     }
 }

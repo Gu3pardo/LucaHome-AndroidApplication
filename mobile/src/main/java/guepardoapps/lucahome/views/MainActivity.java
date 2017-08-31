@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
                             Locale.getDefault(),
                             "Current temperature: %.2f degree Celsius\nCurrent condition: %s",
                             _openWeatherService.CurrentWeather().GetTemperature(), _openWeatherService.CurrentWeather().GetDescription()));
-                    _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, _openWeatherService.ForecastWeather().GetWallpaper());
+                    _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, _openWeatherService.CurrentWeather().GetCondition().GetWallpaper());
 
                     _listView.setVisibility(View.VISIBLE);
                     _progressBar.setVisibility(View.GONE);
