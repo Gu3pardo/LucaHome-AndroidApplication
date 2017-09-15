@@ -14,7 +14,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.views.*;
 
 public class NavigationService {
-    public enum NavigationResult {NULL, NO_BACK_ENTRY, PERMITTED, PERMITTED_SAME_ACTIVITIES, POSSIBLE, SUCCESS}
+    public enum NavigationResult {NULL, PERMITTED, PERMITTED_SAME_ACTIVITIES, POSSIBLE, SUCCESS}
 
     private static final NavigationService SINGLETON = new NavigationService();
 
@@ -81,7 +81,7 @@ public class NavigationService {
                 startActivityContext));
 
         if (_backEntryList.size() == 0) {
-            return NavigationResult.NO_BACK_ENTRY;
+            _backEntryList.add(MainActivity.class);
         }
 
         Class<?> backActivity = _backEntryList.get(_backEntryList.size() - 1);

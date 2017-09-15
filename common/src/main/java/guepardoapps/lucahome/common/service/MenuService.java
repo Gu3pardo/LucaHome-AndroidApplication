@@ -121,6 +121,7 @@ public class MenuService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 _logger.Error(contentResponse);
+                _listedMenuList = _databaseListedMenuList.GetListedMenuList();
                 sendFailedListedMenuDownloadBroadcast(contentResponse);
                 return;
             }
@@ -129,6 +130,7 @@ public class MenuService implements IDataService {
 
             if (!content.Success) {
                 _logger.Error("Download was not successful!");
+                _listedMenuList = _databaseListedMenuList.GetListedMenuList();
                 sendFailedListedMenuDownloadBroadcast(contentResponse);
                 return;
             }
@@ -136,6 +138,7 @@ public class MenuService implements IDataService {
             SerializableList<ListedMenu> listedMenuList = _jsonDataToListedMenuConverter.GetList(contentResponse);
             if (listedMenuList == null) {
                 _logger.Error("Converted listedMenuList is null!");
+                _listedMenuList = _databaseListedMenuList.GetListedMenuList();
                 sendFailedListedMenuDownloadBroadcast(contentResponse);
                 return;
             }
@@ -168,6 +171,7 @@ public class MenuService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 _logger.Error(contentResponse);
+                _menuList = _databaseMenuList.GetMenuList();
                 sendFailedMenuDownloadBroadcast(contentResponse);
                 return;
             }
@@ -176,6 +180,7 @@ public class MenuService implements IDataService {
 
             if (!content.Success) {
                 _logger.Error("Download was not successful!");
+                _menuList = _databaseMenuList.GetMenuList();
                 sendFailedMenuDownloadBroadcast(contentResponse);
                 return;
             }
@@ -183,6 +188,7 @@ public class MenuService implements IDataService {
             SerializableList<LucaMenu> menuList = _jsonDataToMenuConverter.GetList(contentResponse);
             if (menuList == null) {
                 _logger.Error("Converted menuList is null!");
+                _menuList = _databaseMenuList.GetMenuList();
                 sendFailedMenuDownloadBroadcast(contentResponse);
                 return;
             }
@@ -659,14 +665,14 @@ public class MenuService implements IDataService {
         _broadcastController.SendSerializableBroadcast(
                 ListedMenuDownloadFinishedBroadcast,
                 ListedMenuDownloadFinishedBundle,
-                new ListedMenuDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new ListedMenuDownloadFinishedContent(_listedMenuList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedMenuDownloadBroadcast(@NonNull String response) {
         _broadcastController.SendSerializableBroadcast(
                 MenuDownloadFinishedBroadcast,
                 MenuDownloadFinishedBundle,
-                new MenuDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new MenuDownloadFinishedContent(_menuList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedMenuUpdateBroadcast(@NonNull String response) {
@@ -685,6 +691,9 @@ public class MenuService implements IDataService {
 
     private LucaMenu resetMenu(@NonNull LucaMenu menu) {
         _logger.Debug(String.format("Resetting menu %s", menu.toString()));
+
+        menu.SetTitle("-");
+        menu.SetDescription("-");
 
         Calendar today = Calendar.getInstance();
 
@@ -705,24 +714,11 @@ public class MenuService implements IDataService {
             dayOfWeekDifference += 7;
         }
 
-        if (menu.GetDate().Year() < year) {
+        if (menu.GetDate().Year() < year || menu.GetDate().Month() < month || menu.GetDate().DayOfMonth() < dayOfMonth) {
             return calculateDate(menu, year, month, dayOfMonth, dayOfWeekDifference);
         }
 
-        if (menu.GetDate().Month() < month) {
-            return calculateDate(menu, year, month, dayOfMonth, dayOfWeekDifference);
-        }
-
-        if (menu.GetDate().DayOfMonth() < dayOfMonth) {
-            return calculateDate(menu, year, month, dayOfMonth, dayOfWeekDifference);
-        }
-
-        menu.SetTitle("-");
-        menu.SetDescription("-");
-
-        _logger.Debug(String.format(Locale.getDefault(), "Menu was reset: %s", menu));
-
-        return menu;
+        return null;
     }
 
     private LucaMenu calculateDate(
@@ -776,6 +772,7 @@ public class MenuService implements IDataService {
                 }
                 break;
             default:
+                _logger.Error(String.format(Locale.getDefault(), "Invalid month %d!", month));
                 return null;
         }
 

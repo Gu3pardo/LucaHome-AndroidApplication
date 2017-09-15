@@ -323,6 +323,10 @@ public class MainService extends Service {
         _wirelessSocketService.LoadData();
     }
 
+    public void Cancel() {
+        stopSelf();
+    }
+
     private void broadcastDownloadCount() {
         _logger.Debug("broadcastDownloadCount");
 

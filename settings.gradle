@@ -1,2 +1,2 @@
-include ':mobile', ':common', ':basic', ':lib_openweather'
+include ':mobile', ':common', ':basic', ':lib_openweather', ':mediamirrorv2'
 project(':lib_openweather').projectDir = new File(settingsDir, '../OpenWeather/lib_openweather')

@@ -95,6 +95,7 @@ public class MapContentService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 _logger.Error(contentResponse);
+                _mapContentList = _databaseMapContentList.GetMapContent(_wirelessSocketService.GetDataList(), _temperatureService.GetDataList());
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -103,6 +104,7 @@ public class MapContentService implements IDataService {
 
             if (!content.Success) {
                 _logger.Error("Download was not successful!");
+                _mapContentList = _databaseMapContentList.GetMapContent(_wirelessSocketService.GetDataList(), _temperatureService.GetDataList());
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -329,6 +331,6 @@ public class MapContentService implements IDataService {
         _broadcastController.SendSerializableBroadcast(
                 MapContentDownloadFinishedBroadcast,
                 MapContentDownloadFinishedBundle,
-                new MapContentDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new MapContentDownloadFinishedContent(_mapContentList, false, Tools.CompressStringToByteArray(response)));
     }
 }

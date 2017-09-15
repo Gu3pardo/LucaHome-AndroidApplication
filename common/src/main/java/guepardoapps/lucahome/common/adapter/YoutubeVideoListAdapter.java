@@ -88,7 +88,10 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
                         }
                     }
                 } else {
-                    MediaMirrorService.getInstance().SendCommand(_serverIp, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                    MediaMirrorService mediaMirrorService = MediaMirrorService.getInstance();
+                    mediaMirrorService.Initialize(_context, false, -1);
+                    mediaMirrorService.SendCommand(_serverIp, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                    mediaMirrorService.Dispose();
                 }
 
                 _closeDialogRunnable.run();

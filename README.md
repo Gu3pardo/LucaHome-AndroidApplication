@@ -6,10 +6,10 @@
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
 [![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
-[![Version](https://img.shields.io/badge/version-v4.4.1.170831-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
+[![Version](https://img.shields.io/badge/version-v4.4.2.170915-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
 
 Part of the LucaHome-Project
-Containing the shared library LucaHome, a wearable project and the main android client application.
+Containing shared libraries for LucaHome, the main android client application and the latest mediamirror project (v2).
 
 Android client to remotely control sockets, mediaserver, view temperature, share your shoppinglist, plan your menu and much more...
 

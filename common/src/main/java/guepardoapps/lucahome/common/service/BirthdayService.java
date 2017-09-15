@@ -112,6 +112,7 @@ public class BirthdayService implements IDataNotificationService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 _logger.Error(contentResponse);
+                _birthdayList = _databaseBirthdayList.GetBirthdayList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -120,6 +121,7 @@ public class BirthdayService implements IDataNotificationService {
 
             if (!content.Success) {
                 _logger.Error("Download was not successful!");
+                _birthdayList = _databaseBirthdayList.GetBirthdayList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -127,6 +129,7 @@ public class BirthdayService implements IDataNotificationService {
             SerializableList<LucaBirthday> birthdayList = _jsonDataToBirthdayConverter.GetList(contentResponse, _context);
             if (birthdayList == null) {
                 _logger.Error("Converted birthdayList is null!");
+                _birthdayList = _databaseBirthdayList.GetBirthdayList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -592,7 +595,7 @@ public class BirthdayService implements IDataNotificationService {
         _broadcastController.SendSerializableBroadcast(
                 BirthdayDownloadFinishedBroadcast,
                 BirthdayDownloadFinishedBundle,
-                new BirthdayDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new BirthdayDownloadFinishedContent(_birthdayList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

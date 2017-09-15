@@ -93,6 +93,17 @@ public class MainActivity extends AppCompatActivity {
     };
 
     /**
+     * BroadcastReceiver to receive updates for the current or forecast weather
+     */
+    private BroadcastReceiver _openWeatherUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_openWeatherUpdateReceiver");
+            updateWeatherCard();
+        }
+    };
+
+    /**
      * BroadcastReceiver to receive progress and success state of initial app download
      */
     private BroadcastReceiver _mainServiceDownloadProgressReceiver = new BroadcastReceiver() {
@@ -102,11 +113,7 @@ public class MainActivity extends AppCompatActivity {
             MainService.MainServiceDownloadCountContent progress = (MainService.MainServiceDownloadCountContent) intent.getSerializableExtra(MainService.MainServiceDownloadCountBundle);
             if (progress != null) {
                 if (progress.DownloadFinished) {
-                    _mainListViewBuilder.UpdateItemDescription(MainListViewItem.Type.Weather, String.format(
-                            Locale.getDefault(),
-                            "Current temperature: %.2f degree Celsius\nCurrent condition: %s",
-                            _openWeatherService.CurrentWeather().GetTemperature(), _openWeatherService.CurrentWeather().GetDescription()));
-                    _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, _openWeatherService.CurrentWeather().GetCondition().GetWallpaper());
+                    updateWeatherCard();
 
                     _listView.setVisibility(View.VISIBLE);
                     _progressBar.setVisibility(View.GONE);
@@ -208,6 +215,8 @@ public class MainActivity extends AppCompatActivity {
         _logger.Debug("onResume");
 
         _navigationService.ClearGoBackList();
+
+        _receiverController.RegisterReceiver(_openWeatherUpdateReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast, OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_mainServiceDownloadProgressReceiver, new String[]{MainService.MainServiceDownloadCountBroadcast});
         _receiverController.RegisterReceiver(_mapContentUpdateReceiver, new String[]{MapContentService.MapContentDownloadFinishedBroadcast});
 
@@ -259,5 +268,14 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void updateWeatherCard() {
+        _logger.Debug("updateWeatherCard");
+        _mainListViewBuilder.UpdateItemDescription(MainListViewItem.Type.Weather, String.format(
+                Locale.getDefault(),
+                "Current temperature: %.2f degree Celsius\nCurrent condition: %s",
+                _openWeatherService.CurrentWeather().GetTemperature(), _openWeatherService.CurrentWeather().GetDescription()));
+        _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, _openWeatherService.CurrentWeather().GetCondition().GetWallpaper());
     }
 }

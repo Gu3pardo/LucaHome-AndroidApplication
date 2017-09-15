@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public enum YoutubeId implements Serializable {
 
-	DEFAULT(0, "The Good Life Live Stream", "K-heSQmydtE"), 
+	DEFAULT(0, "The Good Life Live Stream", "dyLV6gnu-wg"), 
 	
 	THE_GOOD_LIFE_NO_1(1, "The Good Life No.1", "02PzGpODB1E"), 
 	THE_GOOD_LIFE_NO_2(2, "The Good Life No.2", "Zg0vgeSb2h0"), 

@@ -10,6 +10,7 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/basic" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/mediamirrorv2" />
             <option value="$PROJECT_DIR$/mobile" />
             <option value="$PROJECT_DIR$/../OpenWeather/lib_openweather" />
           </set>

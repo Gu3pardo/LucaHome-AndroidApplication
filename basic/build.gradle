@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 26
-        versionCode 40401
-        versionName "4.4.1.170831"
+        versionCode 40402
+        versionName "4.4.2.170915"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
@@ -31,5 +31,6 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     testImplementation 'junit:junit:4.12'
+    implementation 'com.github.GrenderG:Toasty:1.2.5'
     implementation 'com.android.support:appcompat-v7:26.0.2'
 }

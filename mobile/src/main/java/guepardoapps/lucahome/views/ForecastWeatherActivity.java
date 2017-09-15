@@ -75,7 +75,7 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
     private ForecastListAdapter _forecastListAdapter;
 
     /**
-     * BroadcastReceiver to receive updates for the menu
+     * BroadcastReceiver to receive updates for the forecast weather
      */
     private BroadcastReceiver _forecastUpdateReceiver = new BroadcastReceiver() {
         @Override

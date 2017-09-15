@@ -158,6 +158,7 @@ public class CoinService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 _logger.Error(contentResponse);
+                _coinList = _databaseCoinList.GetCoinList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -166,6 +167,7 @@ public class CoinService implements IDataService {
 
             if (!content.Success) {
                 _logger.Error("Download was not successful!");
+                _coinList = _databaseCoinList.GetCoinList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -173,6 +175,7 @@ public class CoinService implements IDataService {
             SerializableList<Coin> coinList = _jsonDataToCoinConverter.GetList(contentResponse, _coinConversionList);
             if (coinList == null) {
                 _logger.Error("Converted CoinList is null!");
+                _coinList = _databaseCoinList.GetCoinList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -596,7 +599,7 @@ public class CoinService implements IDataService {
         _broadcastController.SendSerializableBroadcast(
                 CoinDownloadFinishedBroadcast,
                 CoinDownloadFinishedBundle,
-                new CoinDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new CoinDownloadFinishedContent(_coinList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

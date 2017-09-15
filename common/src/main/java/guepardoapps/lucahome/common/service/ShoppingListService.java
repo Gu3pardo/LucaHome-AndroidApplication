@@ -104,6 +104,7 @@ public class ShoppingListService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 _logger.Error(contentResponse);
+                _shoppingList = _databaseShoppingList.GetShoppingList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -112,6 +113,7 @@ public class ShoppingListService implements IDataService {
 
             if (!content.Success) {
                 _logger.Error("Download was not successful!");
+                _shoppingList = _databaseShoppingList.GetShoppingList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -119,6 +121,7 @@ public class ShoppingListService implements IDataService {
             SerializableList<ShoppingEntry> shoppingList = _jsonDataToShoppingListConverter.GetList(contentResponse);
             if (shoppingList == null) {
                 _logger.Error("Converted shoppingList is null!");
+                _shoppingList = _databaseShoppingList.GetShoppingList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -290,6 +293,7 @@ public class ShoppingListService implements IDataService {
         _networkController = new NetworkController(context);
         _receiverController = new ReceiverController(context);
         _settingsController = SettingsController.getInstance();
+        _settingsController.Initialize(context);
 
         _databaseShoppingList = new DatabaseShoppingList(context);
         _databaseShoppingList.Open();
@@ -527,7 +531,7 @@ public class ShoppingListService implements IDataService {
         _broadcastController.SendSerializableBroadcast(
                 ShoppingListDownloadFinishedBroadcast,
                 ShoppingListDownloadFinishedBundle,
-                new ShoppingListDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new ShoppingListDownloadFinishedContent(_shoppingList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {
