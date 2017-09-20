@@ -17,6 +17,7 @@ import guepardoapps.lucahome.basic.controller.SharedPrefController;
 import guepardoapps.lucahome.basic.controller.TTSController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.constants.Enables;
+import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.mediamirrorv2.R;
 import guepardoapps.mediamirrorv2.common.constants.Constants;
 import guepardoapps.mediamirrorv2.common.constants.RaspPiConstants;
@@ -193,8 +194,8 @@ public class FullscreenActivity extends YouTubeBaseActivity {
         if (!sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.SHARED_PREF_INSTALLED)) {
             _logger.Information("Installing shared preferences!");
 
-            sharedPrefController.SaveStringValue(SharedPrefConstants.USER_NAME, RaspPiConstants.USER);
-            sharedPrefController.SaveStringValue(SharedPrefConstants.USER_PASSPHRASE, RaspPiConstants.PASSWORD);
+            sharedPrefController.SaveStringValue(SettingsController.PREF_USER_NAME, RaspPiConstants.USER);
+            sharedPrefController.SaveStringValue(SettingsController.PREF_USER_PASS_PHRASE, RaspPiConstants.PASSWORD);
             sharedPrefController.SaveBooleanValue(SharedPrefConstants.SHARED_PREF_INSTALLED, true);
         }
     }

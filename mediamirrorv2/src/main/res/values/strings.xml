@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">MediaMirror-v2</string>
-    <string name="serverVersion">2.0.0.170909</string>
+    <string name="serverVersion">2.0.0.170920</string>
 
     <string name="image">Picture</string>
     <string name="notavailable">n.a.</string>
@@ -122,4 +122,8 @@
 
     <string name="errorCenterModel">Error: received center model is buggy!</string>
     <string name="errorRadioStream">An error appeared receiving the radio stream!</string>
+
+    <!-- String for socketStates -->
+    <string name="socketEnabled">Enabled</string>
+    <string name="socketDisabled">Disabled</string>
 </resources>

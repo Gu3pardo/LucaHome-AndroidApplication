@@ -89,7 +89,7 @@ public class SettingsController {
     public LucaUser GetUser() {
         if (!_isInitialized) {
             _logger.Error("Not initialized!");
-            return new LucaUser("DUMMY", "DUMMY");
+            return null;
         }
 
         String userName = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_USER_NAME);

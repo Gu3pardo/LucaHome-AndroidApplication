@@ -90,6 +90,8 @@ public class RaspberryViewController implements IViewController {
     public void onCreate() {
         _logger.Debug("onCreate");
 
+        _screenEnabled = true;
+
         _temperatureRaspberryAlarm = ((Activity) _context).findViewById(R.id.temperatureRaspberryAlarm);
         _temperatureRaspberryName = ((Activity) _context).findViewById(R.id.temperatureRaspberryName);
         _temperatureRaspberryValue = ((Activity) _context).findViewById(R.id.temperatureRaspberryValue);
@@ -98,7 +100,6 @@ public class RaspberryViewController implements IViewController {
     @Override
     public void onStart() {
         _logger.Debug("onStart");
-
     }
 
     @Override
@@ -130,6 +131,11 @@ public class RaspberryViewController implements IViewController {
 
     public void ShowTemperatureGraph(View view) {
         _logger.Debug(String.format(Locale.getDefault(), "showTemperatureGraph: %s", view));
+        if (_raspberryModel == null) {
+            Toasty.error(_context, "No link!", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         String url = _raspberryModel.GetRaspberryTemperatureGraphUrl();
         if (url.length() > 0) {
             _dialogController.DisplayTemperatureDialog(_raspberryModel.GetRaspberryTemperatureGraphUrl());

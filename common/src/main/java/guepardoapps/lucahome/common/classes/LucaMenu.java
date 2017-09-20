@@ -74,6 +74,10 @@ public class LucaMenu implements Serializable {
         return String.format(Locale.getDefault(), "%s, %s", _weekday, _date.DDMMYYYY());
     }
 
+    public String GetSingleLineString() {
+        return String.format(Locale.getDefault(), "%s: %s, %s", GetDateString(), _title, _description);
+    }
+
     public String CommandUpdate() {
         return String.format(Locale.getDefault(), "%s%s&day=%d&month=%d&year=%d&title=%s&description=%s", LucaServerAction.UPDATE_MENU.toString(), _weekday.GetEnglishDay(), _date.DayOfMonth(), _date.Month(), _date.Year(), _title, _description);
     }

@@ -182,12 +182,13 @@ public class CalendarViewController implements IViewController {
         _calendarTextViewArray[0] = ((Activity) _context).findViewById(R.id.calendar1TextView);
         _calendarAlarmViewArray[1] = ((Activity) _context).findViewById(R.id.calendar2AlarmView);
         _calendarTextViewArray[1] = ((Activity) _context).findViewById(R.id.calendar2TextView);
+
+        _screenEnabled = true;
     }
 
     @Override
     public void onStart() {
         _logger.Debug("onStart");
-
     }
 
     @Override

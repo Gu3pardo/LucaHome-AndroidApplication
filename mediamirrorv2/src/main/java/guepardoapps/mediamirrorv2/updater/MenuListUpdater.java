@@ -64,10 +64,11 @@ public class MenuListUpdater {
             return;
         }
 
-        _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.DOWNLOAD_MENU_FINISHED});
+        _receiverController.RegisterReceiver(_updateReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_MENU_UPDATE});
 
         _isRunning = true;
+        DownloadMenuList();
     }
 
     public void Dispose() {

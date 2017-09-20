@@ -71,10 +71,11 @@ public class CurrentWeatherUpdater {
             return;
         }
 
-        _receiverController.RegisterReceiver(_updateReceiver, new String[]{OWBroadcasts.CURRENT_WEATHER_JSON_FINISHED});
+        _receiverController.RegisterReceiver(_updateReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_CURRENT_WEATHER_UPDATE});
 
         _isRunning = true;
+        DownloadWeather();
     }
 
     public void Dispose() {

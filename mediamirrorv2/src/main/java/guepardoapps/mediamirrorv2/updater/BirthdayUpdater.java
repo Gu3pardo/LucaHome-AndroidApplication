@@ -156,6 +156,7 @@ public class BirthdayUpdater {
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_BIRTHDAY_UPDATE});
 
         _isRunning = true;
+        DownloadBirthdays();
     }
 
     public void Dispose() {

@@ -71,10 +71,11 @@ public class SocketListUpdater {
             return;
         }
 
-        _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.DOWNLOAD_SOCKET_FINISHED});
+        _receiverController.RegisterReceiver(_updateReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_SOCKET_UPDATE});
 
         _isRunning = true;
+        DownloadSocketList();
     }
 
     public void Dispose() {

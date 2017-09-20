@@ -171,6 +171,8 @@ public class BirthdayViewController implements IViewController {
 
         _birthdayAlarmView = ((Activity) _context).findViewById(R.id.birthdayAlarmView);
         _birthdayTextView = ((Activity) _context).findViewById(R.id.birthdayTextView);
+
+        _screenEnabled = true;
     }
 
     @Override

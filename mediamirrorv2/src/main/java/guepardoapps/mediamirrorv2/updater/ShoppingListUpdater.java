@@ -84,11 +84,12 @@ public class ShoppingListUpdater {
 
         _updateTime = updateTime;
         _logger.Debug("UpdateTime is: " + String.valueOf(_updateTime));
-        _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.DOWNLOAD_SHOPPING_LIST_FINISHED});
+        _receiverController.RegisterReceiver(_updateReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_SHOPPING_LIST_UPDATE});
         _updateRunnable.run();
 
         _isRunning = true;
+        DownloadShoppingList();
     }
 
     public void Dispose() {

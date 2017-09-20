@@ -11,6 +11,7 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.mediamirrorv2.common.constants.Broadcasts;
 import guepardoapps.mediamirrorv2.common.constants.Bundles;
+import guepardoapps.mediamirrorv2.observer.SettingsContentObserver;
 
 public class MediaVolumeController {
     private static final MediaVolumeController SINGLETON_CONTROLLER = new MediaVolumeController();
@@ -238,6 +239,9 @@ public class MediaVolumeController {
         _currentVolume = _audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         _mute = _audioManager.isStreamMute(AudioManager.STREAM_MUSIC);
 
+        SettingsContentObserver.VolumeChangeModel volumeChangeModel = new SettingsContentObserver.VolumeChangeModel();
+        volumeChangeModel.CurrentVolume = _currentVolume;
+
         String volumeText;
         if (_mute) {
             volumeText = "mute";
@@ -246,6 +250,7 @@ public class MediaVolumeController {
         }
 
         _broadcastController.SendStringBroadcast(Broadcasts.SHOW_VOLUME_MODEL, Bundles.VOLUME_MODEL, volumeText);
+        _broadcastController.SendSerializableBroadcast(SettingsContentObserver.VOLUME_CHANGE_BROADCAST, SettingsContentObserver.VOLUME_CHANGE_BUNDLE, volumeChangeModel);
     }
 
     private BroadcastReceiver _screenEnableReceiver = new BroadcastReceiver() {

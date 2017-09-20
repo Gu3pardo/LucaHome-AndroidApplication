@@ -1,23 +1,37 @@
 package guepardoapps.mediamirrorv2.controller;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import guepardoapps.lucahome.basic.controller.BroadcastController;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
+import es.dmoral.toasty.Toasty;
+import guepardoapps.library.openweather.models.ForecastPartModel;
+import guepardoapps.library.openweather.models.WeatherModel;
+import guepardoapps.library.openweather.service.OpenWeatherService;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.mediamirrorv2.R;
+import guepardoapps.mediamirrorv2.common.constants.Broadcasts;
+import guepardoapps.mediamirrorv2.common.constants.Bundles;
+import guepardoapps.mediamirrorv2.converter.TimeConverter;
 import guepardoapps.mediamirrorv2.interfaces.IViewController;
 
 public class WeatherViewController implements IViewController {
     private static final String TAG = WeatherViewController.class.getSimpleName();
     private Logger _logger;
 
+    private static int FORECAST_COUNT = 5;
+
     private Context _context;
-    private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
 
     private ImageView _conditionImageView;
@@ -27,18 +41,72 @@ public class WeatherViewController implements IViewController {
     private TextView _pressureTextView;
     private TextView _updatedTimeTextView;
 
-    private static int _forecastCount = 5;
-
     private ImageView[] _weatherForecastConditionImageViews;
     private TextView[] _weatherForecastWeekdayTextViews;
     private TextView[] _weatherForecastDateTextViews;
     private TextView[] _weatherForecastTimeTextViews;
     private TextView[] _weatherForecastTemperatureRangeTextViews;
 
+    private BroadcastReceiver _currentWeatherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_currentWeatherReceiver onReceive");
+            WeatherModel currentWeather = (WeatherModel) intent.getSerializableExtra(Bundles.CURRENT_WEATHER_MODEL);
+            if (currentWeather != null) {
+                _conditionImageView.setImageResource(currentWeather.GetCondition().GetIcon());
+                _conditionTextView.setText(currentWeather.GetCondition().GetDescription());
+                _temperatureTextView.setText(String.format(Locale.getDefault(), "%.2f C", currentWeather.GetTemperature()));
+                _humidityTextView.setText(String.format(Locale.getDefault(), "%.2f %%", currentWeather.GetHumidity()));
+                _pressureTextView.setText(String.format(Locale.getDefault(), "%.2f mBar", currentWeather.GetPressure()));
+                _updatedTimeTextView.setText(TimeConverter.GetTime(Calendar.getInstance()));
+            } else {
+                _logger.Error("CurrentWeather is null!");
+                Toasty.error(_context, "CurrentWeather is null!", Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    private BroadcastReceiver _forecastWeatherReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_forecastWeatherReceiver onReceive");
+            OpenWeatherService.ForecastWeatherDownloadFinishedContent model =
+                    (OpenWeatherService.ForecastWeatherDownloadFinishedContent) intent.getSerializableExtra(Bundles.FORECAST_WEATHER_MODEL);
+            if (model != null) {
+                if (model.ForecastWeather != null) {
+                    List<ForecastPartModel> forecastList = model.ForecastWeather.GetList();
+                    if (forecastList != null) {
+                        int forecastCount = 0;
+                        int viewCount = 0;
+
+                        while (forecastList.size() >= FORECAST_COUNT && viewCount < FORECAST_COUNT && forecastCount < forecastList.size()) {
+                            if (forecastList.get(forecastCount).GetForecastListType() == ForecastPartModel.ForecastListType.FORECAST) {
+                                _weatherForecastConditionImageViews[viewCount].setImageResource(forecastList.get(forecastCount).GetCondition().GetIcon());
+                                _weatherForecastDateTextViews[viewCount].setText(forecastList.get(forecastCount).GetDate());
+                                _weatherForecastTimeTextViews[viewCount].setText(forecastList.get(forecastCount).GetTime());
+                                _weatherForecastTemperatureRangeTextViews[viewCount].setText(forecastList.get(forecastCount).GetTemperatureString());
+                                viewCount++;
+                            }
+                            forecastCount++;
+                        }
+                    } else {
+                        _logger.Error("Model forecastList is null!");
+                        Toasty.error(_context, "Model forecastList is null!", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    _logger.Error("Model ForecastWeather is null!");
+                    Toasty.error(_context, "Model ForecastWeather is null!", Toast.LENGTH_LONG).show();
+                }
+            } else {
+                _logger.Error("Model ForecastWeatherDownloadFinishedContent is null!");
+                Toasty.error(_context, "Model ForecastWeatherDownloadFinishedContent is null!", Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
     public WeatherViewController(@NonNull Context context) {
         _logger = new Logger(TAG);
         _context = context;
-        _broadcastController = new BroadcastController(_context);
         _receiverController = new ReceiverController(_context);
     }
 
@@ -53,11 +121,11 @@ public class WeatherViewController implements IViewController {
         _pressureTextView = ((Activity) _context).findViewById(R.id.weatherPressureTextView);
         _updatedTimeTextView = ((Activity) _context).findViewById(R.id.weatherUpdateTextView);
 
-        _weatherForecastConditionImageViews = new ImageView[_forecastCount];
-        _weatherForecastWeekdayTextViews = new TextView[_forecastCount];
-        _weatherForecastDateTextViews = new TextView[_forecastCount];
-        _weatherForecastTimeTextViews = new TextView[_forecastCount];
-        _weatherForecastTemperatureRangeTextViews = new TextView[_forecastCount];
+        _weatherForecastConditionImageViews = new ImageView[FORECAST_COUNT];
+        _weatherForecastWeekdayTextViews = new TextView[FORECAST_COUNT];
+        _weatherForecastDateTextViews = new TextView[FORECAST_COUNT];
+        _weatherForecastTimeTextViews = new TextView[FORECAST_COUNT];
+        _weatherForecastTemperatureRangeTextViews = new TextView[FORECAST_COUNT];
 
         _weatherForecastConditionImageViews[0] = ((Activity) _context).findViewById(R.id.weatherForecast1Condition);
         _weatherForecastWeekdayTextViews[0] = ((Activity) _context).findViewById(R.id.weatherForecast1Weekday);
@@ -93,13 +161,13 @@ public class WeatherViewController implements IViewController {
     @Override
     public void onStart() {
         _logger.Debug("onStart");
-
     }
 
     @Override
     public void onResume() {
         _logger.Debug("onResume");
-
+        _receiverController.RegisterReceiver(_currentWeatherReceiver, new String[]{Broadcasts.SHOW_CURRENT_WEATHER_MODEL});
+        _receiverController.RegisterReceiver(_forecastWeatherReceiver, new String[]{Broadcasts.SHOW_FORECAST_WEATHER_MODEL});
     }
 
     @Override

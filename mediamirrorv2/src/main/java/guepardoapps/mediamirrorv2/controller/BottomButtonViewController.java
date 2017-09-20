@@ -14,6 +14,7 @@ import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.basic.classes.SerializableList;
+import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaMenu;
@@ -29,29 +30,15 @@ public class BottomButtonViewController implements IViewController {
     private Logger _logger;
 
     private boolean _isInitialized;
-    private boolean _screenEnabled;
 
     private Context _context;
+    private BroadcastController _broadcastController;
     private DialogController _dialogController;
     private ReceiverController _receiverController;
 
     private SerializableList<LucaMenu> _menu;
     private SerializableList<ShoppingEntry> _shoppingList;
     private SerializableList<WirelessSocket> _socketList;
-
-    private BroadcastReceiver _screenDisableReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _screenEnabled = false;
-        }
-    };
-
-    private BroadcastReceiver _screenEnableReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _screenEnabled = true;
-        }
-    };
 
     private BroadcastReceiver _menuListReceiver = new BroadcastReceiver() {
         @Override
@@ -97,6 +84,7 @@ public class BottomButtonViewController implements IViewController {
     public BottomButtonViewController(@NonNull Context context) {
         _logger = new Logger(TAG);
         _context = context;
+        _broadcastController = new BroadcastController(_context);
         _dialogController = new DialogController(_context);
         _receiverController = new ReceiverController(_context);
     }
@@ -115,7 +103,7 @@ public class BottomButtonViewController implements IViewController {
             if (_menu != null) {
                 ArrayList<String> menuTitleList = new ArrayList<>();
                 for (int index = 0; index < _menu.getSize(); index++) {
-                    menuTitleList.add(_menu.getValue(index).GetTitle());
+                    menuTitleList.add(_menu.getValue(index).GetSingleLineString());
                 }
 
                 _dialogController.DisplayListViewDialog("Menu", menuTitleList);
@@ -143,7 +131,7 @@ public class BottomButtonViewController implements IViewController {
         floatingActionButtonSocket.setOnClickListener(view -> {
             _logger.Debug("Show Socket Dialog");
             if (_socketList != null) {
-                // TODO
+                _dialogController.DisplaySocketListViewDialog(_socketList);
             } else {
                 _logger.Error("_socketList is null!");
                 Toasty.warning(_context, "SocketList is null!!", Toast.LENGTH_LONG).show();
@@ -152,7 +140,7 @@ public class BottomButtonViewController implements IViewController {
 
         floatingActionButtonReload.setOnClickListener(view -> {
             _logger.Debug("Reload Data");
-            // TODO
+            _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_ALL);
         });
     }
 
@@ -166,8 +154,6 @@ public class BottomButtonViewController implements IViewController {
         _logger.Debug("onResume");
         if (!_isInitialized) {
             _receiverController.RegisterReceiver(_menuListReceiver, new String[]{Broadcasts.MENU});
-            _receiverController.RegisterReceiver(_screenDisableReceiver, new String[]{Broadcasts.SCREEN_OFF});
-            _receiverController.RegisterReceiver(_screenEnableReceiver, new String[]{Broadcasts.SCREEN_ENABLED});
             _receiverController.RegisterReceiver(_shoppingListReceiver, new String[]{Broadcasts.SHOPPING_LIST});
             _receiverController.RegisterReceiver(_socketListReceiver, new String[]{Broadcasts.SOCKET_LIST});
 

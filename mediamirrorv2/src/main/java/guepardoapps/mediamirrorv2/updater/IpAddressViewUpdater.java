@@ -65,6 +65,7 @@ public class IpAddressViewUpdater {
         _updateRunnable.run();
 
         _isRunning = true;
+        GetCurrentLocalIpAddress();
     }
 
     public void Dispose() {

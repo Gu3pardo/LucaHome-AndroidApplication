@@ -91,6 +91,7 @@ public class RSSViewUpdater {
         _receiverController.RegisterReceiver(_updateRSSFeedReceiver, new String[]{Broadcasts.PERFORM_RSS_UPDATE});
 
         _isRunning = true;
+        LoadRss();
     }
 
     public void Dispose() {

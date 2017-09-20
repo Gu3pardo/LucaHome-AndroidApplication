@@ -59,6 +59,8 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
     private FloatingActionButton _floatingActionButtonRadioStreamStop;
     private WebView _centerWebView;
 
+    private TextView _currentPlayingTextView;
+
     private boolean _youTubePlayerIsInitialized;
     private YouTubePlayer _youtubePlayer;
     private boolean _loadingVideo;
@@ -229,42 +231,48 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                     stopVideo();
                     stopRadioPlaying();
 
-                    _youTubePlayerView.setVisibility(View.INVISIBLE);
-                    _centerWebView.setVisibility(View.INVISIBLE);
+                    _youTubePlayerView.setVisibility(View.GONE);
+                    _centerWebView.setVisibility(View.GONE);
                     _centerTextView.setVisibility(View.VISIBLE);
                     _centerRadioStreamLinearLayout.setVisibility(View.GONE);
 
                     _centerTextView.setText(model.GetCenterText());
+
+                    _currentPlayingTextView.setText("");
                 } else if (model.IsYoutubeVisible()) {
                     stopWebViewLoading();
                     stopRadioPlaying();
 
                     _youTubePlayerView.setVisibility(View.VISIBLE);
-                    _centerWebView.setVisibility(View.INVISIBLE);
-                    _centerTextView.setVisibility(View.INVISIBLE);
+                    _centerWebView.setVisibility(View.GONE);
+                    _centerTextView.setVisibility(View.GONE);
                     _centerRadioStreamLinearLayout.setVisibility(View.GONE);
 
                     _youtubeId = model.GetYoutubeId();
                     startVideo(_youtubeId);
+
+                    _currentPlayingTextView.setText(String.format(Locale.getDefault(),"YoutubeId: %s", _youtubeId));
                 } else if (model.IsWebViewVisible()) {
                     stopWebViewLoading();
                     stopVideo();
                     stopRadioPlaying();
 
-                    _youTubePlayerView.setVisibility(View.INVISIBLE);
+                    _youTubePlayerView.setVisibility(View.GONE);
                     _centerWebView.setVisibility(View.VISIBLE);
-                    _centerTextView.setVisibility(View.INVISIBLE);
+                    _centerTextView.setVisibility(View.GONE);
                     _centerRadioStreamLinearLayout.setVisibility(View.GONE);
 
                     _loadingUrl = true;
                     _centerWebView.loadUrl(model.GetWebViewUrl());
+
+                    _currentPlayingTextView.setText("");
                 } else if (model.IsRadioStreamVisible()) {
                     stopWebViewLoading();
                     stopVideo();
                     stopRadioPlaying();
 
-                    _youTubePlayerView.setVisibility(View.INVISIBLE);
-                    _centerWebView.setVisibility(View.INVISIBLE);
+                    _youTubePlayerView.setVisibility(View.GONE);
+                    _centerWebView.setVisibility(View.GONE);
                     _centerTextView.setVisibility(View.VISIBLE);
                     _centerRadioStreamLinearLayout.setVisibility(View.VISIBLE);
 
@@ -273,9 +281,11 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                         _radioStream = radioStream;
                         _centerTextView.setText(_radioStream.GetTitle());
                         startRadioPlaying();
+                        _currentPlayingTextView.setText(String.format(Locale.getDefault(),"RadioStream: %s", _radioStream.GetTitle()));
                     } else {
                         _logger.Error("RadioStream is null!");
                         _centerTextView.setText(_context.getString(R.string.errorRadioStream));
+                        _currentPlayingTextView.setText("");
                     }
                 } else {
                     if (_loadingUrl) {
@@ -287,6 +297,8 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                     _centerTextView.setVisibility(View.VISIBLE);
 
                     _centerTextView.setText(R.string.errorCenterModel);
+
+                    _currentPlayingTextView.setText("");
                 }
             } else {
                 _logger.Warning("model is null!");
@@ -382,6 +394,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         public void onLoaded(String arg0) {
             _loadingVideo = false;
             _youtubePlayer.play();
+            _currentPlayingTextView.setText(String.format(Locale.getDefault(),"YoutubeId: %s", _youtubeId));
         }
 
         @Override
@@ -393,10 +406,12 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
             if (_youtubePlayer.hasNext()) {
                 _youtubePlayer.next();
             } else {
-                _youTubePlayerView.setVisibility(View.INVISIBLE);
-                _centerWebView.setVisibility(View.INVISIBLE);
+                _youTubePlayerView.setVisibility(View.GONE);
+                _centerWebView.setVisibility(View.GONE);
                 _centerTextView.setVisibility(View.VISIBLE);
                 _centerTextView.setText(R.string.madeByGuepardoApps);
+                _centerRadioStreamLinearLayout.setVisibility(View.GONE);
+                _currentPlayingTextView.setText("");
             }
         }
 
@@ -434,6 +449,8 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         _floatingActionButtonRadioStreamPlay = ((Activity) _context).findViewById(R.id.floating_action_button_radio_stream_play);
         _floatingActionButtonRadioStreamStop = ((Activity) _context).findViewById(R.id.floating_action_button_radio_stream_stop);
         _centerWebView = ((Activity) _context).findViewById(R.id.centerWebView);
+
+        _currentPlayingTextView = ((Activity) _context).findViewById(R.id.currentPlayingTextView);
 
         initializeMediaPlayer();
         initializeButtons();
@@ -580,8 +597,9 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         }
 
         _youTubePlayerView.setVisibility(View.VISIBLE);
-        _centerWebView.setVisibility(View.INVISIBLE);
-        _centerTextView.setVisibility(View.INVISIBLE);
+        _centerWebView.setVisibility(View.GONE);
+        _centerTextView.setVisibility(View.GONE);
+        _centerRadioStreamLinearLayout.setVisibility(View.GONE);
     }
 
     private void pauseVideo() {
@@ -638,7 +656,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         _loadingVideo = false;
         _logger.Error("Video Play Error :" + error);
 
-        _youTubePlayerView.setVisibility(View.INVISIBLE);
+        _youTubePlayerView.setVisibility(View.GONE);
 
         _centerTextView.setVisibility(View.VISIBLE);
         _centerTextView.setText(String.format(Locale.getDefault(), "Video Play Error : %s", error));

@@ -20,6 +20,7 @@ import guepardoapps.lucahome.basic.controller.TTSController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.constants.Enables;
 import guepardoapps.lucahome.common.constants.Timeouts;
+import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.enums.RSSFeed;
 import guepardoapps.lucahome.common.enums.RadioStreams;
 import guepardoapps.lucahome.common.enums.YoutubeId;
@@ -73,19 +74,19 @@ public class MainService extends Service {
     private WifiManager _wifiManager;
     private WifiLock _wifiLock;
 
+    private BroadcastReceiver _reloadAllReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_reloadAllReceiver onReceive");
+            reloadAll();
+        }
+    };
+
     private BroadcastReceiver _screenEnableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _birthdayUpdater.DownloadBirthdays();
-            _currentWeatherUpdater.DownloadWeather();
-            _dateViewUpdater.UpdateDate();
-            _forecastWeatherUpdater.DownloadWeather();
-            _ipAddressViewUpdater.GetCurrentLocalIpAddress();
-            _menuListUpdater.DownloadMenuList();
-            _rssViewUpdater.LoadRss();
-            _shoppingListUpdater.DownloadShoppingList();
-            _socketListUpdater.DownloadSocketList();
-            _temperatureUpdater.DownloadTemperature();
+            _logger.Debug("_screenEnableReceiver onReceive");
+            reloadAll();
         }
     };
 
@@ -121,6 +122,7 @@ public class MainService extends Service {
             _broadcastController = new BroadcastController(_context);
             _receiverController = new ReceiverController(_context);
 
+            _receiverController.RegisterReceiver(_reloadAllReceiver, new String[]{Broadcasts.RELOAD_ALL});
             _receiverController.RegisterReceiver(_screenEnableReceiver, new String[]{Broadcasts.SCREEN_ENABLED});
             _receiverController.RegisterReceiver(_timeChangedReceiver, new String[]{Intent.ACTION_TIME_TICK, Intent.ACTION_TIMEZONE_CHANGED, Intent.ACTION_TIME_CHANGED});
 
@@ -138,6 +140,8 @@ public class MainService extends Service {
             _shoppingListUpdater = new ShoppingListUpdater(_context);
             _socketListUpdater = new SocketListUpdater(_context);
             _temperatureUpdater = new TemperatureUpdater(_context);
+
+            SettingsController.getInstance().Initialize(_context);
 
             _ttsController = new TTSController(_context, Enables.TTS);
             _ttsController.Init();
@@ -311,7 +315,7 @@ public class MainService extends Service {
 
         boolean isWeekend = weekday == Calendar.SUNDAY || weekday == Calendar.SATURDAY;
 
-        _logger.Debug(String.format(Locale.GERMAN,
+        _logger.Debug(String.format(Locale.getDefault(),
                 "checkCurrentTime at %02d:%02d:%02d on %d",
                 hour, minute, second, weekday));
 
@@ -327,6 +331,19 @@ public class MainService extends Service {
                 }
             }
         }
+    }
+
+    private void reloadAll(){
+        _birthdayUpdater.DownloadBirthdays();
+        _currentWeatherUpdater.DownloadWeather();
+        _dateViewUpdater.UpdateDate();
+        _forecastWeatherUpdater.DownloadWeather();
+        _ipAddressViewUpdater.GetCurrentLocalIpAddress();
+        _menuListUpdater.DownloadMenuList();
+        _rssViewUpdater.LoadRss();
+        _shoppingListUpdater.DownloadShoppingList();
+        _socketListUpdater.DownloadSocketList();
+        _temperatureUpdater.DownloadTemperature();
     }
 
     private void restartActivity() {

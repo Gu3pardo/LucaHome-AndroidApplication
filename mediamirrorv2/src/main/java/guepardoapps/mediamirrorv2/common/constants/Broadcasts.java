@@ -64,6 +64,8 @@ public class Broadcasts {
     public static final String SOCKET_LIST = "guepardoapps.mediamirror.broadcast.socket_list";
     // VOLUME VIEW
     public static final String SHOW_VOLUME_MODEL = "guepardoapps.mediamirror.show.volume_model";
-    // VOLUME VIEW
+    // YOUTUBE VIEW
     public static final String YOUTUBE_ID = "guepardoapps.mediamirror.youtube_id";
+    // MAIN SERVICE
+    public static final String RELOAD_ALL = "guepardoapps.mediamirror.reload_all";
 }

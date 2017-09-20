@@ -21,8 +21,8 @@ public class BatterySocketController {
     private static final String TAG = BatterySocketController.class.getSimpleName();
     private Logger _logger;
 
-    private static final int UPPER_BATTERY_LIMIT = 90;
-    private static final int LOWER_BATTERY_LIMIT = 10;
+    public static final int UPPER_BATTERY_LIMIT = 90;
+    public static final int LOWER_BATTERY_LIMIT = 10;
 
     private boolean _isInitialized;
     private String _wirelessSocketName;

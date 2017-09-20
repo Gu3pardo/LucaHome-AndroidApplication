@@ -592,12 +592,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/calendarLinearLayout"
-        android:layout_below="@+id/rssRelativeLayout">
-
-        <com.google.android.youtube.player.YouTubePlayerView
-            android:id="@+id/centerYoutubePlayer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        android:layout_below="@+id/rssRelativeLayout"
+        android:layout_margin="3dp">
 
         <TextView
             android:id="@+id/centerTextView"
@@ -651,6 +647,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible" />
+
+        <com.google.android.youtube.player.YouTubePlayerView
+            android:id="@+id/centerYoutubePlayer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
     </FrameLayout>
 

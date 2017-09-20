@@ -34,7 +34,7 @@ public class TemperatureUpdater {
                 RaspberryModel model = null;
 
                 if (result.TemperatureList != null) {
-                    if (result.TemperatureList.getSize() == RaspPiConstants.SERVER_URLs.length) {
+                    if (result.TemperatureList.getSize() > 0) {
                         model = new RaspberryModel(
                                 result.TemperatureList.getValue(0).GetArea(),
                                 result.TemperatureList.getValue(0).GetTemperatureString(),
@@ -83,10 +83,11 @@ public class TemperatureUpdater {
             return;
         }
 
-        _receiverController.RegisterReceiver(_updateReceiver, new String[]{Broadcasts.DOWNLOAD_TEMPERATURE_FINISHED});
+        _receiverController.RegisterReceiver(_updateReceiver, new String[]{TemperatureService.TemperatureDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_TEMPERATURE_UPDATE});
 
         _isRunning = true;
+        DownloadTemperature();
     }
 
     public void Dispose() {
