@@ -7,8 +7,8 @@ android {
         applicationId "guepardoapps.mediamirrorv2"
         minSdkVersion 24
         targetSdkVersion 26
-        versionCode 20000
-        versionName "2.0.0.170920"
+        versionCode 20001
+        versionName "2.0.1.170921"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {

@@ -50,6 +50,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
+                        android:background="@drawable/circle_white"
                         android:contentDescription="@string/contentDescription"
                         app:layout_heightPercent="50%"
                         app:layout_widthPercent="25%"
@@ -81,10 +82,11 @@
 
                         <Switch
                             android:id="@+id/socketCardSwitch"
-                            android:layout_width="match_parent"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_weight="1"
+                            android:background="@drawable/circle_white"
                             android:textOff="@string/socketDisabled"
                             android:textOn="@string/socketEnabled" />
                     </LinearLayout>
