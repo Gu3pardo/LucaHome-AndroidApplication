@@ -66,7 +66,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
     private boolean _loadingVideo;
     private String _youtubeId = YoutubeId.DEFAULT.GetYoutubeId();
 
-    private RadioStreams _radioStream = RadioStreams.DEFAULT;
+    private RadioStreams _radioStream = RadioStreams.BAYERN_3;
     private MediaPlayer _radioPlayer;
 
     private boolean _loadingUrl;
@@ -115,13 +115,10 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                     try {
                         int id = Integer.parseInt(radioStreamId);
                         RadioStreams radioStream = RadioStreams.GetById(id);
-                        if (radioStream == RadioStreams.NULL) {
-                            radioStream = RadioStreams.DEFAULT;
-                        }
                         _radioStream = radioStream;
                     } catch (Exception exception) {
                         _logger.Error(exception.toString());
-                        _radioStream = RadioStreams.DEFAULT;
+                        _radioStream = RadioStreams.BAYERN_3;
                     }
                 }
             }
@@ -384,7 +381,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
 
                     String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=The+Good+Life+24+7&key=" + Keys.YOUTUBE_API_KEY;
 
-                    DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(_context, null, "", false);
+                    DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(_context, null, "", false, false);
                     task.execute(url);
                 }
             }

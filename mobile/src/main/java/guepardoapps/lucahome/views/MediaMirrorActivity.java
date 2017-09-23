@@ -77,9 +77,9 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
      * Enables for selection spinner or seekBars
      * Disable while setting new selection to prevent endless reload
      */
-    private boolean _mediaMirrorSelectionSpinnerEnabled;
-    private boolean _youtubePlayPositionSeekBarEnabled;
-    private boolean _radioStreamSelectionSpinnerEnabled;
+    private boolean _mediaMirrorSelectionSpinnerEnabled = true;
+    private boolean _youtubePlayPositionSeekBarEnabled = true;
+    private boolean _radioStreamSelectionSpinnerEnabled = true;
 
     /**
      * UI variables for CardView MediaMirror Selection, battery and version
@@ -361,7 +361,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
         Snacky.builder()
                 .setActivty(MediaMirrorActivity.this)
                 .setText(message)
-                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setDuration(Snacky.LENGTH_LONG)
                 .setActionText(android.R.string.ok)
                 .error()
                 .show();
@@ -372,7 +372,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
         final ArrayList<String> serverLocations = new ArrayList<>();
         for (MediaServerSelection entry : MediaServerSelection.values()) {
-            if (entry.GetId() > 0) {
+            if (entry != MediaServerSelection.NULL) {
                 serverLocations.add(entry.GetLocation());
             }
         }
@@ -575,7 +575,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
             loadYoutubeVideoImage(_mediaMirrorData);
 
-            if (currentVideoPlayTime == -1 || totalVideoPlayTime == -1 || currentVideoPlayTime == 0) {
+            if (currentVideoPlayTime == -1 || totalVideoPlayTime == -1 || currentVideoPlayTime == 0 || totalVideoPlayTime == 0) {
                 _logger.Error(String.format(Locale.getDefault(), "Invalid values: currentVideoPlayTime: %d: totalVideoPlayTime: %d", currentVideoPlayTime, totalVideoPlayTime));
                 _youtubePlayPositionSeekBar.setVisibility(View.GONE);
                 _youtubePlayPositionTextView.setVisibility(View.GONE);
@@ -607,9 +607,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
         final ArrayList<String> radioStreams = new ArrayList<>();
         for (RadioStreams entry : RadioStreams.values()) {
-            if (entry.GetId() > 1) {
-                radioStreams.add(entry.GetTitle());
-            }
+            radioStreams.add(entry.GetTitle());
         }
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(_context, android.R.layout.simple_spinner_item, radioStreams);
@@ -632,9 +630,6 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
                 String selectedRadioStream = radioStreams.get(position);
                 RadioStreams radioStream = RadioStreams.GetByTitle(selectedRadioStream);
-                if (radioStream == RadioStreams.NULL || radioStream == RadioStreams.DEFAULT) {
-                    radioStream = RadioStreams.BAYERN_3;
-                }
 
                 _mediaMirrorService.SendCommand(
                         _mediaMirrorData.GetMediaServerSelection().GetIp(),
@@ -877,7 +872,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
     }
 
     private void displayBrightnessUi(@NonNull MediaMirrorData mediaMirrorData) {
-        _brightnessTextView.setText(String.format(Locale.getDefault(), "Brightness: %d%%", mediaMirrorData.GetScreenBrightness()));
+        _brightnessTextView.setText(String.format(Locale.getDefault(), "Brightness: %d%%", ((mediaMirrorData.GetScreenBrightness() * 100) / 255)));
     }
 
     private void setUpUpdateUi() {
@@ -986,7 +981,8 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
                 _context,
                 null,
                 mediaMirrorData.GetMediaServerSelection().GetIp(),
-                true);
+                true,
+                false);
         task.execute(url);
     }
 
@@ -1000,7 +996,8 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
                 _context,
                 loadingVideosDialog,
                 mediaMirrorData.GetMediaServerSelection().GetIp(),
-                false);
+                false,
+                true);
         task.execute(url);
     }
 

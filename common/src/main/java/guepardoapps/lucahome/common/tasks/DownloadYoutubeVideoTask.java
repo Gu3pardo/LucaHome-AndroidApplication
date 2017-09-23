@@ -20,6 +20,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ListView;
@@ -43,6 +44,7 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
 
     private boolean _isInitialized = false;
     private boolean _sendFirstEntry = false;
+    private boolean _displayDialog = false;
 
     private String _serverIp;
     private ArrayList<YoutubeVideo> _youtubeVideoList;
@@ -51,7 +53,8 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
             @NonNull Context context,
             ProgressDialog loadingVideosDialog,
             @NonNull String serverIp,
-            boolean sendFirstEntry) {
+            boolean sendFirstEntry,
+            boolean displayDialog) {
         _logger = new Logger(TAG);
         _logger.Debug("Created new " + TAG);
 
@@ -62,6 +65,8 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
 
         _serverIp = serverIp;
         _sendFirstEntry = sendFirstEntry;
+
+        _displayDialog = displayDialog;
 
         _isInitialized = true;
     }
@@ -147,7 +152,7 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
                         }
                     });
 
-                    if (youtubeVideoList.size() > 0) {
+                    if (youtubeVideoList.size() > 0 && _displayDialog) {
                         ((Activity) _context).runOnUiThread(new Runnable() {
                             public void run() {
                                 displayYoutubeIdDialog(_serverIp, youtubeVideoList);
@@ -185,10 +190,10 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
                 return;
             }
 
-            _broadcastController.SendStringBroadcast(
+            _broadcastController.SendSerializableBroadcast(
                     MediaMirrorService.MediaMirrorYoutubeVideoBroadcast,
                     MediaMirrorService.MediaMirrorYoutubeVideoBundle,
-                    _youtubeVideoList.get(0).GetYoutubeId());
+                    _youtubeVideoList.get(0));
 
             _sendFirstEntry = false;
         }
@@ -219,6 +224,14 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 listAdapter.SetPlayOnAllMirror(isChecked);
+            }
+        });
+
+        Button closeButton = dialog.findViewById(R.id.dialog_button_close);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
             }
         });
 

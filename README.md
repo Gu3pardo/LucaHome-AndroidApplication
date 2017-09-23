@@ -6,7 +6,7 @@
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
 [![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
-[![Version](https://img.shields.io/badge/version-v4.4.3.170920-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
+[![Version](https://img.shields.io/badge/version-v4.4.4.170923-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
 
 Part of the LucaHome-Project
 Containing shared libraries for LucaHome, the main android client application and the latest mediamirror project (v2).
@@ -36,7 +36,7 @@ ___________________________________
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
-[![Version](https://img.shields.io/badge/version-v2.0.1.170921-blue.svg)](https://github.com/GuepardoApps/AndroidApplication)
+[![Version](https://img.shields.io/badge/version-v2.0.2.170923-blue.svg)](https://github.com/GuepardoApps/AndroidApplication)
 
 Android application permanently displaying data behind a mirror
 - date and time

@@ -4,9 +4,9 @@ import java.io.Serializable;
 
 public enum MediaServerSelection implements Serializable {
 
-    NULL(0, "", "", "", false),
-    MEDIAMIRROR_1(1, "192.168.178.147", "MediaMirror1", "Workspace Jonas", false),
-    MEDIAMIRROR_2(2, "192.168.178.20", "MediaMirror2", "Sleeping Room", true);
+    MEDIAMIRROR_1(0, "192.168.178.147", "MediaMirror1", "Workspace Jonas", false),
+    MEDIAMIRROR_2(1, "192.168.178.20", "MediaMirror2", "Sleeping Room", true),
+    NULL(-1, "", "", "", false);
 
     private int _id;
     private String _ip;

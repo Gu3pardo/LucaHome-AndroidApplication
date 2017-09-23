@@ -99,7 +99,7 @@ public class MediaMirrorData implements Serializable {
                 -1,
                 new ArrayList<PlayedYoutubeVideo>(),
                 false,
-                RadioStreams.NULL.GetId(),
+                RadioStreams.PLANET_RADIO_LIVE.GetId(),
                 false,
                 -1,
                 serverVersion,

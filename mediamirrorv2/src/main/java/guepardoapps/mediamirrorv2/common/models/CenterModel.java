@@ -15,7 +15,7 @@ public class CenterModel implements Serializable {
     private static final String DEFAULT_CENTER_TEXT = "Hello, this is your media mirror!";
     private static final String DEFAULT_YOUTUBE_VIDEO_ID = YoutubeId.DEFAULT.GetYoutubeId();
     private static final String DEFAULT_WEB_VIEW_URL = "http://imgur.com/";
-    private static final RadioStreams DEFAULT_RADIO_STREAM = RadioStreams.DEFAULT;
+    private static final RadioStreams DEFAULT_RADIO_STREAM = RadioStreams.BAYERN_3;
 
     private boolean _centerVisible;
     private String _centerText;
@@ -104,7 +104,7 @@ public class CenterModel implements Serializable {
                 _webViewUrl = "";
 
                 _radioStreamVisible = false;
-                _radioStream = RadioStreams.NULL;
+                _radioStream = RadioStreams.BAYERN_3;
             }
 
             if (_centerText.length() > 0) {
@@ -118,7 +118,7 @@ public class CenterModel implements Serializable {
                 _webViewUrl = "";
 
                 _radioStreamVisible = false;
-                _radioStream = RadioStreams.NULL;
+                _radioStream = RadioStreams.BAYERN_3;
             }
 
             if (_webViewUrl.length() > 0) {
@@ -132,10 +132,10 @@ public class CenterModel implements Serializable {
                 _logger.Warning("Resetting youtube, center and radio!");
 
                 _radioStreamVisible = false;
-                _radioStream = RadioStreams.NULL;
+                _radioStream = RadioStreams.BAYERN_3;
             }
 
-            if (_radioStream != null || _radioStream != RadioStreams.NULL) {
+            if (_radioStream != null || _radioStream != RadioStreams.BAYERN_3) {
                 _youtubeVisible = false;
                 _youtubeId = "";
 
@@ -166,7 +166,7 @@ public class CenterModel implements Serializable {
                 _webViewUrl = DEFAULT_WEB_VIEW_URL;
             }
         } else if (_radioStreamVisible) {
-            if (_radioStream == null || _radioStream == RadioStreams.NULL) {
+            if (_radioStream == null || _radioStream == RadioStreams.BAYERN_3) {
                 _logger.Warning("Setting radioStream to default: " + DEFAULT_RADIO_STREAM);
                 _radioStream = DEFAULT_RADIO_STREAM;
             }

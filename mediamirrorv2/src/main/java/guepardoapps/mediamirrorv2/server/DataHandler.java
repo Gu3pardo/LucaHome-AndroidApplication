@@ -62,7 +62,7 @@ public class DataHandler {
                     true, "Sleep well!",
                     false, "",
                     false, "",
-                    false, RadioStreams.NULL);
+                    false, RadioStreams.BAYERN_3);
             _logger.Information("Created center model: " + goodNightModel.toString());
 
             _broadcastController.SendSerializableBroadcast(
@@ -146,7 +146,7 @@ public class DataHandler {
                                         false, "",
                                         true, youtubeId.GetYoutubeId(),
                                         false, "",
-                                        false, RadioStreams.NULL);
+                                        false, RadioStreams.BAYERN_3);
                                 _logger.Information("Created center model: " + youtubeModel.toString());
 
                                 _broadcastController.SendSerializableBroadcast(
@@ -161,7 +161,7 @@ public class DataHandler {
                                     false, "",
                                     true, data,
                                     false, "",
-                                    false, RadioStreams.NULL);
+                                    false, RadioStreams.BAYERN_3);
                             _logger.Information("Created center model: " + youtubeModel.toString());
                             _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, youtubeModel);
                             _lastYoutubeId = data;
@@ -244,14 +244,10 @@ public class DataHandler {
                             return "Error:Screen is not enabled!";
                         }
 
-                        RadioStreams radioStream = RadioStreams.DEFAULT;
+                        RadioStreams radioStream = RadioStreams.BAYERN_3;
                         try {
                             int radioStreamId = Integer.parseInt(data);
                             radioStream = RadioStreams.GetById(radioStreamId);
-                            if (radioStream == RadioStreams.NULL) {
-                                _logger.Warning(String.format(Locale.getDefault(), "Failed to find id %d! Setting to default!", radioStreamId));
-                                radioStream = RadioStreams.DEFAULT;
-                            }
                         } catch (Exception exception) {
                             _logger.Error(exception.toString());
                         }
@@ -323,7 +319,7 @@ public class DataHandler {
                                 false, "",
                                 true, YoutubeId.SEA_SOUND.GetYoutubeId(),
                                 false, "",
-                                false, RadioStreams.NULL);
+                                false, RadioStreams.BAYERN_3);
                         _logger.Information("Created center model: " + playSeaSoundModel.toString());
                         _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, playSeaSoundModel);
 
@@ -342,7 +338,7 @@ public class DataHandler {
                                 true, "",
                                 false, "",
                                 false, "",
-                                false, RadioStreams.NULL);
+                                false, RadioStreams.BAYERN_3);
                         _logger.Information("Created center model: " + stopSeaSoundModel.toString());
                         _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, stopSeaSoundModel);
 
@@ -383,7 +379,7 @@ public class DataHandler {
                                 true, data,
                                 false, "",
                                 false, "",
-                                false, RadioStreams.NULL);
+                                false, RadioStreams.BAYERN_3);
                         _logger.Information("Created center model: " + centerTextModel.toString());
                         _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, centerTextModel);
                         break;

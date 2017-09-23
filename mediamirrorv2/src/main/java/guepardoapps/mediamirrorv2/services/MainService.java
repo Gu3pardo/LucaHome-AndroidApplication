@@ -168,7 +168,7 @@ public class MainService extends Service {
                     false, "",
                     true, YoutubeId.THE_GOOD_LIFE_STREAM.GetYoutubeId(),
                     false, "",
-                    false, RadioStreams.NULL);
+                    false, RadioStreams.BAYERN_3);
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CENTER_MODEL,
                     Bundles.CENTER_MODEL,
@@ -244,7 +244,7 @@ public class MainService extends Service {
                         false, "",
                         true, YoutubeId.THE_GOOD_LIFE_STREAM.GetYoutubeId(),
                         false, "",
-                        false, RadioStreams.NULL);
+                        false, RadioStreams.BAYERN_3);
 
                 _broadcastController.SendSerializableBroadcast(
                         Broadcasts.SHOW_CENTER_MODEL,

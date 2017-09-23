@@ -100,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             _logger.Debug("_openWeatherUpdateReceiver");
             updateWeatherCard();
+            updateMapContent();
         }
     };
 
@@ -277,5 +278,11 @@ public class MainActivity extends AppCompatActivity {
                 "Current temperature: %.2f degree Celsius\nCurrent condition: %s",
                 _openWeatherService.CurrentWeather().GetTemperature(), _openWeatherService.CurrentWeather().GetDescription()));
         _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, _openWeatherService.CurrentWeather().GetCondition().GetWallpaper());
+    }
+
+    private void updateMapContent() {
+        _logger.Debug("updateMapContent");
+        _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
+        _mapContentViewBuilder.AddViewsToMap();
     }
 }
