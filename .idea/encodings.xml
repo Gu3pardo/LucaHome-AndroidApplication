@@ -95,6 +95,6 @@
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/BroadcastController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/NotificationController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/ReceiverController.java" charset="windows-1251" />
-    <file url="PROJECT" charset="windows-1251" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>
