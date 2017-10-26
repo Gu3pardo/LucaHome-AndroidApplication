@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -19,6 +21,7 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Coin;
 import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.converter.JsonDataToCoinTrendConverter;
 import guepardoapps.lucahome.common.converter.JsonDataToCoinConversionConverter;
 import guepardoapps.lucahome.common.converter.JsonDataToCoinConverter;
 import guepardoapps.lucahome.common.database.DatabaseCoinList;
@@ -142,6 +145,40 @@ public class CoinService implements IDataService {
         }
     };
 
+    private BroadcastReceiver _coinAggregateDownloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_coinAggregateEurDownloadFinishedReceiver");
+            DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
+            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
+
+            if (content.CurrentDownloadType != DownloadController.DownloadType.CoinAggregate) {
+                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
+                return;
+            }
+
+            Coin coinDto = (Coin) content.Additional;
+            try {
+                coinDto = JsonDataToCoinTrendConverter.UpdateTrend(coinDto, contentResponse, "EUR");
+
+                for (int index = 0; index < _coinList.getSize(); index++) {
+                    if (_coinList.getValue(index).GetId() == coinDto.GetId()) {
+                        _coinList.setValue(index, coinDto);
+                        _logger.Debug(String.format(Locale.getDefault(), "Updated CoinDto is %s", coinDto));
+
+                        _broadcastController.SendSerializableBroadcast(
+                                CoinConversionDownloadFinishedBroadcast,
+                                CoinConversionDownloadFinishedBundle,
+                                new CoinConversionDownloadFinishedContent(_coinConversionList, false, content.Response));
+                        break;
+                    }
+                }
+            } catch (JSONException jsonException) {
+                _logger.Error(jsonException.getMessage());
+            }
+        }
+    };
+
     private BroadcastReceiver _coinDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -190,6 +227,10 @@ public class CoinService implements IDataService {
                     CoinDownloadFinishedBroadcast,
                     CoinDownloadFinishedBundle,
                     new CoinDownloadFinishedContent(_coinList, true, content.Response));
+
+            for (int index = 0; index < _coinList.getSize(); index++) {
+                LoadCoinTrend(_coinList.getValue(index));
+            }
         }
     };
 
@@ -352,6 +393,7 @@ public class CoinService implements IDataService {
         _databaseCoinList = new DatabaseCoinList(context);
         _databaseCoinList.Open();
 
+        _receiverController.RegisterReceiver(_coinAggregateDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinConversionDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -457,6 +499,15 @@ public class CoinService implements IDataService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.CoinConversion, false);
     }
 
+    public void LoadCoinTrend(@NonNull Coin coin) {
+        _logger.Debug(String.format(Locale.getDefault(), "LoadCoinTrend for %s of the last %d hours.", coin, SettingsController.getInstance().GetCoinHoursTrend()));
+
+        String requestUrlEur = String.format(Locale.getDefault(), "https://min-api.cryptocompare.com/data/histohour?fsym=%s&tsym=%s&limit=%d&aggregate=3&e=CCCAGG", coin.GetType(), "EUR", SettingsController.getInstance().GetCoinHoursTrend());
+        _logger.Debug(String.format(Locale.getDefault(), "RequestUrlEur is: %s", requestUrlEur));
+
+        _downloadController.SendCommandToWebsiteAsync(requestUrlEur, DownloadController.DownloadType.CoinAggregate, false, coin);
+    }
+
     @Override
     public void LoadData() {
         _logger.Debug("LoadData");
@@ -464,11 +515,18 @@ public class CoinService implements IDataService {
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _coinList = _databaseCoinList.GetCoinList();
             _filteredCoinList = new SerializableList<>();
+
             mergeCoinConversionWithCoinList();
+
             _broadcastController.SendSerializableBroadcast(
                     CoinDownloadFinishedBroadcast,
                     CoinDownloadFinishedBundle,
                     new CoinDownloadFinishedContent(_coinList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+
+            for (int index = 0; index < _coinList.getSize(); index++) {
+                LoadCoinTrend(_coinList.getValue(index));
+            }
+
             return;
         }
 
@@ -574,6 +632,15 @@ public class CoinService implements IDataService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public void SetCoinHoursTrend(int coinHoursTrend) {
+        if (coinHoursTrend < 24) {
+            _logger.Warning(String.format(Locale.getDefault(), "SetCoinHoursTrend: coinHoursTrend %d is invalid! Setting to 24!", coinHoursTrend));
+            coinHoursTrend = 24;
+        }
+
+        _settingsController.SetCoinHoursTrend(coinHoursTrend);
     }
 
     private void clearCoinListFromDatabase() {

@@ -8,6 +8,8 @@
     <string name="pref_default_ip">192.168.178.22</string>
     <string name="pref_default_open_weather_city">Munich, DE</string>
 
+    <string name="pref_default_coin_hour_trend">24</string>
+
     <string name="all_sockets_off">All Sockets Off</string>
 
     <string name="select_youtube_video">Select a video</string>

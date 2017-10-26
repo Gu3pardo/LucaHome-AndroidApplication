@@ -32,4 +32,9 @@
         android:icon="@mipmap/ic_lightbulb_outline_black_48dp"
         android:title="@string/pref_header_wireless_socket" />
 
+    <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$CoinPreferenceFragment"
+        android:icon="@mipmap/ic_copyright_black_48dp"
+        android:title="@string/pref_header_coins" />
+
 </preference-headers>

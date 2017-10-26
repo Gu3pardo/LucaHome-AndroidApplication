@@ -186,10 +186,10 @@ public class CoinEditActivity extends AppCompatActivity {
                     focusView.requestFocus();
                 } else {
                     if (_coinDto.GetAction() == CoinDto.Action.Add) {
-                        _coinService.AddCoin(new Coin(-1, userName, coinType, Double.parseDouble(coinAmountString), -1, -1));
+                        _coinService.AddCoin(new Coin(-1, userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1));
                         _saveButton.setEnabled(false);
                     } else if (_coinDto.GetAction() == CoinDto.Action.Update) {
-                        _coinService.UpdateCoin(new Coin(_coinDto.GetId(), userName, coinType, Double.parseDouble(coinAmountString), -1, -1));
+                        _coinService.UpdateCoin(new Coin(_coinDto.GetId(), userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1));
                         _saveButton.setEnabled(false);
                     } else {
                         coinEditUserTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _coinDto.GetAction())));

@@ -30,6 +30,7 @@ public class CoinListViewAdapter extends BaseAdapter {
         private TextView _titleText;
         private TextView _amountText;
         private TextView _conversionText;
+        private ImageView _aggregationImage;
         private TextView _valueText;
         private ImageView _imageView;
         private FloatingActionButton _updateButton;
@@ -115,6 +116,7 @@ public class CoinListViewAdapter extends BaseAdapter {
         holder._titleText = rowView.findViewById(R.id.coinCardTitleText);
         holder._amountText = rowView.findViewById(R.id.coinAmountText);
         holder._conversionText = rowView.findViewById(R.id.coinConversionText);
+        holder._aggregationImage = rowView.findViewById(R.id.coinAggregationImage);
         holder._valueText = rowView.findViewById(R.id.coinValueText);
         holder._imageView = rowView.findViewById(R.id.coin_card_image);
         holder._updateButton = rowView.findViewById(R.id.coin_card_update_button);
@@ -128,6 +130,14 @@ public class CoinListViewAdapter extends BaseAdapter {
         holder._valueText.setText(coin.GetValueString());
 
         holder._imageView.setImageResource(coin.GetIcon());
+
+        if (coin.GetCurrentTrend() == Coin.Trend.Rise) {
+            holder._aggregationImage.setImageResource(android.R.drawable.arrow_up_float);
+        } else if (coin.GetCurrentTrend() == Coin.Trend.Fall) {
+            holder._aggregationImage.setImageResource(android.R.drawable.arrow_down_float);
+        } else {
+            holder._aggregationImage.setImageResource(android.R.drawable.radiobutton_off_background);
+        }
 
         holder._updateButton.setOnClickListener(new View.OnClickListener() {
             @Override

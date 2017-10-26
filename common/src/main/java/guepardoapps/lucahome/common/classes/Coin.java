@@ -11,12 +11,15 @@ public class Coin implements Serializable {
     private static final long serialVersionUID = 1027483947363954860L;
     private static final String TAG = Coin.class.getSimpleName();
 
+    public enum Trend {NULL, Fall, Rise}
+
     private int _id;
     private String _user;
     private String _type;
     private double _amount;
 
     private double _currentConversion;
+    private Trend _currentTrend;
 
     private int _icon;
 
@@ -26,6 +29,7 @@ public class Coin implements Serializable {
             @NonNull String type,
             double amount,
             double currentConversion,
+            @NonNull Trend currentTrend,
             int icon) {
         _id = id;
         _user = user;
@@ -33,6 +37,7 @@ public class Coin implements Serializable {
         _amount = amount;
 
         _currentConversion = currentConversion;
+        _currentTrend = currentTrend;
 
         _icon = icon;
     }
@@ -77,6 +82,14 @@ public class Coin implements Serializable {
         return String.format(Locale.getDefault(), "%.2f €", _currentConversion);
     }
 
+    public Trend GetCurrentTrend() {
+        return _currentTrend;
+    }
+
+    public void SetCurrentTrend(@NonNull Trend currentTrend) {
+        _currentTrend = currentTrend;
+    }
+
     public double GetValue() {
         return _amount * _currentConversion;
     }
@@ -103,6 +116,6 @@ public class Coin implements Serializable {
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "{%s: {Id: %d};{User: %s};{Type: %s};{Amount: %.6f}}", TAG, _id, _user, _type, _amount);
+        return String.format(Locale.getDefault(), "{%s: {Id: %d};{User: %s};{Type: %s};{Amount: %.6f};{CurrentConversion: %.6f};{Trend: %s}}", TAG, _id, _user, _type, _amount, _currentConversion, _currentTrend);
     }
 }

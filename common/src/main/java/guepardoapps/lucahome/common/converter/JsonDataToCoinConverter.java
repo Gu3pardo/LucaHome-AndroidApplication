@@ -112,7 +112,7 @@ public final class JsonDataToCoinConverter {
                         icon = R.drawable.btc;
                 }
 
-                return new Coin(id, user, type, amount, currentConversion, icon);
+                return new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon);
             }
         }
 

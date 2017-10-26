@@ -143,7 +143,7 @@ public class DatabaseCoinList {
                     icon = R.drawable.btc;
             }
 
-            Coin entry = new Coin(id, user, type, amount, currentConversion, icon);
+            Coin entry = new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon);
             result.addValue(entry);
         }
 

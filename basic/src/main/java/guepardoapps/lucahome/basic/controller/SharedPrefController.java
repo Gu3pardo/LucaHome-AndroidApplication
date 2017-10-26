@@ -128,10 +128,10 @@ public class SharedPrefController {
     public String LoadStringValueFromSharedPreferences(@NonNull String value) {
         if (_sharedPreferences == null) {
             _logger.Warning("SharedPreferences is null!");
-            return null;
+            return "";
         }
 
-        return _sharedPreferences.getString(value, null);
+        return _sharedPreferences.getString(value, "");
     }
 
     public int LoadIntegerValueFromSharedPreferences(@NonNull String value) {
@@ -155,11 +155,11 @@ public class SharedPrefController {
     public List<String> LoadStringListFromSharedPreferences(@NonNull String listName) {
         if (_sharedPreferences == null) {
             _logger.Warning("SharedPreferences is null!");
-            return null;
+            return new ArrayList<>();
         }
 
         int size = _sharedPreferences.getInt(listName + "_size", 0);
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (int index = 0; index < size; index++) {
             list.add(_sharedPreferences.getString(listName + "_" + index, null));
         }
@@ -170,11 +170,11 @@ public class SharedPrefController {
     public List<Integer> LoadIntegerListFromSharedPreferences(@NonNull String listName) {
         if (_sharedPreferences == null) {
             _logger.Warning("SharedPreferences is null!");
-            return null;
+            return new ArrayList<>();
         }
 
         int size = _sharedPreferences.getInt(listName + "_size", 0);
-        List<Integer> list = new ArrayList<Integer>();
+        List<Integer> list = new ArrayList<>();
         for (int index = 0; index < size; index++) {
             list.add(_sharedPreferences.getInt(listName + "_" + index, 0));
         }
@@ -185,11 +185,11 @@ public class SharedPrefController {
     public List<Boolean> LoadBooleanListFromSharedPreferences(@NonNull String listName) {
         if (_sharedPreferences == null) {
             _logger.Warning("SharedPreferences is null!");
-            return null;
+            return new ArrayList<>();
         }
 
         int size = _sharedPreferences.getInt(listName + "_size", 0);
-        List<Boolean> list = new ArrayList<Boolean>();
+        List<Boolean> list = new ArrayList<>();
         for (int index = 0; index < size; index++) {
             list.add(_sharedPreferences.getBoolean(listName + "_" + index, false));
         }

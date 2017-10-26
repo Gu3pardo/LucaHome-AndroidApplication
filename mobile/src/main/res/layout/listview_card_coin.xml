@@ -42,37 +42,47 @@
                 <android.support.percent.PercentRelativeLayout
                     android:id="@+id/coinCardLinearLayout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
+                    android:layout_height="match_parent">
 
                     <TextView
                         android:id="@+id/coinAmountText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
                         android:gravity="center"
                         android:text="@string/example"
-                        app:layout_heightPercent="33%"
-                        app:layout_widthPercent="100%" />
+                        app:layout_heightPercent="50%"
+                        app:layout_widthPercent="50%" />
 
                     <TextView
                         android:id="@+id/coinConversionText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/coinAmountText"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
                         android:gravity="center"
                         android:text="@string/example"
-                        app:layout_heightPercent="33%"
-                        app:layout_widthPercent="100%" />
+                        app:layout_heightPercent="50%"
+                        app:layout_marginLeftPercent="50%"
+                        app:layout_widthPercent="45%" />
+
+                    <ImageView
+                        android:id="@+id/coinAggregationImage"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:contentDescription="@string/contentDescription"
+                        android:padding="5dip"
+                        app:layout_heightPercent="50%"
+                        app:layout_marginLeftPercent="95%"
+                        app:layout_widthPercent="5%"
+                        app:srcCompat="@android:drawable/radiobutton_off_background" />
 
                     <TextView
                         android:id="@+id/coinValueText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/coinConversionText"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
                         android:gravity="center"
                         android:text="@string/example"
                         android:textStyle="bold"
-                        app:layout_heightPercent="33%"
+                        app:layout_heightPercent="50%"
+                        app:layout_marginTopPercent="50%"
                         app:layout_widthPercent="100%" />
                 </android.support.percent.PercentRelativeLayout>
             </LinearLayout>

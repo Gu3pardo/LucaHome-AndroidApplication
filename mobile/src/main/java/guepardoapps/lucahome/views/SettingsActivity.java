@@ -152,6 +152,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_WIRELESSSOCKET_TIMEOUT)) {
                     _wirelessSocketService.SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
+
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_COIN_HOURS_TREND)) {
+                    _coinService.SetCoinHoursTrend((int) value);
+                    preference.setSummary((int) value);
                 }
 
             } else {
@@ -592,6 +596,36 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_OPEN_WEATHER_CITY));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_CHANGE_WEATHER_WALLPAPER));
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * This fragment shows open weather preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class CoinPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_coins);
+            setHasOptionsMenu(true);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_COIN_HOURS_TREND));
         }
 
         @Override

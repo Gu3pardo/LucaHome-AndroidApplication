@@ -17,6 +17,8 @@ public class SettingsController {
     private static final String TAG = SettingsController.class.getSimpleName();
     private Logger _logger;
 
+    public static final String PREF_SETTINGS_INSTALLED = "settings_installed";
+
     public static final String PREF_USER_NAME = "user_name";
     public static final String PREF_USER_PASS_PHRASE = "user_passphrase";
 
@@ -61,6 +63,8 @@ public class SettingsController {
     public static final String PREF_RELOAD_WEATHER_TIMEOUT = "reload_weather_timeout";
     public static final String PREF_RELOAD_WIRELESSSOCKET_TIMEOUT = "reload_wirelesssocket_timeout";
 
+    public static final String PREF_COIN_HOURS_TREND = "coin_hours_trend";
+
     private Context _context;
     private SharedPrefController _sharedPrefController;
 
@@ -84,6 +88,29 @@ public class SettingsController {
         _sharedPrefController = new SharedPrefController(_context);
 
         _isInitialized = true;
+
+        install();
+    }
+
+    private void install() {
+        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_SETTINGS_INSTALLED)) {
+            return;
+        }
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_BIRTHDAY_TIMEOUT, "240");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_COIN_TIMEOUT, "30");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MAPCONTENT_TIMEOUT, "240");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MEDIAMIRROR_TIMEOUT, "30");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MENU_TIMEOUT, "120");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MOVIE_TIMEOUT, "60");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_SCHEDULE_TIMEOUT, "60");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_SECURITY_TIMEOUT, "15");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_SHOPPING_TIMEOUT, "60");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_TEMPERATURE_TIMEOUT, "15");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_WEATHER_TIMEOUT, "5");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT, "15");
+
+        _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED, true);
     }
 
     public LucaUser GetUser() {
@@ -340,5 +367,13 @@ public class SettingsController {
     public int GetReloadWirelessSocketTimeout() {
         String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT);
         return Integer.parseInt(stringValue);
+    }
+
+    public void SetCoinHoursTrend(int hours) {
+        _sharedPrefController.SaveIntegerValue(PREF_COIN_HOURS_TREND, hours);
+    }
+
+    public int GetCoinHoursTrend() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_COIN_HOURS_TREND);
     }
 }

@@ -167,6 +167,10 @@
     <!-- Settings for User -->
     <string name="pref_header_wireless_socket">Wireless socket</string>
 
+    <!-- Settings for coins -->
+    <string name="pref_header_coins">Coins</string>
+    <string name="pref_title_enter_coin_hour_trend">Enter hours for trend</string>
+
     <!-- Title for activities -->
     <string name="title_activity_wireless_socket">Wireless Sockets</string>
     <string name="title_activity_wireless_socket_edit">Edit Wireless Sockets</string>

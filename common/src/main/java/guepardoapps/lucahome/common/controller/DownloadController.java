@@ -22,7 +22,7 @@ import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinis
 public class DownloadController {
     public enum DownloadType implements Serializable {
         Birthday, BirthdayAdd, BirthdayUpdate, BirthdayDelete,
-        CoinConversion, Coin, CoinAdd, CoinUpdate, CoinDelete,
+        CoinConversion, Coin, CoinAdd, CoinUpdate, CoinDelete, CoinAggregate,
         MapContent,
         ListedMenu,
         Menu, MenuUpdate, MenuClear,
@@ -43,11 +43,13 @@ public class DownloadController {
     public static class DownloadFinishedBroadcastContent extends ObjectChangeFinishedContent {
         public DownloadType CurrentDownloadType;
         public DownloadState FinalDownloadState;
+        public Serializable Additional;
 
-        public DownloadFinishedBroadcastContent(@NonNull byte[] response, boolean success, @NonNull DownloadType currentDownloadType, @NonNull DownloadState finalDownloadState) {
+        public DownloadFinishedBroadcastContent(@NonNull byte[] response, boolean success, @NonNull DownloadType currentDownloadType, @NonNull DownloadState finalDownloadState, Serializable additional) {
             super(success, response);
             CurrentDownloadType = currentDownloadType;
             FinalDownloadState = finalDownloadState;
+            Additional = additional;
         }
     }
 
@@ -70,31 +72,24 @@ public class DownloadController {
         _settingsController = SettingsController.getInstance();
     }
 
+    public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork, Serializable additional) {
+        _logger.Debug("SendCommandToWebsiteAsync");
+
+        if (!canSendAction(downloadType, needsHomeNetwork, requestUrl, additional)) {
+            return;
+        }
+
+        SendActionTask task = new SendActionTask();
+        task.DownloadSuccess = false;
+        task.CurrentDownloadType = downloadType;
+        task.Additional = additional;
+        task.execute(requestUrl);
+    }
+
     public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork) {
         _logger.Debug("SendCommandToWebsiteAsync");
 
-        if (!_networkController.IsNetworkAvailable()) {
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("No network!"), false, downloadType, DownloadState.NoNetwork));
-            return;
-        }
-
-        if (needsHomeNetwork && !_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("No home network!"), false, downloadType, DownloadState.NoHomeNetwork));
-            return;
-        }
-
-        if (requestUrl.length() < 15) {
-            _logger.Error("Invalid requestUrl length!");
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("ERROR: Invalid requestUrl length!"), false, downloadType, DownloadState.InvalidUrl));
+        if (!canSendAction(downloadType, needsHomeNetwork, requestUrl, null)) {
             return;
         }
 
@@ -104,13 +99,43 @@ public class DownloadController {
         task.execute(requestUrl);
     }
 
+    private boolean canSendAction(@NonNull DownloadType downloadType, boolean needsHomeNetwork, @NonNull String requestUrl, Serializable additional) {
+        if (!_networkController.IsNetworkAvailable()) {
+            _broadcastController.SendSerializableBroadcast(
+                    DownloadFinishedBroadcast,
+                    DownloadFinishedBundle,
+                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("No network!"), false, downloadType, DownloadState.NoNetwork, additional));
+            return false;
+        }
+
+        if (needsHomeNetwork && !_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            _broadcastController.SendSerializableBroadcast(
+                    DownloadFinishedBroadcast,
+                    DownloadFinishedBundle,
+                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("No home network!"), false, downloadType, DownloadState.NoHomeNetwork, additional));
+            return false;
+        }
+
+        if (requestUrl.length() < 15) {
+            _logger.Error("Invalid requestUrl length!");
+            _broadcastController.SendSerializableBroadcast(
+                    DownloadFinishedBroadcast,
+                    DownloadFinishedBundle,
+                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("ERROR: Invalid requestUrl length!"), false, downloadType, DownloadState.InvalidUrl, additional));
+            return false;
+        }
+
+        return true;
+    }
+
     private class SendActionTask extends AsyncTask<String, Void, String> {
         boolean DownloadSuccess;
         public DownloadType CurrentDownloadType;
+        Serializable Additional;
 
         @Override
         protected String doInBackground(String... actions) {
-            String result = "";
+            StringBuilder result = new StringBuilder();
             for (String action : actions) {
                 try {
                     _logger.Information("action: " + action);
@@ -125,7 +150,7 @@ public class DownloadController {
 
                     String line;
                     while ((line = reader.readLine()) != null) {
-                        result += line;
+                        result.append(line);
                     }
 
                     reader.close();
@@ -139,7 +164,7 @@ public class DownloadController {
                 }
             }
 
-            return result;
+            return result.toString();
         }
 
         @Override
@@ -147,12 +172,11 @@ public class DownloadController {
             _logger.Debug(String.format(Locale.getDefault(), "onPostExecute: Length of result is %d and result itself is %s", result.length(), result));
 
             byte[] byteArray = Tools.CompressStringToByteArray(result);
-            _logger.Debug(String.format(Locale.getDefault(), "onPostExecute: Length of byteArray is %d and byteArray itself is %s", byteArray.length, byteArray));
 
             _broadcastController.SendSerializableBroadcast(
                     DownloadFinishedBroadcast,
                     DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(byteArray, DownloadSuccess, CurrentDownloadType, DownloadState.Success));
+                    new DownloadFinishedBroadcastContent(byteArray, DownloadSuccess, CurrentDownloadType, DownloadState.Success, Additional));
         }
 
         @Override
@@ -160,7 +184,7 @@ public class DownloadController {
             _broadcastController.SendSerializableBroadcast(
                     DownloadFinishedBroadcast,
                     DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("Canceled!"), false, CurrentDownloadType, DownloadState.Canceled));
+                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("Canceled!"), false, CurrentDownloadType, DownloadState.Canceled, Additional));
         }
     }
 }
