@@ -12,7 +12,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -20,6 +19,7 @@ import android.widget.TextView;
 import com.baoyz.widget.PullRefreshLayout;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
+import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
@@ -173,35 +173,22 @@ public class MainActivity extends AppCompatActivity {
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
         _pullRefreshLayout = findViewById(R.id.skeletonList_pullRefreshLayout_main);
-        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                _logger.Debug("onRefresh " + TAG);
+        _pullRefreshLayout.setOnRefreshListener(() -> {
+            _logger.Debug("onRefresh " + TAG);
 
-                _listView.setVisibility(View.GONE);
-                _progressBar.setVisibility(View.VISIBLE);
+            _listView.setVisibility(View.GONE);
+            _progressBar.setVisibility(View.VISIBLE);
 
-                _mainServiceBinder.StartDownloadAll("pullRefreshLayout setOnRefreshListener");
-            }
+            _mainServiceBinder.StartDownloadAll("pullRefreshLayout setOnRefreshListener");
         });
 
-        ImageButton imageButtonSettings = findViewById(R.id.image_button_settings);
-        imageButtonSettings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                _navigationService.NavigateToActivity(MainActivity.this, SettingsActivity.class);
-            }
-        });
+        FloatingActionButton imageButtonSettings = findViewById(R.id.floating_action_button_settings);
+        imageButtonSettings.setOnClickListener(view -> _navigationService.NavigateToActivity(MainActivity.this, SettingsActivity.class));
 
-        ImageButton imageButtonAbout = findViewById(R.id.image_button_about);
-        imageButtonAbout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new LibsBuilder()
-                        .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
-                        .start(MainActivity.this);
-            }
-        });
+        FloatingActionButton imageButtonAbout = findViewById(R.id.floating_action_button_about);
+        imageButtonAbout.setOnClickListener(view -> new LibsBuilder()
+                .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                .start(MainActivity.this));
     }
 
     @Override

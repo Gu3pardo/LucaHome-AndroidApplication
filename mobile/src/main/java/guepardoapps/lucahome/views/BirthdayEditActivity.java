@@ -122,12 +122,9 @@ public class BirthdayEditActivity extends AppCompatActivity {
             }
         });
 
-        birthdayEditDatePicker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
+        birthdayEditDatePicker.setOnClickListener(view -> {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
         });
 
         if (_birthdayDto != null) {
@@ -138,50 +135,54 @@ public class BirthdayEditActivity extends AppCompatActivity {
         }
 
         _saveButton.setEnabled(false);
-        _saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                birthdayEditTextView.setError(null);
-                boolean cancel = false;
-                View focusView = null;
+        _saveButton.setOnClickListener(view -> {
+            birthdayEditTextView.setError(null);
+            boolean cancel = false;
+            View focusView = null;
 
-                if (!_propertyChanged) {
-                    birthdayEditTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = birthdayEditTextView;
-                    cancel = true;
-                }
+            if (!_propertyChanged) {
+                birthdayEditTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = birthdayEditTextView;
+                cancel = true;
+            }
 
-                String birthdayName = birthdayEditTextView.getText().toString();
+            String birthdayName = birthdayEditTextView.getText().toString();
 
-                if (TextUtils.isEmpty(birthdayName)) {
-                    birthdayEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = birthdayEditTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(birthdayName)) {
+                birthdayEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = birthdayEditTextView;
+                cancel = true;
+            }
 
-                int dayOfMonth = birthdayEditDatePicker.getDayOfMonth();
-                int month = birthdayEditDatePicker.getMonth();
-                int year = birthdayEditDatePicker.getYear();
+            int dayOfMonth = birthdayEditDatePicker.getDayOfMonth();
+            int month = birthdayEditDatePicker.getMonth();
+            int year = birthdayEditDatePicker.getYear();
 
-                SerializableDate birthdayDate = new SerializableDate(year, month, dayOfMonth);
-                if (birthdayDate.isAfterNow()) {
-                    birthdayEditTextView.setError(createErrorText(getString(R.string.error_field_invalid_date)));
-                    focusView = birthdayEditDatePicker;
-                    cancel = true;
-                }
+            SerializableDate birthdayDate = new SerializableDate(year, month, dayOfMonth);
+            if (birthdayDate.isAfterNow()) {
+                birthdayEditTextView.setError(createErrorText(getString(R.string.error_field_invalid_date)));
+                focusView = birthdayEditDatePicker;
+                cancel = true;
+            }
 
-                if (cancel) {
-                    focusView.requestFocus();
-                } else {
-                    if (_birthdayDto.GetAction() == BirthdayDto.Action.Add) {
-                        _birthdayService.AddBirthday(new LucaBirthday(-1, birthdayName, birthdayDate, null));
-                        _saveButton.setEnabled(false);
-                    } else if (_birthdayDto.GetAction() == BirthdayDto.Action.Update) {
-                        _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, null));
-                        _saveButton.setEnabled(false);
-                    } else {
-                        birthdayEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _birthdayDto.GetAction())));
+            if (cancel) {
+                focusView.requestFocus();
+            } else {
+                if (_birthdayDto.GetAction() == BirthdayDto.Action.Add) {
+                    int lastHighestId = 0;
+
+                    int dataListSize = _birthdayService.GetDataList().getSize();
+                    if (dataListSize > 0) {
+                        lastHighestId = _birthdayService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
+
+                    _birthdayService.AddBirthday(new LucaBirthday(lastHighestId, birthdayName, birthdayDate, null));
+                    _saveButton.setEnabled(false);
+                } else if (_birthdayDto.GetAction() == BirthdayDto.Action.Update) {
+                    _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, null));
+                    _saveButton.setEnabled(false);
+                } else {
+                    birthdayEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _birthdayDto.GetAction())));
                 }
             }
         });
@@ -248,14 +249,11 @@ public class BirthdayEditActivity extends AppCompatActivity {
                 .success()
                 .show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NavigationService.NavigationResult navigationResult = _navigationService.GoBack(BirthdayEditActivity.this);
-                if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
-                }
+        new Handler().postDelayed(() -> {
+            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(BirthdayEditActivity.this);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);
     }

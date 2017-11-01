@@ -27,9 +27,9 @@ import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinis
 
 public class MapContentService implements IDataService {
     public static class MapContentDownloadFinishedContent extends ObjectChangeFinishedContent {
-        public SerializableList<MapContent> MapContentList;
+        SerializableList<MapContent> MapContentList;
 
-        public MapContentDownloadFinishedContent(SerializableList<MapContent> mapContentList, boolean succcess, @NonNull byte[] response) {
+        MapContentDownloadFinishedContent(SerializableList<MapContent> mapContentList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             MapContentList = mapContentList;
         }

@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -49,20 +48,12 @@ public class ScheduleListViewAdapter extends BaseAdapter {
                     .applyStyle(_isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
                     .setCancelable(true);
 
-            deleteDialog.positiveActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    _scheduleService.DeleteSchedule(schedule);
-                    deleteDialog.dismiss();
-                }
+            deleteDialog.positiveActionClickListener(view -> {
+                _scheduleService.DeleteSchedule(schedule);
+                deleteDialog.dismiss();
             });
 
-            deleteDialog.negativeActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deleteDialog.dismiss();
-                }
-            });
+            deleteDialog.negativeActionClickListener(view -> deleteDialog.dismiss());
 
             deleteDialog.show();
         }
@@ -131,28 +122,15 @@ public class ScheduleListViewAdapter extends BaseAdapter {
         holder._socketActionText.setText(schedule.GetAction().toString());
 
         holder._cardSwitch.setChecked(schedule.IsActive());
-        holder._cardSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean value) {
-                _scheduleService.SetScheduleState(schedule, value);
-            }
+        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, value) -> _scheduleService.SetScheduleState(schedule, value));
+
+        holder._updateButton.setOnClickListener(view -> {
+            Bundle data = new Bundle();
+            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(schedule.GetId(), schedule.GetName(), schedule.GetSocket(), schedule.GetWeekday(), schedule.GetTime(), schedule.GetAction(), ScheduleDto.Action.Update));
+            _navigationService.NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
         });
 
-        holder._updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle data = new Bundle();
-                data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(schedule.GetId(), schedule.GetName(), schedule.GetSocket(), schedule.GetWeekday(), schedule.GetTime(), schedule.GetAction(), ScheduleDto.Action.Update));
-                _navigationService.NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
-            }
-        });
-
-        holder._deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.displayDeleteDialog(schedule);
-            }
-        });
+        holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(schedule));
 
         return rowView;
     }

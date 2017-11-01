@@ -218,7 +218,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout_mediamirror);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view_mediamirror);
@@ -412,80 +412,68 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
     private void setUpYoutubeMediaMirrorUi() {
         _logger.Debug("setUpYoutubeMediaMirrorUi");
 
-        _youtubeIdSelectionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                displayYoutubeIdSelectionDialog();
+        _youtubeIdSelectionButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            displayYoutubeIdSelectionDialog();
         });
 
-        _youtubePlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _youtubePlayButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
 
-        _youtubePauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.PAUSE_YOUTUBE_VIDEO.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _youtubePauseButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.PAUSE_YOUTUBE_VIDEO.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
 
-        _youtubeStopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.STOP_YOUTUBE_VIDEO.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _youtubeStopButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.STOP_YOUTUBE_VIDEO.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
 
         _youtubePlayPositionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -523,32 +511,29 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
         });
         _youtubePlayPositionSeekBar.setVisibility(View.GONE);
 
-        _sleepTimerButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
+        _sleepTimerButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
+            }
 
-                if (_mediaMirrorData.IsSleepTimerEnabled()) {
-                    _mediaMirrorService.SendCommand(
-                            _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                            MediaServerAction.STOP_SEA_SOUND.toString(),
-                            "");
-                } else {
-                    _mediaMirrorService.SendCommand(
-                            _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                            MediaServerAction.PLAY_SEA_SOUND.toString(),
-                            "");
-                }
-
+            if (_mediaMirrorData.IsSleepTimerEnabled()) {
                 _mediaMirrorService.SendCommand(
                         _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                        MediaServerAction.STOP_SEA_SOUND.toString(),
+                        "");
+            } else {
+                _mediaMirrorService.SendCommand(
+                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                        MediaServerAction.PLAY_SEA_SOUND.toString(),
                         "");
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
         _sleepTimerButton.setVisibility(View.GONE);
         _sleepTimerButton.setEnabled(false);
@@ -647,46 +632,40 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
             }
         });
 
-        _radioStreamPlayButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.PLAY_RADIO_STREAM.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _radioStreamPlayButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.PLAY_RADIO_STREAM.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
 
-        _radioStreamStopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.STOP_RADIO_STREAM.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _radioStreamStopButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.STOP_RADIO_STREAM.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
     }
 
@@ -703,46 +682,40 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
     private void setUpVolumeUi() {
         _logger.Debug("setUpVolumeUi");
 
-        _volumeIncreaseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.INCREASE_VOLUME.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _volumeIncreaseButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.INCREASE_VOLUME.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
 
-        _volumeDecreaseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.DECREASE_VOLUME.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _volumeDecreaseButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.DECREASE_VOLUME.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
     }
 
@@ -796,78 +769,69 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
     private void setUpEditTextUi() {
         _logger.Debug("setUpEditTextUi");
 
-        _sendTextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                String sendText = _editText.getText().toString();
-                if (sendText.length() < 1 || sendText.length() > 500) {
-                    _logger.Error("sendText is null!");
-                    displayErrorSnackBar("sendText is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.SHOW_CENTER_TEXT.toString(),
-                        sendText);
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _sendTextButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            String sendText = _editText.getText().toString();
+            if (sendText.length() < 1 || sendText.length() > 500) {
+                _logger.Error("sendText is null!");
+                displayErrorSnackBar("sendText is null!");
+                return;
+            }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.SHOW_CENTER_TEXT.toString(),
+                    sendText);
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
     }
 
     private void setUpBrightnessUi() {
         _logger.Debug("setUpBrightnessUi");
 
-        _brightnessIncreaseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _brightnessIncreaseButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
 
-        _brightnessDecreaseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.DECREASE_SCREEN_BRIGHTNESS.toString(),
-                        "");
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
-                        "");
+        _brightnessDecreaseButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.DECREASE_SCREEN_BRIGHTNESS.toString(),
+                    "");
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.GET_MEDIAMIRROR_DTO.toString(),
+                    "");
         });
     }
 
@@ -878,100 +842,82 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
     private void setUpUpdateUi() {
         _logger.Debug("setUpBrightnessUi");
 
-        _updateCurrentWeatherButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.UPDATE_CURRENT_WEATHER.toString(),
-                        "");
+        _updateCurrentWeatherButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.UPDATE_CURRENT_WEATHER.toString(),
+                    "");
         });
 
-        _updateForecastWeatherButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.UPDATE_FORECAST_WEATHER.toString(),
-                        "");
+        _updateForecastWeatherButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.UPDATE_FORECAST_WEATHER.toString(),
+                    "");
         });
 
-        _updateTemperatureButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(),
-                        "");
+        _updateTemperatureButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(),
+                    "");
         });
 
-        _updateIpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.UPDATE_IP_ADDRESS.toString(),
-                        "");
+        _updateIpButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.UPDATE_IP_ADDRESS.toString(),
+                    "");
         });
 
-        _updateBirthdaysButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.UPDATE_BIRTHDAY_ALARM.toString(),
-                        "");
+        _updateBirthdaysButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.UPDATE_BIRTHDAY_ALARM.toString(),
+                    "");
         });
 
-        _updateCalendarButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                _mediaMirrorService.SendCommand(
-                        _mediaMirrorData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.UPDATE_CALENDAR_ALARM.toString(),
-                        "");
+        _updateCalendarButton.setOnClickListener(view -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            _mediaMirrorService.SendCommand(
+                    _mediaMirrorData.GetMediaServerSelection().GetIp(),
+                    MediaServerAction.UPDATE_CALENDAR_ALARM.toString(),
+                    "");
         });
     }
 
@@ -1009,12 +955,9 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
         final CheckBox playOnAllMirror = dialog.findViewById(R.id.dialog_select_youtube_play_on_all_mirror);
 
         ImageButton youtubeSearchButton = dialog.findViewById(R.id.dialog_enter_youtube_search_button);
-        youtubeSearchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-                displayYoutubeIdSearchDialog();
-            }
+        youtubeSearchButton.setOnClickListener(view -> {
+            dialog.dismiss();
+            displayYoutubeIdSearchDialog();
         });
 
         final EditText youtubeIdEditText = dialog.findViewById(R.id.dialog_enter_youtube_id_editText);
@@ -1062,30 +1005,27 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
         });
 
         Button btnPlay = dialog.findViewById(R.id.dialog_select_youtube_play);
-        btnPlay.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String youtubeId = youtubeIdEditText.getText().toString();
-                if (youtubeId.length() < 6) {
-                    Toasty.error(_context, "YoutubeId invalid!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-                youtubeId = youtubeId.replace(" ", "");
-
-                if (playOnAllMirror.isChecked()) {
-                    for (MediaServerSelection entry : MediaServerSelection.values()) {
-                        if (entry.GetId() > 0) {
-                            _mediaMirrorService.SendCommand(entry.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
-                        }
-                    }
-                } else {
-                    _mediaMirrorService.SendCommand(_mediaMirrorData.GetMediaServerSelection().GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
-                }
-
-                _mediaMirrorService.SendCommand(_mediaMirrorData.GetMediaServerSelection().GetIp(), MediaServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
-
-                dialog.dismiss();
+        btnPlay.setOnClickListener(view -> {
+            String youtubeId = youtubeIdEditText.getText().toString();
+            if (youtubeId.length() < 6) {
+                Toasty.error(_context, "YoutubeId invalid!", Toast.LENGTH_LONG).show();
+                return;
             }
+            youtubeId = youtubeId.replace(" ", "");
+
+            if (playOnAllMirror.isChecked()) {
+                for (MediaServerSelection entry : MediaServerSelection.values()) {
+                    if (entry.GetId() > 0) {
+                        _mediaMirrorService.SendCommand(entry.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                    }
+                }
+            } else {
+                _mediaMirrorService.SendCommand(_mediaMirrorData.GetMediaServerSelection().GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+            }
+
+            _mediaMirrorService.SendCommand(_mediaMirrorData.GetMediaServerSelection().GetIp(), MediaServerAction.GET_MEDIAMIRROR_DTO.toString(), "");
+
+            dialog.dismiss();
         });
 
         dialog.setCancelable(true);
@@ -1093,7 +1033,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setLayout(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             _logger.Warning("Window is null!");
         }
@@ -1114,25 +1054,22 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
         Button closeButton = dialog.findViewById(R.id.dialog_button_close);
         closeButton.setText("Search");
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (_mediaMirrorData == null) {
-                    _logger.Error("_mediaMirrorData is null!");
-                    displayErrorSnackBar("_mediaMirrorData is null!");
-                    return;
-                }
-
-                String input = inputEditText.getText().toString();
-
-                if (input.length() == 0) {
-                    _logger.Error("Input has invalid length 0!");
-                    Toasty.error(_context, "Input has invalid length 0!", Toast.LENGTH_LONG).show();
-                    return;
-                }
-
-                searchYoutubeVideos(_mediaMirrorData, input);
+        closeButton.setOnClickListener(v -> {
+            if (_mediaMirrorData == null) {
+                _logger.Error("_mediaMirrorData is null!");
+                displayErrorSnackBar("_mediaMirrorData is null!");
+                return;
             }
+
+            String input = inputEditText.getText().toString();
+
+            if (input.length() == 0) {
+                _logger.Error("Input has invalid length 0!");
+                Toasty.error(_context, "Input has invalid length 0!", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            searchYoutubeVideos(_mediaMirrorData, input);
         });
 
         dialog.setCancelable(true);
@@ -1140,7 +1077,7 @@ public class MediaMirrorActivity extends AppCompatActivity implements Navigation
 
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setLayout(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             _logger.Warning("Window is null!");
         }

@@ -6,7 +6,7 @@
         android:capitalize="words"
         android:defaultValue="@string/pref_default_coin_hour_trend"
         android:inputType="numberDecimal"
-        android:key="coin_hour_trend"
+        android:key="coin_hours_trend"
         android:maxLines="1"
         android:selectAllOnFocus="true"
         android:singleLine="true"

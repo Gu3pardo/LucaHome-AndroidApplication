@@ -33,9 +33,9 @@ import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinis
 
 public class CoinService implements IDataService {
     public static class CoinConversionDownloadFinishedContent extends ObjectChangeFinishedContent {
-        public SerializableList<SerializablePair<String, Double>> CoinConversionList;
+        SerializableList<SerializablePair<String, Double>> CoinConversionList;
 
-        public CoinConversionDownloadFinishedContent(SerializableList<SerializablePair<String, Double>> coinConversionList, boolean succcess, @NonNull byte[] response) {
+        CoinConversionDownloadFinishedContent(SerializableList<SerializablePair<String, Double>> coinConversionList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             CoinConversionList = coinConversionList;
         }
@@ -44,7 +44,7 @@ public class CoinService implements IDataService {
     public static class CoinDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Coin> CoinList;
 
-        public CoinDownloadFinishedContent(SerializableList<Coin> coinList, boolean succcess, @NonNull byte[] response) {
+        CoinDownloadFinishedContent(SerializableList<Coin> coinList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             CoinList = coinList;
         }

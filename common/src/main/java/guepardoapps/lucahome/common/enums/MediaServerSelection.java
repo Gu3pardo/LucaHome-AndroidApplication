@@ -65,15 +65,6 @@ public enum MediaServerSelection implements Serializable {
         return NULL;
     }
 
-    public static MediaServerSelection GetBySocket(String socket) {
-        for (MediaServerSelection e : values()) {
-            if (e._socket.contains(socket)) {
-                return e;
-            }
-        }
-        return NULL;
-    }
-
     public static MediaServerSelection GetByLocation(String location) {
         for (MediaServerSelection e : values()) {
             if (e._location.contains(location)) {

@@ -173,24 +173,21 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout_forecast_weather);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view_forecast_weather);
         navigationView.setNavigationItemSelectedListener(this);
 
         _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_forecast_weather);
-        _pullRefreshLayout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                _logger.Debug("onRefresh " + TAG);
+        _pullRefreshLayout.setOnRefreshListener(() -> {
+            _logger.Debug("onRefresh " + TAG);
 
-                _listView.setVisibility(View.GONE);
-                _progressBar.setVisibility(View.VISIBLE);
-                _searchField.setVisibility(View.INVISIBLE);
+            _listView.setVisibility(View.GONE);
+            _progressBar.setVisibility(View.VISIBLE);
+            _searchField.setVisibility(View.INVISIBLE);
 
-                _openWeatherService.LoadForecastWeather();
-            }
+            _openWeatherService.LoadForecastWeather();
         });
     }
 

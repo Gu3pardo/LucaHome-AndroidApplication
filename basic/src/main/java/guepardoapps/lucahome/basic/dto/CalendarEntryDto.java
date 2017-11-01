@@ -64,12 +64,7 @@ public class CalendarEntryDto implements Serializable {
         Date now = calendar.getTime();
         _logger.Debug("Now is " + now.toGMTString());
 
-        if (_begin.getDay() == now.getDay() && _begin.getMonth() == now.getMonth()
-                && _begin.getYear() == now.getYear()) {
-            return true;
-        }
-
-        return false;
+        return _begin.getDay() == now.getDay() && _begin.getMonth() == now.getMonth() && _begin.getYear() == now.getYear();
     }
 
     @SuppressWarnings("deprecation")

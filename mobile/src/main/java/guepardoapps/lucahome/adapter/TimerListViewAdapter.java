@@ -41,20 +41,12 @@ public class TimerListViewAdapter extends BaseAdapter {
                     .applyStyle(_isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
                     .setCancelable(true);
 
-            deleteDialog.positiveActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    _scheduleService.DeleteTimer(timer);
-                    deleteDialog.dismiss();
-                }
+            deleteDialog.positiveActionClickListener(view -> {
+                _scheduleService.DeleteTimer(timer);
+                deleteDialog.dismiss();
             });
 
-            deleteDialog.negativeActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deleteDialog.dismiss();
-                }
-            });
+            deleteDialog.negativeActionClickListener(view -> deleteDialog.dismiss());
 
             deleteDialog.show();
         }
@@ -118,12 +110,7 @@ public class TimerListViewAdapter extends BaseAdapter {
         holder._socketText.setText(timer.GetSocket().GetName());
         holder._socketActionText.setText(timer.GetAction().toString());
 
-        holder._deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.displayDeleteDialog(timer);
-            }
-        });
+        holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(timer));
 
         return rowView;
     }

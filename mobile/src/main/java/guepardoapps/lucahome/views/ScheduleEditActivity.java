@@ -186,50 +186,54 @@ public class ScheduleEditActivity extends AppCompatActivity {
         }
 
         _saveButton.setEnabled(false);
-        _saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                scheduleNameEditTextView.setError(null);
-                boolean cancel = false;
-                View focusView = null;
+        _saveButton.setOnClickListener(view -> {
+            scheduleNameEditTextView.setError(null);
+            boolean cancel = false;
+            View focusView = null;
 
-                if (!_propertyChanged) {
-                    scheduleNameEditTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = scheduleNameEditTextView;
-                    cancel = true;
-                }
+            if (!_propertyChanged) {
+                scheduleNameEditTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = scheduleNameEditTextView;
+                cancel = true;
+            }
 
-                String scheduleName = scheduleNameEditTextView.getText().toString();
+            String scheduleName = scheduleNameEditTextView.getText().toString();
 
-                if (TextUtils.isEmpty(scheduleName)) {
-                    scheduleNameEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = scheduleNameEditTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(scheduleName)) {
+                scheduleNameEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = scheduleNameEditTextView;
+                cancel = true;
+            }
 
-                int socketId = scheduleSocketSelect.getSelectedItemPosition();
-                WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
+            int socketId = scheduleSocketSelect.getSelectedItemPosition();
+            WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
 
-                int weekdayId = scheduleWeekdaySelect.getSelectedItemPosition();
-                Weekday weekday = Weekday.GetById(weekdayId);
+            int weekdayId = scheduleWeekdaySelect.getSelectedItemPosition();
+            Weekday weekday = Weekday.GetById(weekdayId);
 
-                SerializableTime time = new SerializableTime(scheduleTimePicker.getCurrentHour(), scheduleTimePicker.getCurrentMinute(), 0, 0);
+            SerializableTime time = new SerializableTime(scheduleTimePicker.getCurrentHour(), scheduleTimePicker.getCurrentMinute(), 0, 0);
 
-                int socketActionId = scheduleActionSelect.getSelectedItemPosition();
-                SocketAction socketAction = SocketAction.GetById(socketActionId);
+            int socketActionId = scheduleActionSelect.getSelectedItemPosition();
+            SocketAction socketAction = SocketAction.GetById(socketActionId);
 
-                if (cancel) {
-                    focusView.requestFocus();
-                } else {
-                    if (_scheduleDto.GetAction() == ScheduleDto.Action.Add) {
-                        _scheduleService.AddSchedule(new Schedule(-1, scheduleName, wirelessSocket, weekday, time, socketAction, true));
-                        _saveButton.setEnabled(false);
-                    } else if (_scheduleDto.GetAction() == ScheduleDto.Action.Update) {
-                        _scheduleService.UpdateSchedule(new Schedule(_scheduleDto.GetId(), scheduleName, wirelessSocket, weekday, time, socketAction, true));
-                        _saveButton.setEnabled(false);
-                    } else {
-                        scheduleNameEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _scheduleDto.GetAction())));
+            if (cancel) {
+                focusView.requestFocus();
+            } else {
+                if (_scheduleDto.GetAction() == ScheduleDto.Action.Add) {
+                    int lastHighestId = 0;
+
+                    int dataListSize = _scheduleService.GetDataList().getSize();
+                    if (dataListSize > 0) {
+                        lastHighestId = _scheduleService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
+
+                    _scheduleService.AddSchedule(new Schedule(lastHighestId, scheduleName, wirelessSocket, weekday, time, socketAction, true));
+                    _saveButton.setEnabled(false);
+                } else if (_scheduleDto.GetAction() == ScheduleDto.Action.Update) {
+                    _scheduleService.UpdateSchedule(new Schedule(_scheduleDto.GetId(), scheduleName, wirelessSocket, weekday, time, socketAction, true));
+                    _saveButton.setEnabled(false);
+                } else {
+                    scheduleNameEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _scheduleDto.GetAction())));
                 }
             }
         });
@@ -296,14 +300,11 @@ public class ScheduleEditActivity extends AppCompatActivity {
                 .success()
                 .show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ScheduleEditActivity.this);
-                if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
-                }
+        new Handler().postDelayed(() -> {
+            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ScheduleEditActivity.this);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);
     }

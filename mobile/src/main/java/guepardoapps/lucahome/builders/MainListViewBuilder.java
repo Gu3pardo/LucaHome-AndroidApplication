@@ -77,167 +77,92 @@ public class MainListViewBuilder {
 
         MainListViewItem birthdayItem = new MainListViewItem(
                 "Birthdays", "Who's next for birthday", R.drawable.main_image_birthday,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(BirthdayActivity.class);
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        Bundle data = new Bundle();
-                        data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(-1, "", new SerializableDate(), BirthdayDto.Action.Add));
-                        navigateWithDataTo(BirthdayEditActivity.class, data);
-                    }
+                () -> navigateTo(BirthdayActivity.class),
+                () -> {
+                    Bundle data = new Bundle();
+                    data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(-1, "", new SerializableDate(), BirthdayDto.Action.Add));
+                    navigateWithDataTo(BirthdayEditActivity.class, data);
                 },
                 MainListViewItem.Type.Birthday
         );
 
         MainListViewItem coinItem = new MainListViewItem(
                 "Coins", "Watch your coins", R.drawable.main_image_coins,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(CoinActivity.class);
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        Bundle data = new Bundle();
-                        data.putSerializable(CoinService.CoinIntent, new CoinDto(-1, "", "", -1, CoinDto.Action.Add));
-                        navigateWithDataTo(CoinEditActivity.class, data);
-                    }
+                () -> navigateTo(CoinActivity.class),
+                () -> {
+                    Bundle data = new Bundle();
+                    data.putSerializable(CoinService.CoinIntent, new CoinDto(-1, "", "", -1, CoinDto.Action.Add));
+                    navigateWithDataTo(CoinEditActivity.class, data);
                 },
                 MainListViewItem.Type.Coin
         );
 
         MainListViewItem mediaMirrorItem = new MainListViewItem(
                 "MediaMirror", "Control your local media mirror", R.drawable.main_image_mediamirror,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(MediaMirrorActivity.class);
-                    }
-                },
+                () -> navigateTo(MediaMirrorActivity.class),
                 MainListViewItem.Type.MediaMirror
         );
 
         MainListViewItem menuItem = new MainListViewItem(
                 "Menu", "Plan your meals for the week", R.drawable.main_image_menu,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(MenuActivity.class);
-                    }
-                },
+                () -> navigateTo(MenuActivity.class),
                 MainListViewItem.Type.Menu
         );
 
         MainListViewItem movieItem = new MainListViewItem(
                 "Movies", "Want to watch some blockbuster?", R.drawable.main_image_movies,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(MovieActivity.class);
-                    }
-                },
+                () -> navigateTo(MovieActivity.class),
                 MainListViewItem.Type.Movie
         );
 
         MainListViewItem scheduleItem = new MainListViewItem(
                 "Schedules", "Manage sockets using schedules", R.drawable.main_image_schedule,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(ScheduleActivity.class);
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        Bundle data = new Bundle();
-                        data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(-1, "", null, null, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
-                        navigateWithDataTo(ScheduleEditActivity.class, data);
-                    }
+                () -> navigateTo(ScheduleActivity.class),
+                () -> {
+                    Bundle data = new Bundle();
+                    data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(-1, "", null, null, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
+                    navigateWithDataTo(ScheduleEditActivity.class, data);
                 },
                 MainListViewItem.Type.Schedule
         );
 
         MainListViewItem securityItem = new MainListViewItem(
                 "Security", "Secure your living room", R.drawable.main_image_security,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(SecurityActivity.class);
-                    }
-                },
+                () -> navigateTo(SecurityActivity.class),
                 MainListViewItem.Type.Security
         );
 
         MainListViewItem shoppingItem = new MainListViewItem(
                 "Shopping List", "What do we need to buy?", R.drawable.main_image_shopping,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(ShoppingListActivity.class);
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        Bundle data = new Bundle();
-                        data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1));
-                        navigateWithDataTo(ShoppingListEditActivity.class, data);
-                    }
+                () -> navigateTo(ShoppingListActivity.class),
+                () -> {
+                    Bundle data = new Bundle();
+                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1));
+                    navigateWithDataTo(ShoppingListEditActivity.class, data);
                 },
                 MainListViewItem.Type.Shopping
         );
 
         MainListViewItem timerItem = new MainListViewItem(
                 "Timer", "Manage sockets using timer", R.drawable.main_image_timer,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(TimerActivity.class);
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(TimerEditActivity.class);
-                    }
-                },
+                () -> navigateTo(TimerActivity.class),
+                () -> navigateTo(TimerEditActivity.class),
                 MainListViewItem.Type.Timer
         );
 
         MainListViewItem weatherItem = new MainListViewItem(
                 "Weather", "Get your weather for the next days", R.drawable.weather_wallpaper_dummy,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(ForecastWeatherActivity.class);
-                    }
-                },
+                () -> navigateTo(ForecastWeatherActivity.class),
                 MainListViewItem.Type.Weather
         );
 
         MainListViewItem wirelessSocketItem = new MainListViewItem(
                 "Sockets", "Control your sockets", R.drawable.main_image_sockets,
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        navigateTo(WirelessSocketActivity.class);
-                    }
-                },
-                new Runnable() {
-                    @Override
-                    public void run() {
-                        Bundle data = new Bundle();
-                        data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(-1, "", "", "", false, WirelessSocketDto.Action.Add));
-                        navigateWithDataTo(WirelessSocketEditActivity.class, data);
-                    }
+                () -> navigateTo(WirelessSocketActivity.class),
+                () -> {
+                    Bundle data = new Bundle();
+                    data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(-1, "", "", "", false, WirelessSocketDto.Action.Add));
+                    navigateWithDataTo(WirelessSocketEditActivity.class, data);
                 },
                 true, MainListViewItem.Type.WirelessSocket
         );

@@ -8,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -83,34 +82,18 @@ public class ShoppingListViewAdapter extends BaseAdapter {
         holder._groupImageView.setImageResource(shoppingEntry.GetGroup().GetDrawable());
 
         holder._boughtCheckbox.setChecked(shoppingEntry.GetBought());
-        holder._boughtCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
-                _shoppingListService.GetDataList().getValue(index).SetBought(checked);
-            }
+        holder._boughtCheckbox.setOnCheckedChangeListener((compoundButton, checked) -> _shoppingListService.GetDataList().getValue(index).SetBought(checked));
+
+        holder._increaseButton.setOnClickListener(view -> {
+            shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() + 1);
+            _shoppingListService.UpdateShoppingEntry(shoppingEntry);
+        });
+        holder._decreaseButton.setOnClickListener(view -> {
+            shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() - 1);
+            _shoppingListService.UpdateShoppingEntry(shoppingEntry);
         });
 
-        holder._increaseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() + 1);
-                _shoppingListService.UpdateShoppingEntry(shoppingEntry);
-            }
-        });
-        holder._decreaseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() - 1);
-                _shoppingListService.UpdateShoppingEntry(shoppingEntry);
-            }
-        });
-
-        holder._deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                _shoppingListService.DeleteShoppingEntry(shoppingEntry);
-            }
-        });
+        holder._deleteButton.setOnClickListener(view -> _shoppingListService.DeleteShoppingEntry(shoppingEntry));
 
         return rowView;
     }

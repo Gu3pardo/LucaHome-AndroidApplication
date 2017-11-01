@@ -4,17 +4,18 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializablePair;
-import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public class JsonDataToCoinConversionConverter implements IJsonDataConverter {
-    private static final String TAG = JsonDataToCoinConversionConverter.class.getSimpleName();
-    private Logger _logger;
+    private static final int KEY_INDEX = 0;
+    private static final int VALUE_INDEX = 2;
 
-    public JsonDataToCoinConversionConverter() {
-        _logger = new Logger(TAG);
-    }
+    private static final String STRING_SPLIT_REGEX = "\\},";
+    private static final String DATA_SPLIT_REGEX = ":";
+
+    private static final String[] REPLACE_VALUES = {"},", "{", "}}"};
+    private static final String REPLACEMENT = "";
 
     @Override
     public SerializableList<?> GetList(@NonNull String[] stringArray) {
@@ -31,17 +32,31 @@ public class JsonDataToCoinConversionConverter implements IJsonDataConverter {
         return parseStringToList(responseString);
     }
 
-    private SerializableList<SerializablePair<String, Double>> parseStringToList(@NonNull String jsonValue) {
+    private static SerializableList<SerializablePair<String, Double>> parseStringToList(@NonNull String jsonValue) {
         SerializableList<SerializablePair<String, Double>> list = new SerializableList<>();
 
-        String[] entries = jsonValue.split("\\},");
-        for (int index = 0; index < entries.length; index++) {
-            String entry = entries[index];
-            String replacedEntry = entry.replace("},", "").replace("{", "").replace("}}", "");
-            String[] data = replacedEntry.split(":");
+        if (jsonValue.length() == 0) {
+            return list;
+        }
 
-            String key = data[0].replace("\"", "");
-            String valueString = data[2];
+        String[] entries = jsonValue.split(STRING_SPLIT_REGEX);
+
+        for (String entry : entries) {
+            String replacedEntry = entry;
+
+            for (String replaceValue : REPLACE_VALUES) {
+                replacedEntry = replacedEntry.replace(replaceValue, REPLACEMENT);
+            }
+
+            String[] data = replacedEntry.split(DATA_SPLIT_REGEX);
+
+            if (data.length != 3) {
+                break;
+            }
+
+            String key = data[KEY_INDEX].replace("\"", REPLACEMENT);
+
+            String valueString = data[VALUE_INDEX];
             double value = Double.parseDouble(valueString);
 
             SerializablePair<String, Double> newValue = new SerializablePair<>(key, value);

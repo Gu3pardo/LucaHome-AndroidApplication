@@ -18,7 +18,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
@@ -43,7 +42,6 @@ import guepardoapps.lucahome.common.service.TemperatureService;
 import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
-import guepardoapps.lucahome.service.NavigationService;
 
 import java.util.List;
 import java.util.Locale;
@@ -67,7 +65,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static SharedPrefController _sharedPrefController;
     private static SettingsController _settingsController;
 
-    private NavigationService _navigationService;
+    //private NavigationService _navigationService;
 
     private static BirthdayService _birthdayService;
     private static CoinService _coinService;
@@ -154,8 +152,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     preference.setSummary((String) value);
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_COIN_HOURS_TREND)) {
-                    _coinService.SetCoinHoursTrend((int) value);
-                    preference.setSummary((int) value);
+                    int integerValue = Integer.parseInt((String) value);
+                    _coinService.SetCoinHoursTrend(integerValue);
+                    preference.setSummary((String) value);
                 }
 
             } else {
@@ -309,7 +308,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         _settingsController = SettingsController.getInstance();
         _sharedPrefController = new SharedPrefController(this);
 
-        _navigationService = NavigationService.getInstance();
+        //_navigationService = NavigationService.getInstance();
 
         _birthdayService = BirthdayService.getInstance();
         _coinService = CoinService.getInstance();
@@ -389,7 +388,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         loadHeadersFromResource(R.xml.pref_headers, target);
     }
 
-    @Override
+    /*@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         _logger.Debug(String.format("onKeyDown: keyCode: %s | event: %s", keyCode, event));
 
@@ -399,7 +398,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
 
         return super.onKeyDown(keyCode, event);
-    }
+    }*/
 
     /**
      * This method stops fragment injection in malicious applications.
@@ -412,7 +411,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 || NotificationPreferenceFragment.class.getName().equals(fragmentName)
                 || ReloadPreferenceFragment.class.getName().equals(fragmentName)
                 || OpenWeatherPreferenceFragment.class.getName().equals(fragmentName)
-                || WirelessSocketPreferenceFragment.class.getName().equals(fragmentName);
+                || WirelessSocketPreferenceFragment.class.getName().equals(fragmentName)
+                || CoinPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**

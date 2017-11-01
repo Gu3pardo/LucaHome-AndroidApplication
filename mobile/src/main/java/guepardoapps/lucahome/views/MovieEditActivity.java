@@ -123,51 +123,48 @@ public class MovieEditActivity extends AppCompatActivity {
         }
 
         _saveButton.setEnabled(false);
-        _saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                movieTitleTypeTextView.setError(null);
-                movieGenreTypeTextView.setError(null);
-                movieDescriptionTypeTextView.setError(null);
-                boolean cancel = false;
-                View focusView = null;
+        _saveButton.setOnClickListener(view -> {
+            movieTitleTypeTextView.setError(null);
+            movieGenreTypeTextView.setError(null);
+            movieDescriptionTypeTextView.setError(null);
+            boolean cancel = false;
+            View focusView = null;
 
-                if (!_propertyChanged) {
-                    movieTitleTypeTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = movieTitleTypeTextView;
-                    cancel = true;
-                }
+            if (!_propertyChanged) {
+                movieTitleTypeTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = movieTitleTypeTextView;
+                cancel = true;
+            }
 
-                String title = movieTitleTypeTextView.getText().toString();
+            String title = movieTitleTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(title)) {
-                    movieTitleTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = movieTitleTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(title)) {
+                movieTitleTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = movieTitleTypeTextView;
+                cancel = true;
+            }
 
-                String genre = movieGenreTypeTextView.getText().toString();
+            String genre = movieGenreTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(genre)) {
-                    movieGenreTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = movieGenreTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(genre)) {
+                movieGenreTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = movieGenreTypeTextView;
+                cancel = true;
+            }
 
-                String description = movieDescriptionTypeTextView.getText().toString();
+            String description = movieDescriptionTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(description)) {
-                    movieDescriptionTypeTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = movieDescriptionTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(description)) {
+                movieDescriptionTypeTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = movieDescriptionTypeTextView;
+                cancel = true;
+            }
 
-                if (cancel) {
-                    focusView.requestFocus();
-                } else {
-                    _movieService.UpdateMovie(new Movie(_movieDto.GetId(), title, genre, description, (int) movieRatingBar.getRating()/*, _movieDto.GetWatched()*/));
-                    _saveButton.setEnabled(false);
-                }
+            if (cancel) {
+                focusView.requestFocus();
+            } else {
+                _movieService.UpdateMovie(new Movie(_movieDto.GetId(), title, genre, description, (int) movieRatingBar.getRating()/*, _movieDto.GetWatched()*/));
+                _saveButton.setEnabled(false);
             }
         });
     }
@@ -232,14 +229,11 @@ public class MovieEditActivity extends AppCompatActivity {
                 .success()
                 .show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MovieEditActivity.this);
-                if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
-                }
+        new Handler().postDelayed(() -> {
+            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MovieEditActivity.this);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);
     }

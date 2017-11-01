@@ -100,31 +100,19 @@ public class SerializableDate implements Serializable {
     }
 
     public boolean isAfter(SerializableDate compareDate) {
-        if (compareDate.calculateMillis() > calculateMillis()) {
-            return true;
-        }
-        return false;
+        return compareDate.calculateMillis() > calculateMillis();
     }
 
     public boolean isBefore(SerializableDate compareDate) {
-        if (compareDate.calculateMillis() < calculateMillis()) {
-            return true;
-        }
-        return false;
+        return compareDate.calculateMillis() < calculateMillis();
     }
 
     public boolean isAfterNow() {
-        if (nowTimeInMillis() > calculateMillis()) {
-            return true;
-        }
-        return false;
+        return nowTimeInMillis() > calculateMillis();
     }
 
     public boolean isBeforeNow() {
-        if (nowTimeInMillis() < calculateMillis()) {
-            return true;
-        }
-        return false;
+        return nowTimeInMillis() < calculateMillis();
     }
 
     @Override

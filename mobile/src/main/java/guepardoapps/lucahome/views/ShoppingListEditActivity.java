@@ -111,23 +111,17 @@ public class ShoppingListEditActivity extends AppCompatActivity {
         groupDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         entryGroupSelect.setAdapter(groupDataAdapter);
 
-        increaseQuantityButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                _quantity++;
-                quantityTextView.setText(String.valueOf(_quantity));
-            }
+        increaseQuantityButton.setOnClickListener(view -> {
+            _quantity++;
+            quantityTextView.setText(String.valueOf(_quantity));
         });
 
-        decreaseQuantityButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                _quantity--;
-                if (_quantity < 1) {
-                    _quantity = 1;
-                }
-                quantityTextView.setText(String.valueOf(_quantity));
+        decreaseQuantityButton.setOnClickListener(view -> {
+            _quantity--;
+            if (_quantity < 1) {
+                _quantity = 1;
             }
+            quantityTextView.setText(String.valueOf(_quantity));
         });
 
         if (shoppingEntryDto != null) {
@@ -140,36 +134,40 @@ public class ShoppingListEditActivity extends AppCompatActivity {
         }
 
         _saveButton.setEnabled(false);
-        _saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                shoppingNameEditTextView.setError(null);
-                boolean cancel = false;
-                View focusView = null;
+        _saveButton.setOnClickListener(view -> {
+            shoppingNameEditTextView.setError(null);
+            boolean cancel = false;
+            View focusView = null;
 
-                if (!_propertyChanged) {
-                    shoppingNameEditTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = shoppingNameEditTextView;
-                    cancel = true;
+            if (!_propertyChanged) {
+                shoppingNameEditTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = shoppingNameEditTextView;
+                cancel = true;
+            }
+
+            String entryName = shoppingNameEditTextView.getText().toString();
+
+            if (TextUtils.isEmpty(entryName)) {
+                shoppingNameEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = shoppingNameEditTextView;
+                cancel = true;
+            }
+
+            int entryGroupId = entryGroupSelect.getSelectedItemPosition();
+            ShoppingEntryGroup entryGroup = ShoppingEntryGroup.GetById(entryGroupId);
+
+            if (cancel) {
+                focusView.requestFocus();
+            } else {
+                int lastHighestId = 0;
+
+                int dataListSize = _shoppingListService.GetDataList().getSize();
+                if (dataListSize > 0) {
+                    lastHighestId = _shoppingListService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                String entryName = shoppingNameEditTextView.getText().toString();
-
-                if (TextUtils.isEmpty(entryName)) {
-                    shoppingNameEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = shoppingNameEditTextView;
-                    cancel = true;
-                }
-
-                int entryGroupId = entryGroupSelect.getSelectedItemPosition();
-                ShoppingEntryGroup entryGroup = ShoppingEntryGroup.GetById(entryGroupId);
-
-                if (cancel) {
-                    focusView.requestFocus();
-                } else {
-                    _shoppingListService.AddShoppingEntry(new ShoppingEntry(-1, entryName, entryGroup, _quantity));
-                    _saveButton.setEnabled(false);
-                }
+                _shoppingListService.AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity));
+                _saveButton.setEnabled(false);
             }
         });
     }
@@ -234,14 +232,11 @@ public class ShoppingListEditActivity extends AppCompatActivity {
                 .success()
                 .show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ShoppingListEditActivity.this);
-                if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
-                }
+        new Handler().postDelayed(() -> {
+            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ShoppingListEditActivity.this);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);
     }

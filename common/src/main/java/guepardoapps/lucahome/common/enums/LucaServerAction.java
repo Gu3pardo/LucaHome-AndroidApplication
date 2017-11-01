@@ -101,13 +101,4 @@ public enum LucaServerAction implements Serializable {
         }
         return NULL;
     }
-
-    public static LucaServerAction GetByAction(String action) {
-        for (LucaServerAction e : values()) {
-            if (e._action.contains(action)) {
-                return e;
-            }
-        }
-        return NULL;
-    }
 }

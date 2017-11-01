@@ -94,12 +94,22 @@ public class DisplayController {
         }
 
         KeyguardManager keyguardManager = (KeyguardManager) _context.getSystemService(Context.KEYGUARD_SERVICE);
+        if (keyguardManager == null) {
+            _logger.Error("KeyguardManager is null!");
+            return;
+        }
+
         final KeyguardManager.KeyguardLock keyguardLock = keyguardManager.newKeyguardLock("MediaMirrorKeyguardLock");
         keyguardLock.disableKeyguard();
 
         PowerManager powerManager = (PowerManager) _context.getSystemService(Context.POWER_SERVICE);
+        if (powerManager == null) {
+            _logger.Error("PowerManager is null!");
+            return;
+        }
+
         WakeLock wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.ON_AFTER_RELEASE, "MediaMirrorWakeLock");
-        wakeLock.acquire();
+        wakeLock.acquire(24 * 60 * 60 * 1000);
         wakeLock.release();
 
         if (adFlags != null) {

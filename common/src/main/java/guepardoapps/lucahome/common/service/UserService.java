@@ -22,8 +22,8 @@ public class UserService {
     public static final String UserCheckedFinishedBroadcast = "guepardoapps.lucahome.data.service.user.checked.finished";
     public static final String UserCheckedFinishedBundle = "UserCheckedFinishedBundle";
 
-    public static final int MIN_USER_LENGTH = 4;
-    public static final int MIN_PASSWORD_LENGTH = 6;
+    private static final int MIN_USER_LENGTH = 4;
+    private static final int MIN_PASSWORD_LENGTH = 6;
 
     private static final UserService SINGLETON = new UserService();
     private boolean _isInitialized;

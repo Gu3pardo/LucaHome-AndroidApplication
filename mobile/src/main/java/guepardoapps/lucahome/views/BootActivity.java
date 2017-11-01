@@ -11,7 +11,6 @@ import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -213,14 +212,11 @@ public class BootActivity extends AppCompatActivity {
                     .setText("Do you really want to exit during boot?")
                     .setDuration(Snacky.LENGTH_LONG)
                     .setActionText(android.R.string.ok)
-                    .setActionClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View view) {
-                            if(_mainServiceBinder != null){
-                                _mainServiceBinder.Cancel();
-                            }
-                            finish();
+                    .setActionClickListener(view -> {
+                        if(_mainServiceBinder != null){
+                            _mainServiceBinder.Cancel();
                         }
+                        finish();
                     })
                     .warning()
                     .show();

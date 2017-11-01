@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">Basic</string>
+    <string name="application_name">LucaHome</string>
+
+    <string name="pref_default_user_name">Dummy</string>
+    <string name="pref_default_user_passphrase">Dummy</string>
+    <string name="pref_default_ssid">BellaPeca</string>
+    <string name="pref_default_ip">192.168.178.22</string>
+    <string name="pref_default_open_weather_city">Munich, DE</string>
+
+    <string name="pref_default_coin_hour_trend">24</string>
+
+    <string name="all_sockets_off">All Sockets Off</string>
+
+    <string name="select_youtube_video">Select a video</string>
+    <string name="play_video_on_all_mirror">Play on all mirror</string>
+
+    <string name="close">Close</string>
+    <string name="example">Example</string>
+
+    <string name="contentDescription">This is an image</string>
 </resources>

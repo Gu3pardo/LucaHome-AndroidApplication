@@ -125,50 +125,44 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         CookieManager cookieManager = CookieManager.getInstance();
         cookieManager.setAcceptCookie(false);
 
-        _setCameraButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                _logger.Debug("_setCameraButton onClick");
+        _setCameraButton.setOnClickListener(view -> {
+            _logger.Debug("_setCameraButton onClick");
 
-                SerializableList<Security> securityList = _securityService.GetDataList();
-                if (securityList != null) {
-                    if (securityList.getSize() > 0) {
-                        boolean newState = !securityList.getValue(0).IsCameraActive();
-                        if (!newState) {
-                            _securityService.SetMotionState(false);
-                        }
-                        _securityService.SetCameraState(newState);
-                        return;
+            SerializableList<Security> securityList = _securityService.GetDataList();
+            if (securityList != null) {
+                if (securityList.getSize() > 0) {
+                    boolean newState = !securityList.getValue(0).IsCameraActive();
+                    if (!newState) {
+                        _securityService.SetMotionState(false);
                     }
+                    _securityService.SetCameraState(newState);
+                    return;
                 }
-
-                String message = "Could not activate camera!";
-                _logger.Warning(message);
-                displayWarningSnackBar(message);
             }
+
+            String message = "Could not activate camera!";
+            _logger.Warning(message);
+            displayWarningSnackBar(message);
         });
-        _setMotionControlButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                _logger.Debug("_setMotionControlButton onClick");
+        _setMotionControlButton.setOnClickListener(view -> {
+            _logger.Debug("_setMotionControlButton onClick");
 
-                SerializableList<Security> securityList = _securityService.GetDataList();
-                if (securityList != null) {
-                    if (securityList.getSize() > 0) {
-                        _securityService.SetMotionState(!securityList.getValue(0).IsMotionControlActive());
-                        return;
-                    }
+            SerializableList<Security> securityList = _securityService.GetDataList();
+            if (securityList != null) {
+                if (securityList.getSize() > 0) {
+                    _securityService.SetMotionState(!securityList.getValue(0).IsMotionControlActive());
+                    return;
                 }
-
-                String message = "Could not activate camera!";
-                _logger.Warning(message);
-                displayWarningSnackBar(message);
             }
+
+            String message = "Could not activate camera!";
+            _logger.Warning(message);
+            displayWarningSnackBar(message);
         });
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout_security);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view_security);

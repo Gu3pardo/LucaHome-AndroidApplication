@@ -80,13 +80,10 @@ public class MovieListViewAdapter extends BaseAdapter {
         holder._descriptionText.setText(movie.GetDescription());
         holder._ratingText.setText(movie.GetRatingString());
 
-        holder._updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle data = new Bundle();
-                data.putSerializable(MovieService.MovieIntent, new MovieDto(movie.GetId(), movie.GetTitle(), movie.GetGenre(), movie.GetDescription(), movie.GetRating()));
-                _navigationService.NavigateToActivityWithData(_context, MovieEditActivity.class, data);
-            }
+        holder._updateButton.setOnClickListener(view -> {
+            Bundle data = new Bundle();
+            data.putSerializable(MovieService.MovieIntent, new MovieDto(movie.GetId(), movie.GetTitle(), movie.GetGenre(), movie.GetDescription(), movie.GetRating()));
+            _navigationService.NavigateToActivityWithData(_context, MovieEditActivity.class, data);
         });
 
         return rowView;

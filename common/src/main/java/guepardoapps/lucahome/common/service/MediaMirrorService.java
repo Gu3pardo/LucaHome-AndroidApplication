@@ -27,13 +27,11 @@ public class MediaMirrorService {
     public static class MediaMirrorDownloadFinishedContent extends ObjectChangeFinishedContent {
         public MediaMirrorData MediaMirror;
 
-        public MediaMirrorDownloadFinishedContent(MediaMirrorData mediaMirror, boolean succcess, @NonNull byte[] response) {
+        MediaMirrorDownloadFinishedContent(MediaMirrorData mediaMirror, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             MediaMirror = mediaMirror;
         }
     }
-
-    public static final String MediaMirrorIntent = "MediaMirrorIntent";
 
     public static final String MediaMirrorDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.mediamirror.download.finished";
     public static final String MediaMirrorDownloadFinishedBundle = "MediaMirrorDownloadFinishedBundle";

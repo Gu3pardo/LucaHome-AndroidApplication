@@ -44,20 +44,12 @@ public class BirthdayListViewAdapter extends BaseAdapter {
                     .applyStyle(_isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
                     .setCancelable(true);
 
-            deleteDialog.positiveActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    _birthdayService.DeleteBirthday(birthday);
-                    deleteDialog.dismiss();
-                }
+            deleteDialog.positiveActionClickListener(view -> {
+                _birthdayService.DeleteBirthday(birthday);
+                deleteDialog.dismiss();
             });
 
-            deleteDialog.negativeActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deleteDialog.dismiss();
-                }
-            });
+            deleteDialog.negativeActionClickListener(view -> deleteDialog.dismiss());
 
             deleteDialog.show();
         }
@@ -124,21 +116,13 @@ public class BirthdayListViewAdapter extends BaseAdapter {
             holder._titleText.setBackgroundColor(_context.getResources().getColor(R.color.LightRed));
         }
 
-        holder._updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle data = new Bundle();
-                data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(birthday.GetId(), birthday.GetName(), birthday.GetDate(), BirthdayDto.Action.Update));
-                _navigationService.NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
-            }
+        holder._updateButton.setOnClickListener(view -> {
+            Bundle data = new Bundle();
+            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(birthday.GetId(), birthday.GetName(), birthday.GetDate(), BirthdayDto.Action.Update));
+            _navigationService.NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
         });
 
-        holder._deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.displayDeleteDialog(birthday);
-            }
-        });
+        holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(birthday));
 
         return rowView;
     }

@@ -19,8 +19,6 @@ public class LucaMenu implements Serializable {
     private Weekday _weekday;
     private SerializableDate _date;
 
-    private boolean _needsUpdate;
-
     public LucaMenu(
             int id,
             @NonNull String title,

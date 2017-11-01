@@ -137,57 +137,61 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
         }
 
         _saveButton.setEnabled(false);
-        _saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                socketNameTypeTextView.setError(null);
-                socketAreaTypeTextView.setError(null);
-                socketCodeTypeTextView.setError(null);
-                boolean cancel = false;
-                View focusView = null;
+        _saveButton.setOnClickListener(view -> {
+            socketNameTypeTextView.setError(null);
+            socketAreaTypeTextView.setError(null);
+            socketCodeTypeTextView.setError(null);
+            boolean cancel = false;
+            View focusView = null;
 
-                if (!_propertyChanged) {
-                    socketNameTypeTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = socketNameTypeTextView;
-                    cancel = true;
-                }
+            if (!_propertyChanged) {
+                socketNameTypeTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = socketNameTypeTextView;
+                cancel = true;
+            }
 
-                String name = socketNameTypeTextView.getText().toString();
+            String name = socketNameTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(name)) {
-                    socketNameTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = socketNameTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(name)) {
+                socketNameTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = socketNameTypeTextView;
+                cancel = true;
+            }
 
-                String area = socketAreaTypeTextView.getText().toString();
+            String area = socketAreaTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(area)) {
-                    socketAreaTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = socketAreaTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(area)) {
+                socketAreaTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = socketAreaTypeTextView;
+                cancel = true;
+            }
 
-                String code = socketCodeTypeTextView.getText().toString();
+            String code = socketCodeTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(code)) {
-                    socketCodeTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = socketCodeTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(code)) {
+                socketCodeTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = socketCodeTypeTextView;
+                cancel = true;
+            }
 
-                if (cancel) {
-                    focusView.requestFocus();
-                } else {
-                    if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Add) {
-                        _wirelessSocketService.AddWirelessSocket(new WirelessSocket(-1, name, area, code, false));
-                        _saveButton.setEnabled(false);
-                    } else if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Update) {
-                        _wirelessSocketService.UpdateWirelessSocket(new WirelessSocket(_wirelessSocketDto.GetId(), name, area, code, _wirelessSocketDto.IsActivated()));
-                        _saveButton.setEnabled(false);
-                    } else {
-                        socketNameTypeTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _wirelessSocketDto.GetAction())));
+            if (cancel) {
+                focusView.requestFocus();
+            } else {
+                if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Add) {
+                    int lastHighestId = 0;
+
+                    int dataListSize = _wirelessSocketService.GetDataList().getSize();
+                    if (dataListSize > 0) {
+                        lastHighestId = _wirelessSocketService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
+
+                    _wirelessSocketService.AddWirelessSocket(new WirelessSocket(lastHighestId, name, area, code, false));
+                    _saveButton.setEnabled(false);
+                } else if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Update) {
+                    _wirelessSocketService.UpdateWirelessSocket(new WirelessSocket(_wirelessSocketDto.GetId(), name, area, code, _wirelessSocketDto.IsActivated()));
+                    _saveButton.setEnabled(false);
+                } else {
+                    socketNameTypeTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _wirelessSocketDto.GetAction())));
                 }
             }
         });
@@ -254,14 +258,11 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
                 .success()
                 .show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NavigationService.NavigationResult navigationResult = _navigationService.GoBack(WirelessSocketEditActivity.this);
-                if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
-                }
+        new Handler().postDelayed(() -> {
+            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(WirelessSocketEditActivity.this);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);
     }

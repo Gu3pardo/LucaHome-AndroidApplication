@@ -30,7 +30,7 @@ public class Schedule implements Serializable {
             int id,
             @NonNull String name,
             @NonNull String information,
-            @NonNull WirelessSocket socket,
+            WirelessSocket socket,
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             @NonNull SocketAction action,
@@ -48,7 +48,7 @@ public class Schedule implements Serializable {
     public Schedule(
             int id,
             @NonNull String name,
-            @NonNull WirelessSocket socket,
+            WirelessSocket socket,
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             @NonNull SocketAction action,
@@ -66,7 +66,6 @@ public class Schedule implements Serializable {
 
     public Schedule(
             int id,
-            int drawable,
             @NonNull String name,
             @NonNull String information,
             boolean isActive) {

@@ -31,7 +31,7 @@ public class ShoppingListService implements IDataService {
     public static class ShoppingListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<ShoppingEntry> ShoppingList;
 
-        public ShoppingListDownloadFinishedContent(SerializableList<ShoppingEntry> shoppingList, boolean succcess, @NonNull byte[] response) {
+        ShoppingListDownloadFinishedContent(SerializableList<ShoppingEntry> shoppingList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             ShoppingList = shoppingList;
         }

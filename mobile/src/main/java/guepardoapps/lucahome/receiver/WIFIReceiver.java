@@ -36,35 +36,32 @@ public class WIFIReceiver extends BroadcastReceiver {
 
         logger.Information("valid connection! Wait ten seconds to check for network!");
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                BroadcastController broadcastController = new BroadcastController(context);
+        new Handler().postDelayed(() -> {
+            BroadcastController broadcastController = new BroadcastController(context);
 
-                if (new NetworkController(context).IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
-                    logger.Debug("We are in the homeNetwork!");
+            if (new NetworkController(context).IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
+                logger.Debug("We are in the homeNetwork!");
 
-                    if (!new AndroidSystemController(context).IsServiceRunning(MainService.class)) {
-                        logger.Debug("MainService not running! Starting...");
+                if (!new AndroidSystemController(context).IsServiceRunning(MainService.class)) {
+                    logger.Debug("MainService not running! Starting...");
 
-                        Intent startMainServiceIntent = new Intent(context, MainService.class);
-                        startMainServiceIntent.putExtra(MainService.MainServiceOnStartCommandBundle, true);
+                    Intent startMainServiceIntent = new Intent(context, MainService.class);
+                    startMainServiceIntent.putExtra(MainService.MainServiceOnStartCommandBundle, true);
 
-                        context.startService(startMainServiceIntent);
-                    } else {
-                        logger.Debug("MainService running! Sending broadcast...");
-                        broadcastController.SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
-                    }
-
-                    broadcastController.SendSimpleBroadcast(NetworkController.WIFIReceiverInHomeNetworkBroadcast);
+                    context.startService(startMainServiceIntent);
                 } else {
-                    logger.Debug("We are NOT in the homeNetwork!");
-
-                    TemperatureService.getInstance().CloseNotification();
-                    WirelessSocketService.getInstance().CloseNotification();
-
-                    broadcastController.SendSimpleBroadcast(NetworkController.WIFIReceiverNoHomeNetworkBroadcast);
+                    logger.Debug("MainService running! Sending broadcast...");
+                    broadcastController.SendSimpleBroadcast(MainService.MainServiceStartDownloadAllBroadcast);
                 }
+
+                broadcastController.SendSimpleBroadcast(NetworkController.WIFIReceiverInHomeNetworkBroadcast);
+            } else {
+                logger.Debug("We are NOT in the homeNetwork!");
+
+                TemperatureService.getInstance().CloseNotification();
+                WirelessSocketService.getInstance().CloseNotification();
+
+                broadcastController.SendSimpleBroadcast(NetworkController.WIFIReceiverNoHomeNetworkBroadcast);
             }
         }, 10 * 1000);
     }

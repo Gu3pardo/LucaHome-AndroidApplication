@@ -125,81 +125,85 @@ public class TimerEditActivity extends AppCompatActivity {
         timerCountdownSelect.setAdapter(countdownDataAdapter);
 
         _saveButton.setEnabled(false);
-        _saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                timerNameEditTextView.setError(null);
-                boolean cancel = false;
-                View focusView = null;
+        _saveButton.setOnClickListener(view -> {
+            timerNameEditTextView.setError(null);
+            boolean cancel = false;
+            View focusView = null;
 
-                if (!_propertyChanged) {
-                    timerNameEditTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = timerNameEditTextView;
-                    cancel = true;
+            if (!_propertyChanged) {
+                timerNameEditTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = timerNameEditTextView;
+                cancel = true;
+            }
+
+            String timerName = timerNameEditTextView.getText().toString();
+
+            if (TextUtils.isEmpty(timerName)) {
+                timerNameEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = timerNameEditTextView;
+                cancel = true;
+            }
+
+            int socketId = timerSocketSelect.getSelectedItemPosition();
+            WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
+
+            int countdownId = timerCountdownSelect.getSelectedItemPosition();
+
+            Calendar calendarNow = Calendar.getInstance();
+            int currentWeekday = calendarNow.get(Calendar.DAY_OF_WEEK);
+            int hour = calendarNow.get(Calendar.HOUR_OF_DAY);
+            int minute = calendarNow.get(Calendar.MINUTE);
+
+            switch (countdownId) {
+                case 0:
+                    minute += 15;
+                    break;
+                case 1:
+                    minute += 30;
+                    break;
+                case 2:
+                    hour += 1;
+                    break;
+                case 3:
+                    hour += 3;
+                    break;
+                case 4:
+                    hour += 6;
+                    break;
+                case 5:
+                    hour += 12;
+                    break;
+                default:
+                    minute += 30;
+                    break;
+            }
+
+            while (minute > 60) {
+                minute -= 60;
+                hour++;
+            }
+            while (hour > 24) {
+                hour -= 24;
+                currentWeekday++;
+            }
+
+            while (currentWeekday > 7) {
+                currentWeekday -= 7;
+            }
+            Weekday weekday = Weekday.GetById(currentWeekday);
+
+            if (cancel) {
+                focusView.requestFocus();
+            } else {
+                int lastHighestId = 0;
+
+                int dataListSize = _scheduleService.GetTimerList().getSize();
+                if (dataListSize > 0) {
+                    lastHighestId = _scheduleService.GetTimerList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                String timerName = timerNameEditTextView.getText().toString();
-
-                if (TextUtils.isEmpty(timerName)) {
-                    timerNameEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = timerNameEditTextView;
-                    cancel = true;
-                }
-
-                int socketId = timerSocketSelect.getSelectedItemPosition();
-                WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
-
-                int countdownId = timerCountdownSelect.getSelectedItemPosition();
-
-                Calendar calendarNow = Calendar.getInstance();
-                int currentWeekday = calendarNow.get(Calendar.DAY_OF_WEEK);
-                int hour = calendarNow.get(Calendar.HOUR_OF_DAY);
-                int minute = calendarNow.get(Calendar.MINUTE);
-
-                switch (countdownId) {
-                    case 0:
-                        minute += 15;
-                        break;
-                    case 1:
-                        minute += 30;
-                        break;
-                    case 2:
-                        hour += 1;
-                        break;
-                    case 3:
-                        hour += 3;
-                        break;
-                    case 4:
-                        hour += 6;
-                        break;
-                    case 5:
-                        hour += 12;
-                        break;
-                    default:
-                        minute += 30;
-                        break;
-                }
-
-                while (minute > 60) {
-                    minute -= 60;
-                    hour++;
-                }
-                while (hour > 24) {
-                    hour -= 24;
-                    currentWeekday++;
-                }
-
-                while (currentWeekday > 7) {
-                    currentWeekday -= 7;
-                }
-                Weekday weekday = Weekday.GetById(currentWeekday);
-
-                if (cancel) {
-                    focusView.requestFocus();
-                } else {
-                    _scheduleService.AddTimer(new LucaTimer(-1, timerName, wirelessSocket, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true));
-                    _saveButton.setEnabled(false);
-                }
+                _scheduleService.AddTimer(new LucaTimer(lastHighestId, timerName, wirelessSocket, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true));
+                _saveButton.setEnabled(false);
             }
         });
     }
@@ -264,14 +268,11 @@ public class TimerEditActivity extends AppCompatActivity {
                 .success()
                 .show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NavigationService.NavigationResult navigationResult = _navigationService.GoBack(TimerEditActivity.this);
-                if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
-                }
+        new Handler().postDelayed(() -> {
+            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(TimerEditActivity.this);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);
     }

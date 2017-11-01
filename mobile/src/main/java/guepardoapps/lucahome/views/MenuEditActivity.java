@@ -117,42 +117,39 @@ public class MenuEditActivity extends AppCompatActivity {
         }
 
         _saveButton.setEnabled(false);
-        _saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                menuTitleTypeTextView.setError(null);
-                menuDescriptionTypeTextView.setError(null);
-                boolean cancel = false;
-                View focusView = null;
+        _saveButton.setOnClickListener(view -> {
+            menuTitleTypeTextView.setError(null);
+            menuDescriptionTypeTextView.setError(null);
+            boolean cancel = false;
+            View focusView = null;
 
-                if (!_propertyChanged) {
-                    menuTitleTypeTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = menuTitleTypeTextView;
-                    cancel = true;
-                }
+            if (!_propertyChanged) {
+                menuTitleTypeTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = menuTitleTypeTextView;
+                cancel = true;
+            }
 
-                String title = menuTitleTypeTextView.getText().toString();
+            String title = menuTitleTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(title)) {
-                    menuTitleTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = menuTitleTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(title)) {
+                menuTitleTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = menuTitleTypeTextView;
+                cancel = true;
+            }
 
-                String description = menuDescriptionTypeTextView.getText().toString();
+            String description = menuDescriptionTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(description)) {
-                    menuDescriptionTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = menuDescriptionTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(description)) {
+                menuDescriptionTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = menuDescriptionTypeTextView;
+                cancel = true;
+            }
 
-                if (cancel) {
-                    focusView.requestFocus();
-                } else {
-                    _menuService.UpdateMenu(new LucaMenu(_menuDto.GetId(), title, description, _menuDto.GetWeekday(), _menuDto.GetDate()));
-                    _saveButton.setEnabled(false);
-                }
+            if (cancel) {
+                focusView.requestFocus();
+            } else {
+                _menuService.UpdateMenu(new LucaMenu(_menuDto.GetId(), title, description, _menuDto.GetWeekday(), _menuDto.GetDate()));
+                _saveButton.setEnabled(false);
             }
         });
     }
@@ -217,14 +214,11 @@ public class MenuEditActivity extends AppCompatActivity {
                 .success()
                 .show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MenuEditActivity.this);
-                if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
-                }
+        new Handler().postDelayed(() -> {
+            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MenuEditActivity.this);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);
     }

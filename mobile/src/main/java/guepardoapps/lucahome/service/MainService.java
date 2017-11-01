@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.Messenger;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
@@ -38,11 +37,11 @@ public class MainService extends Service {
     }
 
     public static class MainServiceDownloadCountContent implements Serializable {
-        public SerializableList<SerializablePair> DownloadResultList;
+        SerializableList<SerializablePair> DownloadResultList;
         public double DownloadProgress;
         public boolean DownloadFinished;
 
-        public MainServiceDownloadCountContent(SerializableList<SerializablePair> downloadResultList, double downloadProgress, boolean downloadFinished) {
+        MainServiceDownloadCountContent(SerializableList<SerializablePair> downloadResultList, double downloadProgress, boolean downloadFinished) {
             DownloadResultList = downloadResultList;
             DownloadProgress = downloadProgress;
             DownloadFinished = downloadFinished;
@@ -59,7 +58,6 @@ public class MainService extends Service {
     private Logger _logger;
 
     private final IBinder _mainServiceBinder = new MainServiceBinder();
-    private Messenger _messenger;
 
     private BirthdayService _birthdayService;
     private CoinService _coinService;
@@ -77,7 +75,6 @@ public class MainService extends Service {
 
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private int _currentDownloadCount;
     private SerializableList<SerializablePair> _downloadResultList;
@@ -368,7 +365,7 @@ public class MainService extends Service {
         Bundle extras = intent.getExtras();
         if (extras != null) {
             _logger.Debug("onBind with extra");
-            _messenger = (Messenger) extras.get("MESSENGER");
+            // _messenger = (Messenger) extras.get("MESSENGER");
             /*TODO do something with extras*/
         }
 
@@ -383,8 +380,7 @@ public class MainService extends Service {
 
         _broadcastController = new BroadcastController(this);
         _receiverController = new ReceiverController(this);
-        _settingsController = SettingsController.getInstance();
-        _settingsController.Initialize(this);
+        SettingsController.getInstance().Initialize(this);
 
         _receiverController.RegisterReceiver(_startDownloadAllReceiver, new String[]{MainServiceStartDownloadAllBroadcast});
         _receiverController.RegisterReceiver(_birthdayDownloadFinishedReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
@@ -419,78 +415,78 @@ public class MainService extends Service {
         _birthdayService.Initialize(
                 this,
                 BirthdayActivity.class,
-                _settingsController.IsBirthdayNotificationEnabled(),
-                _settingsController.IsReloadBirthdayEnabled(),
-                _settingsController.GetReloadBirthdayTimeout());
+                SettingsController.getInstance().IsBirthdayNotificationEnabled(),
+                SettingsController.getInstance().IsReloadBirthdayEnabled(),
+                SettingsController.getInstance().GetReloadBirthdayTimeout());
 
         _coinService.Initialize(
                 this,
-                _settingsController.IsReloadCoinEnabled(),
-                _settingsController.GetReloadCoinTimeout());
+                SettingsController.getInstance().IsReloadCoinEnabled(),
+                SettingsController.getInstance().GetReloadCoinTimeout());
 
         _mapContentService.Initialize(
                 this,
-                _settingsController.IsReloadMapContentEnabled(),
-                _settingsController.GetReloadMapContentTimeout());
+                SettingsController.getInstance().IsReloadMapContentEnabled(),
+                SettingsController.getInstance().GetReloadMapContentTimeout());
 
         _mediaMirrorService.Initialize(
                 this,
-                _settingsController.IsReloadMediaMirrorEnabled(),
-                _settingsController.GetReloadMediaMirrorTimeout());
+                SettingsController.getInstance().IsReloadMediaMirrorEnabled(),
+                SettingsController.getInstance().GetReloadMediaMirrorTimeout());
 
         _menuService.Initialize(
                 this,
-                _settingsController.IsReloadMenuEnabled(),
-                _settingsController.GetReloadMenuTimeout());
+                SettingsController.getInstance().IsReloadMenuEnabled(),
+                SettingsController.getInstance().GetReloadMenuTimeout());
 
         _movieService.Initialize(
                 this,
-                _settingsController.IsReloadMovieEnabled(),
-                _settingsController.GetReloadMovieTimeout());
+                SettingsController.getInstance().IsReloadMovieEnabled(),
+                SettingsController.getInstance().GetReloadMovieTimeout());
 
         _openWeatherService.Initialize(
                 this,
-                _settingsController.GetOpenWeatherCity(),
-                _settingsController.IsCurrentWeatherNotificationEnabled(),
-                _settingsController.IsForecastWeatherNotificationEnabled(),
+                SettingsController.getInstance().GetOpenWeatherCity(),
+                SettingsController.getInstance().IsCurrentWeatherNotificationEnabled(),
+                SettingsController.getInstance().IsForecastWeatherNotificationEnabled(),
                 MainActivity.class,
                 ForecastWeatherActivity.class,
-                _settingsController.IsChangeWeatherWallpaperActive(),
-                _settingsController.IsReloadWeatherEnabled(),
-                _settingsController.GetReloadWeatherTimeout());
+                SettingsController.getInstance().IsChangeWeatherWallpaperActive(),
+                SettingsController.getInstance().IsReloadWeatherEnabled(),
+                SettingsController.getInstance().GetReloadWeatherTimeout());
 
         _scheduleService.Initialize(
                 this,
-                _settingsController.IsReloadScheduleEnabled(),
-                _settingsController.GetReloadScheduleTimeout());
+                SettingsController.getInstance().IsReloadScheduleEnabled(),
+                SettingsController.getInstance().GetReloadScheduleTimeout());
 
         _securityService.Initialize(
                 this,
                 SecurityActivity.class,
-                _settingsController.IsCameraNotificationEnabled(),
-                _settingsController.IsReloadSecurityEnabled(),
-                _settingsController.GetReloadSecurityTimeout());
+                SettingsController.getInstance().IsCameraNotificationEnabled(),
+                SettingsController.getInstance().IsReloadSecurityEnabled(),
+                SettingsController.getInstance().GetReloadSecurityTimeout());
 
         _shoppingListService.Initialize(
                 this,
-                _settingsController.IsReloadShoppingEnabled(),
-                _settingsController.GetReloadShoppingTimeout());
+                SettingsController.getInstance().IsReloadShoppingEnabled(),
+                SettingsController.getInstance().GetReloadShoppingTimeout());
 
         _temperatureService.Initialize(
                 this,
                 MainActivity.class,
-                _settingsController.IsTemperatureNotificationEnabled(),
-                _settingsController.IsReloadTemperatureEnabled(),
-                _settingsController.GetReloadTemperatureTimeout());
+                SettingsController.getInstance().IsTemperatureNotificationEnabled(),
+                SettingsController.getInstance().IsReloadTemperatureEnabled(),
+                SettingsController.getInstance().GetReloadTemperatureTimeout());
 
         _userService.Initialize(this);
 
         _wirelessSocketService.Initialize(
                 this,
                 SocketActionReceiver.class,
-                _settingsController.IsSocketNotificationEnabled(),
-                _settingsController.IsReloadWirelessSocketEnabled(),
-                _settingsController.GetReloadWirelessSocketTimeout());
+                SettingsController.getInstance().IsSocketNotificationEnabled(),
+                SettingsController.getInstance().IsReloadWirelessSocketEnabled(),
+                SettingsController.getInstance().GetReloadWirelessSocketTimeout());
 
         _currentDownloadCount = 0;
         _downloadResultList = new SerializableList<>();

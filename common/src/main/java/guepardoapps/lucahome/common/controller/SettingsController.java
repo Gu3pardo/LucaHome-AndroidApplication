@@ -17,7 +17,7 @@ public class SettingsController {
     private static final String TAG = SettingsController.class.getSimpleName();
     private Logger _logger;
 
-    public static final String PREF_SETTINGS_INSTALLED = "settings_installed";
+    private static final String PREF_SETTINGS_INSTALLED = "settings_installed";
 
     public static final String PREF_USER_NAME = "user_name";
     public static final String PREF_USER_PASS_PHRASE = "user_passphrase";

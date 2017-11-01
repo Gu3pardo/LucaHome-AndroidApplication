@@ -145,55 +145,59 @@ public class CoinEditActivity extends AppCompatActivity {
         }
 
         _saveButton.setEnabled(false);
-        _saveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                coinEditUserTextView.setError(null);
-                boolean cancel = false;
-                View focusView = null;
+        _saveButton.setOnClickListener(view -> {
+            coinEditUserTextView.setError(null);
+            boolean cancel = false;
+            View focusView = null;
 
-                if (!_propertyChanged) {
-                    coinEditUserTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
-                    focusView = coinEditUserTextView;
-                    cancel = true;
-                }
+            if (!_propertyChanged) {
+                coinEditUserTextView.setError(createErrorText(getString(R.string.error_nothing_changed)));
+                focusView = coinEditUserTextView;
+                cancel = true;
+            }
 
-                String userName = coinEditUserTextView.getText().toString();
+            String userName = coinEditUserTextView.getText().toString();
 
-                if (TextUtils.isEmpty(userName)) {
-                    coinEditUserTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = coinEditUserTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(userName)) {
+                coinEditUserTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = coinEditUserTextView;
+                cancel = true;
+            }
 
-                String coinType = coinEditTypeTextView.getText().toString();
+            String coinType = coinEditTypeTextView.getText().toString();
 
-                if (TextUtils.isEmpty(coinType)) {
-                    coinEditTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = coinEditTypeTextView;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(coinType)) {
+                coinEditTypeTextView.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = coinEditTypeTextView;
+                cancel = true;
+            }
 
-                String coinAmountString = coinAmountEditText.getText().toString();
+            String coinAmountString = coinAmountEditText.getText().toString();
 
-                if (TextUtils.isEmpty(coinAmountString)) {
-                    coinAmountEditText.setError(createErrorText(getString(R.string.error_field_required)));
-                    focusView = coinAmountEditText;
-                    cancel = true;
-                }
+            if (TextUtils.isEmpty(coinAmountString)) {
+                coinAmountEditText.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = coinAmountEditText;
+                cancel = true;
+            }
 
-                if (cancel) {
-                    focusView.requestFocus();
-                } else {
-                    if (_coinDto.GetAction() == CoinDto.Action.Add) {
-                        _coinService.AddCoin(new Coin(-1, userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1));
-                        _saveButton.setEnabled(false);
-                    } else if (_coinDto.GetAction() == CoinDto.Action.Update) {
-                        _coinService.UpdateCoin(new Coin(_coinDto.GetId(), userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1));
-                        _saveButton.setEnabled(false);
-                    } else {
-                        coinEditUserTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _coinDto.GetAction())));
+            if (cancel) {
+                focusView.requestFocus();
+            } else {
+                if (_coinDto.GetAction() == CoinDto.Action.Add) {
+                    int lastHighestId = 0;
+
+                    int dataListSize = _coinService.GetDataList().getSize();
+                    if (dataListSize > 0) {
+                        lastHighestId = _coinService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
+
+                    _coinService.AddCoin(new Coin(lastHighestId, userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1));
+                    _saveButton.setEnabled(false);
+                } else if (_coinDto.GetAction() == CoinDto.Action.Update) {
+                    _coinService.UpdateCoin(new Coin(_coinDto.GetId(), userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1));
+                    _saveButton.setEnabled(false);
+                } else {
+                    coinEditUserTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _coinDto.GetAction())));
                 }
             }
         });
@@ -260,14 +264,11 @@ public class CoinEditActivity extends AppCompatActivity {
                 .success()
                 .show();
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                NavigationService.NavigationResult navigationResult = _navigationService.GoBack(CoinEditActivity.this);
-                if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                    displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
-                }
+        new Handler().postDelayed(() -> {
+            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(CoinEditActivity.this);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);
     }

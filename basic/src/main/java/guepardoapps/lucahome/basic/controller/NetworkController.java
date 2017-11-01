@@ -120,7 +120,7 @@ public class NetworkController {
     }
 
     public String GetIpAddress() {
-        String ip = "";
+        StringBuilder ip = new StringBuilder();
         try {
             Enumeration<NetworkInterface> enumNetworkInterfaces = NetworkInterface.getNetworkInterfaces();
 
@@ -132,16 +132,16 @@ public class NetworkController {
                     InetAddress inetAddress = enumInetAddress.nextElement();
 
                     if (inetAddress.isSiteLocalAddress()) {
-                        ip += "SiteLocalAddress: " + inetAddress.getHostAddress() + "\n";
+                        ip.append("SiteLocalAddress: ").append(inetAddress.getHostAddress()).append("\n");
                     }
                 }
             }
         } catch (SocketException e) {
             _logger.Error(e.toString());
-            ip += "Something Wrong! " + e.toString() + "\n";
+            ip.append("Something Wrong! ").append(e.toString()).append("\n");
         }
 
-        return ip;
+        return ip.toString();
     }
 
     public int GetWifiDBM() {

@@ -25,7 +25,7 @@ public class LucaBirthday implements Serializable {
             int id,
             @NonNull String name,
             @NonNull SerializableDate date,
-            @NonNull Bitmap photo) {
+            Bitmap photo) {
         _id = id;
         _name = name;
         _date = date;
@@ -90,10 +90,7 @@ public class LucaBirthday implements Serializable {
 
     public boolean HasBirthday() {
         SerializableDate today = new SerializableDate();
-        if (today.DayOfMonth() == _date.DayOfMonth() && today.Month() == _date.Month()) {
-            return true;
-        }
-        return false;
+        return today.DayOfMonth() == _date.DayOfMonth() && today.Month() == _date.Month();
     }
 
     public BirthdayType CurrentBirthdayType() {

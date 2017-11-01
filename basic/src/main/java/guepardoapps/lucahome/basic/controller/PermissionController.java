@@ -8,8 +8,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Toast;
 
-import java.util.Locale;
-
 import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.basic.utils.Logger;
 
@@ -26,8 +24,6 @@ public class PermissionController {
     }
 
     public void CheckPermissions(int callbackId, @NonNull String... permissionsId) {
-        _logger.Debug(String.format(Locale.getDefault(), "Call for permission %s with id %s", permissionsId, callbackId));
-
         boolean hasPermission = true;
 
         for (String permission : permissionsId) {

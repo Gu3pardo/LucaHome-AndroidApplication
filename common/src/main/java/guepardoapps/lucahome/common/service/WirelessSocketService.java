@@ -31,7 +31,7 @@ public class WirelessSocketService implements IDataNotificationService {
     public static class WirelessSocketDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<WirelessSocket> WirelessSocketList;
 
-        public WirelessSocketDownloadFinishedContent(SerializableList<WirelessSocket> wirelessSocketList, boolean succcess, @NonNull byte[] response) {
+        WirelessSocketDownloadFinishedContent(SerializableList<WirelessSocket> wirelessSocketList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             WirelessSocketList = wirelessSocketList;
         }

@@ -22,7 +22,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -144,20 +143,14 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
                         _youtubeVideoList = youtubeVideoList;
                     }
 
-                    ((Activity) _context).runOnUiThread(new Runnable() {
-                        public void run() {
-                            if (_loadingVideosDialog != null) {
-                                _loadingVideosDialog.dismiss();
-                            }
+                    ((Activity) _context).runOnUiThread(() -> {
+                        if (_loadingVideosDialog != null) {
+                            _loadingVideosDialog.dismiss();
                         }
                     });
 
                     if (youtubeVideoList.size() > 0 && _displayDialog) {
-                        ((Activity) _context).runOnUiThread(new Runnable() {
-                            public void run() {
-                                displayYoutubeIdDialog(_serverIp, youtubeVideoList);
-                            }
-                        });
+                        ((Activity) _context).runOnUiThread(() -> displayYoutubeIdDialog(_serverIp, youtubeVideoList));
                     }
                 } catch (JSONException exception) {
                     _logger.Error(exception.getMessage());
@@ -207,12 +200,7 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
         TextView title = dialog.findViewById(R.id.dialog_title_text_view);
         title.setText(_context.getResources().getString(R.string.select_youtube_video));
 
-        final YoutubeVideoListAdapter listAdapter = new YoutubeVideoListAdapter(_context, youtubeVideoList, serverIp, new Runnable() {
-            @Override
-            public void run() {
-                dialog.dismiss();
-            }
-        });
+        final YoutubeVideoListAdapter listAdapter = new YoutubeVideoListAdapter(_context, youtubeVideoList, serverIp, dialog::dismiss);
         ListView listView = dialog.findViewById(R.id.dialog_list_view);
         listView.setAdapter(listAdapter);
         listView.setVisibility(View.VISIBLE);
@@ -220,27 +208,17 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
         final CheckBox playOnAllMirror = dialog.findViewById(R.id.dialog_checkbox);
         playOnAllMirror.setText(_context.getResources().getString(R.string.play_video_on_all_mirror));
         playOnAllMirror.setVisibility(View.VISIBLE);
-        playOnAllMirror.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                listAdapter.SetPlayOnAllMirror(isChecked);
-            }
-        });
+        playOnAllMirror.setOnCheckedChangeListener((buttonView, isChecked) -> listAdapter.SetPlayOnAllMirror(isChecked));
 
         Button closeButton = dialog.findViewById(R.id.dialog_button_close);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
+        closeButton.setOnClickListener(view -> dialog.dismiss());
 
         dialog.setCancelable(true);
         dialog.show();
 
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setLayout(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
             _logger.Warning("Window is null!");
         }

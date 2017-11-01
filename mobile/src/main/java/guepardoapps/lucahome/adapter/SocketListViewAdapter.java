@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -48,20 +47,12 @@ public class SocketListViewAdapter extends BaseAdapter {
                     .applyStyle(_isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
                     .setCancelable(true);
 
-            deleteDialog.positiveActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    _wirelessSocketService.DeleteWirelessSocket(wirelessSocket);
-                    deleteDialog.dismiss();
-                }
+            deleteDialog.positiveActionClickListener(view -> {
+                _wirelessSocketService.DeleteWirelessSocket(wirelessSocket);
+                deleteDialog.dismiss();
             });
 
-            deleteDialog.negativeActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deleteDialog.dismiss();
-                }
-            });
+            deleteDialog.negativeActionClickListener(view -> deleteDialog.dismiss());
 
             deleteDialog.show();
         }
@@ -129,28 +120,15 @@ public class SocketListViewAdapter extends BaseAdapter {
         holder._stateView.setBackgroundResource(wirelessSocket.IsActivated() ? R.drawable.circle_green : R.drawable.circle_red);
 
         holder._cardSwitch.setChecked(wirelessSocket.IsActivated());
-        holder._cardSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean value) {
-                _wirelessSocketService.SetWirelessSocketState(wirelessSocket, value);
-            }
+        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, value) -> _wirelessSocketService.SetWirelessSocketState(wirelessSocket, value));
+
+        holder._updateButton.setOnClickListener(view -> {
+            Bundle data = new Bundle();
+            data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(wirelessSocket.GetId(), wirelessSocket.GetName(), wirelessSocket.GetArea(), wirelessSocket.GetCode(), wirelessSocket.IsActivated(), WirelessSocketDto.Action.Update));
+            _navigationService.NavigateToActivityWithData(_context, WirelessSocketEditActivity.class, data);
         });
 
-        holder._updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle data = new Bundle();
-                data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(wirelessSocket.GetId(), wirelessSocket.GetName(), wirelessSocket.GetArea(), wirelessSocket.GetCode(), wirelessSocket.IsActivated(), WirelessSocketDto.Action.Update));
-                _navigationService.NavigateToActivityWithData(_context, WirelessSocketEditActivity.class, data);
-            }
-        });
-
-        holder._deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.displayDeleteDialog(wirelessSocket);
-            }
-        });
+        holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(wirelessSocket));
 
         return rowView;
     }

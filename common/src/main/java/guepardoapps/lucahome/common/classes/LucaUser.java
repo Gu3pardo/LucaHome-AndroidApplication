@@ -23,10 +23,6 @@ public class LucaUser implements Serializable {
         return _name;
     }
 
-    public void SetName(@NonNull String name) {
-        _name = name;
-    }
-
     public String GetPassphrase() {
         return _passphrase;
     }

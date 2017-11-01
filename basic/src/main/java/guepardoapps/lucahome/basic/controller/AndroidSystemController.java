@@ -30,17 +30,30 @@ public class AndroidSystemController {
 
     public boolean IsServiceRunning(@NonNull Class<?> serviceClass) {
         ActivityManager activityManager = (ActivityManager) _context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        if (activityManager == null) {
+            _logger.Error("ActivityManager is null!");
+            return false;
+        }
+
         for (RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
             if (serviceClass.getName().equals(service.service.getClassName())) {
                 return true;
             }
         }
+
         return false;
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     public boolean IsBaseActivityRunning() {
         ActivityManager activityManager = (ActivityManager) _context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        if (activityManager == null) {
+            _logger.Error("ActivityManager is null!");
+            return false;
+        }
+
         List<ActivityManager.AppTask> tasks = activityManager.getAppTasks();
 
         for (ActivityManager.AppTask task : tasks) {
@@ -55,6 +68,12 @@ public class AndroidSystemController {
     @SuppressWarnings("deprecation")
     public boolean IsBaseActivityRunningPreAPI23() {
         ActivityManager activityManager = (ActivityManager) _context.getSystemService(Context.ACTIVITY_SERVICE);
+
+        if (activityManager == null) {
+            _logger.Error("ActivityManager is null!");
+            return false;
+        }
+
         List<RunningTaskInfo> tasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
 
         for (RunningTaskInfo task : tasks) {
@@ -73,8 +92,7 @@ public class AndroidSystemController {
     @TargetApi(23)
     public boolean CheckAPI23SystemPermission(int permissionRequestId) {
         if (!Settings.canDrawOverlays(_context)) {
-            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                    Uri.parse("package:" + _context.getPackageName()));
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + _context.getPackageName()));
             ((Activity) _context).startActivityForResult(intent, permissionRequestId);
             return false;
         }

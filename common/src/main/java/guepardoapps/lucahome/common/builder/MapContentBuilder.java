@@ -3,7 +3,6 @@ package guepardoapps.lucahome.common.builder;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
 import android.webkit.CookieManager;
@@ -30,8 +29,6 @@ import guepardoapps.lucahome.common.service.ShoppingListService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 
 public class MapContentBuilder {
-    private static final String TAG = MapContentBuilder.class.getSimpleName();
-
     public static String GetButtonText(@NonNull MapContent.DrawingType drawingType, WirelessSocket wirelessSocket, Temperature temperature) {
         switch (drawingType) {
             case MediaServer:
@@ -127,122 +124,90 @@ public class MapContentBuilder {
     }
 
     private static Runnable createSocketRunnable(@NonNull final Context context, @NonNull final WirelessSocket wirelessSocket) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
+        return () -> {
+            boolean isLightTheme = ThemeManager.getInstance().getCurrentTheme() == 0;
 
-                final Dialog dialog = new Dialog(context);
-                dialog
-                        .title(String.format(Locale.getDefault(), "Change state of %s?", wirelessSocket.GetName()))
-                        .positiveAction("Activate")
-                        .negativeAction("Deactivate")
-                        .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
-                        .setCancelable(true);
+            final Dialog dialog = new Dialog(context);
+            dialog
+                    .title(String.format(Locale.getDefault(), "Change state of %s?", wirelessSocket.GetName()))
+                    .positiveAction("Activate")
+                    .negativeAction("Deactivate")
+                    .applyStyle(isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
+                    .setCancelable(true);
 
-                dialog.positiveActionClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, true);
-                        dialog.dismiss();
-                    }
-                });
+            dialog.positiveActionClickListener(view -> {
+                WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, true);
+                dialog.dismiss();
+            });
 
-                dialog.negativeActionClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, false);
-                        dialog.dismiss();
-                    }
-                });
+            dialog.negativeActionClickListener(view -> {
+                WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, false);
+                dialog.dismiss();
+            });
 
-                dialog.show();
-            }
+            dialog.show();
         };
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private static Runnable createTemperatureRunnable(@NonNull final Context context, @NonNull final Temperature temperature) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                if (temperature.GetGraphPath().length() > 0) {
-                    final android.app.Dialog dialog = new android.app.Dialog(context);
+        return () -> {
+            if (temperature.GetGraphPath().length() > 0) {
+                final android.app.Dialog dialog = new android.app.Dialog(context);
 
-                    dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-                    dialog.setContentView(R.layout.dialog_webview);
+                dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                dialog.setContentView(R.layout.dialog_webview);
 
-                    TextView titleView = dialog.findViewById(R.id.dialog_title_text_view);
-                    titleView.setText(temperature.GetArea());
+                TextView titleView = dialog.findViewById(R.id.dialog_title_text_view);
+                titleView.setText(temperature.GetArea());
 
-                    com.rey.material.widget.Button closeButton = dialog.findViewById(R.id.dialog_button_close);
-                    closeButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            dialog.dismiss();
-                        }
-                    });
+                com.rey.material.widget.Button closeButton = dialog.findViewById(R.id.dialog_button_close);
+                closeButton.setOnClickListener(v -> dialog.dismiss());
 
-                    String url = temperature.GetGraphPath();
+                String url = temperature.GetGraphPath();
 
-                    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                        url = "http://" + url;
-                    }
-
-                    WebView webview = dialog.findViewById(R.id.dialog_webview);
-
-                    webview.getSettings().setUseWideViewPort(true);
-                    webview.getSettings().setBuiltInZoomControls(true);
-                    webview.getSettings().setSupportZoom(true);
-                    webview.getSettings().setJavaScriptEnabled(true);
-                    webview.getSettings().setLoadWithOverviewMode(true);
-                    webview.setWebViewClient(new WebViewClient());
-                    webview.setInitialScale(100);
-
-                    CookieManager cookieManager = CookieManager.getInstance();
-                    cookieManager.setAcceptCookie(false);
-
-                    webview.loadUrl(url);
-
-                    dialog.setCancelable(true);
-                    dialog.show();
-
-                    Window window = dialog.getWindow();
-                    if (window != null) {
-                        window.setLayout(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-                    }
-                } else {
-                    Toasty.info(context, String.format(Locale.getDefault(), "No action for temperature in area %s", temperature.GetArea()), Toast.LENGTH_LONG).show();
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    url = "http://" + url;
                 }
+
+                WebView webview = dialog.findViewById(R.id.dialog_webview);
+
+                webview.getSettings().setUseWideViewPort(true);
+                webview.getSettings().setBuiltInZoomControls(true);
+                webview.getSettings().setSupportZoom(true);
+                webview.getSettings().setJavaScriptEnabled(true);
+                webview.getSettings().setLoadWithOverviewMode(true);
+                webview.setWebViewClient(new WebViewClient());
+                webview.setInitialScale(100);
+
+                CookieManager cookieManager = CookieManager.getInstance();
+                cookieManager.setAcceptCookie(false);
+
+                webview.loadUrl(url);
+
+                dialog.setCancelable(true);
+                dialog.show();
+
+                Window window = dialog.getWindow();
+                if (window != null) {
+                    window.setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+                }
+            } else {
+                Toasty.info(context, String.format(Locale.getDefault(), "No action for temperature in area %s", temperature.GetArea()), Toast.LENGTH_LONG).show();
             }
         };
     }
 
     private static Runnable createShoppingListRunnable(@NonNull final Context context) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                displayListViewDialog(context, "Shopping list", ShoppingListService.getInstance().GetShoppingDetailList());
-            }
-        };
+        return () -> displayListViewDialog(context, "Shopping list", ShoppingListService.getInstance().GetShoppingDetailList());
     }
 
     private static Runnable createMenuRunnable(@NonNull final Context context) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                displayListViewDialog(context, "Menu", MenuService.getInstance().GetMenuNameList());
-            }
-        };
+        return () -> displayListViewDialog(context, "Menu", MenuService.getInstance().GetMenuNameList());
     }
 
     private static Runnable createCameraRunnable(@NonNull final Context context) {
-        return new Runnable() {
-            @Override
-            public void run() {
-                Toasty.error(context, "Method for camera needs to be implemented!", Toast.LENGTH_LONG).show();
-            }
-        };
+        return () -> Toasty.error(context, "Method for camera needs to be implemented!", Toast.LENGTH_LONG).show();
     }
 
     private static void displayListViewDialog(@NonNull Context context, @NonNull String title, @NonNull ArrayList<String> list) {
@@ -255,12 +220,7 @@ public class MapContentBuilder {
         titleView.setText(title);
 
         com.rey.material.widget.Button closeButton = dialog.findViewById(R.id.dialog_button_close);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
+        closeButton.setOnClickListener(v -> dialog.dismiss());
 
         ListView listView = dialog.findViewById(R.id.dialog_list_view);
         listView.setAdapter(new ArrayAdapter<>(context, android.R.layout.simple_dropdown_item_1line, list));
@@ -270,7 +230,7 @@ public class MapContentBuilder {
 
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setLayout(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
+            window.setLayout(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         }
     }
 }

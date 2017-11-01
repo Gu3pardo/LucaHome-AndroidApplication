@@ -33,7 +33,7 @@ public class BirthdayService implements IDataNotificationService {
     public static class BirthdayDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<LucaBirthday> BirthdayList;
 
-        public BirthdayDownloadFinishedContent(SerializableList<LucaBirthday> birthdayList, boolean succcess, @NonNull byte[] response) {
+        BirthdayDownloadFinishedContent(SerializableList<LucaBirthday> birthdayList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             BirthdayList = birthdayList;
         }

@@ -14,12 +14,10 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,14 +89,11 @@ public class LoginActivity extends AppCompatActivity {
                         .success()
                         .show();
 
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        NavigationService.NavigationResult navigationResult = _navigationService.GoBack(LoginActivity.this);
-                        if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                            displayFailSnacky("Failed to navigate back to BootActivity! Please contact LucaHome support!");
-                        }
+                new Handler().postDelayed(() -> {
+                    NavigationService.NavigationResult navigationResult = _navigationService.GoBack(LoginActivity.this);
+                    if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                        _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                        displayFailSnacky("Failed to navigate back to BootActivity! Please contact LucaHome support!");
                     }
                 }, Snacky.LENGTH_LONG);
             }
@@ -127,24 +122,16 @@ public class LoginActivity extends AppCompatActivity {
         _userView = findViewById(R.id.user);
 
         _passwordView = findViewById(R.id.password);
-        _passwordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
-                    attemptLogin();
-                    return true;
-                }
-                return false;
+        _passwordView.setOnEditorActionListener((textView, id, keyEvent) -> {
+            if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                attemptLogin();
+                return true;
             }
+            return false;
         });
 
         com.rey.material.widget.Button userSignInButton = findViewById(R.id.user_sign_in_button);
-        userSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                attemptLogin();
-            }
-        });
+        userSignInButton.setOnClickListener(view -> attemptLogin());
 
         _loginFormView = findViewById(R.id.login_form);
         _progressView = findViewById(R.id.login_progress);

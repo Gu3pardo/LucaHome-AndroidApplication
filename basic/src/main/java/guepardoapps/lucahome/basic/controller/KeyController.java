@@ -20,7 +20,7 @@ public class KeyController {
         _instrumentation = new Instrumentation();
     }
 
-    public void SimulateKeyPress(@NonNull final int[] keys, @NonNull final int timeout) throws InterruptedException {
+    public void SimulateKeyPress(@NonNull final int[] keys, final int timeout) throws InterruptedException {
         _logger.Debug("SimulateKeyPress");
 
         if (timeout < 0) {

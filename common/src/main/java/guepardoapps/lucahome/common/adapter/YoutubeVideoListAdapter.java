@@ -77,25 +77,22 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
 
         final YoutubeVideo entry = _youtubeVideoList.get(index);
 
-        View.OnClickListener sendYoutubeVideoOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String youtubeId = entry.GetYoutubeId();
-                if (_playOnAllMirror) {
-                    for (MediaServerSelection entry : MediaServerSelection.values()) {
-                        if (entry.GetId() > 0) {
-                            MediaMirrorService.getInstance().SendCommand(entry.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
-                        }
+        View.OnClickListener sendYoutubeVideoOnClickListener = view -> {
+            String youtubeId = entry.GetYoutubeId();
+            if (_playOnAllMirror) {
+                for (MediaServerSelection entry1 : MediaServerSelection.values()) {
+                    if (entry1.GetId() > 0) {
+                        MediaMirrorService.getInstance().SendCommand(entry1.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
                     }
-                } else {
-                    MediaMirrorService mediaMirrorService = MediaMirrorService.getInstance();
-                    mediaMirrorService.Initialize(_context, false, -1);
-                    mediaMirrorService.SendCommand(_serverIp, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
-                    mediaMirrorService.Dispose();
                 }
-
-                _closeDialogRunnable.run();
+            } else {
+                MediaMirrorService mediaMirrorService = MediaMirrorService.getInstance();
+                mediaMirrorService.Initialize(_context, false, -1);
+                mediaMirrorService.SendCommand(_serverIp, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                mediaMirrorService.Dispose();
             }
+
+            _closeDialogRunnable.run();
         };
 
         holder._image = rowView.findViewById(R.id.youtube_video_image);

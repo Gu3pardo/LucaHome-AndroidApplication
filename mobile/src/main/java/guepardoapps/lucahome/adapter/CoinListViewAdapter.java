@@ -52,20 +52,12 @@ public class CoinListViewAdapter extends BaseAdapter {
                     .applyStyle(_isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
                     .setCancelable(true);
 
-            deleteDialog.positiveActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    _coinService.DeleteCoin(coin);
-                    deleteDialog.dismiss();
-                }
+            deleteDialog.positiveActionClickListener(view -> {
+                _coinService.DeleteCoin(coin);
+                deleteDialog.dismiss();
             });
 
-            deleteDialog.negativeActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deleteDialog.dismiss();
-                }
-            });
+            deleteDialog.negativeActionClickListener(view -> deleteDialog.dismiss());
 
             deleteDialog.show();
         }
@@ -139,19 +131,9 @@ public class CoinListViewAdapter extends BaseAdapter {
             holder._aggregationImage.setImageResource(android.R.drawable.radiobutton_off_background);
         }
 
-        holder._updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.navigateToEditActivity(coin);
-            }
-        });
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(coin));
 
-        holder._deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.displayDeleteDialog(coin);
-            }
-        });
+        holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(coin));
 
         return rowView;
     }

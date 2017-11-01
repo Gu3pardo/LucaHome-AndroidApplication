@@ -29,7 +29,7 @@ public class SecurityService implements IDataNotificationService {
     public static class SecurityDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Security> SecurityList;
 
-        public SecurityDownloadFinishedContent(SerializableList<Security> securityList, boolean succcess, @NonNull byte[] response) {
+        SecurityDownloadFinishedContent(SerializableList<Security> securityList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             SecurityList = securityList;
         }

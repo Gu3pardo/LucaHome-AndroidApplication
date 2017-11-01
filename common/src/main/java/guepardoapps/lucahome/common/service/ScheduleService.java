@@ -31,7 +31,7 @@ public class ScheduleService implements IDataService {
     public static class ScheduleDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Schedule> ScheduleList;
 
-        public ScheduleDownloadFinishedContent(SerializableList<Schedule> scheduleList, boolean succcess, @NonNull byte[] response) {
+        ScheduleDownloadFinishedContent(SerializableList<Schedule> scheduleList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             ScheduleList = scheduleList;
         }
@@ -40,14 +40,13 @@ public class ScheduleService implements IDataService {
     public static class TimerDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<LucaTimer> TimerList;
 
-        public TimerDownloadFinishedContent(SerializableList<LucaTimer> timerList, boolean succcess, @NonNull byte[] response) {
+        TimerDownloadFinishedContent(SerializableList<LucaTimer> timerList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             TimerList = timerList;
         }
     }
 
     public static final String ScheduleIntent = "ScheduleIntent";
-    public static final String TimerIntent = "TimerIntent";
 
     public static final String ScheduleDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.schedule.download.finished";
     public static final String ScheduleDownloadFinishedBundle = "ScheduleDownloadFinishedBundle";

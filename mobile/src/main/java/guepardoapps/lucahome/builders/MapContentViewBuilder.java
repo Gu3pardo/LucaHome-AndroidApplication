@@ -90,15 +90,12 @@ public class MapContentViewBuilder {
 
             newTextView.setBackgroundResource(mapContent.Drawable());
 
-            newTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    _logger.Debug(String.format(Locale.getDefault(), "onClick %s", mapContent.ButtonText()));
-                    if (mapContent.GetButtonClick(_context) != null) {
-                        mapContent.GetButtonClick(_context).run();
-                    } else {
-                        Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.ButtonText()), Toast.LENGTH_LONG).show();
-                    }
+            newTextView.setOnClickListener(view -> {
+                _logger.Debug(String.format(Locale.getDefault(), "onClick %s", mapContent.ButtonText()));
+                if (mapContent.GetButtonClick(_context) != null) {
+                    mapContent.GetButtonClick(_context).run();
+                } else {
+                    Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.ButtonText()), Toast.LENGTH_LONG).show();
                 }
             });
 

@@ -63,6 +63,11 @@ public class NotificationController {
         }
 
         NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) {
+            _logger.Error("NotificationManager is null!");
+            return;
+        }
+
         Notification.Builder builder = new Notification.Builder(_context);
 
         Intent intent = new Intent(_context, birthdayActivity);
@@ -273,6 +278,11 @@ public class NotificationController {
         }
 
         NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (notificationManager == null) {
+            _logger.Error("NotificationManager is null!");
+            return;
+        }
+
         Notification.Builder builder = new Notification.Builder(_context);
 
         Intent intent = new Intent(_context, temperatureActivity);

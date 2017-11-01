@@ -36,15 +36,6 @@ public class LucaTimer extends Schedule {
         super(id, name, socket, weekday, time, action, isActive);
     }
 
-    public LucaTimer(
-            int id,
-            int drawable,
-            @NonNull String name,
-            @NonNull String information,
-            boolean isActive) {
-        super(id, drawable, name, information, isActive);
-    }
-
     @Override
     public String CommandAdd() {
         return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.ADD_SCHEDULE.toString(), _name, _socket.GetName(), "", _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "1", "0", "1");

@@ -33,9 +33,9 @@ import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinis
 
 public class MenuService implements IDataService {
     public static class ListedMenuDownloadFinishedContent extends ObjectChangeFinishedContent {
-        public SerializableList<ListedMenu> ListedMenuList;
+        SerializableList<ListedMenu> ListedMenuList;
 
-        public ListedMenuDownloadFinishedContent(SerializableList<ListedMenu> listedMenuList, boolean succcess, @NonNull byte[] response) {
+        ListedMenuDownloadFinishedContent(SerializableList<ListedMenu> listedMenuList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             ListedMenuList = listedMenuList;
         }
@@ -44,7 +44,7 @@ public class MenuService implements IDataService {
     public static class MenuDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<LucaMenu> MenuList;
 
-        public MenuDownloadFinishedContent(SerializableList<LucaMenu> menuList, boolean succcess, @NonNull byte[] response) {
+        MenuDownloadFinishedContent(SerializableList<LucaMenu> menuList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             MenuList = menuList;
         }
@@ -216,7 +216,7 @@ public class MenuService implements IDataService {
             }
             _menuList = menuList;
 
-            ControlMenus();
+            controlMenus();
 
             clearMenuListFromDatabase();
             saveMenuListToDatabase();
@@ -540,52 +540,6 @@ public class MenuService implements IDataService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.MenuClear, true);
     }
 
-    public void ControlMenus() {
-        _logger.Debug("ControlMenus");
-
-        Calendar today = Calendar.getInstance();
-        int year = today.get(Calendar.YEAR);
-        int month = today.get(Calendar.MONTH) + 1;
-        int dayOfMonth = today.get(Calendar.DAY_OF_MONTH);
-
-        for (int index = 0; index < _menuList.getSize(); index++) {
-            LucaMenu menu = _menuList.getValue(index);
-            _logger.Debug(String.format("Checking menu %s", menu.toString()));
-
-            if (menu.GetDate().Year() < year) {
-                _logger.Debug(String.format("Year of menu %s is lower then this year! Updating...", menu.toString()));
-                menu = resetMenu(menu);
-                if (menu == null) {
-                    continue;
-                }
-                UpdateMenu(menu);
-                continue;
-            }
-
-            if (menu.GetDate().Month() < month) {
-                _logger.Debug(String.format("Month of menu %s is lower then this year! Updating...", menu.toString()));
-                menu = resetMenu(menu);
-                if (menu == null) {
-                    continue;
-                }
-                UpdateMenu(menu);
-                continue;
-            }
-
-            if (menu.GetDate().DayOfMonth() < dayOfMonth && menu.GetDate().Month() <= month) {
-                _logger.Debug(String.format(
-                        Locale.getDefault(),
-                        "Day of menu %s is lower then this day and month is lower then this month! Updating...",
-                        menu.toString()));
-                menu = resetMenu(menu);
-                if (menu == null) {
-                    continue;
-                }
-                UpdateMenu(menu);
-            }
-        }
-    }
-
     @Override
     public boolean GetReloadEnabled() {
         return _reloadEnabled;
@@ -687,6 +641,52 @@ public class MenuService implements IDataService {
                 MenuClearFinishedBroadcast,
                 MenuClearFinishedBundle,
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private void controlMenus() {
+        _logger.Debug("controlMenus");
+
+        Calendar today = Calendar.getInstance();
+        int year = today.get(Calendar.YEAR);
+        int month = today.get(Calendar.MONTH) + 1;
+        int dayOfMonth = today.get(Calendar.DAY_OF_MONTH);
+
+        for (int index = 0; index < _menuList.getSize(); index++) {
+            LucaMenu menu = _menuList.getValue(index);
+            _logger.Debug(String.format("Checking menu %s", menu.toString()));
+
+            if (menu.GetDate().Year() < year) {
+                _logger.Debug(String.format("Year of menu %s is lower then this year! Updating...", menu.toString()));
+                menu = resetMenu(menu);
+                if (menu == null) {
+                    continue;
+                }
+                UpdateMenu(menu);
+                continue;
+            }
+
+            if (menu.GetDate().Month() < month) {
+                _logger.Debug(String.format("Month of menu %s is lower then this year! Updating...", menu.toString()));
+                menu = resetMenu(menu);
+                if (menu == null) {
+                    continue;
+                }
+                UpdateMenu(menu);
+                continue;
+            }
+
+            if (menu.GetDate().DayOfMonth() < dayOfMonth && menu.GetDate().Month() <= month) {
+                _logger.Debug(String.format(
+                        Locale.getDefault(),
+                        "Day of menu %s is lower then this day and month is lower then this month! Updating...",
+                        menu.toString()));
+                menu = resetMenu(menu);
+                if (menu == null) {
+                    continue;
+                }
+                UpdateMenu(menu);
+            }
+        }
     }
 
     private LucaMenu resetMenu(@NonNull LucaMenu menu) {

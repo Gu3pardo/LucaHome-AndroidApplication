@@ -69,12 +69,7 @@ public class MainListViewAdapter extends BaseAdapter {
         holder._descriptionText.setText(mainListViewItem.GetDescription());
         holder._cardImage.setImageResource(mainListViewItem.GetImageResource());
 
-        holder._mainClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mainListViewItem.GetMainTouchRunnable().run();
-            }
-        };
+        holder._mainClickListener = view -> mainListViewItem.GetMainTouchRunnable().run();
 
         holder._cardView.setOnClickListener(holder._mainClickListener);
         holder._titleText.setOnClickListener(holder._mainClickListener);
@@ -83,12 +78,7 @@ public class MainListViewAdapter extends BaseAdapter {
 
         holder._addButton.setVisibility((mainListViewItem.IsAddVisibility() ? View.VISIBLE : View.INVISIBLE));
         if (mainListViewItem.IsAddVisibility()) {
-            holder._addButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mainListViewItem.GetAddTouchRunnable().run();
-                }
-            });
+            holder._addButton.setOnClickListener(view -> mainListViewItem.GetAddTouchRunnable().run());
         }
 
         return rowView;

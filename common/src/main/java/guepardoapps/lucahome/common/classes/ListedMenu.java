@@ -3,10 +3,9 @@ package guepardoapps.lucahome.common.classes;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.util.Locale;
 
-public class    ListedMenu implements Serializable {
+public class ListedMenu implements Serializable {
     private static final long serialVersionUID = 3749104839275047381L;
     private static final String TAG = ListedMenu.class.getSimpleName();
 

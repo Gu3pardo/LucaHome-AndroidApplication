@@ -34,7 +34,7 @@ public class TemperatureService implements IDataNotificationService {
     public static class TemperatureDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Temperature> TemperatureList;
 
-        public TemperatureDownloadFinishedContent(SerializableList<Temperature> temperatureList, boolean succcess, @NonNull byte[] response) {
+        TemperatureDownloadFinishedContent(SerializableList<Temperature> temperatureList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             TemperatureList = temperatureList;
         }

@@ -42,20 +42,12 @@ public class MenuListViewAdapter extends BaseAdapter {
                     .applyStyle(_isLightTheme ? R.style.SimpleDialogLight : R.style.SimpleDialog)
                     .setCancelable(true);
 
-            deleteDialog.positiveActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    _menuService.ClearMenu(menu);
-                    deleteDialog.dismiss();
-                }
+            deleteDialog.positiveActionClickListener(view -> {
+                _menuService.ClearMenu(menu);
+                deleteDialog.dismiss();
             });
 
-            deleteDialog.negativeActionClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    deleteDialog.dismiss();
-                }
-            });
+            deleteDialog.negativeActionClickListener(view -> deleteDialog.dismiss());
 
             deleteDialog.show();
         }
@@ -115,20 +107,12 @@ public class MenuListViewAdapter extends BaseAdapter {
         holder._descriptionText.setText(menu.GetDescription());
         holder._dateText.setText(menu.GetDate().DDMMYYYY());
 
-        holder._clearButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                holder.displayDeleteDialog(menu);
-            }
-        });
+        holder._clearButton.setOnClickListener(view -> holder.displayDeleteDialog(menu));
 
-        holder._updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle data = new Bundle();
-                data.putSerializable(MenuService.MenuIntent, new MenuDto(menu.GetId(), menu.GetTitle(), menu.GetDescription(), menu.GetWeekday(), menu.GetDate()));
-                _navigationService.NavigateToActivityWithData(_context, MenuEditActivity.class, data);
-            }
+        holder._updateButton.setOnClickListener(view -> {
+            Bundle data = new Bundle();
+            data.putSerializable(MenuService.MenuIntent, new MenuDto(menu.GetId(), menu.GetTitle(), menu.GetDescription(), menu.GetWeekday(), menu.GetDate()));
+            _navigationService.NavigateToActivityWithData(_context, MenuEditActivity.class, data);
         });
 
         return rowView;

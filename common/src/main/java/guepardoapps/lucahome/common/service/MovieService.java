@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
@@ -32,7 +31,7 @@ public class MovieService implements IDataService {
     public static class MovieDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Movie> MovieList;
 
-        public MovieDownloadFinishedContent(SerializableList<Movie> movieList, boolean succcess, @NonNull byte[] response) {
+        MovieDownloadFinishedContent(SerializableList<Movie> movieList, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             MovieList = movieList;
         }
@@ -389,12 +388,7 @@ public class MovieService implements IDataService {
             tmpMovieList.add(movieList.getValue(index));
         }
 
-        Collections.sort(tmpMovieList, new Comparator<Movie>() {
-            @Override
-            public int compare(final Movie object1, final Movie object2) {
-                return object1.GetTitle().compareTo(object2.GetTitle());
-            }
-        });
+        Collections.sort(tmpMovieList, (movieOne, movieTwo) -> movieOne.GetTitle().compareTo(movieTwo.GetTitle()));
 
         SerializableList<Movie> returnMovieList = new SerializableList<>();
         for (Movie returnMovie : tmpMovieList) {
