@@ -36,58 +36,6 @@
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/Weekday.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/YoutubeId.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/tasks/ClientTask.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/all_power_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/baking.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bath.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bed_heating_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bed_heating_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bed_light_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bed_light_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bed_sound_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bed_sound_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/bread.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/camera.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/candy.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/cereals.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/cleaning.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/compose_icon_socket.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/dash.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/drinks.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/etc.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/eth.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/fruits.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/gameconsole_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/gameconsole_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/laptop_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/laptop_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/leisure.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/light_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/light_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/ltc.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/mediamirror_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/mediamirror_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/milk.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/noodles.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/oil_vinegar.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/printer_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/printer_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/salad.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/shopping.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/socket.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/sound_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/sound_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/spread.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/storage_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/storage_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/tv_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/tv_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/vegetables.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/watering_off.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/watering_on.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/xmr.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/drawable/zec.png" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/dialog_webview.xml" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/notification_camera.xml" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/data/src/main/java/guepardoapps/lucahome/data/controller/DownloadController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/guepardoapps/lucahome/receiver/SocketActionReceiver.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/common/classes/SerializableList.java" charset="windows-1251" />
@@ -95,6 +43,6 @@
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/BroadcastController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/NotificationController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/ReceiverController.java" charset="windows-1251" />
-    <file url="PROJECT" charset="UTF-8" />
+    <file url="PROJECT" charset="windows-1251" />
   </component>
 </project>

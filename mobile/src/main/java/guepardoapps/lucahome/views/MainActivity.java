@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -172,6 +173,32 @@ public class MainActivity extends AppCompatActivity {
         collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
+        FloatingActionButton imageButtonSettings = findViewById(R.id.floating_action_button_settings);
+        imageButtonSettings.setOnClickListener(view -> _navigationService.NavigateToActivity(MainActivity.this, SettingsActivity.class));
+
+        FloatingActionButton imageButtonAbout = findViewById(R.id.floating_action_button_about);
+        imageButtonAbout.setOnClickListener(view -> new LibsBuilder()
+                .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                .start(MainActivity.this));
+
+        _listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView absListView, int scrollState) {
+            }
+
+            @Override
+            public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                // Check if bottom has been reached
+                if (firstVisibleItem + visibleItemCount >= totalItemCount && totalItemCount > 0) {
+                    imageButtonSettings.setVisibility(View.GONE);
+                    imageButtonAbout.setVisibility(View.GONE);
+                } else {
+                    imageButtonSettings.setVisibility(View.VISIBLE);
+                    imageButtonAbout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+
         _pullRefreshLayout = findViewById(R.id.skeletonList_pullRefreshLayout_main);
         _pullRefreshLayout.setOnRefreshListener(() -> {
             _logger.Debug("onRefresh " + TAG);
@@ -181,14 +208,6 @@ public class MainActivity extends AppCompatActivity {
 
             _mainServiceBinder.StartDownloadAll("pullRefreshLayout setOnRefreshListener");
         });
-
-        FloatingActionButton imageButtonSettings = findViewById(R.id.floating_action_button_settings);
-        imageButtonSettings.setOnClickListener(view -> _navigationService.NavigateToActivity(MainActivity.this, SettingsActivity.class));
-
-        FloatingActionButton imageButtonAbout = findViewById(R.id.floating_action_button_about);
-        imageButtonAbout.setOnClickListener(view -> new LibsBuilder()
-                .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
-                .start(MainActivity.this));
     }
 
     @Override
