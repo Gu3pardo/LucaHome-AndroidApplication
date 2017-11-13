@@ -3,6 +3,8 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -18,9 +20,11 @@ import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
+import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.Coin;
 import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.controller.NotificationController;
 import guepardoapps.lucahome.common.converter.JsonDataToCoinTrendConverter;
 import guepardoapps.lucahome.common.converter.JsonDataToCoinConversionConverter;
 import guepardoapps.lucahome.common.converter.JsonDataToCoinConverter;
@@ -28,10 +32,10 @@ import guepardoapps.lucahome.common.database.DatabaseCoinList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
-import guepardoapps.lucahome.common.interfaces.services.IDataService;
+import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-public class CoinService implements IDataService {
+public class CoinService implements IDataNotificationService {
     public static class CoinConversionDownloadFinishedContent extends ObjectChangeFinishedContent {
         SerializableList<SerializablePair<String, Double>> CoinConversionList;
 
@@ -49,6 +53,8 @@ public class CoinService implements IDataService {
             CoinList = coinList;
         }
     }
+
+    public static final int NOTIFICATION_ID = 1100017;
 
     public static final String CoinIntent = "CoinIntent";
 
@@ -73,6 +79,11 @@ public class CoinService implements IDataService {
     private static final String TAG = CoinService.class.getSimpleName();
     private Logger _logger;
 
+    private Context _context;
+
+    private boolean _displayNotification;
+    private Class<?> _receiverActivity;
+
     private static final int MIN_TIMEOUT_MIN = 30;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
@@ -96,6 +107,7 @@ public class CoinService implements IDataService {
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
+    private NotificationController _notificationController;
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
 
@@ -374,7 +386,7 @@ public class CoinService implements IDataService {
     }
 
     @Override
-    public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
+    public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
         _logger.Debug("initialize");
 
         if (_isInitialized) {
@@ -384,13 +396,18 @@ public class CoinService implements IDataService {
 
         _reloadEnabled = reloadEnabled;
 
-        _broadcastController = new BroadcastController(context);
-        _downloadController = new DownloadController(context);
-        _networkController = new NetworkController(context);
-        _receiverController = new ReceiverController(context);
+        _context = context;
+        _receiverActivity = receiverActivity;
+        _displayNotification = displayNotification;
+
+        _broadcastController = new BroadcastController(_context);
+        _downloadController = new DownloadController(_context);
+        _networkController = new NetworkController(_context);
+        _notificationController = new NotificationController(_context);
+        _receiverController = new ReceiverController(_context);
         _settingsController = SettingsController.getInstance();
 
-        _databaseCoinList = new DatabaseCoinList(context);
+        _databaseCoinList = new DatabaseCoinList(_context);
         _databaseCoinList.Open();
 
         _receiverController.RegisterReceiver(_coinAggregateDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -595,6 +612,54 @@ public class CoinService implements IDataService {
                 entry.CommandDelete());
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.CoinDelete, true);
+    }
+
+    @Override
+    public void SetReceiverActivity(@NonNull Class<?> receiverActivity) {
+        _receiverActivity = receiverActivity;
+    }
+
+    @Override
+    public Class<?> GetReceiverActivity() {
+        return _receiverActivity;
+    }
+
+    @Override
+    public void ShowNotification() {
+        _logger.Debug("ShowNotification");
+
+        if (!_displayNotification) {
+            _logger.Warning("_displayNotification is false!");
+            return;
+        }
+
+        Bitmap icon = BitmapFactory.decodeResource(_context.getResources(), R.drawable.btc);
+        _notificationController.CreateSimpleNotification(
+                NOTIFICATION_ID, _receiverActivity, icon,
+                "Coin value", String.format(Locale.getDefault(), "You have a value of: %s", AllCoinsValue()),
+                true);
+    }
+
+    @Override
+    public void CloseNotification() {
+        _logger.Debug("CloseNotification");
+        _notificationController.CloseNotification(NOTIFICATION_ID);
+    }
+
+    @Override
+    public boolean GetDisplayNotification() {
+        return _displayNotification;
+    }
+
+    @Override
+    public void SetDisplayNotification(boolean displayNotification) {
+        _displayNotification = displayNotification;
+
+        if (!_displayNotification) {
+            CloseNotification();
+        } else {
+            ShowNotification();
+        }
     }
 
     @Override

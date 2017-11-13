@@ -102,6 +102,7 @@
     <string name="pref_title_notification_forecast_weather">Display forecast weather notification</string>
     <string name="pref_title_notification_temperature">Display temperature notification</string>
     <string name="pref_title_notification_camera">Display notification whenever camera is active</string>
+    <string name="pref_title_notification_coins">Display notification whenever coins are updated</string>
 
     <!-- Settings for Reload data -->
     <string name="pref_header_reload_data">Reload Data</string>

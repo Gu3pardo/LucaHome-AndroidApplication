@@ -61,7 +61,7 @@ public final class JsonDataToShoppingListConverter implements IJsonDataConverter
     }
 
     private static SerializableList<ShoppingEntry> parseStringToList(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) >= 1) {
+        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
             if (value.contains(_searchParameter)) {
                 SerializableList<ShoppingEntry> list = new SerializableList<>();
 

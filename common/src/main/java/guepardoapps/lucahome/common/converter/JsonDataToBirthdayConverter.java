@@ -39,7 +39,7 @@ public class JsonDataToBirthdayConverter {
 
     private SerializableList<LucaBirthday> parseStringToList(@NonNull String value, @NonNull Context context) {
         if (!value.contains("Error")) {
-            if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
+            if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
                 if (value.contains(_searchParameter)) {
                     SerializableList<LucaBirthday> list = new SerializableList<>();
 

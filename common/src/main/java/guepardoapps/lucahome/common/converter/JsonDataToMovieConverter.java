@@ -36,7 +36,7 @@ public final class JsonDataToMovieConverter implements IJsonDataConverter {
     }
 
     private SerializableList<Movie> parseStringToList(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
+        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
             if (value.contains(_searchParameter)) {
                 SerializableList<Movie> list = new SerializableList<>();
 

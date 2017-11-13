@@ -25,6 +25,7 @@ import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.*;
 import guepardoapps.lucahome.receiver.SocketActionReceiver;
 import guepardoapps.lucahome.views.BirthdayActivity;
+import guepardoapps.lucahome.views.CoinActivity;
 import guepardoapps.lucahome.views.ForecastWeatherActivity;
 import guepardoapps.lucahome.views.MainActivity;
 import guepardoapps.lucahome.views.SecurityActivity;
@@ -421,6 +422,8 @@ public class MainService extends Service {
 
         _coinService.Initialize(
                 this,
+                CoinActivity.class,
+                SettingsController.getInstance().IsCoinsNotificationEnabled(),
                 SettingsController.getInstance().IsReloadCoinEnabled(),
                 SettingsController.getInstance().GetReloadCoinTimeout());
 

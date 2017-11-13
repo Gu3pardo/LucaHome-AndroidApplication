@@ -168,6 +168,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE)) {
                     if ((boolean) value) {
                         _birthdayService.SetDisplayNotification(_settingsController.IsBirthdayNotificationEnabled());
+                        _coinService.SetDisplayNotification(_settingsController.IsCoinsNotificationEnabled());
                         _openWeatherService.SetDisplayCurrentWeatherNotification(_settingsController.IsCurrentWeatherNotificationEnabled());
                         _openWeatherService.SetDisplayForecastWeatherNotification(_settingsController.IsForecastWeatherNotificationEnabled());
                         _securityService.SetDisplayNotification(_settingsController.IsCameraNotificationEnabled());
@@ -175,6 +176,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         _wirelessSocketService.SetDisplayNotification(_settingsController.IsSocketNotificationEnabled());
                     } else {
                         _birthdayService.SetDisplayNotification(false);
+                        _coinService.SetDisplayNotification(false);
                         _openWeatherService.SetDisplayCurrentWeatherNotification(false);
                         _openWeatherService.SetDisplayForecastWeatherNotification(false);
                         _securityService.SetDisplayNotification(false);
@@ -184,6 +186,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_BIRTHDAY)) {
                     _birthdayService.SetDisplayNotification((boolean) value);
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_COINS)) {
+                    _coinService.SetDisplayNotification((boolean) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER)) {
                     _openWeatherService.SetDisplayCurrentWeatherNotification((boolean) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER)) {
@@ -499,6 +503,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_CAMERA));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_COINS));
         }
 
         @Override

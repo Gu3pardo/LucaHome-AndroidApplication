@@ -49,4 +49,11 @@
         android:key="notifications_message_camera"
         android:title="@string/pref_title_notification_camera" />
 
+    <!-- NOTE: This preference will be enabled only when the top checkbox is checked. -->
+    <SwitchPreference
+        android:defaultValue="false"
+        android:dependency="notifications_message"
+        android:key="notifications_message_coins"
+        android:title="@string/pref_title_notification_coins" />
+
 </PreferenceScreen>

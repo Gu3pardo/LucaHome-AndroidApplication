@@ -33,7 +33,7 @@ public final class JsonDataToCoinConverter {
     }
 
     private SerializableList<Coin> parseStringToList(@NonNull String value, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
+        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
             if (value.contains(_searchParameter)) {
                 SerializableList<Coin> list = new SerializableList<>();
 

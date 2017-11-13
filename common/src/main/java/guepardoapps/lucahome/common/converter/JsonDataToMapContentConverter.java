@@ -85,7 +85,7 @@ public final class JsonDataToMapContentConverter {
         _logger.Debug(value);
 
         if (!value.contains("Error")) {
-            if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
+            if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
                 if (value.contains(_searchParameter)) {
                     SerializableList<MapContent> list = new SerializableList<>();
 

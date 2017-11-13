@@ -35,6 +35,7 @@ public class SettingsController {
     public static final String PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER = "notifications_message_forecast_weather";
     public static final String PREF_NOTIFICATION_MESSAGE_TEMPERATURE = "notifications_message_temperature";
     public static final String PREF_NOTIFICATION_MESSAGE_CAMERA = "notifications_message_camera";
+    public static final String PREF_NOTIFICATION_MESSAGE_COINS = "notifications_message_coins";
 
     public static final String PREF_RELOAD_DATA_ENABLED = "reload_data_enabled";
     public static final String PREF_RELOAD_BIRTHDAY_ENABLED = "reload_birthday_enabled";
@@ -215,6 +216,13 @@ public class SettingsController {
             return false;
         }
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_CAMERA);
+    }
+
+    public boolean IsCoinsNotificationEnabled() {
+        if (!AreNotificationsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_COINS);
     }
 
     public boolean IsChangeWeatherWallpaperActive() {

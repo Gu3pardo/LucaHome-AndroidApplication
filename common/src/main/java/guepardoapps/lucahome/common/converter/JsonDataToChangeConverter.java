@@ -38,7 +38,7 @@ public final class JsonDataToChangeConverter implements IJsonDataConverter {
     }
 
     private SerializableList<Change> parseStringToList(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
+        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
             if (value.contains(_searchParameter)) {
                 SerializableList<Change> list = new SerializableList<>();
 

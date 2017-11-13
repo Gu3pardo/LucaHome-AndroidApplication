@@ -48,14 +48,14 @@ public class NotificationController {
         _settingsController = SettingsController.getInstance();
     }
 
-    public void CreateBirthdayNotification(
+    public void CreateSimpleNotification(
             int notificationId,
-            @NonNull Class<?> birthdayActivity,
+            @NonNull Class<?> receiverActivity,
             Bitmap photo,
             @NonNull String title,
             @NonNull String body,
             boolean autoCancelable) {
-        _logger.Debug("CreateBirthdayNotification");
+        _logger.Debug("CreateSimpleNotification");
 
         if (!_settingsController.IsBirthdayNotificationEnabled()) {
             _logger.Warning("Not allowed to display birthday notification!");
@@ -70,7 +70,7 @@ public class NotificationController {
 
         Notification.Builder builder = new Notification.Builder(_context);
 
-        Intent intent = new Intent(_context, birthdayActivity);
+        Intent intent = new Intent(_context, receiverActivity);
         PendingIntent pendingIntent = PendingIntent.getActivity(_context, notificationId, intent, 0);
 
         builder.setSmallIcon(R.drawable.birthday)

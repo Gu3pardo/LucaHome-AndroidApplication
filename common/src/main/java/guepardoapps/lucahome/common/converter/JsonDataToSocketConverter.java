@@ -53,7 +53,7 @@ public final class JsonDataToSocketConverter implements IJsonDataConverter {
     }
 
     private static SerializableList<WirelessSocket> parseStringToList(String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
+        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
             if (value.contains(_searchParameter)) {
                 SerializableList<WirelessSocket> list = new SerializableList<>();
 

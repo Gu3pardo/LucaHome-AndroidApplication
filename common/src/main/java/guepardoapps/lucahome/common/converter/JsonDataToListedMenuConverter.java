@@ -63,7 +63,7 @@ public final class JsonDataToListedMenuConverter implements IJsonDataConverter {
     }
 
     private SerializableList<ListedMenu> parseStringToList(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
+        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
             if (value.contains(_searchParameter)) {
                 SerializableList<ListedMenu> list = new SerializableList<>();
 

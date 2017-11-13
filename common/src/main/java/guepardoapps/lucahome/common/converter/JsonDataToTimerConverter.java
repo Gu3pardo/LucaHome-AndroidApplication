@@ -46,7 +46,7 @@ public final class JsonDataToTimerConverter {
     private SerializableList<LucaTimer> parseStringToList(
             @NonNull String value,
             @NonNull SerializableList<WirelessSocket> socketList) {
-        if (StringHelper.GetStringCount(value, _searchParameter) >= 1) {
+        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
             if (value.contains(_searchParameter)) {
                 SerializableList<LucaTimer> list = new SerializableList<>();
 

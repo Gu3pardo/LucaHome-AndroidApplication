@@ -55,7 +55,7 @@ public final class JsonDataToMenuConverter implements IJsonDataConverter {
     }
 
     private SerializableList<LucaMenu> parseStringToList(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 1) {
+        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
             if (value.contains(_searchParameter)) {
                 SerializableList<LucaMenu> list = new SerializableList<>();
 
