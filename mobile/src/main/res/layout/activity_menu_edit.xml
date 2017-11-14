@@ -82,6 +82,21 @@
 
                 </android.support.design.widget.TextInputLayout>
 
+                <com.rey.material.widget.FloatingActionButton
+                    android:id="@+id/menuRandomEntry_Button"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_below="@+id/menuDescription_TextInputLayout"
+                    android:layout_margin="5dp"
+                    app:fab_iconSize="40dp"
+                    app:fab_iconSrc="@mipmap/ic_casino_white_48dp"
+                    app:fab_radius="25dp"
+                    app:rd_delayClick="none"
+                    app:rd_enable="true"
+                    app:rd_rippleColor="@color/colorPrimary"
+                    app:rd_rippleType="touch" />
+
                 <com.rey.material.widget.Button
                     android:id="@+id/save_menu_edit_button"
                     style="?android:textAppearanceSmall"

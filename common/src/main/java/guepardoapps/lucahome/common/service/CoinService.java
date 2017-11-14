@@ -243,6 +243,8 @@ public class CoinService implements IDataNotificationService {
             for (int index = 0; index < _coinList.getSize(); index++) {
                 LoadCoinTrend(_coinList.getValue(index));
             }
+
+            ShowNotification();
         }
     };
 

@@ -1,5 +1,7 @@
 package guepardoapps.lucahome.basic.classes;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -12,7 +14,7 @@ public class SerializableList<T> implements Serializable {
         _dataList = new ArrayList<>();
     }
 
-    public void addValue(T newValue) {
+    public void addValue(@NonNull T newValue) {
         if (_dataList == null) {
             _dataList = new ArrayList<>();
         }
@@ -20,7 +22,7 @@ public class SerializableList<T> implements Serializable {
         _dataList.add(newValue);
     }
 
-    public void setValue(int index, T value) {
+    public void setValue(int index, @NonNull T value) {
         if (_dataList == null) {
             _dataList = new ArrayList<>();
         }
@@ -33,7 +35,7 @@ public class SerializableList<T> implements Serializable {
         _dataList.set(index, value);
     }
 
-    public void setFirstValue(T value) {
+    public void setFirstValue(@NonNull T value) {
         if (_dataList == null) {
             _dataList = new ArrayList<>();
             return;
@@ -50,7 +52,7 @@ public class SerializableList<T> implements Serializable {
         _dataList.set(0, value);
     }
 
-    public void removeValue(T removeValue) {
+    public void removeValue(@NonNull T removeValue) {
         if (_dataList == null) {
             _dataList = new ArrayList<>();
             return;
@@ -68,7 +70,7 @@ public class SerializableList<T> implements Serializable {
         _dataList.remove(index);
     }
 
-    public boolean hasValue(T checkValue) {
+    public boolean hasValue(@NonNull T checkValue) {
         if (_dataList == null) {
             _dataList = new ArrayList<>();
             return false;
@@ -97,7 +99,7 @@ public class SerializableList<T> implements Serializable {
         return _dataList.size();
     }
 
-    public int getIndex(T entry) {
+    public int getIndex(@NonNull T entry) {
         for (int index = 0; index < getSize(); index++) {
             if (entry == getValue(index)) {
                 return index;

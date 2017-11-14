@@ -103,4 +103,18 @@
         app:rd_rippleColor="@color/colorPrimary"
         app:rd_rippleType="touch" />
 
+    <com.rey.material.widget.FloatingActionButton
+        android:id="@+id/floating_action_button_share_shoppingList"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:visibility="gone"
+        app:fab_iconSrc="@android:drawable/ic_menu_share"
+        app:layout_anchor="@id/appbar_shoppingList"
+        app:layout_anchorGravity="bottom|left|start"
+        app:rd_delayClick="none"
+        app:rd_enable="true"
+        app:rd_rippleColor="@color/colorPrimary"
+        app:rd_rippleType="touch" />
+
 </android.support.design.widget.CoordinatorLayout>

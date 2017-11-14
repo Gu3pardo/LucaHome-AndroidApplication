@@ -99,11 +99,11 @@ public class SerializableDate implements Serializable {
         return DD() + "." + MM() + "." + YYYY();
     }
 
-    public boolean isAfter(SerializableDate compareDate) {
+    public boolean isAfter(@NonNull SerializableDate compareDate) {
         return compareDate.calculateMillis() > calculateMillis();
     }
 
-    public boolean isBefore(SerializableDate compareDate) {
+    public boolean isBefore(@NonNull SerializableDate compareDate) {
         return compareDate.calculateMillis() < calculateMillis();
     }
 

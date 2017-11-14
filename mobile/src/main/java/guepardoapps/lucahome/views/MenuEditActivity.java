@@ -18,13 +18,18 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
+import com.rey.material.widget.FloatingActionButton;
+
 import java.util.Locale;
+import java.util.Random;
 
 import de.mateware.snacky.Snacky;
 import guepardoapps.lucahome.R;
+import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
+import guepardoapps.lucahome.common.classes.ListedMenu;
 import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.dto.MenuDto;
 import guepardoapps.lucahome.common.service.MenuService;
@@ -115,6 +120,17 @@ public class MenuEditActivity extends AppCompatActivity {
         } else {
             displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
+
+        FloatingActionButton randomMenuButton = findViewById(R.id.menuRandomEntry_Button);
+        randomMenuButton.setOnClickListener(view -> {
+            SerializableList<ListedMenu> listedMenuList = _menuService.GetListedMenuList();
+
+            Random randomMenuId = new Random();
+            int menuId = randomMenuId.nextInt(listedMenuList.getSize());
+
+            ListedMenu menu = listedMenuList.getValue(menuId);
+            menuTitleTypeTextView.setText(menu.GetDescription());
+        });
 
         _saveButton.setEnabled(false);
         _saveButton.setOnClickListener(view -> {

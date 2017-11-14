@@ -23,6 +23,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.baoyz.widget.PullRefreshLayout;
+import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
@@ -41,8 +42,6 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     private static final String TAG = MenuActivity.class.getSimpleName();
     private Logger _logger;
 
-    private Context _context;
-
     /**
      * Initiate UI
      */
@@ -51,6 +50,12 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     private ListView _listView;
     private TextView _noDataFallback;
     private PullRefreshLayout _pullRefreshLayout;
+    private FloatingActionButton _shareButton;
+
+    /**
+     * Save context in private variable
+     */
+    private Context _context;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -95,6 +100,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
                         _noDataFallback.setVisibility(View.GONE);
                         _listView.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.VISIBLE);
+                        _shareButton.setVisibility(View.VISIBLE);
                     } else {
                         _noDataFallback.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.INVISIBLE);
@@ -144,6 +150,9 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        _shareButton = findViewById(R.id.floating_action_button_share_menu);
+        _shareButton.setOnClickListener(view -> _menuService.ShareMenuList());
+
         _context = this;
 
         _receiverController = new ReceiverController(_context);
@@ -159,6 +168,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             _noDataFallback.setVisibility(View.GONE);
             _listView.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.VISIBLE);
+            _shareButton.setVisibility(View.VISIBLE);
         }
         _progressBar.setVisibility(View.GONE);
 
@@ -181,6 +191,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
+            _shareButton.setVisibility(View.GONE);
 
             _menuService.LoadData();
         });
@@ -207,6 +218,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             _noDataFallback.setVisibility(View.GONE);
             _listView.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.VISIBLE);
+            _shareButton.setVisibility(View.VISIBLE);
         }
         _progressBar.setVisibility(View.GONE);
     }

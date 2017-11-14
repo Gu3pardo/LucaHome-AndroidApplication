@@ -139,11 +139,11 @@ public class SerializableTime implements Serializable {
         return HH() + ":" + MM() + ":" + SS() + ":" + mm();
     }
 
-    public boolean IsAfter(SerializableTime compareTime) {
+    public boolean IsAfter(@NonNull SerializableTime compareTime) {
         return compareTime.toMilliSecond() > toMilliSecond();
     }
 
-    public boolean IsBefore(SerializableTime compareTime) {
+    public boolean IsBefore(@NonNull SerializableTime compareTime) {
         return compareTime.toMilliSecond() < toMilliSecond();
     }
 

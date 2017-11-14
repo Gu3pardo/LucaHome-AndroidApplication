@@ -90,6 +90,8 @@ public class MenuService implements IDataService {
         }
     };
 
+    private Context _context;
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -341,15 +343,17 @@ public class MenuService implements IDataService {
 
         _reloadEnabled = reloadEnabled;
 
-        _broadcastController = new BroadcastController(context);
-        _downloadController = new DownloadController(context);
-        _networkController = new NetworkController(context);
-        _receiverController = new ReceiverController(context);
+        _context = context;
+
+        _broadcastController = new BroadcastController(_context);
+        _downloadController = new DownloadController(_context);
+        _networkController = new NetworkController(_context);
+        _receiverController = new ReceiverController(_context);
         _settingsController = SettingsController.getInstance();
 
-        _databaseListedMenuList = new DatabaseListedMenuList(context);
+        _databaseListedMenuList = new DatabaseListedMenuList(_context);
         _databaseListedMenuList.Open();
-        _databaseMenuList = new DatabaseMenuList(context);
+        _databaseMenuList = new DatabaseMenuList(_context);
         _databaseMenuList.Open();
 
         _receiverController.RegisterReceiver(_listedMenuDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -575,6 +579,23 @@ public class MenuService implements IDataService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public void ShareMenuList() {
+        StringBuilder shareText = new StringBuilder("Menu:\n");
+
+        for (int index = 0; index < _menuList.getSize(); index++) {
+            LucaMenu entry = _menuList.getValue(index);
+            shareText.append(entry.GetDateString()).append("\n").append(entry.GetTitle()).append("\n").append(entry.GetDescription()).append("\n\n");
+        }
+
+        Intent sendIntent = new Intent();
+
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, shareText.toString());
+        sendIntent.setType("text/plain");
+
+        _context.startActivity(sendIntent);
     }
 
     private void clearListedMenuListFromDatabase() {

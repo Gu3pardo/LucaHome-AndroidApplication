@@ -55,6 +55,8 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
     private TextView _noDataFallback;
     private CollapsingToolbarLayout _collapsingToolbar;
     private PullRefreshLayout _pullRefreshLayout;
+    private FloatingActionButton _addButton;
+    private FloatingActionButton _shareButton;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -99,6 +101,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
                         _noDataFallback.setVisibility(View.GONE);
                         _listView.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.VISIBLE);
+                        _shareButton.setVisibility(View.VISIBLE);
 
                         _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d entries", result.ShoppingList.getSize()));
                     } else {
@@ -107,13 +110,17 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
                         _searchField.setVisibility(View.INVISIBLE);
                     }
 
+                    _addButton.setVisibility(View.VISIBLE);
+
                     return;
                 }
             }
 
             displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
+
             _noDataFallback.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
+            _addButton.setVisibility(View.VISIBLE);
         }
     };
 
@@ -156,6 +163,9 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
         _collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         _collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
+        _shareButton = findViewById(R.id.floating_action_button_share_shoppingList);
+        _shareButton.setOnClickListener(view -> _shoppingListService.ShareShoppingList());
+
         _context = this;
 
         _receiverController = new ReceiverController(_context);
@@ -171,13 +181,14 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
             _noDataFallback.setVisibility(View.GONE);
             _listView.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.VISIBLE);
+            _shareButton.setVisibility(View.VISIBLE);
 
             _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d entries", shoppingList.getSize()));
         }
         _progressBar.setVisibility(View.GONE);
 
-        FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_shoppingList);
-        addButton.setOnClickListener(view -> {
+        _addButton = findViewById(R.id.floating_action_button_add_shoppingList);
+        _addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
             data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1));
 
@@ -203,6 +214,8 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
+            _addButton.setVisibility(View.GONE);
+            _shareButton.setVisibility(View.GONE);
 
             _shoppingListService.LoadData();
         });
@@ -229,6 +242,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
             _noDataFallback.setVisibility(View.GONE);
             _listView.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.VISIBLE);
+            _shareButton.setVisibility(View.VISIBLE);
 
             _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d entries", shoppingList.getSize()));
         }

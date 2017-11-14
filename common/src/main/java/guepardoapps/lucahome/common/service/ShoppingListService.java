@@ -76,6 +76,8 @@ public class ShoppingListService implements IDataService {
         }
     };
 
+    private Context _context;
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -288,14 +290,16 @@ public class ShoppingListService implements IDataService {
 
         _reloadEnabled = reloadEnabled;
 
-        _broadcastController = new BroadcastController(context);
-        _downloadController = new DownloadController(context);
-        _networkController = new NetworkController(context);
-        _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
-        _settingsController.Initialize(context);
+        _context = context;
 
-        _databaseShoppingList = new DatabaseShoppingList(context);
+        _broadcastController = new BroadcastController(_context);
+        _downloadController = new DownloadController(_context);
+        _networkController = new NetworkController(_context);
+        _receiverController = new ReceiverController(_context);
+        _settingsController = SettingsController.getInstance();
+        _settingsController.Initialize(_context);
+
+        _databaseShoppingList = new DatabaseShoppingList(_context);
         _databaseShoppingList.Open();
 
         _receiverController.RegisterReceiver(_shoppingListDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -506,6 +510,23 @@ public class ShoppingListService implements IDataService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public void ShareShoppingList() {
+        StringBuilder shareText = new StringBuilder("ShoppingList:\n");
+
+        for (int index = 0; index < _shoppingList.getSize(); index++) {
+            ShoppingEntry entry = _shoppingList.getValue(index);
+            shareText.append(String.valueOf(entry.GetQuantity())).append("x ").append(entry.GetName()).append("\n");
+        }
+
+        Intent sendIntent = new Intent();
+
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, shareText.toString());
+        sendIntent.setType("text/plain");
+
+        _context.startActivity(sendIntent);
     }
 
     private void clearShoppingListFromDatabase() {

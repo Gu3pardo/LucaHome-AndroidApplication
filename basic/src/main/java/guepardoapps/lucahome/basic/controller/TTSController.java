@@ -51,20 +51,17 @@ public class TTSController {
             return;
         }
 
-        _ttsSpeaker = new TextToSpeech(_context, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = _ttsSpeaker.setLanguage(Locale.US);
-                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        _logger.Error("This Language is not supported!");
-                    } else {
-                        _receiverController.RegisterReceiver(_speakReceiver, new String[]{TTS_SPEAK_TEXT_BROADCAST});
-                        _ttsInitialized = true;
-                    }
+        _ttsSpeaker = new TextToSpeech(_context, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = _ttsSpeaker.setLanguage(Locale.US);
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    _logger.Error("This Language is not supported!");
                 } else {
-                    _logger.Error("Initialization failed!");
+                    _receiverController.RegisterReceiver(_speakReceiver, new String[]{TTS_SPEAK_TEXT_BROADCAST});
+                    _ttsInitialized = true;
                 }
+            } else {
+                _logger.Error("Initialization failed!");
             }
         });
     }
