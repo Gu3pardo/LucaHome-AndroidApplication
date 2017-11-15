@@ -6,10 +6,12 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.library.openweather.models.WeatherModel;
 import guepardoapps.library.openweather.service.OpenWeatherService;
+
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializableTime;
@@ -56,6 +58,8 @@ public class TemperatureService implements IDataNotificationService {
 
     private static final int MIN_TIMEOUT_MIN = 15;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
+
+    private Date _lastUpdate;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -136,6 +140,8 @@ public class TemperatureService implements IDataNotificationService {
                 _temperatureList.addValue(currentWeatherTemperature);
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     TemperatureDownloadFinishedBroadcast,
                     TemperatureDownloadFinishedBundle,
@@ -179,6 +185,8 @@ public class TemperatureService implements IDataNotificationService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new Date();
 
         _receiverActivity = receiverActivity;
         _displayNotification = displayNotification;
@@ -377,6 +385,10 @@ public class TemperatureService implements IDataNotificationService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {

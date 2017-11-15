@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
@@ -67,6 +68,8 @@ public class WirelessSocketService implements IDataNotificationService {
     private Logger _logger;
 
     private boolean _loadDataEnabled;
+
+    private Date _lastUpdate;
 
     private boolean _displayNotification;
     private Class<?> _receiverClass;
@@ -141,6 +144,8 @@ public class WirelessSocketService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _wirelessSocketList = wirelessSocketList;
             ShowNotification();
 
@@ -182,6 +187,8 @@ public class WirelessSocketService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketSetFinishedBroadcast,
                     WirelessSocketSetFinishedBundle,
@@ -218,6 +225,8 @@ public class WirelessSocketService implements IDataNotificationService {
                 sendFailedSocketAddBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketAddFinishedBroadcast,
@@ -256,6 +265,8 @@ public class WirelessSocketService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketUpdateFinishedBroadcast,
                     WirelessSocketUpdateFinishedBundle,
@@ -292,6 +303,8 @@ public class WirelessSocketService implements IDataNotificationService {
                 sendFailedSocketDeleteBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketDeleteFinishedBroadcast,
@@ -338,6 +351,8 @@ public class WirelessSocketService implements IDataNotificationService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new Date();
 
         _loadDataEnabled = true;
 
@@ -782,6 +797,10 @@ public class WirelessSocketService implements IDataNotificationService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void clearSocketListFromDatabase() {

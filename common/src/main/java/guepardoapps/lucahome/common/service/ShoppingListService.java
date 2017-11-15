@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
@@ -62,6 +63,8 @@ public class ShoppingListService implements IDataService {
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
     private boolean _loadDataEnabled;
+
+    private Date _lastUpdate;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -131,6 +134,8 @@ public class ShoppingListService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _shoppingList = shoppingList;
 
             clearShoppingListFromDatabase();
@@ -171,6 +176,8 @@ public class ShoppingListService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListAddFinishedBroadcast,
                     ShoppingListAddFinishedBundle,
@@ -208,6 +215,8 @@ public class ShoppingListService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListUpdateFinishedBroadcast,
                     ShoppingListUpdateFinishedBundle,
@@ -244,6 +253,8 @@ public class ShoppingListService implements IDataService {
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListDeleteFinishedBroadcast,
@@ -290,6 +301,8 @@ public class ShoppingListService implements IDataService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new Date();
 
         _loadDataEnabled = true;
         _reloadEnabled = reloadEnabled;
@@ -596,6 +609,10 @@ public class ShoppingListService implements IDataService {
         sendIntent.setType("text/plain");
 
         _context.startActivity(sendIntent);
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void clearShoppingListFromDatabase() {

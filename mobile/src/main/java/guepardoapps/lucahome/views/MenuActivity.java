@@ -49,6 +49,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private PullRefreshLayout _pullRefreshLayout;
     private FloatingActionButton _shareButton;
 
@@ -92,6 +93,8 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_menuService.GetLastUpdate().toString());
+
                 if (result.MenuList != null) {
                     if (result.MenuList.getSize() > 0) {
                         _menuListViewAdapter = new MenuListViewAdapter(_context, result.MenuList);
@@ -131,6 +134,7 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
         _listView = findViewById(R.id.listView_menu);
         _progressBar = findViewById(R.id.progressBar_menu);
         _noDataFallback = findViewById(R.id.fallBackTextView_menu);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_menu);
 
         _searchField = findViewById(R.id.search_menu);
         _searchField.addTextChangedListener(new TextWatcher() {
@@ -159,6 +163,8 @@ public class MenuActivity extends AppCompatActivity implements NavigationView.On
 
         _navigationService = NavigationService.getInstance();
         _menuService = MenuService.getInstance();
+
+        _lastUpdateTextView.setText(_menuService.GetLastUpdate().toString());
 
         SerializableList<LucaMenu> menuList = _menuService.GetDataList();
         if (menuList.getSize() > 0) {

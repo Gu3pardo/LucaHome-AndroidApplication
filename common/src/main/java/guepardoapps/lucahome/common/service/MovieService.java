@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -53,6 +54,8 @@ public class MovieService implements IDataService {
 
     private static final int MIN_TIMEOUT_MIN = 60;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
+
+    private Date _lastUpdate;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -115,6 +118,8 @@ public class MovieService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _logger.Debug("Successfully converted movieList! Now sorting and then broadcasting!");
             _movieList = sortListAlphabetically(movieList);
 
@@ -152,6 +157,8 @@ public class MovieService implements IDataService {
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     MovieUpdateFinishedBroadcast,
@@ -198,6 +205,8 @@ public class MovieService implements IDataService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new Date();
 
         _reloadEnabled = reloadEnabled;
 
@@ -366,6 +375,10 @@ public class MovieService implements IDataService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {

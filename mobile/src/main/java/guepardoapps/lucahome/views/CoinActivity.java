@@ -52,6 +52,7 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private CollapsingToolbarLayout _collapsingToolbar;
     private PullRefreshLayout _pullRefreshLayout;
 
@@ -90,6 +91,8 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_coinService.GetLastUpdate().toString());
+
                 if (result.CoinList != null) {
                     if (result.CoinList.getSize() > 0) {
                         _coinListViewAdapter = new CoinListViewAdapter(_context, result.CoinList);
@@ -131,6 +134,7 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
         _listView = findViewById(R.id.listView_coin);
         _progressBar = findViewById(R.id.progressBar_coin);
         _noDataFallback = findViewById(R.id.fallBackTextView_coin);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_coin);
 
         _searchField = findViewById(R.id.search_coin);
         _searchField.addTextChangedListener(new TextWatcher() {
@@ -161,6 +165,8 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
 
         _navigationService = NavigationService.getInstance();
         _coinService = CoinService.getInstance();
+
+        _lastUpdateTextView.setText(_coinService.GetLastUpdate().toString());
 
         SerializableList<Coin> coinList = _coinService.GetDataList();
         if (coinList.getSize() > 0) {

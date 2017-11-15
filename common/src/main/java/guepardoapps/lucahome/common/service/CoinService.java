@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import org.json.JSONException;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
@@ -82,6 +83,8 @@ public class CoinService implements IDataNotificationService {
 
     private boolean _loadDataEnabled;
 
+    private Date _lastUpdate;
+
     private Context _context;
 
     private boolean _displayNotification;
@@ -147,6 +150,8 @@ public class CoinService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _coinConversionList = coinConversionList;
 
             mergeCoinConversionWithCoinList();
@@ -194,6 +199,8 @@ public class CoinService implements IDataNotificationService {
             } catch (JSONException jsonException) {
                 _logger.Error(jsonException.getMessage());
             }
+
+            _lastUpdate = new Date();
         }
     };
 
@@ -234,6 +241,8 @@ public class CoinService implements IDataNotificationService {
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _coinList = coinList;
             _filteredCoinList = new SerializableList<>();
@@ -282,6 +291,8 @@ public class CoinService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     CoinAddFinishedBroadcast,
                     CoinAddFinishedBundle,
@@ -319,6 +330,8 @@ public class CoinService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     CoinUpdateFinishedBroadcast,
                     CoinUpdateFinishedBundle,
@@ -355,6 +368,8 @@ public class CoinService implements IDataNotificationService {
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     CoinDeleteFinishedBroadcast,
@@ -401,6 +416,8 @@ public class CoinService implements IDataNotificationService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new Date();
 
         _reloadEnabled = reloadEnabled;
         _loadDataEnabled = true;
@@ -780,6 +797,10 @@ public class CoinService implements IDataNotificationService {
         }
 
         _settingsController.SetCoinHoursTrend(coinHoursTrend);
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void clearCoinListFromDatabase() {

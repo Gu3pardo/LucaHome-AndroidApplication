@@ -51,6 +51,7 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private CollapsingToolbarLayout _collapsingToolbar;
     private PullRefreshLayout _pullRefreshLayout;
 
@@ -89,6 +90,8 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_scheduleService.GetLastUpdate().toString());
+
                 if (result.TimerList != null) {
                     if (result.TimerList.getSize() != 0) {
                         _timerListViewAdapter = new TimerListViewAdapter(_context, result.TimerList);
@@ -130,6 +133,7 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
         _listView = findViewById(R.id.listView_timer);
         _progressBar = findViewById(R.id.progressBar_timer);
         _noDataFallback = findViewById(R.id.fallBackTextView_timer);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_timer);
 
         _searchField = findViewById(R.id.search_timer);
         _searchField.addTextChangedListener(new TextWatcher() {
@@ -160,6 +164,8 @@ public class TimerActivity extends AppCompatActivity implements NavigationView.O
 
         _navigationService = NavigationService.getInstance();
         _scheduleService = ScheduleService.getInstance();
+
+        _lastUpdateTextView.setText(_scheduleService.GetLastUpdate().toString());
 
         SerializableList<LucaTimer> timerList = _scheduleService.GetTimerList();
         if (timerList.getSize() > 0) {

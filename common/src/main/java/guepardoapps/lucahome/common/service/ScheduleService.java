@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
@@ -84,6 +85,8 @@ public class ScheduleService implements IDataService {
     private static final int MIN_TIMEOUT_MIN = 60;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
+    private Date _lastUpdate;
+
     private boolean _reloadEnabled;
     private int _reloadTimeout;
     private Handler _reloadHandler = new Handler();
@@ -153,6 +156,8 @@ public class ScheduleService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _scheduleList = scheduleList;
             _timerList = timerList;
 
@@ -196,6 +201,8 @@ public class ScheduleService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     ScheduleSetFinishedBroadcast,
                     ScheduleSetFinishedBundle,
@@ -232,6 +239,8 @@ public class ScheduleService implements IDataService {
                 sendFailedScheduleAddBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     ScheduleAddFinishedBroadcast,
@@ -270,6 +279,8 @@ public class ScheduleService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     ScheduleUpdateFinishedBroadcast,
                     ScheduleUpdateFinishedBundle,
@@ -306,6 +317,8 @@ public class ScheduleService implements IDataService {
                 sendFailedScheduleDeleteBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     ScheduleDeleteFinishedBroadcast,
@@ -344,6 +357,8 @@ public class ScheduleService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     TimerAddFinishedBroadcast,
                     TimerAddFinishedBundle,
@@ -381,6 +396,8 @@ public class ScheduleService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     TimerUpdateFinishedBroadcast,
                     TimerUpdateFinishedBundle,
@@ -417,6 +434,8 @@ public class ScheduleService implements IDataService {
                 sendFailedTimerDeleteBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     TimerDeleteFinishedBroadcast,
@@ -463,6 +482,8 @@ public class ScheduleService implements IDataService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new Date();
 
         _reloadEnabled = reloadEnabled;
 
@@ -813,6 +834,10 @@ public class ScheduleService implements IDataService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void sendFailedScheduleDownloadBroadcast(@NonNull String response) {

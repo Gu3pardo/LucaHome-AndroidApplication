@@ -50,6 +50,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private CollapsingToolbarLayout _collapsingToolbar;
     private PullRefreshLayout _pullRefreshLayout;
 
@@ -88,6 +89,8 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_movieService.GetLastUpdate().toString());
+
                 if (result.MovieList != null) {
                     if (result.MovieList.getSize() > 0) {
                         _movieListViewAdapter = new MovieListViewAdapter(_context, result.MovieList);
@@ -129,6 +132,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
         _listView = findViewById(R.id.listView_movie);
         _progressBar = findViewById(R.id.progressBar_movie);
         _noDataFallback = findViewById(R.id.fallBackTextView_movie);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_movie);
 
         _searchField = findViewById(R.id.search_movie);
         _searchField.addTextChangedListener(new TextWatcher() {
@@ -159,6 +163,8 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
 
         _navigationService = NavigationService.getInstance();
         _movieService = MovieService.getInstance();
+
+        _lastUpdateTextView.setText(_movieService.GetLastUpdate().toString());
 
         SerializableList<Movie> movieList = _movieService.GetDataList();
         if (movieList.getSize() > 0) {

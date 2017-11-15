@@ -62,6 +62,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private CollapsingToolbarLayout _collapsingToolbar;
     private PullRefreshLayout _pullRefreshLayout;
 
@@ -100,6 +101,8 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_birthdayService.GetLastUpdate().toString());
+
                 if (result.BirthdayList != null) {
                     if (result.BirthdayList.getSize() > 0) {
                         _birthdayListViewAdapter = new BirthdayListViewAdapter(_context, result.BirthdayList);
@@ -141,6 +144,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
         _listView = findViewById(R.id.listView_birthday);
         _progressBar = findViewById(R.id.progressBar_birthday);
         _noDataFallback = findViewById(R.id.fallBackTextView_birthday);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_birthday);
 
         _searchField = findViewById(R.id.search_birthday);
         _searchField.addTextChangedListener(new TextWatcher() {
@@ -171,6 +175,8 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
 
         _navigationService = NavigationService.getInstance();
         _birthdayService = BirthdayService.getInstance();
+
+        _lastUpdateTextView.setText(_birthdayService.GetLastUpdate().toString());
 
         SerializableList<LucaBirthday> birthdayList = _birthdayService.GetDataList();
         if (birthdayList.getSize() > 0) {

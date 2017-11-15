@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
@@ -43,6 +44,8 @@ public class MapContentService implements IDataService {
 
     private static final String TAG = MapContentService.class.getSimpleName();
     private Logger _logger;
+
+    private Date _lastUpdate;
 
     private static final int MIN_TIMEOUT_MIN = 4 * 60;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
@@ -120,6 +123,8 @@ public class MapContentService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _mapContentList = mapContentList;
 
             clearMapContentListFromDatabase();
@@ -168,6 +173,8 @@ public class MapContentService implements IDataService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new Date();
 
         _reloadEnabled = reloadEnabled;
 
@@ -306,6 +313,10 @@ public class MapContentService implements IDataService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void clearMapContentListFromDatabase() {

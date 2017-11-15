@@ -51,6 +51,7 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private KenBurnsView _mainImageView;
     private PullRefreshLayout _pullRefreshLayout;
 
@@ -89,6 +90,8 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_openWeatherService.GetLastUpdate().toString());
+
                 if (result.ForecastWeather != null) {
                     _mainImageView.setImageResource(result.ForecastWeather.GetWallpaper());
 
@@ -126,6 +129,7 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
         _listView = findViewById(R.id.listView_forecast_weather);
         _progressBar = findViewById(R.id.progressBar_forecast_weather);
         _noDataFallback = findViewById(R.id.fallBackTextView_forecast_weather);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_forecast_weather);
         _mainImageView = findViewById(R.id.kenBurnsView_forecast_weather);
 
         _searchField = findViewById(R.id.search_forecast_weather);
@@ -153,6 +157,8 @@ public class ForecastWeatherActivity extends AppCompatActivity implements Naviga
 
         _navigationService = NavigationService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
+
+        _lastUpdateTextView.setText(_openWeatherService.GetLastUpdate().toString());
 
         List<ForecastPartModel> forecastList = _openWeatherService.ForecastWeather().GetList();
         if (forecastList.size() > 0) {

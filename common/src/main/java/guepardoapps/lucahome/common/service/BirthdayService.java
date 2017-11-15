@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
@@ -62,6 +63,8 @@ public class BirthdayService implements IDataNotificationService {
     private Logger _logger;
 
     private boolean _loadDataEnabled;
+
+    private Date _lastUpdate;
 
     private boolean _displayNotification;
     private Class<?> _receiverActivity;
@@ -145,6 +148,8 @@ public class BirthdayService implements IDataNotificationService {
             clearBirthdayListFromDatabase();
             saveBirthdayListToDatabase();
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     BirthdayDownloadFinishedBroadcast,
                     BirthdayDownloadFinishedBundle,
@@ -179,6 +184,8 @@ public class BirthdayService implements IDataNotificationService {
                 sendFailedAddBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     BirthdayAddFinishedBroadcast,
@@ -217,6 +224,8 @@ public class BirthdayService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     BirthdayUpdateFinishedBroadcast,
                     BirthdayUpdateFinishedBundle,
@@ -253,6 +262,8 @@ public class BirthdayService implements IDataNotificationService {
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     BirthdayDeleteFinishedBroadcast,
@@ -301,6 +312,8 @@ public class BirthdayService implements IDataNotificationService {
         }
 
         _loadDataEnabled = true;
+
+        _lastUpdate = new Date();
 
         _receiverActivity = receiverActivity;
         _displayNotification = displayNotification;
@@ -641,6 +654,10 @@ public class BirthdayService implements IDataNotificationService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void clearBirthdayListFromDatabase() {

@@ -53,6 +53,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private CollapsingToolbarLayout _collapsingToolbar;
     private PullRefreshLayout _pullRefreshLayout;
     private FloatingActionButton _addButton;
@@ -93,6 +94,8 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_shoppingListService.GetLastUpdate().toString());
+
                 if (result.ShoppingList != null) {
                     if (result.ShoppingList.getSize() > 0) {
                         _shoppingListViewAdapter = new ShoppingListViewAdapter(_context, result.ShoppingList);
@@ -139,6 +142,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
         _listView = findViewById(R.id.listView_shoppingList);
         _progressBar = findViewById(R.id.progressBar_shoppingList);
         _noDataFallback = findViewById(R.id.fallBackTextView_shoppingList);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_shoppingList);
 
         _searchField = findViewById(R.id.search_shoppingList);
         _searchField.addTextChangedListener(new TextWatcher() {
@@ -172,6 +176,8 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
 
         _navigationService = NavigationService.getInstance();
         _shoppingListService = ShoppingListService.getInstance();
+
+        _lastUpdateTextView.setText(_shoppingListService.GetLastUpdate().toString());
 
         SerializableList<ShoppingEntry> shoppingList = _shoppingListService.GetDataList();
         if (shoppingList.getSize() > 0) {

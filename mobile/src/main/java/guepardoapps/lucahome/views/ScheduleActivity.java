@@ -54,6 +54,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private CollapsingToolbarLayout _collapsingToolbar;
     private PullRefreshLayout _pullRefreshLayout;
 
@@ -92,6 +93,8 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_scheduleService.GetLastUpdate().toString());
+
                 if (result.ScheduleList != null) {
                     if (result.ScheduleList.getSize() > 0) {
                         _scheduleListViewAdapter = new ScheduleListViewAdapter(_context, result.ScheduleList);
@@ -133,6 +136,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
         _listView = findViewById(R.id.listView_schedule);
         _progressBar = findViewById(R.id.progressBar_schedule);
         _noDataFallback = findViewById(R.id.fallBackTextView_schedule);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_schedule);
 
         _searchField = findViewById(R.id.search_schedule);
         _searchField.addTextChangedListener(new TextWatcher() {
@@ -163,6 +167,8 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
         _navigationService = NavigationService.getInstance();
         _scheduleService = ScheduleService.getInstance();
+
+        _lastUpdateTextView.setText(_scheduleService.GetLastUpdate().toString());
 
         SerializableList<Schedule> scheduleList = _scheduleService.GetDataList();
         if (scheduleList.getSize() > 0) {

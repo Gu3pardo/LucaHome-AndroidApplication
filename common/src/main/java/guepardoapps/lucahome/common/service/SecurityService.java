@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 
 import java.util.Locale;
 
+import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
@@ -57,6 +58,8 @@ public class SecurityService implements IDataNotificationService {
 
     private static final int MIN_TIMEOUT_MIN = 15;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
+
+    private SerializableDate _lastUpdate;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -120,6 +123,8 @@ public class SecurityService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new SerializableDate();
+
             _securityList = securityList;
 
             if (_securityList.getSize() > 0) {
@@ -166,6 +171,8 @@ public class SecurityService implements IDataNotificationService {
                 return;
             }
 
+            _lastUpdate = new SerializableDate();
+
             _broadcastController.SendSerializableBroadcast(
                     SecurityCameraStateFinishedBroadcast,
                     SecurityCameraStateFinishedBundle,
@@ -202,6 +209,8 @@ public class SecurityService implements IDataNotificationService {
                 sendFailedMotionStateBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new SerializableDate();
 
             _broadcastController.SendSerializableBroadcast(
                     SecurityMotionStateFinishedBroadcast,
@@ -248,6 +257,8 @@ public class SecurityService implements IDataNotificationService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new SerializableDate();
 
         _receiverActivity = receiverActivity;
         _displayNotification = displayNotification;
@@ -436,6 +447,10 @@ public class SecurityService implements IDataNotificationService {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
         }
+    }
+
+    public SerializableDate GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {

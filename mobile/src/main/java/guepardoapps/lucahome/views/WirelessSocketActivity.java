@@ -52,6 +52,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
     private ProgressBar _progressBar;
     private ListView _listView;
     private TextView _noDataFallback;
+    private TextView _lastUpdateTextView;
     private CollapsingToolbarLayout _collapsingToolbar;
     private PullRefreshLayout _pullRefreshLayout;
 
@@ -90,6 +91,8 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
+                _lastUpdateTextView.setText(_wirelessSocketService.GetLastUpdate().toString());
+
                 if (result.WirelessSocketList != null) {
                     if (result.WirelessSocketList.getSize() > 0) {
                         _socketListViewAdapter = new SocketListViewAdapter(_context, result.WirelessSocketList);
@@ -131,6 +134,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
         _listView = findViewById(R.id.listView_sockets);
         _progressBar = findViewById(R.id.progressBar_sockets);
         _noDataFallback = findViewById(R.id.fallBackTextView_sockets);
+        _lastUpdateTextView = findViewById(R.id.lastUpdateTextView_sockets);
 
         _searchField = findViewById(R.id.search_wireless_socket);
         _searchField.addTextChangedListener(new TextWatcher() {
@@ -161,6 +165,8 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
 
         _navigationService = NavigationService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
+
+        _lastUpdateTextView.setText(_wirelessSocketService.GetLastUpdate().toString());
 
         SerializableList<WirelessSocket> wirelessSocketList = _wirelessSocketService.GetDataList();
         if (wirelessSocketList.getSize() > 0) {

@@ -31,6 +31,14 @@
                 android:src="@drawable/main_image_movies"
                 app:layout_collapseMode="parallax" />
 
+            <TextView
+                android:id="@+id/lastUpdateTextView_movie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|bottom"
+                android:text="@string/example"
+                android:textColor="@color/colorTextIcon" />
+
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar_movie"
                 android:layout_width="match_parent"

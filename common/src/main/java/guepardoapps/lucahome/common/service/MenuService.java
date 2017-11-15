@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableDate;
@@ -72,6 +73,8 @@ public class MenuService implements IDataService {
     private Logger _logger;
 
     private boolean _loadDataEnabled;
+
+    private Date _lastUpdate;
 
     private static final int MIN_TIMEOUT_MIN = 2 * 60;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
@@ -148,6 +151,8 @@ public class MenuService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _listedMenuList = listedMenuList;
 
             clearListedMenuListFromDatabase();
@@ -221,6 +226,8 @@ public class MenuService implements IDataService {
             }
             _menuList = menuList;
 
+            _lastUpdate = new Date();
+
             controlMenus();
 
             clearMenuListFromDatabase();
@@ -261,6 +268,8 @@ public class MenuService implements IDataService {
                 return;
             }
 
+            _lastUpdate = new Date();
+
             _broadcastController.SendSerializableBroadcast(
                     MenuUpdateFinishedBroadcast,
                     MenuUpdateFinishedBundle,
@@ -297,6 +306,8 @@ public class MenuService implements IDataService {
                 sendFailedMenuClearBroadcast(contentResponse);
                 return;
             }
+
+            _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
                     MenuClearFinishedBroadcast,
@@ -343,6 +354,8 @@ public class MenuService implements IDataService {
             _logger.Warning("Already initialized!");
             return;
         }
+
+        _lastUpdate = new Date();
 
         _reloadEnabled = reloadEnabled;
 
@@ -653,6 +666,10 @@ public class MenuService implements IDataService {
         sendIntent.setType("text/plain");
 
         _context.startActivity(sendIntent);
+    }
+
+    public Date GetLastUpdate() {
+        return _lastUpdate;
     }
 
     private void clearListedMenuListFromDatabase() {
