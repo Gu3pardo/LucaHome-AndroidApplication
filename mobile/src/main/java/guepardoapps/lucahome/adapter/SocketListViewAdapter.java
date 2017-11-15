@@ -22,6 +22,7 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.WirelessSocketEditActivity;
@@ -129,6 +130,8 @@ public class SocketListViewAdapter extends BaseAdapter {
         });
 
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(wirelessSocket));
+
+        rowView.setVisibility((wirelessSocket.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);
 
         return rowView;
     }

@@ -11,6 +11,7 @@ import guepardoapps.lucahome.common.classes.MapContent;
 import guepardoapps.lucahome.common.classes.Schedule;
 import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public final class JsonDataToMapContentConverter {
     private static final String TAG = JsonDataToMapContentConverter.class.getSimpleName();
@@ -214,7 +215,9 @@ public final class JsonDataToMapContentConverter {
                         socket,
                         scheduleList,
                         temperature,
-                        visibility);
+                        visibility,
+                        true,
+                        ILucaClass.LucaServerDbAction.Null);
                 _logger.Debug(String.format(Locale.getDefault(), "New MapContentDto %s", newValue));
 
                 return newValue;

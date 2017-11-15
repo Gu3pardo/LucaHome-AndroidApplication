@@ -11,8 +11,9 @@ import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
-public class Schedule implements Serializable {
+public class Schedule implements Serializable, ILucaClass {
     private static final long serialVersionUID = 7735669237381408318L;
     private static final String TAG = Schedule.class.getSimpleName();
 
@@ -26,6 +27,9 @@ public class Schedule implements Serializable {
     protected SocketAction _action;
     protected boolean _isActive;
 
+    private boolean _isOnServer;
+    private LucaServerDbAction _serverDbAction;
+
     public Schedule(
             int id,
             @NonNull String name,
@@ -34,8 +38,11 @@ public class Schedule implements Serializable {
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             @NonNull SocketAction action,
-            boolean isActive) {
+            boolean isActive,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
+
         _name = name;
         _information = information;
         _socket = socket;
@@ -43,6 +50,9 @@ public class Schedule implements Serializable {
         _time = time;
         _action = action;
         _isActive = isActive;
+
+        _isOnServer = isOnServer;
+        _serverDbAction = serverDbAction;
     }
 
     public Schedule(
@@ -52,7 +62,9 @@ public class Schedule implements Serializable {
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             @NonNull SocketAction action,
-            boolean isActive) {
+            boolean isActive,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         this(
                 id,
                 name,
@@ -61,14 +73,18 @@ public class Schedule implements Serializable {
                 weekday,
                 time,
                 action,
-                isActive);
+                isActive,
+                isOnServer,
+                serverDbAction);
     }
 
     public Schedule(
             int id,
             @NonNull String name,
             @NonNull String information,
-            boolean isActive) {
+            boolean isActive,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         this(
                 id,
                 name,
@@ -77,9 +93,12 @@ public class Schedule implements Serializable {
                 Weekday.NULL,
                 new SerializableTime(),
                 SocketAction.NULL,
-                isActive);
+                isActive,
+                isOnServer,
+                serverDbAction);
     }
 
+    @Override
     public int GetId() {
         return _id;
     }
@@ -144,8 +163,28 @@ public class Schedule implements Serializable {
         return (_isActive ? "Active" : "Inactive");
     }
 
-    public int Icon() {
+    public int GetIcon() {
         return R.drawable.main_image_schedule;
+    }
+
+    @Override
+    public void SetIsOnServer(boolean isOnServer) {
+        _isOnServer = isOnServer;
+    }
+
+    @Override
+    public boolean GetIsOnServer() {
+        return _isOnServer;
+    }
+
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
     }
 
     public String CommandSetState() {
@@ -156,14 +195,17 @@ public class Schedule implements Serializable {
         return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SCHEDULE.toString(), _name, (!_isActive ? Constants.STATE_ON : Constants.STATE_OFF));
     }
 
+    @Override
     public String CommandAdd() {
         return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.ADD_SCHEDULE.toString(), _name, _socket.GetName(), "", _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", "0", "1");
     }
 
+    @Override
     public String CommandUpdate() {
         return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.UPDATE_SCHEDULE.toString(), _name, _socket.GetName(), "", _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", "0", "1");
     }
 
+    @Override
     public String CommandDelete() {
         return String.format(Locale.getDefault(), "%s%s", LucaServerAction.DELETE_SCHEDULE.toString(), _name);
     }

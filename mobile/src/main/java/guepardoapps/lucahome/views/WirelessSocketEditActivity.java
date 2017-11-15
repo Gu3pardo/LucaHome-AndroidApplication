@@ -26,6 +26,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
@@ -185,10 +186,10 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
                         lastHighestId = _wirelessSocketService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _wirelessSocketService.AddWirelessSocket(new WirelessSocket(lastHighestId, name, area, code, false));
+                    _wirelessSocketService.AddWirelessSocket(new WirelessSocket(lastHighestId, name, area, code, false, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Update) {
-                    _wirelessSocketService.UpdateWirelessSocket(new WirelessSocket(_wirelessSocketDto.GetId(), name, area, code, _wirelessSocketDto.IsActivated()));
+                    _wirelessSocketService.UpdateWirelessSocket(new WirelessSocket(_wirelessSocketDto.GetId(), name, area, code, _wirelessSocketDto.IsActivated(), false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     socketNameTypeTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _wirelessSocketDto.GetAction())));

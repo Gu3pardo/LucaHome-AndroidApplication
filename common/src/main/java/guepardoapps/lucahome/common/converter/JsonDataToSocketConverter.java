@@ -8,6 +8,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToSocketConverter implements IJsonDataConverter {
@@ -93,7 +94,7 @@ public final class JsonDataToSocketConverter implements IJsonDataConverter {
                 String isActivatedString = data[3].replace("{State:", "").replace("};", "");
                 boolean isActivated = isActivatedString.contains("1");
 
-                WirelessSocket newValue = new WirelessSocket(id, name, area, code, isActivated);
+                WirelessSocket newValue = new WirelessSocket(id, name, area, code, isActivated, true, ILucaClass.LucaServerDbAction.Null);
                 _logger.Debug(String.format(Locale.getDefault(), "New WirelessSocketDto %s", newValue));
                 return newValue;
             }

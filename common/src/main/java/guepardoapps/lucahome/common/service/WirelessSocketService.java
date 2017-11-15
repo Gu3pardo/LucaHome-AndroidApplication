@@ -24,6 +24,7 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.NotificationController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
@@ -64,6 +65,8 @@ public class WirelessSocketService implements IDataNotificationService {
 
     private static final String TAG = WirelessSocketService.class.getSimpleName();
     private Logger _logger;
+
+    private boolean _loadDataEnabled;
 
     private boolean _displayNotification;
     private Class<?> _receiverClass;
@@ -336,6 +339,8 @@ public class WirelessSocketService implements IDataNotificationService {
             return;
         }
 
+        _loadDataEnabled = true;
+
         _receiverClass = receiverClass;
         _displayNotification = displayNotification;
         _reloadEnabled = reloadEnabled;
@@ -462,6 +467,11 @@ public class WirelessSocketService implements IDataNotificationService {
     public void LoadData() {
         _logger.Debug("LoadData");
 
+        if (!_loadDataEnabled) {
+            _logger.Debug("_loadDataEnabled is false!");
+            return;
+        }
+
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _wirelessSocketList = _databaseSocketList.GetSocketList();
             _broadcastController.SendSerializableBroadcast(
@@ -475,6 +485,33 @@ public class WirelessSocketService implements IDataNotificationService {
         if (user == null) {
             sendFailedSocketDownloadBroadcast("No user");
             return;
+        }
+
+        if (hasEntryNotOnServer()) {
+            _loadDataEnabled = false;
+
+            for (int index = 0; index < notOnServerWirelessSockets().getSize(); index++) {
+                WirelessSocket wirelessSocket = notOnServerWirelessSockets().getValue(index);
+
+                switch (wirelessSocket.GetServerDbAction()) {
+                    case Add:
+                        AddWirelessSocket(wirelessSocket);
+                        break;
+                    case Update:
+                        UpdateWirelessSocket(wirelessSocket);
+                        break;
+                    case Delete:
+                        DeleteWirelessSocket(wirelessSocket);
+                        break;
+                    case Null:
+                    default:
+                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", wirelessSocket));
+                        break;
+                }
+
+            }
+
+            _loadDataEnabled = true;
         }
 
         String requestUrl = "http://"
@@ -540,13 +577,7 @@ public class WirelessSocketService implements IDataNotificationService {
             return;
         }
 
-        wirelessSocket.SetActivated(newState);
-        String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
-                user.GetName(), user.GetPassphrase(),
-                wirelessSocket.CommandSetState());
-
-        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketSet, true);
+        SetWirelessSocketState(wirelessSocket, newState);
     }
 
     public void DeactivateAllWirelessSockets() {
@@ -569,6 +600,17 @@ public class WirelessSocketService implements IDataNotificationService {
     public void AddWirelessSocket(@NonNull WirelessSocket entry) {
         _logger.Debug(String.format(Locale.getDefault(), "AddWirelessSocket: Adding new entry %s", entry));
 
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
+
+            _databaseSocketList.CreateEntry(entry);
+
+            LoadData();
+
+            return;
+        }
+
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedSocketAddBroadcast("No user");
@@ -586,6 +628,17 @@ public class WirelessSocketService implements IDataNotificationService {
     public void UpdateWirelessSocket(@NonNull WirelessSocket entry) {
         _logger.Debug(String.format(Locale.getDefault(), "UpdateWirelessSocket: Updating entry %s", entry));
 
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
+
+            _databaseSocketList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
+
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedSocketUpdateBroadcast("No user");
@@ -602,6 +655,17 @@ public class WirelessSocketService implements IDataNotificationService {
 
     public void DeleteWirelessSocket(@NonNull WirelessSocket entry) {
         _logger.Debug(String.format(Locale.getDefault(), "DeleteWirelessSocket: Deleting entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
+
+            _databaseSocketList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -673,24 +737,14 @@ public class WirelessSocketService implements IDataNotificationService {
         }
     }
 
-    public void SetReceiverClass(@NonNull Class<?> receiverClass) {
-        _receiverClass = receiverClass;
-    }
-
-    public Class<?> GetReceiverClass() {
-        return _receiverClass;
-    }
-
     @Override
     public void SetReceiverActivity(@NonNull Class<?> receiverActivity) {
-        _logger.Error("Please use SetReceiverClass instead of SetReceiverActivity!");
-        throw new UnsupportedOperationException("Please use SetReceiverClass instead of SetReceiverActivity!");
+        _receiverClass = receiverActivity;
     }
 
     @Override
     public Class<?> GetReceiverActivity() {
-        _logger.Error("Please use GetReceiverClass instead of GetReceiverActivity!");
-        throw new UnsupportedOperationException("Please use GetReceiverClass instead of GetReceiverActivity!");
+        return _receiverClass;
     }
 
     @Override
@@ -750,6 +804,10 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     private void sendFailedSocketDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for sockets failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 WirelessSocketDownloadFinishedBroadcast,
                 WirelessSocketDownloadFinishedBundle,
@@ -757,6 +815,10 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     private void sendFailedSocketSetBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Set for socket failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 WirelessSocketSetFinishedBroadcast,
                 WirelessSocketSetFinishedBundle,
@@ -764,6 +826,10 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     private void sendFailedSocketAddBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Add for socket failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 WirelessSocketAddFinishedBroadcast,
                 WirelessSocketAddFinishedBundle,
@@ -771,6 +837,10 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     private void sendFailedSocketUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update for socket failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 WirelessSocketUpdateFinishedBroadcast,
                 WirelessSocketUpdateFinishedBundle,
@@ -778,6 +848,10 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     private void sendFailedSocketDeleteBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Delete for socket failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 WirelessSocketDeleteFinishedBroadcast,
                 WirelessSocketDeleteFinishedBundle,
@@ -785,6 +859,10 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     private void sendFailedSocketGetBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Get for sockets failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 WirelessSocketGetFinishedBroadcast,
                 WirelessSocketGetFinishedBundle,
@@ -802,5 +880,21 @@ public class WirelessSocketService implements IDataNotificationService {
             }
         }
         return null;
+    }
+
+    private SerializableList<WirelessSocket> notOnServerWirelessSockets() {
+        SerializableList<WirelessSocket> notOnServerWirelessSocketList = new SerializableList<>();
+
+        for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
+            if (!_wirelessSocketList.getValue(index).GetIsOnServer()) {
+                notOnServerWirelessSocketList.addValue(_wirelessSocketList.getValue(index));
+            }
+        }
+
+        return notOnServerWirelessSocketList;
+    }
+
+    private boolean hasEntryNotOnServer() {
+        return notOnServerWirelessSockets().getSize() > 0;
     }
 }

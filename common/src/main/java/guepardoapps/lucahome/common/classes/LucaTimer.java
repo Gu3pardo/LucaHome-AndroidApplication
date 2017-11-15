@@ -21,8 +21,10 @@ public class LucaTimer extends Schedule {
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             SocketAction action,
-            boolean isActive) {
-        super(id, name, information, socket, weekday, time, action, isActive);
+            boolean isActive,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
+        super(id, name, information, socket, weekday, time, action, isActive, isOnServer, serverDbAction);
     }
 
     public LucaTimer(
@@ -32,8 +34,10 @@ public class LucaTimer extends Schedule {
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             SocketAction action,
-            boolean isActive) {
-        super(id, name, socket, weekday, time, action, isActive);
+            boolean isActive,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
+        super(id, name, socket, weekday, time, action, isActive, isOnServer, serverDbAction);
     }
 
     @Override

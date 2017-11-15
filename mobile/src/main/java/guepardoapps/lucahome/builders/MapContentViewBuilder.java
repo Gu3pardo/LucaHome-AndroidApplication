@@ -86,16 +86,16 @@ public class MapContentViewBuilder {
             newTextView.setGravity(Gravity.CENTER);
             newTextView.setTextSize(10);
             newTextView.setTextColor(Color.WHITE);
-            newTextView.setText(mapContent.ButtonText());
+            newTextView.setText(mapContent.GetButtonText());
 
-            newTextView.setBackgroundResource(mapContent.Drawable());
+            newTextView.setBackgroundResource(mapContent.GetDrawable());
 
             newTextView.setOnClickListener(view -> {
-                _logger.Debug(String.format(Locale.getDefault(), "onClick %s", mapContent.ButtonText()));
+                _logger.Debug(String.format(Locale.getDefault(), "onClick %s", mapContent.GetButtonText()));
                 if (mapContent.GetButtonClick(_context) != null) {
                     mapContent.GetButtonClick(_context).run();
                 } else {
-                    Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.ButtonText()), Toast.LENGTH_LONG).show();
+                    Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.GetButtonText()), Toast.LENGTH_LONG).show();
                 }
             });
 

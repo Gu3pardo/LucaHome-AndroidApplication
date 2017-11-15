@@ -8,6 +8,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.classes.ListedMenu;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToListedMenuConverter implements IJsonDataConverter {
@@ -111,7 +112,7 @@ public final class JsonDataToListedMenuConverter implements IJsonDataConverter {
                 String lastSuggestionString = data[3].replace("{lastSuggestion:", "").replace("};", "");
                 boolean lastSuggestion = lastSuggestionString.contains("1");
 
-                ListedMenu newValue = new ListedMenu(id, description, rating, lastSuggestion);
+                ListedMenu newValue = new ListedMenu(id, description, rating, lastSuggestion, true, ILucaClass.LucaServerDbAction.Null);
                 _logger.Debug(String.format(Locale.getDefault(), "New ListedMenuDto %s", newValue));
 
                 return newValue;

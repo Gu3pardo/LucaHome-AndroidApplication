@@ -8,8 +8,9 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
-public class LucaBirthday implements Serializable {
+public class LucaBirthday implements Serializable, ILucaClass {
     private static final long serialVersionUID = 8796770534492842492L;
     private static final String TAG = LucaBirthday.class.getSimpleName();
 
@@ -21,18 +22,28 @@ public class LucaBirthday implements Serializable {
     private transient Bitmap _photo;
     private int _notificationId;
 
+    private boolean _isOnServer;
+    private LucaServerDbAction _serverDbAction;
+
     public LucaBirthday(
             int id,
             @NonNull String name,
             @NonNull SerializableDate date,
-            Bitmap photo) {
+            Bitmap photo,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
+
         _name = name;
         _date = date;
         _photo = photo;
         _notificationId = _id * _date.DayOfMonth() + _date.Month() * _date.Year();
+
+        _isOnServer = isOnServer;
+        _serverDbAction = serverDbAction;
     }
 
+    @Override
     public int GetId() {
         return _id;
     }
@@ -106,14 +117,37 @@ public class LucaBirthday implements Serializable {
         }
     }
 
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
+    }
+
+    @Override
+    public void SetIsOnServer(boolean isOnServer) {
+        _isOnServer = isOnServer;
+    }
+
+    @Override
+    public boolean GetIsOnServer() {
+        return _isOnServer;
+    }
+
+    @Override
     public String CommandAdd() {
         return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d", LucaServerAction.ADD_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year());
     }
 
+    @Override
     public String CommandUpdate() {
         return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d", LucaServerAction.UPDATE_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year());
     }
 
+    @Override
     public String CommandDelete() {
         return String.format(Locale.getDefault(), "%s%d", LucaServerAction.DELETE_BIRTHDAY.toString(), _id);
     }

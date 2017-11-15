@@ -8,8 +8,9 @@ import java.util.Locale;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
-public class WirelessSocket implements Serializable {
+public class WirelessSocket implements Serializable, ILucaClass {
     private static final long serialVersionUID = 5579389712706446580L;
     private static final String TAG = WirelessSocket.class.getSimpleName();
 
@@ -24,12 +25,17 @@ public class WirelessSocket implements Serializable {
 
     private String _shortName;
 
+    private boolean _isOnServer;
+    private LucaServerDbAction _serverDbAction;
+
     public WirelessSocket(
             int id,
             @NonNull String name,
             @NonNull String area,
             @NonNull String code,
-            boolean isActivated) {
+            boolean isActivated,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
 
         _name = name;
@@ -37,9 +43,13 @@ public class WirelessSocket implements Serializable {
         _code = code;
         _isActivated = isActivated;
 
+        _isOnServer = isOnServer;
+        _serverDbAction = serverDbAction;
+
         _shortName = createShortName(_name);
     }
 
+    @Override
     public int GetId() {
         return _id;
     }
@@ -88,6 +98,26 @@ public class WirelessSocket implements Serializable {
         return String.format(Locale.getDefault(), "%s%s", SETTINGS_HEADER, _name);
     }
 
+    @Override
+    public void SetIsOnServer(boolean isOnServer) {
+        _isOnServer = isOnServer;
+    }
+
+    @Override
+    public boolean GetIsOnServer() {
+        return _isOnServer;
+    }
+
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
+    }
+
     public String CommandSetState() {
         return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
     }
@@ -96,14 +126,17 @@ public class WirelessSocket implements Serializable {
         return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((!_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
     }
 
+    @Override
     public String CommandAdd() {
         return String.format(Locale.getDefault(), "%s%s&area=%s&code=%s", LucaServerAction.ADD_SOCKET.toString(), _name, _area, _code);
     }
 
+    @Override
     public String CommandUpdate() {
         return String.format(Locale.getDefault(), "%s%s&area=%s&code=%s&isactivated=%s", LucaServerAction.ADD_SOCKET.toString(), _name, _area, _code, (_isActivated ? "1" : "0"));
     }
 
+    @Override
     public String CommandDelete() {
         return String.format(Locale.getDefault(), "%s%s", LucaServerAction.DELETE_SOCKET.toString(), _name);
     }

@@ -30,6 +30,7 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.ShoppingEntry;
 import guepardoapps.lucahome.common.dto.ShoppingEntryDto;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.ShoppingListService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
@@ -166,7 +167,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
                     lastHighestId = _shoppingListService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                _shoppingListService.AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity));
+                _shoppingListService.AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });

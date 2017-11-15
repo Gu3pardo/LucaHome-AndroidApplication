@@ -13,6 +13,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.MapContent;
 import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseMapContentList {
     private static final String TAG = DatabaseMapContentList.class.getSimpleName();
@@ -24,10 +25,12 @@ public class DatabaseMapContentList {
     private static final String KEY_SOCKET = "_socket";
     private static final String KEY_TEMPERATURE = "_temperature";
     private static final String KEY_VISIBILITY = "_visibility";
+    private static final String KEY_IS_ON_SERVER = "_isOnServer";
+    private static final String KEY_SERVER_ACTION = "_serverAction";
 
     private static final String DATABASE_NAME = "DatabaseMapContentDb";
     private static final String DATABASE_TABLE = "DatabaseMapContentTable";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -47,7 +50,9 @@ public class DatabaseMapContentList {
                     + KEY_DRAWING_TYPE + " TEXT NOT NULL, "
                     + KEY_SOCKET + " TEXT NOT NULL, "
                     + KEY_TEMPERATURE + " TEXT NOT NULL, "
-                    + KEY_VISIBILITY + " TEXT NOT NULL); ");
+                    + KEY_VISIBILITY + " TEXT NOT NULL, "
+                    + KEY_IS_ON_SERVER + " TEXT NOT NULL, "
+                    + KEY_SERVER_ACTION + " TEXT NOT NULL); ");
         }
 
         @Override
@@ -81,8 +86,27 @@ public class DatabaseMapContentList {
         contentValues.put(KEY_SOCKET, (newEntry.GetSocket() != null ? newEntry.GetSocket().GetName() : ""));
         contentValues.put(KEY_TEMPERATURE, (newEntry.GetTemperature() != null ? newEntry.GetTemperature().GetArea() : ""));
         contentValues.put(KEY_VISIBILITY, (newEntry.IsVisible() ? "1" : "0"));
+        contentValues.put(KEY_IS_ON_SERVER, String.valueOf(newEntry.GetIsOnServer()));
+        contentValues.put(KEY_SERVER_ACTION, newEntry.GetServerDbAction().toString());
 
         return _database.insert(DATABASE_TABLE, null, contentValues);
+    }
+
+    public boolean Update(@NonNull MapContent updateEntry) throws SQLException {
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(KEY_ROW_ID, updateEntry.GetId());
+        contentValues.put(KEY_POSITION, updateEntry.GetPositionString());
+        contentValues.put(KEY_DRAWING_TYPE, String.valueOf(updateEntry.GetDrawingType()));
+        contentValues.put(KEY_SOCKET, (updateEntry.GetSocket() != null ? updateEntry.GetSocket().GetName() : ""));
+        contentValues.put(KEY_TEMPERATURE, (updateEntry.GetTemperature() != null ? updateEntry.GetTemperature().GetArea() : ""));
+        contentValues.put(KEY_VISIBILITY, (updateEntry.IsVisible() ? "1" : "0"));
+        contentValues.put(KEY_IS_ON_SERVER, String.valueOf(updateEntry.GetIsOnServer()));
+        contentValues.put(KEY_SERVER_ACTION, updateEntry.GetServerDbAction().toString());
+
+        _database.update(DATABASE_TABLE, contentValues, KEY_ROW_ID + "=" + updateEntry.GetId(), null);
+
+        return true;
     }
 
     public SerializableList<MapContent> GetMapContent(SerializableList<WirelessSocket> socketList, SerializableList<Temperature> temperatureList) {
@@ -92,7 +116,9 @@ public class DatabaseMapContentList {
                 KEY_DRAWING_TYPE,
                 KEY_SOCKET,
                 KEY_TEMPERATURE,
-                KEY_VISIBILITY};
+                KEY_VISIBILITY,
+                KEY_IS_ON_SERVER,
+                KEY_SERVER_ACTION};
 
         Cursor cursor = _database.query(DATABASE_TABLE, columns, null, null, null, null, null);
         SerializableList<MapContent> result = new SerializableList<>();
@@ -103,6 +129,8 @@ public class DatabaseMapContentList {
         int socketIndex = cursor.getColumnIndex(KEY_SOCKET);
         int temperatureAreaIndex = cursor.getColumnIndex(KEY_TEMPERATURE);
         int visibilityIndex = cursor.getColumnIndex(KEY_VISIBILITY);
+        int isOnServerIndex = cursor.getColumnIndex(KEY_IS_ON_SERVER);
+        int serverActionIndex = cursor.getColumnIndex(KEY_SERVER_ACTION);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String idString = cursor.getString(idIndex);
@@ -157,6 +185,12 @@ public class DatabaseMapContentList {
 
             boolean visibility = visibilityString.contains("1");
 
+            String isOnServerString = cursor.getString(isOnServerIndex);
+            boolean isOnServer = Boolean.getBoolean(isOnServerString);
+
+            String serverActionString = cursor.getString(serverActionIndex);
+            ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
+
             MapContent entry = new MapContent(
                     id,
                     position,
@@ -165,7 +199,9 @@ public class DatabaseMapContentList {
                     wirelessSocket,
                     null,
                     temperature,
-                    visibility);
+                    visibility,
+                    isOnServer,
+                    serverAction);
             result.addValue(entry);
         }
 

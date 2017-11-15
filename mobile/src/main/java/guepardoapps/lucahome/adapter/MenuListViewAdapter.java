@@ -20,6 +20,7 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.dto.MenuDto;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.MenuEditActivity;
@@ -114,6 +115,8 @@ public class MenuListViewAdapter extends BaseAdapter {
             data.putSerializable(MenuService.MenuIntent, new MenuDto(menu.GetId(), menu.GetTitle(), menu.GetDescription(), menu.GetWeekday(), menu.GetDate()));
             _navigationService.NavigateToActivityWithData(_context, MenuEditActivity.class, data);
         });
+
+        rowView.setVisibility((menu.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);
 
         return rowView;
     }

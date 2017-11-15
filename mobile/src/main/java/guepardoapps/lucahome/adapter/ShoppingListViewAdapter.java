@@ -16,6 +16,7 @@ import com.rey.material.widget.FloatingActionButton;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.ShoppingEntry;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.ShoppingListService;
 
 public class ShoppingListViewAdapter extends BaseAdapter {
@@ -86,14 +87,18 @@ public class ShoppingListViewAdapter extends BaseAdapter {
 
         holder._increaseButton.setOnClickListener(view -> {
             shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() + 1);
+            shoppingEntry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
             _shoppingListService.UpdateShoppingEntry(shoppingEntry);
         });
         holder._decreaseButton.setOnClickListener(view -> {
             shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() - 1);
+            shoppingEntry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
             _shoppingListService.UpdateShoppingEntry(shoppingEntry);
         });
 
         holder._deleteButton.setOnClickListener(view -> _shoppingListService.DeleteShoppingEntry(shoppingEntry));
+
+        rowView.setVisibility((shoppingEntry.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);
 
         return rowView;
     }

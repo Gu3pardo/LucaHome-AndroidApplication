@@ -21,6 +21,7 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.BirthdayService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.BirthdayEditActivity;
@@ -123,6 +124,8 @@ public class BirthdayListViewAdapter extends BaseAdapter {
         });
 
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(birthday));
+
+        rowView.setVisibility((birthday.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);
 
         return rowView;
     }

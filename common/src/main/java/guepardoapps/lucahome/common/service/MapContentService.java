@@ -17,11 +17,11 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.classes.MapContent;
 import guepardoapps.lucahome.common.constants.Constants;
+import guepardoapps.lucahome.common.controller.DownloadController;
+import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.converter.JsonDataToMapContentConverter;
 import guepardoapps.lucahome.common.database.DatabaseMapContentList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
-import guepardoapps.lucahome.common.controller.DownloadController;
-import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
@@ -328,9 +328,29 @@ public class MapContentService implements IDataService {
     }
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for mapcontent failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MapContentDownloadFinishedBroadcast,
                 MapContentDownloadFinishedBundle,
                 new MapContentDownloadFinishedContent(_mapContentList, false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private SerializableList<MapContent> notOnServerMapContent() {
+        SerializableList<MapContent> notOnServerMapContentList = new SerializableList<>();
+
+        for (int index = 0; index < _mapContentList.getSize(); index++) {
+            if (!_mapContentList.getValue(index).GetIsOnServer()) {
+                notOnServerMapContentList.addValue(_mapContentList.getValue(index));
+            }
+        }
+
+        return notOnServerMapContentList;
+    }
+
+    private boolean hasEntryNotOnServer() {
+        return notOnServerMapContent().getSize() > 0;
     }
 }

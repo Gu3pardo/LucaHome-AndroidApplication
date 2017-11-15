@@ -50,6 +50,7 @@ public class NotificationController {
 
     public void CreateSimpleNotification(
             int notificationId,
+            int smallIcon,
             @NonNull Class<?> receiverActivity,
             Bitmap photo,
             @NonNull String title,
@@ -73,7 +74,7 @@ public class NotificationController {
         Intent intent = new Intent(_context, receiverActivity);
         PendingIntent pendingIntent = PendingIntent.getActivity(_context, notificationId, intent, 0);
 
-        builder.setSmallIcon(R.drawable.birthday)
+        builder.setSmallIcon(smallIcon)
                 .setLargeIcon(photo)
                 .setContentTitle(title)
                 .setContentText(body)

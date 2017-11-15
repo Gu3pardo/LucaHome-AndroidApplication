@@ -32,6 +32,7 @@ import guepardoapps.lucahome.common.database.DatabaseCoinList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
@@ -78,6 +79,8 @@ public class CoinService implements IDataNotificationService {
 
     private static final String TAG = CoinService.class.getSimpleName();
     private Logger _logger;
+
+    private boolean _loadDataEnabled;
 
     private Context _context;
 
@@ -182,6 +185,9 @@ public class CoinService implements IDataNotificationService {
                                 CoinConversionDownloadFinishedBroadcast,
                                 CoinConversionDownloadFinishedBundle,
                                 new CoinConversionDownloadFinishedContent(_coinConversionList, false, content.Response));
+
+                        ShowNotification();
+
                         break;
                     }
                 }
@@ -397,6 +403,7 @@ public class CoinService implements IDataNotificationService {
         }
 
         _reloadEnabled = reloadEnabled;
+        _loadDataEnabled = true;
 
         _context = context;
         _receiverActivity = receiverActivity;
@@ -531,6 +538,11 @@ public class CoinService implements IDataNotificationService {
     public void LoadData() {
         _logger.Debug("LoadData");
 
+        if (!_loadDataEnabled) {
+            _logger.Debug("_loadDataEnabled is false!");
+            return;
+        }
+
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _coinList = _databaseCoinList.GetCoinList();
             _filteredCoinList = new SerializableList<>();
@@ -555,6 +567,33 @@ public class CoinService implements IDataNotificationService {
             return;
         }
 
+        if (hasEntryNotOnServer()) {
+            _loadDataEnabled = false;
+
+            for (int index = 0; index < notOnServerCoins().getSize(); index++) {
+                Coin coin = notOnServerCoins().getValue(index);
+
+                switch (coin.GetServerDbAction()) {
+                    case Add:
+                        AddCoin(coin);
+                        break;
+                    case Update:
+                        UpdateCoin(coin);
+                        break;
+                    case Delete:
+                        DeleteCoin(coin);
+                        break;
+                    case Null:
+                    default:
+                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", coin));
+                        break;
+                }
+
+            }
+
+            _loadDataEnabled = true;
+        }
+
         String requestUrl = "http://"
                 + _settingsController.GetServerIp()
                 + Constants.ACTION_PATH
@@ -565,8 +604,19 @@ public class CoinService implements IDataNotificationService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Coin, true);
     }
 
-    public void AddCoin(Coin entry) {
+    public void AddCoin(@NonNull Coin entry) {
         _logger.Debug(String.format(Locale.getDefault(), "AddCoin: Adding new entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
+
+            _databaseCoinList.CreateEntry(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -582,8 +632,19 @@ public class CoinService implements IDataNotificationService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.CoinAdd, true);
     }
 
-    public void UpdateCoin(Coin entry) {
+    public void UpdateCoin(@NonNull Coin entry) {
         _logger.Debug(String.format(Locale.getDefault(), "UpdateCoin: Updating entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
+
+            _databaseCoinList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -599,8 +660,19 @@ public class CoinService implements IDataNotificationService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.CoinUpdate, true);
     }
 
-    public void DeleteCoin(Coin entry) {
+    public void DeleteCoin(@NonNull Coin entry) {
         _logger.Debug(String.format(Locale.getDefault(), "DeleteCoin: Deleting entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
+
+            _databaseCoinList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -637,7 +709,7 @@ public class CoinService implements IDataNotificationService {
 
         Bitmap icon = BitmapFactory.decodeResource(_context.getResources(), R.drawable.btc);
         _notificationController.CreateSimpleNotification(
-                NOTIFICATION_ID, _receiverActivity, icon,
+                NOTIFICATION_ID, R.drawable.btc, _receiverActivity, icon,
                 "Coin value", String.format(Locale.getDefault(), "You have a value of: %s", AllCoinsValue()),
                 true);
     }
@@ -730,6 +802,10 @@ public class CoinService implements IDataNotificationService {
     }
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for coins failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 CoinDownloadFinishedBroadcast,
                 CoinDownloadFinishedBundle,
@@ -737,6 +813,10 @@ public class CoinService implements IDataNotificationService {
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Add for coins failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 CoinAddFinishedBroadcast,
                 CoinAddFinishedBundle,
@@ -744,6 +824,10 @@ public class CoinService implements IDataNotificationService {
     }
 
     private void sendFailedUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update for coins failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 CoinUpdateFinishedBroadcast,
                 CoinUpdateFinishedBundle,
@@ -751,6 +835,10 @@ public class CoinService implements IDataNotificationService {
     }
 
     private void sendFailedDeleteBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Delete for coins failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 CoinDeleteFinishedBroadcast,
                 CoinDeleteFinishedBundle,
@@ -780,5 +868,23 @@ public class CoinService implements IDataNotificationService {
                 }
             }
         }
+
+        ShowNotification();
+    }
+
+    private SerializableList<Coin> notOnServerCoins() {
+        SerializableList<Coin> notOnServerCoinList = new SerializableList<>();
+
+        for (int index = 0; index < _coinList.getSize(); index++) {
+            if (!_coinList.getValue(index).GetIsOnServer()) {
+                notOnServerCoinList.addValue(_coinList.getValue(index));
+            }
+        }
+
+        return notOnServerCoinList;
+    }
+
+    private boolean hasEntryNotOnServer() {
+        return notOnServerCoins().getSize() > 0;
     }
 }

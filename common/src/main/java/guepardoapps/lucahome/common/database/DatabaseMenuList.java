@@ -13,6 +13,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.enums.Weekday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseMenuList {
     private static final String TAG = DatabaseMenuList.class.getSimpleName();
@@ -25,10 +26,12 @@ public class DatabaseMenuList {
     private static final String KEY_YEAR = "_year";
     private static final String KEY_TITLE = "_title";
     private static final String KEY_DESCRIPTION = "_description";
+    private static final String KEY_IS_ON_SERVER = "_isOnServer";
+    private static final String KEY_SERVER_ACTION = "_serverAction";
 
     private static final String DATABASE_NAME = "DatabaseMenuListDb";
     private static final String DATABASE_TABLE = "DatabaseMenuListTable";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -49,7 +52,9 @@ public class DatabaseMenuList {
                     + KEY_MONTH + " TEXT NOT NULL, "
                     + KEY_YEAR + " TEXT NOT NULL, "
                     + KEY_TITLE + " TEXT NOT NULL, "
-                    + KEY_DESCRIPTION + " TEXT NOT NULL); ");
+                    + KEY_DESCRIPTION + " TEXT NOT NULL, "
+                    + KEY_IS_ON_SERVER + " TEXT NOT NULL, "
+                    + KEY_SERVER_ACTION + " TEXT NOT NULL); ");
         }
 
         @Override
@@ -84,8 +89,28 @@ public class DatabaseMenuList {
         contentValues.put(KEY_YEAR, String.valueOf(newEntry.GetDate().Year()));
         contentValues.put(KEY_TITLE, newEntry.GetTitle());
         contentValues.put(KEY_DESCRIPTION, newEntry.GetDescription());
+        contentValues.put(KEY_IS_ON_SERVER, String.valueOf(newEntry.GetIsOnServer()));
+        contentValues.put(KEY_SERVER_ACTION, newEntry.GetServerDbAction().toString());
 
         return _database.insert(DATABASE_TABLE, null, contentValues);
+    }
+
+    public boolean Update(@NonNull LucaMenu updateEntry) throws SQLException {
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(KEY_ROW_ID, updateEntry.GetId());
+        contentValues.put(KEY_WEEKDAY, updateEntry.GetWeekday().GetEnglishDay());
+        contentValues.put(KEY_DAY, String.valueOf(updateEntry.GetDate().DayOfMonth()));
+        contentValues.put(KEY_MONTH, String.valueOf(updateEntry.GetDate().Month()));
+        contentValues.put(KEY_YEAR, String.valueOf(updateEntry.GetDate().Year()));
+        contentValues.put(KEY_TITLE, updateEntry.GetTitle());
+        contentValues.put(KEY_DESCRIPTION, updateEntry.GetDescription());
+        contentValues.put(KEY_IS_ON_SERVER, String.valueOf(updateEntry.GetIsOnServer()));
+        contentValues.put(KEY_SERVER_ACTION, updateEntry.GetServerDbAction().toString());
+
+        _database.update(DATABASE_TABLE, contentValues, KEY_ROW_ID + "=" + updateEntry.GetId(), null);
+
+        return true;
     }
 
     public SerializableList<LucaMenu> GetMenuList() {
@@ -96,7 +121,9 @@ public class DatabaseMenuList {
                 KEY_MONTH,
                 KEY_YEAR,
                 KEY_TITLE,
-                KEY_DESCRIPTION};
+                KEY_DESCRIPTION,
+                KEY_IS_ON_SERVER,
+                KEY_SERVER_ACTION};
 
         Cursor cursor = _database.query(DATABASE_TABLE, columns, null, null, null, null, null);
         SerializableList<LucaMenu> result = new SerializableList<>();
@@ -108,6 +135,8 @@ public class DatabaseMenuList {
         int yearIndex = cursor.getColumnIndex(KEY_YEAR);
         int titleIndex = cursor.getColumnIndex(KEY_TITLE);
         int descriptionIndex = cursor.getColumnIndex(KEY_DESCRIPTION);
+        int isOnServerIndex = cursor.getColumnIndex(KEY_IS_ON_SERVER);
+        int serverActionIndex = cursor.getColumnIndex(KEY_SERVER_ACTION);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String idString = cursor.getString(idIndex);
@@ -137,7 +166,13 @@ public class DatabaseMenuList {
                 _logger.Error(ex.toString());
             }
 
-            LucaMenu entry = new LucaMenu(id, title, description, weekday, date);
+            String isOnServerString = cursor.getString(isOnServerIndex);
+            boolean isOnServer = Boolean.getBoolean(isOnServerString);
+
+            String serverActionString = cursor.getString(serverActionIndex);
+            ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
+
+            LucaMenu entry = new LucaMenu(id, title, description, weekday, date, isOnServer, serverAction);
             result.addValue(entry);
         }
 

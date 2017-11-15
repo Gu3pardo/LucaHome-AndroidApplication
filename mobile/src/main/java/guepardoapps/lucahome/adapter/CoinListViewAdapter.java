@@ -21,6 +21,7 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.Coin;
 import guepardoapps.lucahome.common.dto.CoinDto;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.CoinService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.CoinEditActivity;
@@ -134,6 +135,8 @@ public class CoinListViewAdapter extends BaseAdapter {
         holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(coin));
 
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(coin));
+
+        rowView.setVisibility((coin.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);
 
         return rowView;
     }

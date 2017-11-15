@@ -10,6 +10,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.enums.Weekday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToMenuConverter implements IJsonDataConverter {
@@ -107,7 +108,7 @@ public final class JsonDataToMenuConverter implements IJsonDataConverter {
                     description = " ";
                 }
 
-                LucaMenu newValue = new LucaMenu(id, title, description, weekday, date);
+                LucaMenu newValue = new LucaMenu(id, title, description, weekday, date, true, ILucaClass.LucaServerDbAction.Null);
                 _logger.Debug(String.format(Locale.getDefault(), "New LucaMenu %s", newValue));
 
                 return newValue;

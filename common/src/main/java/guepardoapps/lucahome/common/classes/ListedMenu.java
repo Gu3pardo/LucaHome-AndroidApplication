@@ -5,7 +5,9 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Locale;
 
-public class ListedMenu implements Serializable {
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+
+public class ListedMenu implements Serializable, ILucaClass {
     private static final long serialVersionUID = 3749104839275047381L;
     private static final String TAG = ListedMenu.class.getSimpleName();
 
@@ -14,15 +16,24 @@ public class ListedMenu implements Serializable {
     private int _rating;
     private boolean _lastSuggestion;
 
+    private boolean _isOnServer;
+    private LucaServerDbAction _serverDbAction;
+
     public ListedMenu(
             int id,
             @NonNull String description,
             int rating,
-            boolean lastSuggestion) {
+            boolean lastSuggestion,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
+
         _description = description;
         _rating = rating;
         _lastSuggestion = lastSuggestion;
+
+        _isOnServer = isOnServer;
+        _serverDbAction = serverDbAction;
     }
 
     public int GetId() {
@@ -51,6 +62,41 @@ public class ListedMenu implements Serializable {
 
     public void SetLastSuggestion(boolean lastSuggestion) {
         _lastSuggestion = lastSuggestion;
+    }
+
+    @Override
+    public void SetIsOnServer(boolean isOnServer) {
+        _isOnServer = isOnServer;
+    }
+
+    @Override
+    public boolean GetIsOnServer() {
+        return _isOnServer;
+    }
+
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
+    }
+
+    @Override
+    public String CommandAdd() throws NoSuchMethodException {
+        throw new NoSuchMethodException("No method CommandAdd for ListedMenu");
+    }
+
+    @Override
+    public String CommandUpdate() throws NoSuchMethodException {
+        throw new NoSuchMethodException("No method CommandUpdate for ListedMenu");
+    }
+
+    @Override
+    public String CommandDelete() throws NoSuchMethodException {
+        throw new NoSuchMethodException("No method CommandDelete for ListedMenu");
     }
 
     @Override

@@ -33,6 +33,7 @@ import guepardoapps.lucahome.common.classes.LucaTimer;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
@@ -202,7 +203,7 @@ public class TimerEditActivity extends AppCompatActivity {
                     lastHighestId = _scheduleService.GetTimerList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                _scheduleService.AddTimer(new LucaTimer(lastHighestId, timerName, wirelessSocket, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true));
+                _scheduleService.AddTimer(new LucaTimer(lastHighestId, timerName, wirelessSocket, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });

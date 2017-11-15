@@ -6,8 +6,9 @@ import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.common.enums.LucaServerAction;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
-public class Coin implements Serializable {
+public class Coin implements Serializable, ILucaClass {
     private static final long serialVersionUID = 1027483947363954860L;
     private static final String TAG = Coin.class.getSimpleName();
 
@@ -23,6 +24,9 @@ public class Coin implements Serializable {
 
     private int _icon;
 
+    private boolean _isOnServer;
+    private LucaServerDbAction _serverDbAction;
+
     public Coin(
             int id,
             @NonNull String user,
@@ -30,7 +34,9 @@ public class Coin implements Serializable {
             double amount,
             double currentConversion,
             @NonNull Trend currentTrend,
-            int icon) {
+            int icon,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
         _user = user;
         _type = type;
@@ -40,8 +46,12 @@ public class Coin implements Serializable {
         _currentTrend = currentTrend;
 
         _icon = icon;
+
+        _isOnServer = isOnServer;
+        _serverDbAction = serverDbAction;
     }
 
+    @Override
     public int GetId() {
         return _id;
     }
@@ -102,14 +112,37 @@ public class Coin implements Serializable {
         return _icon;
     }
 
+    @Override
+    public void SetIsOnServer(boolean isOnServer) {
+        _isOnServer = isOnServer;
+    }
+
+    @Override
+    public boolean GetIsOnServer() {
+        return _isOnServer;
+    }
+
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
+    }
+
+    @Override
     public String CommandAdd() {
         return String.format(Locale.getDefault(), "%s%d&username=%s&type=%s&amount=%.6f", LucaServerAction.ADD_COIN.toString(), _id, _user, _type, _amount);
     }
 
+    @Override
     public String CommandUpdate() {
         return String.format(Locale.getDefault(), "%s%d&username=%s&type=%s&amount=%.6f", LucaServerAction.UPDATE_COIN.toString(), _id, _user, _type, _amount);
     }
 
+    @Override
     public String CommandDelete() {
         return String.format(Locale.getDefault(), "%s%d", LucaServerAction.DELETE_COIN.toString(), _id);
     }

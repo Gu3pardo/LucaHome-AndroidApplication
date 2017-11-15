@@ -9,6 +9,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.classes.ShoppingEntry;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToShoppingListConverter implements IJsonDataConverter {
@@ -123,7 +124,7 @@ public final class JsonDataToShoppingListConverter implements IJsonDataConverter
                     _logger.Error(ex.toString());
                 }
 
-                ShoppingEntry newValue = new ShoppingEntry(id, name, group, quantity);
+                ShoppingEntry newValue = new ShoppingEntry(id, name, group, quantity, true, ILucaClass.LucaServerDbAction.Null);
                 _logger.Debug(String.format(Locale.getDefault(), "New ShoppingEntryDto %s", newValue));
                 return newValue;
             } else {

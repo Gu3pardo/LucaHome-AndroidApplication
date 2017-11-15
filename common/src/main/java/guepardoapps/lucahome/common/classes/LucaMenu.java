@@ -8,30 +8,42 @@ import java.util.Locale;
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.enums.Weekday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
-public class LucaMenu implements Serializable {
+public class LucaMenu implements Serializable, ILucaClass {
     private static final long serialVersionUID = 3749147384275047381L;
     private static final String TAG = LucaMenu.class.getSimpleName();
 
     private int _id;
+
     private String _title;
     private String _description;
     private Weekday _weekday;
     private SerializableDate _date;
+
+    private boolean _isOnServer;
+    private LucaServerDbAction _serverDbAction;
 
     public LucaMenu(
             int id,
             @NonNull String title,
             @NonNull String description,
             @NonNull Weekday weekday,
-            @NonNull SerializableDate date) {
+            @NonNull SerializableDate date,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
+
         _title = title;
         _description = description;
         _weekday = weekday;
         _date = date;
+
+        _isOnServer = isOnServer;
+        _serverDbAction = serverDbAction;
     }
 
+    @Override
     public int GetId() {
         return _id;
     }
@@ -76,12 +88,39 @@ public class LucaMenu implements Serializable {
         return String.format(Locale.getDefault(), "%s: %s, %s", GetDateString(), _title, _description);
     }
 
+    @Override
+    public void SetIsOnServer(boolean isOnServer) {
+        _isOnServer = isOnServer;
+    }
+
+    @Override
+    public boolean GetIsOnServer() {
+        return _isOnServer;
+    }
+
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
+    }
+
+    @Override
+    public String CommandAdd() throws NoSuchMethodException {
+        throw new NoSuchMethodException("No method CommandAdd for ListedMenu");
+    }
+
+    @Override
     public String CommandUpdate() {
         return String.format(Locale.getDefault(), "%s%s&day=%d&month=%d&year=%d&title=%s&description=%s", LucaServerAction.UPDATE_MENU.toString(), _weekday.GetEnglishDay(), _date.DayOfMonth(), _date.Month(), _date.Year(), _title, _description);
     }
 
-    public String CommandClear() {
-        return String.format(Locale.getDefault(), "%s%s", LucaServerAction.UPDATE_MENU.toString(), _weekday.GetEnglishDay());
+    @Override
+    public String CommandDelete() {
+        return String.format(Locale.getDefault(), "%s%s", LucaServerAction.CLEAR_MENU.toString(), _weekday.GetEnglishDay());
     }
 
     @Override

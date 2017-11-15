@@ -7,8 +7,9 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
-public class ShoppingEntry implements Serializable {
+public class ShoppingEntry implements Serializable, ILucaClass {
     private static final long serialVersionUID = 2455793897127065732L;
     private static final String TAG = ShoppingEntry.class.getSimpleName();
 
@@ -19,27 +20,39 @@ public class ShoppingEntry implements Serializable {
 
     private boolean _bought;
 
+    private boolean _isOnServer;
+    private LucaServerDbAction _serverDbAction;
+
     public ShoppingEntry(
             int id,
             @NonNull String name,
             @NonNull ShoppingEntryGroup group,
             int quantity,
-            boolean bought) {
+            boolean bought,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
+
         _name = name;
         _group = group;
         _quantity = quantity;
         _bought = bought;
+
+        _isOnServer = isOnServer;
+        _serverDbAction = serverDbAction;
     }
 
     public ShoppingEntry(
             int id,
             @NonNull String name,
             @NonNull ShoppingEntryGroup group,
-            int quantity) {
-        this(id, name, group, quantity, false);
+            int quantity,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
+        this(id, name, group, quantity, false, isOnServer, serverDbAction);
     }
 
+    @Override
     public int GetId() {
         return _id;
     }
@@ -79,18 +92,41 @@ public class ShoppingEntry implements Serializable {
         _bought = bought;
     }
 
-    public int Icon() {
+    public int GetIcon() {
         return _group.GetDrawable();
     }
 
+    @Override
+    public void SetIsOnServer(boolean isOnServer) {
+        _isOnServer = isOnServer;
+    }
+
+    @Override
+    public boolean GetIsOnServer() {
+        return _isOnServer;
+    }
+
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
+    }
+
+    @Override
     public String CommandAdd() {
         return String.format(Locale.getDefault(), LucaServerAction.ADD_SHOPPING_ENTRY_F.toString(), _id, _name, _group.toString(), _quantity);
     }
 
+    @Override
     public String CommandUpdate() {
         return String.format(Locale.getDefault(), LucaServerAction.UPDATE_SHOPPING_ENTRY_F.toString(), _id, _name, _group.toString(), _quantity);
     }
 
+    @Override
     public String CommandDelete() {
         return String.format(Locale.getDefault(), LucaServerAction.DELETE_SHOPPING_ENTRY_F.toString(), _id);
     }

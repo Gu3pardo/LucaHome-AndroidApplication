@@ -17,6 +17,7 @@ import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
+import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.constants.Constants;
@@ -26,6 +27,7 @@ import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.converter.JsonDataToBirthdayConverter;
 import guepardoapps.lucahome.common.database.DatabaseBirthdayList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
@@ -58,6 +60,8 @@ public class BirthdayService implements IDataNotificationService {
 
     private static final String TAG = BirthdayService.class.getSimpleName();
     private Logger _logger;
+
+    private boolean _loadDataEnabled;
 
     private boolean _displayNotification;
     private Class<?> _receiverActivity;
@@ -296,6 +300,8 @@ public class BirthdayService implements IDataNotificationService {
             return;
         }
 
+        _loadDataEnabled = true;
+
         _receiverActivity = receiverActivity;
         _displayNotification = displayNotification;
         _reloadEnabled = reloadEnabled;
@@ -385,6 +391,11 @@ public class BirthdayService implements IDataNotificationService {
     public void LoadData() {
         _logger.Debug("LoadData");
 
+        if (!_loadDataEnabled) {
+            _logger.Debug("_loadDataEnabled is false!");
+            return;
+        }
+
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _birthdayList = _databaseBirthdayList.GetBirthdayList();
             _broadcastController.SendSerializableBroadcast(
@@ -400,6 +411,33 @@ public class BirthdayService implements IDataNotificationService {
             return;
         }
 
+        if (hasEntryNotOnServer()) {
+            _loadDataEnabled = false;
+
+            for (int index = 0; index < notOnServerBirthdays().getSize(); index++) {
+                LucaBirthday lucaBirthday = notOnServerBirthdays().getValue(index);
+
+                switch (lucaBirthday.GetServerDbAction()) {
+                    case Add:
+                        AddBirthday(lucaBirthday);
+                        break;
+                    case Update:
+                        UpdateBirthday(lucaBirthday);
+                        break;
+                    case Delete:
+                        DeleteBirthday(lucaBirthday);
+                        break;
+                    case Null:
+                    default:
+                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", lucaBirthday));
+                        break;
+                }
+
+            }
+
+            _loadDataEnabled = true;
+        }
+
         String requestUrl = "http://"
                 + _settingsController.GetServerIp()
                 + Constants.ACTION_PATH
@@ -412,6 +450,17 @@ public class BirthdayService implements IDataNotificationService {
 
     public void AddBirthday(@NonNull LucaBirthday entry) {
         _logger.Debug(String.format(Locale.getDefault(), "AddBirthday: Adding new entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
+
+            _databaseBirthdayList.CreateEntry(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -430,6 +479,17 @@ public class BirthdayService implements IDataNotificationService {
     public void UpdateBirthday(@NonNull LucaBirthday entry) {
         _logger.Debug(String.format(Locale.getDefault(), "UpdateBirthday: Updating entry %s", entry));
 
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
+
+            _databaseBirthdayList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
+
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedUpdateBroadcast("No user");
@@ -446,6 +506,17 @@ public class BirthdayService implements IDataNotificationService {
 
     public void DeleteBirthday(@NonNull LucaBirthday entry) {
         _logger.Debug(String.format(Locale.getDefault(), "DeleteBirthday: Deleting entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
+
+            _databaseBirthdayList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -505,7 +576,7 @@ public class BirthdayService implements IDataNotificationService {
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
             if (birthday.HasBirthday() && _settingsController.IsBirthdayNotificationEnabled()) {
-                _notificationController.CreateSimpleNotification(birthday.GetNotificationId(), _receiverActivity, birthday.GetPhoto(), birthday.GetName(), birthday.GetNotificationBody(), true);
+                _notificationController.CreateSimpleNotification(birthday.GetNotificationId(), R.drawable.birthday, _receiverActivity, birthday.GetPhoto(), birthday.GetName(), birthday.GetNotificationBody(), true);
             }
         }
     }
@@ -592,6 +663,10 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for birthdays failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 BirthdayDownloadFinishedBroadcast,
                 BirthdayDownloadFinishedBundle,
@@ -599,6 +674,10 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Add for birthday failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 BirthdayAddFinishedBroadcast,
                 BirthdayAddFinishedBundle,
@@ -606,6 +685,10 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     private void sendFailedUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update for birthday failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 BirthdayUpdateFinishedBroadcast,
                 BirthdayUpdateFinishedBundle,
@@ -613,9 +696,29 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     private void sendFailedDeleteBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Delete for birthday failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 BirthdayDeleteFinishedBroadcast,
                 BirthdayDeleteFinishedBundle,
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private SerializableList<LucaBirthday> notOnServerBirthdays() {
+        SerializableList<LucaBirthday> notOnServerBirthdayList = new SerializableList<>();
+
+        for (int index = 0; index < _birthdayList.getSize(); index++) {
+            if (!_birthdayList.getValue(index).GetIsOnServer()) {
+                notOnServerBirthdayList.addValue(_birthdayList.getValue(index));
+            }
+        }
+
+        return notOnServerBirthdayList;
+    }
+
+    private boolean hasEntryNotOnServer() {
+        return notOnServerBirthdays().getSize() > 0;
     }
 }

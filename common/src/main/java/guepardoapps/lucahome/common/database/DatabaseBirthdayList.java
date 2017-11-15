@@ -15,6 +15,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseBirthdayList {
     private static final String TAG = DatabaseBirthdayList.class.getSimpleName();
@@ -23,10 +24,12 @@ public class DatabaseBirthdayList {
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_NAME = "_name";
     private static final String KEY_DATE = "_date";
+    private static final String KEY_IS_ON_SERVER = "_isOnServer";
+    private static final String KEY_SERVER_ACTION = "_serverAction";
 
     private static final String DATABASE_NAME = "DatabaseBirthdayListDb";
     private static final String DATABASE_TABLE = "DatabaseBirthdayListTable";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -43,7 +46,9 @@ public class DatabaseBirthdayList {
             database.execSQL(" CREATE TABLE " + DATABASE_TABLE + " ( "
                     + KEY_ROW_ID + " TEXT NOT NULL, "
                     + KEY_NAME + " TEXT NOT NULL, "
-                    + KEY_DATE + " TEXT NOT NULL); ");
+                    + KEY_DATE + " TEXT NOT NULL, "
+                    + KEY_IS_ON_SERVER + " TEXT NOT NULL, "
+                    + KEY_SERVER_ACTION + " TEXT NOT NULL); ");
         }
 
         @Override
@@ -74,15 +79,33 @@ public class DatabaseBirthdayList {
         contentValues.put(KEY_ROW_ID, newEntry.GetId());
         contentValues.put(KEY_NAME, newEntry.GetName());
         contentValues.put(KEY_DATE, newEntry.GetDate().DDMMYYYY());
+        contentValues.put(KEY_IS_ON_SERVER, String.valueOf(newEntry.GetIsOnServer()));
+        contentValues.put(KEY_SERVER_ACTION, newEntry.GetServerDbAction().toString());
 
         return _database.insert(DATABASE_TABLE, null, contentValues);
+    }
+
+    public boolean Update(@NonNull LucaBirthday updateEntry) throws SQLException {
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(KEY_ROW_ID, updateEntry.GetId());
+        contentValues.put(KEY_NAME, updateEntry.GetName());
+        contentValues.put(KEY_DATE, updateEntry.GetDate().DDMMYYYY());
+        contentValues.put(KEY_IS_ON_SERVER, String.valueOf(updateEntry.GetIsOnServer()));
+        contentValues.put(KEY_SERVER_ACTION, updateEntry.GetServerDbAction().toString());
+
+        _database.update(DATABASE_TABLE, contentValues, KEY_ROW_ID + "=" + updateEntry.GetId(), null);
+
+        return true;
     }
 
     public SerializableList<LucaBirthday> GetBirthdayList() {
         String[] columns = new String[]{
                 KEY_ROW_ID,
                 KEY_NAME,
-                KEY_DATE};
+                KEY_DATE,
+                KEY_IS_ON_SERVER,
+                KEY_SERVER_ACTION};
 
         Cursor cursor = _database.query(DATABASE_TABLE, columns, null, null, null, null, null);
         SerializableList<LucaBirthday> result = new SerializableList<>();
@@ -90,6 +113,8 @@ public class DatabaseBirthdayList {
         int idIndex = cursor.getColumnIndex(KEY_ROW_ID);
         int nameIndex = cursor.getColumnIndex(KEY_NAME);
         int dateIndex = cursor.getColumnIndex(KEY_DATE);
+        int isOnServerIndex = cursor.getColumnIndex(KEY_IS_ON_SERVER);
+        int serverActionIndex = cursor.getColumnIndex(KEY_SERVER_ACTION);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String idString = cursor.getString(idIndex);
@@ -130,7 +155,13 @@ public class DatabaseBirthdayList {
                 _logger.Error(exception.getMessage());
             }
 
-            LucaBirthday entry = new LucaBirthday(id, name, date, photo);
+            String isOnServerString = cursor.getString(isOnServerIndex);
+            boolean isOnServer = Boolean.getBoolean(isOnServerString);
+
+            String serverActionString = cursor.getString(serverActionIndex);
+            ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
+
+            LucaBirthday entry = new LucaBirthday(id, name, date, photo, isOnServer, serverAction);
             result.addValue(entry);
         }
 

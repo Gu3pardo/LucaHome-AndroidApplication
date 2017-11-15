@@ -8,14 +8,16 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.builder.MapContentBuilder;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
-public class MapContent implements Serializable {
+public class MapContent implements Serializable, ILucaClass {
     private static final long serialVersionUID = 8796770534384442492L;
     private static final String TAG = MapContent.class.getSimpleName();
 
     public enum DrawingType {Null, Raspberry, Arduino, Socket, Temperature, MediaServer, ShoppingList, Menu, Camera, PuckJS}
 
     private int _id;
+
     private int[] _position;
     private DrawingType _drawingType;
     private String _temperatureArea;
@@ -23,6 +25,9 @@ public class MapContent implements Serializable {
     private SerializableList<Schedule> _scheduleList;
     private Temperature _temperature;
     private boolean _visibility;
+
+    private boolean _isOnServer;
+    private LucaServerDbAction _serverDbAction;
 
     public MapContent(
             int id,
@@ -32,8 +37,11 @@ public class MapContent implements Serializable {
             WirelessSocket socket,
             SerializableList<Schedule> scheduleList,
             Temperature temperature,
-            boolean visibility) {
+            boolean visibility,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
+
         _position = position;
         _drawingType = drawingType;
         _temperatureArea = temperatureArea;
@@ -41,8 +49,12 @@ public class MapContent implements Serializable {
         _scheduleList = scheduleList;
         _temperature = temperature;
         _visibility = visibility;
+
+        _isOnServer = isOnServer;
+        _serverDbAction = serverDbAction;
     }
 
+    @Override
     public int GetId() {
         return _id;
     }
@@ -107,12 +119,47 @@ public class MapContent implements Serializable {
         return MapContentBuilder.GetRunnable(_drawingType, _socket, _temperature, context);
     }
 
-    public String ButtonText() {
+    public String GetButtonText() {
         return MapContentBuilder.GetButtonText(_drawingType, _socket, _temperature);
     }
 
-    public int Drawable() {
+    public int GetDrawable() {
         return MapContentBuilder.GetDrawable(_drawingType, _socket, _temperature);
+    }
+
+    @Override
+    public void SetIsOnServer(boolean isOnServer) {
+        _isOnServer = isOnServer;
+    }
+
+    @Override
+    public boolean GetIsOnServer() {
+        return _isOnServer;
+    }
+
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
+    }
+
+    @Override
+    public String CommandAdd() throws NoSuchMethodException {
+        throw new NoSuchMethodException("No method CommandAdd for ListedMenu");
+    }
+
+    @Override
+    public String CommandUpdate() throws NoSuchMethodException {
+        throw new NoSuchMethodException("No method CommandUpdate for ListedMenu");
+    }
+
+    @Override
+    public String CommandDelete() throws NoSuchMethodException {
+        throw new NoSuchMethodException("No method CommandDelete for ListedMenu");
     }
 
     @Override

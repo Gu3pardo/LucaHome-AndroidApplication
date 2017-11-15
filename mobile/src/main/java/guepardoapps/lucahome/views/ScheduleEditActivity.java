@@ -35,6 +35,7 @@ import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.dto.ScheduleDto;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
@@ -227,10 +228,10 @@ public class ScheduleEditActivity extends AppCompatActivity {
                         lastHighestId = _scheduleService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _scheduleService.AddSchedule(new Schedule(lastHighestId, scheduleName, wirelessSocket, weekday, time, socketAction, true));
+                    _scheduleService.AddSchedule(new Schedule(lastHighestId, scheduleName, wirelessSocket, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_scheduleDto.GetAction() == ScheduleDto.Action.Update) {
-                    _scheduleService.UpdateSchedule(new Schedule(_scheduleDto.GetId(), scheduleName, wirelessSocket, weekday, time, socketAction, true));
+                    _scheduleService.UpdateSchedule(new Schedule(_scheduleDto.GetId(), scheduleName, wirelessSocket, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     scheduleNameEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _scheduleDto.GetAction())));

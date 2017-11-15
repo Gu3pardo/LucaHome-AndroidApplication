@@ -28,6 +28,7 @@ import guepardoapps.lucahome.common.database.DatabaseMenuList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
@@ -69,6 +70,8 @@ public class MenuService implements IDataService {
 
     private static final String TAG = MenuService.class.getSimpleName();
     private Logger _logger;
+
+    private boolean _loadDataEnabled;
 
     private static final int MIN_TIMEOUT_MIN = 2 * 60;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
@@ -343,6 +346,8 @@ public class MenuService implements IDataService {
 
         _reloadEnabled = reloadEnabled;
 
+        _loadDataEnabled = true;
+
         _context = context;
 
         _broadcastController = new BroadcastController(_context);
@@ -485,6 +490,11 @@ public class MenuService implements IDataService {
     public void LoadData() {
         _logger.Debug("LoadData");
 
+        if (!_loadDataEnabled) {
+            _logger.Debug("_loadDataEnabled is false!");
+            return;
+        }
+
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _menuList = _databaseMenuList.GetMenuList();
             _broadcastController.SendSerializableBroadcast(
@@ -500,6 +510,31 @@ public class MenuService implements IDataService {
             return;
         }
 
+        if (hasMenuEntryNotOnServer()) {
+            _loadDataEnabled = false;
+
+            for (int index = 0; index < notOnServerMenu().getSize(); index++) {
+                LucaMenu lucaMenu = notOnServerMenu().getValue(index);
+
+                switch (lucaMenu.GetServerDbAction()) {
+                    case Update:
+                        UpdateMenu(lucaMenu);
+                        break;
+                    case Delete:
+                        ClearMenu(lucaMenu);
+                        break;
+                    case Add:
+                    case Null:
+                    default:
+                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", lucaMenu));
+                        break;
+                }
+
+            }
+
+            _loadDataEnabled = true;
+        }
+
         String requestUrl = "http://"
                 + _settingsController.GetServerIp()
                 + Constants.ACTION_PATH
@@ -512,6 +547,17 @@ public class MenuService implements IDataService {
 
     public void UpdateMenu(@NonNull LucaMenu entry) {
         _logger.Debug(String.format(Locale.getDefault(), "UpdateMenu: Updating entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
+
+            _databaseMenuList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -530,6 +576,17 @@ public class MenuService implements IDataService {
     public void ClearMenu(@NonNull LucaMenu entry) {
         _logger.Debug(String.format(Locale.getDefault(), "DeleteMenu: Deleting entry %s", entry));
 
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
+
+            _databaseMenuList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
+
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedMenuClearBroadcast("No user");
@@ -539,7 +596,7 @@ public class MenuService implements IDataService {
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
                 _settingsController.GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
-                entry.CommandClear());
+                entry.CommandDelete());
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.MenuClear, true);
     }
@@ -637,6 +694,10 @@ public class MenuService implements IDataService {
     }
 
     private void sendFailedListedMenuDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for listedmenu failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ListedMenuDownloadFinishedBroadcast,
                 ListedMenuDownloadFinishedBundle,
@@ -644,6 +705,10 @@ public class MenuService implements IDataService {
     }
 
     private void sendFailedMenuDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for menu failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MenuDownloadFinishedBroadcast,
                 MenuDownloadFinishedBundle,
@@ -651,6 +716,10 @@ public class MenuService implements IDataService {
     }
 
     private void sendFailedMenuUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update for menu failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MenuUpdateFinishedBroadcast,
                 MenuUpdateFinishedBundle,
@@ -658,6 +727,10 @@ public class MenuService implements IDataService {
     }
 
     private void sendFailedMenuClearBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Clear for menu failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MenuClearFinishedBroadcast,
                 MenuClearFinishedBundle,
@@ -800,5 +873,37 @@ public class MenuService implements IDataService {
         menu.SetDate(new SerializableDate(year, month, dayOfMonth));
 
         return menu;
+    }
+
+    private SerializableList<LucaMenu> notOnServerMenu() {
+        SerializableList<LucaMenu> notOnServerMenuList = new SerializableList<>();
+
+        for (int index = 0; index < _menuList.getSize(); index++) {
+            if (!_menuList.getValue(index).GetIsOnServer()) {
+                notOnServerMenuList.addValue(_menuList.getValue(index));
+            }
+        }
+
+        return notOnServerMenuList;
+    }
+
+    private boolean hasMenuEntryNotOnServer() {
+        return notOnServerMenu().getSize() > 0;
+    }
+
+    private SerializableList<ListedMenu> notOnServerListedMenu() {
+        SerializableList<ListedMenu> notOnServerListedMenuList = new SerializableList<>();
+
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            if (!_listedMenuList.getValue(index).GetIsOnServer()) {
+                notOnServerListedMenuList.addValue(_listedMenuList.getValue(index));
+            }
+        }
+
+        return notOnServerListedMenuList;
+    }
+
+    private boolean hasListedMenuEntryNotOnServer() {
+        return notOnServerListedMenu().getSize() > 0;
     }
 }

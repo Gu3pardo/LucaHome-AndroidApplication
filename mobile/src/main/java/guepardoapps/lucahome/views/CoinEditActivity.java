@@ -29,6 +29,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Coin;
 import guepardoapps.lucahome.common.dto.CoinDto;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.CoinService;
 import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
@@ -191,10 +192,10 @@ public class CoinEditActivity extends AppCompatActivity {
                         lastHighestId = _coinService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _coinService.AddCoin(new Coin(lastHighestId, userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1));
+                    _coinService.AddCoin(new Coin(lastHighestId, userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_coinDto.GetAction() == CoinDto.Action.Update) {
-                    _coinService.UpdateCoin(new Coin(_coinDto.GetId(), userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1));
+                    _coinService.UpdateCoin(new Coin(_coinDto.GetId(), userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1, false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     coinEditUserTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _coinDto.GetAction())));

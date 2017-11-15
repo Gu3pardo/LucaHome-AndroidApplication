@@ -13,6 +13,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class JsonDataToBirthdayConverter {
     private static final String TAG = JsonDataToBirthdayConverter.class.getSimpleName();
@@ -94,7 +95,7 @@ public class JsonDataToBirthdayConverter {
                     _logger.Error(String.format(Locale.getDefault(), "Exception in RetrieveContactPhoto: %s", exception.getMessage()));
                 }
 
-                LucaBirthday newValue = new LucaBirthday(id, name, birthday, photo);
+                LucaBirthday newValue = new LucaBirthday(id, name, birthday, photo, true, ILucaClass.LucaServerDbAction.Null);
                 _logger.Debug(String.format(Locale.getDefault(), "New BirthdayDto %s", newValue));
 
                 return newValue;

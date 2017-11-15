@@ -24,6 +24,7 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
@@ -59,6 +60,8 @@ public class ShoppingListService implements IDataService {
 
     private static final int MIN_TIMEOUT_MIN = 60;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
+
+    private boolean _loadDataEnabled;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -288,6 +291,7 @@ public class ShoppingListService implements IDataService {
             return;
         }
 
+        _loadDataEnabled = true;
         _reloadEnabled = reloadEnabled;
 
         _context = context;
@@ -399,6 +403,11 @@ public class ShoppingListService implements IDataService {
     public void LoadData() {
         _logger.Debug("LoadData");
 
+        if (!_loadDataEnabled) {
+            _logger.Debug("_loadDataEnabled is false!");
+            return;
+        }
+
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _shoppingList = _databaseShoppingList.GetShoppingList();
             _broadcastController.SendSerializableBroadcast(
@@ -414,6 +423,33 @@ public class ShoppingListService implements IDataService {
             return;
         }
 
+        if (hasEntryNotOnServer()) {
+            _loadDataEnabled = false;
+
+            for (int index = 0; index < notOnServerShoppingEntry().getSize(); index++) {
+                ShoppingEntry shoppingEntry = notOnServerShoppingEntry().getValue(index);
+
+                switch (shoppingEntry.GetServerDbAction()) {
+                    case Add:
+                        AddShoppingEntry(shoppingEntry);
+                        break;
+                    case Update:
+                        UpdateShoppingEntry(shoppingEntry);
+                        break;
+                    case Delete:
+                        DeleteShoppingEntry(shoppingEntry);
+                        break;
+                    case Null:
+                    default:
+                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", shoppingEntry));
+                        break;
+                }
+
+            }
+
+            _loadDataEnabled = true;
+        }
+
         String requestUrl = "http://"
                 + _settingsController.GetServerIp()
                 + Constants.ACTION_PATH
@@ -424,8 +460,19 @@ public class ShoppingListService implements IDataService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingList, true);
     }
 
-    public void AddShoppingEntry(ShoppingEntry entry) {
+    public void AddShoppingEntry(@NonNull ShoppingEntry entry) {
         _logger.Debug(String.format(Locale.getDefault(), "AddShoppingEntry: Adding new entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
+
+            _databaseShoppingList.CreateEntry(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -441,8 +488,19 @@ public class ShoppingListService implements IDataService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingListAdd, true);
     }
 
-    public void UpdateShoppingEntry(ShoppingEntry entry) {
+    public void UpdateShoppingEntry(@NonNull ShoppingEntry entry) {
         _logger.Debug(String.format(Locale.getDefault(), "UpdateShoppingEntry: Updating entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
+
+            _databaseShoppingList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -458,8 +516,19 @@ public class ShoppingListService implements IDataService {
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingListUpdate, true);
     }
 
-    public void DeleteShoppingEntry(ShoppingEntry entry) {
+    public void DeleteShoppingEntry(@NonNull ShoppingEntry entry) {
         _logger.Debug(String.format(Locale.getDefault(), "DeleteShoppingEntry: Deleting entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
+
+            _databaseShoppingList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
@@ -549,6 +618,10 @@ public class ShoppingListService implements IDataService {
     }
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for shopping entry failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ShoppingListDownloadFinishedBroadcast,
                 ShoppingListDownloadFinishedBundle,
@@ -556,6 +629,10 @@ public class ShoppingListService implements IDataService {
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Add for shopping entry failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ShoppingListAddFinishedBroadcast,
                 ShoppingListAddFinishedBundle,
@@ -563,6 +640,10 @@ public class ShoppingListService implements IDataService {
     }
 
     private void sendFailedUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update of shopping entry failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ShoppingListUpdateFinishedBroadcast,
                 ShoppingListUpdateFinishedBundle,
@@ -570,9 +651,29 @@ public class ShoppingListService implements IDataService {
     }
 
     private void sendFailedDeleteBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Delete for shopping entry failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ShoppingListDeleteFinishedBroadcast,
                 ShoppingListDeleteFinishedBundle,
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private SerializableList<ShoppingEntry> notOnServerShoppingEntry() {
+        SerializableList<ShoppingEntry> notOnServerShoppingList = new SerializableList<>();
+
+        for (int index = 0; index < _shoppingList.getSize(); index++) {
+            if (!_shoppingList.getValue(index).GetIsOnServer()) {
+                notOnServerShoppingList.addValue(_shoppingList.getValue(index));
+            }
+        }
+
+        return notOnServerShoppingList;
+    }
+
+    private boolean hasEntryNotOnServer() {
+        return notOnServerShoppingEntry().getSize() > 0;
     }
 }

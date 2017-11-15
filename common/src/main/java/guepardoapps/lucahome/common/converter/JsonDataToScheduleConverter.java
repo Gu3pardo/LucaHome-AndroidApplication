@@ -12,6 +12,7 @@ import guepardoapps.lucahome.common.classes.Schedule;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public final class JsonDataToScheduleConverter {
     private static final String TAG = JsonDataToScheduleConverter.class.getSimpleName();
@@ -152,7 +153,9 @@ public final class JsonDataToScheduleConverter {
                             weekday,
                             time,
                             socketAction,
-                            isActive);
+                            isActive,
+                            true,
+                            ILucaClass.LucaServerDbAction.Null);
                     _logger.Debug(String.format(Locale.getDefault(), "New Schedule %s", newValue));
 
                     return newValue;

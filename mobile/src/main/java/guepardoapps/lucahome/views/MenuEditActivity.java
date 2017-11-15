@@ -32,6 +32,7 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.ListedMenu;
 import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.dto.MenuDto;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
@@ -164,7 +165,7 @@ public class MenuEditActivity extends AppCompatActivity {
             if (cancel) {
                 focusView.requestFocus();
             } else {
-                _menuService.UpdateMenu(new LucaMenu(_menuDto.GetId(), title, description, _menuDto.GetWeekday(), _menuDto.GetDate()));
+                _menuService.UpdateMenu(new LucaMenu(_menuDto.GetId(), title, description, _menuDto.GetWeekday(), _menuDto.GetDate(), false, ILucaClass.LucaServerDbAction.Update));
                 _saveButton.setEnabled(false);
             }
         });

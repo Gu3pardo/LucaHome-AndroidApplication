@@ -12,6 +12,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.Coin;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseCoinList {
     private static final String TAG = DatabaseCoinList.class.getSimpleName();
@@ -22,10 +23,12 @@ public class DatabaseCoinList {
     private static final String KEY_TYPE = "_type";
     private static final String KEY_AMOUNT = "_amount";
     private static final String KEY_CURRENT_CONVERSION = "_currentConversion";
+    private static final String KEY_IS_ON_SERVER = "_isOnServer";
+    private static final String KEY_SERVER_ACTION = "_serverAction";
 
     private static final String DATABASE_NAME = "DatabaseCoinListDb";
     private static final String DATABASE_TABLE = "DatabaseCoinListTable";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -44,7 +47,9 @@ public class DatabaseCoinList {
                     + KEY_USER + " TEXT NOT NULL, "
                     + KEY_TYPE + " TEXT NOT NULL, "
                     + KEY_AMOUNT + " TEXT NOT NULL, "
-                    + KEY_CURRENT_CONVERSION + " TEXT NOT NULL); ");
+                    + KEY_CURRENT_CONVERSION + " TEXT NOT NULL, "
+                    + KEY_IS_ON_SERVER + " TEXT NOT NULL, "
+                    + KEY_SERVER_ACTION + " TEXT NOT NULL); ");
         }
 
         @Override
@@ -77,12 +82,30 @@ public class DatabaseCoinList {
         contentValues.put(KEY_TYPE, newEntry.GetType());
         contentValues.put(KEY_AMOUNT, String.valueOf(newEntry.GetAmount()));
         contentValues.put(KEY_CURRENT_CONVERSION, String.valueOf(newEntry.GetCurrentConversion()));
+        contentValues.put(KEY_IS_ON_SERVER, String.valueOf(newEntry.GetIsOnServer()));
+        contentValues.put(KEY_SERVER_ACTION, newEntry.GetServerDbAction().toString());
 
         return _database.insert(DATABASE_TABLE, null, contentValues);
     }
 
+    public boolean Update(@NonNull Coin updateEntry) throws SQLException {
+        ContentValues contentValues = new ContentValues();
+
+        contentValues.put(KEY_ROW_ID, updateEntry.GetId());
+        contentValues.put(KEY_USER, updateEntry.GetUser());
+        contentValues.put(KEY_TYPE, updateEntry.GetType());
+        contentValues.put(KEY_AMOUNT, String.valueOf(updateEntry.GetAmount()));
+        contentValues.put(KEY_CURRENT_CONVERSION, String.valueOf(updateEntry.GetCurrentConversion()));
+        contentValues.put(KEY_IS_ON_SERVER, String.valueOf(updateEntry.GetIsOnServer()));
+        contentValues.put(KEY_SERVER_ACTION, updateEntry.GetServerDbAction().toString());
+
+        _database.update(DATABASE_TABLE, contentValues, KEY_ROW_ID + "=" + updateEntry.GetId(), null);
+
+        return true;
+    }
+
     public SerializableList<Coin> GetCoinList() {
-        String[] columns = new String[]{KEY_ROW_ID, KEY_USER, KEY_TYPE, KEY_AMOUNT, KEY_CURRENT_CONVERSION};
+        String[] columns = new String[]{KEY_ROW_ID, KEY_USER, KEY_TYPE, KEY_AMOUNT, KEY_CURRENT_CONVERSION, KEY_IS_ON_SERVER, KEY_SERVER_ACTION};
 
         Cursor cursor = _database.query(DATABASE_TABLE, columns, null, null, null, null, null);
         SerializableList<Coin> result = new SerializableList<>();
@@ -92,6 +115,8 @@ public class DatabaseCoinList {
         int typeIndex = cursor.getColumnIndex(KEY_TYPE);
         int amountIndex = cursor.getColumnIndex(KEY_AMOUNT);
         int currentConversionIndex = cursor.getColumnIndex(KEY_CURRENT_CONVERSION);
+        int isOnServerIndex = cursor.getColumnIndex(KEY_IS_ON_SERVER);
+        int serverActionIndex = cursor.getColumnIndex(KEY_SERVER_ACTION);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String idString = cursor.getString(idIndex);
@@ -143,7 +168,13 @@ public class DatabaseCoinList {
                     icon = R.drawable.btc;
             }
 
-            Coin entry = new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon);
+            String isOnServerString = cursor.getString(isOnServerIndex);
+            boolean isOnServer = Boolean.getBoolean(isOnServerString);
+
+            String serverActionString = cursor.getString(serverActionIndex);
+            ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
+
+            Coin entry = new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon, isOnServer, serverAction);
             result.addValue(entry);
         }
 

@@ -8,6 +8,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.Coin;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public final class JsonDataToCoinConverter {
     private static final String TAG = JsonDataToCoinConverter.class.getSimpleName();
@@ -112,7 +113,7 @@ public final class JsonDataToCoinConverter {
                         icon = R.drawable.btc;
                 }
 
-                return new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon);
+                return new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon, true, ILucaClass.LucaServerDbAction.Null);
             }
         }
 
