@@ -29,94 +29,108 @@ import guepardoapps.lucahome.common.service.ShoppingListService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 
 public class MapContentBuilder {
-    public static String GetButtonText(@NonNull MapContent.DrawingType drawingType, WirelessSocket wirelessSocket, Temperature temperature) {
-        switch (drawingType) {
-            case MediaServer:
+    public static int GetDrawable(@NonNull MapContent mapContent) {
+        switch (mapContent.GetDrawingType()) {
             case Socket:
-                return (wirelessSocket != null ? wirelessSocket.GetShortName() : "");
-            case Temperature:
-                return (temperature != null ? temperature.GetTemperatureString() : "T");
-            case ShoppingList:
-                return "S";
-            case Menu:
-                return "M";
-            case Camera:
-                return "C";
-            case PuckJS:
-                return "P";
-            case Raspberry:
-                return "R";
-            case Arduino:
-                return "A";
-            case Null:
-            default:
-                return "";
-        }
-    }
-
-    public static int GetDrawable(@NonNull MapContent.DrawingType drawingType, WirelessSocket wirelessSocket, Temperature temperature) {
-        switch (drawingType) {
-            case Socket:
-                if (wirelessSocket == null) {
+                if (mapContent.GetWirelessSocket() == null) {
                     return R.drawable.drawing_socket_off;
                 }
 
-                if (wirelessSocket.IsActivated()) {
+                if (mapContent.GetWirelessSocket().IsActivated()) {
                     return R.drawable.drawing_socket_on;
                 } else {
                     return R.drawable.drawing_socket_off;
                 }
 
+            case LAN:
+                // TODO add drawable for LAN
+                return R.drawable.drawing_socket_off;
+
             case MediaServer:
-                if (wirelessSocket == null) {
+                if (mapContent.GetWirelessSocket() == null) {
                     return R.drawable.drawing_mediamirror_off;
                 }
 
-                if (wirelessSocket.IsActivated()) {
+                if (mapContent.GetWirelessSocket().IsActivated()) {
                     return R.drawable.drawing_mediamirror_on;
                 } else {
                     return R.drawable.drawing_mediamirror_off;
                 }
 
+            case RaspberryPi:
+                // TODO add drawable for RaspberryPi
+                return R.drawable.drawing_socket_off;
+
+            case NAS:
+                // TODO add drawable for NAS
+                return R.drawable.drawing_socket_off;
+
+            case LightSwitch:
+                // TODO add drawable for LightSwitch
+                return R.drawable.drawing_socket_off;
+
             case Temperature:
-                return (temperature != null ? temperature.GetDrawable() : R.drawable.drawing_temperature);
-            case Raspberry:
-                return R.drawable.drawing_raspberry;
-            case Arduino:
-                return R.drawable.drawing_arduino;
-            case ShoppingList:
-                return R.drawable.drawing_shoppinglist;
-            case Menu:
-                return R.drawable.drawing_menu;
-            case Camera:
-                return R.drawable.drawing_camera;
+                return (mapContent.GetTemperature() != null ? mapContent.GetTemperature().GetDrawable() : R.drawable.drawing_temperature);
+
             case PuckJS:
                 return R.drawable.drawing_puckjs;
+
+            case Menu:
+                return R.drawable.drawing_menu;
+
+            case ShoppingList:
+                return R.drawable.drawing_shoppinglist;
+
+            case Camera:
+                return R.drawable.drawing_camera;
+
             case Null:
             default:
                 return R.drawable.drawing_socket_off;
         }
     }
 
-    public static Runnable GetRunnable(@NonNull MapContent.DrawingType drawingType, WirelessSocket wirelessSocket, Temperature temperature, @NonNull Context context) {
-        switch (drawingType) {
-            case MediaServer:
+    public static Runnable GetRunnable(@NonNull MapContent mapContent, @NonNull Context context) {
+        switch (mapContent.GetDrawingType()) {
             case Socket:
-                return (wirelessSocket != null ? createSocketRunnable(context, wirelessSocket) : null);
+                return (mapContent.GetWirelessSocket() != null ? createSocketRunnable(context, mapContent.GetWirelessSocket()) : null);
+
+            case LAN:
+                // TODO add Runnable for LAN
+                return null;
+
+            case MediaServer:
+                // TODO add Runnable for MediaServer
+                return (mapContent.GetWirelessSocket() != null ? createSocketRunnable(context, mapContent.GetWirelessSocket()) : null);
+
+            case RaspberryPi:
+                // TODO add Runnable for RaspberryPi
+                return null;
+
+            case NAS:
+                // TODO add Runnable for NAS
+                return null;
+
+            case LightSwitch:
+                // TODO add Runnable for LightSwitch
+                return null;
+
             case Temperature:
-                return (temperature != null ? createTemperatureRunnable(context, temperature) : null);
-            case ShoppingList:
-                return createShoppingListRunnable(context);
+                return (mapContent.GetTemperature() != null ? createTemperatureRunnable(context, mapContent.GetTemperature()) : null);
+
+            case PuckJS:
+                // TODO add Runnable for PuckJS
+                return null;
+
             case Menu:
                 return createMenuRunnable(context);
+
+            case ShoppingList:
+                return createShoppingListRunnable(context);
+
             case Camera:
                 return createCameraRunnable(context);
-            case PuckJS:
-                return null;
-            case Raspberry:
-                return null;
-            case Arduino:
-                return null;
+
             case Null:
             default:
                 return null;

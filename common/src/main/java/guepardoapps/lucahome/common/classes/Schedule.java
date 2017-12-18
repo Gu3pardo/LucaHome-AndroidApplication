@@ -18,10 +18,9 @@ public class Schedule implements Serializable, ILucaClass {
     private static final String TAG = Schedule.class.getSimpleName();
 
     protected int _id;
-
     protected String _name;
-    protected String _information;
-    protected WirelessSocket _socket;
+    protected WirelessSocket _wirelessSocket;
+    protected WirelessSwitch _wirelessSwitch;
     protected Weekday _weekday;
     protected SerializableTime _time;
     protected SocketAction _action;
@@ -33,8 +32,8 @@ public class Schedule implements Serializable, ILucaClass {
     public Schedule(
             int id,
             @NonNull String name,
-            @NonNull String information,
-            WirelessSocket socket,
+            WirelessSocket wirelessSocket,
+            WirelessSwitch wirelessSwitch,
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             @NonNull SocketAction action,
@@ -42,10 +41,9 @@ public class Schedule implements Serializable, ILucaClass {
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
-
         _name = name;
-        _information = information;
-        _socket = socket;
+        _wirelessSocket = wirelessSocket;
+        _wirelessSwitch = wirelessSwitch;
         _weekday = weekday;
         _time = time;
         _action = action;
@@ -58,37 +56,13 @@ public class Schedule implements Serializable, ILucaClass {
     public Schedule(
             int id,
             @NonNull String name,
-            WirelessSocket socket,
-            @NonNull Weekday weekday,
-            @NonNull SerializableTime time,
-            @NonNull SocketAction action,
             boolean isActive,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
         this(
                 id,
                 name,
-                "",
-                socket,
-                weekday,
-                time,
-                action,
-                isActive,
-                isOnServer,
-                serverDbAction);
-    }
-
-    public Schedule(
-            int id,
-            @NonNull String name,
-            @NonNull String information,
-            boolean isActive,
-            boolean isOnServer,
-            @NonNull LucaServerDbAction serverDbAction) {
-        this(
-                id,
-                name,
-                information,
+                null,
                 null,
                 Weekday.NULL,
                 new SerializableTime(),
@@ -111,20 +85,20 @@ public class Schedule implements Serializable, ILucaClass {
         _name = name;
     }
 
-    public String GetInformation() {
-        return _information;
+    public WirelessSocket GetWirelessSocket() {
+        return _wirelessSocket;
     }
 
-    public void SetInformation(@NonNull String information) {
-        _information = information;
+    public void SetWirelessSocket(@NonNull WirelessSocket wirelessSocket) {
+        _wirelessSocket = wirelessSocket;
     }
 
-    public WirelessSocket GetSocket() {
-        return _socket;
+    public WirelessSwitch GetWirelessSwitch() {
+        return _wirelessSwitch;
     }
 
-    public void SetSocket(@NonNull WirelessSocket socket) {
-        _socket = socket;
+    public void SetWirelessSwitch(@NonNull WirelessSwitch wirelessSwitch) {
+        _wirelessSwitch = wirelessSwitch;
     }
 
     public Weekday GetWeekday() {
@@ -197,12 +171,12 @@ public class Schedule implements Serializable, ILucaClass {
 
     @Override
     public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.ADD_SCHEDULE.toString(), _name, _socket.GetName(), "", _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", "0", "1");
+        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&switch=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.ADD_SCHEDULE.toString(), _name, _wirelessSocket.GetName(), "", _wirelessSwitch.GetName(), _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", "0", "1");
     }
 
     @Override
     public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.UPDATE_SCHEDULE.toString(), _name, _socket.GetName(), "", _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", "0", "1");
+        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&switch=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.UPDATE_SCHEDULE.toString(), _name, _wirelessSocket.GetName(), "", _wirelessSwitch.GetName(), _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", "0", "1");
     }
 
     @Override
@@ -219,7 +193,8 @@ public class Schedule implements Serializable, ILucaClass {
         return "{" + TAG
                 + ": {Id: " + String.valueOf(_id)
                 + "};{Name: " + _name
-                + "};{WirelessSocket: " + (_socket != null ? _socket.toString() : "")
+                + "};{WirelessSocket: " + (_wirelessSocket != null ? _wirelessSocket.toString() : "")
+                + "};{WirelessSwitch: " + (_wirelessSwitch != null ? _wirelessSwitch.toString() : "")
                 + "};{Weekday: " + _weekday.toString()
                 + "};{Time: " + _time.toString()
                 + "};{Action: " + _action.toString()

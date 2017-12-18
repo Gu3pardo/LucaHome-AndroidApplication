@@ -14,7 +14,7 @@ import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
-import guepardoapps.lucahome.common.classes.MediaMirrorData;
+import guepardoapps.lucahome.common.classes.MediaServerData;
 import guepardoapps.lucahome.common.classes.PlayedYoutubeVideo;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.SettingsController;
@@ -23,11 +23,11 @@ import guepardoapps.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.common.tasks.ClientTask;
 
-public class MediaMirrorService {
+public class MediaServerService {
     public static class MediaMirrorDownloadFinishedContent extends ObjectChangeFinishedContent {
-        public MediaMirrorData MediaMirror;
+        public MediaServerData MediaMirror;
 
-        MediaMirrorDownloadFinishedContent(MediaMirrorData mediaMirror, boolean succcess, @NonNull byte[] response) {
+        MediaMirrorDownloadFinishedContent(MediaServerData mediaMirror, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
             MediaMirror = mediaMirror;
         }
@@ -54,10 +54,10 @@ public class MediaMirrorService {
     public static final String MediaMirrorYoutubeVideoBroadcast = "guepardoapps.lucahome.data.service.mediamirror.youtubevideo";
     public static final String MediaMirrorYoutubeVideoBundle = "MediaMirrorYoutubeVideoBundle";
 
-    private static final MediaMirrorService SINGLETON = new MediaMirrorService();
+    private static final MediaServerService SINGLETON = new MediaServerService();
     private boolean _isInitialized;
 
-    private static final String TAG = MediaMirrorService.class.getSimpleName();
+    private static final String TAG = MediaServerService.class.getSimpleName();
     private Logger _logger;
 
     private static final int MIN_TIMEOUT_MIN = 30;
@@ -85,7 +85,7 @@ public class MediaMirrorService {
     private SettingsController _settingsController;
 
     private Context _context;
-    private MediaMirrorData _mediaMirrorData;
+    private MediaServerData _mediaServerData;
 
     private BroadcastReceiver _mediaMirrorDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
@@ -123,12 +123,12 @@ public class MediaMirrorService {
         }
     };
 
-    private MediaMirrorService() {
+    private MediaServerService() {
         _logger = new Logger(TAG);
         _logger.Debug("Created...");
     }
 
-    public static MediaMirrorService getInstance() {
+    public static MediaServerService getInstance() {
         return SINGLETON;
     }
 
@@ -165,8 +165,8 @@ public class MediaMirrorService {
         _isInitialized = false;
     }
 
-    public MediaMirrorData GetMediaMirrorData() {
-        return _mediaMirrorData;
+    public MediaServerData GetMediaServerData() {
+        return _mediaServerData;
     }
 
     public void SendCommand(
@@ -398,7 +398,7 @@ public class MediaMirrorService {
                                 _logger.Error(ex.toString());
                             }
 
-                            _mediaMirrorData = new MediaMirrorData(
+                            _mediaServerData = new MediaServerData(
                                     mediaServerSelection,
                                     batteryLevel,
                                     socketName,
@@ -419,7 +419,7 @@ public class MediaMirrorService {
                             _broadcastController.SendSerializableBroadcast(
                                     MediaMirrorDownloadFinishedBroadcast,
                                     MediaMirrorDownloadFinishedBundle,
-                                    new MediaMirrorDownloadFinishedContent(_mediaMirrorData, true, Tools.CompressStringToByteArray(response)));
+                                    new MediaMirrorDownloadFinishedContent(_mediaServerData, true, Tools.CompressStringToByteArray(response)));
 
                         } else {
                             _logger.Warning(String.format("Length %s for MediaMirrorData is invalid!", mediaMirrorData.length));

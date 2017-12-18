@@ -172,7 +172,7 @@ public class CoinService implements IDataNotificationService {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
-            if (content.CurrentDownloadType != DownloadController.DownloadType.CoinAggregate) {
+            if (content.CurrentDownloadType != DownloadController.DownloadType.CoinTrend) {
                 _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
@@ -548,7 +548,7 @@ public class CoinService implements IDataNotificationService {
         String requestUrlEur = String.format(Locale.getDefault(), "https://min-api.cryptocompare.com/data/histohour?fsym=%s&tsym=%s&limit=%d&aggregate=3&e=CCCAGG", coin.GetType(), "EUR", SettingsController.getInstance().GetCoinHoursTrend());
         _logger.Debug(String.format(Locale.getDefault(), "RequestUrlEur is: %s", requestUrlEur));
 
-        _downloadController.SendCommandToWebsiteAsync(requestUrlEur, DownloadController.DownloadType.CoinAggregate, false, coin);
+        _downloadController.SendCommandToWebsiteAsync(requestUrlEur, DownloadController.DownloadType.CoinTrend, false, coin);
     }
 
     @Override

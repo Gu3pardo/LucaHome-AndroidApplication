@@ -31,17 +31,22 @@ public enum LucaServerAction implements Serializable {
     //INFORMATION
     GET_INFORMATIONS(40, "getinformationsrest"),
 
+    //LISTED MENU
+    GET_LISTEDMENU(50, "getlistedmenu"),
+    ADD_LISTEDMENU(51, "addlistedmenu&id="),
+    UPDATE_LISTEDMENU(52, "updatelistedmenu&id="),
+    DELETE_LISTEDMENU(53, "deletelistedmenu&id="),
+
     //MAP_CONTENT
-    GET_MAP_CONTENTS(50, "getmapcontents"),
-    ADD_MAP_CONTENT(51, "addmapcontent&id="),
-    UPDATE_MAP_CONTENT(52, "updatemapcontent&id="),
-    DELETE_MAP_CONTENT(53, "deletemapcontent&id="),
+    GET_MAP_CONTENTS(60, "getmapcontents"),
+    ADD_MAP_CONTENT(61, "addmapcontent&id="),
+    UPDATE_MAP_CONTENT(62, "updatemapcontent&id="),
+    DELETE_MAP_CONTENT(63, "deletemapcontent&id="),
 
     //MENU
-    GET_MENU(60, "getmenu"),
-    UPDATE_MENU(61, "updatemenu&weekday="),
-    CLEAR_MENU(62, "clearmenu&weekday="),
-    GET_LISTED_MENU(63, "getlistedmenu"),
+    GET_MENU(54, "getmenu"),
+    UPDATE_MENU(55, "updatemenu&weekday="),
+    CLEAR_MENU(56, "clearmenu&weekday="),
 
     //MOVIE
     GET_MOVIES(70, "getmovies"),
@@ -70,11 +75,19 @@ public enum LucaServerAction implements Serializable {
     DELETE_SOCKET(105, "deletesocket&socket="),
     DEACTIVATE_ALL_SOCKETS(106, "deactivateAllSockets"),
 
+    //SWITCHES
+    GET_SWITCHES(110, "getswitches"),
+    ADD_SWITCH(111, "addswitch&name="),
+    UPDATE_SWITCH(112, "updateswitch&name="),
+    DELETE_SWITCH(113, "deleteswitch&name="),
+    TOGGLE_SWITCH(114, "toggleswitch&name="),
+    TOGGLE_ALL_SWITCHES(115, "toggleallswitches"),
+
     //TEMPERATURE
-    GET_TEMPERATURES(110, "getcurrenttemperaturerest"),
+    GET_TEMPERATURES(120, "getcurrenttemperaturerest"),
 
     //USER
-    VALIDATE_USER(120, "validateuser");
+    VALIDATE_USER(130, "validateuser");
 
     private int _id;
     private String _action;

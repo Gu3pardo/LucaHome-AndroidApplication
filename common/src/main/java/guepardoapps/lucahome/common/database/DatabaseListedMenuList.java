@@ -18,15 +18,16 @@ public class DatabaseListedMenuList {
     private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
+    private static final String KEY_TITLE = "_title";
     private static final String KEY_DESCRIPTION = "_description";
     private static final String KEY_RATING = "_rating";
-    private static final String KEY_LAST_SUGGESTION = "_lastSuggestion";
+    private static final String KEY_USE_COUNTER = "_useCounter";
     private static final String KEY_IS_ON_SERVER = "_isOnServer";
     private static final String KEY_SERVER_ACTION = "_serverAction";
 
     private static final String DATABASE_NAME = "DatabaseListedMenuListDb";
     private static final String DATABASE_TABLE = "DatabaseListedMenuListTable";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -42,9 +43,10 @@ public class DatabaseListedMenuList {
         public void onCreate(SQLiteDatabase database) {
             database.execSQL(" CREATE TABLE " + DATABASE_TABLE + " ( "
                     + KEY_ROW_ID + " TEXT NOT NULL, "
+                    + KEY_TITLE + " TEXT NOT NULL, "
                     + KEY_DESCRIPTION + " TEXT NOT NULL, "
                     + KEY_RATING + " TEXT NOT NULL, "
-                    + KEY_LAST_SUGGESTION + " TEXT NOT NULL, "
+                    + KEY_USE_COUNTER + " TEXT NOT NULL, "
                     + KEY_IS_ON_SERVER + " TEXT NOT NULL, "
                     + KEY_SERVER_ACTION + " TEXT NOT NULL); ");
         }
@@ -75,9 +77,10 @@ public class DatabaseListedMenuList {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(KEY_ROW_ID, newEntry.GetId());
+        contentValues.put(KEY_TITLE, newEntry.GetDescription());
         contentValues.put(KEY_DESCRIPTION, newEntry.GetDescription());
         contentValues.put(KEY_RATING, String.valueOf(newEntry.GetRating()));
-        contentValues.put(KEY_LAST_SUGGESTION, newEntry.GetLastSuggestion() ? "1" : "0");
+        contentValues.put(KEY_USE_COUNTER, String.valueOf(newEntry.GetUseCounter()));
         contentValues.put(KEY_IS_ON_SERVER, String.valueOf(newEntry.GetIsOnServer()));
         contentValues.put(KEY_SERVER_ACTION, newEntry.GetServerDbAction().toString());
 
@@ -88,9 +91,10 @@ public class DatabaseListedMenuList {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(KEY_ROW_ID, updateEntry.GetId());
+        contentValues.put(KEY_TITLE, updateEntry.GetDescription());
         contentValues.put(KEY_DESCRIPTION, updateEntry.GetDescription());
         contentValues.put(KEY_RATING, String.valueOf(updateEntry.GetRating()));
-        contentValues.put(KEY_LAST_SUGGESTION, updateEntry.GetLastSuggestion() ? "1" : "0");
+        contentValues.put(KEY_USE_COUNTER, String.valueOf(updateEntry.GetUseCounter()));
         contentValues.put(KEY_IS_ON_SERVER, String.valueOf(updateEntry.GetIsOnServer()));
         contentValues.put(KEY_SERVER_ACTION, updateEntry.GetServerDbAction().toString());
 
@@ -102,9 +106,10 @@ public class DatabaseListedMenuList {
     public SerializableList<ListedMenu> GetListedMenuList() {
         String[] columns = new String[]{
                 KEY_ROW_ID,
+                KEY_TITLE,
                 KEY_DESCRIPTION,
                 KEY_RATING,
-                KEY_LAST_SUGGESTION,
+                KEY_USE_COUNTER,
                 KEY_IS_ON_SERVER,
                 KEY_SERVER_ACTION};
 
@@ -112,17 +117,19 @@ public class DatabaseListedMenuList {
         SerializableList<ListedMenu> result = new SerializableList<>();
 
         int idIndex = cursor.getColumnIndex(KEY_ROW_ID);
+        int titleIndex = cursor.getColumnIndex(KEY_TITLE);
         int descriptionIndex = cursor.getColumnIndex(KEY_DESCRIPTION);
         int ratingIndex = cursor.getColumnIndex(KEY_RATING);
-        int lastSuggestionIndex = cursor.getColumnIndex(KEY_LAST_SUGGESTION);
+        int useCounterIndex = cursor.getColumnIndex(KEY_USE_COUNTER);
         int isOnServerIndex = cursor.getColumnIndex(KEY_IS_ON_SERVER);
         int serverActionIndex = cursor.getColumnIndex(KEY_SERVER_ACTION);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String idString = cursor.getString(idIndex);
+            String title = cursor.getString(titleIndex);
             String description = cursor.getString(descriptionIndex);
             String ratingString = cursor.getString(ratingIndex);
-            String lastSuggestionString = cursor.getString(lastSuggestionIndex);
+            String useCounterString = cursor.getString(useCounterIndex);
 
             int id = -1;
             try {
@@ -138,7 +145,12 @@ public class DatabaseListedMenuList {
                 _logger.Error(ex.toString());
             }
 
-            boolean lastSuggestion = lastSuggestionString.contains("1");
+            int useCounter = -1;
+            try {
+                useCounter = Integer.parseInt(useCounterString);
+            } catch (Exception ex) {
+                _logger.Error(ex.toString());
+            }
 
             String isOnServerString = cursor.getString(isOnServerIndex);
             boolean isOnServer = Boolean.getBoolean(isOnServerString);
@@ -146,7 +158,7 @@ public class DatabaseListedMenuList {
             String serverActionString = cursor.getString(serverActionIndex);
             ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
 
-            ListedMenu entry = new ListedMenu(id, description, rating, lastSuggestion, isOnServer, serverAction);
+            ListedMenu entry = new ListedMenu(id, title, description, rating, useCounter, isOnServer, serverAction);
             result.addValue(entry);
         }
 

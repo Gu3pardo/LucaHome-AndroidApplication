@@ -24,12 +24,14 @@ public class DatabaseBirthdayList {
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_NAME = "_name";
     private static final String KEY_DATE = "_date";
+    private static final String KEY_REMIND_ME = "_remindMe";
+    private static final String KEY_SEND_MAIL = "_sendMail";
     private static final String KEY_IS_ON_SERVER = "_isOnServer";
     private static final String KEY_SERVER_ACTION = "_serverAction";
 
     private static final String DATABASE_NAME = "DatabaseBirthdayListDb";
     private static final String DATABASE_TABLE = "DatabaseBirthdayListTable";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -47,6 +49,8 @@ public class DatabaseBirthdayList {
                     + KEY_ROW_ID + " TEXT NOT NULL, "
                     + KEY_NAME + " TEXT NOT NULL, "
                     + KEY_DATE + " TEXT NOT NULL, "
+                    + KEY_REMIND_ME + " TEXT NOT NULL, "
+                    + KEY_SEND_MAIL + " TEXT NOT NULL, "
                     + KEY_IS_ON_SERVER + " TEXT NOT NULL, "
                     + KEY_SERVER_ACTION + " TEXT NOT NULL); ");
         }
@@ -79,6 +83,8 @@ public class DatabaseBirthdayList {
         contentValues.put(KEY_ROW_ID, newEntry.GetId());
         contentValues.put(KEY_NAME, newEntry.GetName());
         contentValues.put(KEY_DATE, newEntry.GetDate().DDMMYYYY());
+        contentValues.put(KEY_REMIND_ME, (newEntry.GetRemindMe() ? "1" : "0"));
+        contentValues.put(KEY_SEND_MAIL, (newEntry.GetSendMail() ? "1" : "0"));
         contentValues.put(KEY_IS_ON_SERVER, String.valueOf(newEntry.GetIsOnServer()));
         contentValues.put(KEY_SERVER_ACTION, newEntry.GetServerDbAction().toString());
 
@@ -91,6 +97,8 @@ public class DatabaseBirthdayList {
         contentValues.put(KEY_ROW_ID, updateEntry.GetId());
         contentValues.put(KEY_NAME, updateEntry.GetName());
         contentValues.put(KEY_DATE, updateEntry.GetDate().DDMMYYYY());
+        contentValues.put(KEY_REMIND_ME, (updateEntry.GetRemindMe() ? "1" : "0"));
+        contentValues.put(KEY_SEND_MAIL, (updateEntry.GetSendMail() ? "1" : "0"));
         contentValues.put(KEY_IS_ON_SERVER, String.valueOf(updateEntry.GetIsOnServer()));
         contentValues.put(KEY_SERVER_ACTION, updateEntry.GetServerDbAction().toString());
 
@@ -104,6 +112,8 @@ public class DatabaseBirthdayList {
                 KEY_ROW_ID,
                 KEY_NAME,
                 KEY_DATE,
+                KEY_REMIND_ME,
+                KEY_SEND_MAIL,
                 KEY_IS_ON_SERVER,
                 KEY_SERVER_ACTION};
 
@@ -113,16 +123,20 @@ public class DatabaseBirthdayList {
         int idIndex = cursor.getColumnIndex(KEY_ROW_ID);
         int nameIndex = cursor.getColumnIndex(KEY_NAME);
         int dateIndex = cursor.getColumnIndex(KEY_DATE);
+        int remindMeIndex = cursor.getColumnIndex(KEY_REMIND_ME);
+        int sendMailIndex = cursor.getColumnIndex(KEY_SEND_MAIL);
         int isOnServerIndex = cursor.getColumnIndex(KEY_IS_ON_SERVER);
         int serverActionIndex = cursor.getColumnIndex(KEY_SERVER_ACTION);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String idString = cursor.getString(idIndex);
-            int id = -1;
             String name = cursor.getString(nameIndex);
             String dateString = cursor.getString(dateIndex);
+            String remindMeString = cursor.getString(remindMeIndex);
+            String sendMailString = cursor.getString(sendMailIndex);
             SerializableDate date = new SerializableDate();
 
+            int id = -1;
             try {
                 id = Integer.parseInt(idString);
             } catch (Exception ex) {
@@ -148,6 +162,9 @@ public class DatabaseBirthdayList {
                 _logger.Error("Size of birthdayStringArray has invalid size " + String.valueOf(dateStringArray.length));
             }
 
+            boolean remindMe = remindMeString.contains("1");
+            boolean sendMail = sendMailString.contains("1");
+
             Bitmap photo = BitmapFactory.decodeResource(_context.getResources(), guepardoapps.lucahome.basic.R.mipmap.ic_face_white_48dp);
             try {
                 photo = Tools.RetrieveContactPhoto(_context, name, 250, 250, true);
@@ -161,7 +178,7 @@ public class DatabaseBirthdayList {
             String serverActionString = cursor.getString(serverActionIndex);
             ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
 
-            LucaBirthday entry = new LucaBirthday(id, name, date, photo, isOnServer, serverAction);
+            LucaBirthday entry = new LucaBirthday(id, name, remindMe, sendMail, date, photo, isOnServer, serverAction);
             result.addValue(entry);
         }
 

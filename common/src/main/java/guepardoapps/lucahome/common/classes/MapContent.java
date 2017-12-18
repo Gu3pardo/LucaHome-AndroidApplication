@@ -14,41 +14,73 @@ public class MapContent implements Serializable, ILucaClass {
     private static final long serialVersionUID = 8796770534384442492L;
     private static final String TAG = MapContent.class.getSimpleName();
 
-    public enum DrawingType {Null, Raspberry, Arduino, Socket, Temperature, MediaServer, ShoppingList, Menu, Camera, PuckJS}
+    public enum DrawingType {Null, Socket, LAN, MediaServer, RaspberryPi, NAS, LightSwitch, Temperature, PuckJS, Menu, ShoppingList, Camera}
 
     private int _id;
-
-    private int[] _position;
     private DrawingType _drawingType;
-    private String _temperatureArea;
-    private WirelessSocket _socket;
-    private SerializableList<Schedule> _scheduleList;
-    private Temperature _temperature;
+    private int _drawingTypeId;
+    private int[] _position;
+    private String _name;
+    private String _shortName;
+    private String _area;
     private boolean _visibility;
+
+    private SerializableList<ListedMenu> _listedMenuList;
+    private SerializableList<LucaMenu> _menuList;
+    private SerializableList<ShoppingEntry> _shoppingList;
+
+    private MediaServerData _mediaServer;
+    private Security _security;
+    private Temperature _temperature;
+    private WirelessSocket _wirelessSocket;
+    private WirelessSwitch _wirelessSwitch;
 
     private boolean _isOnServer;
     private LucaServerDbAction _serverDbAction;
 
     public MapContent(
             int id,
+            DrawingType drawingType,
+            int drawingTypeId,
             int[] position,
-            @NonNull DrawingType drawingType,
-            @NonNull String temperatureArea,
-            WirelessSocket socket,
-            SerializableList<Schedule> scheduleList,
-            Temperature temperature,
+            @NonNull String name,
+            @NonNull String shortName,
+            @NonNull String area,
             boolean visibility,
+
+            SerializableList<ListedMenu> listedMenuList,
+            SerializableList<LucaMenu> menuList,
+            SerializableList<ShoppingEntry> shoppingList,
+
+            MediaServerData mediaServer,
+            Security security,
+            Temperature temperature,
+            WirelessSocket wirelessSocket,
+            WirelessSwitch wirelessSwitch,
+
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
+        _drawingType = drawingType;
+        _drawingTypeId = drawingTypeId;
 
         _position = position;
-        _drawingType = drawingType;
-        _temperatureArea = temperatureArea;
-        _socket = socket;
-        _scheduleList = scheduleList;
-        _temperature = temperature;
+
+        _name = name;
+        _shortName = shortName;
+        _area = area;
+
         _visibility = visibility;
+
+        _listedMenuList = listedMenuList;
+        _menuList = menuList;
+        _shoppingList = shoppingList;
+
+        _mediaServer = mediaServer;
+        _security = security;
+        _temperature = temperature;
+        _wirelessSocket = wirelessSocket;
+        _wirelessSwitch = wirelessSwitch;
 
         _isOnServer = isOnServer;
         _serverDbAction = serverDbAction;
@@ -57,6 +89,22 @@ public class MapContent implements Serializable, ILucaClass {
     @Override
     public int GetId() {
         return _id;
+    }
+
+    public DrawingType GetDrawingType() {
+        return _drawingType;
+    }
+
+    public void SetDrawingType(DrawingType drawingType) {
+        _drawingType = drawingType;
+    }
+
+    public int GetDrawingTypeId() {
+        return _drawingTypeId;
+    }
+
+    public void SetDrawingTypeId(int drawingTypeId) {
+        _drawingTypeId = drawingTypeId;
     }
 
     public int[] GetPosition() {
@@ -71,60 +119,76 @@ public class MapContent implements Serializable, ILucaClass {
         _position = position;
     }
 
-    public DrawingType GetDrawingType() {
-        return _drawingType;
+    public String GetName() {
+        return _name;
     }
 
-    public void SetDrawingType(DrawingType drawingType) {
-        _drawingType = drawingType;
+    public void SetName(@NonNull String name) {
+        _name = name;
     }
 
-    public String GetTemperatureArea() {
-        return _temperatureArea;
+    public String GetShortName() {
+        return _shortName;
     }
 
-    public void SetTemperatureArea(String temperatureArea) {
-        _temperatureArea = temperatureArea;
+    public void SetShortName(@NonNull String shortName) {
+        _shortName = shortName;
     }
 
-    public WirelessSocket GetSocket() {
-        return _socket;
+    public String GetArea() {
+        return _area;
     }
 
-    public void SetSocket(WirelessSocket socket) {
-        _socket = socket;
-    }
-
-    public SerializableList<Schedule> GetScheduleList() {
-        return _scheduleList;
-    }
-
-    public void SetScheduleList(SerializableList<Schedule> scheduleList) {
-        _scheduleList = scheduleList;
-    }
-
-    public Temperature GetTemperature() {
-        return _temperature;
-    }
-
-    public void SetTemperature(Temperature temperature) {
-        _temperature = temperature;
+    public void SetArea(@NonNull String area) {
+        _area = area;
     }
 
     public boolean IsVisible() {
         return _visibility;
     }
 
-    public Runnable GetButtonClick(@NonNull Context context) {
-        return MapContentBuilder.GetRunnable(_drawingType, _socket, _temperature, context);
+    public void SetVisible(boolean visibility) {
+        _visibility = visibility;
     }
 
-    public String GetButtonText() {
-        return MapContentBuilder.GetButtonText(_drawingType, _socket, _temperature);
+    public SerializableList<ListedMenu> GetListedMenuList() {
+        return _listedMenuList;
+    }
+
+    public SerializableList<LucaMenu> GetMenuList() {
+        return _menuList;
+    }
+
+    public SerializableList<ShoppingEntry> GetShoppingList() {
+        return _shoppingList;
+    }
+
+    public MediaServerData GetMediaServer() {
+        return _mediaServer;
+    }
+
+    public Security GetSecurity() {
+        return _security;
+    }
+
+    public Temperature GetTemperature() {
+        return _temperature;
+    }
+
+    public WirelessSocket GetWirelessSocket() {
+        return _wirelessSocket;
+    }
+
+    public WirelessSwitch GetWirelessSwitch() {
+        return _wirelessSwitch;
+    }
+
+    public Runnable GetButtonClick(@NonNull Context context) {
+        return MapContentBuilder.GetRunnable(this, context);
     }
 
     public int GetDrawable() {
-        return MapContentBuilder.GetDrawable(_drawingType, _socket, _temperature);
+        return MapContentBuilder.GetDrawable(this);
     }
 
     @Override
@@ -166,7 +230,7 @@ public class MapContent implements Serializable, ILucaClass {
     public String toString() {
         return String.format(
                 Locale.getDefault(),
-                "( %s: (Id: %d );(Position: %d|%d );(Type: %s );(TemperatureArea: %s );(Socket: %s );(ScheduleList: %s );(Temperature: %s );(ButtonVisibility: %s ))",
-                TAG, _id, _position[0], _position[1], _drawingType, _temperatureArea, _socket, _scheduleList, _temperature, _visibility);
+                "( %s: (Id: %d );(Type: %s );(TypeId: %d );(Position: %s );(Name: %s );(ShortName: %s );(Area: %s );(ButtonVisibility: %s ))",
+                TAG, _id, _drawingType, _drawingTypeId, GetPositionString(), _name, _shortName, _area, _visibility);
     }
 }

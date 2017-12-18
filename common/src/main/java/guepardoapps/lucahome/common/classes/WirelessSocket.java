@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Locale;
 
+import guepardoapps.lucahome.basic.classes.SerializableDate;
+import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
@@ -16,17 +18,21 @@ public class WirelessSocket implements Serializable, ILucaClass {
 
     public static final String SETTINGS_HEADER = "SharedPref_Notification_";
 
-    private int _id;
+    protected int _id;
 
-    private String _name;
-    private String _area;
-    private String _code;
-    private boolean _isActivated;
+    protected String _name;
+    protected String _area;
+    protected String _code;
+    protected boolean _isActivated;
 
-    private String _shortName;
+    protected SerializableDate _lastTriggerDate;
+    protected SerializableTime _lastTriggerTime;
+    protected String _lastTriggerUser;
 
-    private boolean _isOnServer;
-    private LucaServerDbAction _serverDbAction;
+    protected String _shortName;
+
+    protected boolean _isOnServer;
+    protected LucaServerDbAction _serverDbAction;
 
     public WirelessSocket(
             int id,
@@ -34,6 +40,9 @@ public class WirelessSocket implements Serializable, ILucaClass {
             @NonNull String area,
             @NonNull String code,
             boolean isActivated,
+            @NonNull SerializableDate lastTriggerDate,
+            @NonNull SerializableTime lastTriggerTime,
+            @NonNull String lastTriggerUser,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
@@ -42,6 +51,10 @@ public class WirelessSocket implements Serializable, ILucaClass {
         _area = area;
         _code = code;
         _isActivated = isActivated;
+
+        _lastTriggerDate = lastTriggerDate;
+        _lastTriggerTime = lastTriggerTime;
+        _lastTriggerUser = lastTriggerUser;
 
         _isOnServer = isOnServer;
         _serverDbAction = serverDbAction;
@@ -86,6 +99,30 @@ public class WirelessSocket implements Serializable, ILucaClass {
         _isActivated = isActivated;
     }
 
+    public SerializableDate GetLastTriggerDate() {
+        return _lastTriggerDate;
+    }
+
+    public void SetLastTriggerDate(@NonNull SerializableDate lastTriggerDate) {
+        _lastTriggerDate = lastTriggerDate;
+    }
+
+    public SerializableTime GetLastTriggerTime() {
+        return _lastTriggerTime;
+    }
+
+    public void SetLastTriggerTime(@NonNull SerializableTime lastTriggerTime) {
+        _lastTriggerTime = lastTriggerTime;
+    }
+
+    public String GetLastTriggerUser() {
+        return _lastTriggerUser;
+    }
+
+    public void SetLastTriggeUser(@NonNull String lastTriggerUser) {
+        _lastTriggerUser = lastTriggerUser;
+    }
+
     public String GetActivationString() {
         return _isActivated ? "On" : "Off";
     }
@@ -118,11 +155,11 @@ public class WirelessSocket implements Serializable, ILucaClass {
         return _serverDbAction;
     }
 
-    public String CommandSetState() {
+    public String CommandSetState() throws Exception {
         return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
     }
 
-    public String CommandChangeState() {
+    public String CommandChangeState() throws Exception {
         return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((!_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
     }
 
@@ -139,10 +176,6 @@ public class WirelessSocket implements Serializable, ILucaClass {
     @Override
     public String CommandDelete() {
         return String.format(Locale.getDefault(), "%s%s", LucaServerAction.DELETE_SOCKET.toString(), _name);
-    }
-
-    public String CommandWear() {
-        return String.format(Locale.getDefault(), "ACTION:SET:SOCKET:%s%s", _name, (_isActivated ? ":0" : ":1"));
     }
 
     public int GetWallpaper() {
@@ -185,7 +218,7 @@ public class WirelessSocket implements Serializable, ILucaClass {
                     return R.drawable.sound_off;
                 }
             }
-        } else if (_name.contains("PC")) {
+        } else if (_name.contains("PC") || _name.contains("WorkStation")) {
             if (_isActivated) {
                 return R.drawable.laptop_on;
             } else {
@@ -217,7 +250,7 @@ public class WirelessSocket implements Serializable, ILucaClass {
             } else {
                 return R.drawable.watering_off;
             }
-        } else if (_name.contains("MediaMirror")) {
+        } else if (_name.contains("MediaServer")) {
             if (_isActivated) {
                 return R.drawable.mediamirror_on;
             } else {
@@ -229,6 +262,12 @@ public class WirelessSocket implements Serializable, ILucaClass {
             } else {
                 return R.drawable.gameconsole_off;
             }
+        } else if (_name.contains("RaspberryPi")) {
+            if (_isActivated) {
+                return R.drawable.raspberry_on;
+            } else {
+                return R.drawable.raspberry_off;
+            }
         }
         return R.drawable.socket;
     }
@@ -238,7 +277,7 @@ public class WirelessSocket implements Serializable, ILucaClass {
         return String.format(Locale.getDefault(), "( %s: (Name: %s );(Area: %s );(Code: %s );(IsActivated: %s ))", TAG, _name, _area, _code, (_isActivated ? "1" : "0"));
     }
 
-    private String createShortName(String name) {
+    protected String createShortName(String name) {
         String shortName;
 
         if (name.contains("_")) {

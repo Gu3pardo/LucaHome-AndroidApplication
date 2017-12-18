@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Locale;
 
+import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class ListedMenu implements Serializable, ILucaClass {
@@ -12,25 +13,27 @@ public class ListedMenu implements Serializable, ILucaClass {
     private static final String TAG = ListedMenu.class.getSimpleName();
 
     private int _id;
+    private String _title;
     private String _description;
     private int _rating;
-    private boolean _lastSuggestion;
+    private int _useCounter;
 
     private boolean _isOnServer;
     private LucaServerDbAction _serverDbAction;
 
     public ListedMenu(
             int id,
+            @NonNull String title,
             @NonNull String description,
             int rating,
-            boolean lastSuggestion,
+            int useCounter,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
-
+        _title = title;
         _description = description;
         _rating = rating;
-        _lastSuggestion = lastSuggestion;
+        _useCounter = useCounter;
 
         _isOnServer = isOnServer;
         _serverDbAction = serverDbAction;
@@ -38,6 +41,14 @@ public class ListedMenu implements Serializable, ILucaClass {
 
     public int GetId() {
         return _id;
+    }
+
+    public String GetTitle() {
+        return _title;
+    }
+
+    public void SetTitle(@NonNull String title) {
+        _title = title;
     }
 
     public String GetDescription() {
@@ -56,12 +67,12 @@ public class ListedMenu implements Serializable, ILucaClass {
         _rating = rating;
     }
 
-    public boolean GetLastSuggestion() {
-        return _lastSuggestion;
+    public int GetUseCounter() {
+        return _useCounter;
     }
 
-    public void SetLastSuggestion(boolean lastSuggestion) {
-        _lastSuggestion = lastSuggestion;
+    public void SetUseCounter(int useCounter) {
+        _useCounter = useCounter;
     }
 
     @Override
@@ -85,22 +96,22 @@ public class ListedMenu implements Serializable, ILucaClass {
     }
 
     @Override
-    public String CommandAdd() throws NoSuchMethodException {
-        throw new NoSuchMethodException("No method CommandAdd for ListedMenu");
+    public String CommandAdd() {
+        return String.format(Locale.getDefault(), "%s%d&title=%s&description=%s&rating=%d", LucaServerAction.ADD_LISTEDMENU.toString(), _id, _title, _description, _rating);
     }
 
     @Override
     public String CommandUpdate() throws NoSuchMethodException {
-        throw new NoSuchMethodException("No method CommandUpdate for ListedMenu");
+        return String.format(Locale.getDefault(), "%s%d&title=%s&description=%s&rating=%d", LucaServerAction.UPDATE_LISTEDMENU.toString(), _id, _title, _description, _rating);
     }
 
     @Override
     public String CommandDelete() throws NoSuchMethodException {
-        throw new NoSuchMethodException("No method CommandDelete for ListedMenu");
+        return String.format(Locale.getDefault(), "%s%d", LucaServerAction.DELETE_LISTEDMENU.toString(), _id);
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Description: %s );(Rating: %d );(LastSuggestion: %s ))", TAG, _id, _description, _rating, _lastSuggestion);
+        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Title: %s );(Description: %s );(Rating: %d );(LastSuggestion: %s ))", TAG, _id, _title, _description, _rating, _useCounter);
     }
 }

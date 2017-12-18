@@ -50,6 +50,7 @@ public class SettingsController {
     public static final String PREF_RELOAD_TEMPERATURE_ENABLED = "reload_temperature_enabled";
     public static final String PREF_RELOAD_WEATHER_ENABLED = "reload_weather_enabled";
     public static final String PREF_RELOAD_WIRELESSSOCKET_ENABLED = "reload_wirelesssocket_enabled";
+    public static final String PREF_RELOAD_WIRELESSSWITCH_ENABLED = "reload_wirelessswitch_enabled";
 
     public static final String PREF_RELOAD_BIRTHDAY_TIMEOUT = "reload_birthday_timeout";
     public static final String PREF_RELOAD_COIN_TIMEOUT = "reload_coin_timeout";
@@ -63,6 +64,7 @@ public class SettingsController {
     public static final String PREF_RELOAD_TEMPERATURE_TIMEOUT = "reload_temperature_timeout";
     public static final String PREF_RELOAD_WEATHER_TIMEOUT = "reload_weather_timeout";
     public static final String PREF_RELOAD_WIRELESSSOCKET_TIMEOUT = "reload_wirelesssocket_timeout";
+    public static final String PREF_RELOAD_WIRELESSSWITCH_TIMEOUT = "reload_wirelessswitch_timeout";
 
     public static final String PREF_COIN_HOURS_TREND = "coin_hours_trend";
 
@@ -110,6 +112,7 @@ public class SettingsController {
         _sharedPrefController.SaveStringValue(PREF_RELOAD_TEMPERATURE_TIMEOUT, "15");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_WEATHER_TIMEOUT, "5");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT, "15");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT, "15");
 
         _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED, true);
     }
@@ -317,6 +320,13 @@ public class SettingsController {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_ENABLED);
     }
 
+    public boolean IsReloadWirelessSwitchEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WIRELESSSWITCH_ENABLED);
+    }
+
     public int GetReloadBirthdayTimeout() {
         String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_TIMEOUT);
         return Integer.parseInt(stringValue);
@@ -374,6 +384,11 @@ public class SettingsController {
 
     public int GetReloadWirelessSocketTimeout() {
         String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT);
+        return Integer.parseInt(stringValue);
+    }
+
+    public int GetReloadWirelessSwitchTimeout() {
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT);
         return Integer.parseInt(stringValue);
     }
 

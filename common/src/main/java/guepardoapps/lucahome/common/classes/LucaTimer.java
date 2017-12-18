@@ -16,38 +16,25 @@ public class LucaTimer extends Schedule {
     public LucaTimer(
             int id,
             @NonNull String name,
-            @NonNull String information,
-            @NonNull WirelessSocket socket,
+            WirelessSocket wirelessSocket,
+            WirelessSwitch wirelessSwitch,
             @NonNull Weekday weekday,
             @NonNull SerializableTime time,
             SocketAction action,
             boolean isActive,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
-        super(id, name, information, socket, weekday, time, action, isActive, isOnServer, serverDbAction);
-    }
-
-    public LucaTimer(
-            int id,
-            @NonNull String name,
-            @NonNull WirelessSocket socket,
-            @NonNull Weekday weekday,
-            @NonNull SerializableTime time,
-            SocketAction action,
-            boolean isActive,
-            boolean isOnServer,
-            @NonNull LucaServerDbAction serverDbAction) {
-        super(id, name, socket, weekday, time, action, isActive, isOnServer, serverDbAction);
+        super(id, name, wirelessSocket, wirelessSwitch, weekday, time, action, isActive, isOnServer, serverDbAction);
     }
 
     @Override
     public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.ADD_SCHEDULE.toString(), _name, _socket.GetName(), "", _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "1", "0", "1");
+        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&switch=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.ADD_SCHEDULE.toString(), _name, _wirelessSocket.GetName(), "", _wirelessSwitch.GetName(), _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "1", "0", "1");
     }
 
     @Override
     public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.UPDATE_SCHEDULE.toString(), _name, _socket.GetName(), "", _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "1", "0", "1");
+        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&switch=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.UPDATE_SCHEDULE.toString(), _name, _wirelessSocket.GetName(), "", _wirelessSwitch.GetName(), _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "1", "0", "1");
     }
 
     @Override
@@ -55,7 +42,8 @@ public class LucaTimer extends Schedule {
         return "{" + TAG
                 + ": {Id: " + String.valueOf(_id)
                 + "};{Name: " + _name
-                + "};{WirelessSocket: " + (_socket != null ? _socket.toString() : "")
+                + "};{WirelessSocket: " + (_wirelessSocket != null ? _wirelessSocket.toString() : "")
+                + "};{WirelessSwitch: " + (_wirelessSwitch != null ? _wirelessSwitch.toString() : "")
                 + "};{Weekday: " + _weekday.toString()
                 + "};{Time: " + _time.toString()
                 + "};{Action: " + _action.toString()

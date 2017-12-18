@@ -573,7 +573,6 @@ public class ScheduleService implements IDataService {
             if (String.valueOf(entry.GetId()).contains(searchKey)
                     || entry.GetName().contains(searchKey)
                     || entry.GetTime().toString().contains(searchKey)
-                    || entry.GetInformation().contains(searchKey)
                     || entry.GetWeekday().toString().contains(searchKey)
                     || entry.GetAction().toString().contains(searchKey)
                     || entry.GetIsActiveString().contains(searchKey)) {
@@ -631,7 +630,6 @@ public class ScheduleService implements IDataService {
             if (String.valueOf(entry.GetId()).contains(searchKey)
                     || entry.GetName().contains(searchKey)
                     || entry.GetTime().toString().contains(searchKey)
-                    || entry.GetInformation().contains(searchKey)
                     || entry.GetWeekday().toString().contains(searchKey)
                     || entry.GetAction().toString().contains(searchKey)
                     || entry.GetIsActiveString().contains(searchKey)) {

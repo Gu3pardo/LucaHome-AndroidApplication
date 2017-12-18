@@ -22,18 +22,19 @@ import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinis
 public class DownloadController {
     public enum DownloadType implements Serializable {
         Birthday, BirthdayAdd, BirthdayUpdate, BirthdayDelete,
-        CoinConversion, Coin, CoinAdd, CoinUpdate, CoinDelete, CoinAggregate,
+        CoinConversion, Coin, CoinAdd, CoinUpdate, CoinDelete, CoinTrend,
         MapContent,
-        ListedMenu,
+        ListedMenu, ListedMenuAdd, ListedMenuUpdate, ListedMenuDelete,
         Menu, MenuUpdate, MenuClear,
         Movie, MovieUpdate,
         Schedule, ScheduleSet, ScheduleAdd, ScheduleUpdate, ScheduleDelete,
-        Security, SecurityCamera, SecurityMotionControl,
+        Security, SecurityCamera, SecurityCameraControl,
         ShoppingList, ShoppingListAdd, ShoppingListDelete, ShoppingListUpdate,
         Temperature,
         TimerAdd, TimerUpdate, TimerDelete,
         User,
-        WirelessSocket, WirelessSocketSet, WirelessSocketAdd, WirelessSocketUpdate, WirelessSocketDelete
+        WirelessSocket, WirelessSocketSet, WirelessSocketAdd, WirelessSocketUpdate, WirelessSocketDelete,
+        WirelessSwitch, WirelessSwitchToggle, WirelessSwitchAdd, WirelessSwitchUpdate, WirelessSwitchDelete
     }
 
     public enum DownloadState implements Serializable {

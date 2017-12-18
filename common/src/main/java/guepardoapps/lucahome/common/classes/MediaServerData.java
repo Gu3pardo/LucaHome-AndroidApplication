@@ -9,10 +9,10 @@ import java.util.Locale;
 import guepardoapps.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.lucahome.common.enums.RadioStreams;
 
-public class MediaMirrorData implements Serializable {
+public class MediaServerData implements Serializable {
     private static final long serialVersionUID = -6336573950675481913L;
 
-    private static final String TAG = MediaMirrorData.class.getSimpleName();
+    private static final String TAG = MediaServerData.class.getSimpleName();
 
     private MediaServerSelection _mediaServerSelection;
 
@@ -39,7 +39,7 @@ public class MediaMirrorData implements Serializable {
 
     private int _screenBrightness;
 
-    public MediaMirrorData(
+    public MediaServerData(
             @NonNull MediaServerSelection mediaServerSelection,
             int batteryLevel,
             @NonNull String socketName,
@@ -82,7 +82,7 @@ public class MediaMirrorData implements Serializable {
         _screenBrightness = screenBrightness;
     }
 
-    public MediaMirrorData(
+    public MediaServerData(
             @NonNull MediaServerSelection mediaServerSelection,
             int batteryLevel,
             int volume,

@@ -493,7 +493,7 @@ public class MenuService implements IDataService {
                 + _settingsController.GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
-                + "&action=" + LucaServerAction.GET_LISTED_MENU.toString();
+                + "&action=" + LucaServerAction.GET_LISTEDMENU.toString();
         _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenu, true);

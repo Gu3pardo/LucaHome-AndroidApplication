@@ -18,7 +18,10 @@ public class LucaBirthday implements Serializable, ILucaClass {
 
     private int _id;
     private String _name;
+    private boolean _remindMe;
+    private boolean _sendMail;
     private SerializableDate _date;
+
     private transient Bitmap _photo;
     private int _notificationId;
 
@@ -28,14 +31,18 @@ public class LucaBirthday implements Serializable, ILucaClass {
     public LucaBirthday(
             int id,
             @NonNull String name,
+            boolean remindMe,
+            boolean sendMail,
             @NonNull SerializableDate date,
             Bitmap photo,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
-
         _name = name;
         _date = date;
+        _remindMe = remindMe;
+        _sendMail = sendMail;
+
         _photo = photo;
         _notificationId = _id * _date.DayOfMonth() + _date.Month() * _date.Year();
 
@@ -54,6 +61,22 @@ public class LucaBirthday implements Serializable, ILucaClass {
 
     public void SetName(@NonNull String name) {
         _name = name;
+    }
+
+    public boolean GetRemindMe() {
+        return _remindMe;
+    }
+
+    public void SetRemindMe(boolean remindMe) {
+        _remindMe = remindMe;
+    }
+
+    public boolean GetSendMail() {
+        return _sendMail;
+    }
+
+    public void SetSendMail(boolean sendMail) {
+        _sendMail = sendMail;
     }
 
     public SerializableDate GetDate() {
@@ -139,12 +162,12 @@ public class LucaBirthday implements Serializable, ILucaClass {
 
     @Override
     public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d", LucaServerAction.ADD_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year());
+        return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d&remindme=%s", LucaServerAction.ADD_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year(), (_remindMe ? "1" : "0"));
     }
 
     @Override
     public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d", LucaServerAction.UPDATE_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year());
+        return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d&remindme=%s", LucaServerAction.UPDATE_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year(), (_remindMe ? "1" : "0"));
     }
 
     @Override
