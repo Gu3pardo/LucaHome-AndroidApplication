@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 
@@ -18,7 +19,8 @@ public class ScheduleDto implements Serializable {
     private int _id;
 
     private String _name;
-    private WirelessSocket _socket;
+    private WirelessSocket _wirelessSocket;
+    private WirelessSwitch _wirelessSwitch;
     private Weekday _weekday;
     private SerializableTime _time;
     private SocketAction _socketAction;
@@ -28,14 +30,16 @@ public class ScheduleDto implements Serializable {
     public ScheduleDto(
             int id,
             @NonNull String name,
-            WirelessSocket socket,
+            WirelessSocket wirelessSocket,
+            WirelessSwitch wirelessSwitch,
             Weekday weekday,
             @NonNull SerializableTime time,
             @NonNull SocketAction socketAction,
             @NonNull Action action) {
         _id = id;
         _name = name;
-        _socket = socket;
+        _wirelessSocket = wirelessSocket;
+        _wirelessSwitch = wirelessSwitch;
         _weekday = weekday;
         _time = time;
         _socketAction = socketAction;
@@ -50,8 +54,12 @@ public class ScheduleDto implements Serializable {
         return _name;
     }
 
-    public WirelessSocket GetSocket() {
-        return _socket;
+    public WirelessSocket GetWirelessSocket() {
+        return _wirelessSocket;
+    }
+
+    public WirelessSwitch GetWirelessSwitch() {
+        return _wirelessSwitch;
     }
 
     public Weekday GetWeekday() {
@@ -75,7 +83,8 @@ public class ScheduleDto implements Serializable {
         return "{" + TAG
                 + ": {Id: " + String.valueOf(_id)
                 + "};{Name: " + _name
-                + "};{WirelessSocket: " + (_socket != null ? _socket.toString() : "")
+                + "};{WirelessSocket: " + (_wirelessSocket != null ? _wirelessSocket.toString() : "")
+                + "};{WirelessSwitch: " + (_wirelessSwitch != null ? _wirelessSwitch.toString() : "")
                 + "};{Weekday: " + (_weekday != null ? _weekday.toString() : "")
                 + "};{Time: " + _time.toString()
                 + "};{SocketAction: " + _socketAction.toString()

@@ -117,7 +117,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -125,7 +125,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -151,7 +152,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -159,7 +160,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -177,7 +179,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -185,7 +187,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -203,7 +206,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -211,7 +214,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -223,7 +227,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuEditActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -231,7 +235,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -244,7 +249,7 @@ public class NavigationService {
 
             return NavigationResult.PERMITTED;
 
-        } else if (startActivityContext.getClass() == MediaMirrorActivity.class) {
+        } else if (startActivityContext.getClass() == MediaServerActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
@@ -257,7 +262,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -269,7 +275,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieEditActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -277,7 +283,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -296,7 +303,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleEditActivity.class)
@@ -304,7 +311,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -323,14 +331,15 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -342,7 +351,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -350,7 +359,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -362,7 +372,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -370,7 +380,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListEditActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -389,7 +400,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -397,7 +408,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerEditActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -416,7 +428,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
-                    || endActivity.getClass().isInstance(MediaMirrorActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
@@ -424,7 +436,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
                     || endActivity.getClass().isInstance(TimerActivity.class)
-                    || endActivity.getClass().isInstance(WirelessSocketEditActivity.class)) {
+                    || endActivity.getClass().isInstance(WirelessSocketEditActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 
@@ -432,6 +445,34 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == WirelessSocketEditActivity.class) {
             if (endActivity.getClass().isInstance(WirelessSocketActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
+        } else if (startActivityContext.getClass() == WirelessSwitchActivity.class) {
+            if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(CoinActivity.class)
+                    || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
+                    || endActivity.getClass().isInstance(LoginActivity.class)
+                    || endActivity.getClass().isInstance(MainActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
+                    || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(ScheduleActivity.class)
+                    || endActivity.getClass().isInstance(SecurityActivity.class)
+                    || endActivity.getClass().isInstance(SettingsActivity.class)
+                    || endActivity.getClass().isInstance(ShoppingListActivity.class)
+                    || endActivity.getClass().isInstance(TimerActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchEditActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
+        } else if (startActivityContext.getClass() == WirelessSwitchEditActivity.class) {
+            if (endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
                 return NavigationResult.POSSIBLE;
             }
 

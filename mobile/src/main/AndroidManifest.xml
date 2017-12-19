@@ -72,8 +72,8 @@
         <activity android:name=".views.LoginActivity" />
         <activity android:name=".views.MainActivity" />
         <activity
-            android:name=".views.MediaMirrorActivity"
-            android:label="@string/title_activity_mediamirror"
+            android:name=".views.MediaServerActivity"
+            android:label="@string/title_activity_mediaserver"
             android:parentActivityName=".views.MainActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateHidden|adjustResize">
@@ -206,6 +206,25 @@
         <activity
             android:name=".views.WirelessSocketEditActivity"
             android:label="@string/title_activity_wireless_socket_edit"
+            android:parentActivityName=".views.WirelessSocketActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.WirelessSocketActivity" />
+        </activity>
+        <activity
+            android:name=".views.WirelessSwitchActivity"
+            android:label="@string/title_activity_wireless_switch"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.WirelessSwitchEditActivity"
+            android:label="@string/title_activity_wireless_switch_edit"
             android:parentActivityName=".views.WirelessSocketActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

@@ -2,7 +2,9 @@ package guepardoapps.lucahome.common.converter;
 
 import android.support.annotation.NonNull;
 
-import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -14,7 +16,7 @@ public class JsonDataToSecurityConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToSecurityConverter.class.getSimpleName();
     private Logger _logger;
 
-    private static String _searchParameter = "{MotionData:";
+    private static String _searchParameter = "{\"MotionData\":";
 
     public JsonDataToSecurityConverter() {
         _logger = new Logger(TAG);
@@ -36,83 +38,37 @@ public class JsonDataToSecurityConverter implements IJsonDataConverter {
     }
 
     private SerializableList<Security> parseStringToList(@NonNull String value) {
-        _logger.Debug("SerializableList<Security> parseStringToList");
-        _logger.Debug(value);
+        try {
+            if (!value.contains("Error")) {
+                SerializableList<Security> list = new SerializableList<>();
 
-        if (!value.contains("Error")) {
-            if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
-                if (value.contains(_searchParameter)) {
-                    SerializableList<Security> list = new SerializableList<>();
+                JSONObject jsonObject = new JSONObject(value);
+                JSONObject jsonObjectData = jsonObject.getJSONObject("MotionData");
 
-                    String[] entries = value.split("\\" + _searchParameter);
-                    for (String entry : entries) {
-                        entry = entry.replace(_searchParameter, "").replace("};};", "");
+                boolean state = jsonObjectData.getString("State").contains("ON");
+                boolean control = jsonObjectData.getString("Control").contains("ON");
 
-                        String[] data = entry.split("\\};");
-                        Security newValue = parseStringToValue(data);
-                        if (newValue != null) {
-                            list.addValue(newValue);
-                        } else {
-                            _logger.Error("NewValue is null!");
-                        }
-                    }
+                String url = jsonObjectData.getString("URL");
 
-                    return list;
-                } else {
-                    _logger.Error("Value does not contain " + _searchParameter);
+                JSONArray jsonArrayEvents = jsonObjectData.getJSONArray("Events");
+                SerializableList<String> registeredEvents = new SerializableList<>();
+
+                for (int dataIndex = 0; dataIndex < jsonArrayEvents.length(); dataIndex++) {
+                    String name = jsonArrayEvents.getJSONObject(dataIndex).getString("FileName");
+                    registeredEvents.addValue(name);
                 }
-            } else {
-                _logger.Error("Value does not contain more then 0x " + _searchParameter);
+
+                Security security = new Security(state, control, url, registeredEvents);
+                list.addValue(security);
+
+                return list;
             }
-        } else {
-            _logger.Error("value contains error!");
+        } catch (JSONException jsonException) {
+            _logger.Error(jsonException.getMessage());
         }
 
         _logger.Error(value + " has an error!");
 
         return new SerializableList<>();
-    }
-
-    private Security parseStringToValue(@NonNull String[] data) {
-        _logger.Debug("Security parseStringToValue");
-        _logger.Debug("Data has size " + String.valueOf(data.length));
-
-        if (data.length == 4) {
-            if (data[0].contains("{State:")
-                    && data[1].contains("{URL:")
-                    && data[2].contains("{MotionEvents:")
-                    && data[3].contains("{Control:")) {
-
-                String isCameraActiveString = data[0].replace("{State:", "").replace("};", "");
-                boolean isCameraActive = isCameraActiveString.contains("1");
-
-                String isMotionControlActiveString = data[3].replace("{Control:", "").replace("};", "");
-                boolean isMotionControlActive = isMotionControlActiveString.contains("1");
-
-                String url = data[1].replace("{URL:", "").replace("};", "");
-
-                String registeredEventsString = data[2].replace("{MotionEvents:", "").replace("};", "");
-                String[] registeredEventsData = registeredEventsString.split("\\},");
-
-                SerializableList<String> registeredEvents = new SerializableList<>();
-                for (String registeredEvent : registeredEventsData) {
-                    registeredEvent = registeredEvent.replace("{Event:", "").replace("},", "");
-                    registeredEvents.addValue(registeredEvent);
-                }
-
-                Security newValue = new Security(isCameraActive, isMotionControlActive, url, registeredEvents);
-                _logger.Debug(String.format(Locale.getDefault(), "New Security %s", newValue));
-
-                return newValue;
-            } else {
-                _logger.Error("Data contains invalid parameter");
-            }
-        } else {
-            _logger.Error("Data has invalid length " + String.valueOf(data.length));
-        }
-
-        _logger.Error("Data has an error!");
-
-        return null;
     }
 }

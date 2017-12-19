@@ -2,6 +2,10 @@ package guepardoapps.lucahome.common.converter;
 
 import android.support.annotation.NonNull;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializablePair;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -14,7 +18,7 @@ public final class JsonDataToCoinConverter {
     private static final String TAG = JsonDataToCoinConverter.class.getSimpleName();
     private Logger _logger;
 
-    private static String _searchParameter = "{coin:";
+    private static String _searchParameter = "{\"Data\":";
 
     public JsonDataToCoinConverter() {
         _logger = new Logger(TAG);
@@ -34,22 +38,35 @@ public final class JsonDataToCoinConverter {
     }
 
     private SerializableList<Coin> parseStringToList(@NonNull String value, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
-            if (value.contains(_searchParameter)) {
+        try {
+            if (!value.contains("Error")) {
                 SerializableList<Coin> list = new SerializableList<>();
 
-                String[] entries = value.split("\\" + _searchParameter);
-                for (String entry : entries) {
-                    entry = entry.replace(_searchParameter, "").replace("};};", "");
+                JSONObject jsonObject = new JSONObject(value);
+                JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                    String[] data = entry.split("\\};");
-                    Coin newValue = parseStringToValue(data, conversionList);
-                    if (newValue != null) {
-                        list.addValue(newValue);
-                    }
+                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
+                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Coin");
+
+                    int id = child.getInt("ID");
+
+                    String user = child.getString("User");
+                    String type = child.getString("Type");
+
+                    int amount = child.getInt("Amount");
+
+                    double currentConversion = getCurrentConversion(type, conversionList);
+
+                    int icon = getIcon(type);
+
+                    Coin newCoin = new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon, true, ILucaClass.LucaServerDbAction.Null);
+                    list.addValue(newCoin);
                 }
+
                 return list;
             }
+        } catch (JSONException jsonException) {
+            _logger.Error(jsonException.getMessage());
         }
 
         _logger.Error(value + " has an error!");
@@ -57,68 +74,40 @@ public final class JsonDataToCoinConverter {
         return new SerializableList<>();
     }
 
-    private Coin parseStringToValue(@NonNull String[] data, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
-        if (data.length == 4) {
-            if (data[0].contains("{Id:")
-                    && data[1].contains("{User:")
-                    && data[2].contains("{Type:")
-                    && data[3].contains("{Amount:")) {
-
-                String idString = data[0].replace("{Id:", "").replace("};", "");
-                int id = Integer.parseInt(idString);
-
-                String user = data[1].replace("{User:", "").replace("};", "");
-
-                String type = data[2].replace("{Type:", "").replace("};", "");
-
-                String amountString = data[3].replace("{Amount:", "").replace("};", "");
-                double amount = Double.parseDouble(amountString);
-
-                double currentConversion = 0;
-                for (int index = 0; index < conversionList.getSize(); index++) {
-                    SerializablePair<String, Double> entry = conversionList.getValue(index);
-                    if (entry.GetKey().contains(type)) {
-                        currentConversion = entry.GetValue();
-                        break;
-                    }
-                }
-
-                int icon;
-                switch (type) {
-                    case "BCH":
-                        icon = R.drawable.bch;
-                        break;
-                    case "BTC":
-                        icon = R.drawable.btc;
-                        break;
-                    case "DASH":
-                        icon = R.drawable.dash;
-                        break;
-                    case "ETC":
-                        icon = R.drawable.etc;
-                        break;
-                    case "ETH":
-                        icon = R.drawable.eth;
-                        break;
-                    case "LTC":
-                        icon = R.drawable.ltc;
-                        break;
-                    case "XMR":
-                        icon = R.drawable.xmr;
-                        break;
-                    case "ZEC":
-                        icon = R.drawable.zec;
-                        break;
-                    default:
-                        icon = R.drawable.btc;
-                }
-
-                return new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon, true, ILucaClass.LucaServerDbAction.Null);
+    private double getCurrentConversion(@NonNull String type, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
+        for (int index = 0; index < conversionList.getSize(); index++) {
+            SerializablePair<String, Double> entry = conversionList.getValue(index);
+            if (entry.GetKey().contains(type)) {
+                return entry.GetValue();
             }
         }
+        return 0;
+    }
 
-        _logger.Error("Data has an error!");
-
-        return null;
+    private int getIcon(@NonNull String type) {
+        switch (type) {
+            case "BCH":
+                return R.drawable.bch;
+            case "BTC":
+                return R.drawable.btc;
+            case "DASH":
+                return R.drawable.dash;
+            case "ETC":
+                return R.drawable.etc;
+            case "ETH":
+                return R.drawable.eth;
+            case "IOTA":
+                return R.drawable.iota;
+            case "LTC":
+                return R.drawable.ltc;
+            case "XMR":
+                return R.drawable.xmr;
+            case "XRP":
+                return R.drawable.xrp;
+            case "ZEC":
+                return R.drawable.zec;
+            default:
+                return R.drawable.btc;
+        }
     }
 }

@@ -33,7 +33,8 @@ public class ScheduleListViewAdapter extends BaseAdapter {
         private TextView _dateText;
         private TextView _timeText;
         private TextView _socketText;
-        private TextView _socketActionText;
+        private TextView _switchText;
+        private TextView _actionText;
         private Switch _cardSwitch;
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
@@ -106,27 +107,29 @@ public class ScheduleListViewAdapter extends BaseAdapter {
         holder._dateText = rowView.findViewById(R.id.scheduleDateText);
         holder._timeText = rowView.findViewById(R.id.scheduleTimeText);
         holder._socketText = rowView.findViewById(R.id.scheduleSocketText);
-        holder._socketActionText = rowView.findViewById(R.id.scheduleSocketActionText);
+        holder._switchText = rowView.findViewById(R.id.scheduleSwitchText);
+        holder._actionText = rowView.findViewById(R.id.scheduleActionText);
         holder._cardSwitch = rowView.findViewById(R.id.scheduleCardSwitch);
         holder._updateButton = rowView.findViewById(R.id.schedule_card_update_button);
         holder._deleteButton = rowView.findViewById(R.id.schedule_card_delete_button);
 
         final Schedule schedule = _listViewItems.getValue(index);
 
-        holder._socketImageView.setImageResource(schedule.GetSocket().GetDrawable());
+        holder._socketImageView.setImageResource(schedule.GetWirelessSocket().GetDrawable());
 
         holder._titleText.setText(schedule.GetName());
         holder._dateText.setText(schedule.GetWeekday().toString());
         holder._timeText.setText(schedule.GetTime().HHMM());
-        holder._socketText.setText(schedule.GetSocket().GetName());
-        holder._socketActionText.setText(schedule.GetAction().toString());
+        holder._socketText.setText(schedule.GetWirelessSocket().GetName());
+        holder._switchText.setText(schedule.GetWirelessSwitch().GetName());
+        holder._actionText.setText(schedule.GetAction().toString());
 
         holder._cardSwitch.setChecked(schedule.IsActive());
         holder._cardSwitch.setOnCheckedChangeListener((compoundButton, value) -> _scheduleService.SetScheduleState(schedule, value));
 
         holder._updateButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(schedule.GetId(), schedule.GetName(), schedule.GetSocket(), schedule.GetWeekday(), schedule.GetTime(), schedule.GetAction(), ScheduleDto.Action.Update));
+            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(schedule.GetId(), schedule.GetName(), schedule.GetWirelessSocket(), schedule.GetWirelessSwitch(), schedule.GetWeekday(), schedule.GetTime(), schedule.GetAction(), ScheduleDto.Action.Update));
             _navigationService.NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
         });
 

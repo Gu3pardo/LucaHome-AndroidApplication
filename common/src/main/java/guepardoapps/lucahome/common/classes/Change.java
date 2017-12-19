@@ -3,9 +3,9 @@ package guepardoapps.lucahome.common.classes;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
-import java.sql.Date;
 import java.util.Locale;
 
+import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableTime;
 
 public class Change implements Serializable {
@@ -15,20 +15,19 @@ public class Change implements Serializable {
     private int _id;
 
     private String _type;
-    private Date _date;
+    private SerializableDate _date;
     private SerializableTime _time;
     private String _user;
 
     public Change(
             int id,
             @NonNull String type,
-            @NonNull Date date,
+            @NonNull SerializableDate date,
             @NonNull SerializableTime time,
             @NonNull String user) {
         _id = id;
         _type = type;
         _date = date;
-        _date.setYear(_date.getYear() - 1900);
         _time = time;
         _user = user;
     }
@@ -41,7 +40,7 @@ public class Change implements Serializable {
         return _type;
     }
 
-    public Date GetDate() {
+    public SerializableDate GetDate() {
         return _date;
     }
 

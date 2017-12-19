@@ -2,22 +2,23 @@ package guepardoapps.lucahome.common.converter;
 
 import android.support.annotation.NonNull;
 
-import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
+import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
-import guepardoapps.lucahome.common.classes.MapContent;
-import guepardoapps.lucahome.common.classes.Schedule;
-import guepardoapps.lucahome.common.classes.Temperature;
-import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public final class JsonDataToMapContentConverter {
     private static final String TAG = JsonDataToMapContentConverter.class.getSimpleName();
     private static Logger _logger;
 
-    private static String _searchParameter = "{mapcontent:";
+    private static String _searchParameter = "{\"Data\":";
 
     public JsonDataToMapContentConverter() {
         _logger = new Logger(TAG);
@@ -25,93 +26,96 @@ public final class JsonDataToMapContentConverter {
 
     public SerializableList<MapContent> GetList(
             @NonNull String[] stringArray,
-            @NonNull SerializableList<Temperature> temperatureList,
-            @NonNull SerializableList<WirelessSocket> socketList,
-            @NonNull SerializableList<Schedule> scheduleList) {
+            @NonNull SerializableList<ListedMenu> listedMenuList, @NonNull SerializableList<LucaMenu> menuList, @NonNull SerializableList<ShoppingEntry> shoppingList,
+            @NonNull SerializableList<MediaServerData> mediaServerList, @NonNull Security security, @NonNull SerializableList<Temperature> temperatureList,
+            @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
         if (StringHelper.StringsAreEqual(stringArray)) {
-            return parseStringToList(stringArray[0], temperatureList, socketList, scheduleList);
+            return parseStringToList(
+                    stringArray[0],
+                    listedMenuList, menuList, shoppingList,
+                    mediaServerList, security, temperatureList,
+                    wirelessSocketList, wirelessSwitchList);
         } else {
             String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
-            return parseStringToList(usedEntry, temperatureList, socketList, scheduleList);
+            return parseStringToList(
+                    usedEntry,
+                    listedMenuList, menuList, shoppingList,
+                    mediaServerList, security, temperatureList,
+                    wirelessSocketList, wirelessSwitchList);
         }
     }
 
     public SerializableList<MapContent> GetList(
             @NonNull String jsonString,
-            @NonNull SerializableList<Temperature> temperatureList,
-            @NonNull SerializableList<WirelessSocket> socketList,
-            @NonNull SerializableList<Schedule> scheduleList) {
-        return parseStringToList(jsonString, temperatureList, socketList, scheduleList);
-    }
-
-    public MapContent Get(
-            @NonNull String value,
-            @NonNull SerializableList<Temperature> temperatureList,
-            @NonNull SerializableList<WirelessSocket> socketList,
-            @NonNull SerializableList<Schedule> scheduleList) {
-        _logger.Debug("MapContentDto Get");
-        _logger.Debug(value);
-
-        if (!value.contains("Error")) {
-            if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
-                if (value.contains(_searchParameter)) {
-                    value = value.replace(_searchParameter, "").replace("};};", "");
-                    _logger.Debug(value);
-                    String[] data = value.split("\\};");
-                    MapContent newValue = parseStringToValue(data, temperatureList, socketList, scheduleList);
-                    if (newValue != null) {
-                        return newValue;
-                    }
-                } else {
-                    _logger.Error("MapContent does not contain " + _searchParameter);
-                }
-            } else {
-                _logger.Error("String count of mapContent is not 1!");
-            }
-        } else {
-            _logger.Error("mapContent contains error!");
-        }
-
-        _logger.Error(value + " has an error!");
-
-        return null;
+            @NonNull SerializableList<ListedMenu> listedMenuList, @NonNull SerializableList<LucaMenu> menuList, @NonNull SerializableList<ShoppingEntry> shoppingList,
+            @NonNull SerializableList<MediaServerData> mediaServerList, @NonNull Security security, @NonNull SerializableList<Temperature> temperatureList,
+            @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
+        return parseStringToList(
+                jsonString,
+                listedMenuList, menuList, shoppingList,
+                mediaServerList, security, temperatureList,
+                wirelessSocketList, wirelessSwitchList);
     }
 
     private SerializableList<MapContent> parseStringToList(
             @NonNull String value,
-            @NonNull SerializableList<Temperature> temperatureList,
-            @NonNull SerializableList<WirelessSocket> socketList,
-            @NonNull SerializableList<Schedule> scheduleList) {
-        _logger.Debug("SerializableList<MapContentDto> ParseStringToList");
-        _logger.Debug(value);
+            @NonNull SerializableList<ListedMenu> listedMenuList, @NonNull SerializableList<LucaMenu> menuList, @NonNull SerializableList<ShoppingEntry> shoppingList,
+            @NonNull SerializableList<MediaServerData> mediaServerList, @NonNull Security security, @NonNull SerializableList<Temperature> temperatureList,
+            @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
+        try {
+            if (!value.contains("Error")) {
+                SerializableList<MapContent> list = new SerializableList<>();
 
-        if (!value.contains("Error")) {
-            if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
-                if (value.contains(_searchParameter)) {
-                    SerializableList<MapContent> list = new SerializableList<>();
+                JSONObject jsonObject = new JSONObject(value);
+                JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                    String[] entries = value.split("\\" + _searchParameter);
-                    for (String entry : entries) {
-                        _logger.Debug(entry);
-                        entry = entry.replace(_searchParameter, "").replace("};};", "");
-                        _logger.Debug(entry);
+                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
+                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("MapContent");
 
-                        String[] data = entry.split("\\};");
-                        MapContent newValue = parseStringToValue(data, temperatureList, socketList, scheduleList);
-                        if (newValue != null) {
-                            list.addValue(newValue);
-                        }
-                    }
+                    int id = child.getInt("ID");
 
-                    return list;
-                } else {
-                    _logger.Error("MapContent does not contain " + _searchParameter);
+                    String typeString = child.getString("Type");
+                    MapContent.DrawingType drawingType = getDrawingType(typeString);
+                    int typeId = child.getInt("TypeId");
+
+                    String name = child.getString("Name");
+                    String shortName = child.getString("ShortName");
+                    String area = child.getString("Area");
+
+                    boolean visibility = child.getString("Visibility").contains("1");
+
+                    JSONObject positionJson = child.getJSONObject("Position");
+                    JSONObject pointJson = positionJson.getJSONObject("Point");
+
+                    int positionX = pointJson.getInt("X");
+                    int positionY = pointJson.getInt("Y");
+
+                    int[] position = new int[]{positionX, positionY};
+
+                    SerializableList<ListedMenu> _listedMenuList = ((name.equals("ListedMenu") && drawingType == MapContent.DrawingType.Menu) ? listedMenuList : null);
+                    SerializableList<LucaMenu> _menuList = ((name.equals("Menu") && drawingType == MapContent.DrawingType.Menu) ? menuList : null);
+                    SerializableList<ShoppingEntry> _shoppingList = ((name.equals("ShoppingList") && drawingType == MapContent.DrawingType.ShoppingList) ? shoppingList : null);
+
+                    MediaServerData _mediaServer = drawingType == MapContent.DrawingType.MediaServer ? (mediaServerList.getSize() > 0 ? mediaServerList.getValue(typeId - 1) : null) : null;
+                    Security _security = drawingType == MapContent.DrawingType.Camera ? security : null;
+
+                    // TODO Fix temperature selection
+                    // Temperature _temperature = drawingType == MapContent.DrawingType.Temperature ? (temperatureList.getSize() > 0 ? temperatureList.getValue(typeId - 1) : null) : null;
+                    Temperature _temperature = new Temperature(-273.15, "SPACE", new SerializableDate(), new SerializableTime(), "", Temperature.TemperatureType.DUMMY, "");
+                    WirelessSocket _wirelessSocket = drawingType == MapContent.DrawingType.Socket ? (wirelessSocketList.getSize() > 0 ? wirelessSocketList.getValue(typeId - 1) : null) : null;
+                    WirelessSwitch _wirelessSwitch = drawingType == MapContent.DrawingType.LightSwitch ? (wirelessSwitchList.getSize() > 0 ? wirelessSwitchList.getValue(typeId - 1) : null) : null;
+
+                    MapContent newMapContent = new MapContent(id, drawingType, typeId, position, name, shortName, area, visibility,
+                            _listedMenuList, _menuList, _shoppingList, _mediaServer, _security, _temperature, _wirelessSocket, _wirelessSwitch,
+                            true, ILucaClass.LucaServerDbAction.Null);
+
+                    list.addValue(newMapContent);
                 }
-            } else {
-                _logger.Error("String count of mapContent is not bigger then 1!");
+
+                return list;
             }
-        } else {
-            _logger.Error("mapContent contains error!");
+        } catch (JSONException jsonException) {
+            _logger.Error(jsonException.getMessage());
         }
 
         _logger.Error(value + " has an error!");
@@ -119,117 +123,32 @@ public final class JsonDataToMapContentConverter {
         return new SerializableList<>();
     }
 
-    private MapContent parseStringToValue(
-            @NonNull String[] data,
-            @NonNull SerializableList<Temperature> temperatureList,
-            @NonNull SerializableList<WirelessSocket> socketList,
-            @NonNull SerializableList<Schedule> scheduleList) {
-        _logger.Debug("MapContentDto ParseStringToValue");
-
-        if (data.length == 8) {
-            _logger.Warning("Length is 8! trying to fix!");
-            if (data[0].length() == 0) {
-                _logger.Warning("Value at index 0 is null! Trying to fix...");
-                String[] fixedData = new String[7];
-                System.arraycopy(data, 1, fixedData, 0, 7);
-                data = fixedData;
-            }
+    private MapContent.DrawingType getDrawingType(@NonNull String typeString) {
+        switch (typeString) {
+            case "WirelessSocket":
+                return MapContent.DrawingType.Socket;
+            case "LAN":
+                return MapContent.DrawingType.LAN;
+            case "MediaServer":
+                return MapContent.DrawingType.MediaServer;
+            case "RaspberryPi":
+                return MapContent.DrawingType.RaspberryPi;
+            case "NAS":
+                return MapContent.DrawingType.NAS;
+            case "LightSwitch":
+                return MapContent.DrawingType.LightSwitch;
+            case "Temperature":
+                return MapContent.DrawingType.Temperature;
+            case "PuckJS":
+                return MapContent.DrawingType.PuckJS;
+            case "Menu":
+                return MapContent.DrawingType.Menu;
+            case "ShoppingList":
+                return MapContent.DrawingType.ShoppingList;
+            case "Camera":
+                return MapContent.DrawingType.Camera;
+            default:
+                return MapContent.DrawingType.Null;
         }
-
-        if (data.length == 7) {
-            if (data[0].contains("{id:")
-                    && data[1].contains("{position:")
-                    && data[2].contains("{type:")
-                    && data[3].contains("{schedules:")
-                    && data[4].contains("{sockets:")
-                    && data[5].contains("{temperatureArea:")
-                    && data[6].contains("{visibility:")) {
-
-                String idString = data[0].replace("{id:", "").replace("};", "");
-                int id = Integer.parseInt(idString);
-
-                String positionString = data[1].replace("{position:", "").replace("};", "");
-                String[] coordinates = positionString.split("\\|");
-                int x = Integer.parseInt(coordinates[0]);
-                int y = Integer.parseInt(coordinates[1]);
-
-                int[] position = new int[2];
-                position[0] = x;
-                position[1] = y;
-
-                String typeString = data[2].replace("{type:", "").replace("};", "");
-                int typeInteger = Integer.parseInt(typeString);
-                MapContent.DrawingType drawingType = MapContent.DrawingType.values()[typeInteger];
-
-                SerializableList<Schedule> mapScheduleList = new SerializableList<>();
-                String scheduleString = data[3].replace("{schedules:", "").replace("};", "");
-                String[] scheduleStringList = scheduleString.split("\\|");
-                for (String entry : scheduleStringList) {
-                    for (int scheduleIndex = 0; scheduleIndex < scheduleList.getSize(); scheduleIndex++) {
-                        Schedule currentSchedule = scheduleList.getValue(scheduleIndex);
-                        if (entry.contains(currentSchedule.GetName())) {
-                            mapScheduleList.addValue(currentSchedule);
-                            break;
-                        }
-                    }
-                }
-
-                WirelessSocket socket = null;
-                boolean foundSocket = false;
-                String socketString = data[4].replace("{sockets:", "").replace("};", "");
-                String[] socketStringList = socketString.split("\\|");
-                for (String entry : socketStringList) {
-                    for (int socketIndex = 0; socketIndex < socketList.getSize(); socketIndex++) {
-                        WirelessSocket currentSocket = socketList.getValue(socketIndex);
-                        if (entry.contains(currentSocket.GetName())) {
-                            socket = currentSocket;
-                            foundSocket = true;
-                            break;
-                        }
-                    }
-                    if (foundSocket) {
-                        break;
-                    }
-                }
-
-                String temperatureArea = data[5].replace("{temperatureArea:", "").replace("};", "");
-
-                Temperature temperature = null;
-                if (drawingType == MapContent.DrawingType.Temperature) {
-                    for (int temperatureIndex = 0; temperatureIndex < temperatureList.getSize(); temperatureIndex++) {
-                        Temperature currentTemperature = temperatureList.getValue(temperatureIndex);
-                        if (currentTemperature.GetArea().contains(temperatureArea)) {
-                            temperature = currentTemperature;
-                            break;
-                        }
-                    }
-                }
-
-                boolean visibility = data[6].contains("1");
-
-                MapContent newValue = new MapContent(
-                        id,
-                        position,
-                        drawingType,
-                        temperatureArea,
-                        socket,
-                        scheduleList,
-                        temperature,
-                        visibility,
-                        true,
-                        ILucaClass.LucaServerDbAction.Null);
-                _logger.Debug(String.format(Locale.getDefault(), "New MapContentDto %s", newValue));
-
-                return newValue;
-            } else {
-                _logger.Error("MapContent does contain valid parameter");
-            }
-        } else {
-            _logger.Error("MapContent has wrong size (not 7!): " + String.valueOf(data.length));
-        }
-
-        _logger.Error("Data has an error!");
-
-        return null;
     }
 }

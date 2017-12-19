@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -32,6 +33,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
         private TextView _titleText;
         private TextView _dateText;
         private TextView _ageTextView;
+        private CheckBox _remindMeCheckBox;
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
 
@@ -102,6 +104,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
         holder._titleText = rowView.findViewById(R.id.birthday_card_title_text_view);
         holder._dateText = rowView.findViewById(R.id.birthday_date_text_view);
         holder._ageTextView = rowView.findViewById(R.id.birthday_age_text_view);
+        holder._remindMeCheckBox = rowView.findViewById(R.id.birthday_remind_me_checkbox);
         holder._updateButton = rowView.findViewById(R.id.birthday_card_update_button);
         holder._deleteButton = rowView.findViewById(R.id.birthday_card_delete_button);
 
@@ -117,9 +120,15 @@ public class BirthdayListViewAdapter extends BaseAdapter {
             holder._titleText.setBackgroundColor(_context.getResources().getColor(R.color.LightRed));
         }
 
+        holder._remindMeCheckBox.setChecked(birthday.GetRemindMe());
+        holder._remindMeCheckBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            birthday.SetRemindMe(isChecked);
+            BirthdayService.getInstance().UpdateBirthday(birthday);
+        });
+
         holder._updateButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(birthday.GetId(), birthday.GetName(), birthday.GetDate(), BirthdayDto.Action.Update));
+            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(birthday.GetId(), birthday.GetName(), birthday.GetDate(), birthday.GetRemindMe(), BirthdayDto.Action.Update));
             _navigationService.NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
         });
 

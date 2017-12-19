@@ -280,7 +280,7 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_movie) {
             navigationResult = _navigationService.NavigateToActivity(_context, MovieActivity.class);
         } else if (id == R.id.nav_mediamirror) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MediaMirrorActivity.class);
+            navigationResult = _navigationService.NavigateToActivity(_context, MediaServerActivity.class);
         } else if (id == R.id.nav_menu) {
             navigationResult = _navigationService.NavigateToActivity(_context, MenuActivity.class);
         } else if (id == R.id.nav_shopping) {
@@ -293,6 +293,8 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
             navigationResult = _navigationService.NavigateToActivity(_context, SecurityActivity.class);
         } else if (id == R.id.nav_settings) {
             navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
+        } else if (id == R.id.nav_switch) {
+            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

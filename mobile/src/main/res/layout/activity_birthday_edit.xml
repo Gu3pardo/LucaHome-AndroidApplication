@@ -52,13 +52,23 @@
                     android:id="@+id/birthday_edit_datePicker"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_above="@+id/save_birthday_edit_button"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/birthday_TextInputLayout"
                     android:background="@color/colorPrimary"
+                    android:nextFocusDown="@+id/birthday_edit_remindMeCheckBox"
+                    android:nextFocusRight="@+id/birthday_edit_remindMeCheckBox" />
+
+                <CheckBox
+                    android:id="@+id/birthday_edit_remindMeCheckBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/birthday_edit_datePicker"
                     android:nextFocusDown="@+id/save_birthday_edit_button"
-                    android:nextFocusRight="@+id/save_birthday_edit_button" />
+                    android:nextFocusRight="@+id/save_birthday_edit_button"
+                    android:text="@string/birthday_remind_me" />
 
                 <com.rey.material.widget.Button
                     android:id="@+id/save_birthday_edit_button"

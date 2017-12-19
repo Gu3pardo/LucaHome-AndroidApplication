@@ -14,18 +14,21 @@ public class MovieDto implements Serializable {
     private String _genre;
     private String _description;
     private int _rating;
+    private int _watched;
 
     public MovieDto(
             int id,
             @NonNull String title,
             @NonNull String genre,
             @NonNull String description,
-            int rating) {
+            int rating,
+            int watched) {
         _id = id;
         _title = title;
         _genre = genre;
         _description = description;
         _rating = rating;
+        _watched = watched;
     }
 
     public int GetId() {
@@ -48,6 +51,10 @@ public class MovieDto implements Serializable {
         return _rating;
     }
 
+    public int GetWatched() {
+        return _watched;
+    }
+
     @Override
     public String toString() {
         return "{" + TAG
@@ -55,6 +62,7 @@ public class MovieDto implements Serializable {
                 + "};{Title: " + _title
                 + "};{Genre: " + _genre
                 + "};{Description: " + _description
-                + "};{Rating: " + String.valueOf(_rating) + "}}";
+                + "};{Rating: " + String.valueOf(_rating)
+                + "};{Watched: " + String.valueOf(_watched) + "}}";
     }
 }

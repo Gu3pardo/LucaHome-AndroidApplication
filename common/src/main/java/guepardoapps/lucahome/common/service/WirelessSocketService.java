@@ -19,7 +19,7 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.converter.JsonDataToSocketConverter;
+import guepardoapps.lucahome.common.converter.JsonDataToWirelessSocketConverter;
 import guepardoapps.lucahome.common.database.DatabaseWirelessSocketList;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.controller.DownloadController;
@@ -102,7 +102,7 @@ public class WirelessSocketService implements IDataNotificationService {
 
     private DatabaseWirelessSocketList _databaseWirelessSocketList;
 
-    private JsonDataToSocketConverter _jsonDataToWirelessSocketConverter;
+    private JsonDataToWirelessSocketConverter _jsonDataToWirelessSocketConverter;
 
     private SerializableList<WirelessSocket> _wirelessSocketList = new SerializableList<>();
 
@@ -379,7 +379,7 @@ public class WirelessSocketService implements IDataNotificationService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToWirelessSocketConverter = new JsonDataToSocketConverter();
+        _jsonDataToWirelessSocketConverter = new JsonDataToWirelessSocketConverter();
 
         SetReloadTimeout(reloadTimeout);
 
@@ -810,7 +810,7 @@ public class WirelessSocketService implements IDataNotificationService {
     private void clearSocketListFromDatabase() {
         _logger.Debug("clearSocketListFromDatabase");
 
-        SerializableList<WirelessSocket> socketList = _databaseWirelessSocketList.GetSocketList();
+        SerializableList<WirelessSocket> socketList = _databaseWirelessSocketList.GetWirelessSocketList();
         for (int index = 0; index < socketList.getSize(); index++) {
             WirelessSocket socket = socketList.getValue(index);
             _databaseWirelessSocketList.Delete(socket);

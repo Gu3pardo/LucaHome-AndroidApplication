@@ -150,12 +150,20 @@ public class MapContentBuilder {
                     .setCancelable(true);
 
             dialog.positiveActionClickListener(view -> {
-                WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, true);
+                try {
+                    WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, true);
+                } catch (Exception exception) {
+                    // Perhaps log exception
+                }
                 dialog.dismiss();
             });
 
             dialog.negativeActionClickListener(view -> {
-                WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, false);
+                try {
+                    WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, false);
+                } catch (Exception exception) {
+                    // Perhaps log exception
+                }
                 dialog.dismiss();
             });
 

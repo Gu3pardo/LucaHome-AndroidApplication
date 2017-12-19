@@ -19,13 +19,16 @@ import guepardoapps.lucahome.common.dto.CoinDto;
 import guepardoapps.lucahome.common.dto.ScheduleDto;
 import guepardoapps.lucahome.common.dto.ShoppingEntryDto;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
+import guepardoapps.lucahome.common.dto.WirelessSwitchDto;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
 import guepardoapps.lucahome.common.enums.SocketAction;
+import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.service.BirthdayService;
 import guepardoapps.lucahome.common.service.CoinService;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.ShoppingListService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.*;
 
@@ -80,7 +83,7 @@ public class MainListViewBuilder {
                 () -> navigateTo(BirthdayActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(-1, "", new SerializableDate(), BirthdayDto.Action.Add));
+                    data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetDataList().getSize(), "", new SerializableDate(), true, BirthdayDto.Action.Add));
                     navigateWithDataTo(BirthdayEditActivity.class, data);
                 },
                 MainListViewItem.Type.Birthday
@@ -91,7 +94,7 @@ public class MainListViewBuilder {
                 () -> navigateTo(CoinActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(CoinService.CoinIntent, new CoinDto(-1, "", "", -1, CoinDto.Action.Add));
+                    data.putSerializable(CoinService.CoinIntent, new CoinDto(CoinService.getInstance().GetDataList().getSize(), "", "", -1, CoinDto.Action.Add));
                     navigateWithDataTo(CoinEditActivity.class, data);
                 },
                 MainListViewItem.Type.Coin
@@ -99,8 +102,8 @@ public class MainListViewBuilder {
 
         MainListViewItem mediaMirrorItem = new MainListViewItem(
                 "MediaMirror", "Control your local media mirror", R.drawable.main_image_mediamirror,
-                () -> navigateTo(MediaMirrorActivity.class),
-                MainListViewItem.Type.MediaMirror
+                () -> navigateTo(MediaServerActivity.class),
+                MainListViewItem.Type.MediaServer
         );
 
         MainListViewItem menuItem = new MainListViewItem(
@@ -120,7 +123,7 @@ public class MainListViewBuilder {
                 () -> navigateTo(ScheduleActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(-1, "", null, null, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
+                    data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(ScheduleService.getInstance().GetDataList().getSize(), "", null, null, Weekday.NULL, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
                     navigateWithDataTo(ScheduleEditActivity.class, data);
                 },
                 MainListViewItem.Type.Schedule
@@ -137,7 +140,7 @@ public class MainListViewBuilder {
                 () -> navigateTo(ShoppingListActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1));
+                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(ShoppingListService.getInstance().GetDataList().getSize(), "", ShoppingEntryGroup.OTHER, 1));
                     navigateWithDataTo(ShoppingListEditActivity.class, data);
                 },
                 MainListViewItem.Type.Shopping
@@ -161,13 +164,25 @@ public class MainListViewBuilder {
                 () -> navigateTo(WirelessSocketActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(-1, "", "", "", false, WirelessSocketDto.Action.Add));
+                    data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(WirelessSocketService.getInstance().GetDataList().getSize(), "", "", "", false, WirelessSocketDto.Action.Add));
                     navigateWithDataTo(WirelessSocketEditActivity.class, data);
                 },
                 true, MainListViewItem.Type.WirelessSocket
         );
 
+        MainListViewItem wirelessSwitchItem = new MainListViewItem(
+                "Switches", "Control your switches", R.drawable.main_image_switches,
+                () -> navigateTo(WirelessSwitchActivity.class),
+                () -> {
+                    Bundle data = new Bundle();
+                    data.putSerializable(WirelessSwitchService.WirelessSwitchIntent, new WirelessSwitchDto(WirelessSwitchService.getInstance().GetDataList().getSize(), "", "", -1, '1', WirelessSwitchDto.Action.Add));
+                    navigateWithDataTo(WirelessSwitchEditActivity.class, data);
+                },
+                true, MainListViewItem.Type.WirelessSwitch
+        );
+
         _mainListViewItems.addValue(wirelessSocketItem);
+        _mainListViewItems.addValue(wirelessSwitchItem);
         _mainListViewItems.addValue(weatherItem);
         _mainListViewItems.addValue(coinItem);
         _mainListViewItems.addValue(shoppingItem);

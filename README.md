@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
-[![Build](https://img.shields.io/badge/build-fail-red.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
+[![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
 [![Version](https://img.shields.io/badge/version-v5.0.0.171219-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
 
 Part of the LucaHome-Project
@@ -36,7 +36,7 @@ ___________________________________
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
-[![Build](https://img.shields.io/badge/build-fail-red.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
+[![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
 [![Version](https://img.shields.io/badge/version-v5.0.0.171219-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication)
 
 Android application permanently displaying data behind a mirror

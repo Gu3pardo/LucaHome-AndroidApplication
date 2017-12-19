@@ -40,17 +40,6 @@ public enum MediaServerAction implements Serializable {
     PLAY_ALARM(50, "Play_Alarm", 4),
     STOP_ALARM(51, "Stop_Alarm", 4),
 
-    /*GAME_COMMAND(60, "GAME_COMMAND", 1),
-    GAME_PONG_START(61, "GAME_PONG_START", 1),
-    GAME_PONG_STOP(62, "GAME_PONG_STOP", 1),
-    GAME_PONG_PAUSE(63, "GAME_PONG_PAUSE", 1),
-    GAME_PONG_RESUME(64, "GAME_PONG_RESUME", 1),
-    GAME_PONG_RESTART(65, "GAME_PONG_RESTART", 1),
-    GAME_SNAKE_START(66, "GAME_SNAKE_START", 1),
-    GAME_SNAKE_STOP(67, "GAME_SNAKE_STOP", 1),
-    GAME_TETRIS_START(68, "GAME_TETRIS_START", 1),
-    GAME_TETRIS_STOP(69, "GAME_TETRIS_STOP", 1),*/
-
     INCREASE_SCREEN_BRIGHTNESS(70, "Increase_Screen_Brightness", 3),
     DECREASE_SCREEN_BRIGHTNESS(71, "Decrease_Screen_Brightness", 3),
     GET_SCREEN_BRIGHTNESS(72, "Get_Screen_Brightness", 1),
@@ -64,7 +53,7 @@ public enum MediaServerAction implements Serializable {
     GET_BATTERY_LEVEL(90, "Get_Battery_Level", 1),
     GET_SERVER_VERSION(91, "Get_Server_Version", 1),
 
-    GET_MEDIAMIRROR_DTO(100, "Get_MediaMirror_Dto", 1),
+    GET_MEDIA_SERVER_DTO(100, "Get_MediaServer_Dto", 1),
 
     SHOW_RADIO_STREAM(110, "Show_Radio_Stream", 1),
     PLAY_RADIO_STREAM(111, "Play_Radio_Stream", 1),

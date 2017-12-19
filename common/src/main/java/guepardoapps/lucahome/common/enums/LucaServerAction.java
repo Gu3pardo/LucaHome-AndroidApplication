@@ -52,7 +52,6 @@ public enum LucaServerAction implements Serializable {
     GET_MOVIES(70, "getmovies"),
     START_MOVIE(71, "startmovie&title="),
     UPDATE_MOVIE(72, "updatemovie&title="),
-    GET_MOVIES_REDUCED(73, "getmoviesreduced"),
 
     //SCHEDULES
     GET_SCHEDULES(80, "getschedules"),

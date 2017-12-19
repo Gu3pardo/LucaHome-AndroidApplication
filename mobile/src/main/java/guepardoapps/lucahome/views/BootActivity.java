@@ -74,6 +74,8 @@ public class BootActivity extends AppCompatActivity {
             _mainServiceBinder = ((MainService.MainServiceBinder) binder).getService();
 
             if (!_userService.IsAnUserSaved()) {
+                _logger.Information("No user saved. Prompt for login!");
+
                 _loginAttempt = true;
                 NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(BootActivity.this, LoginActivity.class);
 
@@ -213,7 +215,7 @@ public class BootActivity extends AppCompatActivity {
                     .setDuration(Snacky.LENGTH_LONG)
                     .setActionText(android.R.string.ok)
                     .setActionClickListener(view -> {
-                        if(_mainServiceBinder != null){
+                        if (_mainServiceBinder != null) {
                             _mainServiceBinder.Cancel();
                         }
                         finish();

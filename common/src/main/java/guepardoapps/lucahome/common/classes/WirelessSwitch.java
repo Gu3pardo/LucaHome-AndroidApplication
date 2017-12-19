@@ -14,6 +14,8 @@ public class WirelessSwitch extends WirelessSocket {
     private static final long serialVersionUID = 5579389712706412340L;
     private static final String TAG = WirelessSwitch.class.getSimpleName();
 
+    public static final String SETTINGS_HEADER = "SharedPref_Notification_Switch_";
+
     private int _remoteId;
     private char _keyCode;
     private boolean _action;

@@ -109,8 +109,6 @@ public class ScheduleService implements IDataService {
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
 
-    private WirelessSocketService _wirelessSocketService;
-
     private JsonDataToScheduleConverter _jsonDataToScheduleConverter;
     private JsonDataToTimerConverter _jsonDataToTimerConverter;
 
@@ -147,8 +145,8 @@ public class ScheduleService implements IDataService {
                 return;
             }
 
-            SerializableList<Schedule> scheduleList = _jsonDataToScheduleConverter.GetList(contentResponse, _wirelessSocketService.GetDataList());
-            SerializableList<LucaTimer> timerList = _jsonDataToTimerConverter.GetList(contentResponse, _wirelessSocketService.GetDataList());
+            SerializableList<Schedule> scheduleList = _jsonDataToScheduleConverter.GetList(contentResponse, WirelessSocketService.getInstance().GetDataList(), WirelessSwitchService.getInstance().GetDataList());
+            SerializableList<LucaTimer> timerList = _jsonDataToTimerConverter.GetList(contentResponse, WirelessSocketService.getInstance().GetDataList(), WirelessSwitchService.getInstance().GetDataList());
             if (scheduleList == null) {
                 _logger.Error("Converted scheduleList is null!");
                 sendFailedTimerDownloadBroadcast(contentResponse);
@@ -493,8 +491,6 @@ public class ScheduleService implements IDataService {
         _receiverController = new ReceiverController(context);
         _settingsController = SettingsController.getInstance();
 
-        _wirelessSocketService = WirelessSocketService.getInstance();
-
         _receiverController.RegisterReceiver(_scheduleDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_scheduleSetFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_scheduleAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -573,6 +569,8 @@ public class ScheduleService implements IDataService {
             if (String.valueOf(entry.GetId()).contains(searchKey)
                     || entry.GetName().contains(searchKey)
                     || entry.GetTime().toString().contains(searchKey)
+                    || entry.GetWirelessSocket().toString().contains(searchKey)
+                    || entry.GetWirelessSwitch().toString().contains(searchKey)
                     || entry.GetWeekday().toString().contains(searchKey)
                     || entry.GetAction().toString().contains(searchKey)
                     || entry.GetIsActiveString().contains(searchKey)) {
@@ -630,6 +628,8 @@ public class ScheduleService implements IDataService {
             if (String.valueOf(entry.GetId()).contains(searchKey)
                     || entry.GetName().contains(searchKey)
                     || entry.GetTime().toString().contains(searchKey)
+                    || entry.GetWirelessSocket().toString().contains(searchKey)
+                    || entry.GetWirelessSwitch().toString().contains(searchKey)
                     || entry.GetWeekday().toString().contains(searchKey)
                     || entry.GetAction().toString().contains(searchKey)
                     || entry.GetIsActiveString().contains(searchKey)) {

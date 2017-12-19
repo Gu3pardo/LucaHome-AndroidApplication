@@ -2,7 +2,9 @@ package guepardoapps.lucahome.common.converter;
 
 import android.support.annotation.NonNull;
 
-import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -14,7 +16,7 @@ public final class JsonDataToMovieConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToMovieConverter.class.getSimpleName();
     private Logger _logger;
 
-    private static String _searchParameter = "movie::";
+    private static String _searchParameter = "{\"Data\":";
 
     public JsonDataToMovieConverter() {
         _logger = new Logger(TAG);
@@ -36,48 +38,35 @@ public final class JsonDataToMovieConverter implements IJsonDataConverter {
     }
 
     private SerializableList<Movie> parseStringToList(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
-            if (value.contains(_searchParameter)) {
+        try {
+            if (!value.contains("Error")) {
                 SerializableList<Movie> list = new SerializableList<>();
 
-                String[] entries = value.split(_searchParameter);
-                for (int index = 0; index < entries.length; index++) {
-                    String entry = entries[index];
-                    entry = entry.replace(_searchParameter, "").replace(";", "");
+                JSONObject jsonObject = new JSONObject(value);
+                JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                    String[] data = entry.split("::");
-                    Movie newValue = parseStringToValue(index, data);
-                    if (newValue != null) {
-                        list.addValue(newValue);
-                    }
+                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
+                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Movie");
+
+                    String title = child.getString("Title");
+                    String genre = child.getString("Genre");
+                    String description = child.getString("Description");
+
+                    int rating = child.getInt("Rating");
+                    int watched = child.getInt("Watched");
+
+                    Movie newMovie = new Movie(dataIndex, title, genre, description, rating, watched);
+                    list.addValue(newMovie);
                 }
+
                 return list;
             }
+        } catch (JSONException jsonException) {
+            _logger.Error(jsonException.getMessage());
         }
 
         _logger.Error(value + " has an error!");
+
         return new SerializableList<>();
-    }
-
-    private Movie parseStringToValue(int id, @NonNull String[] data) {
-        if (data.length == 5) {
-            String title = data[0].replace("::", "");
-            String genre = data[1].replace("::", "");
-            String description = data[2].replace("::", "");
-
-            String ratingString = data[3].replace("::", "");
-            int rating = Integer.parseInt(ratingString);
-
-            //String watchedString = data[4].replace("::", "");
-            //int watched = Integer.parseInt(watchedString);
-
-            Movie newValue = new Movie(id, title, genre, description, rating);
-            _logger.Debug(String.format(Locale.getDefault(), "New MovieDto %s", newValue));
-
-            return newValue;
-        }
-
-        _logger.Error("Data has an error!");
-        return null;
     }
 }

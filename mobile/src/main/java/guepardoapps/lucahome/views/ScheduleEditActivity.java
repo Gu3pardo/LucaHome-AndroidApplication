@@ -32,12 +32,14 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Schedule;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.dto.ScheduleDto;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
@@ -51,6 +53,7 @@ public class ScheduleEditActivity extends AppCompatActivity {
     private NavigationService _navigationService;
     private ScheduleService _scheduleService;
     private WirelessSocketService _wirelessSocketService;
+    private WirelessSwitchService _wirelessSwitchService;
 
     private ReceiverController _receiverController;
 
@@ -107,11 +110,13 @@ public class ScheduleEditActivity extends AppCompatActivity {
         _navigationService = NavigationService.getInstance();
         _scheduleService = ScheduleService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
+        _wirelessSwitchService = WirelessSwitchService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
         final AutoCompleteTextView scheduleNameEditTextView = findViewById(R.id.schedule_edit_name_textview);
         final Spinner scheduleSocketSelect = findViewById(R.id.schedule_socket_select);
+        final Spinner scheduleSwitchSelect = findViewById(R.id.schedule_switch_select);
         final Spinner scheduleWeekdaySelect = findViewById(R.id.schedule_weekday_select);
         final TimePicker scheduleTimePicker = findViewById(R.id.schedule_timePicker);
         final Spinner scheduleActionSelect = findViewById(R.id.schedule_action_select);
@@ -138,6 +143,10 @@ public class ScheduleEditActivity extends AppCompatActivity {
         ArrayAdapter<String> socketDataAdapter = new ArrayAdapter<>(ScheduleEditActivity.this, android.R.layout.simple_spinner_item, _wirelessSocketService.GetNameList());
         socketDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         scheduleSocketSelect.setAdapter(socketDataAdapter);
+
+        ArrayAdapter<String> switchDataAdapter = new ArrayAdapter<>(ScheduleEditActivity.this, android.R.layout.simple_spinner_item, _wirelessSwitchService.GetNameList());
+        switchDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        scheduleSwitchSelect.setAdapter(switchDataAdapter);
 
         List<String> weekdays = new ArrayList<>();
         for (Weekday weekday : Weekday.values()) {
@@ -168,10 +177,18 @@ public class ScheduleEditActivity extends AppCompatActivity {
 
         if (_scheduleDto != null) {
             scheduleNameEditTextView.setText(_scheduleDto.GetName());
-            if (_scheduleDto.GetSocket() != null) {
+            if (_scheduleDto.GetWirelessSocket() != null) {
                 for (int socketIndex = 0; socketIndex < _wirelessSocketService.GetNameList().size(); socketIndex++) {
-                    if (_wirelessSocketService.GetNameList().get(socketIndex).contentEquals(_scheduleDto.GetSocket().GetName())) {
+                    if (_wirelessSocketService.GetNameList().get(socketIndex).contentEquals(_scheduleDto.GetWirelessSocket().GetName())) {
                         scheduleSocketSelect.setSelection(socketIndex);
+                        break;
+                    }
+                }
+            }
+            if (_scheduleDto.GetWirelessSwitch() != null) {
+                for (int switchIndex = 0; switchIndex < _wirelessSwitchService.GetNameList().size(); switchIndex++) {
+                    if (_wirelessSwitchService.GetNameList().get(switchIndex).contentEquals(_scheduleDto.GetWirelessSwitch().GetName())) {
+                        scheduleSwitchSelect.setSelection(switchIndex);
                         break;
                     }
                 }
@@ -209,6 +226,9 @@ public class ScheduleEditActivity extends AppCompatActivity {
             int socketId = scheduleSocketSelect.getSelectedItemPosition();
             WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
 
+            int switchId = scheduleSwitchSelect.getSelectedItemPosition();
+            WirelessSwitch wirelessSwitch = _wirelessSwitchService.GetDataList().getValue(switchId);
+
             int weekdayId = scheduleWeekdaySelect.getSelectedItemPosition();
             Weekday weekday = Weekday.GetById(weekdayId);
 
@@ -228,10 +248,10 @@ public class ScheduleEditActivity extends AppCompatActivity {
                         lastHighestId = _scheduleService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _scheduleService.AddSchedule(new Schedule(lastHighestId, scheduleName, wirelessSocket, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Add));
+                    _scheduleService.AddSchedule(new Schedule(lastHighestId, scheduleName, wirelessSocket, wirelessSwitch, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_scheduleDto.GetAction() == ScheduleDto.Action.Update) {
-                    _scheduleService.UpdateSchedule(new Schedule(_scheduleDto.GetId(), scheduleName, wirelessSocket, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Update));
+                    _scheduleService.UpdateSchedule(new Schedule(_scheduleDto.GetId(), scheduleName, wirelessSocket, wirelessSwitch, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     scheduleNameEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _scheduleDto.GetAction())));

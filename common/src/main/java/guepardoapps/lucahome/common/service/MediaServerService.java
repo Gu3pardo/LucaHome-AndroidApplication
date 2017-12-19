@@ -24,35 +24,35 @@ import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinis
 import guepardoapps.lucahome.common.tasks.ClientTask;
 
 public class MediaServerService {
-    public static class MediaMirrorDownloadFinishedContent extends ObjectChangeFinishedContent {
-        public MediaServerData MediaMirror;
+    public static class MediaServerDownloadFinishedContent extends ObjectChangeFinishedContent {
+        public MediaServerData MediaServer;
 
-        MediaMirrorDownloadFinishedContent(MediaServerData mediaMirror, boolean succcess, @NonNull byte[] response) {
+        MediaServerDownloadFinishedContent(MediaServerData mediaServer, boolean succcess, @NonNull byte[] response) {
             super(succcess, response);
-            MediaMirror = mediaMirror;
+            MediaServer = mediaServer;
         }
     }
 
-    public static final String MediaMirrorDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.mediamirror.download.finished";
-    public static final String MediaMirrorDownloadFinishedBundle = "MediaMirrorDownloadFinishedBundle";
+    public static final String MediaServerDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.mediaServer.download.finished";
+    public static final String MediaServerDownloadFinishedBundle = "MediaServerDownloadFinishedBundle";
 
-    public static final String MediaMirrorVolumeBroadcast = "guepardoapps.lucahome.data.service.mediamirror.volume";
-    public static final String MediaMirrorVolumeBundle = "MediaMirrorVolumeBundle";
+    public static final String MediaServerVolumeBroadcast = "guepardoapps.lucahome.data.service.mediaServer.volume";
+    public static final String MediaServerVolumeBundle = "MediaServerVolumeBundle";
 
-    public static final String MediaMirrorBrightnessBroadcast = "guepardoapps.lucahome.data.service.mediamirror.brightness";
-    public static final String MediaMirrorBrightnessBundle = "MediaMirrorBrightnessBundle";
+    public static final String MediaServerBrightnessBroadcast = "guepardoapps.lucahome.data.service.mediaServer.brightness";
+    public static final String MediaServerBrightnessBundle = "MediaServerBrightnessBundle";
 
-    public static final String MediaMirrorPlayedYoutubeBroadcast = "guepardoapps.lucahome.data.service.mediamirror.playedyoutube";
-    public static final String MediaMirrorPlayedYoutubeBundle = "MediaMirrorPlayedYoutubeBundle";
+    public static final String MediaServerPlayedYoutubeBroadcast = "guepardoapps.lucahome.data.service.mediaServer.playedyoutube";
+    public static final String MediaServerPlayedYoutubeBundle = "MediaServerPlayedYoutubeBundle";
 
-    public static final String MediaMirrorBatteryBroadcast = "guepardoapps.lucahome.data.service.mediamirror.battery";
-    public static final String MediaMirrorBatteryBundle = "MediaMirrorBatteryBundle";
+    public static final String MediaServerBatteryBroadcast = "guepardoapps.lucahome.data.service.mediaServer.battery";
+    public static final String MediaServerBatteryBundle = "MediaServerBatteryBundle";
 
-    public static final String MediaMirrorServerVersionBroadcast = "guepardoapps.lucahome.data.service.mediamirror.serverversion";
-    public static final String MediaMirrorServerVersionBundle = "MediaMirrorServerVersionBundle";
+    public static final String MediaServerServerVersionBroadcast = "guepardoapps.lucahome.data.service.mediaServer.serverversion";
+    public static final String MediaServerServerVersionBundle = "MediaServerServerVersionBundle";
 
-    public static final String MediaMirrorYoutubeVideoBroadcast = "guepardoapps.lucahome.data.service.mediamirror.youtubevideo";
-    public static final String MediaMirrorYoutubeVideoBundle = "MediaMirrorYoutubeVideoBundle";
+    public static final String MediaServerYoutubeVideoBroadcast = "guepardoapps.lucahome.data.service.mediaServer.youtubevideo";
+    public static final String MediaServerYoutubeVideoBundle = "MediaServerYoutubeVideoBundle";
 
     private static final MediaServerService SINGLETON = new MediaServerService();
     private boolean _isInitialized;
@@ -87,10 +87,10 @@ public class MediaServerService {
     private Context _context;
     private MediaServerData _mediaServerData;
 
-    private BroadcastReceiver _mediaMirrorDownloadFinishedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _mediaServerDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_mediaMirrorDownloadFinishedReceiver");
+            _logger.Debug("_mediaServerDownloadFinishedReceiver");
             String response = intent.getStringExtra(ClientTask.ClientTaskBundle);
             if (response != null) {
                 try {
@@ -149,7 +149,7 @@ public class MediaServerService {
         _receiverController = new ReceiverController(_context);
         _settingsController = SettingsController.getInstance();
 
-        _receiverController.RegisterReceiver(_mediaMirrorDownloadFinishedReceiver, new String[]{ClientTask.ClientTaskBroadcast});
+        _receiverController.RegisterReceiver(_mediaServerDownloadFinishedReceiver, new String[]{ClientTask.ClientTaskBroadcast});
 
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
@@ -190,7 +190,7 @@ public class MediaServerService {
         ClientTask clientTask = new ClientTask(
                 _context,
                 serverIp,
-                Constants.MEDIAMIRROR_SERVERPORT,
+                Constants.MEDIASERVER_SERVERPORT,
                 communication);
         clientTask.execute();
     }
@@ -246,8 +246,8 @@ public class MediaServerService {
                     case GET_CURRENT_VOLUME:
                         String currentVolume = responseData[responseData.length - 1];
                         _broadcastController.SendStringBroadcast(
-                                MediaMirrorVolumeBroadcast,
-                                MediaMirrorVolumeBundle,
+                                MediaServerVolumeBroadcast,
+                                MediaServerVolumeBundle,
                                 currentVolume);
                         break;
 
@@ -256,8 +256,8 @@ public class MediaServerService {
                     case GET_SCREEN_BRIGHTNESS:
                         String currentBrightness = responseData[responseData.length - 1];
                         _broadcastController.SendStringBroadcast(
-                                MediaMirrorBrightnessBroadcast,
-                                MediaMirrorBrightnessBundle,
+                                MediaServerBrightnessBroadcast,
+                                MediaServerBrightnessBundle,
                                 currentBrightness);
                         break;
 
@@ -281,35 +281,35 @@ public class MediaServerService {
                         }
 
                         _broadcastController.SendSerializableBroadcast(
-                                MediaMirrorPlayedYoutubeBroadcast,
-                                MediaMirrorPlayedYoutubeBundle,
+                                MediaServerPlayedYoutubeBroadcast,
+                                MediaServerPlayedYoutubeBundle,
                                 playedYoutubeVideos);
                         break;
 
                     case GET_BATTERY_LEVEL:
                         String currentBatteryLevel = responseData[responseData.length - 1];
                         _broadcastController.SendStringBroadcast(
-                                MediaMirrorBatteryBroadcast,
-                                MediaMirrorBatteryBundle,
+                                MediaServerBatteryBroadcast,
+                                MediaServerBatteryBundle,
                                 currentBatteryLevel);
                         break;
 
                     case GET_SERVER_VERSION:
                         String currentServerVersion = responseData[responseData.length - 1];
                         _broadcastController.SendStringBroadcast(
-                                MediaMirrorServerVersionBroadcast,
-                                MediaMirrorServerVersionBundle,
+                                MediaServerServerVersionBroadcast,
+                                MediaServerServerVersionBundle,
                                 currentServerVersion);
                         break;
 
-                    case GET_MEDIAMIRROR_DTO:
-                        String mediaMirrorDataString = responseData[responseData.length - 1];
-                        String[] mediaMirrorData = mediaMirrorDataString.split("\\|");
-                        if (mediaMirrorData.length == 16) {
-                            String serverIp = mediaMirrorData[0];
+                    case GET_MEDIA_SERVER_DTO:
+                        String mediaServerDataString = responseData[responseData.length - 1];
+                        String[] mediaServerData = mediaServerDataString.split("\\|");
+                        if (mediaServerData.length == 16) {
+                            String serverIp = mediaServerData[0];
                             MediaServerSelection mediaServerSelection = MediaServerSelection.GetByIp(serverIp);
 
-                            String batteryLevelString = mediaMirrorData[1];
+                            String batteryLevelString = mediaServerData[1];
                             int batteryLevel = -1;
                             try {
                                 batteryLevel = Integer.parseInt(batteryLevelString);
@@ -317,11 +317,11 @@ public class MediaServerService {
                                 _logger.Error(ex.toString());
                             }
 
-                            String socketName = mediaMirrorData[2];
-                            String socketStateString = mediaMirrorData[3];
+                            String socketName = mediaServerData[2];
+                            String socketStateString = mediaServerData[3];
                             boolean socketState = socketStateString.contains("1");
 
-                            String volumeString = mediaMirrorData[4];
+                            String volumeString = mediaServerData[4];
                             int volume = -1;
                             try {
                                 volume = Integer.parseInt(volumeString);
@@ -329,12 +329,12 @@ public class MediaServerService {
                                 _logger.Error(ex.toString());
                             }
 
-                            String youtubeId = mediaMirrorData[5];
+                            String youtubeId = mediaServerData[5];
 
-                            String youtubeIsPlayingString = mediaMirrorData[6];
+                            String youtubeIsPlayingString = mediaServerData[6];
                             boolean youtubeIsPlaying = youtubeIsPlayingString.contains("1");
 
-                            String youtubeVideoCurrentPlayTimeString = mediaMirrorData[7];
+                            String youtubeVideoCurrentPlayTimeString = mediaServerData[7];
                             int youtubeVideoCurrentPlayTime = -1;
                             try {
                                 youtubeVideoCurrentPlayTime = Integer.parseInt(youtubeVideoCurrentPlayTimeString);
@@ -342,7 +342,7 @@ public class MediaServerService {
                                 _logger.Error(ex.toString());
                             }
 
-                            String youtubeVideoDurationString = mediaMirrorData[8];
+                            String youtubeVideoDurationString = mediaServerData[8];
                             int youtubeVideoDuration = -1;
                             try {
                                 youtubeVideoDuration = Integer.parseInt(youtubeVideoDurationString);
@@ -350,7 +350,7 @@ public class MediaServerService {
                                 _logger.Error(ex.toString());
                             }
 
-                            String alreadyPlayedYoutubeData = mediaMirrorData[9];
+                            String alreadyPlayedYoutubeData = mediaServerData[9];
                             String[] rawPlayedYoutubeIds = alreadyPlayedYoutubeData.split("\\;");
                             ArrayList<PlayedYoutubeVideo> alreadyPlayedYoutubeVideos = new ArrayList<>();
                             for (String entry : rawPlayedYoutubeIds) {
@@ -367,7 +367,7 @@ public class MediaServerService {
                                 }
                             }
 
-                            String radioStreamIdString = mediaMirrorData[10];
+                            String radioStreamIdString = mediaServerData[10];
                             int radioStreamId = -1;
                             try {
                                 radioStreamId = Integer.parseInt(radioStreamIdString);
@@ -375,12 +375,12 @@ public class MediaServerService {
                                 _logger.Error(exception.toString());
                             }
 
-                            String isRadioStreamPlayingString = mediaMirrorData[11];
+                            String isRadioStreamPlayingString = mediaServerData[11];
                             boolean isRadioStreamPlaying = isRadioStreamPlayingString.contains("1");
 
-                            String isSeaSSoundPlayingString = mediaMirrorData[12];
+                            String isSeaSSoundPlayingString = mediaServerData[12];
                             boolean isSeaSSoundPlaying = isSeaSSoundPlayingString.contains("1");
-                            String seaSoundCountdownString = mediaMirrorData[13];
+                            String seaSoundCountdownString = mediaServerData[13];
                             int seaSoundCountdownSec = -1;
                             try {
                                 seaSoundCountdownSec = Integer.parseInt(seaSoundCountdownString);
@@ -388,9 +388,9 @@ public class MediaServerService {
                                 _logger.Error(ex.toString());
                             }
 
-                            String serverVersion = mediaMirrorData[14];
+                            String serverVersion = mediaServerData[14];
 
-                            String screenBrightnessString = mediaMirrorData[15];
+                            String screenBrightnessString = mediaServerData[15];
                             int screenBrightness = -1;
                             try {
                                 screenBrightness = Integer.parseInt(screenBrightnessString);
@@ -417,12 +417,12 @@ public class MediaServerService {
                                     screenBrightness);
 
                             _broadcastController.SendSerializableBroadcast(
-                                    MediaMirrorDownloadFinishedBroadcast,
-                                    MediaMirrorDownloadFinishedBundle,
-                                    new MediaMirrorDownloadFinishedContent(_mediaServerData, true, Tools.CompressStringToByteArray(response)));
+                                    MediaServerDownloadFinishedBroadcast,
+                                    MediaServerDownloadFinishedBundle,
+                                    new MediaServerDownloadFinishedContent(_mediaServerData, true, Tools.CompressStringToByteArray(response)));
 
                         } else {
-                            _logger.Warning(String.format("Length %s for MediaMirrorData is invalid!", mediaMirrorData.length));
+                            _logger.Warning(String.format("Length %s for MediaServerData is invalid!", mediaServerData.length));
                         }
                         break;
 
@@ -437,8 +437,8 @@ public class MediaServerService {
 
     private void sendFailedDownloadBroadcast(@NonNull String response) {
         _broadcastController.SendSerializableBroadcast(
-                MediaMirrorDownloadFinishedBroadcast,
-                MediaMirrorDownloadFinishedBundle,
-                new MediaMirrorDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                MediaServerDownloadFinishedBroadcast,
+                MediaServerDownloadFinishedBundle,
+                new MediaServerDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
     }
 }

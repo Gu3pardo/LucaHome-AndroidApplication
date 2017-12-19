@@ -11,8 +11,8 @@ public class Constants {
     public static final String STATE_ON = "&state=1";
     public static final String STATE_OFF = "&state=0";
 
-    // ========== MEDIAMIRROR DATA ==========
-    public static final int MEDIAMIRROR_SERVERPORT = 8080;
+    // ========== MEDIASERVER DATA ==========
+    public static final int MEDIASERVER_SERVERPORT = 8080;
 
     // ========== YOUTUBE DATA ==========
     public static final String YOUTUBE_SEARCH = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=%d&q=%s&key=%s";

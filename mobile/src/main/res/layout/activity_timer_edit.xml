@@ -55,6 +55,16 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/timerName_TextInputLayout"
+                    android:nextFocusDown="@+id/timer_switch_select"
+                    android:nextFocusRight="@+id/timer_switch_select" />
+
+                <Spinner
+                    android:id="@+id/timer_switch_select"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/timer_socket_select"
                     android:nextFocusDown="@+id/timer_countdown_select"
                     android:nextFocusRight="@+id/timer_countdown_select" />
 
@@ -64,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
-                    android:layout_below="@+id/timer_socket_select"
+                    android:layout_below="@+id/timer_switch_select"
                     android:nextFocusDown="@+id/save_timer_edit_button"
                     android:nextFocusRight="@+id/save_timer_edit_button" />
 

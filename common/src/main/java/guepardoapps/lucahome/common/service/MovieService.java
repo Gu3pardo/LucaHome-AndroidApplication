@@ -317,7 +317,7 @@ public class MovieService implements IDataService {
                 + _settingsController.GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
-                + "&action=" + LucaServerAction.GET_MOVIES_REDUCED.toString();
+                + "&action=" + LucaServerAction.GET_MOVIES.toString();
         _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Movie, true);

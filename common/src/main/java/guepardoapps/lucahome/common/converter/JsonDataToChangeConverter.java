@@ -2,9 +2,11 @@ package guepardoapps.lucahome.common.converter;
 
 import android.support.annotation.NonNull;
 
-import java.sql.Date;
-import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -16,7 +18,7 @@ public final class JsonDataToChangeConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToChangeConverter.class.getSimpleName();
     private Logger _logger;
 
-    private static String _searchParameter = "{change:";
+    private static String _searchParameter = "{\"Data\":";
 
     public JsonDataToChangeConverter() {
         _logger = new Logger(TAG);
@@ -38,68 +40,42 @@ public final class JsonDataToChangeConverter implements IJsonDataConverter {
     }
 
     private SerializableList<Change> parseStringToList(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
-            if (value.contains(_searchParameter)) {
+        try {
+            if (!value.contains("Error")) {
                 SerializableList<Change> list = new SerializableList<>();
 
-                String[] entries = value.split("\\" + _searchParameter);
-                for (int index = 0; index < entries.length; index++) {
-                    String entry = entries[index];
-                    entry = entry.replace(_searchParameter, "").replace("};};", "");
+                JSONObject jsonObject = new JSONObject(value);
+                JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                    String[] data = entry.split("\\};");
-                    Change newValue = parseStringToValue(index, data);
-                    if (newValue != null) {
-                        list.addValue(newValue);
-                    }
+                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
+                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Change");
+
+                    String type = child.getString("Type");
+                    String user = child.getString("UserName");
+
+                    JSONObject jsonDate = child.getJSONObject("Date");
+
+                    int day = jsonDate.getInt("Day");
+                    int month = jsonDate.getInt("Month");
+                    int year = jsonDate.getInt("Year");
+
+                    JSONObject jsonTime = child.getJSONObject("Time");
+
+                    int hour = jsonTime.getInt("Hour");
+                    int minute = jsonTime.getInt("Minute");
+
+                    Change newChange = new Change(dataIndex, type, new SerializableDate(year, month, day), new SerializableTime(hour, minute, 0, 0), user);
+                    list.addValue(newChange);
                 }
+
                 return list;
             }
+        } catch (JSONException jsonException) {
+            _logger.Error(jsonException.getMessage());
         }
 
         _logger.Error(value + " has an error!");
 
         return new SerializableList<>();
-    }
-
-    private Change parseStringToValue(int id, @NonNull String[] data) {
-        if (data.length == 7) {
-            if (data[0].contains("{Type:")
-                    && data[1].contains("{Hour:")
-                    && data[2].contains("{Minute:")
-                    && data[3].contains("{Day:")
-                    && data[4].contains("{Month:")
-                    && data[5].contains("{Year:")
-                    && data[6].contains("{User:")) {
-
-                String type = data[0].replace("{Type:", "").replace("};", "");
-
-                String dayString = data[3].replace("{Day:", "").replace("};", "");
-                int day = Integer.parseInt(dayString);
-                String monthString = data[4].replace("{Month:", "").replace("};", "");
-                int month = Integer.parseInt(monthString) - 1;
-                String yearString = data[5].replace("{Year:", "").replace("};", "");
-                int year = Integer.parseInt(yearString);
-                @SuppressWarnings("deprecation")
-                Date date = new Date(year, month, day);
-
-                String hourString = data[1].replace("{Hour:", "").replace("};", "");
-                int hour = Integer.parseInt(hourString);
-                String minuteString = data[2].replace("{Minute:", "").replace("};", "");
-                int minute = Integer.parseInt(minuteString);
-                SerializableTime time = new SerializableTime(hour, minute, 0, 0);
-
-                String user = data[6].replace("{User:", "").replace("};", "");
-
-                Change newValue = new Change(id, type, date, time, user);
-                _logger.Debug(String.format(Locale.getDefault(), "New ChangeDto %s", newValue));
-
-                return newValue;
-            }
-        }
-
-        _logger.Error("Data has an error!");
-
-        return null;
     }
 }

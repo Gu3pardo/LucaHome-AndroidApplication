@@ -45,6 +45,7 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
 import guepardoapps.lucahome.common.service.BirthdayService;
 import guepardoapps.lucahome.service.NavigationService;
@@ -194,7 +195,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_birthday);
         addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(-1, "", new SerializableDate(), BirthdayDto.Action.Add));
+            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetDataList().getSize(), "", new SerializableDate(), true, BirthdayDto.Action.Add));
 
             NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -308,7 +309,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
         } else if (id == R.id.nav_movie) {
             navigationResult = _navigationService.NavigateToActivity(_context, MovieActivity.class);
         } else if (id == R.id.nav_mediamirror) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MediaMirrorActivity.class);
+            navigationResult = _navigationService.NavigateToActivity(_context, MediaServerActivity.class);
         } else if (id == R.id.nav_coins) {
             navigationResult = _navigationService.NavigateToActivity(_context, CoinActivity.class);
         } else if (id == R.id.nav_menu) {
@@ -321,6 +322,8 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
             navigationResult = _navigationService.NavigateToActivity(_context, SecurityActivity.class);
         } else if (id == R.id.nav_settings) {
             navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
+        } else if (id == R.id.nav_switch) {
+            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

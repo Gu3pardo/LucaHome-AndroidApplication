@@ -16,7 +16,7 @@ public class WirelessSocket implements Serializable, ILucaClass {
     private static final long serialVersionUID = 5579389712706446580L;
     private static final String TAG = WirelessSocket.class.getSimpleName();
 
-    public static final String SETTINGS_HEADER = "SharedPref_Notification_";
+    public static final String SETTINGS_HEADER = "SharedPref_Notification_Socket_";
 
     protected int _id;
 

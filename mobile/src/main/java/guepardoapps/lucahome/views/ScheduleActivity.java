@@ -38,6 +38,7 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Schedule;
 import guepardoapps.lucahome.common.dto.ScheduleDto;
 import guepardoapps.lucahome.common.enums.SocketAction;
+import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.service.NavigationService;
 
@@ -186,7 +187,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_schedule);
         addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(-1, "", null, null, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
+            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(-1, "", null, null, Weekday.NULL, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
 
             NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -280,7 +281,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
         } else if (id == R.id.nav_movie) {
             navigationResult = _navigationService.NavigateToActivity(_context, MovieActivity.class);
         } else if (id == R.id.nav_mediamirror) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MediaMirrorActivity.class);
+            navigationResult = _navigationService.NavigateToActivity(_context, MediaServerActivity.class);
         } else if (id == R.id.nav_coins) {
             navigationResult = _navigationService.NavigateToActivity(_context, CoinActivity.class);
         } else if (id == R.id.nav_menu) {
@@ -295,6 +296,8 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
             navigationResult = _navigationService.NavigateToActivity(_context, SecurityActivity.class);
         } else if (id == R.id.nav_settings) {
             navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
+        } else if (id == R.id.nav_switch) {
+            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

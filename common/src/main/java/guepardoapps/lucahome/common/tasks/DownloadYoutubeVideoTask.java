@@ -30,7 +30,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.adapter.YoutubeVideoListAdapter;
 import guepardoapps.lucahome.common.classes.YoutubeVideo;
-import guepardoapps.lucahome.common.service.MediaMirrorService;
+import guepardoapps.lucahome.common.service.MediaServerService;
 
 public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
     private static final String TAG = DownloadYoutubeVideoTask.class.getSimpleName();
@@ -184,8 +184,8 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
             }
 
             _broadcastController.SendSerializableBroadcast(
-                    MediaMirrorService.MediaMirrorYoutubeVideoBroadcast,
-                    MediaMirrorService.MediaMirrorYoutubeVideoBundle,
+                    MediaServerService.MediaServerYoutubeVideoBroadcast,
+                    MediaServerService.MediaServerYoutubeVideoBundle,
                     _youtubeVideoList.get(0));
 
             _sendFirstEntry = false;

@@ -82,7 +82,7 @@ public class MovieListViewAdapter extends BaseAdapter {
 
         holder._updateButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(MovieService.MovieIntent, new MovieDto(movie.GetId(), movie.GetTitle(), movie.GetGenre(), movie.GetDescription(), movie.GetRating()));
+            data.putSerializable(MovieService.MovieIntent, new MovieDto(movie.GetId(), movie.GetTitle(), movie.GetGenre(), movie.GetDescription(), movie.GetRating(), movie.GetWatched()));
             _navigationService.NavigateToActivityWithData(_context, MovieEditActivity.class, data);
         });
 

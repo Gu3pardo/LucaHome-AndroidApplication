@@ -277,7 +277,7 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
         } else if (id == R.id.nav_movie) {
             navigationResult = _navigationService.NavigateToActivity(_context, MovieActivity.class);
         } else if (id == R.id.nav_mediamirror) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MediaMirrorActivity.class);
+            navigationResult = _navigationService.NavigateToActivity(_context, MediaServerActivity.class);
         } else if (id == R.id.nav_coins) {
             navigationResult = _navigationService.NavigateToActivity(_context, CoinActivity.class);
         } else if (id == R.id.nav_menu) {
@@ -292,6 +292,8 @@ public class WirelessSocketActivity extends AppCompatActivity implements Navigat
             navigationResult = _navigationService.NavigateToActivity(_context, SecurityActivity.class);
         } else if (id == R.id.nav_settings) {
             navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
+        } else if (id == R.id.nav_switch) {
+            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

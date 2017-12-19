@@ -29,7 +29,7 @@
 
     <header
         android:fragment="guepardoapps.lucahome.views.SettingsActivity$WirelessSocketPreferenceFragment"
-        android:icon="@mipmap/ic_lightbulb_outline_black_48dp"
+        android:icon="@mipmap/ic_settings_remote_black_48dp"
         android:title="@string/pref_header_wireless_socket" />
 
     <header

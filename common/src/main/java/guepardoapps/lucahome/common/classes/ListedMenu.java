@@ -101,12 +101,12 @@ public class ListedMenu implements Serializable, ILucaClass {
     }
 
     @Override
-    public String CommandUpdate() throws NoSuchMethodException {
+    public String CommandUpdate() {
         return String.format(Locale.getDefault(), "%s%d&title=%s&description=%s&rating=%d", LucaServerAction.UPDATE_LISTEDMENU.toString(), _id, _title, _description, _rating);
     }
 
     @Override
-    public String CommandDelete() throws NoSuchMethodException {
+    public String CommandDelete() {
         return String.format(Locale.getDefault(), "%s%d", LucaServerAction.DELETE_LISTEDMENU.toString(), _id);
     }
 

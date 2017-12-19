@@ -28,11 +28,12 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.controller.SharedPrefController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.BirthdayService;
 import guepardoapps.lucahome.common.service.CoinService;
 import guepardoapps.lucahome.common.service.MapContentService;
-import guepardoapps.lucahome.common.service.MediaMirrorService;
+import guepardoapps.lucahome.common.service.MediaServerService;
 import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.common.service.MovieService;
 import guepardoapps.lucahome.common.service.ScheduleService;
@@ -41,6 +42,7 @@ import guepardoapps.lucahome.common.service.ShoppingListService;
 import guepardoapps.lucahome.common.service.TemperatureService;
 import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
 import java.util.List;
@@ -70,7 +72,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static BirthdayService _birthdayService;
     private static CoinService _coinService;
     private static MapContentService _mapContentService;
-    private static MediaMirrorService _mediaMirrorService;
+    private static MediaServerService _mediaServerService;
     private static MenuService _menuService;
     private static MovieService _movieService;
     private static OpenWeatherService _openWeatherService;
@@ -80,6 +82,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static TemperatureService _temperatureService;
     private static UserService _userService;
     private static WirelessSocketService _wirelessSocketService;
+    private static WirelessSwitchService _wirelessSwitchService;
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -123,8 +126,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MAPCONTENT_TIMEOUT)) {
                     _mapContentService.SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
-                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MEDIAMIRROR_TIMEOUT)) {
-                    _mediaMirrorService.SetReloadTimeout((Integer.parseInt((String) value)));
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MEDIASERVER_TIMEOUT)) {
+                    _mediaServerService.SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MENU_TIMEOUT)) {
                     _menuService.SetReloadTimeout((Integer.parseInt((String) value)));
@@ -150,6 +153,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_WIRELESSSOCKET_TIMEOUT)) {
                     _wirelessSocketService.SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_WIRELESSSWITCH_TIMEOUT)) {
+                    _wirelessSwitchService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_COIN_HOURS_TREND)) {
                     int integerValue = Integer.parseInt((String) value);
@@ -174,6 +180,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         _securityService.SetDisplayNotification(_settingsController.IsCameraNotificationEnabled());
                         _temperatureService.SetDisplayNotification(_settingsController.IsTemperatureNotificationEnabled());
                         _wirelessSocketService.SetDisplayNotification(_settingsController.IsSocketNotificationEnabled());
+                        _wirelessSwitchService.SetDisplayNotification(_settingsController.IsSwitchNotificationEnabled());
                     } else {
                         _birthdayService.SetDisplayNotification(false);
                         _coinService.SetDisplayNotification(false);
@@ -182,6 +189,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         _securityService.SetDisplayNotification(false);
                         _temperatureService.SetDisplayNotification(false);
                         _wirelessSocketService.SetDisplayNotification(false);
+                        _wirelessSwitchService.SetDisplayNotification(false);
                     }
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_BIRTHDAY)) {
@@ -196,6 +204,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     _wirelessSocketService.SetDisplayNotification((boolean) value);
                 } else if (preference.getKey().contains(WirelessSocket.SETTINGS_HEADER)) {
                     _wirelessSocketService.ShowNotification();
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_SWITCHES)) {
+                    _wirelessSwitchService.SetDisplayNotification((boolean) value);
+                } else if (preference.getKey().contains(WirelessSwitch.SETTINGS_HEADER)) {
+                    _wirelessSwitchService.ShowNotification();
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_CAMERA)) {
                     _securityService.SetDisplayNotification((boolean) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_TEMPERATURE)) {
@@ -209,7 +221,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         _birthdayService.SetReloadEnabled(_settingsController.IsReloadBirthdayEnabled());
                         _coinService.SetReloadEnabled(_settingsController.IsReloadCoinEnabled());
                         _mapContentService.SetReloadEnabled(_settingsController.IsReloadMapContentEnabled());
-                        _mediaMirrorService.SetReloadEnabled(_settingsController.IsReloadMediaMirrorEnabled());
+                        _mediaServerService.SetReloadEnabled(_settingsController.IsReloadMediaServerEnabled());
                         _menuService.SetReloadEnabled(_settingsController.IsReloadMenuEnabled());
                         _movieService.SetReloadEnabled(_settingsController.IsReloadMovieEnabled());
                         _openWeatherService.SetReloadEnabled(_settingsController.IsReloadWeatherEnabled());
@@ -218,11 +230,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         _shoppingListService.SetReloadEnabled(_settingsController.IsReloadShoppingEnabled());
                         _temperatureService.SetReloadEnabled(_settingsController.IsReloadTemperatureEnabled());
                         _wirelessSocketService.SetReloadEnabled(_settingsController.IsReloadWirelessSocketEnabled());
+                        _wirelessSwitchService.SetReloadEnabled(_settingsController.IsReloadWirelessSwitchEnabled());
                     } else {
                         _birthdayService.SetReloadEnabled(false);
                         _coinService.SetReloadEnabled(false);
                         _mapContentService.SetReloadEnabled(false);
-                        _mediaMirrorService.SetReloadEnabled(false);
+                        _mediaServerService.SetReloadEnabled(false);
                         _menuService.SetReloadEnabled(false);
                         _movieService.SetReloadEnabled(false);
                         _openWeatherService.SetReloadEnabled(false);
@@ -231,6 +244,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         _shoppingListService.SetReloadEnabled(false);
                         _temperatureService.SetReloadEnabled(false);
                         _wirelessSocketService.SetReloadEnabled(false);
+                        _wirelessSwitchService.SetReloadEnabled(false);
                     }
                 }
             }
@@ -317,7 +331,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         _birthdayService = BirthdayService.getInstance();
         _coinService = CoinService.getInstance();
         _mapContentService = MapContentService.getInstance();
-        _mediaMirrorService = MediaMirrorService.getInstance();
+        _mediaServerService = MediaServerService.getInstance();
         _menuService = MenuService.getInstance();
         _movieService = MovieService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
@@ -327,6 +341,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         _temperatureService = TemperatureService.getInstance();
         _userService = UserService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
+        _wirelessSwitchService = WirelessSwitchService.getInstance();
 
         setupActionBar();
     }
@@ -416,7 +431,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 || ReloadPreferenceFragment.class.getName().equals(fragmentName)
                 || OpenWeatherPreferenceFragment.class.getName().equals(fragmentName)
                 || WirelessSocketPreferenceFragment.class.getName().equals(fragmentName)
-                || CoinPreferenceFragment.class.getName().equals(fragmentName);
+                || CoinPreferenceFragment.class.getName().equals(fragmentName)
+                || WirelessSwitchPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
@@ -499,6 +515,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // guidelines.
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_SOCKETS));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_SWITCHES));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_BIRTHDAY));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER));
@@ -544,8 +561,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MAPCONTENT_ENABLED));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MAPCONTENT_TIMEOUT));
 
-            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MEDIAMIRROR_ENABLED));
-            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MEDIAMIRROR_TIMEOUT));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MEDIASERVER_ENABLED));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MEDIASERVER_TIMEOUT));
 
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MENU_ENABLED));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MENU_TIMEOUT));
@@ -570,6 +587,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_WIRELESSSOCKET_ENABLED));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_WIRELESSSOCKET_TIMEOUT));
+
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_WIRELESSSWITCH_ENABLED));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_WIRELESSSWITCH_TIMEOUT));
         }
 
         @Override
@@ -669,6 +689,50 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 preference.setTitle(wirelessSocket.GetName());
                 preference.setKey(wirelessSocket.GetSettingsKey());
+                preference.setDefaultValue(false);
+
+                preferenceCategory.addPreference(preference);
+
+                bindPreferenceSummaryToValue(preference);
+            }
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * This fragment shows wireless switch preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class WirelessSwitchPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_wireless_switch);
+            setHasOptionsMenu(true);
+
+            PreferenceScreen preferenceScreen = this.getPreferenceScreen();
+
+            PreferenceCategory preferenceCategory = new PreferenceCategory(preferenceScreen.getContext());
+            preferenceCategory.setTitle("Wireless switches");
+            preferenceScreen.addPreference(preferenceCategory);
+
+            for (int index = 0; index < _wirelessSwitchService.GetDataList().getSize(); index++) {
+                WirelessSwitch wirelessSwitch = _wirelessSwitchService.GetDataList().getValue(index);
+
+                SwitchPreference preference = new SwitchPreference(preferenceScreen.getContext());
+
+                preference.setTitle(wirelessSwitch.GetName());
+                preference.setKey(wirelessSwitch.GetSettingsKey());
                 preference.setDefaultValue(false);
 
                 preferenceCategory.addPreference(preference);

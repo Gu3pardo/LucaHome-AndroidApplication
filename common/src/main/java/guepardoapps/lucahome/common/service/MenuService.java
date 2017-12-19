@@ -57,6 +57,15 @@ public class MenuService implements IDataService {
     public static final String ListedMenuDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.listedmenu.download.finished";
     public static final String ListedMenuDownloadFinishedBundle = "ListedMenuDownloadFinishedBundle";
 
+    public static final String ListedMenuAddFinishedBroadcast = "guepardoapps.lucahome.data.service.listedmenu.add.finished";
+    public static final String ListedMenuAddFinishedBundle = "ListedMenuAddFinishedBundle";
+
+    public static final String ListedMenuUpdateFinishedBroadcast = "guepardoapps.lucahome.data.service.listedmenu.update.finished";
+    public static final String ListedMenuUpdateFinishedBundle = "ListedMenuUpdateFinishedBundle";
+
+    public static final String ListedMenuDeleteFinishedBroadcast = "guepardoapps.lucahome.data.service.listedmenu.delete.finished";
+    public static final String ListedMenuDeleteFinishedBundle = "ListedMenuDeleteFinishedBundle";
+
     public static final String MenuDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.menu.download.finished";
     public static final String MenuDownloadFinishedBundle = "MenuDownloadFinishedBundle";
 
@@ -162,6 +171,123 @@ public class MenuService implements IDataService {
                     ListedMenuDownloadFinishedBroadcast,
                     ListedMenuDownloadFinishedBundle,
                     new ListedMenuDownloadFinishedContent(_listedMenuList, true, content.Response));
+        }
+    };
+
+    private BroadcastReceiver _listedMenuAddFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_listedMenuAddFinishedReceiver");
+            DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
+            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
+
+            if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuAdd) {
+                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
+                return;
+            }
+
+            if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
+                    || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
+                    || content.FinalDownloadState != DownloadController.DownloadState.Success) {
+                _logger.Error(contentResponse);
+                sendFailedListedMenuAddBroadcast(contentResponse);
+                return;
+            }
+
+            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
+
+            if (!content.Success) {
+                _logger.Error("Download was not successful!");
+                sendFailedListedMenuAddBroadcast(contentResponse);
+                return;
+            }
+
+            _lastUpdate = new Date();
+
+            _broadcastController.SendSerializableBroadcast(
+                    ListedMenuAddFinishedBroadcast,
+                    ListedMenuAddFinishedBundle,
+                    new ObjectChangeFinishedContent(true, content.Response));
+
+            LoadListedMenuList();
+        }
+    };
+
+    private BroadcastReceiver _listedMenuUpdateFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_listedMenuUpdateFinishedReceiver");
+            DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
+            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
+
+            if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuUpdate) {
+                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
+                return;
+            }
+
+            if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
+                    || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
+                    || content.FinalDownloadState != DownloadController.DownloadState.Success) {
+                _logger.Error(contentResponse);
+                sendFailedListedMenuUpdateBroadcast(contentResponse);
+                return;
+            }
+
+            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
+
+            if (!content.Success) {
+                _logger.Error("Download was not successful!");
+                sendFailedListedMenuUpdateBroadcast(contentResponse);
+                return;
+            }
+
+            _lastUpdate = new Date();
+
+            _broadcastController.SendSerializableBroadcast(
+                    ListedMenuUpdateFinishedBroadcast,
+                    ListedMenuUpdateFinishedBundle,
+                    new ObjectChangeFinishedContent(true, content.Response));
+
+            LoadListedMenuList();
+        }
+    };
+
+    private BroadcastReceiver _listedMenuDeleteFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_listedMenuDeleteFinishedReceiver");
+            DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
+            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
+
+            if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuDelete) {
+                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
+                return;
+            }
+
+            if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
+                    || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
+                    || content.FinalDownloadState != DownloadController.DownloadState.Success) {
+                _logger.Error(contentResponse);
+                sendFailedListedMenuDeleteBroadcast(contentResponse);
+                return;
+            }
+
+            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
+
+            if (!content.Success) {
+                _logger.Error("Download was not successful!");
+                sendFailedListedMenuDeleteBroadcast(contentResponse);
+                return;
+            }
+
+            _lastUpdate = new Date();
+
+            _broadcastController.SendSerializableBroadcast(
+                    ListedMenuDeleteFinishedBroadcast,
+                    ListedMenuDeleteFinishedBundle,
+                    new ObjectChangeFinishedContent(true, content.Response));
+
+            LoadListedMenuList();
         }
     };
 
@@ -375,6 +501,9 @@ public class MenuService implements IDataService {
         _databaseMenuList.Open();
 
         _receiverController.RegisterReceiver(_listedMenuDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuUpdateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuDeleteFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_menuDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_menuUpdateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_menuClearFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -497,6 +626,90 @@ public class MenuService implements IDataService {
         _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenu, true);
+    }
+
+    public void AddListedMenu(@NonNull ListedMenu entry) {
+        _logger.Debug(String.format(Locale.getDefault(), "AddListedMenu: Adding entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
+
+            _databaseListedMenuList.CreateEntry(entry);
+
+            LoadData();
+
+            return;
+        }
+
+        LucaUser user = _settingsController.GetUser();
+        if (user == null) {
+            sendFailedListedMenuAddBroadcast("No user");
+            return;
+        }
+
+        String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
+                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                user.GetName(), user.GetPassphrase(),
+                entry.CommandAdd());
+
+        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenuAdd, true);
+    }
+
+    public void UpdateListedMenu(@NonNull ListedMenu entry) {
+        _logger.Debug(String.format(Locale.getDefault(), "UpdateListedMenu: Updating entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
+
+            _databaseListedMenuList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
+
+        LucaUser user = _settingsController.GetUser();
+        if (user == null) {
+            sendFailedListedMenuUpdateBroadcast("No user");
+            return;
+        }
+
+        String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
+                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                user.GetName(), user.GetPassphrase(),
+                entry.CommandUpdate());
+
+        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenuUpdate, true);
+    }
+
+    public void DeleteListedMenu(@NonNull ListedMenu entry) {
+        _logger.Debug(String.format(Locale.getDefault(), "DeleteListedMenu: Deleting entry %s", entry));
+
+        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            entry.SetIsOnServer(false);
+            entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
+
+            _databaseListedMenuList.Update(entry);
+
+            LoadData();
+
+            return;
+        }
+
+        LucaUser user = _settingsController.GetUser();
+        if (user == null) {
+            sendFailedListedMenuDeleteBroadcast("No user");
+            return;
+        }
+
+        String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
+                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                user.GetName(), user.GetPassphrase(),
+                entry.CommandDelete());
+
+        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenuDelete, true);
     }
 
     @Override
@@ -719,6 +932,39 @@ public class MenuService implements IDataService {
                 ListedMenuDownloadFinishedBroadcast,
                 ListedMenuDownloadFinishedBundle,
                 new ListedMenuDownloadFinishedContent(_listedMenuList, false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private void sendFailedListedMenuAddBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Add for listedmenu failed!";
+        }
+
+        _broadcastController.SendSerializableBroadcast(
+                ListedMenuAddFinishedBroadcast,
+                ListedMenuAddFinishedBundle,
+                new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private void sendFailedListedMenuUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update for listedmenu failed!";
+        }
+
+        _broadcastController.SendSerializableBroadcast(
+                ListedMenuUpdateFinishedBroadcast,
+                ListedMenuUpdateFinishedBundle,
+                new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private void sendFailedListedMenuDeleteBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Delete for listedmenu failed!";
+        }
+
+        _broadcastController.SendSerializableBroadcast(
+                ListedMenuDeleteFinishedBroadcast,
+                ListedMenuDeleteFinishedBundle,
+                new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedMenuDownloadBroadcast(@NonNull String response) {

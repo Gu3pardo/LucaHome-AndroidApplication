@@ -536,7 +536,7 @@ public class CoinService implements IDataNotificationService {
     public void LoadCoinConversionList() {
         _logger.Debug("LoadCoinConversionList");
 
-        String requestUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BCH,BTC,DASH,ETC,ETH,LTC,XMR,ZEC&tsyms=EUR";
+        String requestUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BCH,BTC,DASH,ETC,ETH,IOTA,LTC,XMR,XRP,ZEC&tsyms=EUR";
         _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.CoinConversion, false);

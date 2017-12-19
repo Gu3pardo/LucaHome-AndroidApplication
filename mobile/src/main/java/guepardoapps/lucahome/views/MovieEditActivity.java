@@ -163,7 +163,7 @@ public class MovieEditActivity extends AppCompatActivity {
             if (cancel) {
                 focusView.requestFocus();
             } else {
-                _movieService.UpdateMovie(new Movie(_movieDto.GetId(), title, genre, description, (int) movieRatingBar.getRating()/*, _movieDto.GetWatched()*/));
+                _movieService.UpdateMovie(new Movie(_movieDto.GetId(), title, genre, description, (int) movieRatingBar.getRating(), _movieDto.GetWatched()));
                 _saveButton.setEnabled(false);
             }
         });

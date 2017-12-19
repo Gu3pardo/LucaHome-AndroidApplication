@@ -28,7 +28,8 @@ public class TimerListViewAdapter extends BaseAdapter {
         private TextView _dateText;
         private TextView _timeText;
         private TextView _socketText;
-        private TextView _socketActionText;
+        private TextView _switchText;
+        private TextView _actionText;
         private FloatingActionButton _deleteButton;
 
         private void displayDeleteDialog(@NonNull final LucaTimer timer) {
@@ -97,18 +98,20 @@ public class TimerListViewAdapter extends BaseAdapter {
         holder._dateText = rowView.findViewById(R.id.timerDateText);
         holder._timeText = rowView.findViewById(R.id.timerTimeText);
         holder._socketText = rowView.findViewById(R.id.timerSocketText);
-        holder._socketActionText = rowView.findViewById(R.id.timerSocketActionText);
+        holder._switchText = rowView.findViewById(R.id.timerSwitchText);
+        holder._actionText = rowView.findViewById(R.id.timerActionText);
         holder._deleteButton = rowView.findViewById(R.id.timerDeleteButton);
 
         final LucaTimer timer = _listViewItems.getValue(index);
 
-        holder._socketImageView.setImageResource(timer.GetSocket().GetDrawable());
+        holder._socketImageView.setImageResource(timer.GetWirelessSocket().GetDrawable());
 
         holder._titleText.setText(timer.GetName());
         holder._dateText.setText(timer.GetWeekday().toString());
         holder._timeText.setText(timer.GetTime().HHMM());
-        holder._socketText.setText(timer.GetSocket().GetName());
-        holder._socketActionText.setText(timer.GetAction().toString());
+        holder._socketText.setText(timer.GetWirelessSocket().GetName());
+        holder._switchText.setText(timer.GetWirelessSwitch().GetName());
+        holder._actionText.setText(timer.GetAction().toString());
 
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(timer));
 

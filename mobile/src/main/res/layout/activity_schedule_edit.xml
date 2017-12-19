@@ -55,6 +55,16 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/scheduleName_TextInputLayout"
+                    android:nextFocusDown="@+id/schedule_switch_select"
+                    android:nextFocusRight="@+id/schedule_switch_select" />
+
+                <Spinner
+                    android:id="@+id/schedule_switch_select"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/schedule_socket_select"
                     android:nextFocusDown="@+id/schedule_weekday_select"
                     android:nextFocusRight="@+id/schedule_weekday_select" />
 
@@ -64,7 +74,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
-                    android:layout_below="@+id/schedule_socket_select"
+                    android:layout_below="@+id/schedule_switch_select"
                     android:nextFocusDown="@+id/schedule_timePicker"
                     android:nextFocusRight="@+id/schedule_timePicker" />
 

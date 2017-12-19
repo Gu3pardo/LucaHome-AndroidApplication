@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/nav_switch"
+        android:icon="@mipmap/ic_lightbulb_outline_black_48dp"
+        android:title="Wireless Switch" />
+    <item
         android:id="@+id/nav_schedule"
         android:icon="@mipmap/ic_schedule_black_48dp"
         android:title="Schedules" />

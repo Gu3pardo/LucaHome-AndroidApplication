@@ -4,8 +4,12 @@
         <menu>
             <item
                 android:id="@+id/nav_socket"
-                android:icon="@mipmap/ic_lightbulb_outline_black_48dp"
+                android:icon="@mipmap/ic_settings_remote_black_48dp"
                 android:title="Wireless Socket" />
+            <item
+                android:id="@+id/nav_switch"
+                android:icon="@mipmap/ic_lightbulb_outline_black_48dp"
+                android:title="Wireless Switch" />
             <item
                 android:id="@+id/nav_schedule"
                 android:icon="@mipmap/ic_schedule_black_48dp"

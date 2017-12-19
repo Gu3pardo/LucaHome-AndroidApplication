@@ -16,6 +16,7 @@ import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.CheckBox;
 import android.widget.DatePicker;
 
 import java.util.Locale;
@@ -103,8 +104,17 @@ public class BirthdayEditActivity extends AppCompatActivity {
 
         final AutoCompleteTextView birthdayEditTextView = findViewById(R.id.birthday_edit_textview);
         final DatePicker birthdayEditDatePicker = findViewById(R.id.birthday_edit_datePicker);
+        final CheckBox birthdayRemindMeCheckBox = findViewById(R.id.birthday_edit_remindMeCheckBox);
 
         _saveButton = findViewById(R.id.save_birthday_edit_button);
+
+        if (_birthdayDto != null) {
+            birthdayEditTextView.setText(_birthdayDto.GetName());
+            birthdayEditDatePicker.updateDate(_birthdayDto.GetDate().Year(), _birthdayDto.GetDate().Month(), _birthdayDto.GetDate().DayOfMonth());
+            birthdayRemindMeCheckBox.setChecked(_birthdayDto.GetRemindMe());
+        } else {
+            displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
+        }
 
         birthdayEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, _birthdayService.GetBirthdayNameList()));
         birthdayEditTextView.addTextChangedListener(new TextWatcher() {
@@ -128,12 +138,11 @@ public class BirthdayEditActivity extends AppCompatActivity {
             _saveButton.setEnabled(true);
         });
 
-        if (_birthdayDto != null) {
-            birthdayEditTextView.setText(_birthdayDto.GetName());
-            birthdayEditDatePicker.updateDate(_birthdayDto.GetDate().Year(), _birthdayDto.GetDate().Month(), _birthdayDto.GetDate().DayOfMonth());
-        } else {
-            displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
-        }
+        birthdayRemindMeCheckBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        });
+
 
         _saveButton.setEnabled(false);
         _saveButton.setOnClickListener(view -> {
@@ -166,6 +175,8 @@ public class BirthdayEditActivity extends AppCompatActivity {
                 cancel = true;
             }
 
+            boolean remindMe = birthdayRemindMeCheckBox.isChecked();
+
             if (cancel) {
                 focusView.requestFocus();
             } else {
@@ -177,10 +188,10 @@ public class BirthdayEditActivity extends AppCompatActivity {
                         lastHighestId = _birthdayService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _birthdayService.AddBirthday(new LucaBirthday(lastHighestId, birthdayName, birthdayDate, null, false, ILucaClass.LucaServerDbAction.Add));
+                    _birthdayService.AddBirthday(new LucaBirthday(lastHighestId, birthdayName, remindMe, false, birthdayDate, null, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_birthdayDto.GetAction() == BirthdayDto.Action.Update) {
-                    _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, null, false, ILucaClass.LucaServerDbAction.Update));
+                    _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, remindMe, false, birthdayDate, null, false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     birthdayEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _birthdayDto.GetAction())));

@@ -74,10 +74,6 @@ public class MapContentService implements IDataService {
 
     private DatabaseMapContentList _databaseMapContentList;
 
-    private ScheduleService _scheduleService;
-    private TemperatureService _temperatureService;
-    private WirelessSocketService _wirelessSocketService;
-
     private JsonDataToMapContentConverter _jsonDataToMapContentConverter;
 
     private SerializableList<MapContent> _mapContentList = new SerializableList<>();
@@ -98,7 +94,12 @@ public class MapContentService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 _logger.Error(contentResponse);
-                _mapContentList = _databaseMapContentList.GetMapContent(_wirelessSocketService.GetDataList(), _temperatureService.GetDataList());
+                _mapContentList = _databaseMapContentList.GetMapContent(
+                        /* TODO add MediaServerData */
+                        new SerializableList<>(),
+                        TemperatureService.getInstance().GetDataList(),
+                        WirelessSocketService.getInstance().GetDataList(),
+                        WirelessSwitchService.getInstance().GetDataList());
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -107,16 +108,27 @@ public class MapContentService implements IDataService {
 
             if (!content.Success) {
                 _logger.Error("Download was not successful!");
-                _mapContentList = _databaseMapContentList.GetMapContent(_wirelessSocketService.GetDataList(), _temperatureService.GetDataList());
+                _mapContentList = _databaseMapContentList.GetMapContent(
+                        /* TODO add MediaServerData */
+                        new SerializableList<>(),
+                        TemperatureService.getInstance().GetDataList(),
+                        WirelessSocketService.getInstance().GetDataList(),
+                        WirelessSwitchService.getInstance().GetDataList());
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
             SerializableList<MapContent> mapContentList = _jsonDataToMapContentConverter.GetList(
                     contentResponse,
-                    _temperatureService.GetDataList(),
-                    _wirelessSocketService.GetDataList(),
-                    _scheduleService.GetDataList());
+                    MenuService.getInstance().GetListedMenuList(),
+                    MenuService.getInstance().GetDataList(),
+                    ShoppingListService.getInstance().GetDataList(),
+                    /* TODO add MediaServerData */
+                    new SerializableList<>(),
+                    SecurityService.getInstance().GetDataList().getValue(0),
+                    TemperatureService.getInstance().GetDataList(),
+                    WirelessSocketService.getInstance().GetDataList(),
+                    WirelessSwitchService.getInstance().GetDataList());
             if (mapContentList == null) {
                 _logger.Error("Converted mapContentList is null!");
                 sendFailedDownloadBroadcast(contentResponse);
@@ -187,10 +199,6 @@ public class MapContentService implements IDataService {
         _databaseMapContentList = new DatabaseMapContentList(context);
         _databaseMapContentList.Open();
 
-        _scheduleService = ScheduleService.getInstance();
-        _temperatureService = TemperatureService.getInstance();
-        _wirelessSocketService = WirelessSocketService.getInstance();
-
         _receiverController.RegisterReceiver(_mapContentDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
 
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
@@ -236,12 +244,12 @@ public class MapContentService implements IDataService {
         for (int index = 0; index < _mapContentList.getSize(); index++) {
             MapContent entry = _mapContentList.getValue(index);
 
-            if (entry.GetTemperatureArea().contains(searchKey)
+            if (entry.GetArea().contains(searchKey)
                     || String.valueOf(entry.GetId()).contains(searchKey)
                     || entry.GetTemperature().toString().contains(searchKey)
                     || entry.GetDrawingType().toString().contains(searchKey)
-                    || entry.GetScheduleList().toString().contains(searchKey)
-                    || entry.GetSocket().toString().contains(searchKey)) {
+                    || entry.GetWirelessSocket().toString().contains(searchKey)
+                    || entry.GetWirelessSwitch().toString().contains(searchKey)) {
                 foundMapContents.addValue(entry);
             }
         }
@@ -254,7 +262,12 @@ public class MapContentService implements IDataService {
         _logger.Debug("LoadData");
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
-            _mapContentList = _databaseMapContentList.GetMapContent(_wirelessSocketService.GetDataList(), _temperatureService.GetDataList());
+            _mapContentList = _databaseMapContentList.GetMapContent(
+                        /* TODO add MediaServerData */
+                    new SerializableList<>(),
+                    TemperatureService.getInstance().GetDataList(),
+                    WirelessSocketService.getInstance().GetDataList(),
+                    WirelessSwitchService.getInstance().GetDataList());
             _broadcastController.SendSerializableBroadcast(
                     MapContentDownloadFinishedBroadcast,
                     MapContentDownloadFinishedBundle,
@@ -322,7 +335,12 @@ public class MapContentService implements IDataService {
     private void clearMapContentListFromDatabase() {
         _logger.Debug("clearMapContentListFromDatabase");
 
-        SerializableList<MapContent> mapContentList = _databaseMapContentList.GetMapContent(null, null);
+        SerializableList<MapContent> mapContentList = _databaseMapContentList.GetMapContent(
+                /* TODO add MediaServerData */
+                new SerializableList<>(),
+                TemperatureService.getInstance().GetDataList(),
+                WirelessSocketService.getInstance().GetDataList(),
+                WirelessSwitchService.getInstance().GetDataList());
         for (int index = 0; index < mapContentList.getSize(); index++) {
             MapContent mapContent = mapContentList.getValue(index);
             _databaseMapContentList.Delete(mapContent);
@@ -361,7 +379,7 @@ public class MapContentService implements IDataService {
         return notOnServerMapContentList;
     }
 
-    private boolean hasEntryNotOnServer() {
+    private boolean hasMapContentEntryNotOnServer() {
         return notOnServerMapContent().getSize() > 0;
     }
 }

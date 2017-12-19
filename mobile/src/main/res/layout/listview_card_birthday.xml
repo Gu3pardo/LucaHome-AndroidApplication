@@ -64,6 +64,14 @@
                         app:layout_heightPercent="100%"
                         app:layout_widthPercent="50%" />
                 </android.support.percent.PercentRelativeLayout>
+
+                <CheckBox
+                    android:id="@+id/birthday_remind_me_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:text="@string/birthday_remind_me"
+                    android:textColor="@color/SecondaryText" />
             </LinearLayout>
 
             <ImageView

@@ -34,8 +34,8 @@ public class DatabaseWirelessSwitchList {
     private static final String KEY_IS_ON_SERVER = "_isOnServer";
     private static final String KEY_SERVER_ACTION = "_serverAction";
 
-    private static final String DATABASE_NAME = "DatabaseSocketListDb";
-    private static final String DATABASE_TABLE = "DatabaseSocketListTable";
+    private static final String DATABASE_NAME = "DatabaseSwitchListDb";
+    private static final String DATABASE_TABLE = "DatabaseSwitchListTable";
     private static final int DATABASE_VERSION = 1;
 
     private DatabaseHelper _databaseHelper;

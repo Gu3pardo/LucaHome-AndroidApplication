@@ -63,7 +63,7 @@ public class MainService extends Service {
     private BirthdayService _birthdayService;
     private CoinService _coinService;
     private MapContentService _mapContentService;
-    private MediaMirrorService _mediaMirrorService;
+    private MediaServerService _mediaServerService;
     private MenuService _menuService;
     private MovieService _movieService;
     private OpenWeatherService _openWeatherService;
@@ -73,6 +73,7 @@ public class MainService extends Service {
     private TemperatureService _temperatureService;
     private UserService _userService;
     private WirelessSocketService _wirelessSocketService;
+    private WirelessSwitchService _wirelessSwitchService;
 
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
@@ -297,6 +298,22 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _wirelessSwitchDownloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _logger.Debug("_wirelessSwitchDownloadFinishedReceiver");
+            WirelessSwitchService.WirelessSwitchDownloadFinishedContent result = (WirelessSwitchService.WirelessSwitchDownloadFinishedContent) intent.getSerializableExtra(WirelessSwitchService.WirelessSwitchDownloadFinishedBundle);
+            if (result != null) {
+                _downloadResultList.addValue(new SerializablePair("WirelessSwitch", result.Success));
+            } else {
+                _downloadResultList.addValue(new SerializablePair("WirelessSwitch", false));
+            }
+            broadcastDownloadCount();
+
+            _scheduleService.LoadData();
+        }
+    };
+
     public void StartDownloadAll(@NonNull String caller) {
         _logger.Debug("StartDownloadAll with " + caller);
 
@@ -319,6 +336,7 @@ public class MainService extends Service {
         _securityService.LoadData();
         _shoppingListService.LoadData();
         _wirelessSocketService.LoadData();
+        _wirelessSwitchService.LoadData();
     }
 
     public void Cancel() {
@@ -398,11 +416,12 @@ public class MainService extends Service {
         _receiverController.RegisterReceiver(_shoppingListDownloadFinishedReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_temperatureDownloadFinishedReceiver, new String[]{TemperatureService.TemperatureDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_wirelessSocketDownloadFinishedReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_wirelessSwitchDownloadFinishedReceiver, new String[]{WirelessSwitchService.WirelessSwitchDownloadFinishedBroadcast});
 
         _birthdayService = BirthdayService.getInstance();
         _coinService = CoinService.getInstance();
         _mapContentService = MapContentService.getInstance();
-        _mediaMirrorService = MediaMirrorService.getInstance();
+        _mediaServerService = MediaServerService.getInstance();
         _menuService = MenuService.getInstance();
         _movieService = MovieService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
@@ -412,6 +431,7 @@ public class MainService extends Service {
         _temperatureService = TemperatureService.getInstance();
         _userService = UserService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
+        _wirelessSwitchService = WirelessSwitchService.getInstance();
 
         _birthdayService.Initialize(
                 this,
@@ -432,10 +452,10 @@ public class MainService extends Service {
                 SettingsController.getInstance().IsReloadMapContentEnabled(),
                 SettingsController.getInstance().GetReloadMapContentTimeout());
 
-        _mediaMirrorService.Initialize(
+        _mediaServerService.Initialize(
                 this,
-                SettingsController.getInstance().IsReloadMediaMirrorEnabled(),
-                SettingsController.getInstance().GetReloadMediaMirrorTimeout());
+                SettingsController.getInstance().IsReloadMediaServerEnabled(),
+                SettingsController.getInstance().GetReloadMediaServerTimeout());
 
         _menuService.Initialize(
                 this,
@@ -491,6 +511,15 @@ public class MainService extends Service {
                 SettingsController.getInstance().IsReloadWirelessSocketEnabled(),
                 SettingsController.getInstance().GetReloadWirelessSocketTimeout());
 
+        _wirelessSwitchService.Initialize(
+                this,
+                /* TODO add ReceiverClass! */
+                null,
+                SettingsController.getInstance().IsSwitchNotificationEnabled(),
+                SettingsController.getInstance().IsReloadWirelessSwitchEnabled(),
+                SettingsController.getInstance().GetReloadWirelessSwitchTimeout()
+        );
+
         _currentDownloadCount = 0;
         _downloadResultList = new SerializableList<>();
     }
@@ -504,7 +533,7 @@ public class MainService extends Service {
         _birthdayService.Dispose();
         _coinService.Dispose();
         _mapContentService.Dispose();
-        _mediaMirrorService.Dispose();
+        _mediaServerService.Dispose();
         _menuService.Dispose();
         _movieService.Dispose();
         _openWeatherService.Dispose();
@@ -514,5 +543,6 @@ public class MainService extends Service {
         _temperatureService.Dispose();
         _userService.Dispose();
         _wirelessSocketService.Dispose();
+        _wirelessSwitchService.Dispose();
     }
 }

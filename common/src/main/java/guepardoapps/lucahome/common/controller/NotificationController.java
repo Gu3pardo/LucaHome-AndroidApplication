@@ -21,6 +21,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.R;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 
 public class NotificationController {
     private static final String TAG = NotificationController.class.getSimpleName();
@@ -262,6 +263,11 @@ public class NotificationController {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
         notificationManager.notify(notificationId, notification);
+    }
+
+    public void CreateWirelessSwitchNotification(int notificationId, SerializableList<WirelessSwitch> wirelessSwitchList, Class<?> receiverClass) {
+        // TODO implement method
+        _logger.Error("TODO: Implement method!");
     }
 
     public void CreateTemperatureNotification(

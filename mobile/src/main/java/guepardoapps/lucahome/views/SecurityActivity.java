@@ -230,7 +230,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         } else if (id == R.id.nav_movie) {
             navigationResult = _navigationService.NavigateToActivity(_context, MovieActivity.class);
         } else if (id == R.id.nav_mediamirror) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MediaMirrorActivity.class);
+            navigationResult = _navigationService.NavigateToActivity(_context, MediaServerActivity.class);
         } else if (id == R.id.nav_coins) {
             navigationResult = _navigationService.NavigateToActivity(_context, CoinActivity.class);
         } else if (id == R.id.nav_menu) {
@@ -243,6 +243,8 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
             navigationResult = _navigationService.NavigateToActivity(_context, BirthdayActivity.class);
         } else if (id == R.id.nav_settings) {
             navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
+        } else if (id == R.id.nav_switch) {
+            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

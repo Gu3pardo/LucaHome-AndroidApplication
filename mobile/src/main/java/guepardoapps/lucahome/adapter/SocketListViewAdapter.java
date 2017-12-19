@@ -121,7 +121,13 @@ public class SocketListViewAdapter extends BaseAdapter {
         holder._stateView.setBackgroundResource(wirelessSocket.IsActivated() ? R.drawable.circle_green : R.drawable.circle_red);
 
         holder._cardSwitch.setChecked(wirelessSocket.IsActivated());
-        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, value) -> _wirelessSocketService.SetWirelessSocketState(wirelessSocket, value));
+        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
+            try {
+                _wirelessSocketService.SetWirelessSocketState(wirelessSocket, isChecked);
+            } catch (Exception exception) {
+                // TODO perhaps log exception or make a notification...
+            }
+        });
 
         holder._updateButton.setOnClickListener(view -> {
             Bundle data = new Bundle();

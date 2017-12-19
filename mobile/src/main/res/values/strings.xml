@@ -14,6 +14,7 @@
     <!-- Strings related to edit -->
     <string name="save">Save</string>
     <string name="prompt_birthday_name">Birthday name</string>
+    <string name="birthday_remind_me">Remind me about this birthday</string>
     <string name="error_field_invalid_date">This date is not valid</string>
     <string name="error_nothing_changed">Nothing changed</string>
     <string name="prompt_coin_user">User</string>
@@ -31,6 +32,10 @@
     <string name="prompt_shopping_quantity">Shopping quantity</string>
     <string name="prompt_schedule_name">Schedule name</string>
     <string name="prompt_timer_name">Timer name</string>
+    <string name="prompt_switch_name">Switch name</string>
+    <string name="prompt_switch_area">Switch area</string>
+    <string name="prompt_switch_remote_id">Switch remote id</string>
+    <string name="prompt_switch_keycode">Switch keycode</string>
 
     <!-- Further strings -->
     <string name="play">Play</string>
@@ -97,6 +102,7 @@
     <string name="pref_title_notifications">Activate/Deactivate notifications</string>
 
     <string name="pref_title_notification_sockets">Display socket notification</string>
+    <string name="pref_title_notification_wireless_switches">Display wireless switches notification</string>
     <string name="pref_title_notification_birthday">Display birthday notification</string>
     <string name="pref_title_notification_current_weather">Display current weather notification</string>
     <string name="pref_title_notification_forecast_weather">Display forecast weather notification</string>
@@ -157,6 +163,10 @@
     <string name="pref_title_reload_wireless_socket_timeout">Enter wireless socket reload timeout in min</string>
     <integer name="pref_default_wireless_socket_timeout_min">15</integer>
 
+    <string name="pref_title_reload_wireless_switch">Reload wireless switch data</string>
+    <string name="pref_title_reload_wireless_switch_timeout">Enter wireless switch reload timeout in min</string>
+    <integer name="pref_default_wireless_switch_timeout_min">15</integer>
+
     <!-- Settings for Open Weather -->
     <string name="pref_header_open_weather">Open Weather</string>
 
@@ -175,6 +185,8 @@
     <!-- Title for activities -->
     <string name="title_activity_wireless_socket">Wireless Sockets</string>
     <string name="title_activity_wireless_socket_edit">Edit Wireless Sockets</string>
+    <string name="title_activity_wireless_switch">Wireless Switches</string>
+    <string name="title_activity_wireless_switch_edit">Edit Wireless Switches</string>
     <string name="title_activity_schedule">Schedules</string>
     <string name="title_activity_schedule_edit">Edit Schedules</string>
     <string name="title_activity_timer">Timer</string>
@@ -190,7 +202,7 @@
     <string name="title_activity_shopping_list">Shopping List</string>
     <string name="title_activity_shopping_list_edit">Edit Shopping List</string>
     <string name="title_activity_forecast_weather">Forecast weather</string>
-    <string name="title_activity_mediamirror">Media mirror</string>
+    <string name="title_activity_mediaserver">Media server</string>
     <string name="title_activity_security">Security</string>
 
 

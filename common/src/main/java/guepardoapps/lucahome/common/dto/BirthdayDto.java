@@ -16,16 +16,19 @@ public class BirthdayDto implements Serializable {
     private int _id;
     private String _name;
     private SerializableDate _date;
+    private boolean _remindMe;
     private Action _action;
 
     public BirthdayDto(
             int id,
             String name,
             SerializableDate date,
+            boolean remindMe,
             @NonNull Action action) {
         _id = id;
         _name = name;
         _date = date;
+        _remindMe = remindMe;
         _action = action;
     }
 
@@ -41,12 +44,16 @@ public class BirthdayDto implements Serializable {
         return _date;
     }
 
+    public boolean GetRemindMe() {
+        return _remindMe;
+    }
+
     public Action GetAction() {
         return _action;
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Name: %s );(Birthday: %s );(Action: %s ))", TAG, _name, _date, _action);
+        return String.format(Locale.getDefault(), "( %s: (Name: %s );(Birthday: %s );(RemindMe: %s );(Action: %s ))", TAG, _name, _date, _remindMe, _action);
     }
 }

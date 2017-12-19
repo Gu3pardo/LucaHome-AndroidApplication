@@ -2,7 +2,9 @@ package guepardoapps.lucahome.common.converter;
 
 import android.support.annotation.NonNull;
 
-import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializableTime;
@@ -10,6 +12,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.classes.LucaTimer;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
@@ -18,7 +21,7 @@ public final class JsonDataToTimerConverter {
     private static final String TAG = JsonDataToTimerConverter.class.getSimpleName();
     private Logger _logger;
 
-    private static String _searchParameter = "{schedule:";
+    private static String _searchParameter = "{\"Data\":";
 
     public JsonDataToTimerConverter() {
         _logger = new Logger(TAG);
@@ -26,152 +29,96 @@ public final class JsonDataToTimerConverter {
 
     public SerializableList<LucaTimer> GetList(
             @NonNull String[] stringArray,
-            @NonNull SerializableList<WirelessSocket> socketList) {
+            @NonNull SerializableList<WirelessSocket> wirelessSocketList,
+            @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
         if (StringHelper.StringsAreEqual(stringArray)) {
             _logger.Information("StringsAreEqual");
-            return parseStringToList(stringArray[0], socketList);
+            return parseStringToList(stringArray[0], wirelessSocketList, wirelessSwitchList);
         } else {
             _logger.Information("Selecting entry");
             String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
             _logger.Information("usedEntry: " + usedEntry);
-            return parseStringToList(usedEntry, socketList);
+            return parseStringToList(usedEntry, wirelessSocketList, wirelessSwitchList);
         }
     }
 
     public SerializableList<LucaTimer> GetList(
             @NonNull String jsonString,
-            @NonNull SerializableList<WirelessSocket> socketList) {
-        return parseStringToList(jsonString, socketList);
+            @NonNull SerializableList<WirelessSocket> wirelessSocketList,
+            @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
+        return parseStringToList(jsonString, wirelessSocketList, wirelessSwitchList);
     }
 
     private SerializableList<LucaTimer> parseStringToList(
             @NonNull String value,
-            @NonNull SerializableList<WirelessSocket> socketList) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
-            if (value.contains(_searchParameter)) {
+            @NonNull SerializableList<WirelessSocket> wirelessSocketList,
+            @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
+        try {
+            if (!value.contains("Error")) {
                 SerializableList<LucaTimer> list = new SerializableList<>();
 
-                String[] entries = value.split("\\" + _searchParameter);
-                _logger.Information(String.format("Found %s entries!", entries.length));
-                for (int index = 0; index < entries.length; index++) {
-                    String entry = entries[index];
-                    if (entry == null) {
-                        _logger.Error("Entry is null!");
+                JSONObject jsonObject = new JSONObject(value);
+                JSONArray dataArray = jsonObject.getJSONArray("Data");
+
+                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
+                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Schedule");
+
+                    boolean isTimer = child.getString("IsTimer").contains("1");
+                    if (!isTimer) {
                         continue;
                     }
 
-                    entry = entry.replace(_searchParameter, "").replace("};};", "");
-                    _logger.Information(String.format("Timer entry is %s", entry));
+                    String name = child.getString("Name");
 
-                    String[] data = entry.split("\\};");
-                    _logger.Information(String.format("Split data %s has size is %s", data, data.length));
-                    LucaTimer newValue = ParseStringToValue(index, data, socketList);
-                    if (newValue != null) {
-                        _logger.Information(String.format("Adding new value %s to list %s", newValue, list));
-                        list.addValue(newValue);
-                    } else {
-                        _logger.Warning("newValue is null! Skipping!");
-                    }
+                    String wirelessSocketName = child.getString("Socket");
+                    WirelessSocket wirelessSocket = getWirelessSocket(wirelessSocketName, wirelessSocketList);
+
+                    String gpioName = child.getString("Gpio");
+                    // TODO Gpios currently not supported in LucaHome Android application
+
+                    String wirelessSwitchName = child.getString("Switch");
+                    WirelessSwitch wirelessSwitch = getWirelessSwitch(wirelessSwitchName, wirelessSwitchList);
+
+                    int weekdayInteger = child.getInt("Weekday");
+                    Weekday weekday = Weekday.GetById(weekdayInteger);
+
+                    int hour = child.getInt("Hour");
+                    int minute = child.getInt("Minute");
+                    SerializableTime time = new SerializableTime(hour, minute, 0, 0);
+
+                    SocketAction action = child.getString("OnOff").contains("1") ? SocketAction.Activate : SocketAction.Deactivate;
+                    boolean isActive = child.getString("State").contains("1");
+
+                    LucaTimer newTimer = new LucaTimer(dataIndex, name, wirelessSocket, wirelessSwitch, weekday, time, action, isActive, true, ILucaClass.LucaServerDbAction.Null);
+                    list.addValue(newTimer);
                 }
+
                 return list;
-            } else {
-                _logger.Error(String.format("Entry %s does not contain searchParameter %s!", value, _searchParameter));
             }
-        } else {
-            _logger.Error(String.format("Entry %s does contain %sx searchParameter!", value,
-                    StringHelper.GetStringCount(value, _searchParameter)));
+        } catch (JSONException jsonException) {
+            _logger.Error(jsonException.getMessage());
         }
 
-        _logger.Error("ParseStringToList: " + value + " has an error!");
+        _logger.Error(value + " has an error!");
 
         return new SerializableList<>();
     }
 
-    private LucaTimer ParseStringToValue(
-            int id,
-            @NonNull String[] data,
-            @NonNull SerializableList<WirelessSocket> socketList) {
-        if (data.length == 11) {
-            if (data[0].contains("{Name:")
-                    && data[1].contains("{Socket:")
-                    && data[2].contains("{Gpio:")
-                    && data[3].contains("{Weekday:")
-                    && data[4].contains("{Hour:")
-                    && data[5].contains("{Minute:")
-                    && data[6].contains("{OnOff:")
-                    && data[7].contains("{IsTimer:")
-                    && data[8].contains("{PlaySound:")
-                    && data[9].contains("{Raspberry:")
-                    && data[10].contains("{State:")) {
-
-                String name = data[0].replace("{Name:", "").replace("};", "");
-
-                String socketName = data[1].replace("{Socket:", "").replace("};", "");
-                WirelessSocket socket = null;
-                for (int index = 0; index < socketList.getSize(); index++) {
-                    if (socketList.getValue(index).GetName().contains(socketName)) {
-                        socket = socketList.getValue(index);
-                        break;
-                    }
-                }
-
-                if (socket == null) {
-                    _logger.Error("Socket is null!");
-                    return null;
-                }
-
-                String weekdayString = data[3].replace("{Weekday:", "").replace("};", "");
-                int weekdayInteger = Integer.parseInt(weekdayString);
-                Weekday weekday = Weekday.GetById(weekdayInteger);
-
-                String hourString = data[4].replace("{Hour:", "").replace("};", "");
-                int Hour = Integer.parseInt(hourString);
-                String minuteString = data[5].replace("{Minute:", "").replace("};", "");
-                int Minute = Integer.parseInt(minuteString);
-                SerializableTime time = new SerializableTime(Hour, Minute, 0, 0);
-
-                String actionString = data[6].replace("{OnOff:", "").replace("};", "");
-                boolean actionBoolean = actionString.contains("1");
-                SocketAction socketAction = actionBoolean ? SocketAction.Activate : SocketAction.Deactivate;
-
-                String isTimerString = data[7].replace("{IsTimer:", "").replace("};", "");
-                boolean isTimer = isTimerString.contains("1");
-
-                //String playSoundString = data[8].replace("{PlaySound:", "").replace("};", "");
-                //boolean playSound = playSoundString.contains("1");
-                //String playRaspberryString = data[9].replace("{Raspberry:", "").replace("};", "");
-
-                String IsActiveString = data[10].replace("{State:", "").replace("};", "");
-                boolean isActive = IsActiveString.contains("1");
-
-                if (!isTimer) {
-                    _logger.Warning("isSchedule!");
-                    return null;
-                } else {
-                    LucaTimer newValue = new LucaTimer(
-                            id,
-                            name,
-                            "",
-                            socket,
-                            weekday,
-                            time,
-                            socketAction,
-                            isActive,
-                            true,
-                            ILucaClass.LucaServerDbAction.Null);
-                    _logger.Debug(String.format(Locale.getDefault(), "New Schedule %s", newValue));
-
-                    return newValue;
-                }
-            } else {
-                _logger.Error("Invalid entries!!!");
-                for (String dataEntry : data) {
-                    _logger.Warning(dataEntry);
-                }
+    private WirelessSocket getWirelessSocket(@NonNull String wirelessSocketName, @NonNull SerializableList<WirelessSocket> wirelessSocketList) {
+        for (int index = 0; index < wirelessSocketList.getSize(); index++) {
+            if (wirelessSocketList.getValue(index).GetName().contains(wirelessSocketName)) {
+                return wirelessSocketList.getValue(index);
             }
         }
+        return null;
+    }
 
-        _logger.Error("Data has an error!");
+    private WirelessSwitch getWirelessSwitch(String wirelessSwitchName, SerializableList<WirelessSwitch> wirelessSwitchList) {
+        for (int index = 0; index < wirelessSwitchList.getSize(); index++) {
+            if (wirelessSwitchList.getValue(index).GetName().contains(wirelessSwitchName)) {
+                return wirelessSwitchList.getValue(index);
+            }
+        }
         return null;
     }
 }

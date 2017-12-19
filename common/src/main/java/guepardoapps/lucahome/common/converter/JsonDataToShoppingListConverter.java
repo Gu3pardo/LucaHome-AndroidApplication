@@ -2,7 +2,9 @@ package guepardoapps.lucahome.common.converter;
 
 import android.support.annotation.NonNull;
 
-import java.util.Locale;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -16,7 +18,7 @@ public final class JsonDataToShoppingListConverter implements IJsonDataConverter
     private static final String TAG = JsonDataToShoppingListConverter.class.getSimpleName();
     private static Logger _logger;
 
-    private static String _searchParameter = "{shopping_entry:";
+    private static String _searchParameter = "{\"Data\":";
 
     public JsonDataToShoppingListConverter() {
         _logger = new Logger(TAG);
@@ -37,104 +39,42 @@ public final class JsonDataToShoppingListConverter implements IJsonDataConverter
         return parseStringToList(jsonString);
     }
 
-    public static ShoppingEntry Get(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) == 1) {
-            if (value.contains(_searchParameter)) {
-                value = value.replace(_searchParameter, "").replace("};};", "");
-
-                String[] data = value.split("\\};");
-                ShoppingEntry newValue = parseStringToValue(data);
-                if (newValue != null) {
-                    return newValue;
-                } else {
-                    _logger.Error("newValue is null!");
-                }
-            } else {
-                _logger.Error("Value does not contain " + _searchParameter);
-            }
-        } else {
-            _logger.Error(String.format("String %s contains %s times searchParameter %s", value,
-                    StringHelper.GetStringCount(value, _searchParameter), _searchParameter));
-        }
-
-        _logger.Error(value + " has an error!");
-        return null;
-    }
-
     private static SerializableList<ShoppingEntry> parseStringToList(@NonNull String value) {
-        if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
-            if (value.contains(_searchParameter)) {
+        try {
+            if (!value.contains("Error")) {
                 SerializableList<ShoppingEntry> list = new SerializableList<>();
 
-                String[] entries = value.split("\\" + _searchParameter);
-                for (String entry : entries) {
-                    entry = entry.replace(_searchParameter, "").replace("};};", "");
+                JSONObject jsonObject = new JSONObject(value);
+                JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                    String[] data = entry.split("\\};");
-                    ShoppingEntry newValue = parseStringToValue(data);
-                    if (newValue != null) {
-                        list.addValue(newValue);
-                    } else {
-                        _logger.Error("newValue is null!");
+                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
+                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("ShoppingEntry");
+
+                    int id = child.getInt("ID");
+
+                    String name = child.getString("Name");
+                    String groupString = child.getString("Group");
+                    ShoppingEntryGroup group = ShoppingEntryGroup.OTHER;
+                    try {
+                        group = ShoppingEntryGroup.GetByString(groupString);
+                    } catch (Exception ex) {
+                        _logger.Error(ex.toString());
                     }
+
+                    int quantity = child.getInt("Quantity");
+
+                    ShoppingEntry newShoppingEntry = new ShoppingEntry(id, name, group, quantity, true, ILucaClass.LucaServerDbAction.Null);
+                    list.addValue(newShoppingEntry);
                 }
+
                 return list;
-            } else {
-                _logger.Error("Value does not contain " + _searchParameter);
             }
-        } else {
-            _logger.Error(String.format("String %s contains %s times searchParameter %s", value,
-                    StringHelper.GetStringCount(value, _searchParameter), _searchParameter));
+        } catch (JSONException jsonException) {
+            _logger.Error(jsonException.getMessage());
         }
 
         _logger.Error(value + " has an error!");
+
         return new SerializableList<>();
-    }
-
-    private static ShoppingEntry parseStringToValue(@NonNull String[] data) {
-        if (data.length == 4) {
-            if (data[0].contains("{id:")
-                    && data[1].contains("{name:")
-                    && data[2].contains("{group:")
-                    && data[3].contains("{quantity:")) {
-
-                String idString = data[0].replace("{id:", "").replace("};", "");
-                int id = -1;
-                try {
-                    id = Integer.parseInt(idString);
-                } catch (Exception ex) {
-                    _logger.Error(ex.toString());
-                }
-
-                String name = data[1].replace("{name:", "").replace("};", "");
-
-                String groupString = data[2].replace("{group:", "").replace("};", "");
-                ShoppingEntryGroup group = ShoppingEntryGroup.OTHER;
-                try {
-                    group = ShoppingEntryGroup.GetByString(groupString);
-                } catch (Exception ex) {
-                    _logger.Error(ex.toString());
-                }
-
-                String quantityString = data[3].replace("{quantity:", "").replace("};", "");
-                int quantity = -1;
-                try {
-                    quantity = Integer.parseInt(quantityString);
-                } catch (Exception ex) {
-                    _logger.Error(ex.toString());
-                }
-
-                ShoppingEntry newValue = new ShoppingEntry(id, name, group, quantity, true, ILucaClass.LucaServerDbAction.Null);
-                _logger.Debug(String.format(Locale.getDefault(), "New ShoppingEntryDto %s", newValue));
-                return newValue;
-            } else {
-                _logger.Error("data contains invalid entries!");
-            }
-        } else {
-            _logger.Error(String.format("Data has invalid length %s", data.length));
-        }
-
-        _logger.Error("Data has an error!");
-        return null;
     }
 }

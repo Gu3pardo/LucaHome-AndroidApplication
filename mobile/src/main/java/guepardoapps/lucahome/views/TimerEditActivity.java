@@ -31,11 +31,13 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaTimer;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
@@ -48,6 +50,7 @@ public class TimerEditActivity extends AppCompatActivity {
     private NavigationService _navigationService;
     private ScheduleService _scheduleService;
     private WirelessSocketService _wirelessSocketService;
+    private WirelessSwitchService _wirelessSwitchService;
 
     private ReceiverController _receiverController;
 
@@ -84,11 +87,13 @@ public class TimerEditActivity extends AppCompatActivity {
         _navigationService = NavigationService.getInstance();
         _scheduleService = ScheduleService.getInstance();
         _wirelessSocketService = WirelessSocketService.getInstance();
+        _wirelessSwitchService = WirelessSwitchService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
         final AutoCompleteTextView timerNameEditTextView = findViewById(R.id.timer_edit_name_textview);
         final Spinner timerSocketSelect = findViewById(R.id.timer_socket_select);
+        final Spinner timerSwitchSelect = findViewById(R.id.timer_switch_select);
         final Spinner timerCountdownSelect = findViewById(R.id.timer_countdown_select);
 
         _saveButton = findViewById(R.id.save_timer_edit_button);
@@ -113,6 +118,10 @@ public class TimerEditActivity extends AppCompatActivity {
         ArrayAdapter<String> socketDataAdapter = new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_spinner_item, _wirelessSocketService.GetNameList());
         socketDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timerSocketSelect.setAdapter(socketDataAdapter);
+
+        ArrayAdapter<String> switchDataAdapter = new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_spinner_item, _wirelessSwitchService.GetNameList());
+        switchDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        timerSwitchSelect.setAdapter(switchDataAdapter);
 
         List<String> countdownList = new ArrayList<>();
         countdownList.add("00:15");
@@ -147,6 +156,9 @@ public class TimerEditActivity extends AppCompatActivity {
 
             int socketId = timerSocketSelect.getSelectedItemPosition();
             WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
+
+            int switchId = timerSwitchSelect.getSelectedItemPosition();
+            WirelessSwitch wirelessSwitch = _wirelessSwitchService.GetDataList().getValue(switchId);
 
             int countdownId = timerCountdownSelect.getSelectedItemPosition();
 
@@ -203,7 +215,7 @@ public class TimerEditActivity extends AppCompatActivity {
                     lastHighestId = _scheduleService.GetTimerList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                _scheduleService.AddTimer(new LucaTimer(lastHighestId, timerName, wirelessSocket, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true, false, ILucaClass.LucaServerDbAction.Add));
+                _scheduleService.AddTimer(new LucaTimer(lastHighestId, timerName, wirelessSocket, wirelessSwitch, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });

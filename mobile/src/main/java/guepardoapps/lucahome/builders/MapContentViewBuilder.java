@@ -55,7 +55,7 @@ public class MapContentViewBuilder {
             }
 
             private void init() {
-                _size = new Point(_relativeLayoutMapPaint.getWidth(), _relativeLayoutMapPaint.getHeight());
+                _size = new Point(_relativeLayoutMapPaint.getWidth() - 100, _relativeLayoutMapPaint.getHeight() - 100);
                 _logger.Debug("Size is: " + _size.toString());
 
                 if (_tempMapContentList != null) {
@@ -86,21 +86,21 @@ public class MapContentViewBuilder {
             newTextView.setGravity(Gravity.CENTER);
             newTextView.setTextSize(10);
             newTextView.setTextColor(Color.WHITE);
-            newTextView.setText(mapContent.GetButtonText());
+            newTextView.setText(mapContent.GetShortName());
 
             newTextView.setBackgroundResource(mapContent.GetDrawable());
 
             newTextView.setOnClickListener(view -> {
-                _logger.Debug(String.format(Locale.getDefault(), "onClick %s", mapContent.GetButtonText()));
+                _logger.Debug(String.format(Locale.getDefault(), "onClick %s", mapContent.GetShortName()));
                 if (mapContent.GetButtonClick(_context) != null) {
                     mapContent.GetButtonClick(_context).run();
                 } else {
-                    Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.GetButtonText()), Toast.LENGTH_LONG).show();
+                    Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.GetShortName()), Toast.LENGTH_LONG).show();
                 }
             });
 
-            int positionX = _size.x - (_size.x * mapContent.GetPosition()[1] / 100) - 50;
-            int positionY = (_size.y * mapContent.GetPosition()[0] / 100) - 25;
+            int positionX = _size.x * mapContent.GetPosition()[0] / 100;
+            int positionY = _size.y - (_size.y * mapContent.GetPosition()[1] / 100);
             RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.WRAP_CONTENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT);

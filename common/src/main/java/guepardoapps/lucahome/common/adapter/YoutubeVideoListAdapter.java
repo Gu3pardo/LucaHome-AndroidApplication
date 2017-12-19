@@ -18,7 +18,7 @@ import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.YoutubeVideo;
 import guepardoapps.lucahome.common.enums.MediaServerAction;
 import guepardoapps.lucahome.common.enums.MediaServerSelection;
-import guepardoapps.lucahome.common.service.MediaMirrorService;
+import guepardoapps.lucahome.common.service.MediaServerService;
 
 public class YoutubeVideoListAdapter extends BaseAdapter {
     private class Holder {
@@ -82,11 +82,11 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
             if (_playOnAllMirror) {
                 for (MediaServerSelection entry1 : MediaServerSelection.values()) {
                     if (entry1.GetId() > 0) {
-                        MediaMirrorService.getInstance().SendCommand(entry1.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                        MediaServerService.getInstance().SendCommand(entry1.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
                     }
                 }
             } else {
-                MediaMirrorService mediaMirrorService = MediaMirrorService.getInstance();
+                MediaServerService mediaMirrorService = MediaServerService.getInstance();
                 mediaMirrorService.Initialize(_context, false, -1);
                 mediaMirrorService.SendCommand(_serverIp, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
                 mediaMirrorService.Dispose();

@@ -189,7 +189,7 @@ public class SecurityService implements IDataNotificationService {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
-            if (content.CurrentDownloadType != DownloadController.DownloadType.SecurityMotionControl) {
+            if (content.CurrentDownloadType != DownloadController.DownloadType.SecurityCameraControl) {
                 _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
@@ -359,7 +359,7 @@ public class SecurityService implements IDataNotificationService {
                 + "&action=" + LucaServerAction.SET_MOTION_CONTROL_TASK.toString() + (state ? "1" : "0");
         _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
-        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.SecurityMotionControl, true);
+        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.SecurityCameraControl, true);
     }
 
     @Override

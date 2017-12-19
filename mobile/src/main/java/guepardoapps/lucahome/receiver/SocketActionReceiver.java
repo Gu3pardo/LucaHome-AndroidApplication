@@ -47,7 +47,11 @@ public class SocketActionReceiver extends BroadcastReceiver {
             }
 
             logger.Debug(String.format(Locale.getDefault(), "socket: %s", socket));
-            WirelessSocketService.getInstance().ChangeWirelessSocketState(socket);
+            try {
+                WirelessSocketService.getInstance().ChangeWirelessSocketState(socket);
+            } catch (Exception exception) {
+                logger.Error(exception.getMessage());
+            }
 
         } else {
             logger.Error("Action contains errors: " + action);

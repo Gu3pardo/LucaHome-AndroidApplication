@@ -64,21 +64,38 @@
                         app:layout_heightPercent="20%"
                         app:layout_widthPercent="100%" />
 
-                    <TextView
-                        android:id="@+id/scheduleSocketText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                    <android.support.percent.PercentRelativeLayout
+                        android:id="@+id/scheduleDataPercentRelativeLayout"
                         android:layout_below="@+id/scheduleTimeText"
-                        android:gravity="center"
-                        android:text="@string/example"
                         app:layout_heightPercent="20%"
-                        app:layout_widthPercent="100%" />
+                        app:layout_widthPercent="100%">
+
+                        <TextView
+                            android:id="@+id/scheduleSocketText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="@string/example"
+                            app:layout_heightPercent="100%"
+                            app:layout_widthPercent="50%" />
+
+                        <TextView
+                            android:id="@+id/scheduleSwitchText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@+id/scheduleSocketText"
+                            android:gravity="center"
+                            android:text="@string/example"
+                            app:layout_heightPercent="100%"
+                            app:layout_widthPercent="50%" />
+
+                    </android.support.percent.PercentRelativeLayout>
 
                     <TextView
-                        android:id="@+id/scheduleSocketActionText"
+                        android:id="@+id/scheduleActionText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/scheduleSocketText"
+                        android:layout_below="@+id/scheduleDataPercentRelativeLayout"
                         android:gravity="center"
                         android:text="@string/example"
                         app:layout_heightPercent="20%"
@@ -88,7 +105,7 @@
                         android:id="@+id/scheduleCardSwitch"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/scheduleSocketActionText"
+                        android:layout_below="@+id/scheduleActionText"
                         android:gravity="center"
                         android:textOff="@string/socketDisabled"
                         android:textOn="@string/socketEnabled"

@@ -5,6 +5,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableDate;
@@ -19,7 +23,7 @@ public class JsonDataToBirthdayConverter {
     private static final String TAG = JsonDataToBirthdayConverter.class.getSimpleName();
     private Logger _logger;
 
-    private static String _searchParameter = "{birthday:";
+    private static String _searchParameter = "{\"Data\":";
 
     public JsonDataToBirthdayConverter() {
         _logger = new Logger(TAG);
@@ -39,71 +43,49 @@ public class JsonDataToBirthdayConverter {
     }
 
     private SerializableList<LucaBirthday> parseStringToList(@NonNull String value, @NonNull Context context) {
-        if (!value.contains("Error")) {
-            if (StringHelper.GetStringCount(value, _searchParameter) > 0) {
-                if (value.contains(_searchParameter)) {
-                    SerializableList<LucaBirthday> list = new SerializableList<>();
+        try {
+            if (!value.contains("Error")) {
+                SerializableList<LucaBirthday> list = new SerializableList<>();
 
-                    String[] entries = value.split("\\" + _searchParameter);
-                    for (String entry : entries) {
-                        entry = entry.replace(_searchParameter, "").replace("};};", "");
+                JSONObject jsonObject = new JSONObject(value);
+                JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                        String[] data = entry.split("\\};");
-                        LucaBirthday newValue = parseStringToValue(data, context);
-                        if (newValue != null) {
-                            list.addValue(newValue);
-                        }
+                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
+                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Birthday");
+
+                    int id = child.getInt("ID");
+
+                    String name = child.getString("Name");
+
+                    boolean remindMe = child.getString("RemindMe").contains("1");
+                    boolean sendMail = child.getString("SendMail").contains("1");
+
+                    JSONObject birthdayJsonDate = child.getJSONObject("Date");
+
+                    int day = birthdayJsonDate.getInt("Day");
+                    int month = birthdayJsonDate.getInt("Month");
+                    int year = birthdayJsonDate.getInt("Year");
+
+                    Bitmap photo = BitmapFactory.decodeResource(context.getResources(), guepardoapps.lucahome.basic.R.mipmap.ic_face_white_48dp);
+                    try {
+                        photo = Tools.RetrieveContactPhoto(context, name, 250, 250, true);
+                        _logger.Debug(String.format(Locale.getDefault(), "Retrieved photo is %s", photo));
+                    } catch (Exception exception) {
+                        _logger.Error(String.format(Locale.getDefault(), "Exception in RetrieveContactPhoto: %s", exception.getMessage()));
                     }
 
-                    return list;
+                    LucaBirthday newBirthday = new LucaBirthday(id, name, remindMe, sendMail, new SerializableDate(year, month, day), photo, true, ILucaClass.LucaServerDbAction.Null);
+                    list.addValue(newBirthday);
                 }
+
+                return list;
             }
+        } catch (JSONException jsonException) {
+            _logger.Error(jsonException.getMessage());
         }
 
         _logger.Error(value + " has an error!");
 
         return new SerializableList<>();
-    }
-
-    private LucaBirthday parseStringToValue(@NonNull String[] data, @NonNull Context context) {
-        if (data.length == 5) {
-            if (data[0].contains("{id:")
-                    && data[1].contains("{name:")
-                    && data[2].contains("{day:")
-                    && data[3].contains("{month:")
-                    && data[4].contains("{year:")) {
-
-                String idString = data[0].replace("{id:", "").replace("};", "");
-                int id = Integer.parseInt(idString);
-
-                String name = data[1].replace("{name:", "").replace("};", "");
-
-                String dayString = data[2].replace("{day:", "").replace("};", "");
-                int day = Integer.parseInt(dayString);
-                String monthString = data[3].replace("{month:", "").replace("};", "");
-                int month = Integer.parseInt(monthString);
-                String yearString = data[4].replace("{year:", "").replace("};", "");
-                int year = Integer.parseInt(yearString);
-
-                SerializableDate birthday = new SerializableDate(year, month, day);
-
-                Bitmap photo = BitmapFactory.decodeResource(context.getResources(), guepardoapps.lucahome.basic.R.mipmap.ic_face_white_48dp);
-                try {
-                    photo = Tools.RetrieveContactPhoto(context, name, 250, 250, true);
-                    _logger.Debug(String.format(Locale.getDefault(), "Retrieved photo is %s", photo));
-                } catch (Exception exception) {
-                    _logger.Error(String.format(Locale.getDefault(), "Exception in RetrieveContactPhoto: %s", exception.getMessage()));
-                }
-
-                LucaBirthday newValue = new LucaBirthday(id, name, birthday, photo, true, ILucaClass.LucaServerDbAction.Null);
-                _logger.Debug(String.format(Locale.getDefault(), "New BirthdayDto %s", newValue));
-
-                return newValue;
-            }
-        }
-
-        _logger.Error("Data has an error!");
-
-        return null;
     }
 }

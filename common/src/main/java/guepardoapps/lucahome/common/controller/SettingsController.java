@@ -36,12 +36,13 @@ public class SettingsController {
     public static final String PREF_NOTIFICATION_MESSAGE_TEMPERATURE = "notifications_message_temperature";
     public static final String PREF_NOTIFICATION_MESSAGE_CAMERA = "notifications_message_camera";
     public static final String PREF_NOTIFICATION_MESSAGE_COINS = "notifications_message_coins";
+    public static final String PREF_NOTIFICATION_MESSAGE_SWITCHES = "notifications_message_switches";
 
     public static final String PREF_RELOAD_DATA_ENABLED = "reload_data_enabled";
     public static final String PREF_RELOAD_BIRTHDAY_ENABLED = "reload_birthday_enabled";
     public static final String PREF_RELOAD_COIN_ENABLED = "reload_coin_enabled";
     public static final String PREF_RELOAD_MAPCONTENT_ENABLED = "reload_mapcontent_enabled";
-    public static final String PREF_RELOAD_MEDIAMIRROR_ENABLED = "reload_mediamirror_enabled";
+    public static final String PREF_RELOAD_MEDIASERVER_ENABLED = "reload_mediaserver_enabled";
     public static final String PREF_RELOAD_MENU_ENABLED = "reload_menu_enabled";
     public static final String PREF_RELOAD_MOVIE_ENABLED = "reload_movie_enabled";
     public static final String PREF_RELOAD_SCHEDULE_ENABLED = "reload_schedule_enabled";
@@ -55,7 +56,7 @@ public class SettingsController {
     public static final String PREF_RELOAD_BIRTHDAY_TIMEOUT = "reload_birthday_timeout";
     public static final String PREF_RELOAD_COIN_TIMEOUT = "reload_coin_timeout";
     public static final String PREF_RELOAD_MAPCONTENT_TIMEOUT = "reload_mapcontent_timeout";
-    public static final String PREF_RELOAD_MEDIAMIRROR_TIMEOUT = "reload_mediamirror_timeout";
+    public static final String PREF_RELOAD_MEDIASERVER_TIMEOUT = "reload_mediaserver_timeout";
     public static final String PREF_RELOAD_MENU_TIMEOUT = "reload_menu_timeout";
     public static final String PREF_RELOAD_MOVIE_TIMEOUT = "reload_movie_timeout";
     public static final String PREF_RELOAD_SCHEDULE_TIMEOUT = "reload_schedule_timeout";
@@ -103,7 +104,7 @@ public class SettingsController {
         _sharedPrefController.SaveStringValue(PREF_RELOAD_BIRTHDAY_TIMEOUT, "240");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_COIN_TIMEOUT, "30");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MAPCONTENT_TIMEOUT, "240");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MEDIAMIRROR_TIMEOUT, "30");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MEDIASERVER_TIMEOUT, "30");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MENU_TIMEOUT, "120");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MOVIE_TIMEOUT, "60");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_SCHEDULE_TIMEOUT, "60");
@@ -149,7 +150,7 @@ public class SettingsController {
 
     public String GetServerIp() {
         String serverIp = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_IP);
-        if (serverIp == null) {
+        if (serverIp == null || serverIp.length() == 0) {
             serverIp = _context.getResources().getString(R.string.pref_default_ip);
         }
         return serverIp;
@@ -157,7 +158,7 @@ public class SettingsController {
 
     public String GetHomeSsid() {
         String serverSsid = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_SSID);
-        if (serverSsid == null) {
+        if (serverSsid == null || serverSsid.length() == 0) {
             serverSsid = _context.getResources().getString(R.string.pref_default_ssid);
         }
         return serverSsid;
@@ -165,7 +166,7 @@ public class SettingsController {
 
     public String GetOpenWeatherCity() {
         String openWeatherCity = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_OPEN_WEATHER_CITY);
-        if (openWeatherCity == null) {
+        if (openWeatherCity == null || openWeatherCity.length() == 0) {
             openWeatherCity = _context.getResources().getString(R.string.pref_default_open_weather_city);
         }
         return openWeatherCity;
@@ -228,6 +229,13 @@ public class SettingsController {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_COINS);
     }
 
+    public boolean IsSwitchNotificationEnabled() {
+        if (!AreNotificationsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_SWITCHES);
+    }
+
     public boolean IsChangeWeatherWallpaperActive() {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_CHANGE_WEATHER_WALLPAPER);
     }
@@ -257,11 +265,11 @@ public class SettingsController {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MAPCONTENT_ENABLED);
     }
 
-    public boolean IsReloadMediaMirrorEnabled() {
+    public boolean IsReloadMediaServerEnabled() {
         if (!AreReloadsEnabled()) {
             return false;
         }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MEDIAMIRROR_ENABLED);
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MEDIASERVER_ENABLED);
     }
 
     public boolean IsReloadMenuEnabled() {
@@ -342,8 +350,8 @@ public class SettingsController {
         return Integer.parseInt(stringValue);
     }
 
-    public int GetReloadMediaMirrorTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MEDIAMIRROR_TIMEOUT);
+    public int GetReloadMediaServerTimeout() {
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MEDIASERVER_TIMEOUT);
         return Integer.parseInt(stringValue);
     }
 
