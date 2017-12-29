@@ -2,7 +2,7 @@ package guepardoapps.mediamirror.common.constants;
 
 public class SharedPrefConstants {
     public static final String SHARED_PREF_NAME = "LUCA_HOME";
-    public static final String SHARED_PREF_INSTALLED = "APP_VERSION_5.0.0.171219_INSTALLED";
+    public static final String SHARED_PREF_INSTALLED = "APP_VERSION_5.1.0.171229_INSTALLED";
 
     public static final String USER_DATA_ENTERED = "USER_DATA_ENTERED";
     public static final String USER_NAME = "USER_NAME";

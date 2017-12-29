@@ -2,7 +2,6 @@ package guepardoapps.lucahome.common.tasks;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,7 +33,6 @@ import guepardoapps.lucahome.common.service.MediaServerService;
 
 public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
     private static final String TAG = DownloadYoutubeVideoTask.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
     private BroadcastController _broadcastController;
@@ -54,9 +52,6 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
             @NonNull String serverIp,
             boolean sendFirstEntry,
             boolean displayDialog) {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created new " + TAG);
-
         _context = context;
 
         _broadcastController = new BroadcastController(_context);
@@ -73,17 +68,17 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
     @Override
     protected String doInBackground(String... urls) {
         if (!_isInitialized) {
-            _logger.Error(TAG + " is not initialized!");
+            Logger.getInstance().Error(TAG, "Not initialized!");
             return "Error:Not initialized!";
         }
 
         if (_context == null) {
-            _logger.Error("_context is null!");
+            Logger.getInstance().Error(TAG, "_context is null!");
             return "Error:_context is null";
         }
 
         if (urls.length > 1) {
-            _logger.Warning("Entered too many urls!");
+            Logger.getInstance().Warning(TAG, "Entered too many urls!");
             return "Error:Entered too many urls!";
         }
 
@@ -92,19 +87,16 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
             String userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.17 (KHTML, like Gecko) Chrome/24.0.1312.56 Safari/537.17";
             document = Jsoup.connect(urls[0]).ignoreContentType(true).timeout(60 * 1000).userAgent(userAgent).get();
         } catch (IOException exception) {
-            _logger.Error(exception.getMessage());
+            Logger.getInstance().Error(TAG, exception.getMessage());
         }
 
         if (document != null) {
             String getJson = document.text();
-            _logger.Debug("getJson: " + getJson);
-
             JSONObject jsonObject = null;
             try {
                 jsonObject = (JSONObject) new JSONTokener(getJson).nextValue();
-                _logger.Debug(String.format(Locale.getDefault(), "jsonObject: %s", jsonObject));
             } catch (JSONException exception) {
-                _logger.Error(exception.getMessage());
+                Logger.getInstance().Error(TAG, exception.getMessage());
             }
 
             if (jsonObject != null) {
@@ -129,13 +121,12 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
 
                             if (videoId != null && title != null && description != null) {
                                 YoutubeVideo modelDto = new YoutubeVideo(videoId, title, description, mediumUrl);
-                                _logger.Debug("New Dto: " + modelDto.toString());
                                 youtubeVideoList.add(modelDto);
                             } else {
-                                _logger.Warning("Error in parsing data!");
+                                Logger.getInstance().Warning(TAG, "Error in parsing data!");
                             }
                         } catch (Exception exception) {
-                            _logger.Error(exception.getMessage());
+                            Logger.getInstance().Error(TAG, exception.getMessage());
                         }
                     }
 
@@ -153,10 +144,10 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
                         ((Activity) _context).runOnUiThread(() -> displayYoutubeIdDialog(_serverIp, youtubeVideoList));
                     }
                 } catch (JSONException exception) {
-                    _logger.Error(exception.getMessage());
+                    Logger.getInstance().Error(TAG, exception.getMessage());
                 }
             } else {
-                _logger.Warning("JsonObject is null!");
+                Logger.getInstance().Warning(TAG, "JsonObject is null!");
             }
         }
 
@@ -166,20 +157,18 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
     @Override
     protected void onPostExecute(String result) {
         if (_sendFirstEntry) {
-            _logger.Debug("Sending first entry");
-
             if (_youtubeVideoList == null) {
-                _logger.Error("_youtubeVideoList is null!");
+                Logger.getInstance().Error(TAG, "_youtubeVideoList is null!");
                 return;
             }
 
             if (_youtubeVideoList.size() == 0) {
-                _logger.Error("_youtubeVideoList size is 0!");
+                Logger.getInstance().Error(TAG, "_youtubeVideoList size is 0!");
                 return;
             }
 
             if (_broadcastController == null) {
-                _logger.Error("_broadcastController is null!");
+                Logger.getInstance().Error(TAG, "_broadcastController is null!");
                 return;
             }
 
@@ -220,7 +209,7 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> {
         if (window != null) {
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
-            _logger.Warning("Window is null!");
+            Logger.getInstance().Warning(TAG, "Window is null!");
         }
     }
 }

@@ -17,7 +17,6 @@ public class MediaVolumeController {
     private static final MediaVolumeController SINGLETON_CONTROLLER = new MediaVolumeController();
 
     private static final String TAG = MediaVolumeController.class.getSimpleName();
-    private Logger _logger;
 
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
@@ -36,8 +35,6 @@ public class MediaVolumeController {
     }
 
     private MediaVolumeController() {
-        _logger = new Logger(TAG);
-        _logger.Debug(TAG + " created...");
     }
 
     public void Initialize(@NonNull Context context) {
@@ -47,31 +44,33 @@ public class MediaVolumeController {
             _receiverController.RegisterReceiver(_screenEnableReceiver, new String[]{Broadcasts.SCREEN_ENABLED});
 
             _audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-            _currentVolume = _audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            _maxVolume = _audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            _mute = _audioManager.isStreamMute(AudioManager.STREAM_MUSIC);
+            if (_audioManager != null) {
+                _currentVolume = _audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                _maxVolume = _audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                _mute = _audioManager.isStreamMute(AudioManager.STREAM_MUSIC);
 
-            sendVolumeBroadcast();
+                sendVolumeBroadcast();
 
-            _isInitialized = true;
+                _isInitialized = true;
+            } else {
+                Logger.getInstance().Error(TAG, "AudioManager is null!");
+            }
         }
     }
 
     public boolean IncreaseVolume() {
-        _logger.Debug("IncreaseVolume");
-
         if (!_isInitialized) {
-            _logger.Error("not initialized!");
+            Logger.getInstance().Error(TAG, "not initialized!");
             return false;
         }
 
         if (_mute) {
-            _logger.Warning("Audio stream is muted!");
+            Logger.getInstance().Warning(TAG, "Audio stream is muted!");
             return false;
         }
 
         if (_currentVolume >= _maxVolume) {
-            _logger.Warning("Current volume is already _maxVolume: " + String.valueOf(_maxVolume));
+            Logger.getInstance().Warning(TAG, "Current volume is already _maxVolume: " + String.valueOf(_maxVolume));
             return false;
         }
 
@@ -80,7 +79,6 @@ public class MediaVolumeController {
             newVolume = _maxVolume;
         }
 
-        _logger.Debug("newVolume: " + String.valueOf(newVolume));
         _audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0);
         sendVolumeBroadcast();
 
@@ -88,20 +86,18 @@ public class MediaVolumeController {
     }
 
     public boolean DecreaseVolume() {
-        _logger.Debug("DecreaseVolume");
-
         if (!_isInitialized) {
-            _logger.Error("not initialized!");
+            Logger.getInstance().Error(TAG, "not initialized!");
             return false;
         }
 
         if (_mute) {
-            _logger.Warning("Audio stream is muted!");
+            Logger.getInstance().Warning(TAG, "Audio stream is muted!");
             return false;
         }
 
         if (_currentVolume <= 0) {
-            _logger.Warning("Current volume is already 0!");
+            Logger.getInstance().Warning(TAG, "Current volume is already 0!");
             return false;
         }
 
@@ -110,7 +106,6 @@ public class MediaVolumeController {
             newVolume = 0;
         }
 
-        _logger.Debug("newVolume: " + String.valueOf(newVolume));
         _audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newVolume, 0);
         sendVolumeBroadcast();
 
@@ -118,15 +113,13 @@ public class MediaVolumeController {
     }
 
     public boolean SetVolume(int volume) {
-        _logger.Debug("SetVolume: " + String.valueOf(volume));
-
         if (!_isInitialized) {
-            _logger.Error("not initialized!");
+            Logger.getInstance().Error(TAG, "not initialized!");
             return false;
         }
 
         if (_mute) {
-            _logger.Warning("Audio stream is muted!");
+            Logger.getInstance().Warning(TAG, "Audio stream is muted!");
             UnMuteVolume();
         }
 
@@ -137,7 +130,6 @@ public class MediaVolumeController {
             volume = _maxVolume;
         }
 
-        _logger.Debug("newVolume: " + String.valueOf(volume));
         _audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
         sendVolumeBroadcast();
 
@@ -146,15 +138,13 @@ public class MediaVolumeController {
 
     @SuppressWarnings("deprecation")
     public boolean MuteVolume() {
-        _logger.Debug("MuteVolume");
-
         if (!_isInitialized) {
-            _logger.Error("not initialized!");
+            Logger.getInstance().Error(TAG, "not initialized!");
             return false;
         }
 
         if (_mute) {
-            _logger.Warning("Audio stream is already muted!");
+            Logger.getInstance().Warning(TAG, "Audio stream is already muted!");
             return false;
         }
 
@@ -167,15 +157,13 @@ public class MediaVolumeController {
 
     @SuppressWarnings("deprecation")
     public boolean UnMuteVolume() {
-        _logger.Debug("UnMuteVolume");
-
         if (!_isInitialized) {
-            _logger.Error("not initialized!");
+            Logger.getInstance().Error(TAG, "not initialized!");
             return false;
         }
 
         if (!_mute) {
-            _logger.Warning("Audio stream is already unmuted!");
+            Logger.getInstance().Warning(TAG, "Audio stream is already unmuted!");
             return false;
         }
 
@@ -200,10 +188,8 @@ public class MediaVolumeController {
 
     @SuppressWarnings("deprecation")
     public boolean SetCurrentVolume(int currentVolume) {
-        _logger.Debug("SetCurrentVolume: " + String.valueOf(currentVolume));
-
         if (!_isInitialized) {
-            _logger.Error("not initialized!");
+            Logger.getInstance().Error(TAG, "not initialized!");
             return false;
         }
 
@@ -220,10 +206,8 @@ public class MediaVolumeController {
     }
 
     public boolean Dispose() {
-        _logger.Debug("Dispose");
-
         if (!_isInitialized) {
-            _logger.Error("not initialized!");
+            Logger.getInstance().Error(TAG, "not initialized!");
             return false;
         }
 

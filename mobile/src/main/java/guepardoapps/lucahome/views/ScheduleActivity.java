@@ -44,7 +44,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class ScheduleActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = ScheduleActivity.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -85,7 +84,6 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
     private BroadcastReceiver _scheduleUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_scheduleUpdateReceiver");
             ScheduleService.ScheduleDownloadFinishedContent result =
                     (ScheduleService.ScheduleDownloadFinishedContent) intent.getSerializableExtra(ScheduleService.ScheduleDownloadFinishedBundle);
 
@@ -125,9 +123,6 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         setContentView(R.layout.activity_schedule);
 
@@ -191,7 +186,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
             NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
             }
         });
@@ -206,12 +201,9 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
 
         _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_schedule);
         _pullRefreshLayout.setOnRefreshListener(() -> {
-            _logger.Debug("onRefresh " + TAG);
-
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
-
             _scheduleService.LoadData();
         });
     }
@@ -219,13 +211,11 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         _receiverController.RegisterReceiver(_scheduleUpdateReceiver, new String[]{ScheduleService.ScheduleDownloadFinishedBroadcast});
 
@@ -246,14 +236,12 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -301,7 +289,7 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
             displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 

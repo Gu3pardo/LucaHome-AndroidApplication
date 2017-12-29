@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
-import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -43,7 +42,6 @@ public class MapContentService implements IDataService {
     private boolean _isInitialized;
 
     private static final String TAG = MapContentService.class.getSimpleName();
-    private Logger _logger;
 
     private Date _lastUpdate;
 
@@ -56,10 +54,7 @@ public class MapContentService implements IDataService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -74,26 +69,22 @@ public class MapContentService implements IDataService {
 
     private DatabaseMapContentList _databaseMapContentList;
 
-    private JsonDataToMapContentConverter _jsonDataToMapContentConverter;
-
     private SerializableList<MapContent> _mapContentList = new SerializableList<>();
 
     private BroadcastReceiver _mapContentDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_mapContentDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MapContent) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _mapContentList = _databaseMapContentList.GetMapContent(
                         /* TODO add MediaServerData */
                         new SerializableList<>(),
@@ -103,11 +94,9 @@ public class MapContentService implements IDataService {
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _mapContentList = _databaseMapContentList.GetMapContent(
                         /* TODO add MediaServerData */
                         new SerializableList<>(),
@@ -118,7 +107,7 @@ public class MapContentService implements IDataService {
                 return;
             }
 
-            SerializableList<MapContent> mapContentList = _jsonDataToMapContentConverter.GetList(
+            SerializableList<MapContent> mapContentList = JsonDataToMapContentConverter.getInstance().GetList(
                     contentResponse,
                     MenuService.getInstance().GetListedMenuList(),
                     MenuService.getInstance().GetDataList(),
@@ -130,7 +119,7 @@ public class MapContentService implements IDataService {
                     WirelessSocketService.getInstance().GetDataList(),
                     WirelessSwitchService.getInstance().GetDataList());
             if (mapContentList == null) {
-                _logger.Error("Converted mapContentList is null!");
+                Logger.getInstance().Error(TAG, "Converted mapContentList is null!");
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -152,7 +141,6 @@ public class MapContentService implements IDataService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -163,14 +151,11 @@ public class MapContentService implements IDataService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private MapContentService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static MapContentService getInstance() {
@@ -179,10 +164,8 @@ public class MapContentService implements IDataService {
 
     @Override
     public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -204,8 +187,6 @@ public class MapContentService implements IDataService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToMapContentConverter = new JsonDataToMapContentConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -213,7 +194,6 @@ public class MapContentService implements IDataService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _databaseMapContentList.Close();
@@ -259,8 +239,6 @@ public class MapContentService implements IDataService {
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _mapContentList = _databaseMapContentList.GetMapContent(
                         /* TODO add MediaServerData */
@@ -286,7 +264,6 @@ public class MapContentService implements IDataService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_MAP_CONTENTS.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.MapContent, true);
     }
@@ -313,11 +290,9 @@ public class MapContentService implements IDataService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -333,8 +308,6 @@ public class MapContentService implements IDataService {
     }
 
     private void clearMapContentListFromDatabase() {
-        _logger.Debug("clearMapContentListFromDatabase");
-
         SerializableList<MapContent> mapContentList = _databaseMapContentList.GetMapContent(
                 /* TODO add MediaServerData */
                 new SerializableList<>(),
@@ -348,8 +321,6 @@ public class MapContentService implements IDataService {
     }
 
     private void saveMapContentListToDatabase() {
-        _logger.Debug("saveMapContentListToDatabase");
-
         for (int index = 0; index < _mapContentList.getSize(); index++) {
             MapContent mapContent = _mapContentList.getValue(index);
             _databaseMapContentList.CreateEntry(mapContent);

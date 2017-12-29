@@ -21,7 +21,8 @@ public enum ShoppingEntryGroup implements Serializable {
     BATH_UTILITY("Bath_utility", 12, R.drawable.bath),
     LEISURE("Leisure", 13, R.drawable.leisure),
     BAKING("Baking", 14, R.drawable.baking),
-    CEREALS("Cereals", 15, R.drawable.cereals);
+    CEREALS("Cereals", 15, R.drawable.cereals),
+    SPICES("Spices", 16, R.drawable.spices);
 
     private String _string;
     private int _int;

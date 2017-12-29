@@ -28,7 +28,6 @@ import guepardoapps.mediamirror.rss.RssService;
 
 public class RssViewController implements IViewController {
     private static final String TAG = RssViewController.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
     private ReceiverController _receiverController;
@@ -69,16 +68,12 @@ public class RssViewController implements IViewController {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
 
-            _logger.Debug("_updateViewReceiver onReceive");
             RSSModel model = (RSSModel) intent.getSerializableExtra(Bundles.RSS_DATA_MODEL);
 
             if (model != null) {
-                _logger.Debug(model.toString());
-
                 if (model.GetVisibility()) {
                     startService(model.GetRSSFeed());
                 } else {
@@ -94,7 +89,6 @@ public class RssViewController implements IViewController {
         @Override
         protected void onReceiveResult(int resultCode, Bundle resultData) {
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
 
@@ -118,13 +112,8 @@ public class RssViewController implements IViewController {
     private Runnable _updateRSSTextViewRunnable = new Runnable() {
         public void run() {
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
-
-            _logger.Debug("Update RSS text view!");
-            _logger.Debug("RSS List size is: " + String.valueOf(_items.size()));
-            _logger.Debug("Index is: " + String.valueOf(_index));
 
             if (_index >= _items.size()) {
                 _index = 0;
@@ -158,17 +147,13 @@ public class RssViewController implements IViewController {
     };
 
     public RssViewController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _receiverController = new ReceiverController(_context);
     }
 
     @Override
     public void onCreate() {
-        _logger.Debug("onCreate");
-
         _screenEnabled = true;
-
         _rssTitleTextView = ((Activity) _context).findViewById(R.id.rssTitleTextView);
         _rssHeader1TextView = ((Activity) _context).findViewById(R.id.rssTextView1);
         _rssDescription1TextView = ((Activity) _context).findViewById(R.id.rssDescriptionTextView1);
@@ -180,31 +165,26 @@ public class RssViewController implements IViewController {
 
     @Override
     public void onStart() {
-        _logger.Debug("onStart");
     }
 
     @Override
     public void onResume() {
-        _logger.Debug("onResume");
         if (!_isInitialized) {
             _receiverController.RegisterReceiver(_screenDisableReceiver, new String[]{Broadcasts.SCREEN_OFF});
             _receiverController.RegisterReceiver(_screenEnableReceiver, new String[]{Broadcasts.SCREEN_ENABLED});
             _receiverController.RegisterReceiver(_updateViewReceiver, new String[]{Broadcasts.SHOW_RSS_DATA_MODEL});
             _isInitialized = true;
-            _logger.Debug("Initializing!");
         } else {
-            _logger.Warning("Is ALREADY initialized!");
+            Logger.getInstance().Warning(TAG, "Is ALREADY initialized!");
         }
     }
 
     @Override
     public void onPause() {
-        _logger.Debug("onPause");
     }
 
     @Override
     public void onDestroy() {
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
         _isInitialized = false;
     }

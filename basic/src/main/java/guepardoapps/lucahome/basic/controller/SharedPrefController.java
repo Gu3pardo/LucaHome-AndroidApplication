@@ -11,16 +11,11 @@ import java.util.List;
 import guepardoapps.lucahome.basic.utils.Logger;
 
 public class SharedPrefController {
-
     private static final String TAG = SharedPrefController.class.getSimpleName();
-    private Logger _logger;
 
     private SharedPreferences _sharedPreferences;
 
     public SharedPrefController(@NonNull Context context) {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created new " + TAG + "...");
-
         _sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
@@ -28,7 +23,7 @@ public class SharedPrefController {
         if (_sharedPreferences.contains(key)) {
             return true;
         }
-        _logger.Warning("Key not available!");
+        Logger.getInstance().Warning(TAG, "Key not available!");
         return false;
     }
 
@@ -36,7 +31,7 @@ public class SharedPrefController {
             @NonNull String key,
             @NonNull String value) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return false;
         }
 
@@ -50,7 +45,7 @@ public class SharedPrefController {
             @NonNull String key,
             int value) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return false;
         }
 
@@ -64,7 +59,7 @@ public class SharedPrefController {
             @NonNull String key,
             boolean value) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return false;
         }
 
@@ -78,7 +73,7 @@ public class SharedPrefController {
             @NonNull List<String> list,
             @NonNull String arrayName) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return false;
         }
 
@@ -95,7 +90,7 @@ public class SharedPrefController {
             @NonNull List<Integer> list,
             @NonNull String arrayName) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return false;
         }
 
@@ -112,7 +107,7 @@ public class SharedPrefController {
             @NonNull List<Boolean> list,
             @NonNull String arrayName) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return false;
         }
 
@@ -127,7 +122,7 @@ public class SharedPrefController {
 
     public String LoadStringValueFromSharedPreferences(@NonNull String value) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return "";
         }
 
@@ -136,7 +131,7 @@ public class SharedPrefController {
 
     public int LoadIntegerValueFromSharedPreferences(@NonNull String value) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return 0;
         }
 
@@ -145,7 +140,7 @@ public class SharedPrefController {
 
     public Boolean LoadBooleanValueFromSharedPreferences(@NonNull String value) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return false;
         }
 
@@ -154,7 +149,7 @@ public class SharedPrefController {
 
     public List<String> LoadStringListFromSharedPreferences(@NonNull String listName) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return new ArrayList<>();
         }
 
@@ -169,7 +164,7 @@ public class SharedPrefController {
 
     public List<Integer> LoadIntegerListFromSharedPreferences(@NonNull String listName) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return new ArrayList<>();
         }
 
@@ -184,7 +179,7 @@ public class SharedPrefController {
 
     public List<Boolean> LoadBooleanListFromSharedPreferences(@NonNull String listName) {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return new ArrayList<>();
         }
 
@@ -199,7 +194,7 @@ public class SharedPrefController {
 
     public boolean RemoveSharedPreferences() {
         if (_sharedPreferences == null) {
-            _logger.Warning("SharedPreferences is null!");
+            Logger.getInstance().Warning(TAG, "SharedPreferences is null!");
             return false;
         }
 

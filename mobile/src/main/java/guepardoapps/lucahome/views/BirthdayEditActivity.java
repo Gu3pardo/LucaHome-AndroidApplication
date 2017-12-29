@@ -36,7 +36,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class BirthdayEditActivity extends AppCompatActivity {
     private static final String TAG = BirthdayEditActivity.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _propertyChanged;
     private BirthdayDto _birthdayDto;
@@ -51,7 +50,6 @@ public class BirthdayEditActivity extends AppCompatActivity {
     private BroadcastReceiver _addFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayAddFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -70,7 +68,6 @@ public class BirthdayEditActivity extends AppCompatActivity {
     private BroadcastReceiver _updateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayUpdateFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -91,9 +88,6 @@ public class BirthdayEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_birthday_edit);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _birthdayDto = (BirthdayDto) getIntent().getSerializableExtra(BirthdayService.BirthdayIntent);
 
@@ -188,10 +182,10 @@ public class BirthdayEditActivity extends AppCompatActivity {
                         lastHighestId = _birthdayService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _birthdayService.AddBirthday(new LucaBirthday(lastHighestId, birthdayName, remindMe, false, birthdayDate, null, false, ILucaClass.LucaServerDbAction.Add));
+                    _birthdayService.AddBirthday(new LucaBirthday(lastHighestId, birthdayName, birthdayDate, "", remindMe, false, null, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_birthdayDto.GetAction() == BirthdayDto.Action.Update) {
-                    _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, remindMe, false, birthdayDate, null, false, ILucaClass.LucaServerDbAction.Update));
+                    _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, "", remindMe, false, null, false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     birthdayEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _birthdayDto.GetAction())));
@@ -203,13 +197,11 @@ public class BirthdayEditActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_addFinishedReceiver, new String[]{BirthdayService.BirthdayAddFinishedBroadcast});
         _receiverController.RegisterReceiver(_updateFinishedReceiver, new String[]{BirthdayService.BirthdayUpdateFinishedBroadcast});
     }
@@ -217,14 +209,12 @@ public class BirthdayEditActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -264,7 +254,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> {
             NavigationService.NavigationResult navigationResult = _navigationService.GoBack(BirthdayEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);

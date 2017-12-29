@@ -8,9 +8,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.views.*;
 
 public class NavigationService {
@@ -18,16 +16,13 @@ public class NavigationService {
 
     private static final NavigationService SINGLETON = new NavigationService();
 
-    private static final String TAG = NavigationService.class.getSimpleName();
-    private Logger _logger;
+    // private static final String TAG = NavigationService.class.getSimpleName();
 
     private Class<?> _currentActivity;
 
     private List<Class<?>> _backEntryList = new ArrayList<>();
 
     private NavigationService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static NavigationService getInstance() {
@@ -35,11 +30,6 @@ public class NavigationService {
     }
 
     public NavigationResult NavigateToActivity(@NonNull Context startActivityContext, @NonNull Class<?> endActivity) {
-        _logger.Debug(String.format(
-                Locale.getDefault(),
-                "Trying to navigate from %s to %s",
-                startActivityContext, endActivity));
-
         NavigationResult canNavigateResult = canNavigate(startActivityContext, endActivity);
         if (canNavigateResult != NavigationResult.POSSIBLE) {
             return canNavigateResult;
@@ -54,11 +44,6 @@ public class NavigationService {
     }
 
     public NavigationResult NavigateToActivityWithData(@NonNull Context startActivityContext, @NonNull Class<?> endActivity, @NonNull Bundle data) {
-        _logger.Debug(String.format(
-                Locale.getDefault(),
-                "Trying to navigate from %s to %s",
-                startActivityContext, endActivity));
-
         NavigationResult canNavigateResult = canNavigate(startActivityContext, endActivity);
         if (canNavigateResult != NavigationResult.POSSIBLE) {
             return canNavigateResult;
@@ -75,11 +60,6 @@ public class NavigationService {
     }
 
     public NavigationResult GoBack(@NonNull Context startActivityContext) {
-        _logger.Debug(String.format(
-                Locale.getDefault(),
-                "Trying to go back from %s",
-                startActivityContext));
-
         if (_backEntryList.size() == 0) {
             _backEntryList.add(MainActivity.class);
         }

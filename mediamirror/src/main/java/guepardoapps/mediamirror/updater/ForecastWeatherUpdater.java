@@ -15,7 +15,6 @@ import guepardoapps.mediamirror.common.constants.Constants;
 
 public class ForecastWeatherUpdater {
     private static final String TAG = ForecastWeatherUpdater.class.getSimpleName();
-    private Logger _logger;
 
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
@@ -27,7 +26,6 @@ public class ForecastWeatherUpdater {
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateReceiver onReceive");
             OpenWeatherService.ForecastWeatherDownloadFinishedContent result =
                     (OpenWeatherService.ForecastWeatherDownloadFinishedContent) intent.getSerializableExtra(OpenWeatherService.ForecastWeatherDownloadFinishedBundle);
 
@@ -37,7 +35,7 @@ public class ForecastWeatherUpdater {
                         Bundles.FORECAST_WEATHER_MODEL,
                         result);
             } else {
-                _logger.Warning("Forecast weather is null!");
+                Logger.getInstance().Warning(TAG, "Forecast weather is null!");
             }
         }
     };
@@ -45,26 +43,20 @@ public class ForecastWeatherUpdater {
     private BroadcastReceiver _performUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_performUpdateReceiver onReceive");
             DownloadWeather();
         }
     };
 
     public ForecastWeatherUpdater(@NonNull Context context) {
-        _logger = new Logger(TAG);
-
         _broadcastController = new BroadcastController(context);
         _receiverController = new ReceiverController(context);
-
         _openWeatherService = OpenWeatherService.getInstance();
         _openWeatherService.Initialize(context, Constants.CITY, false, false, null, null, false, true, 5 * 60 * 1000);
     }
 
     public void Start() {
-        _logger.Debug("Initialize");
-
         if (_isRunning) {
-            _logger.Warning("Already running!");
+            Logger.getInstance().Warning(TAG, "Already running!");
             return;
         }
 
@@ -76,13 +68,11 @@ public class ForecastWeatherUpdater {
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadWeather() {
-        _logger.Debug("DownloadWeather");
         _openWeatherService.LoadForecastWeather();
     }
 }

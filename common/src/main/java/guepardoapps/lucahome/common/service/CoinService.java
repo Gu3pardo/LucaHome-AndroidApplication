@@ -79,7 +79,6 @@ public class CoinService implements IDataNotificationService {
     private boolean _isInitialized;
 
     private static final String TAG = CoinService.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _loadDataEnabled;
 
@@ -99,11 +98,8 @@ public class CoinService implements IDataNotificationService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadCoinConversionList();
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -119,9 +115,6 @@ public class CoinService implements IDataNotificationService {
 
     private DatabaseCoinList _databaseCoinList;
 
-    private JsonDataToCoinConverter _jsonDataToCoinConverter;
-    private JsonDataToCoinConversionConverter _jsonDataToCoinConversionConverter;
-
     private SerializableList<Coin> _coinList = new SerializableList<>();
     private SerializableList<Coin> _filteredCoinList = new SerializableList<>();
     private SerializableList<SerializablePair<String, Double>> _coinConversionList = new SerializableList<>();
@@ -129,24 +122,20 @@ public class CoinService implements IDataNotificationService {
     private BroadcastReceiver _coinConversionDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinConversionDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinConversion) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
-            SerializableList<SerializablePair<String, Double>> coinConversionList = _jsonDataToCoinConversionConverter.GetList(contentResponse);
+            SerializableList<SerializablePair<String, Double>> coinConversionList = JsonDataToCoinConversionConverter.getInstance().GetList(contentResponse);
             if (coinConversionList == null) {
-                _logger.Error("Converted coinConversionList is null!");
-
+                Logger.getInstance().Error(TAG, "Converted coinConversionList is null!");
                 _broadcastController.SendSerializableBroadcast(
                         CoinConversionDownloadFinishedBroadcast,
                         CoinConversionDownloadFinishedBundle,
                         new CoinConversionDownloadFinishedContent(_coinConversionList, false, content.Response));
-
                 return;
             }
 
@@ -168,12 +157,10 @@ public class CoinService implements IDataNotificationService {
     private BroadcastReceiver _coinAggregateDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinAggregateEurDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinTrend) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
@@ -184,7 +171,6 @@ public class CoinService implements IDataNotificationService {
                 for (int index = 0; index < _coinList.getSize(); index++) {
                     if (_coinList.getValue(index).GetId() == coinDto.GetId()) {
                         _coinList.setValue(index, coinDto);
-                        _logger.Debug(String.format(Locale.getDefault(), "Updated CoinDto is %s", coinDto));
 
                         _broadcastController.SendSerializableBroadcast(
                                 CoinConversionDownloadFinishedBroadcast,
@@ -197,7 +183,7 @@ public class CoinService implements IDataNotificationService {
                     }
                 }
             } catch (JSONException jsonException) {
-                _logger.Error(jsonException.getMessage());
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
 
             _lastUpdate = new Date();
@@ -207,36 +193,32 @@ public class CoinService implements IDataNotificationService {
     private BroadcastReceiver _coinDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Coin) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _coinList = _databaseCoinList.GetCoinList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _coinList = _databaseCoinList.GetCoinList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<Coin> coinList = _jsonDataToCoinConverter.GetList(contentResponse, _coinConversionList);
+            SerializableList<Coin> coinList = JsonDataToCoinConverter.getInstance().GetList(contentResponse, _coinConversionList);
             if (coinList == null) {
-                _logger.Error("Converted CoinList is null!");
+                Logger.getInstance().Error(TAG, "Converted CoinList is null!");
                 _coinList = _databaseCoinList.GetCoinList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
@@ -266,27 +248,23 @@ public class CoinService implements IDataNotificationService {
     private BroadcastReceiver _coinAddFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinAddFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinAdd) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedAddBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedAddBroadcast(contentResponse);
                 return;
             }
@@ -305,27 +283,23 @@ public class CoinService implements IDataNotificationService {
     private BroadcastReceiver _coinUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinUpdateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinUpdate) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
@@ -344,27 +318,23 @@ public class CoinService implements IDataNotificationService {
     private BroadcastReceiver _coinDeleteFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinDeleteFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinDelete) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
@@ -383,7 +353,6 @@ public class CoinService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -394,14 +363,11 @@ public class CoinService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private CoinService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static CoinService getInstance() {
@@ -410,10 +376,8 @@ public class CoinService implements IDataNotificationService {
 
     @Override
     public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -446,9 +410,6 @@ public class CoinService implements IDataNotificationService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToCoinConverter = new JsonDataToCoinConverter();
-        _jsonDataToCoinConversionConverter = new JsonDataToCoinConversionConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -456,7 +417,6 @@ public class CoinService implements IDataNotificationService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _databaseCoinList.Close();
@@ -534,29 +494,18 @@ public class CoinService implements IDataNotificationService {
     }
 
     public void LoadCoinConversionList() {
-        _logger.Debug("LoadCoinConversionList");
-
         String requestUrl = "https://min-api.cryptocompare.com/data/pricemulti?fsyms=BCH,BTC,DASH,ETC,ETH,IOTA,LTC,XMR,XRP,ZEC&tsyms=EUR";
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
-
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.CoinConversion, false);
     }
 
     public void LoadCoinTrend(@NonNull Coin coin) {
-        _logger.Debug(String.format(Locale.getDefault(), "LoadCoinTrend for %s of the last %d hours.", coin, SettingsController.getInstance().GetCoinHoursTrend()));
-
         String requestUrlEur = String.format(Locale.getDefault(), "https://min-api.cryptocompare.com/data/histohour?fsym=%s&tsym=%s&limit=%d&aggregate=3&e=CCCAGG", coin.GetType(), "EUR", SettingsController.getInstance().GetCoinHoursTrend());
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrlEur is: %s", requestUrlEur));
-
         _downloadController.SendCommandToWebsiteAsync(requestUrlEur, DownloadController.DownloadType.CoinTrend, false, coin);
     }
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         if (!_loadDataEnabled) {
-            _logger.Debug("_loadDataEnabled is false!");
             return;
         }
 
@@ -602,7 +551,7 @@ public class CoinService implements IDataNotificationService {
                         break;
                     case Null:
                     default:
-                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", coin));
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", coin));
                         break;
                 }
 
@@ -616,14 +565,11 @@ public class CoinService implements IDataNotificationService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_COINS_USER.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Coin, true);
     }
 
     public void AddCoin(@NonNull Coin entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "AddCoin: Adding new entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
@@ -650,8 +596,6 @@ public class CoinService implements IDataNotificationService {
     }
 
     public void UpdateCoin(@NonNull Coin entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateCoin: Updating entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
@@ -678,8 +622,6 @@ public class CoinService implements IDataNotificationService {
     }
 
     public void DeleteCoin(@NonNull Coin entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "DeleteCoin: Deleting entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
@@ -717,10 +659,8 @@ public class CoinService implements IDataNotificationService {
 
     @Override
     public void ShowNotification() {
-        _logger.Debug("ShowNotification");
-
         if (!_displayNotification) {
-            _logger.Warning("_displayNotification is false!");
+            Logger.getInstance().Warning(TAG, "_displayNotification is false!");
             return;
         }
 
@@ -733,7 +673,6 @@ public class CoinService implements IDataNotificationService {
 
     @Override
     public void CloseNotification() {
-        _logger.Debug("CloseNotification");
         _notificationController.CloseNotification(NOTIFICATION_ID);
     }
 
@@ -775,11 +714,9 @@ public class CoinService implements IDataNotificationService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MS %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -792,7 +729,7 @@ public class CoinService implements IDataNotificationService {
 
     public void SetCoinHoursTrend(int coinHoursTrend) {
         if (coinHoursTrend < 24) {
-            _logger.Warning(String.format(Locale.getDefault(), "SetCoinHoursTrend: coinHoursTrend %d is invalid! Setting to 24!", coinHoursTrend));
+            Logger.getInstance().Warning(TAG, String.format(Locale.getDefault(), "SetCoinHoursTrend: coinHoursTrend %d is invalid! Setting to 24!", coinHoursTrend));
             coinHoursTrend = 24;
         }
 
@@ -804,8 +741,6 @@ public class CoinService implements IDataNotificationService {
     }
 
     private void clearCoinListFromDatabase() {
-        _logger.Debug("clearCoinListFromDatabase");
-
         SerializableList<Coin> coinList = _databaseCoinList.GetCoinList();
         for (int index = 0; index < coinList.getSize(); index++) {
             Coin coin = coinList.getValue(index);
@@ -814,8 +749,6 @@ public class CoinService implements IDataNotificationService {
     }
 
     private void saveCoinListToDatabase() {
-        _logger.Debug("saveCoinListToDatabase");
-
         for (int index = 0; index < _coinList.getSize(); index++) {
             Coin coin = _coinList.getValue(index);
             _databaseCoinList.CreateEntry(coin);
@@ -868,12 +801,12 @@ public class CoinService implements IDataNotificationService {
 
     private void mergeCoinConversionWithCoinList() {
         if (_coinList == null) {
-            _logger.Error("_coinList is null!");
+            Logger.getInstance().Error(TAG, "_coinList is null!");
             return;
         }
 
         if (_coinConversionList == null) {
-            _logger.Error("_coinConversionList is null!");
+            Logger.getInstance().Error(TAG, "_coinConversionList is null!");
             return;
         }
 

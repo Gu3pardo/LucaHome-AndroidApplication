@@ -15,12 +15,15 @@ import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToTemperatureConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToTemperatureConverter.class.getSimpleName();
-    private Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Temperature\":";
 
-    private static String _searchParameter = "{\"Temperature\":";
+    private static final JsonDataToTemperatureConverter SINGLETON = new JsonDataToTemperatureConverter();
 
-    public JsonDataToTemperatureConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToTemperatureConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToTemperatureConverter() {
     }
 
     @Override
@@ -28,7 +31,7 @@ public final class JsonDataToTemperatureConverter implements IJsonDataConverter 
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry);
         }
     }
@@ -39,10 +42,10 @@ public final class JsonDataToTemperatureConverter implements IJsonDataConverter 
     }
 
     private SerializableList<Temperature> parseStringToList(@NonNull String value) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<Temperature> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<Temperature> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONObject jsonObjectData = jsonObject.getJSONObject("Temperature");
 
@@ -56,14 +59,13 @@ public final class JsonDataToTemperatureConverter implements IJsonDataConverter 
                 Temperature temperature = new Temperature(temperatureValue, area, new SerializableDate(), new SerializableTime(), sensorPath, Temperature.TemperatureType.RASPBERRY, graphPath);
                 list.addValue(temperature);
 
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 }

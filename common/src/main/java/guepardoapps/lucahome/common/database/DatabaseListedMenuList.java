@@ -15,7 +15,6 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseListedMenuList {
     private static final String TAG = DatabaseListedMenuList.class.getSimpleName();
-    private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_TITLE = "_title";
@@ -59,7 +58,6 @@ public class DatabaseListedMenuList {
     }
 
     public DatabaseListedMenuList(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -135,21 +133,21 @@ public class DatabaseListedMenuList {
             try {
                 id = Integer.parseInt(idString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             int rating = -1;
             try {
                 rating = Integer.parseInt(ratingString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             int useCounter = -1;
             try {
                 useCounter = Integer.parseInt(useCounterString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             String isOnServerString = cursor.getString(isOnServerIndex);

@@ -38,7 +38,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class SecurityActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = SecurityActivity.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -72,7 +71,6 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
     private BroadcastReceiver _securityUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_securityUpdateReceiver");
             SecurityService.SecurityDownloadFinishedContent result =
                     (SecurityService.SecurityDownloadFinishedContent) intent.getSerializableExtra(SecurityService.SecurityDownloadFinishedBundle);
 
@@ -93,9 +91,6 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         setContentView(R.layout.activity_security);
 
@@ -126,8 +121,6 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         cookieManager.setAcceptCookie(false);
 
         _setCameraButton.setOnClickListener(view -> {
-            _logger.Debug("_setCameraButton onClick");
-
             SerializableList<Security> securityList = _securityService.GetDataList();
             if (securityList != null) {
                 if (securityList.getSize() > 0) {
@@ -141,12 +134,10 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
             }
 
             String message = "Could not activate camera!";
-            _logger.Warning(message);
+            Logger.getInstance().Warning(TAG, message);
             displayWarningSnackBar(message);
         });
         _setMotionControlButton.setOnClickListener(view -> {
-            _logger.Debug("_setMotionControlButton onClick");
-
             SerializableList<Security> securityList = _securityService.GetDataList();
             if (securityList != null) {
                 if (securityList.getSize() > 0) {
@@ -156,7 +147,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
             }
 
             String message = "Could not activate camera!";
-            _logger.Warning(message);
+            Logger.getInstance().Warning(TAG, message);
             displayWarningSnackBar(message);
         });
 
@@ -172,13 +163,11 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         _receiverController.RegisterReceiver(_securityUpdateReceiver, new String[]{SecurityService.SecurityDownloadFinishedBroadcast});
 
@@ -193,14 +182,12 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -248,7 +235,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
             displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
@@ -258,8 +245,6 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
     }
 
     private void setUI(@NonNull Security security) {
-        _logger.Debug(String.format(Locale.getDefault(), "setUI with security %s", security));
-
         _cameraStateTextView.setVisibility(security.IsCameraActive() ? View.GONE : View.VISIBLE);
         _setMotionControlButton.setVisibility(security.IsCameraActive() ? View.VISIBLE : View.INVISIBLE);
         _cameraWebView.setVisibility(security.IsCameraActive() ? View.VISIBLE : View.GONE);
@@ -278,7 +263,6 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         if (security.IsCameraActive() && security.GetCameraUrl() != null) {
             if (security.GetCameraUrl().length() > 0) {
                 String url = "http://" + security.GetCameraUrl();
-                _logger.Information("Load url " + url);
                 _cameraWebView.loadUrl(url);
             }
         }

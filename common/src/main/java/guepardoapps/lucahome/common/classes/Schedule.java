@@ -171,12 +171,12 @@ public class Schedule implements Serializable, ILucaClass {
 
     @Override
     public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&switch=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.ADD_SCHEDULE.toString(), _name, _wirelessSocket.GetName(), "", _wirelessSwitch.GetName(), _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", "0", "1");
+        return String.format(Locale.getDefault(), "%s%s&name=%s&socket=%s&gpio=%s&switch=%s&weekday=%s&hour=%s&minute=%s&action=%s&isTimer=%s", LucaServerAction.ADD_SCHEDULE.toString(), _id, _name, _wirelessSocket.GetName(), "", _wirelessSwitch.GetName(), _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0");
     }
 
     @Override
     public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%s&socket=%s&gpio=%s&switch=%s&weekday=%s&hour=%s&minute=%s&onoff=%s&isTimer=%s&playSound=%s&playRaspberry=%s", LucaServerAction.UPDATE_SCHEDULE.toString(), _name, _wirelessSocket.GetName(), "", _wirelessSwitch.GetName(), _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", "0", "1");
+        return String.format(Locale.getDefault(), "%s%s&name=%s&socket=%s&gpio=%s&switch=%s&weekday=%s&hour=%s&minute=%s&action=%s&isTimer=%s&isactive=%s", LucaServerAction.UPDATE_SCHEDULE.toString(), _id, _name, _wirelessSocket.GetName(), "", _wirelessSwitch.GetName(), _weekday, _time.HH(), _time.MM(), _action.GetFlag(), "0", (_isActive ? "1" : "0"));
     }
 
     @Override

@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 
 public class RaspberryModel implements Serializable {
-
     private static final long serialVersionUID = -7204415758428216530L;
 
     private static final String TAG = RaspberryModel.class.getSimpleName();

@@ -16,7 +16,6 @@ import guepardoapps.mediamirror.common.constants.Bundles;
 
 public class SocketListUpdater {
     private static final String TAG = SocketListUpdater.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
     private BroadcastController _broadcastController;
@@ -29,7 +28,6 @@ public class SocketListUpdater {
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateReceiver onReceive");
             WirelessSocketService.WirelessSocketDownloadFinishedContent result =
                     (WirelessSocketService.WirelessSocketDownloadFinishedContent) intent.getSerializableExtra(WirelessSocketService.WirelessSocketDownloadFinishedBundle);
 
@@ -49,13 +47,11 @@ public class SocketListUpdater {
     private BroadcastReceiver _performUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_performUpdateReceiver onReceive");
             DownloadSocketList();
         }
     };
 
     public SocketListUpdater(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _broadcastController = new BroadcastController(_context);
         _receiverController = new ReceiverController(_context);
@@ -64,28 +60,22 @@ public class SocketListUpdater {
     }
 
     public void Start() {
-        _logger.Debug("Initialize");
-
         if (_isRunning) {
-            _logger.Warning("Already running!");
+            Logger.getInstance().Warning(TAG, "Already running!");
             return;
         }
-
         _receiverController.RegisterReceiver(_updateReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_SOCKET_UPDATE});
-
         _isRunning = true;
         DownloadSocketList();
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadSocketList() {
-        _logger.Debug("startDownloadSocketList");
         _wirelessSocketService.LoadData();
     }
 }

@@ -16,19 +16,19 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseShoppingList {
     private static final String TAG = DatabaseShoppingList.class.getSimpleName();
-    private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_NAME = "_name";
     private static final String KEY_GROUP = "_group";
     private static final String KEY_QUANTITY = "_quantity";
+    private static final String KEY_UNIT = "_unit";
     private static final String KEY_BOUGHT = "_bought";
     private static final String KEY_IS_ON_SERVER = "_isOnServer";
     private static final String KEY_SERVER_ACTION = "_serverAction";
 
     private static final String DATABASE_NAME = "DatabaseShoppingListDb";
     private static final String DATABASE_TABLE = "DatabaseShoppingListTable";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -60,7 +60,6 @@ public class DatabaseShoppingList {
     }
 
     public DatabaseShoppingList(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -81,6 +80,7 @@ public class DatabaseShoppingList {
         contentValues.put(KEY_NAME, newEntry.GetName());
         contentValues.put(KEY_GROUP, newEntry.GetGroup().toString());
         contentValues.put(KEY_QUANTITY, newEntry.GetQuantity());
+        contentValues.put(KEY_UNIT, newEntry.GetUnit());
         contentValues.put(KEY_BOUGHT, (newEntry.GetBought() ? "1" : "0"));
         contentValues.put(KEY_IS_ON_SERVER, String.valueOf(newEntry.GetIsOnServer()));
         contentValues.put(KEY_SERVER_ACTION, newEntry.GetServerDbAction().toString());
@@ -95,6 +95,7 @@ public class DatabaseShoppingList {
         contentValues.put(KEY_NAME, updateEntry.GetName());
         contentValues.put(KEY_GROUP, updateEntry.GetGroup().toString());
         contentValues.put(KEY_QUANTITY, updateEntry.GetQuantity());
+        contentValues.put(KEY_UNIT, updateEntry.GetUnit());
         contentValues.put(KEY_BOUGHT, (updateEntry.GetBought() ? "1" : "0"));
         contentValues.put(KEY_IS_ON_SERVER, String.valueOf(updateEntry.GetIsOnServer()));
         contentValues.put(KEY_SERVER_ACTION, updateEntry.GetServerDbAction().toString());
@@ -105,7 +106,7 @@ public class DatabaseShoppingList {
     }
 
     public SerializableList<ShoppingEntry> GetShoppingList() {
-        String[] columns = new String[]{KEY_ROW_ID, KEY_NAME, KEY_GROUP, KEY_QUANTITY, KEY_BOUGHT, KEY_IS_ON_SERVER, KEY_SERVER_ACTION};
+        String[] columns = new String[]{KEY_ROW_ID, KEY_NAME, KEY_GROUP, KEY_QUANTITY, KEY_UNIT, KEY_BOUGHT, KEY_IS_ON_SERVER, KEY_SERVER_ACTION};
 
         Cursor cursor = _database.query(DATABASE_TABLE, columns, null, null, null, null, null);
         SerializableList<ShoppingEntry> result = new SerializableList<>();
@@ -114,6 +115,7 @@ public class DatabaseShoppingList {
         int nameIndex = cursor.getColumnIndex(KEY_NAME);
         int groupIndex = cursor.getColumnIndex(KEY_GROUP);
         int quantityIndex = cursor.getColumnIndex(KEY_QUANTITY);
+        int unitIndex = cursor.getColumnIndex(KEY_UNIT);
         int boughtIndex = cursor.getColumnIndex(KEY_BOUGHT);
         int isOnServerIndex = cursor.getColumnIndex(KEY_IS_ON_SERVER);
         int serverActionIndex = cursor.getColumnIndex(KEY_SERVER_ACTION);
@@ -123,27 +125,28 @@ public class DatabaseShoppingList {
             String name = cursor.getString(nameIndex);
             String groupString = cursor.getString(groupIndex);
             String quantityString = cursor.getString(quantityIndex);
+            String unit = cursor.getString(unitIndex);
             String boughtString = cursor.getString(boughtIndex);
 
             int id = -1;
             try {
                 id = Integer.parseInt(idString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             ShoppingEntryGroup group = ShoppingEntryGroup.OTHER;
             try {
                 group = ShoppingEntryGroup.GetByString(groupString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             int quantity = -1;
             try {
                 quantity = Integer.parseInt(quantityString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             boolean bought = boughtString.contains("1");
@@ -154,7 +157,7 @@ public class DatabaseShoppingList {
             String serverActionString = cursor.getString(serverActionIndex);
             ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
 
-            ShoppingEntry entry = new ShoppingEntry(id, name, group, quantity, bought, isOnServer, serverAction);
+            ShoppingEntry entry = new ShoppingEntry(id, name, group, quantity, unit, bought, isOnServer, serverAction);
             result.addValue(entry);
         }
 

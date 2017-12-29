@@ -19,7 +19,6 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseMapContentList {
     private static final String TAG = DatabaseMapContentList.class.getSimpleName();
-    private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_DRAWING_TYPE = "_drawingType";
@@ -77,7 +76,6 @@ public class DatabaseMapContentList {
     }
 
     public DatabaseMapContentList(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -216,7 +214,7 @@ public class DatabaseMapContentList {
                 mediaServerId = Integer.parseInt(mediaServerIdString);
 
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             boolean visibility = visibilityString.contains("1");

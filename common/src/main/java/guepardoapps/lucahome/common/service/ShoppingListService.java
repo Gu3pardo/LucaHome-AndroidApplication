@@ -57,7 +57,6 @@ public class ShoppingListService implements IDataService {
     private boolean _isInitialized;
 
     private static final String TAG = ShoppingListService.class.getSimpleName();
-    private Logger _logger;
 
     private static final int MIN_TIMEOUT_MIN = 60;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
@@ -72,10 +71,7 @@ public class ShoppingListService implements IDataService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -92,43 +88,37 @@ public class ShoppingListService implements IDataService {
 
     private DatabaseShoppingList _databaseShoppingList;
 
-    private JsonDataToShoppingListConverter _jsonDataToShoppingListConverter;
-
     private SerializableList<ShoppingEntry> _shoppingList = new SerializableList<>();
 
     private BroadcastReceiver _shoppingListDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_shoppingListDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingList) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _shoppingList = _databaseShoppingList.GetShoppingList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _shoppingList = _databaseShoppingList.GetShoppingList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<ShoppingEntry> shoppingList = _jsonDataToShoppingListConverter.GetList(contentResponse);
+            SerializableList<ShoppingEntry> shoppingList = JsonDataToShoppingListConverter.getInstance().GetList(contentResponse);
             if (shoppingList == null) {
-                _logger.Error("Converted shoppingList is null!");
+                Logger.getInstance().Error(TAG, "Converted shoppingList is null!");
                 _shoppingList = _databaseShoppingList.GetShoppingList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
@@ -151,27 +141,23 @@ public class ShoppingListService implements IDataService {
     private BroadcastReceiver _shoppingListAddFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_shoppingListAddFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListAdd) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedAddBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedAddBroadcast(contentResponse);
                 return;
             }
@@ -190,27 +176,23 @@ public class ShoppingListService implements IDataService {
     private BroadcastReceiver _shoppingListUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_shoppingListUpdateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListUpdate) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
@@ -229,27 +211,23 @@ public class ShoppingListService implements IDataService {
     private BroadcastReceiver _shoppingListDeleteFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_shoppingListDeleteFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListDelete) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
@@ -268,7 +246,6 @@ public class ShoppingListService implements IDataService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -279,14 +256,11 @@ public class ShoppingListService implements IDataService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private ShoppingListService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static ShoppingListService getInstance() {
@@ -295,10 +269,8 @@ public class ShoppingListService implements IDataService {
 
     @Override
     public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -327,8 +299,6 @@ public class ShoppingListService implements IDataService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToShoppingListConverter = new JsonDataToShoppingListConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -336,7 +306,6 @@ public class ShoppingListService implements IDataService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _databaseShoppingList.Close();
@@ -414,10 +383,7 @@ public class ShoppingListService implements IDataService {
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         if (!_loadDataEnabled) {
-            _logger.Debug("_loadDataEnabled is false!");
             return;
         }
 
@@ -454,7 +420,7 @@ public class ShoppingListService implements IDataService {
                         break;
                     case Null:
                     default:
-                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", shoppingEntry));
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", shoppingEntry));
                         break;
                 }
 
@@ -468,14 +434,11 @@ public class ShoppingListService implements IDataService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_SHOPPING_LIST.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingList, true);
     }
 
     public void AddShoppingEntry(@NonNull ShoppingEntry entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "AddShoppingEntry: Adding new entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
@@ -502,8 +465,6 @@ public class ShoppingListService implements IDataService {
     }
 
     public void UpdateShoppingEntry(@NonNull ShoppingEntry entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateShoppingEntry: Updating entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
@@ -530,8 +491,6 @@ public class ShoppingListService implements IDataService {
     }
 
     public void DeleteShoppingEntry(@NonNull ShoppingEntry entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "DeleteShoppingEntry: Deleting entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
@@ -579,11 +538,9 @@ public class ShoppingListService implements IDataService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -616,8 +573,6 @@ public class ShoppingListService implements IDataService {
     }
 
     private void clearShoppingListFromDatabase() {
-        _logger.Debug("clearShoppingListFromDatabase");
-
         SerializableList<ShoppingEntry> shoppingList = _databaseShoppingList.GetShoppingList();
         for (int index = 0; index < shoppingList.getSize(); index++) {
             ShoppingEntry shoppingEntry = shoppingList.getValue(index);
@@ -626,8 +581,6 @@ public class ShoppingListService implements IDataService {
     }
 
     private void saveShoppingListToDatabase() {
-        _logger.Debug("saveShoppingListToDatabase");
-
         for (int index = 0; index < _shoppingList.getSize(); index++) {
             ShoppingEntry shoppingEntry = _shoppingList.getValue(index);
             _databaseShoppingList.CreateEntry(shoppingEntry);

@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Locale;
 
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -23,7 +22,6 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
     public static final String ClientTaskBundle = "ClientTaskBundle";
 
     private static final String TAG = ClientTask.class.getSimpleName();
-    private Logger _logger;
 
     private static final int DEFAULT_TIMEOUT_MS = 500;
 
@@ -43,17 +41,14 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
             int port,
             @NonNull String communication,
             int timeoutMSec) {
-        _logger = new Logger(TAG);
         _broadcastController = new BroadcastController(context);
 
         _address = address;
         _port = port;
         _communication = communication + "\n";
 
-        _logger.Information(String.format(Locale.getDefault(), "Address: %s; Port: %d, Communication: %s", _address, _port, _communication));
-
         if (timeoutMSec <= 0) {
-            _logger.Warning("TimeOut was set lower then 1ms! Setting to default!");
+            Logger.getInstance().Warning(TAG, "TimeOut was set lower then 1ms! Setting to default!");
             timeoutMSec = DEFAULT_TIMEOUT_MS;
         }
 
@@ -71,10 +66,8 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
 
     @Override
     protected Void doInBackground(Void... arg0) {
-        _logger.Debug("executing Task");
         Socket socket = null;
         try {
-            _logger.Debug("New communication is set");
             socket = new Socket();
             socket.connect(new InetSocketAddress(_address, _port), _timeoutMSec);
 
@@ -98,12 +91,12 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
             outputStreamWriter.close();
 
         } catch (UnknownHostException exception) {
-            _logger.Error(exception.getMessage());
+            Logger.getInstance().Error(TAG, exception.getMessage());
             _response = "UnknownHostException: " + exception.getMessage();
             _responseError = true;
 
         } catch (IOException exception) {
-            _logger.Error(exception.getMessage());
+            Logger.getInstance().Error(TAG, exception.getMessage());
             _response = "IOException: " + exception.getMessage();
             _responseError = true;
 
@@ -111,8 +104,8 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
             if (socket != null) {
                 try {
                     socket.close();
-                } catch (IOException e) {
-                    _logger.Error(e.toString());
+                } catch (IOException exception) {
+                    Logger.getInstance().Error(TAG, exception.getMessage());
                 }
             }
             _communication = "";
@@ -123,12 +116,12 @@ public class ClientTask extends AsyncTask<Void, Void, Void> {
     @Override
     protected void onPostExecute(Void result) {
         if (_response == null) {
-            _logger.Error("Response is null!");
+            Logger.getInstance().Error(TAG, "Response is null!");
             return;
         }
 
         if (_responseError) {
-            _logger.Error("An response error appeared!");
+            Logger.getInstance().Error(TAG, "An response error appeared!");
             return;
         }
 

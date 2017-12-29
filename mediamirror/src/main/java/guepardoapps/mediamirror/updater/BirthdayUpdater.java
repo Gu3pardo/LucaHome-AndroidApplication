@@ -1,7 +1,6 @@
 package guepardoapps.mediamirror.updater;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,7 +18,6 @@ import guepardoapps.mediamirror.common.constants.Bundles;
 
 public class BirthdayUpdater {
     private static final String TAG = BirthdayUpdater.class.getSimpleName();
-    private Logger _logger;
 
     private static final int MAX_BIRTHDAY_COUNT = 1;
 
@@ -33,7 +31,6 @@ public class BirthdayUpdater {
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateReceiver");
             BirthdayService.BirthdayDownloadFinishedContent result =
                     (BirthdayService.BirthdayDownloadFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
 
@@ -43,7 +40,7 @@ public class BirthdayUpdater {
 
                 if (loadedBirthdayList != null) {
                     if (loadedBirthdayList.getSize() == 0) {
-                        _logger.Warning("loadedBirthdayList size is 0!");
+                        Logger.getInstance().Warning(TAG, "loadedBirthdayList size is 0!");
                         return;
                     }
 
@@ -58,45 +55,32 @@ public class BirthdayUpdater {
                             _nextBirthdaysList.setValue(index, null);
                         }
                     } else if (loadedBirthdayList.getSize() > MAX_BIRTHDAY_COUNT) {
-                        Calendar today = Calendar.getInstance();
                         ArrayList<LucaBirthday> nextDateList = new ArrayList<>();
                         ArrayList<LucaBirthday> prevDateList = new ArrayList<>();
-
-                        _logger.Information("Today:");
-                        _logger.Information(today.toString());
 
                         for (int index = 0; index < loadedBirthdayList.getSize(); index++) {
                             LucaBirthday entry = loadedBirthdayList.getValue(index);
 
-                            _logger.Information("Entry:" + entry.toString());
-
                             switch (entry.CurrentBirthdayType()) {
                                 case UPCOMING:
                                 case TODAY:
-                                    _logger.Information("Next: " + entry.GetName());
                                     nextDateList.add(entry);
                                     break;
                                 case PREVIOUS:
-                                    _logger.Information("Prev:" + entry.GetName());
                                     prevDateList.add(entry);
                                     break;
                                 default:
-                                    _logger.Error("Not supported BirthdayDateType: " + entry.CurrentBirthdayType());
+                                    Logger.getInstance().Error(TAG, "Not supported BirthdayDateType: " + entry.CurrentBirthdayType());
                                     break;
                             }
                         }
 
                         int nextDateCount = nextDateList.size();
-                        _logger.Debug("BirthdayList nextDateCount" + String.valueOf(nextDateCount));
                         if (nextDateCount >= MAX_BIRTHDAY_COUNT) {
-                            _logger.Debug("Size of nextDateCount is bigger or same as MAX_BIRTHDAY_COUNT");
                             for (int index = 0; index < MAX_BIRTHDAY_COUNT; index++) {
-                                _logger.Debug("Adding entry to _nextBirthdaysList");
                                 _nextBirthdaysList.setValue(index, nextDateList.get(index));
-                                _logger.Debug("Added entry to list: " + _nextBirthdaysList.getValue(index).toString());
                             }
                         } else {
-                            _logger.Debug("Size of nextDateCount is lower then MAX_BIRTHDAY_COUNT");
                             for (int index = 0; index < nextDateCount; index++) {
                                 _nextBirthdaysList.setValue(index, nextDateList.get(index));
                             }
@@ -115,10 +99,9 @@ public class BirthdayUpdater {
                         }
                     }
                 } else {
-                    _logger.Warning("loadedBirthdayList is null!");
+                    Logger.getInstance().Warning(TAG, "loadedBirthdayList is null!");
                 }
 
-                _logger.Debug("Sending current _nextBirthdaysList: " + _nextBirthdaysList.toString());
                 _broadcastController.SendSerializableBroadcast(
                         Broadcasts.SHOW_BIRTHDAY_MODEL,
                         Bundles.BIRTHDAY_MODEL,
@@ -130,25 +113,20 @@ public class BirthdayUpdater {
     private BroadcastReceiver _performUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_performUpdateReceiver onReceive");
             DownloadBirthdays();
         }
     };
 
     public BirthdayUpdater(@NonNull Context context) {
-        _logger = new Logger(TAG);
-
         _broadcastController = new BroadcastController(context);
         _receiverController = new ReceiverController(context);
-
         _birthdayService = BirthdayService.getInstance();
         _birthdayService.Initialize(context, null, false, true, 6 * 60);
     }
 
     public void Start() {
-        _logger.Debug("Initialize");
         if (_isRunning) {
-            _logger.Warning("Already running!");
+            Logger.getInstance().Warning(TAG, "Already running!");
             return;
         }
 
@@ -160,13 +138,11 @@ public class BirthdayUpdater {
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadBirthdays() {
-        _logger.Debug("startDownloadBirthdays");
         _birthdayService.LoadData();
     }
 }

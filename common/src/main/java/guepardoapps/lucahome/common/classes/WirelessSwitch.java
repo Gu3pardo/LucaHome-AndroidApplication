@@ -2,7 +2,6 @@ package guepardoapps.lucahome.common.classes;
 
 import android.support.annotation.NonNull;
 
-import java.util.Date;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableDate;
@@ -79,17 +78,17 @@ public class WirelessSwitch extends WirelessSocket {
 
     @Override
     public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%s&area=%s&remoteid=%s&keycode=%s", LucaServerAction.ADD_SWITCH.toString(), _name, _area, _remoteId, _keyCode);
+        return String.format(Locale.getDefault(), "%s%d&name=%s&area=%s&remoteid=%s&keycode=%s", LucaServerAction.ADD_SWITCH.toString(), _typeId, _name, _area, _remoteId, _keyCode);
     }
 
     @Override
     public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%s&area=%s&remoteid=%s&keycode=%s", LucaServerAction.UPDATE_SWITCH.toString(), _name, _area, _remoteId, _keyCode);
+        return String.format(Locale.getDefault(), "%s%d&name=%s&area=%s&remoteid=%s&keycode=%s", LucaServerAction.UPDATE_SWITCH.toString(), _typeId, _name, _area, _remoteId, _keyCode);
     }
 
     @Override
     public String CommandDelete() {
-        return String.format(Locale.getDefault(), "%s%s", LucaServerAction.DELETE_SWITCH.toString(), _name);
+        return String.format(Locale.getDefault(), "%s%d", LucaServerAction.DELETE_SWITCH.toString(), _typeId);
     }
 
     @Override

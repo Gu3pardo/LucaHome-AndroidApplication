@@ -16,12 +16,15 @@ import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToShoppingListConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToShoppingListConverter.class.getSimpleName();
-    private static Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Data\":";
 
-    private static String _searchParameter = "{\"Data\":";
+    private static final JsonDataToShoppingListConverter SINGLETON = new JsonDataToShoppingListConverter();
 
-    public JsonDataToShoppingListConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToShoppingListConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToShoppingListConverter() {
     }
 
     @Override
@@ -29,7 +32,7 @@ public final class JsonDataToShoppingListConverter implements IJsonDataConverter
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry);
         }
     }
@@ -40,17 +43,17 @@ public final class JsonDataToShoppingListConverter implements IJsonDataConverter
     }
 
     private static SerializableList<ShoppingEntry> parseStringToList(@NonNull String value) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<ShoppingEntry> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<ShoppingEntry> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
                 for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
                     JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("ShoppingEntry");
 
-                    int id = child.getInt("ID");
+                    int id = child.getInt("Id");
 
                     String name = child.getString("Name");
                     String groupString = child.getString("Group");
@@ -58,23 +61,23 @@ public final class JsonDataToShoppingListConverter implements IJsonDataConverter
                     try {
                         group = ShoppingEntryGroup.GetByString(groupString);
                     } catch (Exception ex) {
-                        _logger.Error(ex.toString());
+                        Logger.getInstance().Error(TAG, ex.toString());
                     }
 
                     int quantity = child.getInt("Quantity");
+                    String unit = child.getString("Unit");
 
-                    ShoppingEntry newShoppingEntry = new ShoppingEntry(id, name, group, quantity, true, ILucaClass.LucaServerDbAction.Null);
+                    ShoppingEntry newShoppingEntry = new ShoppingEntry(id, name, group, quantity, unit, true, ILucaClass.LucaServerDbAction.Null);
                     list.addValue(newShoppingEntry);
                 }
 
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 }

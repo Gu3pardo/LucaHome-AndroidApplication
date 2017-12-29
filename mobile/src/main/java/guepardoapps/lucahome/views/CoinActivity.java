@@ -41,7 +41,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class CoinActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = CoinActivity.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -82,7 +81,6 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
     private BroadcastReceiver _coinUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinUpdateReceiver");
             CoinService.CoinDownloadFinishedContent result =
                     (CoinService.CoinDownloadFinishedContent) intent.getSerializableExtra(CoinService.CoinDownloadFinishedBundle);
 
@@ -122,9 +120,6 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         setContentView(R.layout.activity_coin);
 
@@ -188,7 +183,7 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
 
             NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, CoinEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
             }
         });
@@ -203,12 +198,9 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
 
         _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_coin);
         _pullRefreshLayout.setOnRefreshListener(() -> {
-            _logger.Debug("onRefresh " + TAG);
-
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
-
             _coinService.LoadCoinConversionList();
         });
     }
@@ -216,13 +208,11 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         _receiverController.RegisterReceiver(_coinUpdateReceiver, new String[]{CoinService.CoinDownloadFinishedBroadcast});
 
@@ -243,14 +233,12 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -298,7 +286,7 @@ public class CoinActivity extends AppCompatActivity implements NavigationView.On
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
             displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 

@@ -7,7 +7,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
@@ -58,7 +57,6 @@ public class MediaServerService {
     private boolean _isInitialized;
 
     private static final String TAG = MediaServerService.class.getSimpleName();
-    private Logger _logger;
 
     private static final int MIN_TIMEOUT_MIN = 30;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
@@ -69,10 +67,7 @@ public class MediaServerService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             //TODO reload method
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -90,16 +85,15 @@ public class MediaServerService {
     private BroadcastReceiver _mediaServerDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_mediaServerDownloadFinishedReceiver");
             String response = intent.getStringExtra(ClientTask.ClientTaskBundle);
             if (response != null) {
                 try {
                     handleResponse(response);
                 } catch (Exception exception) {
-                    _logger.Error(exception.getMessage());
+                    Logger.getInstance().Error(TAG, exception.getMessage());
                 }
             } else {
-                _logger.Error("Received null response!");
+                Logger.getInstance().Error(TAG, "Received null response!");
             }
         }
     };
@@ -107,7 +101,6 @@ public class MediaServerService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -118,14 +111,11 @@ public class MediaServerService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private MediaServerService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static MediaServerService getInstance() {
@@ -133,10 +123,8 @@ public class MediaServerService {
     }
 
     public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -160,7 +148,6 @@ public class MediaServerService {
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _receiverController.Dispose();
         _isInitialized = false;
     }
@@ -173,8 +160,6 @@ public class MediaServerService {
             @NonNull String serverIp,
             @NonNull String command,
             @NonNull String data) {
-        _logger.Debug(String.format(Locale.getDefault(), "SendCommand with ServerIp %s, command %s and data %s", serverIp, command, data));
-
         if (!_isInitialized) {
             sendFailedDownloadBroadcast("Not initialized!");
             return;
@@ -213,11 +198,9 @@ public class MediaServerService {
 
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -229,17 +212,12 @@ public class MediaServerService {
     }
 
     private void handleResponse(@NonNull String response) {
-        _logger.Debug("handleResponse");
-
         String[] responseData = response.split("\\:");
 
         if (responseData.length > 1) {
             MediaServerAction responseAction = MediaServerAction.GetByString(responseData[0]);
             if (responseAction != null) {
-                _logger.Information("ResponseAction: " + responseAction.toString());
-
                 switch (responseAction) {
-
                     case INCREASE_VOLUME:
                     case DECREASE_VOLUME:
                     case UNMUTE_VOLUME:
@@ -273,10 +251,9 @@ public class MediaServerService {
                                         Integer.parseInt(data[0]),
                                         data[1],
                                         Integer.parseInt(data[2]));
-                                _logger.Debug("Created new entry: " + newData.toString());
                                 playedYoutubeVideos.add(newData);
                             } else {
-                                _logger.Warning("Wrong Size (" + data.length + ") for " + entry);
+                                Logger.getInstance().Warning(TAG, "Wrong Size (" + data.length + ") for " + entry);
                             }
                         }
 
@@ -314,7 +291,7 @@ public class MediaServerService {
                             try {
                                 batteryLevel = Integer.parseInt(batteryLevelString);
                             } catch (Exception ex) {
-                                _logger.Error(ex.toString());
+                                Logger.getInstance().Error(TAG, ex.getMessage());
                             }
 
                             String socketName = mediaServerData[2];
@@ -326,7 +303,7 @@ public class MediaServerService {
                             try {
                                 volume = Integer.parseInt(volumeString);
                             } catch (Exception ex) {
-                                _logger.Error(ex.toString());
+                                Logger.getInstance().Error(TAG, ex.getMessage());
                             }
 
                             String youtubeId = mediaServerData[5];
@@ -339,7 +316,7 @@ public class MediaServerService {
                             try {
                                 youtubeVideoCurrentPlayTime = Integer.parseInt(youtubeVideoCurrentPlayTimeString);
                             } catch (Exception ex) {
-                                _logger.Error(ex.toString());
+                                Logger.getInstance().Error(TAG, ex.getMessage());
                             }
 
                             String youtubeVideoDurationString = mediaServerData[8];
@@ -347,7 +324,7 @@ public class MediaServerService {
                             try {
                                 youtubeVideoDuration = Integer.parseInt(youtubeVideoDurationString);
                             } catch (Exception ex) {
-                                _logger.Error(ex.toString());
+                                Logger.getInstance().Error(TAG, ex.getMessage());
                             }
 
                             String alreadyPlayedYoutubeData = mediaServerData[9];
@@ -360,10 +337,9 @@ public class MediaServerService {
                                             Integer.parseInt(data[0]),
                                             data[1],
                                             Integer.parseInt(data[2]));
-                                    _logger.Debug("Created new entry: " + newData.toString());
                                     alreadyPlayedYoutubeVideos.add(newData);
                                 } else {
-                                    _logger.Warning("Wrong Size (" + data.length + ") for " + entry);
+                                    Logger.getInstance().Warning(TAG, "Wrong Size (" + data.length + ") for " + entry);
                                 }
                             }
 
@@ -372,7 +348,7 @@ public class MediaServerService {
                             try {
                                 radioStreamId = Integer.parseInt(radioStreamIdString);
                             } catch (Exception exception) {
-                                _logger.Error(exception.toString());
+                                Logger.getInstance().Error(TAG, exception.getMessage());
                             }
 
                             String isRadioStreamPlayingString = mediaServerData[11];
@@ -384,8 +360,8 @@ public class MediaServerService {
                             int seaSoundCountdownSec = -1;
                             try {
                                 seaSoundCountdownSec = Integer.parseInt(seaSoundCountdownString);
-                            } catch (Exception ex) {
-                                _logger.Error(ex.toString());
+                            } catch (Exception exception) {
+                                Logger.getInstance().Error(TAG, exception.getMessage());
                             }
 
                             String serverVersion = mediaServerData[14];
@@ -394,8 +370,8 @@ public class MediaServerService {
                             int screenBrightness = -1;
                             try {
                                 screenBrightness = Integer.parseInt(screenBrightnessString);
-                            } catch (Exception ex) {
-                                _logger.Error(ex.toString());
+                            } catch (Exception exception) {
+                                Logger.getInstance().Error(TAG, exception.getMessage());
                             }
 
                             _mediaServerData = new MediaServerData(
@@ -422,7 +398,7 @@ public class MediaServerService {
                                     new MediaServerDownloadFinishedContent(_mediaServerData, true, Tools.CompressStringToByteArray(response)));
 
                         } else {
-                            _logger.Warning(String.format("Length %s for MediaServerData is invalid!", mediaServerData.length));
+                            Logger.getInstance().Warning(TAG, String.format("Length %s for MediaServerData is invalid!", mediaServerData.length));
                         }
                         break;
 
@@ -430,7 +406,7 @@ public class MediaServerService {
                         break;
                 }
             } else {
-                _logger.Warning("responseAction is null!");
+                Logger.getInstance().Warning(TAG, "responseAction is null!");
             }
         }
     }

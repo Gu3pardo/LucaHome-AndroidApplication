@@ -135,6 +135,14 @@
     <string name="pref_title_reload_menu_timeout">Enter menu reload timeout in min</string>
     <integer name="pref_default_menu_timeout_min">120</integer>
 
+    <string name="pref_title_reload_meter_data">Reload meter data</string>
+    <string name="pref_title_reload_meter_data_timeout">Enter meter data reload timeout in min</string>
+    <integer name="pref_default_meter_data_timeout_min">240</integer>
+
+    <string name="pref_title_reload_money_meter_data">Reload money meter data</string>
+    <string name="pref_title_reload_money_meter_data_timeout">Enter money meter data reload timeout in min</string>
+    <integer name="pref_default_money_meter_data_timeout_min">240</integer>
+
     <string name="pref_title_reload_movie">Reload movie data</string>
     <string name="pref_title_reload_movie_timeout">Enter movie reload timeout in min</string>
     <integer name="pref_default_movie_timeout_min">60</integer>

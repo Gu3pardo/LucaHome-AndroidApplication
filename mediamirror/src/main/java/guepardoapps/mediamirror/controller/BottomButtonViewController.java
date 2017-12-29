@@ -27,7 +27,6 @@ import guepardoapps.mediamirror.interfaces.IViewController;
 
 public class BottomButtonViewController implements IViewController {
     private static final String TAG = BottomButtonViewController.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _isInitialized;
 
@@ -48,7 +47,7 @@ public class BottomButtonViewController implements IViewController {
             if (menu != null) {
                 _menu = menu;
             } else {
-                _logger.Warning("menu is null!");
+                Logger.getInstance().Warning(TAG, "menu is null!");
             }
         }
     };
@@ -62,7 +61,7 @@ public class BottomButtonViewController implements IViewController {
             if (shoppingList != null) {
                 _shoppingList = shoppingList;
             } else {
-                _logger.Warning("shoppingList is null!");
+                Logger.getInstance().Warning(TAG, "shoppingList is null!");
             }
         }
     };
@@ -76,13 +75,12 @@ public class BottomButtonViewController implements IViewController {
             if (socketList != null) {
                 _socketList = socketList;
             } else {
-                _logger.Warning("socketList is null!");
+                Logger.getInstance().Warning(TAG, "socketList is null!");
             }
         }
     };
 
     public BottomButtonViewController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _broadcastController = new BroadcastController(_context);
         _dialogController = new DialogController(_context);
@@ -91,15 +89,12 @@ public class BottomButtonViewController implements IViewController {
 
     @Override
     public void onCreate() {
-        _logger.Debug("onCreate");
-
         FloatingActionButton floatingActionButtonMenu = ((Activity) _context).findViewById(R.id.floating_action_button_menu);
         FloatingActionButton floatingActionButtonShopping = ((Activity) _context).findViewById(R.id.floating_action_button_shopping);
         FloatingActionButton floatingActionButtonSocket = ((Activity) _context).findViewById(R.id.floating_action_button_socket);
         FloatingActionButton floatingActionButtonReload = ((Activity) _context).findViewById(R.id.floating_action_button_reload);
 
         floatingActionButtonMenu.setOnClickListener(view -> {
-            _logger.Debug("Show Menu Dialog");
             if (_menu != null) {
                 ArrayList<String> menuTitleList = new ArrayList<>();
                 for (int index = 0; index < _menu.getSize(); index++) {
@@ -108,13 +103,12 @@ public class BottomButtonViewController implements IViewController {
 
                 _dialogController.DisplayListViewDialog("Menu", menuTitleList);
             } else {
-                _logger.Error("_menu is null!");
+                Logger.getInstance().Error(TAG, "_menu is null!");
                 Toasty.warning(_context, "Menu is null!!", Toast.LENGTH_LONG).show();
             }
         });
 
         floatingActionButtonShopping.setOnClickListener(view -> {
-            _logger.Debug("Show Shopping Dialog");
             if (_shoppingList != null) {
                 ArrayList<String> shoppingListTitleList = new ArrayList<>();
                 for (int index = 0; index < _shoppingList.getSize(); index++) {
@@ -123,55 +117,45 @@ public class BottomButtonViewController implements IViewController {
 
                 _dialogController.DisplayListViewDialog("Shopping List", shoppingListTitleList);
             } else {
-                _logger.Error("_shoppingList is null!");
+                Logger.getInstance().Error(TAG, "_shoppingList is null!");
                 Toasty.warning(_context, "ShoppingList is null!!", Toast.LENGTH_LONG).show();
             }
         });
 
         floatingActionButtonSocket.setOnClickListener(view -> {
-            _logger.Debug("Show Socket Dialog");
             if (_socketList != null) {
                 _dialogController.DisplaySocketListViewDialog(_socketList);
             } else {
-                _logger.Error("_socketList is null!");
+                Logger.getInstance().Error(TAG, "_socketList is null!");
                 Toasty.warning(_context, "SocketList is null!!", Toast.LENGTH_LONG).show();
             }
         });
 
-        floatingActionButtonReload.setOnClickListener(view -> {
-            _logger.Debug("Reload Data");
-            _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_ALL);
-        });
+        floatingActionButtonReload.setOnClickListener(view -> _broadcastController.SendSimpleBroadcast(Broadcasts.RELOAD_ALL));
     }
 
     @Override
     public void onStart() {
-        _logger.Debug("onStart");
     }
 
     @Override
     public void onResume() {
-        _logger.Debug("onResume");
         if (!_isInitialized) {
             _receiverController.RegisterReceiver(_menuListReceiver, new String[]{Broadcasts.MENU});
             _receiverController.RegisterReceiver(_shoppingListReceiver, new String[]{Broadcasts.SHOPPING_LIST});
             _receiverController.RegisterReceiver(_socketListReceiver, new String[]{Broadcasts.SOCKET_LIST});
-
             _isInitialized = true;
-            _logger.Debug("Initializing!");
         } else {
-            _logger.Warning("Is ALREADY initialized!");
+            Logger.getInstance().Warning(TAG, "Is ALREADY initialized!");
         }
     }
 
     @Override
     public void onPause() {
-        _logger.Debug("onPause");
     }
 
     @Override
     public void onDestroy() {
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
         _isInitialized = false;
     }

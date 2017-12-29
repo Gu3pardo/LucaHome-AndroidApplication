@@ -7,7 +7,6 @@ import java.io.Serializable;
 import guepardoapps.lucahome.common.enums.RSSFeed;
 
 public class RSSModel implements Serializable {
-
     private static final long serialVersionUID = -7114381765862344762L;
 
     private static final String TAG = RSSModel.class.getSimpleName();

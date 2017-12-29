@@ -56,7 +56,6 @@ public class MainService extends Service {
     public static final String MainServiceOnStartCommandBundle = "MainServiceOnStartCommandBundle";
 
     private static final String TAG = MainService.class.getSimpleName();
-    private Logger _logger;
 
     private final IBinder _mainServiceBinder = new MainServiceBinder();
 
@@ -65,6 +64,8 @@ public class MainService extends Service {
     private MapContentService _mapContentService;
     private MediaServerService _mediaServerService;
     private MenuService _menuService;
+    private MeterListService _meterListService;
+    private MoneyMeterListService _moneyMeterListService;
     private MovieService _movieService;
     private OpenWeatherService _openWeatherService;
     private ScheduleService _scheduleService;
@@ -85,7 +86,6 @@ public class MainService extends Service {
     private BroadcastReceiver _startDownloadAllReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_birthdayDownloadFinishedReceiver");
             StartDownloadAll("_birthdayDownloadFinishedReceiver onReceive");
         }
     };
@@ -93,7 +93,6 @@ public class MainService extends Service {
     private BroadcastReceiver _birthdayDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_birthdayDownloadFinishedReceiver");
             BirthdayService.BirthdayDownloadFinishedContent result = (BirthdayService.BirthdayDownloadFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("Birthday", result.Success));
@@ -107,7 +106,6 @@ public class MainService extends Service {
     private BroadcastReceiver _coinConversionDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinConversionDownloadFinishedReceiver");
             CoinService.CoinConversionDownloadFinishedContent result = (CoinService.CoinConversionDownloadFinishedContent) intent.getSerializableExtra(CoinService.CoinConversionDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("CoinConversion", result.Success));
@@ -121,7 +119,6 @@ public class MainService extends Service {
     private BroadcastReceiver _coinDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_coinDownloadFinishedReceiver");
             CoinService.CoinDownloadFinishedContent result = (CoinService.CoinDownloadFinishedContent) intent.getSerializableExtra(CoinService.CoinDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("Coin", result.Success));
@@ -135,7 +132,6 @@ public class MainService extends Service {
     private BroadcastReceiver _mapContentDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_mapContentDownloadFinishedReceiver");
             MapContentService.MapContentDownloadFinishedContent result = (MapContentService.MapContentDownloadFinishedContent) intent.getSerializableExtra(MapContentService.MapContentDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("MapContent", result.Success));
@@ -149,7 +145,6 @@ public class MainService extends Service {
     private BroadcastReceiver _listedMenuDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_listedMenuDownloadFinishedReceiver");
             MenuService.ListedMenuDownloadFinishedContent result = (MenuService.ListedMenuDownloadFinishedContent) intent.getSerializableExtra(MenuService.ListedMenuDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("ListedMenu", result.Success));
@@ -163,7 +158,6 @@ public class MainService extends Service {
     private BroadcastReceiver _menuDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_menuDownloadFinishedReceiver");
             MenuService.MenuDownloadFinishedContent result = (MenuService.MenuDownloadFinishedContent) intent.getSerializableExtra(MenuService.MenuDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("Menu", result.Success));
@@ -174,10 +168,35 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _meterListDownloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MeterListService.MeterDataListDownloadFinishedContent result = (MeterListService.MeterDataListDownloadFinishedContent) intent.getSerializableExtra(MeterListService.MeterDataListDownloadFinishedBundle);
+            if (result != null) {
+                _downloadResultList.addValue(new SerializablePair("MeterDataList", result.Success));
+            } else {
+                _downloadResultList.addValue(new SerializablePair("MeterDataList", false));
+            }
+            broadcastDownloadCount();
+        }
+    };
+
+    private BroadcastReceiver _moneyMeterListDownloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MoneyMeterListService.MoneyMeterDataListDownloadFinishedContent result = (MoneyMeterListService.MoneyMeterDataListDownloadFinishedContent) intent.getSerializableExtra(MoneyMeterListService.MoneyMeterDataListDownloadFinishedBundle);
+            if (result != null) {
+                _downloadResultList.addValue(new SerializablePair("MoneyMeterDataList", result.Success));
+            } else {
+                _downloadResultList.addValue(new SerializablePair("MoneyMeterDataList", false));
+            }
+            broadcastDownloadCount();
+        }
+    };
+
     private BroadcastReceiver _movieDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_movieDownloadFinishedReceiver");
             MovieService.MovieDownloadFinishedContent result = (MovieService.MovieDownloadFinishedContent) intent.getSerializableExtra(MovieService.MovieDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("Movie", result.Success));
@@ -191,7 +210,6 @@ public class MainService extends Service {
     private BroadcastReceiver _openWeatherCurrentWeatherDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_openWeatherCurrentWeatherDownloadFinishedReceiver");
             OpenWeatherService.CurrentWeatherDownloadFinishedContent result = (OpenWeatherService.CurrentWeatherDownloadFinishedContent) intent.getSerializableExtra(OpenWeatherService.CurrentWeatherDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("CurrentWeather", result.Success));
@@ -207,7 +225,6 @@ public class MainService extends Service {
     private BroadcastReceiver _openWeatherForecastWeatherDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_openWeatherForecastWeatherDownloadFinishedReceiver");
             OpenWeatherService.ForecastWeatherDownloadFinishedContent result = (OpenWeatherService.ForecastWeatherDownloadFinishedContent) intent.getSerializableExtra(OpenWeatherService.ForecastWeatherDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("ForecastWeather", result.Success));
@@ -221,7 +238,6 @@ public class MainService extends Service {
     private BroadcastReceiver _scheduleDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_scheduleDownloadFinishedReceiver");
             ScheduleService.ScheduleDownloadFinishedContent result = (ScheduleService.ScheduleDownloadFinishedContent) intent.getSerializableExtra(ScheduleService.ScheduleDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("Schedule", result.Success));
@@ -239,7 +255,6 @@ public class MainService extends Service {
     private BroadcastReceiver _securityDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_securityDownloadFinishedReceiver");
             SecurityService.SecurityDownloadFinishedContent result = (SecurityService.SecurityDownloadFinishedContent) intent.getSerializableExtra(SecurityService.SecurityDownloadFinishedBroadcast);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("Security", result.Success));
@@ -253,7 +268,6 @@ public class MainService extends Service {
     private BroadcastReceiver _shoppingListDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_shoppingListDownloadFinishedReceiver");
             ShoppingListService.ShoppingListDownloadFinishedContent result = (ShoppingListService.ShoppingListDownloadFinishedContent) intent.getSerializableExtra(ShoppingListService.ShoppingListDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("ShoppingList", result.Success));
@@ -267,7 +281,6 @@ public class MainService extends Service {
     private BroadcastReceiver _temperatureDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_temperatureDownloadFinishedReceiver");
             TemperatureService.TemperatureDownloadFinishedContent result = (TemperatureService.TemperatureDownloadFinishedContent) intent.getSerializableExtra(TemperatureService.TemperatureDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("Temperature", result.Success));
@@ -285,7 +298,6 @@ public class MainService extends Service {
     private BroadcastReceiver _wirelessSocketDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSocketDownloadFinishedReceiver");
             WirelessSocketService.WirelessSocketDownloadFinishedContent result = (WirelessSocketService.WirelessSocketDownloadFinishedContent) intent.getSerializableExtra(WirelessSocketService.WirelessSocketDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("WirelessSocket", result.Success));
@@ -301,7 +313,6 @@ public class MainService extends Service {
     private BroadcastReceiver _wirelessSwitchDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSwitchDownloadFinishedReceiver");
             WirelessSwitchService.WirelessSwitchDownloadFinishedContent result = (WirelessSwitchService.WirelessSwitchDownloadFinishedContent) intent.getSerializableExtra(WirelessSwitchService.WirelessSwitchDownloadFinishedBundle);
             if (result != null) {
                 _downloadResultList.addValue(new SerializablePair("WirelessSwitch", result.Success));
@@ -315,10 +326,9 @@ public class MainService extends Service {
     };
 
     public void StartDownloadAll(@NonNull String caller) {
-        _logger.Debug("StartDownloadAll with " + caller);
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "StartDownloadAll by caller %s", caller));
 
         if (_downloading) {
-            _logger.Debug("Already downloading!");
             return;
         }
 
@@ -330,6 +340,8 @@ public class MainService extends Service {
         _coinService.LoadCoinConversionList();
         _menuService.LoadListedMenuList();
         _menuService.LoadData();
+        _meterListService.LoadData();
+        _moneyMeterListService.LoadData();
         _movieService.LoadData();
         _openWeatherService.LoadCurrentWeather();
         _openWeatherService.LoadForecastWeather();
@@ -344,14 +356,9 @@ public class MainService extends Service {
     }
 
     private void broadcastDownloadCount() {
-        _logger.Debug("broadcastDownloadCount");
-
         _currentDownloadCount++;
         double downloadPercentage = (_currentDownloadCount * 100) / Constants.DOWNLOAD_STEPS;
         _downloading = !(downloadPercentage >= 100);
-
-        _logger.Debug(String.format(Locale.getDefault(), "broadcastDownloadCount with _currentDownloadCount %d and downloadPercentage %.2f and _downloading: %s", _currentDownloadCount, downloadPercentage, _downloading));
-
         _broadcastController.SendSerializableBroadcast(
                 MainServiceDownloadCountBroadcast,
                 MainServiceDownloadCountBundle,
@@ -362,7 +369,6 @@ public class MainService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        _logger.Debug("onStartCommand");
 
         try {
             boolean downloadAll = intent.getBooleanExtra(MainServiceOnStartCommandBundle, false);
@@ -370,7 +376,7 @@ public class MainService extends Service {
                 StartDownloadAll("onStartCommand");
             }
         } catch (Exception exception) {
-            _logger.Error(exception.getMessage());
+            Logger.getInstance().Error(TAG, exception.getMessage());
             Toasty.error(this, exception.getMessage(), Toast.LENGTH_LONG).show();
         }
 
@@ -379,23 +385,17 @@ public class MainService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        _logger.Debug("onBind");
-
         Bundle extras = intent.getExtras();
         if (extras != null) {
-            _logger.Debug("onBind with extra");
             // _messenger = (Messenger) extras.get("MESSENGER");
             /*TODO do something with extras*/
         }
-
         return _mainServiceBinder;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _broadcastController = new BroadcastController(this);
         _receiverController = new ReceiverController(this);
@@ -408,6 +408,8 @@ public class MainService extends Service {
         _receiverController.RegisterReceiver(_mapContentDownloadFinishedReceiver, new String[]{MapContentService.MapContentDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_listedMenuDownloadFinishedReceiver, new String[]{MenuService.ListedMenuDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_menuDownloadFinishedReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_meterListDownloadFinishedReceiver, new String[]{MeterListService.MeterDataListDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_moneyMeterListDownloadFinishedReceiver, new String[]{MoneyMeterListService.MoneyMeterDataListDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_movieDownloadFinishedReceiver, new String[]{MovieService.MovieDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_openWeatherCurrentWeatherDownloadFinishedReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_openWeatherForecastWeatherDownloadFinishedReceiver, new String[]{OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
@@ -423,6 +425,8 @@ public class MainService extends Service {
         _mapContentService = MapContentService.getInstance();
         _mediaServerService = MediaServerService.getInstance();
         _menuService = MenuService.getInstance();
+        _meterListService = MeterListService.getInstance();
+        _moneyMeterListService = MoneyMeterListService.getInstance();
         _movieService = MovieService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
         _scheduleService = ScheduleService.getInstance();
@@ -461,6 +465,18 @@ public class MainService extends Service {
                 this,
                 SettingsController.getInstance().IsReloadMenuEnabled(),
                 SettingsController.getInstance().GetReloadMenuTimeout());
+
+        _meterListService.Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMeterDataEnabled(),
+                SettingsController.getInstance().GetReloadMeterDataTimeout()
+        );
+
+        _moneyMeterListService.Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMoneyMeterDataEnabled(),
+                SettingsController.getInstance().GetReloadMoneyMeterDataTimeout()
+        );
 
         _movieService.Initialize(
                 this,
@@ -527,7 +543,6 @@ public class MainService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
 
         _birthdayService.Dispose();
@@ -535,6 +550,8 @@ public class MainService extends Service {
         _mapContentService.Dispose();
         _mediaServerService.Dispose();
         _menuService.Dispose();
+        _meterListService.Dispose();
+        _moneyMeterListService.Dispose();
         _movieService.Dispose();
         _openWeatherService.Dispose();
         _scheduleService.Dispose();

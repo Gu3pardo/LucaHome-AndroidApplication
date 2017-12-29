@@ -25,7 +25,6 @@ import guepardoapps.lucahome.common.classes.WirelessSwitch;
 
 public class NotificationController {
     private static final String TAG = NotificationController.class.getSimpleName();
-    private Logger _logger;
 
     private static final int MAX_NOTIFICATION_SOCKETS = 10;
 
@@ -41,10 +40,7 @@ public class NotificationController {
     private SettingsController _settingsController;
 
     public NotificationController(@NonNull Context context) {
-        _logger = new Logger(TAG);
-
         _context = context;
-
         _notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
         _settingsController = SettingsController.getInstance();
     }
@@ -57,16 +53,14 @@ public class NotificationController {
             @NonNull String title,
             @NonNull String body,
             boolean autoCancelable) {
-        _logger.Debug("CreateSimpleNotification");
-
         if (!_settingsController.IsBirthdayNotificationEnabled()) {
-            _logger.Warning("Not allowed to display birthday notification!");
+            Logger.getInstance().Warning(TAG, "Not allowed to display birthday notification!");
             return;
         }
 
         NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager == null) {
-            _logger.Error("NotificationManager is null!");
+            Logger.getInstance().Error(TAG, "NotificationManager is null!");
             return;
         }
 
@@ -92,7 +86,7 @@ public class NotificationController {
             @NonNull Class<?> receiverActivity) {
 
         if (!_settingsController.IsCameraNotificationEnabled()) {
-            _logger.Warning("Not allowed to display camera notification!");
+            Logger.getInstance().Warning(TAG, "Not allowed to display camera notification!");
             return;
         }
 
@@ -124,45 +118,34 @@ public class NotificationController {
     }
 
     public void CreateSocketNotification(int notificationId, @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull Class<?> receiverClass) {
-        _logger.Debug("CreateSocketNotification");
-
         if (!_settingsController.IsSocketNotificationEnabled()) {
-            _logger.Warning("Not allowed to display socket notification!");
+            Logger.getInstance().Warning(TAG, "Not allowed to display socket notification!");
             return;
         }
 
         if (wirelessSocketList.getSize() > MAX_NOTIFICATION_SOCKETS) {
-            _logger.Warning(String.format(Locale.getDefault(), "Too many sockets: %S! Cutting sockets to display!", wirelessSocketList.getSize()));
+            Logger.getInstance().Warning(TAG, String.format(Locale.getDefault(), "Too many sockets: %S! Cutting sockets to display!", wirelessSocketList.getSize()));
 
             SerializableList<WirelessSocket> tempWirelessSocketList = new SerializableList<>();
             for (int index = 0; index < wirelessSocketList.getSize(); index++) {
                 WirelessSocket entry = wirelessSocketList.getValue(index);
                 boolean isVisible = _settingsController.IsWirelessSocketVisible(entry);
-                _logger.Information(String.format(Locale.getDefault(), "Key of socket %s is %s and has value %s", entry.GetName(), entry.GetSettingsKey(), isVisible));
-
                 if (isVisible) {
-                    _logger.Information(String.format(Locale.getDefault(), "Adding socket %s to list!", entry.GetName()));
                     tempWirelessSocketList.addValue(entry);
                 }
             }
 
             wirelessSocketList = tempWirelessSocketList;
-            _logger.Information(String.format(Locale.getDefault(), "Size of visible wirelessSocketList is: %s!", wirelessSocketList.getSize()));
 
             if (wirelessSocketList.getSize() > MAX_NOTIFICATION_SOCKETS) {
                 tempWirelessSocketList = new SerializableList<>();
-                _logger.Warning(String.format(Locale.getDefault(), "Still too many sockets: %s! Removing last entries!", wirelessSocketList.getSize()));
-
                 for (int index = 0; index < MAX_NOTIFICATION_SOCKETS; index++) {
                     WirelessSocket entry = wirelessSocketList.getValue(index);
                     tempWirelessSocketList.addValue(entry);
                 }
-
                 wirelessSocketList = tempWirelessSocketList;
-                _logger.Information(String.format(Locale.getDefault(), "Size of reduced wirelessSocketList is: %s!", wirelessSocketList.getSize()));
             }
         }
-        _logger.Information(String.format(Locale.getDefault(), "Size of wirelessSocketList is: %s!", wirelessSocketList.getSize()));
 
         int[] imageButtonArray = new int[]{
                 R.id.socket_1_on, R.id.socket_1_off,
@@ -267,7 +250,7 @@ public class NotificationController {
 
     public void CreateWirelessSwitchNotification(int notificationId, SerializableList<WirelessSwitch> wirelessSwitchList, Class<?> receiverClass) {
         // TODO implement method
-        _logger.Error("TODO: Implement method!");
+        Logger.getInstance().Error(TAG, "TODO: Implement method!");
     }
 
     public void CreateTemperatureNotification(
@@ -277,16 +260,14 @@ public class NotificationController {
             @NonNull String title,
             @NonNull String body,
             boolean autoCancelable) {
-        _logger.Debug("CreateTemperatureNotification");
-
         if (!_settingsController.IsTemperatureNotificationEnabled()) {
-            _logger.Warning("Not allowed to display temperature notification!");
+            Logger.getInstance().Warning(TAG, "Not allowed to display temperature notification!");
             return;
         }
 
         NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (notificationManager == null) {
-            _logger.Error("NotificationManager is null!");
+            Logger.getInstance().Error(TAG, "NotificationManager is null!");
             return;
         }
 

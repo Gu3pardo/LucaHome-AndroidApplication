@@ -4,10 +4,13 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializablePair;
+import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public class JsonDataToCoinConversionConverter implements IJsonDataConverter {
+    private static String TAG = JsonDataToCoinConversionConverter.class.getSimpleName();
+
     private static final int KEY_INDEX = 0;
     private static final int VALUE_INDEX = 2;
 
@@ -16,6 +19,15 @@ public class JsonDataToCoinConversionConverter implements IJsonDataConverter {
 
     private static final String[] REPLACE_VALUES = {"},", "{", "}}"};
     private static final String REPLACEMENT = "";
+
+    private static final JsonDataToCoinConversionConverter SINGLETON = new JsonDataToCoinConversionConverter();
+
+    public static JsonDataToCoinConversionConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToCoinConversionConverter() {
+    }
 
     @Override
     public SerializableList<?> GetList(@NonNull String[] stringArray) {
@@ -39,28 +51,32 @@ public class JsonDataToCoinConversionConverter implements IJsonDataConverter {
             return list;
         }
 
-        String[] entries = jsonValue.split(STRING_SPLIT_REGEX);
+        try {
+            String[] entries = jsonValue.split(STRING_SPLIT_REGEX);
 
-        for (String entry : entries) {
-            String replacedEntry = entry;
+            for (String entry : entries) {
+                String replacedEntry = entry;
 
-            for (String replaceValue : REPLACE_VALUES) {
-                replacedEntry = replacedEntry.replace(replaceValue, REPLACEMENT);
+                for (String replaceValue : REPLACE_VALUES) {
+                    replacedEntry = replacedEntry.replace(replaceValue, REPLACEMENT);
+                }
+
+                String[] data = replacedEntry.split(DATA_SPLIT_REGEX);
+
+                if (data.length != 3) {
+                    break;
+                }
+
+                String key = data[KEY_INDEX].replace("\"", REPLACEMENT);
+
+                String valueString = data[VALUE_INDEX];
+                double value = Double.parseDouble(valueString);
+
+                SerializablePair<String, Double> newValue = new SerializablePair<>(key, value);
+                list.addValue(newValue);
             }
-
-            String[] data = replacedEntry.split(DATA_SPLIT_REGEX);
-
-            if (data.length != 3) {
-                break;
-            }
-
-            String key = data[KEY_INDEX].replace("\"", REPLACEMENT);
-
-            String valueString = data[VALUE_INDEX];
-            double value = Double.parseDouble(valueString);
-
-            SerializablePair<String, Double> newValue = new SerializablePair<>(key, value);
-            list.addValue(newValue);
+        } catch (Exception exception) {
+            Logger.getInstance().Error(TAG, exception.getMessage());
         }
 
         return list;

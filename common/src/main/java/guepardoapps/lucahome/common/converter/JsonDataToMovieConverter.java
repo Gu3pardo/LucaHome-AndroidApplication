@@ -14,12 +14,15 @@ import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToMovieConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToMovieConverter.class.getSimpleName();
-    private Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Data\":";
 
-    private static String _searchParameter = "{\"Data\":";
+    private static final JsonDataToMovieConverter SINGLETON = new JsonDataToMovieConverter();
 
-    public JsonDataToMovieConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToMovieConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToMovieConverter() {
     }
 
     @Override
@@ -27,7 +30,7 @@ public final class JsonDataToMovieConverter implements IJsonDataConverter {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry);
         }
     }
@@ -38,15 +41,18 @@ public final class JsonDataToMovieConverter implements IJsonDataConverter {
     }
 
     private SerializableList<Movie> parseStringToList(@NonNull String value) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<Movie> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<Movie> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
                 for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
                     JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Movie");
+
+                    //TODO Disabled due to error on server
+                    // int id = child.getInt("Id");
 
                     String title = child.getString("Title");
                     String genre = child.getString("Genre");
@@ -59,14 +65,13 @@ public final class JsonDataToMovieConverter implements IJsonDataConverter {
                     list.addValue(newMovie);
                 }
 
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 }

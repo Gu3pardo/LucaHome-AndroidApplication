@@ -18,7 +18,6 @@ import guepardoapps.mediamirror.common.constants.Bundles;
 
 public class CalendarViewUpdater {
     private static final String TAG = CalendarViewUpdater.class.getSimpleName();
-    private Logger _logger;
 
     private Handler _updater;
 
@@ -31,15 +30,11 @@ public class CalendarViewUpdater {
 
     private Runnable _updateRunnable = new Runnable() {
         public void run() {
-            _logger.Debug("_updateRunnable run");
-
             SerializableList<CalendarEntryDto> calendarList = _calendarController.ReadCalendar(DateUtils.YEAR_IN_MILLIS * 10000);
-
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CALENDAR_MODEL,
                     Bundles.CALENDAR_MODEL,
                     calendarList);
-
             _updater.postDelayed(_updateRunnable, _updateTime);
         }
     };
@@ -47,10 +42,7 @@ public class CalendarViewUpdater {
     private BroadcastReceiver _performUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_performUpdateReceiver onReceive");
-
             SerializableList<CalendarEntryDto> calendarList = _calendarController.ReadCalendar(DateUtils.YEAR_IN_MILLIS * 10000);
-
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CALENDAR_MODEL,
                     Bundles.CALENDAR_MODEL,
@@ -59,7 +51,6 @@ public class CalendarViewUpdater {
     };
 
     public CalendarViewUpdater(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _updater = new Handler();
         _broadcastController = new BroadcastController(context);
         _calendarController = new CalendarController(context);
@@ -67,22 +58,17 @@ public class CalendarViewUpdater {
     }
 
     public void Start(int updateTime) {
-        _logger.Debug("Initialize");
-
         if (_isRunning) {
-            _logger.Warning("Already running!");
+            Logger.getInstance().Warning(TAG, "Already running!");
             return;
         }
-
         _updateTime = updateTime;
-        _logger.Debug("UpdateTime is: " + String.valueOf(_updateTime));
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_CALENDAR_UPDATE});
         _updateRunnable.run();
         _isRunning = true;
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _updater.removeCallbacks(_updateRunnable);
         _receiverController.Dispose();
         _isRunning = false;

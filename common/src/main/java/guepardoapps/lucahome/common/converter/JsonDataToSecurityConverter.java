@@ -14,12 +14,15 @@ import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public class JsonDataToSecurityConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToSecurityConverter.class.getSimpleName();
-    private Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"MotionData\":";
 
-    private static String _searchParameter = "{\"MotionData\":";
+    private static final JsonDataToSecurityConverter SINGLETON = new JsonDataToSecurityConverter();
 
-    public JsonDataToSecurityConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToSecurityConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToSecurityConverter() {
     }
 
     @Override
@@ -27,7 +30,7 @@ public class JsonDataToSecurityConverter implements IJsonDataConverter {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry);
         }
     }
@@ -38,10 +41,10 @@ public class JsonDataToSecurityConverter implements IJsonDataConverter {
     }
 
     private SerializableList<Security> parseStringToList(@NonNull String value) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<Security> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<Security> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONObject jsonObjectData = jsonObject.getJSONObject("MotionData");
 
@@ -61,14 +64,13 @@ public class JsonDataToSecurityConverter implements IJsonDataConverter {
                 Security security = new Security(state, control, url, registeredEvents);
                 list.addValue(security);
 
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 }

@@ -17,10 +17,13 @@ public class LucaBirthday implements Serializable, ILucaClass {
     public enum BirthdayType {PREVIOUS, TODAY, UPCOMING}
 
     private int _id;
+
     private String _name;
-    private boolean _remindMe;
-    private boolean _sendMail;
     private SerializableDate _date;
+    private String _group;
+
+    private boolean _remindMe;
+    private boolean _sentMail;
 
     private transient Bitmap _photo;
     private int _notificationId;
@@ -31,17 +34,21 @@ public class LucaBirthday implements Serializable, ILucaClass {
     public LucaBirthday(
             int id,
             @NonNull String name,
-            boolean remindMe,
-            boolean sendMail,
             @NonNull SerializableDate date,
+            @NonNull String group,
+            boolean remindMe,
+            boolean sentMail,
             Bitmap photo,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
         _id = id;
+
         _name = name;
         _date = date;
+        _group = group;
+
         _remindMe = remindMe;
-        _sendMail = sendMail;
+        _sentMail = sentMail;
 
         _photo = photo;
         _notificationId = _id * _date.DayOfMonth() + _date.Month() * _date.Year();
@@ -63,22 +70,6 @@ public class LucaBirthday implements Serializable, ILucaClass {
         _name = name;
     }
 
-    public boolean GetRemindMe() {
-        return _remindMe;
-    }
-
-    public void SetRemindMe(boolean remindMe) {
-        _remindMe = remindMe;
-    }
-
-    public boolean GetSendMail() {
-        return _sendMail;
-    }
-
-    public void SetSendMail(boolean sendMail) {
-        _sendMail = sendMail;
-    }
-
     public SerializableDate GetDate() {
         return _date;
     }
@@ -87,12 +78,28 @@ public class LucaBirthday implements Serializable, ILucaClass {
         _date = date;
     }
 
-    public int GetNotificationId() {
-        return _notificationId;
+    public String GetGroup() {
+        return _group;
     }
 
-    public String GetNotificationBody() {
-        return "It is " + _name + "'s " + String.valueOf(GetAge()) + "th birthday!";
+    public void SetGroup(@NonNull String group) {
+        _group = group;
+    }
+
+    public boolean GetRemindMe() {
+        return _remindMe;
+    }
+
+    public void SetRemindMe(boolean remindMe) {
+        _remindMe = remindMe;
+    }
+
+    public boolean GetSentMail() {
+        return _sentMail;
+    }
+
+    public void SetSentMail(boolean sentMail) {
+        _sentMail = sentMail;
     }
 
     public Bitmap GetPhoto() {
@@ -101,6 +108,14 @@ public class LucaBirthday implements Serializable, ILucaClass {
 
     public void SetPhoto(@NonNull Bitmap photo) {
         _photo = photo;
+    }
+
+    public int GetNotificationId() {
+        return _notificationId;
+    }
+
+    public String GetNotificationBody() {
+        return "It is " + _name + "'s " + String.valueOf(GetAge()) + "th birthday!";
     }
 
     public int GetAge() {
@@ -162,12 +177,12 @@ public class LucaBirthday implements Serializable, ILucaClass {
 
     @Override
     public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d&remindme=%s", LucaServerAction.ADD_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year(), (_remindMe ? "1" : "0"));
+        return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d&group=%s&remindme=%s", LucaServerAction.ADD_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year(), _group, (_remindMe ? "1" : "0"));
     }
 
     @Override
     public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d&remindme=%s", LucaServerAction.UPDATE_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year(), (_remindMe ? "1" : "0"));
+        return String.format(Locale.getDefault(), "%s%d&name=%s&day=%d&month=%d&year=%d&group=%s&remindme=%s", LucaServerAction.UPDATE_BIRTHDAY.toString(), _id, _name, _date.DayOfMonth(), _date.Month(), _date.Year(), _group, (_remindMe ? "1" : "0"));
     }
 
     @Override
@@ -177,6 +192,6 @@ public class LucaBirthday implements Serializable, ILucaClass {
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Name: %s );(Birthday: %s );(Age: %d );(HasBirthday: %s ))", TAG, _name, _date, GetAge(), HasBirthday());
+        return String.format(Locale.getDefault(), "( %s: (Name: %s );(Birthday: %s );(Age: %d );(Group: %s );(HasBirthday: %s ))", TAG, _name, _date, GetAge(), _group, HasBirthday());
     }
 }

@@ -34,24 +34,16 @@ import guepardoapps.lucahome.views.*;
 
 public class MainListViewBuilder {
     private static final String TAG = MainListViewBuilder.class.getSimpleName();
-    private Logger _logger;
-
-    private NavigationService _navigationService;
 
     private Context _context;
     private SerializableList<MainListViewItem> _mainListViewItems = new SerializableList<>();
 
     public MainListViewBuilder(@NonNull Context context) {
-        _logger = new Logger(TAG);
-
-        _navigationService = NavigationService.getInstance();
-
         _context = context;
         createDefaultList();
     }
 
     public SerializableList<MainListViewItem> GetList() {
-        _logger.Debug("GetList");
         return _mainListViewItems;
     }
 
@@ -83,7 +75,7 @@ public class MainListViewBuilder {
                 () -> navigateTo(BirthdayActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetDataList().getSize(), "", new SerializableDate(), true, BirthdayDto.Action.Add));
+                    data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetDataList().getSize(), "", new SerializableDate(), "", true, BirthdayDto.Action.Add));
                     navigateWithDataTo(BirthdayEditActivity.class, data);
                 },
                 MainListViewItem.Type.Birthday
@@ -140,7 +132,7 @@ public class MainListViewBuilder {
                 () -> navigateTo(ShoppingListActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(ShoppingListService.getInstance().GetDataList().getSize(), "", ShoppingEntryGroup.OTHER, 1));
+                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(ShoppingListService.getInstance().GetDataList().getSize(), "", ShoppingEntryGroup.OTHER, 1, ""));
                     navigateWithDataTo(ShoppingListEditActivity.class, data);
                 },
                 MainListViewItem.Type.Shopping
@@ -196,12 +188,10 @@ public class MainListViewBuilder {
     }
 
     private void navigateTo(@NonNull Class<?> targetActivity) {
-        _logger.Debug(String.format(Locale.getDefault(), "Navigating to activity %s.", targetActivity.getClass().getSimpleName()));
-
-        NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(_context, targetActivity);
+        NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivity(_context, targetActivity);
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s", navigationResult));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s", navigationResult));
             Snacky.builder()
                     .setActivty((AppCompatActivity) _context)
                     .setText(String.format(Locale.getDefault(), "Failed to navigate to %s! Please contact LucaHome support!", targetActivity.getClass().getSimpleName()))
@@ -213,12 +203,10 @@ public class MainListViewBuilder {
     }
 
     private void navigateWithDataTo(@NonNull Class<?> targetActivity, @NonNull Bundle data) {
-        _logger.Debug(String.format(Locale.getDefault(), "Navigating to activity %s with data %s", targetActivity.getClass().getSimpleName(), data));
-
-        NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, targetActivity, data);
+        NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, targetActivity, data);
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s", navigationResult));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s", navigationResult));
             Snacky.builder()
                     .setActivty((AppCompatActivity) _context)
                     .setText(String.format(Locale.getDefault(), "Failed to navigate to %s! Please contact LucaHome support!", targetActivity.getClass().getSimpleName()))

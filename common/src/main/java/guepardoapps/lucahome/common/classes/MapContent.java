@@ -14,7 +14,7 @@ public class MapContent implements Serializable, ILucaClass {
     private static final long serialVersionUID = 8796770534384442492L;
     private static final String TAG = MapContent.class.getSimpleName();
 
-    public enum DrawingType {Null, Socket, LAN, MediaServer, RaspberryPi, NAS, LightSwitch, Temperature, PuckJS, Menu, ShoppingList, Camera}
+    public enum DrawingType {Null, Socket, LAN, MediaServer, RaspberryPi, NAS, LightSwitch, Temperature, PuckJS, Menu, ShoppingList, Camera, Meter }
 
     private int _id;
     private DrawingType _drawingType;
@@ -213,17 +213,17 @@ public class MapContent implements Serializable, ILucaClass {
 
     @Override
     public String CommandAdd() throws NoSuchMethodException {
-        throw new NoSuchMethodException("No method CommandAdd for ListedMenu");
+        throw new NoSuchMethodException("No method CommandAdd for MapContent");
     }
 
     @Override
     public String CommandUpdate() throws NoSuchMethodException {
-        throw new NoSuchMethodException("No method CommandUpdate for ListedMenu");
+        throw new NoSuchMethodException("No method CommandUpdate for MapContent");
     }
 
     @Override
     public String CommandDelete() throws NoSuchMethodException {
-        throw new NoSuchMethodException("No method CommandDelete for ListedMenu");
+        throw new NoSuchMethodException("No method CommandDelete for MapContent");
     }
 
     @Override

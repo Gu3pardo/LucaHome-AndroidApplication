@@ -16,7 +16,6 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseCoinList {
     private static final String TAG = DatabaseCoinList.class.getSimpleName();
-    private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_USER = "_user";
@@ -60,7 +59,6 @@ public class DatabaseCoinList {
     }
 
     public DatabaseCoinList(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -134,7 +132,7 @@ public class DatabaseCoinList {
                 amount = Double.parseDouble(amountString);
                 currentConversion = Double.parseDouble(currentConversionString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
 
@@ -155,11 +153,17 @@ public class DatabaseCoinList {
                 case "ETH":
                     icon = R.drawable.eth;
                     break;
+                case "IOTA":
+                    icon = R.drawable.iota;
+                    break;
                 case "LTC":
                     icon = R.drawable.ltc;
                     break;
                 case "XMR":
                     icon = R.drawable.xmr;
+                    break;
+                case "XRP":
+                    icon = R.drawable.xrp;
                     break;
                 case "ZEC":
                     icon = R.drawable.zec;

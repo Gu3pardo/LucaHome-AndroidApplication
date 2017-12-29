@@ -39,7 +39,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class MovieActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = MovieActivity.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -80,7 +79,6 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
     private BroadcastReceiver _movieUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_movieUpdateReceiver");
             MovieService.MovieDownloadFinishedContent result =
                     (MovieService.MovieDownloadFinishedContent) intent.getSerializableExtra(MovieService.MovieDownloadFinishedBundle);
 
@@ -120,9 +118,6 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         setContentView(R.layout.activity_movie);
 
@@ -189,12 +184,9 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
 
         _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_movie);
         _pullRefreshLayout.setOnRefreshListener(() -> {
-            _logger.Debug("onRefresh " + TAG);
-
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
-
             _movieService.LoadData();
         });
     }
@@ -202,13 +194,11 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         _receiverController.RegisterReceiver(_movieUpdateReceiver, new String[]{MovieService.MovieDownloadFinishedBroadcast});
 
@@ -229,14 +219,12 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -284,7 +272,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
             displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 

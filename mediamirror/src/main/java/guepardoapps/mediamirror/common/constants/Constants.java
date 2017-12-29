@@ -2,7 +2,7 @@ package guepardoapps.mediamirror.common.constants;
 
 public class Constants {
     // CURRENT WEATHER VIEW
-    public static final String CITY = "Munich, DE";
+    public static final String CITY = "Nuremberg, DE";
     // SERVER
     public static final int SERVER_PORT = 8080;
     // NAS
@@ -14,7 +14,7 @@ public class Constants {
 
     public static final String NAS_GALLERY = "ftp://" + NAS_1 + "/Galerie/";
     public static final String NAS_LIBRARY = "ftp://" + NAS_1 + "/Bibliothek/";
-    public static final String NAS_MOVIES = "ftp://" + NAS_2 + "/Filme&Serien/";
+    public static final String NAS_MOVIES = "ftp://" + NAS_1 + "/Filme&Serien/";
     public static final String NAS_MUSIC = "ftp://" + NAS_1 + "/Musik/";
     public static final String NAS_PUBLIC = "ftp://" + NAS_1 + "/Public/";
     // PERMISSIONS

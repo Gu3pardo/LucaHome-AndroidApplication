@@ -19,7 +19,6 @@ import guepardoapps.mediamirror.converter.WeekdayConverter;
 
 public class DateViewUpdater {
     private static final String TAG = DateViewUpdater.class.getSimpleName();
-    private Logger _logger;
 
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
@@ -30,13 +29,10 @@ public class DateViewUpdater {
         @Override
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
-            _logger.Debug("action: " + action);
-
             if (action == null) {
-                _logger.Error("action is null!");
+                Logger.getInstance().Error(TAG, "action is null!");
                 return;
             }
-
             if (action.equals(Intent.ACTION_TIME_TICK)) {
                 UpdateDate();
             }
@@ -44,26 +40,21 @@ public class DateViewUpdater {
     };
 
     public DateViewUpdater(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _broadcastController = new BroadcastController(context);
         _receiverController = new ReceiverController(context);
     }
 
     public void Start() {
-        _logger.Debug("Initialize");
-
         if (_isRunning) {
-            _logger.Warning("Already running!");
+            Logger.getInstance().Warning(TAG, "Already running!");
             return;
         }
-
         _receiverController.RegisterReceiver(_timeTickReceiver, new String[]{Intent.ACTION_TIME_TICK});
         UpdateDate();
         _isRunning = true;
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _receiverController.Dispose();
         _isRunning = false;
     }

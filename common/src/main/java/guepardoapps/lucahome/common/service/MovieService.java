@@ -50,7 +50,6 @@ public class MovieService implements IDataService {
     private boolean _isInitialized;
 
     private static final String TAG = MovieService.class.getSimpleName();
-    private Logger _logger;
 
     private static final int MIN_TIMEOUT_MIN = 60;
     private static final int MAX_TIMEOUT_MIN = 24 * 60;
@@ -63,10 +62,7 @@ public class MovieService implements IDataService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -79,50 +75,41 @@ public class MovieService implements IDataService {
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
 
-    private JsonDataToMovieConverter _jsonDataToMovieConverter;
-
     private SerializableList<Movie> _movieList = new SerializableList<>();
 
     private BroadcastReceiver _movieDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_movieDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Movie) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<Movie> movieList = _jsonDataToMovieConverter.GetList(contentResponse);
+            SerializableList<Movie> movieList = JsonDataToMovieConverter.getInstance().GetList(contentResponse);
             if (movieList == null) {
-                _logger.Error("Converted movieList is null!");
+                Logger.getInstance().Error(TAG, "Converted movieList is null!");
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
             _lastUpdate = new Date();
-
-            _logger.Debug("Successfully converted movieList! Now sorting and then broadcasting!");
             _movieList = sortListAlphabetically(movieList);
-
             _broadcastController.SendSerializableBroadcast(
                     MovieDownloadFinishedBroadcast,
                     MovieDownloadFinishedBundle,
@@ -133,27 +120,23 @@ public class MovieService implements IDataService {
     private BroadcastReceiver _movieUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_movieUpdateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MovieUpdate) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
@@ -172,7 +155,6 @@ public class MovieService implements IDataService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -183,14 +165,11 @@ public class MovieService implements IDataService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private MovieService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static MovieService getInstance() {
@@ -199,10 +178,8 @@ public class MovieService implements IDataService {
 
     @Override
     public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -222,8 +199,6 @@ public class MovieService implements IDataService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToMovieConverter = new JsonDataToMovieConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -231,7 +206,6 @@ public class MovieService implements IDataService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _isInitialized = false;
@@ -305,8 +279,6 @@ public class MovieService implements IDataService {
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast("No user");
@@ -318,14 +290,11 @@ public class MovieService implements IDataService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_MOVIES.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Movie, true);
     }
 
-    public void UpdateMovie(Movie entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateMovie: Updating entry %s", entry));
-
+    public void UpdateMovie(@NonNull Movie entry) {
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedUpdateBroadcast("No user");
@@ -362,11 +331,9 @@ public class MovieService implements IDataService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -395,7 +362,7 @@ public class MovieService implements IDataService {
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
     }
 
-    private SerializableList<Movie> sortListAlphabetically(SerializableList<Movie> movieList) {
+    private SerializableList<Movie> sortListAlphabetically(@NonNull SerializableList<Movie> movieList) {
         List<Movie> tmpMovieList = new ArrayList<>();
         for (int index = 0; index < movieList.getSize(); index++) {
             tmpMovieList.add(movieList.getValue(index));

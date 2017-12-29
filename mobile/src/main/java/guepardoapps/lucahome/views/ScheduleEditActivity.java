@@ -45,7 +45,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class ScheduleEditActivity extends AppCompatActivity {
     private static final String TAG = ScheduleEditActivity.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _propertyChanged;
     private ScheduleDto _scheduleDto;
@@ -62,7 +61,6 @@ public class ScheduleEditActivity extends AppCompatActivity {
     private BroadcastReceiver _addFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(ScheduleService.ScheduleAddFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -81,7 +79,6 @@ public class ScheduleEditActivity extends AppCompatActivity {
     private BroadcastReceiver _updateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(ScheduleService.ScheduleUpdateFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -101,9 +98,6 @@ public class ScheduleEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_edit);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _scheduleDto = (ScheduleDto) getIntent().getSerializableExtra(ScheduleService.ScheduleIntent);
 
@@ -263,13 +257,11 @@ public class ScheduleEditActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_addFinishedReceiver, new String[]{ScheduleService.ScheduleAddFinishedBroadcast});
         _receiverController.RegisterReceiver(_updateFinishedReceiver, new String[]{ScheduleService.ScheduleUpdateFinishedBroadcast});
     }
@@ -277,14 +269,12 @@ public class ScheduleEditActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -324,7 +314,7 @@ public class ScheduleEditActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> {
             NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ScheduleEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);

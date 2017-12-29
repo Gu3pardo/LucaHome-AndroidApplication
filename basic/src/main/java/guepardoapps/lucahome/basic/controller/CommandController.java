@@ -15,7 +15,6 @@ import guepardoapps.lucahome.basic.utils.Logger;
 
 public class CommandController {
     private static final String TAG = CommandController.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -44,25 +43,22 @@ public class CommandController {
     };
 
     public CommandController(@NonNull Context context) {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created new " + TAG + "...");
-
         _context = context;
     }
 
     public boolean RebootDevice(int timeout) {
         if (!HasRoot()) {
-            _logger.Warning("Device is not rooted!");
+            Logger.getInstance().Warning(TAG, "Device is not rooted!");
             return false;
         }
 
         if (timeout < 0) {
-            _logger.Error("Timeout cannot be negative!");
+            Logger.getInstance().Error(TAG, "Timeout cannot be negative!");
             return false;
         }
 
         if (timeout % RUNNABLE_TIMEOUT != 0) {
-            _logger.Error("Invalid timeout!");
+            Logger.getInstance().Error(TAG, "Invalid timeout!");
             return false;
         }
 
@@ -78,17 +74,17 @@ public class CommandController {
 
     public boolean ShutDownDevice(int timeout) {
         if (!HasRoot()) {
-            _logger.Warning("Device is not rooted!");
+            Logger.getInstance().Warning(TAG, "Device is not rooted!");
             return false;
         }
 
         if (timeout < 0) {
-            _logger.Error("Timeout cannot be negative!");
+            Logger.getInstance().Error(TAG, "Timeout cannot be negative!");
             return false;
         }
 
         if (timeout % RUNNABLE_TIMEOUT != 0) {
-            _logger.Error("Invalid timeout!");
+            Logger.getInstance().Error(TAG, "Invalid timeout!");
             return false;
         }
 
@@ -108,7 +104,7 @@ public class CommandController {
 
     public boolean PerformCommand(@NonNull String[] command) {
         if (!HasRoot()) {
-            _logger.Warning("Device is not rooted!");
+            Logger.getInstance().Warning(TAG, "Device is not rooted!");
             return false;
         }
 
@@ -124,9 +120,7 @@ public class CommandController {
 
     private boolean checkRootMethodBuildTags() {
         String buildTags = android.os.Build.TAGS;
-        boolean rootDetected = buildTags != null && buildTags.contains("test-keys");
-        _logger.Debug("Detected root with method buildTags: " + String.valueOf(rootDetected));
-        return rootDetected;
+        return buildTags != null && buildTags.contains("test-keys");
     }
 
     private boolean checkRootMethodFilePath() {
@@ -136,12 +130,10 @@ public class CommandController {
 
         for (String path : paths) {
             if (new File(path).exists()) {
-                _logger.Debug("Detected root in path: " + path);
                 return true;
             }
         }
 
-        _logger.Debug("No root detected with method filepath");
         return false;
     }
 
@@ -151,13 +143,11 @@ public class CommandController {
             process = Runtime.getRuntime().exec(new String[]{"/system/xbin/which", "su"});
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             if (bufferedReader.readLine() != null) {
-                _logger.Debug("Detected root with method process!");
                 return true;
             }
-            _logger.Debug("No root detected with method process");
             return false;
         } catch (Throwable throwable) {
-            _logger.Debug("No root detected with method process and error detected!");
+            Logger.getInstance().Debug(TAG, "No root detected with method process and error detected!");
             return false;
         } finally {
             if (process != null) {
@@ -176,12 +166,12 @@ public class CommandController {
         @Override
         public void run() {
             if (_command == null) {
-                _logger.Error("Command is null!");
+                Logger.getInstance().Error(TAG, "Command is null!");
                 return;
             }
 
             if (_command.length == 0) {
-                _logger.Error("Command has no data!");
+                Logger.getInstance().Error(TAG, "Command has no data!");
                 return;
             }
 

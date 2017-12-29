@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 
-import java.util.Locale;
-
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -29,7 +27,6 @@ public class UserService {
     private boolean _isInitialized;
 
     private static final String TAG = UserService.class.getSimpleName();
-    private Logger _logger;
 
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
@@ -41,28 +38,24 @@ public class UserService {
     private BroadcastReceiver _userCheckedFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_userCheckedFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.User) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _tempUser = null;
                 sendFailedCheckBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _tempUser = null;
                 sendFailedCheckBroadcast(contentResponse);
                 return;
@@ -79,8 +72,6 @@ public class UserService {
     };
 
     private UserService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static UserService getInstance() {
@@ -88,10 +79,8 @@ public class UserService {
     }
 
     public void Initialize(@NonNull Context context) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -105,7 +94,6 @@ public class UserService {
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _receiverController.Dispose();
         _isInitialized = false;
     }
@@ -173,14 +161,11 @@ public class UserService {
     }
 
     private void validateUser(@NonNull LucaUser user) {
-        _logger.Debug("validateUser");
-
         String requestUrl = "http://"
                 + _settingsController.GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.VALIDATE_USER.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _tempUser = user;
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.User, true);

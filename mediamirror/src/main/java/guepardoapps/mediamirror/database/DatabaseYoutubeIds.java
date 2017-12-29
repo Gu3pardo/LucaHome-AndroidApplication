@@ -15,7 +15,6 @@ import guepardoapps.mediamirror.common.models.YoutubeDatabaseModel;
 
 public class DatabaseYoutubeIds {
     private static final String TAG = DatabaseYoutubeIds.class.getSimpleName();
-    private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
 
@@ -57,7 +56,6 @@ public class DatabaseYoutubeIds {
     }
 
     public DatabaseYoutubeIds(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -120,7 +118,7 @@ public class DatabaseYoutubeIds {
             try {
                 playCount = Integer.parseInt(cursor.getString(playCountIndex));
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
                 playCount = 0;
             }
 

@@ -79,7 +79,6 @@ public class MenuService implements IDataService {
     private boolean _isInitialized;
 
     private static final String TAG = MenuService.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _loadDataEnabled;
 
@@ -94,11 +93,8 @@ public class MenuService implements IDataService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadListedMenuList();
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -116,45 +112,38 @@ public class MenuService implements IDataService {
     private DatabaseListedMenuList _databaseListedMenuList;
     private DatabaseMenuList _databaseMenuList;
 
-    private JsonDataToListedMenuConverter _jsonDataToListedMenuConverter;
-    private JsonDataToMenuConverter _jsonDataToMenuConverter;
-
     private SerializableList<ListedMenu> _listedMenuList = new SerializableList<>();
     private SerializableList<LucaMenu> _menuList = new SerializableList<>();
 
     private BroadcastReceiver _listedMenuDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_listedMenuDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenu) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _listedMenuList = _databaseListedMenuList.GetListedMenuList();
                 sendFailedListedMenuDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _listedMenuList = _databaseListedMenuList.GetListedMenuList();
                 sendFailedListedMenuDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<ListedMenu> listedMenuList = _jsonDataToListedMenuConverter.GetList(contentResponse);
+            SerializableList<ListedMenu> listedMenuList = JsonDataToListedMenuConverter.getInstance().GetList(contentResponse);
             if (listedMenuList == null) {
-                _logger.Error("Converted listedMenuList is null!");
+                Logger.getInstance().Error(TAG, "Converted listedMenuList is null!");
                 _listedMenuList = _databaseListedMenuList.GetListedMenuList();
                 sendFailedListedMenuDownloadBroadcast(contentResponse);
                 return;
@@ -177,27 +166,23 @@ public class MenuService implements IDataService {
     private BroadcastReceiver _listedMenuAddFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_listedMenuAddFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuAdd) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedListedMenuAddBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedListedMenuAddBroadcast(contentResponse);
                 return;
             }
@@ -216,27 +201,23 @@ public class MenuService implements IDataService {
     private BroadcastReceiver _listedMenuUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_listedMenuUpdateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuUpdate) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedListedMenuUpdateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedListedMenuUpdateBroadcast(contentResponse);
                 return;
             }
@@ -255,27 +236,23 @@ public class MenuService implements IDataService {
     private BroadcastReceiver _listedMenuDeleteFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_listedMenuDeleteFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuDelete) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedListedMenuDeleteBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedListedMenuDeleteBroadcast(contentResponse);
                 return;
             }
@@ -294,36 +271,32 @@ public class MenuService implements IDataService {
     private BroadcastReceiver _menuDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_menuDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Menu) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _menuList = _databaseMenuList.GetMenuList();
                 sendFailedMenuDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _menuList = _databaseMenuList.GetMenuList();
                 sendFailedMenuDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<LucaMenu> menuList = _jsonDataToMenuConverter.GetList(contentResponse);
+            SerializableList<LucaMenu> menuList = JsonDataToMenuConverter.getInstance().GetList(contentResponse);
             if (menuList == null) {
-                _logger.Error("Converted menuList is null!");
+                Logger.getInstance().Error(TAG, "Converted menuList is null!");
                 _menuList = _databaseMenuList.GetMenuList();
                 sendFailedMenuDownloadBroadcast(contentResponse);
                 return;
@@ -369,27 +342,23 @@ public class MenuService implements IDataService {
     private BroadcastReceiver _menuUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_menuUpdateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MenuUpdate) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedMenuUpdateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedMenuUpdateBroadcast(contentResponse);
                 return;
             }
@@ -408,27 +377,23 @@ public class MenuService implements IDataService {
     private BroadcastReceiver _menuClearFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_menuClearFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MenuClear) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedMenuClearBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedMenuClearBroadcast(contentResponse);
                 return;
             }
@@ -447,7 +412,6 @@ public class MenuService implements IDataService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -458,14 +422,11 @@ public class MenuService implements IDataService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private MenuService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static MenuService getInstance() {
@@ -474,10 +435,8 @@ public class MenuService implements IDataService {
 
     @Override
     public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -511,9 +470,6 @@ public class MenuService implements IDataService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToListedMenuConverter = new JsonDataToListedMenuConverter();
-        _jsonDataToMenuConverter = new JsonDataToMenuConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -521,7 +477,6 @@ public class MenuService implements IDataService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _databaseListedMenuList.Close();
@@ -601,8 +556,6 @@ public class MenuService implements IDataService {
     }
 
     public void LoadListedMenuList() {
-        _logger.Debug("LoadListedMenuList");
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _listedMenuList = _databaseListedMenuList.GetListedMenuList();
             _broadcastController.SendSerializableBroadcast(
@@ -623,14 +576,11 @@ public class MenuService implements IDataService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_LISTEDMENU.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenu, true);
     }
 
     public void AddListedMenu(@NonNull ListedMenu entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "AddListedMenu: Adding entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
@@ -657,8 +607,6 @@ public class MenuService implements IDataService {
     }
 
     public void UpdateListedMenu(@NonNull ListedMenu entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateListedMenu: Updating entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
@@ -685,8 +633,6 @@ public class MenuService implements IDataService {
     }
 
     public void DeleteListedMenu(@NonNull ListedMenu entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "DeleteListedMenu: Deleting entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
@@ -714,10 +660,7 @@ public class MenuService implements IDataService {
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         if (!_loadDataEnabled) {
-            _logger.Debug("_loadDataEnabled is false!");
             return;
         }
 
@@ -752,7 +695,7 @@ public class MenuService implements IDataService {
                     case Add:
                     case Null:
                     default:
-                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", lucaMenu));
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", lucaMenu));
                         break;
                 }
 
@@ -766,14 +709,11 @@ public class MenuService implements IDataService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_MENU.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Menu, true);
     }
 
     public void UpdateMenu(@NonNull LucaMenu entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateMenu: Updating entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
@@ -800,8 +740,6 @@ public class MenuService implements IDataService {
     }
 
     public void ClearMenu(@NonNull LucaMenu entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "DeleteMenu: Deleting entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
@@ -849,11 +787,9 @@ public class MenuService implements IDataService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -886,8 +822,6 @@ public class MenuService implements IDataService {
     }
 
     private void clearListedMenuListFromDatabase() {
-        _logger.Debug("clearListedMenuListFromDatabase");
-
         SerializableList<ListedMenu> listedMenuList = _databaseListedMenuList.GetListedMenuList();
         for (int index = 0; index < listedMenuList.getSize(); index++) {
             ListedMenu listedMenu = listedMenuList.getValue(index);
@@ -896,8 +830,6 @@ public class MenuService implements IDataService {
     }
 
     private void saveListedMenuListToDatabase() {
-        _logger.Debug("saveListedMenuListToDatabase");
-
         for (int index = 0; index < _listedMenuList.getSize(); index++) {
             ListedMenu listedMenu = _listedMenuList.getValue(index);
             _databaseListedMenuList.CreateEntry(listedMenu);
@@ -905,8 +837,6 @@ public class MenuService implements IDataService {
     }
 
     private void clearMenuListFromDatabase() {
-        _logger.Debug("clearMenuListFromDatabase");
-
         SerializableList<LucaMenu> menuList = _databaseMenuList.GetMenuList();
         for (int index = 0; index < menuList.getSize(); index++) {
             LucaMenu menu = menuList.getValue(index);
@@ -915,8 +845,6 @@ public class MenuService implements IDataService {
     }
 
     private void saveMenuListToDatabase() {
-        _logger.Debug("saveMenuListToDatabase");
-
         for (int index = 0; index < _menuList.getSize(); index++) {
             LucaMenu menu = _menuList.getValue(index);
             _databaseMenuList.CreateEntry(menu);
@@ -1001,8 +929,6 @@ public class MenuService implements IDataService {
     }
 
     private void controlMenus() {
-        _logger.Debug("controlMenus");
-
         Calendar today = Calendar.getInstance();
         int year = today.get(Calendar.YEAR);
         int month = today.get(Calendar.MONTH) + 1;
@@ -1010,10 +936,9 @@ public class MenuService implements IDataService {
 
         for (int index = 0; index < _menuList.getSize(); index++) {
             LucaMenu menu = _menuList.getValue(index);
-            _logger.Debug(String.format("Checking menu %s", menu.toString()));
 
             if (menu.GetDate().Year() < year) {
-                _logger.Debug(String.format("Year of menu %s is lower then this year! Updating...", menu.toString()));
+                Logger.getInstance().Debug(TAG, String.format("Year of menu %s is lower then this year! Updating...", menu.toString()));
                 menu = resetMenu(menu);
                 if (menu == null) {
                     continue;
@@ -1023,7 +948,7 @@ public class MenuService implements IDataService {
             }
 
             if (menu.GetDate().Month() < month) {
-                _logger.Debug(String.format("Month of menu %s is lower then this year! Updating...", menu.toString()));
+                Logger.getInstance().Debug(TAG, String.format("Month of menu %s is lower then this year! Updating...", menu.toString()));
                 menu = resetMenu(menu);
                 if (menu == null) {
                     continue;
@@ -1033,10 +958,7 @@ public class MenuService implements IDataService {
             }
 
             if (menu.GetDate().DayOfMonth() < dayOfMonth && menu.GetDate().Month() <= month) {
-                _logger.Debug(String.format(
-                        Locale.getDefault(),
-                        "Day of menu %s is lower then this day and month is lower then this month! Updating...",
-                        menu.toString()));
+                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Day of menu %s is lower then this day and month is lower then this month! Updating...", menu.toString()));
                 menu = resetMenu(menu);
                 if (menu == null) {
                     continue;
@@ -1047,8 +969,6 @@ public class MenuService implements IDataService {
     }
 
     private LucaMenu resetMenu(@NonNull LucaMenu menu) {
-        _logger.Debug(String.format("Resetting menu %s", menu.toString()));
-
         menu.SetTitle("-");
         menu.SetDescription("-");
 
@@ -1062,7 +982,7 @@ public class MenuService implements IDataService {
         int menuDayOfWeek = menu.GetWeekday().GetInt();
 
         if (menuDayOfWeek <= 0) {
-            _logger.Error("Day of week was not found!");
+            Logger.getInstance().Error(TAG, "Day of week was not found!");
             return null;
         }
 
@@ -1084,7 +1004,6 @@ public class MenuService implements IDataService {
             int month,
             int dayOfMonth,
             int dayOfWeekDifference) {
-        _logger.Debug(String.format(Locale.getDefault(), "calculateDate for menu %s", menu));
         dayOfMonth += dayOfWeekDifference;
 
         switch (month - 1) {
@@ -1129,7 +1048,7 @@ public class MenuService implements IDataService {
                 }
                 break;
             default:
-                _logger.Error(String.format(Locale.getDefault(), "Invalid month %d!", month));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Invalid month %d!", month));
                 return null;
         }
 

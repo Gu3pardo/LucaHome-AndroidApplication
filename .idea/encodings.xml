@@ -22,7 +22,6 @@
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToMovieConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToScheduleConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToShoppingListConverter.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToSocketConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToTemperatureConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToTimerConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/dto/MovieDto.java" charset="windows-1251" />
@@ -42,6 +41,6 @@
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/BroadcastController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/NotificationController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/ReceiverController.java" charset="windows-1251" />
-    <file url="PROJECT" charset="windows-1251" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
+import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.MapContent;
 import guepardoapps.lucahome.common.classes.Temperature;
@@ -29,6 +30,8 @@ import guepardoapps.lucahome.common.service.ShoppingListService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 
 public class MapContentBuilder {
+    private static String TAG = MapContentBuilder.class.getSimpleName();
+
     public static int GetDrawable(@NonNull MapContent mapContent) {
         switch (mapContent.GetDrawingType()) {
             case Socket:
@@ -153,7 +156,7 @@ public class MapContentBuilder {
                 try {
                     WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, true);
                 } catch (Exception exception) {
-                    // Perhaps log exception
+                    Logger.getInstance().Error(TAG, exception.getMessage());
                 }
                 dialog.dismiss();
             });
@@ -162,7 +165,7 @@ public class MapContentBuilder {
                 try {
                     WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, false);
                 } catch (Exception exception) {
-                    // Perhaps log exception
+                    Logger.getInstance().Error(TAG, exception.getMessage());
                 }
                 dialog.dismiss();
             });

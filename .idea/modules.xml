@@ -6,7 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/basic/basic.iml" filepath="$PROJECT_DIR$/basic/basic.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/lib_openweather.iml" filepath="$PROJECT_DIR$/../OpenWeather/lib_openweather/lib_openweather.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mediamirror/mediamirrorv2.iml" filepath="$PROJECT_DIR$/mediamirror/mediamirrorv2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mediamirror/mediamirror.iml" filepath="$PROJECT_DIR$/mediamirror/mediamirror.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
     </modules>
   </component>

@@ -51,7 +51,6 @@ public class TemperatureService implements IDataNotificationService {
     private boolean _isInitialized;
 
     private static final String TAG = TemperatureService.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _displayNotification;
     private Class<?> _receiverActivity;
@@ -67,10 +66,7 @@ public class TemperatureService implements IDataNotificationService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -85,41 +81,35 @@ public class TemperatureService implements IDataNotificationService {
     private SettingsController _settingsController;
     private OpenWeatherService _openWeatherService;
 
-    private JsonDataToTemperatureConverter _jsonDataToTemperatureConverter;
-
     private SerializableList<Temperature> _temperatureList = new SerializableList<>();
 
     private BroadcastReceiver _temperatureDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_temperatureDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Temperature) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<Temperature> temperatureList = _jsonDataToTemperatureConverter.GetList(contentResponse);
+            SerializableList<Temperature> temperatureList = JsonDataToTemperatureConverter.getInstance().GetList(contentResponse);
             if (temperatureList == null) {
-                _logger.Error("Converted temperatureList is null!");
+                Logger.getInstance().Error(TAG, "Converted temperatureList is null!");
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -152,7 +142,6 @@ public class TemperatureService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -163,14 +152,11 @@ public class TemperatureService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private TemperatureService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static TemperatureService getInstance() {
@@ -179,10 +165,8 @@ public class TemperatureService implements IDataNotificationService {
 
     @Override
     public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -205,8 +189,6 @@ public class TemperatureService implements IDataNotificationService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToTemperatureConverter = new JsonDataToTemperatureConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -214,7 +196,6 @@ public class TemperatureService implements IDataNotificationService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _isInitialized = false;
@@ -279,8 +260,6 @@ public class TemperatureService implements IDataNotificationService {
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast("No user");
@@ -292,7 +271,6 @@ public class TemperatureService implements IDataNotificationService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_TEMPERATURES.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Temperature, true);
     }
@@ -309,15 +287,13 @@ public class TemperatureService implements IDataNotificationService {
 
     @Override
     public void ShowNotification() {
-        _logger.Debug("ShowNotification");
-
         if (_temperatureList == null) {
-            _logger.Error("_temperatureList is null!");
+            Logger.getInstance().Error(TAG, "_temperatureList is null!");
             return;
         }
 
         if (_temperatureList.getSize() < 1) {
-            _logger.Error("_temperatureList is empty!");
+            Logger.getInstance().Error(TAG, "_temperatureList is empty!");
             return;
         }
 
@@ -330,7 +306,6 @@ public class TemperatureService implements IDataNotificationService {
 
     @Override
     public void CloseNotification() {
-        _logger.Debug("CloseNotification");
         _notificationController.CloseNotification(NOTIFICATION_ID);
     }
 
@@ -372,11 +347,9 @@ public class TemperatureService implements IDataNotificationService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 

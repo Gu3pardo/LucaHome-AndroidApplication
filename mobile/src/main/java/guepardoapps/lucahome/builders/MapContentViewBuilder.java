@@ -24,7 +24,6 @@ import guepardoapps.lucahome.common.classes.MapContent;
 
 public class MapContentViewBuilder {
     private static final String TAG = MapContentViewBuilder.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -38,7 +37,6 @@ public class MapContentViewBuilder {
     private Point _size;
 
     public MapContentViewBuilder(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -56,8 +54,6 @@ public class MapContentViewBuilder {
 
             private void init() {
                 _size = new Point(_relativeLayoutMapPaint.getWidth() - 100, _relativeLayoutMapPaint.getHeight() - 100);
-                _logger.Debug("Size is: " + _size.toString());
-
                 if (_tempMapContentList != null) {
                     CreateMapContentViewList(_tempMapContentList);
                     AddViewsToMap();
@@ -71,7 +67,7 @@ public class MapContentViewBuilder {
         _relativeLayoutMapPaint.removeAllViews();
 
         if (_size == null) {
-            _logger.Error("_size is null!");
+            Logger.getInstance().Error(TAG, "_size is null!");
             _tempMapContentList = mapContentList;
             return;
         }
@@ -91,7 +87,6 @@ public class MapContentViewBuilder {
             newTextView.setBackgroundResource(mapContent.GetDrawable());
 
             newTextView.setOnClickListener(view -> {
-                _logger.Debug(String.format(Locale.getDefault(), "onClick %s", mapContent.GetShortName()));
                 if (mapContent.GetButtonClick(_context) != null) {
                     mapContent.GetButtonClick(_context).run();
                 } else {

@@ -6,9 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.classes.*;
@@ -16,12 +14,15 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public final class JsonDataToMapContentConverter {
     private static final String TAG = JsonDataToMapContentConverter.class.getSimpleName();
-    private static Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Data\":";
 
-    private static String _searchParameter = "{\"Data\":";
+    private static final JsonDataToMapContentConverter SINGLETON = new JsonDataToMapContentConverter();
 
-    public JsonDataToMapContentConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToMapContentConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToMapContentConverter() {
     }
 
     public SerializableList<MapContent> GetList(
@@ -36,7 +37,7 @@ public final class JsonDataToMapContentConverter {
                     mediaServerList, security, temperatureList,
                     wirelessSocketList, wirelessSwitchList);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(
                     usedEntry,
                     listedMenuList, menuList, shoppingList,
@@ -62,17 +63,17 @@ public final class JsonDataToMapContentConverter {
             @NonNull SerializableList<ListedMenu> listedMenuList, @NonNull SerializableList<LucaMenu> menuList, @NonNull SerializableList<ShoppingEntry> shoppingList,
             @NonNull SerializableList<MediaServerData> mediaServerList, @NonNull Security security, @NonNull SerializableList<Temperature> temperatureList,
             @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<MapContent> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<MapContent> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
                 for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
                     JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("MapContent");
 
-                    int id = child.getInt("ID");
+                    int id = child.getInt("Id");
 
                     String typeString = child.getString("Type");
                     MapContent.DrawingType drawingType = getDrawingType(typeString);
@@ -99,9 +100,7 @@ public final class JsonDataToMapContentConverter {
                     MediaServerData _mediaServer = drawingType == MapContent.DrawingType.MediaServer ? (mediaServerList.getSize() > 0 ? mediaServerList.getValue(typeId - 1) : null) : null;
                     Security _security = drawingType == MapContent.DrawingType.Camera ? security : null;
 
-                    // TODO Fix temperature selection
-                    // Temperature _temperature = drawingType == MapContent.DrawingType.Temperature ? (temperatureList.getSize() > 0 ? temperatureList.getValue(typeId - 1) : null) : null;
-                    Temperature _temperature = new Temperature(-273.15, "SPACE", new SerializableDate(), new SerializableTime(), "", Temperature.TemperatureType.DUMMY, "");
+                    Temperature _temperature = drawingType == MapContent.DrawingType.Temperature ? (temperatureList.getSize() > 0 ? temperatureList.getValue(typeId - 1) : null) : null;
                     WirelessSocket _wirelessSocket = drawingType == MapContent.DrawingType.Socket ? (wirelessSocketList.getSize() > 0 ? wirelessSocketList.getValue(typeId - 1) : null) : null;
                     WirelessSwitch _wirelessSwitch = drawingType == MapContent.DrawingType.LightSwitch ? (wirelessSwitchList.getSize() > 0 ? wirelessSwitchList.getValue(typeId - 1) : null) : null;
 
@@ -112,14 +111,13 @@ public final class JsonDataToMapContentConverter {
                     list.addValue(newMapContent);
                 }
 
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 
@@ -147,6 +145,8 @@ public final class JsonDataToMapContentConverter {
                 return MapContent.DrawingType.ShoppingList;
             case "Camera":
                 return MapContent.DrawingType.Camera;
+            case "Meter":
+                return MapContent.DrawingType.Meter;
             default:
                 return MapContent.DrawingType.Null;
         }

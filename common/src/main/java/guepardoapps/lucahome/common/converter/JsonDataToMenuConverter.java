@@ -6,8 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Locale;
-
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -19,12 +17,15 @@ import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToMenuConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToMenuConverter.class.getSimpleName();
-    private Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Data\":";
 
-    private static String _searchParameter = "{\"Data\":";
+    private static final JsonDataToMenuConverter SINGLETON = new JsonDataToMenuConverter();
 
-    public JsonDataToMenuConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToMenuConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToMenuConverter() {
     }
 
     @Override
@@ -32,7 +33,7 @@ public final class JsonDataToMenuConverter implements IJsonDataConverter {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry);
         }
     }
@@ -43,10 +44,10 @@ public final class JsonDataToMenuConverter implements IJsonDataConverter {
     }
 
     private SerializableList<LucaMenu> parseStringToList(@NonNull String value) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<LucaMenu> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<LucaMenu> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
@@ -68,15 +69,14 @@ public final class JsonDataToMenuConverter implements IJsonDataConverter {
                     LucaMenu newMenu = new LucaMenu(dataIndex, title, description, weekday, new SerializableDate(year, month, day), true, ILucaClass.LucaServerDbAction.Null);
                     list.addValue(newMenu);
                 }
-
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 }

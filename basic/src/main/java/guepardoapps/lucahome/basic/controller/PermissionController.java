@@ -13,13 +13,10 @@ import guepardoapps.lucahome.basic.utils.Logger;
 
 public class PermissionController {
     private static final String TAG = PermissionController.class.getSimpleName();
-    protected Logger _logger;
 
     protected Context _context;
 
     public PermissionController(@NonNull Context context) {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created new " + TAG + "...");
         _context = context;
     }
 
@@ -34,7 +31,7 @@ public class PermissionController {
             try {
                 ActivityCompat.requestPermissions((Activity) _context, permissionsId, callbackId);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.toString());
                 Toasty.error(_context, "Failed to ask for permissions!", Toast.LENGTH_LONG).show();
             }
         }

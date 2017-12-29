@@ -25,7 +25,6 @@ import guepardoapps.mediamirror.interfaces.IViewController;
 
 public class CalendarViewController implements IViewController {
     private static final String TAG = CalendarViewController.class.getSimpleName();
-    private Logger _logger;
 
     private static final int PERMISSION_READ_CALENDAR_ID = 69;
     private static final int INVERT_TIME = 1000;
@@ -48,16 +47,14 @@ public class CalendarViewController implements IViewController {
     private BroadcastReceiver _dateChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_dateChangedReceiver onReceive");
             final String action = intent.getAction();
 
             if (action == null) {
-                _logger.Error("action is null!");
+                Logger.getInstance().Error(TAG, "action is null!");
                 return;
             }
 
             if (action.equals(Intent.ACTION_DATE_CHANGED)) {
-                _logger.Debug("ACTION_DATE_CHANGED");
                 _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_CALENDAR_UPDATE);
             }
         }
@@ -81,20 +78,17 @@ public class CalendarViewController implements IViewController {
     private BroadcastReceiver _updateCalendarViewReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateBirthdayViewReceiver onReceive");
             SerializableList<CalendarEntryDto> calendarList = new SerializableList<>();
 
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
 
-            _logger.Debug("Receiving Serializable object from intent and bundle birthdayModel and trying to cast it to SerializableList<CalendarEntryDto>");
             SerializableList<?> serializableExtra = (SerializableList<?>) intent.getSerializableExtra(Bundles.CALENDAR_MODEL);
             if (serializableExtra != null) {
                 for (int index = 0; index < serializableExtra.getSize(); index++) {
                     if (!(serializableExtra.getValue(index) instanceof CalendarEntryDto)) {
-                        _logger.Error(String.format(Locale.getDefault(), "Value at index %d is not an instance of CalendarEntryDto: %s", index, serializableExtra.getValue(index)));
+                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Value at index %d is not an instance of CalendarEntryDto: %s", index, serializableExtra.getValue(index)));
                         return;
                     } else {
                         calendarList.addValue((CalendarEntryDto) serializableExtra.getValue(index));
@@ -102,14 +96,12 @@ public class CalendarViewController implements IViewController {
                 }
             }
 
-            _logger.Debug("calendarList: " + calendarList.toString());
             _calendarList.clear();
 
             for (int index = 0; index < calendarList.getSize(); index++) {
                 CalendarEntryDto entry = calendarList.getValue(index);
 
                 if (entry.BeginIsAfterNow()) {
-                    _logger.Debug(entry.toString() + ": begin is after now!");
                     _calendarList.addValue(entry);
                 }
             }
@@ -122,11 +114,9 @@ public class CalendarViewController implements IViewController {
                 if (index < _calendarList.getSize()) {
                     CalendarEntryDto entry = _calendarList.getValue(index);
                     if (entry.IsToday()) {
-                        _logger.Debug(entry.toString() + " is today!");
                         _isToday[index] = true;
                         _calendarAlarmViewArray[index].setVisibility(View.VISIBLE);
                     } else {
-                        _logger.Debug(entry.toString() + " is not today!");
                         _isToday[index] = false;
                         _calendarAlarmViewArray[index].setVisibility(View.INVISIBLE);
                     }
@@ -147,7 +137,6 @@ public class CalendarViewController implements IViewController {
 
         public void run() {
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
 
@@ -167,7 +156,6 @@ public class CalendarViewController implements IViewController {
     };
 
     public CalendarViewController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _broadcastController = new BroadcastController(_context);
         _permissionController = new PermissionController(_context);
@@ -176,50 +164,39 @@ public class CalendarViewController implements IViewController {
 
     @Override
     public void onCreate() {
-        _logger.Debug("onCreate");
-
         _calendarAlarmViewArray[0] = ((Activity) _context).findViewById(R.id.calendar1AlarmView);
         _calendarTextViewArray[0] = ((Activity) _context).findViewById(R.id.calendar1TextView);
         _calendarAlarmViewArray[1] = ((Activity) _context).findViewById(R.id.calendar2AlarmView);
         _calendarTextViewArray[1] = ((Activity) _context).findViewById(R.id.calendar2TextView);
-
         _screenEnabled = true;
     }
 
     @Override
     public void onStart() {
-        _logger.Debug("onStart");
     }
 
     @Override
     public void onResume() {
-        _logger.Debug("onResume");
         if (!_isInitialized) {
-            _logger.Debug("Initializing!");
-
             _receiverController.RegisterReceiver(_dateChangedReceiver, new String[]{Intent.ACTION_DATE_CHANGED});
             _receiverController.RegisterReceiver(_screenDisableReceiver, new String[]{Broadcasts.SCREEN_OFF});
             _receiverController.RegisterReceiver(_screenEnableReceiver, new String[]{Broadcasts.SCREEN_ENABLED});
             _receiverController.RegisterReceiver(_updateCalendarViewReceiver, new String[]{Broadcasts.SHOW_CALENDAR_MODEL});
-
             _isInitialized = true;
-
             if (_screenEnabled) {
                 _permissionController.CheckPermissions(PERMISSION_READ_CALENDAR_ID, Manifest.permission.READ_CALENDAR);
             }
         } else {
-            _logger.Warning("Is ALREADY initialized!");
+            Logger.getInstance().Warning(TAG, "Is ALREADY initialized!");
         }
     }
 
     @Override
     public void onPause() {
-        _logger.Debug("onPause");
     }
 
     @Override
     public void onDestroy() {
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
         _isInitialized = false;
     }

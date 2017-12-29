@@ -60,7 +60,6 @@ public class BirthdayService implements IDataNotificationService {
     private boolean _isInitialized;
 
     private static final String TAG = BirthdayService.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _loadDataEnabled;
 
@@ -78,10 +77,7 @@ public class BirthdayService implements IDataNotificationService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -99,43 +95,37 @@ public class BirthdayService implements IDataNotificationService {
 
     private DatabaseBirthdayList _databaseBirthdayList;
 
-    private JsonDataToBirthdayConverter _jsonDataToBirthdayConverter;
-
     private SerializableList<LucaBirthday> _birthdayList = new SerializableList<>();
 
     private BroadcastReceiver _birthdayDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_birthdayDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Birthday) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _birthdayList = _databaseBirthdayList.GetBirthdayList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _birthdayList = _databaseBirthdayList.GetBirthdayList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<LucaBirthday> birthdayList = _jsonDataToBirthdayConverter.GetList(contentResponse, _context);
+            SerializableList<LucaBirthday> birthdayList = JsonDataToBirthdayConverter.getInstance().GetList(contentResponse, _context);
             if (birthdayList == null) {
-                _logger.Error("Converted birthdayList is null!");
+                Logger.getInstance().Error(TAG, "Converted birthdayList is null!");
                 _birthdayList = _databaseBirthdayList.GetBirthdayList();
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
@@ -160,27 +150,23 @@ public class BirthdayService implements IDataNotificationService {
     private BroadcastReceiver _birthdayAddFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_birthdayAddFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.BirthdayAdd) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedAddBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedAddBroadcast(contentResponse);
                 return;
             }
@@ -199,27 +185,23 @@ public class BirthdayService implements IDataNotificationService {
     private BroadcastReceiver _birthdayUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_birthdayUpdateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.BirthdayUpdate) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", Tools.DecompressByteArrayToString(content.Response)));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedUpdateBroadcast(contentResponse);
                 return;
             }
@@ -238,27 +220,23 @@ public class BirthdayService implements IDataNotificationService {
     private BroadcastReceiver _birthdayDeleteFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_birthdayDeleteFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.BirthdayDelete) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedDeleteBroadcast(contentResponse);
                 return;
             }
@@ -277,7 +255,6 @@ public class BirthdayService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -288,14 +265,11 @@ public class BirthdayService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private BirthdayService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static BirthdayService getInstance() {
@@ -304,10 +278,8 @@ public class BirthdayService implements IDataNotificationService {
 
     @Override
     public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -339,8 +311,6 @@ public class BirthdayService implements IDataNotificationService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToBirthdayConverter = new JsonDataToBirthdayConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -348,7 +318,6 @@ public class BirthdayService implements IDataNotificationService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _databaseBirthdayList.Close();
@@ -402,10 +371,7 @@ public class BirthdayService implements IDataNotificationService {
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         if (!_loadDataEnabled) {
-            _logger.Debug("_loadDataEnabled is false!");
             return;
         }
 
@@ -442,7 +408,7 @@ public class BirthdayService implements IDataNotificationService {
                         break;
                     case Null:
                     default:
-                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", lucaBirthday));
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", lucaBirthday));
                         break;
                 }
 
@@ -456,14 +422,11 @@ public class BirthdayService implements IDataNotificationService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_BIRTHDAYS.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Birthday, true);
     }
 
     public void AddBirthday(@NonNull LucaBirthday entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "AddBirthday: Adding new entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
@@ -490,8 +453,6 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     public void UpdateBirthday(@NonNull LucaBirthday entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateBirthday: Updating entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
@@ -518,8 +479,6 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     public void DeleteBirthday(@NonNull LucaBirthday entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "DeleteBirthday: Deleting entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
@@ -546,8 +505,6 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     public void RetrieveContactPhotos() {
-        _logger.Debug("RetrieveContactPhotos");
-
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
 
@@ -555,7 +512,7 @@ public class BirthdayService implements IDataNotificationService {
             try {
                 photo = Tools.RetrieveContactPhoto(_context, birthday.GetName(), 100, 100, true);
             } catch (Exception exception) {
-                _logger.Error(exception.getMessage());
+                Logger.getInstance().Error(TAG, exception.getMessage());
             }
 
             birthday.SetPhoto(photo);
@@ -579,10 +536,8 @@ public class BirthdayService implements IDataNotificationService {
 
     @Override
     public void ShowNotification() {
-        _logger.Debug("ShowNotification");
-
         if (!_displayNotification) {
-            _logger.Warning("_displayNotification is false!");
+            Logger.getInstance().Warning(TAG, "_displayNotification is false!");
             return;
         }
 
@@ -596,7 +551,6 @@ public class BirthdayService implements IDataNotificationService {
 
     @Override
     public void CloseNotification() {
-        _logger.Debug("CloseNotification");
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
             _notificationController.CloseNotification(birthday.GetNotificationId());
@@ -641,11 +595,9 @@ public class BirthdayService implements IDataNotificationService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -661,8 +613,6 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     private void clearBirthdayListFromDatabase() {
-        _logger.Debug("clearBirthdayListFromDatabase");
-
         SerializableList<LucaBirthday> birthdayList = _databaseBirthdayList.GetBirthdayList();
         for (int index = 0; index < birthdayList.getSize(); index++) {
             LucaBirthday birthday = birthdayList.getValue(index);
@@ -671,8 +621,6 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     private void saveBirthdayListToDatabase() {
-        _logger.Debug("saveBirthdayListToDatabase");
-
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
             _databaseBirthdayList.CreateEntry(birthday);

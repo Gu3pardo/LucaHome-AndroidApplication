@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Locale;
 
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
@@ -26,6 +25,8 @@ public class DownloadController {
         MapContent,
         ListedMenu, ListedMenuAdd, ListedMenuUpdate, ListedMenuDelete,
         Menu, MenuUpdate, MenuClear,
+        MeterData, MeterDataAdd, MeterDataUpdate, MeterDataDelete,
+        MoneyMeterData, MoneyMeterDataAdd, MoneyMeterDataUpdate, MoneyMeterDataDelete,
         Movie, MovieUpdate,
         Schedule, ScheduleSet, ScheduleAdd, ScheduleUpdate, ScheduleDelete,
         Security, SecurityCamera, SecurityCameraControl,
@@ -58,7 +59,6 @@ public class DownloadController {
     public static final String DownloadFinishedBundle = "DownloadFinishedBundle";
 
     private static final String TAG = DownloadController.class.getSimpleName();
-    private Logger _logger;
 
     private static final int TIMEOUT_MS = 3000;
 
@@ -67,15 +67,12 @@ public class DownloadController {
     private SettingsController _settingsController;
 
     public DownloadController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _broadcastController = new BroadcastController(context);
         _networkController = new NetworkController(context);
         _settingsController = SettingsController.getInstance();
     }
 
     public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork, Serializable additional) {
-        _logger.Debug("SendCommandToWebsiteAsync");
-
         if (!canSendAction(downloadType, needsHomeNetwork, requestUrl, additional)) {
             return;
         }
@@ -88,8 +85,6 @@ public class DownloadController {
     }
 
     public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork) {
-        _logger.Debug("SendCommandToWebsiteAsync");
-
         if (!canSendAction(downloadType, needsHomeNetwork, requestUrl, null)) {
             return;
         }
@@ -118,7 +113,7 @@ public class DownloadController {
         }
 
         if (requestUrl.length() < 15) {
-            _logger.Error("Invalid requestUrl length!");
+            Logger.getInstance().Error(TAG, "Invalid requestUrl length!");
             _broadcastController.SendSerializableBroadcast(
                     DownloadFinishedBroadcast,
                     DownloadFinishedBundle,
@@ -139,8 +134,6 @@ public class DownloadController {
             StringBuilder result = new StringBuilder();
             for (String action : actions) {
                 try {
-                    _logger.Information("action: " + action);
-
                     URL url = new URL(action);
                     URLConnection connection = url.openConnection();
                     connection.setConnectTimeout(TIMEOUT_MS);
@@ -161,7 +154,7 @@ public class DownloadController {
                     DownloadSuccess = true;
                 } catch (IOException exception) {
                     DownloadSuccess = false;
-                    _logger.Error(exception.getMessage());
+                    Logger.getInstance().Error(TAG, exception.getMessage());
                 }
             }
 
@@ -170,10 +163,7 @@ public class DownloadController {
 
         @Override
         protected void onPostExecute(String result) {
-            _logger.Debug(String.format(Locale.getDefault(), "onPostExecute: Length of result is %d and result itself is %s", result.length(), result));
-
             byte[] byteArray = Tools.CompressStringToByteArray(result);
-
             _broadcastController.SendSerializableBroadcast(
                     DownloadFinishedBroadcast,
                     DownloadFinishedBundle,

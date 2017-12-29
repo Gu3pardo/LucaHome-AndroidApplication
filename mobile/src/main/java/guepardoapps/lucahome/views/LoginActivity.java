@@ -39,7 +39,6 @@ import guepardoapps.lucahome.service.NavigationService;
  */
 public class LoginActivity extends AppCompatActivity {
     private static String TAG = LoginActivity.class.getSimpleName();
-    private Logger _logger;
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -68,13 +67,12 @@ public class LoginActivity extends AppCompatActivity {
     private BroadcastReceiver _userCheckReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_userCheckReceiver");
             showProgress(false);
 
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(UserService.UserCheckedFinishedBundle);
 
             if (!result.Success) {
-                _logger.Error(String.format(Locale.getDefault(), "Login failed: %s!", Tools.DecompressByteArrayToString(result.Response)));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Login failed: %s!", Tools.DecompressByteArrayToString(result.Response)));
 
                 displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
 
@@ -92,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
                 new Handler().postDelayed(() -> {
                     NavigationService.NavigationResult navigationResult = _navigationService.GoBack(LoginActivity.this);
                     if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                        _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                         displayFailSnacky("Failed to navigate back to BootActivity! Please contact LucaHome support!");
                     }
                 }, Snacky.LENGTH_LONG);
@@ -104,9 +102,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _receiverController = new ReceiverController(this);
         _navigationService = NavigationService.getInstance();
@@ -140,41 +135,34 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_userCheckReceiver, new String[]{UserService.UserCheckedFinishedBroadcast});
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        _logger.Debug(String.format("onKeyDown: keyCode: %s | event: %s", keyCode, event));
-
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             _navigationService.ClearCurrentActivity();
             _navigationService.ClearGoBackList();
             finish();
             return true;
         }
-
         return super.onKeyDown(keyCode, event);
     }
 

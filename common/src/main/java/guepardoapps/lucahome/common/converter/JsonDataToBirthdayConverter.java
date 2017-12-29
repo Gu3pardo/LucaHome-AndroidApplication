@@ -18,22 +18,26 @@ import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+import guepardoapps.lucahome.common.interfaces.converter.IJsonContextDataConverter;
 
-public class JsonDataToBirthdayConverter {
+public class JsonDataToBirthdayConverter implements IJsonContextDataConverter {
     private static final String TAG = JsonDataToBirthdayConverter.class.getSimpleName();
-    private Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Data\":";
 
-    private static String _searchParameter = "{\"Data\":";
+    private static final JsonDataToBirthdayConverter SINGLETON = new JsonDataToBirthdayConverter();
 
-    public JsonDataToBirthdayConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToBirthdayConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToBirthdayConverter() {
     }
 
     public SerializableList<LucaBirthday> GetList(@NonNull String[] stringArray, @NonNull Context context) {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0], context);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry, context);
         }
     }
@@ -43,22 +47,23 @@ public class JsonDataToBirthdayConverter {
     }
 
     private SerializableList<LucaBirthday> parseStringToList(@NonNull String value, @NonNull Context context) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<LucaBirthday> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<LucaBirthday> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
                 for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
                     JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Birthday");
 
-                    int id = child.getInt("ID");
+                    int id = child.getInt("Id");
 
                     String name = child.getString("Name");
+                    String group = child.getString("Group");
 
                     boolean remindMe = child.getString("RemindMe").contains("1");
-                    boolean sendMail = child.getString("SendMail").contains("1");
+                    boolean sentMail = child.getString("SentMail").contains("1");
 
                     JSONObject birthdayJsonDate = child.getJSONObject("Date");
 
@@ -69,23 +74,22 @@ public class JsonDataToBirthdayConverter {
                     Bitmap photo = BitmapFactory.decodeResource(context.getResources(), guepardoapps.lucahome.basic.R.mipmap.ic_face_white_48dp);
                     try {
                         photo = Tools.RetrieveContactPhoto(context, name, 250, 250, true);
-                        _logger.Debug(String.format(Locale.getDefault(), "Retrieved photo is %s", photo));
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Retrieved photo is %s", photo));
                     } catch (Exception exception) {
-                        _logger.Error(String.format(Locale.getDefault(), "Exception in RetrieveContactPhoto: %s", exception.getMessage()));
+                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Exception in RetrieveContactPhoto: %s", exception.getMessage()));
                     }
 
-                    LucaBirthday newBirthday = new LucaBirthday(id, name, remindMe, sendMail, new SerializableDate(year, month, day), photo, true, ILucaClass.LucaServerDbAction.Null);
+                    LucaBirthday newBirthday = new LucaBirthday(id, name, new SerializableDate(year, month, day), group, remindMe, sentMail, photo, true, ILucaClass.LucaServerDbAction.Null);
                     list.addValue(newBirthday);
                 }
-
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 }

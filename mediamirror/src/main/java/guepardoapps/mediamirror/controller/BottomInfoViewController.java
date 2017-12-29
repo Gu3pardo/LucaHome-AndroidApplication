@@ -24,7 +24,6 @@ import guepardoapps.mediamirror.observer.SettingsContentObserver;
 
 public class BottomInfoViewController implements IViewController {
     private static final String TAG = BottomInfoViewController.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
     private ReceiverController _receiverController;
@@ -39,7 +38,6 @@ public class BottomInfoViewController implements IViewController {
     private BroadcastReceiver _batteryInfoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_batteryInfoReceiver onReceive");
             int level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             if (level != -1) {
                 _batteryTextView.setText(String.format(Locale.getDefault(), "%d %%", level));
@@ -61,12 +59,11 @@ public class BottomInfoViewController implements IViewController {
     private BroadcastReceiver _ipAddressReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_ipAddressReceiver onReceive");
             IpAddressModel model = (IpAddressModel) intent.getSerializableExtra(Bundles.IP_ADDRESS_MODEL);
             if (model != null) {
                 _ipAddressTextView.setText(model.GetIpAddress());
             } else {
-                _logger.Error("IpAddressModel is null!");
+                Logger.getInstance().Error(TAG, "IpAddressModel is null!");
             }
         }
     };
@@ -74,27 +71,22 @@ public class BottomInfoViewController implements IViewController {
     private BroadcastReceiver _volumeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_volumeReceiver onReceive");
-            SettingsContentObserver.VolumeChangeModel model =
-                    (SettingsContentObserver.VolumeChangeModel) intent.getSerializableExtra(SettingsContentObserver.VOLUME_CHANGE_BUNDLE);
+            SettingsContentObserver.VolumeChangeModel model = (SettingsContentObserver.VolumeChangeModel) intent.getSerializableExtra(SettingsContentObserver.VOLUME_CHANGE_BUNDLE);
             if (model != null) {
                 _volumeTextView.setText(String.format(Locale.getDefault(), "Vol.: %d", model.CurrentVolume));
             } else {
-                _logger.Error("VolumeChangeModel is null!");
+                Logger.getInstance().Error(TAG, "VolumeChangeModel is null!");
             }
         }
     };
 
     public BottomInfoViewController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _receiverController = new ReceiverController(_context);
     }
 
     @Override
     public void onCreate() {
-        _logger.Debug("onCreate");
-
         _settingsContentObserver = new SettingsContentObserver(_context, new Handler());
         _context.getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, _settingsContentObserver);
 
@@ -107,18 +99,16 @@ public class BottomInfoViewController implements IViewController {
         if (audioManager != null) {
             _volumeTextView.setText(String.format(Locale.getDefault(), "Vol.: %d", audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)));
         } else {
-            _logger.Error("audioManager is null!");
+            Logger.getInstance().Error(TAG, "audioManager is null!");
         }
     }
 
     @Override
     public void onStart() {
-        _logger.Debug("onStart");
     }
 
     @Override
     public void onResume() {
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_batteryInfoReceiver, new String[]{Intent.ACTION_BATTERY_CHANGED});
         _receiverController.RegisterReceiver(_ipAddressReceiver, new String[]{Broadcasts.SHOW_IP_ADDRESS_MODEL});
         _receiverController.RegisterReceiver(_volumeReceiver, new String[]{SettingsContentObserver.VOLUME_CHANGE_BROADCAST});
@@ -126,12 +116,10 @@ public class BottomInfoViewController implements IViewController {
 
     @Override
     public void onPause() {
-        _logger.Debug("onPause");
     }
 
     @Override
     public void onDestroy() {
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
         _context.getContentResolver().unregisterContentObserver(_settingsContentObserver);
     }

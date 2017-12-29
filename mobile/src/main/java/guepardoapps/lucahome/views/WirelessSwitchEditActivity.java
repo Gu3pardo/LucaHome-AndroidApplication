@@ -35,7 +35,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class WirelessSwitchEditActivity extends AppCompatActivity {
     private static final String TAG = WirelessSwitchEditActivity.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _propertyChanged;
     private WirelessSwitchDto _wirelessSwitchDto;
@@ -50,7 +49,6 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
     private BroadcastReceiver _addFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(WirelessSwitchService.WirelessSwitchAddFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -69,7 +67,6 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
     private BroadcastReceiver _updateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(WirelessSwitchService.WirelessSwitchUpdateFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -89,9 +86,6 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wireless_switch_edit);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _wirelessSwitchDto = (WirelessSwitchDto) getIntent().getSerializableExtra(WirelessSwitchService.WirelessSwitchIntent);
 
@@ -217,13 +211,11 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_addFinishedReceiver, new String[]{WirelessSwitchService.WirelessSwitchAddFinishedBroadcast});
         _receiverController.RegisterReceiver(_updateFinishedReceiver, new String[]{WirelessSwitchService.WirelessSwitchUpdateFinishedBroadcast});
     }
@@ -231,14 +223,12 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -278,7 +268,7 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> {
             NavigationService.NavigationResult navigationResult = _navigationService.GoBack(WirelessSwitchEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);

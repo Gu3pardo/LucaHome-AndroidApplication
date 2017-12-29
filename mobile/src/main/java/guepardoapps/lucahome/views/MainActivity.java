@@ -38,7 +38,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private Logger _logger;
 
     /**
      * Initiate UI
@@ -84,11 +83,9 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection _mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             _mainServiceBinder = ((MainService.MainServiceBinder) binder).getService();
-            _logger.Debug("onServiceConnected");
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            _logger.Debug("onServiceDisconnected");
             _mainServiceBinder = null;
         }
     };
@@ -99,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver _openWeatherUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_openWeatherUpdateReceiver");
             updateWeatherCard();
             updateMapContent();
         }
@@ -111,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver _mainServiceDownloadProgressReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_mainServiceDownloadProgress");
             MainService.MainServiceDownloadCountContent progress = (MainService.MainServiceDownloadCountContent) intent.getSerializableExtra(MainService.MainServiceDownloadCountBundle);
             if (progress != null) {
                 if (progress.DownloadFinished) {
@@ -136,7 +131,6 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver _mapContentUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_mapContentUpdateReceiver");
             _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
             _mapContentViewBuilder.AddViewsToMap();
         }
@@ -145,8 +139,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         setContentView(R.layout.activity_main);
 
@@ -201,11 +193,8 @@ public class MainActivity extends AppCompatActivity {
 
         _pullRefreshLayout = findViewById(R.id.skeletonList_pullRefreshLayout_main);
         _pullRefreshLayout.setOnRefreshListener(() -> {
-            _logger.Debug("onRefresh " + TAG);
-
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
-
             _mainServiceBinder.StartDownloadAll("pullRefreshLayout setOnRefreshListener");
         });
     }
@@ -213,13 +202,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         _navigationService.ClearGoBackList();
 
@@ -228,7 +215,6 @@ public class MainActivity extends AppCompatActivity {
         _receiverController.RegisterReceiver(_mapContentUpdateReceiver, new String[]{MapContentService.MapContentDownloadFinishedBroadcast});
 
         if (_mainServiceBinder == null) {
-            _logger.Debug("Not bound to service! Binding now...");
             bindService(new Intent(this, MainService.class), _mainServiceConnection, Context.BIND_AUTO_CREATE);
         }
 
@@ -240,16 +226,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
 
         _receiverController.Dispose();
 
         if (_mainServiceBinder != null) {
-            _logger.Debug("Unbinding from server");
             try {
                 unbindService(_mainServiceConnection);
             } catch (Exception exception) {
-                _logger.Error(exception.getMessage());
+                Logger.getInstance().Error(TAG, exception.getMessage());
             } finally {
                 _mainServiceBinder = null;
             }
@@ -259,26 +243,21 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        _logger.Debug(String.format("onKeyDown: keyCode: %s | event: %s", keyCode, event));
-
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             _navigationService.ClearCurrentActivity();
             _navigationService.ClearGoBackList();
             finish();
             return true;
         }
-
         return super.onKeyDown(keyCode, event);
     }
 
     private void updateWeatherCard() {
-        _logger.Debug("updateWeatherCard");
         _mainListViewBuilder.UpdateItemDescription(MainListViewItem.Type.Weather, String.format(
                 Locale.getDefault(),
                 "Current temperature: %.2f degree Celsius\nCurrent condition: %s",
@@ -287,7 +266,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void updateMapContent() {
-        _logger.Debug("updateMapContent");
         _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
         _mapContentViewBuilder.AddViewsToMap();
     }

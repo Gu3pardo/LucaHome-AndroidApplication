@@ -16,12 +16,15 @@ import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToChangeConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToChangeConverter.class.getSimpleName();
-    private Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Data\":";
 
-    private static String _searchParameter = "{\"Data\":";
+    private static final JsonDataToChangeConverter SINGLETON = new JsonDataToChangeConverter();
 
-    public JsonDataToChangeConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToChangeConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToChangeConverter() {
     }
 
     @Override
@@ -29,7 +32,7 @@ public final class JsonDataToChangeConverter implements IJsonDataConverter {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry);
         }
     }
@@ -40,9 +43,10 @@ public final class JsonDataToChangeConverter implements IJsonDataConverter {
     }
 
     private SerializableList<Change> parseStringToList(@NonNull String value) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<Change> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<Change> list = new SerializableList<>();
+
+            try {
 
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
@@ -67,15 +71,14 @@ public final class JsonDataToChangeConverter implements IJsonDataConverter {
                     Change newChange = new Change(dataIndex, type, new SerializableDate(year, month, day), new SerializableTime(hour, minute, 0, 0), user);
                     list.addValue(newChange);
                 }
-
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 }

@@ -23,7 +23,6 @@ import guepardoapps.mediamirror.interfaces.IViewController;
 
 public class BirthdayViewController implements IViewController {
     private static final String TAG = BirthdayViewController.class.getSimpleName();
-    private Logger _logger;
 
     private static final int INVERT_TIME = 1000;
 
@@ -43,16 +42,14 @@ public class BirthdayViewController implements IViewController {
     private BroadcastReceiver _dateChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_dateChangedReceiver onReceive");
             final String action = intent.getAction();
 
             if (action == null) {
-                _logger.Error("action is null!");
+                Logger.getInstance().Error(TAG, "action is null!");
                 return;
             }
 
             if (action.equals(Intent.ACTION_DATE_CHANGED)) {
-                _logger.Debug("ACTION_DATE_CHANGED");
                 _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_BIRTHDAY_UPDATE);
             }
         }
@@ -76,20 +73,17 @@ public class BirthdayViewController implements IViewController {
     private BroadcastReceiver _updateBirthdayViewReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateBirthdayViewReceiver onReceive");
             SerializableList<LucaBirthday> birthdayList = new SerializableList<>();
 
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
 
-            _logger.Debug("Receiving Serializable object from intent and bundle birthdayModel and trying to cast it to SerializableList<BirthdayDto>");
             SerializableList<?> serializableExtra = (SerializableList<?>) intent.getSerializableExtra(Bundles.BIRTHDAY_MODEL);
             if (serializableExtra != null) {
                 for (int index = 0; index < serializableExtra.getSize(); index++) {
                     if (!(serializableExtra.getValue(index) instanceof LucaBirthday)) {
-                        _logger.Error(String.format(Locale.getDefault(), "Value at index %d is not an instance of BirthdayDto: %s", index, serializableExtra.getValue(index)));
+                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Value at index %d is not an instance of BirthdayDto: %s", index, serializableExtra.getValue(index)));
                         return;
                     } else {
                         birthdayList.addValue((LucaBirthday) serializableExtra.getValue(index));
@@ -97,15 +91,11 @@ public class BirthdayViewController implements IViewController {
                 }
             }
 
-            _logger.Debug("birthdayList: " + birthdayList.toString());
-
             for (int index = 0; index < birthdayList.getSize(); index++) {
                 LucaBirthday entry = birthdayList.getValue(index);
-                _logger.Debug(String.format(Locale.getDefault(), "Birthday: %s", entry));
 
                 if (entry != null) {
                     if (entry.HasBirthday()) {
-                        _logger.Debug("Entry has today birthday!");
                         _hasBirthday = true;
                         _birthdayTextView.setText(entry.GetNotificationBody());
                         _birthdayAlarmView.setVisibility(View.VISIBLE);
@@ -117,7 +107,7 @@ public class BirthdayViewController implements IViewController {
                         _birthdayAlarmView.setVisibility(View.INVISIBLE);
                     }
                 } else {
-                    _logger.Warning("Birthday entry is null!");
+                    Logger.getInstance().Warning(TAG, "Birthday entry is null!");
                     _hasBirthday = false;
                     _birthdayTextView.setText("");
                     _birthdayAlarmView.setVisibility(View.INVISIBLE);
@@ -129,8 +119,7 @@ public class BirthdayViewController implements IViewController {
         }
 
         private void checkPlayBirthdaySong(@NonNull LucaBirthday entry) {
-            _logger.Debug("checkPlayBirthdaySong");
-            if (entry.GetName().contains("Sandra Huber") || entry.GetName().contains("Jonas Schubert")) {
+            if (entry.GetName().contains("Jonas Schubert")) {
                 _broadcastController.SendSimpleBroadcast(Broadcasts.PLAY_BIRTHDAY_SONG);
             }
         }
@@ -141,7 +130,6 @@ public class BirthdayViewController implements IViewController {
 
         public void run() {
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
 
@@ -159,7 +147,6 @@ public class BirthdayViewController implements IViewController {
     };
 
     public BirthdayViewController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _broadcastController = new BroadcastController(_context);
         _receiverController = new ReceiverController(_context);
@@ -167,44 +154,34 @@ public class BirthdayViewController implements IViewController {
 
     @Override
     public void onCreate() {
-        _logger.Debug("onCreate");
-
         _birthdayAlarmView = ((Activity) _context).findViewById(R.id.birthdayAlarmView);
         _birthdayTextView = ((Activity) _context).findViewById(R.id.birthdayTextView);
-
         _screenEnabled = true;
     }
 
     @Override
     public void onStart() {
-        _logger.Debug("onStart");
     }
 
     @Override
     public void onResume() {
-        _logger.Debug("onResume");
         if (!_isInitialized) {
-            _logger.Debug("Initializing!");
-
             _receiverController.RegisterReceiver(_dateChangedReceiver, new String[]{Intent.ACTION_DATE_CHANGED});
             _receiverController.RegisterReceiver(_screenDisableReceiver, new String[]{Broadcasts.SCREEN_OFF});
             _receiverController.RegisterReceiver(_screenEnableReceiver, new String[]{Broadcasts.SCREEN_ENABLED});
             _receiverController.RegisterReceiver(_updateBirthdayViewReceiver, new String[]{Broadcasts.SHOW_BIRTHDAY_MODEL});
-
             _isInitialized = true;
         } else {
-            _logger.Warning("Is ALREADY initialized!");
+            Logger.getInstance().Warning(TAG, "Is ALREADY initialized!");
         }
     }
 
     @Override
     public void onPause() {
-        _logger.Debug("onPause");
     }
 
     @Override
     public void onDestroy() {
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
         _isInitialized = false;
     }

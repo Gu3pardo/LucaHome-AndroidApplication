@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 
 public class DateModel implements Serializable {
-
     private static final long serialVersionUID = -3097274504214063795L;
 
     private static final String TAG = DateModel.class.getSimpleName();

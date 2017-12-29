@@ -17,7 +17,6 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseWirelessSocketList {
     private static final String TAG = DatabaseWirelessSocketList.class.getSimpleName();
-    private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_NAME = "_name";
@@ -73,7 +72,6 @@ public class DatabaseWirelessSocketList {
     }
 
     public DatabaseWirelessSocketList(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -194,7 +192,7 @@ public class DatabaseWirelessSocketList {
                 hour = Integer.parseInt(lastTriggerHourString);
                 minute = Integer.parseInt(lastTriggerMinuteString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             boolean isActivated = isActivatedString.contains("1");

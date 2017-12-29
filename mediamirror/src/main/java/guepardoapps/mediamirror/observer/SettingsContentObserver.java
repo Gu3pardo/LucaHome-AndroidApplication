@@ -13,9 +13,8 @@ import guepardoapps.lucahome.basic.utils.Logger;
 
 public class SettingsContentObserver extends ContentObserver {
     private static final String TAG = SettingsContentObserver.class.getSimpleName();
-    private Logger _logger;
 
-    public static final String VOLUME_CHANGE_BROADCAST = "guepardoapps.mediamirrorv2.observer.settingsvontentobserver.volume.change";
+    public static final String VOLUME_CHANGE_BROADCAST = "guepardoapps.mediamirror.observer.settingsvontentobserver.volume.change";
     public static final String VOLUME_CHANGE_BUNDLE = "VOLUME_CHANGE_BUNDLE";
 
     public static class VolumeChangeModel implements Serializable {
@@ -42,8 +41,6 @@ public class SettingsContentObserver extends ContentObserver {
     public SettingsContentObserver(@NonNull Context context, @NonNull Handler handler) {
         super(handler);
 
-        _logger = new Logger(TAG);
-
         _context = context;
         _broadcastController = new BroadcastController(_context);
 
@@ -51,7 +48,7 @@ public class SettingsContentObserver extends ContentObserver {
         if (audioManager != null) {
             _previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         } else {
-            _logger.Error("audioManager is null!");
+            Logger.getInstance().Error(TAG, "audioManager is null!");
         }
     }
 
@@ -75,22 +72,19 @@ public class SettingsContentObserver extends ContentObserver {
             volumeChangeModel.Difference = delta;
 
             if (delta > 0) {
-                _logger.Debug("Volume decreased");
                 _previousVolume = currentVolume;
                 volumeChangeModel.ChangeState = VolumeChangeState.DECREASED;
             } else if (delta < 0) {
-                _logger.Debug("Volume increased");
                 _previousVolume = currentVolume;
                 volumeChangeModel.ChangeState = VolumeChangeState.INCREASED;
             } else {
-                _logger.Debug("Volume did not change");
                 _previousVolume = currentVolume;
                 volumeChangeModel.ChangeState = VolumeChangeState.NULL;
             }
 
             _broadcastController.SendSerializableBroadcast(VOLUME_CHANGE_BROADCAST, VOLUME_CHANGE_BUNDLE, volumeChangeModel);
         } else {
-            _logger.Error("audioManager is null!");
+            Logger.getInstance().Error(TAG, "audioManager is null!");
         }
     }
 }

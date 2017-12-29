@@ -11,7 +11,6 @@ import android.os.PowerManager;
 import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -39,7 +38,6 @@ import guepardoapps.mediamirror.updater.*;
 
 public class MainService extends Service {
     private static final String TAG = MainService.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -77,7 +75,6 @@ public class MainService extends Service {
     private BroadcastReceiver _reloadAllReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_reloadAllReceiver onReceive");
             reloadAll();
         }
     };
@@ -85,7 +82,6 @@ public class MainService extends Service {
     private BroadcastReceiver _screenEnableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_screenEnableReceiver onReceive");
             reloadAll();
         }
     };
@@ -96,7 +92,7 @@ public class MainService extends Service {
             final String action = intent.getAction();
 
             if (action == null) {
-                _logger.Error("Action is null!");
+                Logger.getInstance().Error(TAG, "Action is null!");
                 return;
             }
 
@@ -114,8 +110,6 @@ public class MainService extends Service {
 
         if (!_isInitialized) {
             _isInitialized = true;
-
-            _logger = new Logger(TAG);
 
             _context = this;
 
@@ -186,10 +180,6 @@ public class MainService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (_logger != null) {
-            _logger.Debug("onStartCommand");
-        }
-
         if (_isInitialized) {
             if (_batterySocketController != null) {
                 _batterySocketController.Start();
@@ -265,18 +255,12 @@ public class MainService extends Service {
 
     @Override
     public IBinder onBind(Intent arg0) {
-        if (_logger != null) {
-            _logger.Debug("onBind");
-        }
         return null;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (_logger != null) {
-            _logger.Debug("onDestroy");
-        }
 
         _receiverController.Dispose();
         _serverThread.Dispose();
@@ -315,10 +299,6 @@ public class MainService extends Service {
 
         boolean isWeekend = weekday == Calendar.SUNDAY || weekday == Calendar.SATURDAY;
 
-        _logger.Debug(String.format(Locale.getDefault(),
-                "checkCurrentTime at %02d:%02d:%02d on %d",
-                hour, minute, second, weekday));
-
         if ((second >= 0 && second < 5) && minute == 0) {
             for (AutomaticSettings entry : AutomaticSettings.values()) {
                 if (entry.GetEnableHour() == hour) {
@@ -333,7 +313,7 @@ public class MainService extends Service {
         }
     }
 
-    private void reloadAll(){
+    private void reloadAll() {
         _birthdayUpdater.DownloadBirthdays();
         _currentWeatherUpdater.DownloadWeather();
         _dateViewUpdater.UpdateDate();
@@ -347,7 +327,6 @@ public class MainService extends Service {
     }
 
     private void restartActivity() {
-        _logger.Information("Restarting activity Main.class!");
         Toasty.info(_context, "Restarting activity Main.class!", Toast.LENGTH_LONG).show();
 
         Intent intent = new Intent(_context, FullscreenActivity.class);
@@ -357,21 +336,28 @@ public class MainService extends Service {
     }
 
     private void setLocks() {
-        _logger.Debug("setLocks");
-
         if (_powerManager == null) {
             _powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         }
 
-        _wakeLock = _powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MediaServerMainService_WakeLock");
-        _wakeLock.acquire();
+        if (_powerManager != null) {
+            _wakeLock = _powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MediaServerMainService_WakeLock");
+            _wakeLock.acquire();
+        } else {
+            Logger.getInstance().Error(TAG, "_powerManager is null");
+        }
+
 
         if (_wifiManager == null) {
             _wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         }
 
-        _wifiLock = _wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "MediaServerMainService_WifiLock");
-        _wifiLock.acquire();
+        if (_wifiManager != null) {
+            _wifiLock = _wifiManager.createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, "MediaServerMainService_WifiLock");
+            _wifiLock.acquire();
+        } else {
+            Logger.getInstance().Error(TAG, "_wifiManager is null");
+        }
     }
 
     private void setSettings(double currentVolume, int screenBrightness) {

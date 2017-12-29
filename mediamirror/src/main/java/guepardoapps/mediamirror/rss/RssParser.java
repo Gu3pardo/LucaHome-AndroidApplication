@@ -14,7 +14,6 @@ import java.util.List;
 import guepardoapps.lucahome.basic.utils.Logger;
 
 public class RssParser {
-
     private static final String TAG = RssParser.class.getSimpleName();
 
     private static final int MAX_ITEM_COUNT = 100;
@@ -30,7 +29,7 @@ public class RssParser {
 
             return readFeed(parser);
         } catch (Exception exception) {
-            new Logger(TAG).Error(exception.getMessage());
+            Logger.getInstance().Error(TAG, exception.getMessage());
         } finally {
             inputStream.close();
         }

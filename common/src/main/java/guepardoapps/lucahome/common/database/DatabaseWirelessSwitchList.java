@@ -17,7 +17,6 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseWirelessSwitchList {
     private static final String TAG = DatabaseWirelessSwitchList.class.getSimpleName();
-    private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_NAME = "_name";
@@ -75,7 +74,6 @@ public class DatabaseWirelessSwitchList {
     }
 
     public DatabaseWirelessSwitchList(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -205,7 +203,7 @@ public class DatabaseWirelessSwitchList {
                 hour = Integer.parseInt(lastTriggerHourString);
                 minute = Integer.parseInt(lastTriggerMinuteString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             boolean action = actionString.contains("1");

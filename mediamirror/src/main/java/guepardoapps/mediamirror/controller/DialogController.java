@@ -16,27 +16,21 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.mediamirror.R;
 import guepardoapps.mediamirror.adapter.SocketListViewAdapter;
 
 public class DialogController {
-    private static final String TAG = DialogController.class.getSimpleName();
-    private Logger _logger;
+    // private static final String TAG = DialogController.class.getSimpleName();
 
     private Context _context;
 
     public DialogController(@NonNull Context context) {
-        _logger = new Logger(TAG);
-        _logger.Debug("DialogController...");
         _context = context;
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     public void DisplayTemperatureDialog(@NonNull String url) {
-        _logger.Debug("DisplayTemperatureDialog");
-
         final Dialog dialog = createDialog();
         dialog.setContentView(R.layout.dialog_webview);
 
@@ -69,8 +63,6 @@ public class DialogController {
     }
 
     public void DisplayListViewDialog(@NonNull String title, @NonNull ArrayList<String> list) {
-        _logger.Debug("DisplayListViewDialog");
-
         final Dialog dialog = createDialog();
         dialog.setContentView(R.layout.dialog_listview);
 
@@ -87,8 +79,6 @@ public class DialogController {
     }
 
     public void DisplaySocketListViewDialog(SerializableList<WirelessSocket> socketList) {
-        _logger.Debug("DisplaySocketListViewDialog");
-
         final Dialog dialog = createDialog();
         dialog.setContentView(R.layout.dialog_listview);
 
@@ -105,20 +95,14 @@ public class DialogController {
     }
 
     private Dialog createDialog() {
-        _logger.Debug("createDialog");
-
         final Dialog dialog = new Dialog(_context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
         return dialog;
     }
 
     private void displayDialog(final Dialog dialog) {
-        _logger.Debug("displayDialog");
-
         dialog.setCancelable(true);
         dialog.show();
-
         Window window = dialog.getWindow();
         if (window != null) {
             window.setLayout(WindowManager.LayoutParams.FILL_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);

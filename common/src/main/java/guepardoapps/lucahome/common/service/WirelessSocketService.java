@@ -65,7 +65,6 @@ public class WirelessSocketService implements IDataNotificationService {
     private boolean _isInitialized;
 
     private static final String TAG = WirelessSocketService.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _loadDataEnabled;
 
@@ -83,10 +82,7 @@ public class WirelessSocketService implements IDataNotificationService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -102,43 +98,37 @@ public class WirelessSocketService implements IDataNotificationService {
 
     private DatabaseWirelessSocketList _databaseWirelessSocketList;
 
-    private JsonDataToWirelessSocketConverter _jsonDataToWirelessSocketConverter;
-
     private SerializableList<WirelessSocket> _wirelessSocketList = new SerializableList<>();
 
     private BroadcastReceiver _wirelessSocketDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSocketDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocket) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
                 sendFailedSocketDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
                 sendFailedSocketDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<WirelessSocket> wirelessSocketList = _jsonDataToWirelessSocketConverter.GetList(contentResponse);
+            SerializableList<WirelessSocket> wirelessSocketList = JsonDataToWirelessSocketConverter.getInstance().GetList(contentResponse);
             if (wirelessSocketList == null) {
-                _logger.Error("Converted wirelessSocketList is null!");
+                Logger.getInstance().Error(TAG, "Converted wirelessSocketList is null!");
                 _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
                 sendFailedSocketDownloadBroadcast(contentResponse);
                 return;
@@ -162,27 +152,23 @@ public class WirelessSocketService implements IDataNotificationService {
     private BroadcastReceiver _wirelessSocketSetFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSocketSetFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocketSet) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedSocketSetBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedSocketSetBroadcast(contentResponse);
                 return;
             }
@@ -201,27 +187,23 @@ public class WirelessSocketService implements IDataNotificationService {
     private BroadcastReceiver _wirelessSocketAddFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSocketAddFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocketAdd) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedSocketAddBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedSocketAddBroadcast(contentResponse);
                 return;
             }
@@ -240,27 +222,23 @@ public class WirelessSocketService implements IDataNotificationService {
     private BroadcastReceiver _wirelessSocketUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSocketUpdateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocketUpdate) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedSocketUpdateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedSocketUpdateBroadcast(contentResponse);
                 return;
             }
@@ -279,27 +257,23 @@ public class WirelessSocketService implements IDataNotificationService {
     private BroadcastReceiver _wirelessSocketDeleteFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSocketDeleteFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocketDelete) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedSocketDeleteBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedSocketDeleteBroadcast(contentResponse);
                 return;
             }
@@ -318,7 +292,6 @@ public class WirelessSocketService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -329,14 +302,11 @@ public class WirelessSocketService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private WirelessSocketService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static WirelessSocketService getInstance() {
@@ -345,10 +315,8 @@ public class WirelessSocketService implements IDataNotificationService {
 
     @Override
     public void Initialize(@NonNull Context context, @NonNull Class<?> receiverClass, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -379,8 +347,6 @@ public class WirelessSocketService implements IDataNotificationService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToWirelessSocketConverter = new JsonDataToWirelessSocketConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -388,7 +354,6 @@ public class WirelessSocketService implements IDataNotificationService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _databaseWirelessSocketList.Close();
@@ -480,10 +445,7 @@ public class WirelessSocketService implements IDataNotificationService {
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         if (!_loadDataEnabled) {
-            _logger.Debug("_loadDataEnabled is false!");
             return;
         }
 
@@ -520,7 +482,7 @@ public class WirelessSocketService implements IDataNotificationService {
                         break;
                     case Null:
                     default:
-                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", wirelessSocket));
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", wirelessSocket));
                         break;
                 }
 
@@ -534,14 +496,11 @@ public class WirelessSocketService implements IDataNotificationService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_SOCKETS.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocket, true);
     }
 
     public void ChangeWirelessSocketState(@NonNull WirelessSocket entry) throws Exception {
-        _logger.Debug(String.format(Locale.getDefault(), "ChangeWirelessSocketState: Changing state of entry %s", entry));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedSocketSetBroadcast("No user");
@@ -557,8 +516,6 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void SetWirelessSocketState(@NonNull WirelessSocket entry, boolean newState) throws Exception {
-        _logger.Debug(String.format(Locale.getDefault(), "SetWirelessSocketState: Setting state of entry %s to %s", entry, newState));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedSocketSetBroadcast("No user");
@@ -575,8 +532,6 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void SetWirelessSocketState(@NonNull String socketName, boolean newState) {
-        _logger.Debug(String.format(Locale.getDefault(), "SetWirelessSocketState: Setting state of socket %s to %s", socketName, newState));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedSocketSetBroadcast("No user");
@@ -587,7 +542,7 @@ public class WirelessSocketService implements IDataNotificationService {
 
         if (wirelessSocket == null) {
             String errorMessage = String.format(Locale.getDefault(), "WirelessSocket is null! Name %s not found!", socketName);
-            _logger.Error(errorMessage);
+            Logger.getInstance().Error(TAG, errorMessage);
             sendFailedSocketSetBroadcast(errorMessage);
             return;
         }
@@ -595,13 +550,11 @@ public class WirelessSocketService implements IDataNotificationService {
         try {
             SetWirelessSocketState(wirelessSocket, newState);
         } catch (Exception exception) {
-            _logger.Error(exception.getMessage());
+            Logger.getInstance().Error(TAG, exception.getMessage());
         }
     }
 
     public void DeactivateAllWirelessSockets() {
-        _logger.Debug("DeactivateAllWirelessSockets");
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedSocketSetBroadcast("No user");
@@ -617,8 +570,6 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void AddWirelessSocket(@NonNull WirelessSocket entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "AddWirelessSocket: Adding new entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
@@ -645,8 +596,6 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void UpdateWirelessSocket(@NonNull WirelessSocket entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateWirelessSocket: Updating entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
@@ -673,8 +622,6 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void DeleteWirelessSocket(@NonNull WirelessSocket entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "DeleteWirelessSocket: Deleting entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
@@ -701,8 +648,6 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public boolean GetWirelessSocketState(@NonNull String socketName) {
-        _logger.Debug(String.format(Locale.getDefault(), "GetWirelessSocketState: State of socket %s", socketName));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedSocketGetBroadcast("No user");
@@ -713,7 +658,7 @@ public class WirelessSocketService implements IDataNotificationService {
 
         if (wirelessSocket == null) {
             String errorMessage = String.format(Locale.getDefault(), "WirelessSocket is null! Name %s not found!", socketName);
-            _logger.Error(errorMessage);
+            Logger.getInstance().Error(TAG, errorMessage);
             sendFailedSocketGetBroadcast(errorMessage);
             return false;
         }
@@ -723,13 +668,12 @@ public class WirelessSocketService implements IDataNotificationService {
 
     @Override
     public void ShowNotification() {
-        _logger.Debug("ShowNotification");
         if (!_displayNotification) {
-            _logger.Warning("_displayNotification is false!");
+            Logger.getInstance().Warning(TAG, "_displayNotification is false!");
             return;
         }
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
-            _logger.Warning("No home network!");
+            Logger.getInstance().Warning(TAG, "No home network!");
             return;
         }
         _notificationController.CreateSocketNotification(NOTIFICATION_ID, _wirelessSocketList, _receiverClass);
@@ -737,7 +681,6 @@ public class WirelessSocketService implements IDataNotificationService {
 
     @Override
     public void CloseNotification() {
-        _logger.Debug("CloseNotification");
         _notificationController.CloseNotification(NOTIFICATION_ID);
     }
 
@@ -788,11 +731,9 @@ public class WirelessSocketService implements IDataNotificationService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -808,8 +749,6 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     private void clearSocketListFromDatabase() {
-        _logger.Debug("clearSocketListFromDatabase");
-
         SerializableList<WirelessSocket> socketList = _databaseWirelessSocketList.GetWirelessSocketList();
         for (int index = 0; index < socketList.getSize(); index++) {
             WirelessSocket socket = socketList.getValue(index);
@@ -818,8 +757,6 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     private void saveSocketListToDatabase() {
-        _logger.Debug("saveSocketListToDatabase");
-
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
             WirelessSocket socket = _wirelessSocketList.getValue(index);
             _databaseWirelessSocketList.CreateEntry(socket);

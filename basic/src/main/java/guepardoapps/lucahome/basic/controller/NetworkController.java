@@ -18,7 +18,6 @@ import guepardoapps.lucahome.basic.utils.Logger;
 
 public class NetworkController {
     private static final String TAG = NetworkController.class.getSimpleName();
-    private Logger _logger;
 
     public static final String WIFIReceiverInHomeNetworkBroadcast = "guepardoapps.lucahome.receiver.wifi.home_network.yes";
     public static final String WIFIReceiverNoHomeNetworkBroadcast = "guepardoapps.lucahome.receiver.wifi.home_network.no";
@@ -35,23 +34,16 @@ public class NetworkController {
     };
 
     public NetworkController(@NonNull Context context) {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created new " + TAG + "...");
         _context = context;
     }
 
     public boolean IsNetworkAvailable() {
         ConnectivityManager connectivityManager = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager == null) {
-            _logger.Debug("connectivityManager is null");
             return false;
         }
         NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-
-        boolean isNetworkAvailable = activeNetworkInfo != null && activeNetworkInfo.isConnected();
-        _logger.Debug("isNetworkAvailable: " + String.valueOf(isNetworkAvailable));
-
-        return isNetworkAvailable;
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     public boolean IsWifiConnected() {
@@ -61,20 +53,16 @@ public class NetworkController {
 
         ConnectivityManager connectivityManager = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager == null) {
-            _logger.Debug("connectivityManager is null");
             return false;
         }
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
 
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
             if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
                 return true;
-            } else {
-                _logger.Debug(String.format(Locale.getDefault(), "Active network is %s", activeNetwork.getType()));
             }
         }
 
-        _logger.Debug("activeNetwork is null");
         return false;
     }
 
@@ -85,21 +73,19 @@ public class NetworkController {
 
         ConnectivityManager connectivityManager = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (connectivityManager == null) {
-            _logger.Debug("connectivityManager is null");
             return false;
         }
-        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
 
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
             if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
                 WifiManager wifiManager = (WifiManager) _context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                 if (wifiManager == null) {
                     return false;
                 }
-                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
+                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
                 String currentSSID = wifiInfo.getSSID();
-                _logger.Debug("currentSSID: " + currentSSID);
 
                 try {
                     if (currentSSID.contains(homeSSID)) {
@@ -107,15 +93,14 @@ public class NetworkController {
                     }
                 } catch (Exception exception) {
                     String errorString = (exception.getMessage() == null) ? "HomeSSID failed" : exception.getMessage();
-                    _logger.Error(errorString);
+                    Logger.getInstance().Error(TAG, errorString);
                     return false;
                 }
             } else {
-                _logger.Warning("Active network is not wifi: " + String.valueOf(activeNetwork.getType()));
+                Logger.getInstance().Warning(TAG, "Active network is not wifi: " + String.valueOf(activeNetwork.getType()));
             }
         }
 
-        _logger.Debug("activeNetwork is null");
         return false;
     }
 
@@ -137,7 +122,7 @@ public class NetworkController {
                 }
             }
         } catch (SocketException e) {
-            _logger.Error(e.toString());
+            Logger.getInstance().Error(TAG, e.toString());
             ip.append("Something Wrong! ").append(e.toString()).append("\n");
         }
 

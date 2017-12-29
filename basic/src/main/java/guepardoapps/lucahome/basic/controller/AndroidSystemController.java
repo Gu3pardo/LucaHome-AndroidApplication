@@ -18,13 +18,10 @@ import guepardoapps.lucahome.basic.utils.Logger;
 
 public class AndroidSystemController {
     private static final String TAG = AndroidSystemController.class.getSimpleName();
-    protected Logger _logger;
 
     protected Context _context;
 
     public AndroidSystemController(@NonNull Context context) {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created new " + TAG + "...");
         _context = context;
     }
 
@@ -32,7 +29,7 @@ public class AndroidSystemController {
         ActivityManager activityManager = (ActivityManager) _context.getSystemService(Context.ACTIVITY_SERVICE);
 
         if (activityManager == null) {
-            _logger.Error("ActivityManager is null!");
+            Logger.getInstance().Error(TAG, "ActivityManager is null!");
             return false;
         }
 
@@ -50,7 +47,7 @@ public class AndroidSystemController {
         ActivityManager activityManager = (ActivityManager) _context.getSystemService(Context.ACTIVITY_SERVICE);
 
         if (activityManager == null) {
-            _logger.Error("ActivityManager is null!");
+            Logger.getInstance().Error(TAG, "ActivityManager is null!");
             return false;
         }
 
@@ -70,7 +67,7 @@ public class AndroidSystemController {
         ActivityManager activityManager = (ActivityManager) _context.getSystemService(Context.ACTIVITY_SERVICE);
 
         if (activityManager == null) {
-            _logger.Error("ActivityManager is null!");
+            Logger.getInstance().Error(TAG, "ActivityManager is null!");
             return false;
         }
 

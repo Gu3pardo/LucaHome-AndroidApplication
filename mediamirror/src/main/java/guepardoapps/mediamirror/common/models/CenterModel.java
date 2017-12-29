@@ -10,7 +10,6 @@ import guepardoapps.lucahome.common.enums.YoutubeId;
 
 public class CenterModel implements Serializable {
     private static final String TAG = CenterModel.class.getSimpleName();
-    private Logger _logger;
 
     private static final String DEFAULT_CENTER_TEXT = "Hello, this is your media mirror!";
     private static final String DEFAULT_YOUTUBE_VIDEO_ID = YoutubeId.DEFAULT.GetYoutubeId();
@@ -34,8 +33,6 @@ public class CenterModel implements Serializable {
             boolean youtubeVisible, @NonNull String youtubeId,
             boolean webViewVisible, @NonNull String webViewUrl,
             boolean radioStreamVisible, @NonNull RadioStreams radioStream) {
-        _logger = new Logger(TAG);
-
         _centerVisible = centerVisible;
         _centerText = centerText;
 
@@ -91,11 +88,11 @@ public class CenterModel implements Serializable {
                 || (_youtubeVisible && _radioStreamVisible)
                 || (_webViewVisible && _radioStreamVisible)) {
 
-            _logger.Warning("Invalid visibilities!");
+            Logger.getInstance().Warning(TAG, "Invalid visibilities!");
 
             if (_youtubeId.length() > 0) {
                 _youtubeVisible = true;
-                _logger.Warning("Resetting center, webView and radio!");
+                Logger.getInstance().Warning(TAG, "Resetting center, webView and radio!");
 
                 _centerVisible = false;
                 _centerText = "";
@@ -112,7 +109,7 @@ public class CenterModel implements Serializable {
                 _youtubeId = "";
 
                 _centerVisible = true;
-                _logger.Warning("Resetting youtube, webView and radio!");
+                Logger.getInstance().Warning(TAG, "Resetting youtube, webView and radio!");
 
                 _webViewVisible = false;
                 _webViewUrl = "";
@@ -129,7 +126,7 @@ public class CenterModel implements Serializable {
                 _centerText = "";
 
                 _webViewVisible = true;
-                _logger.Warning("Resetting youtube, center and radio!");
+                Logger.getInstance().Warning(TAG, "Resetting youtube, center and radio!");
 
                 _radioStreamVisible = false;
                 _radioStream = RadioStreams.BAYERN_3;
@@ -146,34 +143,34 @@ public class CenterModel implements Serializable {
                 _webViewUrl = "";
 
                 _radioStreamVisible = true;
-                _logger.Warning("Resetting youtube, center and webView!");
+                Logger.getInstance().Warning(TAG, "Resetting youtube, center and webView!");
             }
         }
 
         if (_centerVisible) {
             if (_centerText.length() == 0) {
-                _logger.Warning("Setting center to default: " + DEFAULT_CENTER_TEXT);
+                Logger.getInstance().Warning(TAG, "Setting center to default: " + DEFAULT_CENTER_TEXT);
                 _centerText = DEFAULT_CENTER_TEXT;
             }
         } else if (_youtubeVisible) {
             if (_youtubeId.length() != 11) {
-                _logger.Warning("Setting videoUrl to default!");
+                Logger.getInstance().Warning(TAG, "Setting videoUrl to default!");
                 _youtubeId = DEFAULT_YOUTUBE_VIDEO_ID;
             }
         } else if (_webViewVisible) {
             if (_webViewUrl.length() == 0) {
-                _logger.Warning("Setting webViewUrl to default: " + DEFAULT_WEB_VIEW_URL);
+                Logger.getInstance().Warning(TAG, "Setting webViewUrl to default: " + DEFAULT_WEB_VIEW_URL);
                 _webViewUrl = DEFAULT_WEB_VIEW_URL;
             }
         } else if (_radioStreamVisible) {
             if (_radioStream == null || _radioStream == RadioStreams.BAYERN_3) {
-                _logger.Warning("Setting radioStream to default: " + DEFAULT_RADIO_STREAM);
+                Logger.getInstance().Warning(TAG, "Setting radioStream to default: " + DEFAULT_RADIO_STREAM);
                 _radioStream = DEFAULT_RADIO_STREAM;
             }
         } else {
             _centerVisible = true;
             if (_centerText.length() == 0) {
-                _logger.Warning("Setting center to default!");
+                Logger.getInstance().Warning(TAG, "Setting center to default!");
                 _centerText = DEFAULT_CENTER_TEXT;
             }
         }

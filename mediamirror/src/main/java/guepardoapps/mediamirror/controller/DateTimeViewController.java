@@ -17,7 +17,6 @@ import guepardoapps.mediamirror.interfaces.IViewController;
 
 public class DateTimeViewController implements IViewController {
     private static final String TAG = DateTimeViewController.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _isInitialized;
     private boolean _screenEnabled;
@@ -33,20 +32,16 @@ public class DateTimeViewController implements IViewController {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
 
-            _logger.Debug("_updateViewReceiver onReceive");
             DateModel model = (DateModel) intent.getSerializableExtra(Bundles.DATE_MODEL);
             if (model != null) {
-                _logger.Debug(model.toString());
-
                 _weekdayTextView.setText(model.GetWeekday());
                 _dateTextView.setText(model.GetDate());
                 _timeTextView.setText(model.GetTime());
             } else {
-                _logger.Warning("model is null!");
+                Logger.getInstance().Warning(TAG, "model is null!");
             }
         }
     };
@@ -70,17 +65,13 @@ public class DateTimeViewController implements IViewController {
     };
 
     public DateTimeViewController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _receiverController = new ReceiverController(_context);
     }
 
     @Override
     public void onCreate() {
-        _logger.Debug("onCreate");
-
         _screenEnabled = true;
-
         _weekdayTextView = ((Activity) _context).findViewById(R.id.weekdayTextView);
         _dateTextView = ((Activity) _context).findViewById(R.id.dateTextView);
         _timeTextView = ((Activity) _context).findViewById(R.id.timeTextView);
@@ -88,31 +79,26 @@ public class DateTimeViewController implements IViewController {
 
     @Override
     public void onStart() {
-        _logger.Debug("onStart");
     }
 
     @Override
     public void onResume() {
-        _logger.Debug("onResume");
         if (!_isInitialized) {
             _receiverController.RegisterReceiver(_screenDisableReceiver, new String[]{Broadcasts.SCREEN_OFF});
             _receiverController.RegisterReceiver(_screenEnableReceiver, new String[]{Broadcasts.SCREEN_ENABLED});
             _receiverController.RegisterReceiver(_updateViewReceiver, new String[]{Broadcasts.SHOW_DATE_MODEL});
             _isInitialized = true;
-            _logger.Debug("Initializing!");
         } else {
-            _logger.Warning("Is ALREADY initialized!");
+            Logger.getInstance().Warning(TAG, "Is ALREADY initialized!");
         }
     }
 
     @Override
     public void onPause() {
-        _logger.Debug("onPause");
     }
 
     @Override
     public void onDestroy() {
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
         _isInitialized = false;
     }

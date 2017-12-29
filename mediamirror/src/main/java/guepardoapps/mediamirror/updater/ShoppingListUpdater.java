@@ -17,7 +17,6 @@ import guepardoapps.mediamirror.common.constants.Bundles;
 
 public class ShoppingListUpdater {
     private static final String TAG = ShoppingListUpdater.class.getSimpleName();
-    private Logger _logger;
 
     private Handler _updater;
 
@@ -32,7 +31,6 @@ public class ShoppingListUpdater {
 
     private Runnable _updateRunnable = new Runnable() {
         public void run() {
-            _logger.Debug("_updateRunnable run");
             DownloadShoppingList();
             _updater.postDelayed(_updateRunnable, _updateTime);
         }
@@ -41,7 +39,6 @@ public class ShoppingListUpdater {
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateReceiver onReceive");
             ShoppingListService.ShoppingListDownloadFinishedContent result =
                     (ShoppingListService.ShoppingListDownloadFinishedContent) intent.getSerializableExtra(ShoppingListService.ShoppingListDownloadFinishedBundle);
 
@@ -59,13 +56,11 @@ public class ShoppingListUpdater {
     private BroadcastReceiver _performUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_performUpdateReceiver onReceive");
             DownloadShoppingList();
         }
     };
 
     public ShoppingListUpdater(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _updater = new Handler();
         _context = context;
         _broadcastController = new BroadcastController(_context);
@@ -75,32 +70,25 @@ public class ShoppingListUpdater {
     }
 
     public void Start(int updateTime) {
-        _logger.Debug("Initialize");
-
         if (_isRunning) {
-            _logger.Warning("Already running!");
+            Logger.getInstance().Warning(TAG, "Already running!");
             return;
         }
-
         _updateTime = updateTime;
-        _logger.Debug("UpdateTime is: " + String.valueOf(_updateTime));
         _receiverController.RegisterReceiver(_updateReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_SHOPPING_LIST_UPDATE});
         _updateRunnable.run();
-
         _isRunning = true;
         DownloadShoppingList();
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _updater.removeCallbacks(_updateRunnable);
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadShoppingList() {
-        _logger.Debug("startDownloadShoppingList");
         _shoppingListService.LoadData();
     }
 }

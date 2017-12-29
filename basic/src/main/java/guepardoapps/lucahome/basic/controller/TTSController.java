@@ -12,7 +12,6 @@ import guepardoapps.lucahome.basic.utils.Logger;
 
 public class TTSController {
     private static final String TAG = TTSController.class.getSimpleName();
-    private Logger _logger;
 
     public static final String TTS_SPEAK_TEXT_BUNDLE = "TTS_SPEAK_TEXT_BUNDLE";
     public static final String TTS_SPEAK_TEXT_BROADCAST = "guepardoapps.lucahome.basic.controller.ttscontroller.speak.text";
@@ -28,7 +27,6 @@ public class TTSController {
     private BroadcastReceiver _speakReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_speakReceiver onReceive");
             String text = intent.getStringExtra(TTS_SPEAK_TEXT_BUNDLE);
             if (text != null) {
                 speak(text);
@@ -39,7 +37,6 @@ public class TTSController {
     public TTSController(
             @NonNull Context context,
             boolean enabled) {
-        _logger = new Logger(TAG);
         _context = context;
         _enabled = enabled;
         _receiverController = new ReceiverController(_context);
@@ -47,7 +44,7 @@ public class TTSController {
 
     public void Init() {
         if (_ttsInitialized) {
-            _logger.Warning(TAG + " is already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -55,47 +52,41 @@ public class TTSController {
             if (status == TextToSpeech.SUCCESS) {
                 int result = _ttsSpeaker.setLanguage(Locale.US);
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    _logger.Error("This Language is not supported!");
+                    Logger.getInstance().Error(TAG, "This Language is not supported!");
                 } else {
                     _receiverController.RegisterReceiver(_speakReceiver, new String[]{TTS_SPEAK_TEXT_BROADCAST});
                     _ttsInitialized = true;
                 }
             } else {
-                _logger.Error("Initialization failed!");
+                Logger.getInstance().Error(TAG, "Initialization failed!");
             }
         });
     }
 
     public void SetEnabled(boolean enabled) {
-        _logger.Debug(String.format("SetEnabled from %s to %s!", _enabled, enabled));
         _enabled = enabled;
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
-
         if (_ttsSpeaker != null) {
             _ttsSpeaker.stop();
             _ttsSpeaker.shutdown();
             _ttsSpeaker = null;
         }
-
         _receiverController.UnregisterReceiver(_speakReceiver);
-
         _ttsInitialized = false;
     }
 
     private void speak(@NonNull String text) {
-        _logger.Debug("Speak: " + text);
         if (!_enabled) {
-            _logger.Warning("TTS is disabled!");
+            Logger.getInstance().Warning(TAG, "TTS is disabled!");
             return;
         }
 
         if (_ttsInitialized) {
             _ttsSpeaker.speak(text, TextToSpeech.QUEUE_FLUSH, null, "");
         } else {
-            _logger.Warning("TTSSpeaker not initialized!");
+            Logger.getInstance().Warning(TAG, "TTSSpeaker not initialized!");
         }
     }
 }

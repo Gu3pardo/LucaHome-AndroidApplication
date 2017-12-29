@@ -27,7 +27,6 @@ import guepardoapps.mediamirror.interfaces.IViewController;
 
 public class WeatherViewController implements IViewController {
     private static final String TAG = WeatherViewController.class.getSimpleName();
-    private Logger _logger;
 
     private static int FORECAST_COUNT = 5;
 
@@ -50,7 +49,6 @@ public class WeatherViewController implements IViewController {
     private BroadcastReceiver _currentWeatherReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_currentWeatherReceiver onReceive");
             WeatherModel currentWeather = (WeatherModel) intent.getSerializableExtra(Bundles.CURRENT_WEATHER_MODEL);
             if (currentWeather != null) {
                 _conditionImageView.setImageResource(currentWeather.GetCondition().GetIcon());
@@ -60,7 +58,7 @@ public class WeatherViewController implements IViewController {
                 _pressureTextView.setText(String.format(Locale.getDefault(), "%.2f mBar", currentWeather.GetPressure()));
                 _updatedTimeTextView.setText(TimeConverter.GetTime(Calendar.getInstance()));
             } else {
-                _logger.Error("CurrentWeather is null!");
+                Logger.getInstance().Error(TAG, "CurrentWeather is null!");
                 Toasty.error(_context, "CurrentWeather is null!", Toast.LENGTH_LONG).show();
             }
         }
@@ -69,7 +67,6 @@ public class WeatherViewController implements IViewController {
     private BroadcastReceiver _forecastWeatherReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_forecastWeatherReceiver onReceive");
             OpenWeatherService.ForecastWeatherDownloadFinishedContent model =
                     (OpenWeatherService.ForecastWeatherDownloadFinishedContent) intent.getSerializableExtra(Bundles.FORECAST_WEATHER_MODEL);
             if (model != null) {
@@ -90,30 +87,27 @@ public class WeatherViewController implements IViewController {
                             forecastCount++;
                         }
                     } else {
-                        _logger.Error("Model forecastList is null!");
+                        Logger.getInstance().Error(TAG, "Model forecastList is null!");
                         Toasty.error(_context, "Model forecastList is null!", Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    _logger.Error("Model ForecastWeather is null!");
+                    Logger.getInstance().Error(TAG, "Model ForecastWeather is null!");
                     Toasty.error(_context, "Model ForecastWeather is null!", Toast.LENGTH_LONG).show();
                 }
             } else {
-                _logger.Error("Model ForecastWeatherDownloadFinishedContent is null!");
+                Logger.getInstance().Error(TAG, "Model ForecastWeatherDownloadFinishedContent is null!");
                 Toasty.error(_context, "Model ForecastWeatherDownloadFinishedContent is null!", Toast.LENGTH_LONG).show();
             }
         }
     };
 
     public WeatherViewController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _receiverController = new ReceiverController(_context);
     }
 
     @Override
     public void onCreate() {
-        _logger.Debug("onCreate");
-
         _conditionImageView = ((Activity) _context).findViewById(R.id.weatherConditionImageView);
         _conditionTextView = ((Activity) _context).findViewById(R.id.weatherConditionTextView);
         _temperatureTextView = ((Activity) _context).findViewById(R.id.weatherTemperatureTextView);
@@ -160,25 +154,21 @@ public class WeatherViewController implements IViewController {
 
     @Override
     public void onStart() {
-        _logger.Debug("onStart");
     }
 
     @Override
     public void onResume() {
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_currentWeatherReceiver, new String[]{Broadcasts.SHOW_CURRENT_WEATHER_MODEL});
         _receiverController.RegisterReceiver(_forecastWeatherReceiver, new String[]{Broadcasts.SHOW_FORECAST_WEATHER_MODEL});
     }
 
     @Override
     public void onPause() {
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     public void onDestroy() {
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 }

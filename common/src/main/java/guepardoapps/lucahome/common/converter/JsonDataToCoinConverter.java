@@ -16,19 +16,22 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public final class JsonDataToCoinConverter {
     private static final String TAG = JsonDataToCoinConverter.class.getSimpleName();
-    private Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Data\":";
 
-    private static String _searchParameter = "{\"Data\":";
+    private static final JsonDataToCoinConverter SINGLETON = new JsonDataToCoinConverter();
 
-    public JsonDataToCoinConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToCoinConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToCoinConverter() {
     }
 
     public SerializableList<Coin> GetList(@NonNull String[] stringArray, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0], conversionList);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry, conversionList);
         }
     }
@@ -38,17 +41,17 @@ public final class JsonDataToCoinConverter {
     }
 
     private SerializableList<Coin> parseStringToList(@NonNull String value, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<Coin> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<Coin> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
                 for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
                     JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Coin");
 
-                    int id = child.getInt("ID");
+                    int id = child.getInt("Id");
 
                     String user = child.getString("User");
                     String type = child.getString("Type");
@@ -62,15 +65,14 @@ public final class JsonDataToCoinConverter {
                     Coin newCoin = new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon, true, ILucaClass.LucaServerDbAction.Null);
                     list.addValue(newCoin);
                 }
-
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 

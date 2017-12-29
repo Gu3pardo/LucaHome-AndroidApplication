@@ -42,7 +42,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class ShoppingListActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = ShoppingListActivity.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -85,7 +84,6 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
     private BroadcastReceiver _shoppingListUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_shoppingListUpdateReceiver");
             ShoppingListService.ShoppingListDownloadFinishedContent result =
                     (ShoppingListService.ShoppingListDownloadFinishedContent) intent.getSerializableExtra(ShoppingListService.ShoppingListDownloadFinishedBundle);
 
@@ -130,9 +128,6 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         setContentView(R.layout.activity_shopping);
 
@@ -196,11 +191,11 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
         _addButton = findViewById(R.id.floating_action_button_add_shoppingList);
         _addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1));
+            data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1, ""));
 
             NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, ShoppingListEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
             }
         });
@@ -215,14 +210,11 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
 
         _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_shoppingList);
         _pullRefreshLayout.setOnRefreshListener(() -> {
-            _logger.Debug("onRefresh " + TAG);
-
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
             _addButton.setVisibility(View.GONE);
             _shareButton.setVisibility(View.GONE);
-
             _shoppingListService.LoadData();
         });
     }
@@ -230,13 +222,11 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         _receiverController.RegisterReceiver(_shoppingListUpdateReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
 
@@ -258,14 +248,12 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -313,7 +301,7 @@ public class ShoppingListActivity extends AppCompatActivity implements Navigatio
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
             displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 

@@ -50,43 +50,56 @@ public enum LucaServerAction implements Serializable {
 
     //MOVIE
     GET_MOVIES(70, "getmovies"),
-    START_MOVIE(71, "startmovie&title="),
-    UPDATE_MOVIE(72, "updatemovie&title="),
+    START_MOVIE(71, "startmovie&id="),
+    UPDATE_MOVIE(72, "updatemovie&id="),
 
     //SCHEDULES
     GET_SCHEDULES(80, "getschedules"),
-    SET_SCHEDULE(81, "setschedule&schedule="),
-    ADD_SCHEDULE(82, "addschedule&name="),
-    UPDATE_SCHEDULE(83, "updateschedule&name="),
-    DELETE_SCHEDULE(84, "deleteschedule&schedule="),
+    SET_SCHEDULE(81, "setschedule&id="),
+    ADD_SCHEDULE(82, "addschedule&id="),
+    UPDATE_SCHEDULE(83, "updateschedule&id="),
+    DELETE_SCHEDULE(84, "deleteschedule&id="),
 
     //SHOPPING_LIST
     GET_SHOPPING_LIST(90, "getshoppinglist"),
-    ADD_SHOPPING_ENTRY_F(91, "addshoppingentry&id=%d&name=%s&group=%s&quantity=%d"),
-    UPDATE_SHOPPING_ENTRY_F(92, "updateshoppingentry&id=%d&name=%s&group=%s&quantity=%d"),
+    ADD_SHOPPING_ENTRY_F(91, "addshoppingentry&id=%d&name=%s&group=%s&quantity=%d&unit=%s"),
+    UPDATE_SHOPPING_ENTRY_F(92, "updateshoppingentry&id=%d&name=%s&group=%s&quantity=%d&unit=%s"),
     DELETE_SHOPPING_ENTRY_F(93, "deleteshoppingentry&id=%d"),
 
     //SOCKETS
     GET_SOCKETS(100, "getsockets"),
     SET_SOCKET(102, "setsocket&socket="),
-    ADD_SOCKET(103, "addsocket&name="),
-    UPDATE_SOCKET(104, "updatesocket&name="),
-    DELETE_SOCKET(105, "deletesocket&socket="),
+    ADD_SOCKET(103, "addsocket&typeid="),
+    UPDATE_SOCKET(104, "updatesocket&typeid="),
+    DELETE_SOCKET(105, "deletesocket&typeid="),
     DEACTIVATE_ALL_SOCKETS(106, "deactivateAllSockets"),
 
     //SWITCHES
     GET_SWITCHES(110, "getswitches"),
-    ADD_SWITCH(111, "addswitch&name="),
-    UPDATE_SWITCH(112, "updateswitch&name="),
-    DELETE_SWITCH(113, "deleteswitch&name="),
+    ADD_SWITCH(111, "addswitch&id="),
+    UPDATE_SWITCH(112, "updateswitch&id="),
+    DELETE_SWITCH(113, "deleteswitch&id="),
     TOGGLE_SWITCH(114, "toggleswitch&name="),
     TOGGLE_ALL_SWITCHES(115, "toggleallswitches"),
 
+    //METER DATA
+    GET_METER_DATA(120, "getmeterdata"),
+    ADD_METER_DATA(121, "addmeterdata&id="),
+    UPDATE_METER_DATA(122, "updatemeterdata&id="),
+    DELETE_METER_DATA(123, "deletemeterdata&id="),
+
+    //MONEY METER DATA
+    GET_MONEY_METER_DATA_ALL(130, "getmoneymeterdataall"),
+    GET_MONEY_METER_DATA_USER(131, "getmoneymeterdatauser"),
+    ADD_MONEY_METER_DATA(132, "addmoneymeterdata&id="),
+    UPDATE_MONEY_METER_DATA(133, "updatemoneymeterdata&id="),
+    DELETE_MONEY_METER_DATA(134, "deletemoneymeterdata&id="),
+
     //TEMPERATURE
-    GET_TEMPERATURES(120, "getcurrenttemperaturerest"),
+    GET_TEMPERATURES(140, "getcurrenttemperaturerest"),
 
     //USER
-    VALIDATE_USER(130, "validateuser");
+    VALIDATE_USER(150, "validateuser");
 
     private int _id;
     private String _action;

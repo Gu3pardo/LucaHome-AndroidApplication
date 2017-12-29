@@ -37,7 +37,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class ShoppingListEditActivity extends AppCompatActivity {
     private static final String TAG = ShoppingListEditActivity.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _propertyChanged;
     private int _quantity = 1;
@@ -52,7 +51,6 @@ public class ShoppingListEditActivity extends AppCompatActivity {
     private BroadcastReceiver _addFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(ShoppingListService.ShoppingListAddFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -72,9 +70,6 @@ public class ShoppingListEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_edit);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         ShoppingEntryDto shoppingEntryDto = (ShoppingEntryDto) getIntent().getSerializableExtra(ShoppingListService.ShoppingIntent);
 
@@ -167,7 +162,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
                     lastHighestId = _shoppingListService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                _shoppingListService.AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity, false, ILucaClass.LucaServerDbAction.Add));
+                _shoppingListService.AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity, "", false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });
@@ -176,27 +171,23 @@ public class ShoppingListEditActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_addFinishedReceiver, new String[]{ShoppingListService.ShoppingListAddFinishedBroadcast});
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -236,7 +227,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> {
             NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ShoppingListEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);

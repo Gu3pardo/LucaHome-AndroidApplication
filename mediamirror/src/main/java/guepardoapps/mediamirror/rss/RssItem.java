@@ -3,7 +3,6 @@ package guepardoapps.mediamirror.rss;
 import android.support.annotation.NonNull;
 
 public class RssItem {
-
     private static final String TAG = RssItem.class.getSimpleName();
 
     private final String _title;

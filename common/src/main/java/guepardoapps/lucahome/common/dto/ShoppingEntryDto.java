@@ -15,16 +15,19 @@ public class ShoppingEntryDto implements Serializable {
     private String _name;
     private ShoppingEntryGroup _group;
     private int _quantity;
+    private String _unit;
 
     public ShoppingEntryDto(
             int id,
             @NonNull String name,
             @NonNull ShoppingEntryGroup group,
-            int quantity) {
+            int quantity,
+            @NonNull String unit) {
         _id = id;
         _name = name;
         _group = group;
         _quantity = quantity;
+        _unit = unit;
     }
 
     public int GetId() {
@@ -43,8 +46,12 @@ public class ShoppingEntryDto implements Serializable {
         return _quantity;
     }
 
+    public String GetUnit() {
+        return _unit;
+    }
+
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Name: %s );(Group: %s );(Quantity: %d ))", TAG, _id, _name, _group, _quantity);
+        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Name: %s );(Group: %s );(Quantity: %d );(Unit: %s ))", TAG, _id, _name, _group, _quantity, _unit);
     }
 }

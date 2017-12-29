@@ -35,7 +35,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class BootActivity extends AppCompatActivity {
     private static final String TAG = BootActivity.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _loginAttempt;
 
@@ -70,17 +69,12 @@ public class BootActivity extends AppCompatActivity {
      */
     private ServiceConnection _mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
-            _logger.Debug("onServiceConnected");
             _mainServiceBinder = ((MainService.MainServiceBinder) binder).getService();
-
             if (!_userService.IsAnUserSaved()) {
-                _logger.Information("No user saved. Prompt for login!");
-
                 _loginAttempt = true;
                 NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(BootActivity.this, LoginActivity.class);
-
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                    _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                    Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                     displayErrorSnackBar("Failed to navigate to LoginActivity! Please contact LucaHome support!");
                 }
             } else {
@@ -89,7 +83,6 @@ public class BootActivity extends AppCompatActivity {
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            _logger.Debug("onServiceDisconnected");
             _mainServiceBinder = null;
         }
     };
@@ -100,17 +93,14 @@ public class BootActivity extends AppCompatActivity {
     private BroadcastReceiver _mainServiceDownloadProgressReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_mainServiceDownloadProgress");
             MainService.MainServiceDownloadCountContent progress = (MainService.MainServiceDownloadCountContent) intent.getSerializableExtra(MainService.MainServiceDownloadCountBundle);
-
             if (progress != null) {
                 _percentProgressBar.setProgress((int) progress.DownloadProgress);
                 _percentProgressTextView.setText(String.format(Locale.getDefault(), "%.0f %%", progress.DownloadProgress));
-
                 if (progress.DownloadFinished) {
                     NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(BootActivity.this, MainActivity.class);
                     if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                        _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                         displayErrorSnackBar("Failed to navigate back to MainActivity! Please contact LucaHome support!");
                     } else {
                         finish();
@@ -124,9 +114,6 @@ public class BootActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_boot);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _percentProgressBar = findViewById(R.id.percentProgressBar);
         _percentProgressBar.setProgress(0);
@@ -159,17 +146,14 @@ public class BootActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
         startService(new Intent(BootActivity.this, MainService.class));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         if (_mainServiceBinder == null) {
-            _logger.Debug("Not bound to service! Binding now...");
             bindService(new Intent(this, MainService.class), _mainServiceConnection, Context.BIND_AUTO_CREATE);
         }
 
@@ -184,14 +168,12 @@ public class BootActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
         if (_mainServiceBinder != null) {
-            _logger.Debug("Unbinding from server");
             try {
                 unbindService(_mainServiceConnection);
             } catch (Exception exception) {
-                _logger.Error(exception.getMessage());
+                Logger.getInstance().Error(TAG, exception.getMessage());
             }
         }
     }
@@ -199,15 +181,12 @@ public class BootActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
         _loginAttempt = false;
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        _logger.Debug(String.format("onKeyDown: keyCode: %s | event: %s", keyCode, event));
-
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             Snacky.builder()
                     .setActivty(BootActivity.this)

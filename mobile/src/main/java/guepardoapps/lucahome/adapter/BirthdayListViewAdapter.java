@@ -128,7 +128,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
 
         holder._updateButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(birthday.GetId(), birthday.GetName(), birthday.GetDate(), birthday.GetRemindMe(), BirthdayDto.Action.Update));
+            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(birthday.GetId(), birthday.GetName(), birthday.GetDate(), birthday.GetGroup(), birthday.GetRemindMe(), BirthdayDto.Action.Update));
             _navigationService.NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
         });
 

@@ -21,7 +21,7 @@ public class BootReceiver extends BroadcastReceiver {
             final Handler handler = new Handler();
             handler.postDelayed(() -> {
                 Intent startIntent = new Intent();
-                startIntent.setClassName("guepardoapps.mediamirrorv2", "guepardoapps.mediamirrorv2.activity.FullscreenActivity");
+                startIntent.setClassName("guepardoapps.mediamirror", "guepardoapps.mediamirror.activity.FullscreenActivity");
                 startIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(startIntent);
             }, DELAY);

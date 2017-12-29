@@ -6,20 +6,17 @@ import android.util.Log;
 import java.io.Serializable;
 
 public class Logger implements Serializable {
-
     private static final long serialVersionUID = -6278387904140268519L;
 
-    private String _tag;
-    private boolean _debuggingEnabled;
+    private static final Logger SINGLETON = new Logger();
 
-    public Logger(@NonNull String tag, boolean debuggingEnabled) {
-        _tag = tag;
-        _debuggingEnabled = debuggingEnabled;
-        Debug("Created logger for " + _tag + "! Is Enabled: " + String.valueOf(_debuggingEnabled));
+    public static Logger getInstance() {
+        return SINGLETON;
     }
 
-    public Logger(@NonNull String tag) {
-        this(tag, true);
+    private boolean _debuggingEnabled;
+
+    private Logger() {
     }
 
     public void SetEnable(boolean debuggingEnabled) {
@@ -30,133 +27,133 @@ public class Logger implements Serializable {
         return _debuggingEnabled;
     }
 
-    public void Verbose(@NonNull String message) {
+    public void Verbose(@NonNull String tag, @NonNull String message) {
         if (_debuggingEnabled) {
             if (message.length() > 0) {
-                Log.v(_tag, message);
+                Log.v(tag, message);
             }
         }
     }
 
-    public void Verbose(int message) {
+    public void Verbose(@NonNull String tag, int message) {
         if (_debuggingEnabled) {
-            Log.v(_tag, String.valueOf(message));
+            Log.v(tag, String.valueOf(message));
         }
     }
 
-    public void Verbose(double message) {
+    public void Verbose(@NonNull String tag, double message) {
         if (_debuggingEnabled) {
-            Log.v(_tag, String.valueOf(message));
+            Log.v(tag, String.valueOf(message));
         }
     }
 
-    public void Verbose(boolean message) {
+    public void Verbose(@NonNull String tag, boolean message) {
         if (_debuggingEnabled) {
-            Log.v(_tag, String.valueOf(message));
+            Log.v(tag, String.valueOf(message));
         }
     }
 
-    public void Debug(@NonNull String message) {
+    public void Debug(@NonNull String tag, @NonNull String message) {
         if (_debuggingEnabled) {
             if (message.length() > 0) {
-                Log.d(_tag, message);
+                Log.d(tag, message);
             }
         }
     }
 
-    public void Debug(int message) {
+    public void Debug(@NonNull String tag, int message) {
         if (_debuggingEnabled) {
-            Log.d(_tag, String.valueOf(message));
+            Log.d(tag, String.valueOf(message));
         }
     }
 
-    public void Debug(double message) {
+    public void Debug(@NonNull String tag, double message) {
         if (_debuggingEnabled) {
-            Log.d(_tag, String.valueOf(message));
+            Log.d(tag, String.valueOf(message));
         }
     }
 
-    public void Debug(boolean message) {
+    public void Debug(@NonNull String tag, boolean message) {
         if (_debuggingEnabled) {
-            Log.d(_tag, String.valueOf(message));
+            Log.d(tag, String.valueOf(message));
         }
     }
 
-    public void Information(@NonNull String message) {
+    public void Information(@NonNull String tag, @NonNull String message) {
         if (_debuggingEnabled) {
             if (message.length() > 0) {
-                Log.i(_tag, message);
+                Log.i(tag, message);
             }
         }
     }
 
-    public void Information(int message) {
+    public void Information(@NonNull String tag, int message) {
         if (_debuggingEnabled) {
-            Log.i(_tag, String.valueOf(message));
+            Log.i(tag, String.valueOf(message));
         }
     }
 
-    public void Information(double message) {
+    public void Information(@NonNull String tag, double message) {
         if (_debuggingEnabled) {
-            Log.i(_tag, String.valueOf(message));
+            Log.i(tag, String.valueOf(message));
         }
     }
 
-    public void Information(boolean message) {
+    public void Information(@NonNull String tag, boolean message) {
         if (_debuggingEnabled) {
-            Log.i(_tag, String.valueOf(message));
+            Log.i(tag, String.valueOf(message));
         }
     }
 
-    public void Warning(@NonNull String message) {
+    public void Warning(@NonNull String tag, @NonNull String message) {
         if (_debuggingEnabled) {
             if (message.length() > 0) {
-                Log.w(_tag, message);
+                Log.w(tag, message);
             }
         }
     }
 
-    public void Warning(int message) {
+    public void Warning(@NonNull String tag, int message) {
         if (_debuggingEnabled) {
-            Log.w(_tag, String.valueOf(message));
+            Log.w(tag, String.valueOf(message));
         }
     }
 
-    public void Warning(double message) {
+    public void Warning(@NonNull String tag, double message) {
         if (_debuggingEnabled) {
-            Log.w(_tag, String.valueOf(message));
+            Log.w(tag, String.valueOf(message));
         }
     }
 
-    public void Warning(boolean message) {
+    public void Warning(@NonNull String tag, boolean message) {
         if (_debuggingEnabled) {
-            Log.w(_tag, String.valueOf(message));
+            Log.w(tag, String.valueOf(message));
         }
     }
 
-    public void Error(@NonNull String message) {
+    public void Error(@NonNull String tag, @NonNull String message) {
         if (_debuggingEnabled) {
             if (message.length() > 0) {
-                Log.e(_tag, message);
+                Log.e(tag, message);
             }
         }
     }
 
-    public void Error(int message) {
+    public void Error(@NonNull String tag, int message) {
         if (_debuggingEnabled) {
-            Log.e(_tag, String.valueOf(message));
+            Log.e(tag, String.valueOf(message));
         }
     }
 
-    public void Error(double message) {
+    public void Error(@NonNull String tag, double message) {
         if (_debuggingEnabled) {
-            Log.e(_tag, String.valueOf(message));
+            Log.e(tag, String.valueOf(message));
         }
     }
 
-    public void Error(boolean message) {
+    public void Error(@NonNull String tag, boolean message) {
         if (_debuggingEnabled) {
-            Log.e(_tag, String.valueOf(message));
+            Log.e(tag, String.valueOf(message));
         }
     }
 }

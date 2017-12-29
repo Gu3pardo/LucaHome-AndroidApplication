@@ -65,7 +65,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     private boolean _isInitialized;
 
     private static final String TAG = WirelessSwitchService.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _loadDataEnabled;
 
@@ -83,10 +82,7 @@ public class WirelessSwitchService implements IDataNotificationService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -102,43 +98,37 @@ public class WirelessSwitchService implements IDataNotificationService {
 
     private DatabaseWirelessSwitchList _databaseWirelessSwitchList;
 
-    private JsonDataToWirelessSwitchConverter _jsonDataToWirelessSwitchConverter;
-
     private SerializableList<WirelessSwitch> _wirelessSwitchList = new SerializableList<>();
 
     private BroadcastReceiver _wirelessSwitchDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSwitchDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitch) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
                 sendFailedWirelessSwitchDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
                 sendFailedWirelessSwitchDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<WirelessSwitch> wirelessSwitchList = _jsonDataToWirelessSwitchConverter.GetList(contentResponse);
+            SerializableList<WirelessSwitch> wirelessSwitchList = JsonDataToWirelessSwitchConverter.getInstance().GetList(contentResponse);
             if (wirelessSwitchList == null) {
-                _logger.Error("Converted wirelessSwitchList is null!");
+                Logger.getInstance().Error(TAG, "Converted wirelessSwitchList is null!");
                 _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
                 sendFailedWirelessSwitchDownloadBroadcast(contentResponse);
                 return;
@@ -162,27 +152,23 @@ public class WirelessSwitchService implements IDataNotificationService {
     private BroadcastReceiver _wirelessSwitchToggleFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSwitchToggleFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitchToggle) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedWirelessSwitchToggleBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedWirelessSwitchToggleBroadcast(contentResponse);
                 return;
             }
@@ -201,27 +187,23 @@ public class WirelessSwitchService implements IDataNotificationService {
     private BroadcastReceiver _wirelessSwitchAddFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSwitchAddFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitchAdd) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedWirelessSwitchAddBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedWirelessSwitchAddBroadcast(contentResponse);
                 return;
             }
@@ -240,27 +222,23 @@ public class WirelessSwitchService implements IDataNotificationService {
     private BroadcastReceiver _wirelessSwitchUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSwitchUpdateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitchUpdate) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedWirelessSwitchUpdateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedWirelessSwitchUpdateBroadcast(contentResponse);
                 return;
             }
@@ -279,27 +257,23 @@ public class WirelessSwitchService implements IDataNotificationService {
     private BroadcastReceiver _wirelessSwitchDeleteFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_wirelessSwitchDeleteFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitchDelete) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedWirelessSwitchDeleteBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedWirelessSwitchDeleteBroadcast(contentResponse);
                 return;
             }
@@ -318,7 +292,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -329,14 +302,11 @@ public class WirelessSwitchService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private WirelessSwitchService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static WirelessSwitchService getInstance() {
@@ -345,10 +315,8 @@ public class WirelessSwitchService implements IDataNotificationService {
 
     @Override
     public void Initialize(@NonNull Context context, @NonNull Class<?> receiverClass, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -379,8 +347,6 @@ public class WirelessSwitchService implements IDataNotificationService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToWirelessSwitchConverter = new JsonDataToWirelessSwitchConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -388,7 +354,6 @@ public class WirelessSwitchService implements IDataNotificationService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _databaseWirelessSwitchList.Close();
@@ -497,10 +462,7 @@ public class WirelessSwitchService implements IDataNotificationService {
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         if (!_loadDataEnabled) {
-            _logger.Debug("_loadDataEnabled is false!");
             return;
         }
 
@@ -537,7 +499,7 @@ public class WirelessSwitchService implements IDataNotificationService {
                         break;
                     case Null:
                     default:
-                        _logger.Debug(String.format(Locale.getDefault(), "Nothing todo with %s.", wirelessSwitch));
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", wirelessSwitch));
                         break;
                 }
 
@@ -551,14 +513,11 @@ public class WirelessSwitchService implements IDataNotificationService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_SWITCHES.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSwitch, true);
     }
 
     public void ToggleWirelessSwitch(@NonNull WirelessSwitch entry) throws Exception {
-        _logger.Debug(String.format(Locale.getDefault(), "ToggleWirelessSwitch: Toggle entry %s", entry));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedWirelessSwitchToggleBroadcast("No user");
@@ -574,8 +533,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     }
 
     public void ToggleWirelessSwitch(@NonNull String wirelessSwitchName) {
-        _logger.Debug(String.format(Locale.getDefault(), "ToggleWirelessSwitch: Toggle entry %s", wirelessSwitchName));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedWirelessSwitchToggleBroadcast("No user");
@@ -586,7 +543,7 @@ public class WirelessSwitchService implements IDataNotificationService {
 
         if (wirelessSwitch == null) {
             String errorMessage = String.format(Locale.getDefault(), "WirelessSwitch is null! Name %s not found!", wirelessSwitchName);
-            _logger.Error(errorMessage);
+            Logger.getInstance().Error(TAG, errorMessage);
             sendFailedWirelessSwitchToggleBroadcast(errorMessage);
             return;
         }
@@ -594,13 +551,11 @@ public class WirelessSwitchService implements IDataNotificationService {
         try {
             ToggleWirelessSwitch(wirelessSwitch);
         } catch (Exception exception) {
-            _logger.Error(exception.getMessage());
+            Logger.getInstance().Error(TAG, exception.getMessage());
         }
     }
 
     public void ToggleAllWirelessSwitches() {
-        _logger.Debug("ToggleAllWirelessSwitches");
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedWirelessSwitchToggleBroadcast("No user");
@@ -616,8 +571,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     }
 
     public void AddWirelessSwitch(@NonNull WirelessSwitch entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "AddWirelessSwitch: Adding new entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
@@ -644,8 +597,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     }
 
     public void UpdateWirelessSwitch(@NonNull WirelessSwitch entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "UpdateWirelessSwitch: Updating entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
@@ -672,8 +623,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     }
 
     public void DeleteWirelessSwitch(@NonNull WirelessSwitch entry) {
-        _logger.Debug(String.format(Locale.getDefault(), "DeleteWirelessSwitch: Deleting entry %s", entry));
-
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
@@ -700,8 +649,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     }
 
     public boolean GetWirelessSwitchAction(@NonNull String wirelessSwitchName) {
-        _logger.Debug(String.format(Locale.getDefault(), "GetWirelessSwitchAction: Action of wirelessSwitch %s", wirelessSwitchName));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedWirelessSwitchGetBroadcast("No user");
@@ -712,7 +659,7 @@ public class WirelessSwitchService implements IDataNotificationService {
 
         if (wirelessSwitch == null) {
             String errorMessage = String.format(Locale.getDefault(), "WirelessSwitch is null! Name %s not found!", wirelessSwitchName);
-            _logger.Error(errorMessage);
+            Logger.getInstance().Error(TAG, errorMessage);
             sendFailedWirelessSwitchGetBroadcast(errorMessage);
             return false;
         }
@@ -722,13 +669,12 @@ public class WirelessSwitchService implements IDataNotificationService {
 
     @Override
     public void ShowNotification() {
-        _logger.Debug("ShowNotification");
         if (!_displayNotification) {
-            _logger.Warning("_displayNotification is false!");
+            Logger.getInstance().Warning(TAG, "_displayNotification is false!");
             return;
         }
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
-            _logger.Warning("No home network!");
+            Logger.getInstance().Warning(TAG, "No home network!");
             return;
         }
         _notificationController.CreateWirelessSwitchNotification(NOTIFICATION_ID, _wirelessSwitchList, _receiverClass);
@@ -736,7 +682,6 @@ public class WirelessSwitchService implements IDataNotificationService {
 
     @Override
     public void CloseNotification() {
-        _logger.Debug("CloseNotification");
         _notificationController.CloseNotification(NOTIFICATION_ID);
     }
 
@@ -787,11 +732,9 @@ public class WirelessSwitchService implements IDataNotificationService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 
@@ -807,8 +750,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     }
 
     private void clearSwitchListFromDatabase() {
-        _logger.Debug("clearSwitchListFromDatabase");
-
         SerializableList<WirelessSwitch> wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
         for (int index = 0; index < wirelessSwitchList.getSize(); index++) {
             WirelessSwitch wirelessSwitch = wirelessSwitchList.getValue(index);
@@ -817,8 +758,6 @@ public class WirelessSwitchService implements IDataNotificationService {
     }
 
     private void saveSwitchListToDatabase() {
-        _logger.Debug("saveSwitchListToDatabase");
-
         for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
             WirelessSwitch wirelessSwitch = _wirelessSwitchList.getValue(index);
             _databaseWirelessSwitchList.CreateEntry(wirelessSwitch);

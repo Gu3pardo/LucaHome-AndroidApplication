@@ -12,17 +12,14 @@ import java.util.List;
 import guepardoapps.lucahome.basic.utils.Logger;
 
 public class ReceiverController implements Serializable {
-
     private static final long serialVersionUID = 2288241732336744506L;
 
     private static String TAG = ReceiverController.class.getSimpleName();
 
-    private Logger _logger;
     private Context _context;
     private List<BroadcastReceiver> _registeredReceiver;
 
     public ReceiverController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _registeredReceiver = new ArrayList<>();
     }
@@ -48,7 +45,7 @@ public class ReceiverController implements Serializable {
                     _context.unregisterReceiver(receiver);
                     _registeredReceiver.remove(index);
                 } catch (Exception e) {
-                    _logger.Error(e.toString());
+                    Logger.getInstance().Error(TAG, e.toString());
                 }
                 break;
             }
@@ -56,14 +53,12 @@ public class ReceiverController implements Serializable {
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
-
         for (int index = 0; index < _registeredReceiver.size(); index++) {
             try {
                 _context.unregisterReceiver(_registeredReceiver.get(index));
                 _registeredReceiver.remove(index);
             } catch (Exception e) {
-                _logger.Error(e.toString());
+                Logger.getInstance().Error(TAG, e.toString());
             }
         }
     }

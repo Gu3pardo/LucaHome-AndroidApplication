@@ -37,7 +37,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class CoinEditActivity extends AppCompatActivity {
     private static final String TAG = CoinEditActivity.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _propertyChanged;
     private CoinDto _coinDto;
@@ -52,7 +51,6 @@ public class CoinEditActivity extends AppCompatActivity {
     private BroadcastReceiver _addFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(CoinService.CoinAddFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -71,7 +69,6 @@ public class CoinEditActivity extends AppCompatActivity {
     private BroadcastReceiver _updateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(CoinService.CoinUpdateFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -92,9 +89,6 @@ public class CoinEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_coin_edit);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _coinDto = (CoinDto) getIntent().getSerializableExtra(CoinService.CoinIntent);
 
@@ -207,13 +201,11 @@ public class CoinEditActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_addFinishedReceiver, new String[]{CoinService.CoinAddFinishedBroadcast});
         _receiverController.RegisterReceiver(_updateFinishedReceiver, new String[]{CoinService.CoinUpdateFinishedBroadcast});
     }
@@ -221,14 +213,12 @@ public class CoinEditActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -268,7 +258,7 @@ public class CoinEditActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> {
             NavigationService.NavigationResult navigationResult = _navigationService.GoBack(CoinEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);

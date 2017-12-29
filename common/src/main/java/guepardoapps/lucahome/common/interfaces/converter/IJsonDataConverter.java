@@ -6,5 +6,6 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 
 public interface IJsonDataConverter {
     SerializableList<?> GetList(@NonNull String[] stringArray);
+
     SerializableList<?> GetList(@NonNull String responseString);
 }

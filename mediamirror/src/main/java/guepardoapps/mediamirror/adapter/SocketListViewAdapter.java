@@ -13,11 +13,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
+import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.mediamirror.R;
 
 public class SocketListViewAdapter extends BaseAdapter {
+    private static String TAG = SocketListViewAdapter.class.getSimpleName();
+
     private class Holder {
         private TextView _titleText;
         private TextView _areaText;
@@ -87,7 +90,7 @@ public class SocketListViewAdapter extends BaseAdapter {
             try {
                 _wirelessSocketService.SetWirelessSocketState(wirelessSocket, value);
             } catch (Exception exception) {
-                // TODO perhaps log exception or make notification
+                Logger.getInstance().Error(TAG, exception.getMessage());
             }
             _dialog.dismiss();
         });

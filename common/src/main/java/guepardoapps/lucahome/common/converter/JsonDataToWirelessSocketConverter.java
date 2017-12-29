@@ -17,12 +17,15 @@ import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
 
 public final class JsonDataToWirelessSocketConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToWirelessSocketConverter.class.getSimpleName();
-    private static Logger _logger;
+    private static final String SEARCH_PARAMETER = "{\"Data\":";
 
-    private static String _searchParameter = "{\"Data\":";
+    private static final JsonDataToWirelessSocketConverter SINGLETON = new JsonDataToWirelessSocketConverter();
 
-    public JsonDataToWirelessSocketConverter() {
-        _logger = new Logger(TAG);
+    public static JsonDataToWirelessSocketConverter getInstance() {
+        return SINGLETON;
+    }
+
+    private JsonDataToWirelessSocketConverter() {
     }
 
     @Override
@@ -30,7 +33,7 @@ public final class JsonDataToWirelessSocketConverter implements IJsonDataConvert
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, _searchParameter);
+            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry);
         }
     }
@@ -41,15 +44,17 @@ public final class JsonDataToWirelessSocketConverter implements IJsonDataConvert
     }
 
     private static SerializableList<WirelessSocket> parseStringToList(String value) {
-        try {
-            if (!value.contains("Error")) {
-                SerializableList<WirelessSocket> list = new SerializableList<>();
+        if (!value.contains("Error")) {
+            SerializableList<WirelessSocket> list = new SerializableList<>();
 
+            try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
                 for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
                     JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("WirelessSocket");
+
+                    int typeId = child.getInt("TypeId");
 
                     String name = child.getString("Name");
                     String area = child.getString("Area");
@@ -76,21 +81,19 @@ public final class JsonDataToWirelessSocketConverter implements IJsonDataConvert
                     String lastTriggerUser = lastTriggerJsonData.getString("UserName");
 
                     WirelessSocket newWirelessSocket = new WirelessSocket(
-                            dataIndex,
+                            typeId,
                             name, area, code, isActivated,
                             new SerializableDate(year, month, day), new SerializableTime(hour, minute, 0, 0), lastTriggerUser,
                             true, ILucaClass.LucaServerDbAction.Null);
                     list.addValue(newWirelessSocket);
                 }
-
-                return list;
+            } catch (JSONException jsonException) {
+                Logger.getInstance().Error(TAG, jsonException.getMessage());
             }
-        } catch (JSONException jsonException) {
-            _logger.Error(jsonException.getMessage());
+            return list;
         }
 
-        _logger.Error(value + " has an error!");
-
+        Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
     }
 }

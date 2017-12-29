@@ -26,7 +26,6 @@ import guepardoapps.library.openweather.service.OpenWeatherService;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.controller.SharedPrefController;
-import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.controller.SettingsController;
@@ -35,6 +34,8 @@ import guepardoapps.lucahome.common.service.CoinService;
 import guepardoapps.lucahome.common.service.MapContentService;
 import guepardoapps.lucahome.common.service.MediaServerService;
 import guepardoapps.lucahome.common.service.MenuService;
+import guepardoapps.lucahome.common.service.MeterListService;
+import guepardoapps.lucahome.common.service.MoneyMeterListService;
 import guepardoapps.lucahome.common.service.MovieService;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.SecurityService;
@@ -46,7 +47,6 @@ import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -60,8 +60,7 @@ import java.util.Locale;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
-    private static final String TAG = SettingsActivity.class.getSimpleName();
-    private static Logger _logger;
+    // private static final String TAG = SettingsActivity.class.getSimpleName();
 
     private ReceiverController _receiverController;
     private static SharedPrefController _sharedPrefController;
@@ -74,6 +73,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static MapContentService _mapContentService;
     private static MediaServerService _mediaServerService;
     private static MenuService _menuService;
+    private static MeterListService _meterListService;
+    private static MoneyMeterListService _moneyMeterListService;
     private static MovieService _movieService;
     private static OpenWeatherService _openWeatherService;
     private static ScheduleService _scheduleService;
@@ -91,11 +92,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
-            _logger.Debug(String.format(
-                    Locale.getDefault(),
-                    "sBindPreferenceSummaryToValueListener for preference %s (Key: %s) with value %s",
-                    preference, preference.getKey(), value));
-
             if (preference instanceof ListPreference) {
                 // For list preferences, look up the correct display value in
                 // the preference's 'entries' list.
@@ -132,6 +128,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MENU_TIMEOUT)) {
                     _menuService.SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_METER_DATA_TIMEOUT)) {
+                    _meterListService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MONEY_METER_DATA_TIMEOUT)) {
+                    _moneyMeterListService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MOVIE_TIMEOUT)) {
                     _movieService.SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
@@ -164,11 +166,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
 
             } else {
-                // For all other preferences, just create a log
-                _logger.Debug(String.format(
-                        Locale.getDefault(),
-                        "sBindPreferenceSummaryToValueListener for preference %s (key %s) with value %s",
-                        preference, preference.getKey(), value));
                 _sharedPrefController.SaveBooleanValue(preference.getKey(), (boolean) value);
 
                 if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE)) {
@@ -223,6 +220,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         _mapContentService.SetReloadEnabled(_settingsController.IsReloadMapContentEnabled());
                         _mediaServerService.SetReloadEnabled(_settingsController.IsReloadMediaServerEnabled());
                         _menuService.SetReloadEnabled(_settingsController.IsReloadMenuEnabled());
+                        _meterListService.SetReloadEnabled(_settingsController.IsReloadMeterDataEnabled());
+                        _moneyMeterListService.SetReloadEnabled(_settingsController.IsReloadMoneyMeterDataEnabled());
                         _movieService.SetReloadEnabled(_settingsController.IsReloadMovieEnabled());
                         _openWeatherService.SetReloadEnabled(_settingsController.IsReloadWeatherEnabled());
                         _scheduleService.SetReloadEnabled(_settingsController.IsReloadScheduleEnabled());
@@ -237,6 +236,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         _mapContentService.SetReloadEnabled(false);
                         _mediaServerService.SetReloadEnabled(false);
                         _menuService.SetReloadEnabled(false);
+                        _meterListService.SetReloadEnabled(false);
+                        _moneyMeterListService.SetReloadEnabled(false);
                         _movieService.SetReloadEnabled(false);
                         _openWeatherService.SetReloadEnabled(false);
                         _scheduleService.SetReloadEnabled(false);
@@ -294,7 +295,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private BroadcastReceiver _validateUserReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_validateUserReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(UserService.UserCheckedFinishedBundle);
             if (!result.Success) {
                 Snacky.builder()
@@ -319,8 +319,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _receiverController = new ReceiverController(this);
         _settingsController = SettingsController.getInstance();
@@ -333,6 +331,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         _mapContentService = MapContentService.getInstance();
         _mediaServerService = MediaServerService.getInstance();
         _menuService = MenuService.getInstance();
+        _meterListService = MeterListService.getInstance();
+        _moneyMeterListService = MoneyMeterListService.getInstance();
         _movieService = MovieService.getInstance();
         _openWeatherService = OpenWeatherService.getInstance();
         _scheduleService = ScheduleService.getInstance();
@@ -349,21 +349,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_validateUserReceiver, new String[]{UserService.UserCheckedFinishedBroadcast});
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -566,6 +563,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MENU_ENABLED));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MENU_TIMEOUT));
+
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_METER_DATA_ENABLED));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_METER_DATA_TIMEOUT));
+
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MONEY_METER_DATA_ENABLED));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MONEY_METER_DATA_TIMEOUT));
 
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MOVIE_ENABLED));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MOVIE_TIMEOUT));

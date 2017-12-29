@@ -18,7 +18,7 @@ public class WirelessSocket implements Serializable, ILucaClass {
 
     public static final String SETTINGS_HEADER = "SharedPref_Notification_Socket_";
 
-    protected int _id;
+    protected int _typeId;
 
     protected String _name;
     protected String _area;
@@ -35,7 +35,7 @@ public class WirelessSocket implements Serializable, ILucaClass {
     protected LucaServerDbAction _serverDbAction;
 
     public WirelessSocket(
-            int id,
+            int typeId,
             @NonNull String name,
             @NonNull String area,
             @NonNull String code,
@@ -45,7 +45,7 @@ public class WirelessSocket implements Serializable, ILucaClass {
             @NonNull String lastTriggerUser,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
-        _id = id;
+        _typeId = typeId;
 
         _name = name;
         _area = area;
@@ -64,7 +64,7 @@ public class WirelessSocket implements Serializable, ILucaClass {
 
     @Override
     public int GetId() {
-        return _id;
+        return _typeId;
     }
 
     public String GetName() {
@@ -156,26 +156,26 @@ public class WirelessSocket implements Serializable, ILucaClass {
     }
 
     public String CommandSetState() throws Exception {
-        return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
+        return String.format(Locale.getDefault(), "%s%d%s", LucaServerAction.SET_SOCKET.toString(), _typeId, ((_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
     }
 
     public String CommandChangeState() throws Exception {
-        return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((!_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
+        return String.format(Locale.getDefault(), "%s%d%s", LucaServerAction.SET_SOCKET.toString(), _typeId, ((!_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
     }
 
     @Override
     public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%s&area=%s&code=%s", LucaServerAction.ADD_SOCKET.toString(), _name, _area, _code);
+        return String.format(Locale.getDefault(), "%s%d&name=%s&area=%s&code=%s", LucaServerAction.ADD_SOCKET.toString(), _typeId, _name, _area, _code);
     }
 
     @Override
     public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%s&area=%s&code=%s&isactivated=%s", LucaServerAction.ADD_SOCKET.toString(), _name, _area, _code, (_isActivated ? "1" : "0"));
+        return String.format(Locale.getDefault(), "%s%d&name=%s&area=%s&code=%s&isactivated=%s", LucaServerAction.ADD_SOCKET.toString(), _typeId, _name, _area, _code, (_isActivated ? "1" : "0"));
     }
 
     @Override
     public String CommandDelete() {
-        return String.format(Locale.getDefault(), "%s%s", LucaServerAction.DELETE_SOCKET.toString(), _name);
+        return String.format(Locale.getDefault(), "%s%d", LucaServerAction.DELETE_SOCKET.toString(), _typeId);
     }
 
     public int GetWallpaper() {

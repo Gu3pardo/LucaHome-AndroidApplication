@@ -11,25 +11,20 @@ public class RaspberryTemperatureHelper implements Serializable {
     private static final long serialVersionUID = -8359166934848014777L;
 
     private static final String TAG = RaspberryTemperatureHelper.class.getSimpleName();
-    private Logger _logger;
 
     public RaspberryTemperatureHelper() {
-        _logger = new Logger(TAG);
     }
 
     public int GetIcon(@NonNull String temperature) {
-        _logger.Debug("temperature: " + temperature);
-        String pureDouble = temperature.replace("�C", "");
-        _logger.Debug("pureDouble: " + pureDouble);
+        String pureDouble = temperature.replace("°C", "");
 
         double parsedDouble;
         try {
             parsedDouble = Double.parseDouble(pureDouble);
         } catch (Exception e) {
-            _logger.Warning("Parsing ot string to double failed! Setting to -1");
+            Logger.getInstance().Warning(TAG, "Parsing ot string to double failed! Setting to -1");
             parsedDouble = -1;
         }
-        _logger.Debug("parsedDouble: " + String.valueOf(parsedDouble));
 
         int drawable = 0;
         if (parsedDouble < 12) {
@@ -46,7 +41,6 @@ public class RaspberryTemperatureHelper implements Serializable {
             drawable = R.xml.circle_red;
         }
 
-        _logger.Debug("Drawable: " + String.valueOf(drawable));
         return drawable;
     }
 }

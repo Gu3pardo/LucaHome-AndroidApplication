@@ -14,7 +14,6 @@ import guepardoapps.mediamirror.common.constants.Bundles;
 
 public class MenuListUpdater {
     private static final String TAG = MenuListUpdater.class.getSimpleName();
-    private Logger _logger;
 
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
@@ -26,14 +25,13 @@ public class MenuListUpdater {
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateReceiver onReceive");
             MenuService.MenuDownloadFinishedContent result =
                     (MenuService.MenuDownloadFinishedContent) intent.getSerializableExtra(MenuService.MenuDownloadFinishedBundle);
 
             if (result != null) {
                 _broadcastController.SendSerializableBroadcast(Broadcasts.MENU, Bundles.MENU, result.MenuList);
             } else {
-                _logger.Warning("Result is null!");
+                Logger.getInstance().Warning(TAG, "Result is null!");
             }
         }
     };
@@ -41,26 +39,20 @@ public class MenuListUpdater {
     private BroadcastReceiver _performUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_performUpdateReceiver onReceive");
             DownloadMenuList();
         }
     };
 
     public MenuListUpdater(@NonNull Context context) {
-        _logger = new Logger(TAG);
-
         _broadcastController = new BroadcastController(context);
         _receiverController = new ReceiverController(context);
-
         _menuService = MenuService.getInstance();
         _menuService.Initialize(context, true, 2 * 60);
     }
 
     public void Start() {
-        _logger.Debug("Initialize");
-
         if (_isRunning) {
-            _logger.Warning("Already running!");
+            Logger.getInstance().Warning(TAG, "Already running!");
             return;
         }
 
@@ -72,13 +64,11 @@ public class MenuListUpdater {
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadMenuList() {
-        _logger.Debug("startDownloadMenuList");
         _menuService.LoadData();
     }
 }

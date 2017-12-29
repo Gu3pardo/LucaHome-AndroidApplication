@@ -3,8 +3,6 @@ package guepardoapps.lucahome.common.controller;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import java.util.Locale;
-
 import guepardoapps.lucahome.basic.controller.SharedPrefController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaUser;
@@ -15,9 +13,8 @@ public class SettingsController {
     private static final SettingsController SINGLETON = new SettingsController();
 
     private static final String TAG = SettingsController.class.getSimpleName();
-    private Logger _logger;
 
-    private static final String PREF_SETTINGS_INSTALLED = "settings_installed";
+    private static final String PREF_SETTINGS_INSTALLED = "settings_v5.1.0.171229_installed";
 
     public static final String PREF_USER_NAME = "user_name";
     public static final String PREF_USER_PASS_PHRASE = "user_passphrase";
@@ -44,6 +41,8 @@ public class SettingsController {
     public static final String PREF_RELOAD_MAPCONTENT_ENABLED = "reload_mapcontent_enabled";
     public static final String PREF_RELOAD_MEDIASERVER_ENABLED = "reload_mediaserver_enabled";
     public static final String PREF_RELOAD_MENU_ENABLED = "reload_menu_enabled";
+    public static final String PREF_RELOAD_METER_DATA_ENABLED = "reload_meter_data_enabled";
+    public static final String PREF_RELOAD_MONEY_METER_DATA_ENABLED = "reload_money_meter_data_enabled";
     public static final String PREF_RELOAD_MOVIE_ENABLED = "reload_movie_enabled";
     public static final String PREF_RELOAD_SCHEDULE_ENABLED = "reload_schedule_enabled";
     public static final String PREF_RELOAD_SECURITY_ENABLED = "reload_security_enabled";
@@ -58,6 +57,8 @@ public class SettingsController {
     public static final String PREF_RELOAD_MAPCONTENT_TIMEOUT = "reload_mapcontent_timeout";
     public static final String PREF_RELOAD_MEDIASERVER_TIMEOUT = "reload_mediaserver_timeout";
     public static final String PREF_RELOAD_MENU_TIMEOUT = "reload_menu_timeout";
+    public static final String PREF_RELOAD_METER_DATA_TIMEOUT = "reload_meter_data_timeout";
+    public static final String PREF_RELOAD_MONEY_METER_DATA_TIMEOUT = "reload_money_meter_data_timeout";
     public static final String PREF_RELOAD_MOVIE_TIMEOUT = "reload_movie_timeout";
     public static final String PREF_RELOAD_SCHEDULE_TIMEOUT = "reload_schedule_timeout";
     public static final String PREF_RELOAD_SECURITY_TIMEOUT = "reload_security_timeout";
@@ -75,7 +76,6 @@ public class SettingsController {
     private boolean _isInitialized;
 
     private SettingsController() {
-        _logger = new Logger(TAG);
     }
 
     public static SettingsController getInstance() {
@@ -84,7 +84,7 @@ public class SettingsController {
 
     public void Initialize(@NonNull Context context) {
         if (_isInitialized) {
-            _logger.Error("Already initialized!");
+            Logger.getInstance().Error(TAG, "Already initialized!");
             return;
         }
 
@@ -106,6 +106,8 @@ public class SettingsController {
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MAPCONTENT_TIMEOUT, "240");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MEDIASERVER_TIMEOUT, "30");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MENU_TIMEOUT, "120");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_METER_DATA_TIMEOUT, "240");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MONEY_METER_DATA_TIMEOUT, "240");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MOVIE_TIMEOUT, "60");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_SCHEDULE_TIMEOUT, "60");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_SECURITY_TIMEOUT, "15");
@@ -120,7 +122,7 @@ public class SettingsController {
 
     public LucaUser GetUser() {
         if (!_isInitialized) {
-            _logger.Error("Not initialized!");
+            Logger.getInstance().Error(TAG, "Not initialized!");
             return null;
         }
 
@@ -139,12 +141,10 @@ public class SettingsController {
 
     public void SetUser(LucaUser user) {
         if (user != null) {
-            _logger.Debug(String.format(Locale.getDefault(), "SetUser: %s", user));
-
             _sharedPrefController.SaveStringValue(PREF_USER_NAME, user.GetName());
             _sharedPrefController.SaveStringValue(PREF_USER_PASS_PHRASE, user.GetPassphrase());
         } else {
-            _logger.Error("User may not be null! Cannot save!");
+            Logger.getInstance().Error(TAG, "User may not be null! Cannot save!");
         }
     }
 
@@ -279,6 +279,20 @@ public class SettingsController {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MENU_ENABLED);
     }
 
+    public boolean IsReloadMeterDataEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_METER_DATA_ENABLED);
+    }
+
+    public boolean IsReloadMoneyMeterDataEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MONEY_METER_DATA_ENABLED);
+    }
+
     public boolean IsReloadMovieEnabled() {
         if (!AreReloadsEnabled()) {
             return false;
@@ -357,6 +371,16 @@ public class SettingsController {
 
     public int GetReloadMenuTimeout() {
         String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MENU_TIMEOUT);
+        return Integer.parseInt(stringValue);
+    }
+
+    public int GetReloadMeterDataTimeout() {
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_METER_DATA_TIMEOUT);
+        return Integer.parseInt(stringValue);
+    }
+
+    public int GetReloadMoneyMeterDataTimeout() {
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MONEY_METER_DATA_TIMEOUT);
         return Integer.parseInt(stringValue);
     }
 

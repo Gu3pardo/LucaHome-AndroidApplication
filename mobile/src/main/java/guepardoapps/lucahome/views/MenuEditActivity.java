@@ -39,7 +39,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class MenuEditActivity extends AppCompatActivity {
     private static final String TAG = MenuEditActivity.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _propertyChanged;
     private MenuDto _menuDto;
@@ -54,7 +53,6 @@ public class MenuEditActivity extends AppCompatActivity {
     private BroadcastReceiver _updateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(MenuService.MenuUpdateFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -75,9 +73,6 @@ public class MenuEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_edit);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _menuDto = (MenuDto) getIntent().getSerializableExtra(MenuService.MenuIntent);
 
@@ -174,27 +169,23 @@ public class MenuEditActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_updateFinishedReceiver, new String[]{MenuService.MenuUpdateFinishedBroadcast});
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -234,7 +225,7 @@ public class MenuEditActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> {
             NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MenuEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);

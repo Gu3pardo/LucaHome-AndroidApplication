@@ -19,9 +19,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.enums.RSSFeed;
 
 public class RssService extends IntentService {
-
     private static final String TAG = RssService.class.getSimpleName();
-    private Logger _logger;
 
     public static final String ITEMS = "items";
     public static final String TITLE = "title";
@@ -30,13 +28,10 @@ public class RssService extends IntentService {
 
     public RssService() {
         super(RssService.class.getName());
-        _logger = new Logger(TAG);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        _logger.Debug("Service started");
-
         RSSFeed feed = (RSSFeed) intent.getSerializableExtra(FEED);
         if (feed == null) {
             feed = RSSFeed.DEFAULT;
@@ -47,9 +42,9 @@ public class RssService extends IntentService {
             RssParser parser = new RssParser();
             rssItems = parser.Parse(GetInputStream(feed.GetUrl()));
         } catch (XmlPullParserException e) {
-            _logger.Error(e.getMessage());
+            Logger.getInstance().Error(TAG, e.getMessage());
         } catch (IOException e) {
-            _logger.Warning(e.getMessage());
+            Logger.getInstance().Warning(TAG, e.getMessage());
         }
 
         Bundle bundle = new Bundle();
@@ -65,7 +60,7 @@ public class RssService extends IntentService {
             URL url = new URL(link);
             return url.openConnection().getInputStream();
         } catch (IOException exception) {
-            _logger.Error(String.format(Locale.getDefault(), "Exception while retrieving the input stream %s", exception));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Exception while retrieving the input stream %s", exception));
             return null;
         }
     }

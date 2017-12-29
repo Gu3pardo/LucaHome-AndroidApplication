@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import java.util.Locale;
-
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -51,7 +49,6 @@ public class SecurityService implements IDataNotificationService {
     private boolean _isInitialized;
 
     private static final String TAG = SecurityService.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _displayNotification;
     private Class<?> _receiverActivity;
@@ -67,10 +64,7 @@ public class SecurityService implements IDataNotificationService {
     private Runnable _reloadListRunnable = new Runnable() {
         @Override
         public void run() {
-            _logger.Debug("_reloadListRunnable run");
-
             LoadData();
-
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
@@ -84,41 +78,35 @@ public class SecurityService implements IDataNotificationService {
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
 
-    private JsonDataToSecurityConverter _jsonDataToSecurityConverter;
-
     private SerializableList<Security> _securityList = new SerializableList<>();
 
     private BroadcastReceiver _securityDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_securityDownloadFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Security) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
-
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
 
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
-            SerializableList<Security> securityList = _jsonDataToSecurityConverter.GetList(contentResponse);
+            SerializableList<Security> securityList = JsonDataToSecurityConverter.getInstance().GetList(contentResponse);
             if (securityList == null) {
-                _logger.Error("Converted birthdayList is null!");
+                Logger.getInstance().Error(TAG, "Converted birthdayList is null!");
                 sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
@@ -146,27 +134,23 @@ public class SecurityService implements IDataNotificationService {
     private BroadcastReceiver _cameraStateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_cameraStateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.SecurityCamera) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedCameraStateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedCameraStateBroadcast(contentResponse);
                 return;
             }
@@ -185,27 +169,23 @@ public class SecurityService implements IDataNotificationService {
     private BroadcastReceiver _motionStateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_motionStateFinishedReceiver");
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
             String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.SecurityCameraControl) {
-                _logger.Debug(String.format(Locale.getDefault(), "Received download finished with downloadType %s", content.CurrentDownloadType));
                 return;
             }
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
-                _logger.Error(contentResponse);
+                Logger.getInstance().Error(TAG, contentResponse);
                 sendFailedMotionStateBroadcast(contentResponse);
                 return;
             }
 
-            _logger.Debug(String.format(Locale.getDefault(), "Response is %s", contentResponse));
-
             if (!content.Success) {
-                _logger.Error("Download was not successful!");
+                Logger.getInstance().Error(TAG, "Download was not successful!");
                 sendFailedMotionStateBroadcast(contentResponse);
                 return;
             }
@@ -224,7 +204,6 @@ public class SecurityService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
             if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
@@ -235,14 +214,11 @@ public class SecurityService implements IDataNotificationService {
     private BroadcastReceiver _homeNetworkNotAvailableReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_homeNetworkNotAvailableReceiver onReceive");
             _reloadHandler.removeCallbacks(_reloadListRunnable);
         }
     };
 
     private SecurityService() {
-        _logger = new Logger(TAG);
-        _logger.Debug("Created...");
     }
 
     public static SecurityService getInstance() {
@@ -251,10 +227,8 @@ public class SecurityService implements IDataNotificationService {
 
     @Override
     public void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification, boolean reloadEnabled, int reloadTimeout) {
-        _logger.Debug("initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -278,8 +252,6 @@ public class SecurityService implements IDataNotificationService {
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
-        _jsonDataToSecurityConverter = new JsonDataToSecurityConverter();
-
         SetReloadTimeout(reloadTimeout);
 
         _isInitialized = true;
@@ -287,7 +259,6 @@ public class SecurityService implements IDataNotificationService {
 
     @Override
     public void Dispose() {
-        _logger.Debug("Dispose");
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
         _isInitialized = false;
@@ -300,14 +271,12 @@ public class SecurityService implements IDataNotificationService {
 
     @Override
     public SerializableList<?> SearchDataList(@NonNull String searchKey) {
-        _logger.Error("Not available for " + TAG);
+        Logger.getInstance().Error(TAG, "Not available!");
         return null;
     }
 
     @Override
     public void LoadData() {
-        _logger.Debug("LoadData");
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast("No user");
@@ -319,14 +288,11 @@ public class SecurityService implements IDataNotificationService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_MOTION_DATA.toString();
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.Security, true);
     }
 
     public void SetCameraState(boolean state) {
-        _logger.Debug(String.format(Locale.getDefault(), "SetCameraState: %s", state));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast("No user");
@@ -338,14 +304,11 @@ public class SecurityService implements IDataNotificationService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + (state ? LucaServerAction.START_MOTION.toString() : LucaServerAction.STOP_MOTION.toString());
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.SecurityCamera, true);
     }
 
     public void SetMotionState(boolean state) {
-        _logger.Debug(String.format(Locale.getDefault(), "SetMotionState: %s", state));
-
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast("No user");
@@ -357,16 +320,14 @@ public class SecurityService implements IDataNotificationService {
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.SET_MOTION_CONTROL_TASK.toString() + (state ? "1" : "0");
-        _logger.Debug(String.format(Locale.getDefault(), "RequestUrl is: %s", requestUrl));
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.SecurityCameraControl, true);
     }
 
     @Override
     public void ShowNotification() {
-        _logger.Debug("ShowNotification");
         if (!_displayNotification) {
-            _logger.Warning("_displayNotification is false!");
+            Logger.getInstance().Warning(TAG, "_displayNotification is false!");
             return;
         }
         _notificationController.CreateCameraNotification(NOTIFICATION_ID, _receiverActivity);
@@ -374,7 +335,6 @@ public class SecurityService implements IDataNotificationService {
 
     @Override
     public void CloseNotification() {
-        _logger.Debug("CloseNotification");
         _notificationController.CloseNotification(NOTIFICATION_ID);
     }
 
@@ -434,11 +394,9 @@ public class SecurityService implements IDataNotificationService {
     @Override
     public void SetReloadTimeout(int reloadTimeout) {
         if (reloadTimeout < MIN_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is lower then MIN_TIMEOUT_MIN %d! Setting to MIN_TIMEOUT_MIN!", reloadTimeout, MIN_TIMEOUT_MIN));
             reloadTimeout = MIN_TIMEOUT_MIN;
         }
         if (reloadTimeout > MAX_TIMEOUT_MIN) {
-            _logger.Warning(String.format(Locale.getDefault(), "reloadTimeout %d is higher then MAX_TIMEOUT_MIN %d! Setting to MAX_TIMEOUT_MIN!", reloadTimeout, MAX_TIMEOUT_MIN));
             reloadTimeout = MAX_TIMEOUT_MIN;
         }
 

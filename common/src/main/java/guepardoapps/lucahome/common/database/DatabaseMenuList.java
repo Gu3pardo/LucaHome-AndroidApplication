@@ -17,7 +17,6 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class DatabaseMenuList {
     private static final String TAG = DatabaseMenuList.class.getSimpleName();
-    private Logger _logger;
 
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_WEEKDAY = "_weekday";
@@ -65,7 +64,6 @@ public class DatabaseMenuList {
     }
 
     public DatabaseMenuList(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
     }
 
@@ -151,7 +149,7 @@ public class DatabaseMenuList {
             try {
                 id = Integer.parseInt(idString);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             Weekday weekday = Weekday.GetByEnglishString(weekdayString);
@@ -163,7 +161,7 @@ public class DatabaseMenuList {
                 int year = Integer.parseInt(yearString);
                 date = new SerializableDate(year, month, day);
             } catch (Exception ex) {
-                _logger.Error(ex.toString());
+                Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
             String isOnServerString = cursor.getString(isOnServerIndex);

@@ -45,14 +45,12 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
-import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
 import guepardoapps.lucahome.common.service.BirthdayService;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class BirthdayActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = BirthdayActivity.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -93,7 +91,6 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
     private BroadcastReceiver _birthdayUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_birthdayUpdateReceiver");
             BirthdayService.BirthdayDownloadFinishedContent result =
                     (BirthdayService.BirthdayDownloadFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
 
@@ -133,9 +130,6 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         setContentView(R.layout.activity_birthday);
 
@@ -195,11 +189,11 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_birthday);
         addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetDataList().getSize(), "", new SerializableDate(), true, BirthdayDto.Action.Add));
+            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetDataList().getSize(), "", new SerializableDate(), "", true, BirthdayDto.Action.Add));
 
             NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
             }
         });
@@ -214,12 +208,9 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
 
         _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_birthday);
         _pullRefreshLayout.setOnRefreshListener(() -> {
-            _logger.Debug("onRefresh " + TAG);
-
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
-
             _birthdayService.LoadData();
         });
 
@@ -245,13 +236,11 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         _receiverController.RegisterReceiver(_birthdayUpdateReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
 
@@ -272,14 +261,12 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -327,8 +314,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
             displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 

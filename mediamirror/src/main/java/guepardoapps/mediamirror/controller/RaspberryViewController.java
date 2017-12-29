@@ -9,8 +9,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Locale;
-
 import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -23,7 +21,6 @@ import guepardoapps.mediamirror.interfaces.IViewController;
 
 public class RaspberryViewController implements IViewController {
     private static final String TAG = RaspberryViewController.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _isInitialized;
     private boolean _screenEnabled;
@@ -58,28 +55,23 @@ public class RaspberryViewController implements IViewController {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (!_screenEnabled) {
-                _logger.Debug("Screen is not enabled!");
                 return;
             }
 
-            _logger.Debug("_updateViewReceiver onReceive");
             RaspberryModel model = (RaspberryModel) intent.getSerializableExtra(Bundles.RASPBERRY_DATA_MODEL);
 
             if (model != null) {
-                _logger.Debug(model.toString());
                 _raspberryModel = model;
-
                 _temperatureRaspberryAlarm.setBackgroundResource(_raspberryTemperatureHelper.GetIcon(_raspberryModel.GetRaspberryTemperature()));
                 _temperatureRaspberryName.setText(_raspberryModel.GetRaspberryName());
                 _temperatureRaspberryValue.setText(_raspberryModel.GetRaspberryTemperature());
             } else {
-                _logger.Warning("model is null!");
+                Logger.getInstance().Warning(TAG, "model is null!");
             }
         }
     };
 
     public RaspberryViewController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _dialogController = new DialogController(_context);
         _receiverController = new ReceiverController(_context);
@@ -88,10 +80,7 @@ public class RaspberryViewController implements IViewController {
 
     @Override
     public void onCreate() {
-        _logger.Debug("onCreate");
-
         _screenEnabled = true;
-
         _temperatureRaspberryAlarm = ((Activity) _context).findViewById(R.id.temperatureRaspberryAlarm);
         _temperatureRaspberryName = ((Activity) _context).findViewById(R.id.temperatureRaspberryName);
         _temperatureRaspberryValue = ((Activity) _context).findViewById(R.id.temperatureRaspberryValue);
@@ -99,38 +88,31 @@ public class RaspberryViewController implements IViewController {
 
     @Override
     public void onStart() {
-        _logger.Debug("onStart");
     }
 
     @Override
     public void onResume() {
-        _logger.Debug("onResume");
         if (!_isInitialized) {
             _receiverController.RegisterReceiver(_screenDisableReceiver, new String[]{Broadcasts.SCREEN_OFF});
             _receiverController.RegisterReceiver(_screenEnableReceiver, new String[]{Broadcasts.SCREEN_ENABLED});
             _receiverController.RegisterReceiver(_updateViewReceiver, new String[]{Broadcasts.SHOW_RASPBERRY_DATA_MODEL});
-
             _isInitialized = true;
-            _logger.Debug("Initializing!");
         } else {
-            _logger.Warning("Is ALREADY initialized!");
+            Logger.getInstance().Warning(TAG, "Is ALREADY initialized!");
         }
     }
 
     @Override
     public void onPause() {
-        _logger.Debug("onPause");
     }
 
     @Override
     public void onDestroy() {
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
         _isInitialized = false;
     }
 
     public void ShowTemperatureGraph(View view) {
-        _logger.Debug(String.format(Locale.getDefault(), "showTemperatureGraph: %s", view));
         if (_raspberryModel == null) {
             Toasty.error(_context, "No link!", Toast.LENGTH_LONG).show();
             return;
@@ -140,7 +122,7 @@ public class RaspberryViewController implements IViewController {
         if (url.length() > 0) {
             _dialogController.DisplayTemperatureDialog(_raspberryModel.GetRaspberryTemperatureGraphUrl());
         } else {
-            _logger.Warning("invalid URL!");
+            Logger.getInstance().Warning(TAG, "invalid URL!");
             Toasty.warning(_context, "Invalid URL!", Toast.LENGTH_LONG).show();
         }
     }

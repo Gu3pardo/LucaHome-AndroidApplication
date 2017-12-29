@@ -35,7 +35,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class WirelessSocketEditActivity extends AppCompatActivity {
     private static final String TAG = WirelessSocketEditActivity.class.getSimpleName();
-    private Logger _logger;
 
     private boolean _propertyChanged;
     private WirelessSocketDto _wirelessSocketDto;
@@ -50,7 +49,6 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
     private BroadcastReceiver _addFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_addFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(WirelessSocketService.WirelessSocketAddFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -69,7 +67,6 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
     private BroadcastReceiver _updateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_updateFinishedReceiver onReceive");
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(WirelessSocketService.WirelessSocketUpdateFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -89,9 +86,6 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wireless_socket_edit);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         _wirelessSocketDto = (WirelessSocketDto) getIntent().getSerializableExtra(WirelessSocketService.WirelessSocketIntent);
 
@@ -203,13 +197,11 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_addFinishedReceiver, new String[]{WirelessSocketService.WirelessSocketAddFinishedBroadcast});
         _receiverController.RegisterReceiver(_updateFinishedReceiver, new String[]{WirelessSocketService.WirelessSocketUpdateFinishedBroadcast});
     }
@@ -217,14 +209,12 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -264,7 +254,7 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
         new Handler().postDelayed(() -> {
             NavigationService.NavigationResult navigationResult = _navigationService.GoBack(WirelessSocketEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
             }
         }, 1500);

@@ -4,25 +4,21 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.mediamirror.common.models.YoutubeDatabaseModel;
 import guepardoapps.mediamirror.database.DatabaseYoutubeIds;
 
 public class DatabaseController {
-    private static final DatabaseController SINGLETON = new DatabaseController();
-
     private static final String TAG = DatabaseController.class.getSimpleName();
-    private Logger _logger;
+
+    private static final DatabaseController SINGLETON = new DatabaseController();
 
     private boolean _isInitialized;
 
     private DatabaseYoutubeIds _databaseYoutubeIds;
 
     private DatabaseController() {
-        _logger = new Logger(TAG);
-        _logger.Debug(TAG + " created...");
     }
 
     public static DatabaseController getSingleton() {
@@ -30,10 +26,8 @@ public class DatabaseController {
     }
 
     public void Initialize(@NonNull Context context) {
-        _logger.Debug("Initialize");
-
         if (_isInitialized) {
-            _logger.Warning("Already initialized!");
+            Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
 
@@ -44,37 +38,30 @@ public class DatabaseController {
     }
 
     public ArrayList<YoutubeDatabaseModel> GetYoutubeIds() {
-        _logger.Debug("Loading youtube ids from database");
         return _databaseYoutubeIds.GetYoutubeIds();
     }
 
     public void SaveYoutubeId(@NonNull YoutubeDatabaseModel newEntry) {
-        _logger.Debug("Saving new youtube id to database");
         _databaseYoutubeIds.CreateEntry(newEntry);
     }
 
     public void UpdateYoutubeId(@NonNull YoutubeDatabaseModel updateEntry) {
-        _logger.Debug("Updating youtube id to database");
         _databaseYoutubeIds.Update(updateEntry);
     }
 
     public int GetHighestId() {
-        _logger.Debug("Loading highest id from database");
         return _databaseYoutubeIds.GetHighestId();
     }
 
     public void DeleteYoutubeId(@NonNull YoutubeDatabaseModel deleteEntry) {
-        _logger.Debug(String.format(Locale.GERMAN, "Deleting youtube id %s from database", deleteEntry));
         _databaseYoutubeIds.Delete(deleteEntry);
     }
 
     public void RemoveDatabase() {
-        _logger.Debug("Removing database!");
         _databaseYoutubeIds.Remove();
     }
 
     public void Dispose() {
-        _logger.Debug("Dispose");
         _databaseYoutubeIds.Close();
         _isInitialized = false;
     }

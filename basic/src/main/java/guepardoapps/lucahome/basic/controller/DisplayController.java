@@ -25,7 +25,6 @@ import guepardoapps.lucahome.basic.utils.Logger;
 
 public class DisplayController {
     private static final String TAG = DisplayController.class.getSimpleName();
-    private Logger _logger;
 
     private static final double BRIGHTNESS_MAX_LEVEL = 1.0;
     private static final double BRIGHTNESS_MIN_LEVEL = 0.1;
@@ -55,7 +54,6 @@ public class DisplayController {
     };
 
     public DisplayController(@NonNull Context context) {
-        _logger = new Logger(TAG);
         _context = context;
         _keyController = new KeyController();
     }
@@ -63,24 +61,18 @@ public class DisplayController {
     public Display GetDisplayDimension() {
         WindowManager windowManager = (WindowManager) _context.getSystemService(Context.WINDOW_SERVICE);
         if (windowManager == null) {
-            _logger.Error("windowManager is null!");
+            Logger.getInstance().Error(TAG, "windowManager is null!");
             return null;
         }
-
-        Display display = windowManager.getDefaultDisplay();
-        _logger.Debug(String.format(Locale.GERMAN, "Display: %s", display));
-        return display;
+        return windowManager.getDefaultDisplay();
     }
 
     @SuppressWarnings("deprecation")
     public void ScreenOn(int[] adFlags, int[] viewFlags) {
-        _logger.Debug("ScreenOn");
-
         Settings.System.putInt(_context.getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 30 * 60 * 1000);
         _screenOffHandler.removeCallbacks(_screenOffCountdownRunnable);
 
         if (IsScreenOn()) {
-            _logger.Debug("Screen is already on!");
             return;
         }
 
@@ -89,13 +81,13 @@ public class DisplayController {
         try {
             _keyController.SimulateKeyPress(keys, 0);
         } catch (Exception ex) {
-            _logger.Error(ex.toString());
+            Logger.getInstance().Error(TAG, ex.toString());
             return;
         }
 
         KeyguardManager keyguardManager = (KeyguardManager) _context.getSystemService(Context.KEYGUARD_SERVICE);
         if (keyguardManager == null) {
-            _logger.Error("KeyguardManager is null!");
+            Logger.getInstance().Error(TAG, "KeyguardManager is null!");
             return;
         }
 
@@ -104,7 +96,7 @@ public class DisplayController {
 
         PowerManager powerManager = (PowerManager) _context.getSystemService(Context.POWER_SERVICE);
         if (powerManager == null) {
-            _logger.Error("PowerManager is null!");
+            Logger.getInstance().Error(TAG, "PowerManager is null!");
             return;
         }
 
@@ -115,11 +107,10 @@ public class DisplayController {
         if (adFlags != null) {
             if (adFlags.length > 0) {
                 if (_context instanceof Activity) {
-                    _logger.Debug("Trying to ad flags!");
                     Window window = ((Activity) _context).getWindow();
 
                     if (window == null) {
-                        _logger.Error("Window is null!");
+                        Logger.getInstance().Error(TAG, "Window is null!");
                         return;
                     }
 
@@ -127,7 +118,7 @@ public class DisplayController {
                         window.addFlags(flag);
                     }
                 } else {
-                    _logger.Warning("Context is not an activity!");
+                    Logger.getInstance().Warning(TAG, "Context is not an activity!");
                 }
             }
         }
@@ -135,11 +126,10 @@ public class DisplayController {
         if (viewFlags != null) {
             if (viewFlags.length > 0) {
                 if (_context instanceof Activity) {
-                    _logger.Debug("Trying to set viewFlags!");
                     Window window = ((Activity) _context).getWindow();
 
                     if (window == null) {
-                        _logger.Error("Window is null!");
+                        Logger.getInstance().Error(TAG, "Window is null!");
                         return;
                     }
 
@@ -147,31 +137,27 @@ public class DisplayController {
                         window.getDecorView().setSystemUiVisibility(flag);
                     }
                 } else {
-                    _logger.Warning("Context is not an activity!");
+                    Logger.getInstance().Warning(TAG, "Context is not an activity!");
                 }
             }
         }
     }
 
     public void ScreenOff(int[] removeFlags) {
-        _logger.Debug("ScreenOff is only setting the sceen timeout down to minimum!");
-
         Settings.System.putInt(_context.getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, SCREEN_OFF_MIN_SEC * 1000);
         _screenOffHandler.post(_screenOffCountdownRunnable);
 
         if (!IsScreenOn()) {
-            _logger.Debug("Screen is already off!");
             return;
         }
 
         if (removeFlags != null) {
             if (removeFlags.length > 0) {
                 if (_context instanceof Activity) {
-                    _logger.Debug("Trying to lock the screen!");
                     Window window = ((Activity) _context).getWindow();
 
                     if (window == null) {
-                        _logger.Error("Window is null!");
+                        Logger.getInstance().Error(TAG, "Window is null!");
                         return;
                     }
 
@@ -179,7 +165,7 @@ public class DisplayController {
                         window.clearFlags(flag);
                     }
                 } else {
-                    _logger.Warning("Context is not an activity!");
+                    Logger.getInstance().Warning(TAG, "Context is not an activity!");
                 }
             }
         }
@@ -188,7 +174,7 @@ public class DisplayController {
     public boolean IsScreenOn() {
         DisplayManager displayManager = (DisplayManager) _context.getSystemService(Context.DISPLAY_SERVICE);
         if (displayManager == null) {
-            _logger.Error("displayManager is null!");
+            Logger.getInstance().Error(TAG, "displayManager is null!");
             return false;
         }
 
@@ -201,8 +187,6 @@ public class DisplayController {
     }
 
     public int GetCurrentBrightness() {
-        _logger.Debug("GetCurrentBrightness");
-
         ContentResolver contentResolver = _context.getContentResolver();
         int brightness = -1;
 
@@ -211,34 +195,29 @@ public class DisplayController {
                     Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
             brightness = Settings.System.getInt(contentResolver, Settings.System.SCREEN_BRIGHTNESS);
         } catch (SettingNotFoundException e) {
-            _logger.Error(e.toString());
+            Logger.getInstance().Error(TAG, e.toString());
         }
 
         return brightness;
     }
 
     public void SetBrightness(int brightness) {
-        _logger.Debug("SetBrightness to " + String.valueOf(brightness / (float) 255));
-
         double newBrightness = (brightness / (double) 255);
-
         setBrightness(newBrightness);
     }
 
     public void SetBrightness(double brightness) {
-        _logger.Debug("SetBrightness to " + String.valueOf(brightness));
-
         setBrightness(brightness);
     }
 
     private void setBrightness(double brightness) {
         if (brightness > BRIGHTNESS_MAX_LEVEL) {
-            _logger.Error("Brightness to high! Set to maximum level!");
+            Logger.getInstance().Error(TAG, "Brightness to high! Set to maximum level!");
             brightness = BRIGHTNESS_MAX_LEVEL;
         }
 
         if (brightness < BRIGHTNESS_MIN_LEVEL) {
-            _logger.Error("Brightness to low! Set to minimum level!");
+            Logger.getInstance().Error(TAG, "Brightness to low! Set to minimum level!");
             brightness = BRIGHTNESS_MIN_LEVEL;
         }
 
@@ -251,7 +230,7 @@ public class DisplayController {
             layoutParams.screenBrightness = (float) brightness;
             window.setAttributes(layoutParams);
         } catch (Exception e) {
-            _logger.Error(e.toString());
+            Logger.getInstance().Error(TAG, e.toString());
             Toasty.error(_context, "Failed to set brightness!", Toast.LENGTH_SHORT).show();
         }
     }

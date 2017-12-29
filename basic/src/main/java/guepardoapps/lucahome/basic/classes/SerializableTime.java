@@ -10,7 +10,6 @@ import guepardoapps.lucahome.basic.utils.Logger;
 
 public class SerializableTime implements Serializable {
     private static final String TAG = SerializableTime.class.getSimpleName();
-    private Logger _logger;
 
     private int _hour;
     private int _minute;
@@ -18,19 +17,13 @@ public class SerializableTime implements Serializable {
     private int _millisecond;
 
     public SerializableTime(int hour, int minute, int second, int millisecond) {
-        _logger = new Logger(TAG);
-
         _hour = hour;
         _minute = minute;
         _second = second;
         _millisecond = millisecond;
-
-        _logger.Debug(String.format(Locale.getDefault(), "Created new %s with four given integer properties!", TAG));
     }
 
     public SerializableTime(@NonNull String time) {
-        _logger = new Logger(TAG);
-
         String[] timeArray = time.split("\\:");
         if (timeArray.length == 4) {
             try {
@@ -39,7 +32,7 @@ public class SerializableTime implements Serializable {
                 _second = Integer.parseInt(timeArray[2].replace(":", ""));
                 _millisecond = Integer.parseInt(timeArray[3].replace(":", ""));
             } catch (Exception exception) {
-                _logger.Error(exception.getMessage());
+                Logger.getInstance().Error(TAG, exception.getMessage());
                 setDefaultValues();
             }
         } else if (timeArray.length == 3) {
@@ -49,7 +42,7 @@ public class SerializableTime implements Serializable {
                 _second = Integer.parseInt(timeArray[2].replace(":", ""));
                 _millisecond = 0;
             } catch (Exception exception) {
-                _logger.Error(exception.getMessage());
+                Logger.getInstance().Error(TAG, exception.getMessage());
                 setDefaultValues();
             }
         } else if (timeArray.length == 2) {
@@ -59,7 +52,7 @@ public class SerializableTime implements Serializable {
                 _second = 0;
                 _millisecond = 0;
             } catch (Exception exception) {
-                _logger.Error(exception.getMessage());
+                Logger.getInstance().Error(TAG, exception.getMessage());
                 setDefaultValues();
             }
         } else if (timeArray.length == 1) {
@@ -69,21 +62,16 @@ public class SerializableTime implements Serializable {
                 _second = 0;
                 _millisecond = 0;
             } catch (Exception exception) {
-                _logger.Error(exception.getMessage());
+                Logger.getInstance().Error(TAG, exception.getMessage());
                 setDefaultValues();
             }
         } else {
-            _logger.Warning(String.format(Locale.getDefault(), "Invalid data count %d!", timeArray.length));
             setDefaultValues();
         }
-
-        _logger.Debug(String.format(Locale.getDefault(), "Created new %s with given string property!", TAG));
     }
 
     public SerializableTime() {
-        _logger = new Logger(TAG);
         setDefaultValues();
-        _logger.Debug(String.format(Locale.getDefault(), "Created new %s with no given properties!", TAG));
     }
 
     public int Hour() {

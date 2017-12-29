@@ -59,7 +59,6 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class MediaServerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = MediaServerActivity.class.getSimpleName();
-    private Logger _logger;
 
     private Context _context;
 
@@ -154,7 +153,6 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     private BroadcastReceiver _mediaServerUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_mediaServerUpdateReceiver onReceive");
             MediaServerService.MediaServerDownloadFinishedContent result = (MediaServerService.MediaServerDownloadFinishedContent) intent.getSerializableExtra(MediaServerService.MediaServerDownloadFinishedBundle);
             if (result != null) {
                 if (result.Success) {
@@ -185,14 +183,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     private BroadcastReceiver _youtubeVideoImageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _logger.Debug("_youtubeVideoImageReceiver onReceive");
-
             YoutubeVideo youtubeVideo = (YoutubeVideo) intent.getSerializableExtra(MediaServerService.MediaServerYoutubeVideoBundle);
             if (youtubeVideo != null) {
                 Picasso.with(context).load(youtubeVideo.GetMediumImageUrl()).into(_youtubeVideoImageView);
                 _youtubeIdSelectionButton.setText(youtubeVideo.GetTitle());
             } else {
-                _logger.Warning("youtubeVideo is null");
+                Logger.getInstance().Warning(TAG, "youtubeVideo is null");
             }
         }
     };
@@ -200,9 +196,6 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         setContentView(R.layout.activity_mediamirror);
 
@@ -281,13 +274,11 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
         _receiverController.RegisterReceiver(_mediaServerUpdateReceiver, new String[]{MediaServerService.MediaServerDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_youtubeVideoImageReceiver, new String[]{MediaServerService.MediaServerYoutubeVideoBroadcast});
     }
@@ -295,14 +286,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
         _receiverController.Dispose();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
         _receiverController.Dispose();
     }
 
@@ -350,7 +339,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-            _logger.Error(String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
             displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
@@ -370,8 +359,6 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     }
 
     private void setUpCommonMediaServerUi() {
-        _logger.Debug("setUpCommonMediaServerUi");
-
         final ArrayList<String> serverLocations = new ArrayList<>();
         for (MediaServerSelection entry : MediaServerSelection.values()) {
             if (entry != MediaServerSelection.NULL) {
@@ -387,7 +374,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!_mediaServerSelectionSpinnerEnabled) {
-                    _logger.Warning("_mediaServerSelectionSpinner is disabled!");
+                    Logger.getInstance().Warning(TAG, "_mediaServerSelectionSpinner is disabled!");
                     return;
                 }
 
@@ -412,11 +399,9 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     }
 
     private void setUpYoutubeMediaServerUi() {
-        _logger.Debug("setUpYoutubeMediaServerUi");
-
         _youtubeIdSelectionButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -426,7 +411,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _youtubePlayButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -444,7 +429,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _youtubePauseButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -462,7 +447,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _youtubeStopButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -482,12 +467,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             @Override
             public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
                 if (!_youtubePlayPositionSeekBarEnabled) {
-                    _logger.Warning("_youtubePlayPositionSeekBar is disabled!");
+                    Logger.getInstance().Warning(TAG, "_youtubePlayPositionSeekBar is disabled!");
                     return;
                 }
 
                 if (_mediaServerData == null) {
-                    _logger.Error("_mediaServerData is null!");
+                    Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                     displayErrorSnackBar("_mediaServerData is null!");
                     return;
                 }
@@ -515,7 +500,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _sleepTimerButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -563,7 +548,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             loadYoutubeVideoImage(_mediaServerData);
 
             if (currentVideoPlayTime == -1 || totalVideoPlayTime == -1 || currentVideoPlayTime == 0 || totalVideoPlayTime == 0) {
-                _logger.Error(String.format(Locale.getDefault(), "Invalid values: currentVideoPlayTime: %d: totalVideoPlayTime: %d", currentVideoPlayTime, totalVideoPlayTime));
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Invalid values: currentVideoPlayTime: %d: totalVideoPlayTime: %d", currentVideoPlayTime, totalVideoPlayTime));
                 _youtubePlayPositionSeekBar.setVisibility(View.GONE);
                 _youtubePlayPositionTextView.setVisibility(View.GONE);
 
@@ -590,8 +575,6 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     }
 
     private void setUpRadioStreamUi() {
-        _logger.Debug("setUpYoutubeMediaServerUi");
-
         final ArrayList<String> radioStreams = new ArrayList<>();
         for (RadioStreams entry : RadioStreams.values()) {
             radioStreams.add(entry.GetTitle());
@@ -605,12 +588,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (!_radioStreamSelectionSpinnerEnabled) {
-                    _logger.Warning("_radioStreamSelectionSpinner is disabled!");
+                    Logger.getInstance().Warning(TAG, "_radioStreamSelectionSpinner is disabled!");
                     return;
                 }
 
                 if (_mediaServerData == null) {
-                    _logger.Error("_mediaServerData is null!");
+                    Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                     displayErrorSnackBar("_mediaServerData is null!");
                     return;
                 }
@@ -636,7 +619,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _radioStreamPlayButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -654,7 +637,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _radioStreamStopButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -682,11 +665,9 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     }
 
     private void setUpVolumeUi() {
-        _logger.Debug("setUpVolumeUi");
-
         _volumeIncreaseButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -704,7 +685,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _volumeDecreaseButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -726,8 +707,6 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     }
 
     private void setUpRssUi() {
-        _logger.Debug("setUpRssUi");
-
         final ArrayList<String> rssStreams = new ArrayList<>();
         for (RSSFeed entry : RSSFeed.values()) {
             if (entry.GetId() > 1) {
@@ -743,7 +722,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (_mediaServerData == null) {
-                    _logger.Error("_mediaServerData is null!");
+                    Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                     displayErrorSnackBar("_mediaServerData is null!");
                     return;
                 }
@@ -769,18 +748,16 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     }
 
     private void setUpEditTextUi() {
-        _logger.Debug("setUpEditTextUi");
-
         _sendTextButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
 
             String sendText = _editText.getText().toString();
             if (sendText.length() < 1 || sendText.length() > 500) {
-                _logger.Error("sendText is null!");
+                Logger.getInstance().Error(TAG, "sendText is null!");
                 displayErrorSnackBar("sendText is null!");
                 return;
             }
@@ -798,11 +775,9 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     }
 
     private void setUpBrightnessUi() {
-        _logger.Debug("setUpBrightnessUi");
-
         _brightnessIncreaseButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -820,7 +795,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _brightnessDecreaseButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -842,11 +817,9 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     }
 
     private void setUpUpdateUi() {
-        _logger.Debug("setUpBrightnessUi");
-
         _updateCurrentWeatherButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -859,7 +832,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _updateForecastWeatherButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -872,7 +845,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _updateTemperatureButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -885,7 +858,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _updateIpButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -898,7 +871,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _updateBirthdaysButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -911,7 +884,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _updateCalendarButton.setOnClickListener(view -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -974,7 +947,6 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 YoutubeId selectedYoutubeId = YoutubeId.GetById(position);
-                _logger.Debug(String.format("selectedYoutubeId is %s", selectedYoutubeId));
                 youtubeIdEditText.setText(selectedYoutubeId.GetYoutubeId());
             }
 
@@ -997,7 +969,6 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String selectedYoutubeId = playedYoutubeIdStrings.get(position);
-                _logger.Debug(String.format("selectedYoutubeId is %s", selectedYoutubeId));
                 youtubeIdEditText.setText(selectedYoutubeId);
             }
 
@@ -1037,7 +1008,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         if (window != null) {
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
-            _logger.Warning("Window is null!");
+            Logger.getInstance().Warning(TAG, "Window is null!");
         }
     }
 
@@ -1058,7 +1029,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         closeButton.setText("Search");
         closeButton.setOnClickListener(v -> {
             if (_mediaServerData == null) {
-                _logger.Error("_mediaServerData is null!");
+                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
                 displayErrorSnackBar("_mediaServerData is null!");
                 return;
             }
@@ -1066,7 +1037,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             String input = inputEditText.getText().toString();
 
             if (input.length() == 0) {
-                _logger.Error("Input has invalid length 0!");
+                Logger.getInstance().Error(TAG, "Input has invalid length 0!");
                 Toasty.error(_context, "Input has invalid length 0!", Toast.LENGTH_LONG).show();
                 return;
             }
@@ -1081,7 +1052,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         if (window != null) {
             window.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         } else {
-            _logger.Warning("Window is null!");
+            Logger.getInstance().Warning(TAG, "Window is null!");
         }
     }
 }

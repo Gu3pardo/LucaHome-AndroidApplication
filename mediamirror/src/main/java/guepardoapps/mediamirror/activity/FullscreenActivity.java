@@ -10,8 +10,6 @@ import android.view.WindowManager;
 
 import com.google.android.youtube.player.YouTubeBaseActivity;
 
-import java.util.Locale;
-
 import guepardoapps.lucahome.basic.controller.PermissionController;
 import guepardoapps.lucahome.basic.controller.SharedPrefController;
 import guepardoapps.lucahome.basic.controller.TTSController;
@@ -29,7 +27,6 @@ import guepardoapps.mediamirror.services.MainService;
 
 public class FullscreenActivity extends YouTubeBaseActivity {
     private static final String TAG = FullscreenActivity.class.getSimpleName();
-    private Logger _logger;
 
     private IViewController _birthdayViewController;
     private IViewController _bottomButtonViewController;
@@ -47,9 +44,6 @@ public class FullscreenActivity extends YouTubeBaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        _logger = new Logger(TAG);
-        _logger.Debug("onCreate");
 
         install();
         checkPermissions();
@@ -102,7 +96,6 @@ public class FullscreenActivity extends YouTubeBaseActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        _logger.Debug("onStart");
 
         _birthdayViewController.onStart();
         _bottomButtonViewController.onStart();
@@ -118,7 +111,6 @@ public class FullscreenActivity extends YouTubeBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _logger.Debug("onResume");
 
         _birthdayViewController.onResume();
         _bottomButtonViewController.onResume();
@@ -138,7 +130,6 @@ public class FullscreenActivity extends YouTubeBaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        _logger.Debug("onPause");
 
         _birthdayViewController.onPause();
         _bottomButtonViewController.onPause();
@@ -156,7 +147,6 @@ public class FullscreenActivity extends YouTubeBaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        _logger.Debug("onDestroy");
 
         _birthdayViewController.onDestroy();
         _bottomButtonViewController.onDestroy();
@@ -174,25 +164,22 @@ public class FullscreenActivity extends YouTubeBaseActivity {
 
     @Override
     public void onRequestPermissionsResult(int callbackId, @NonNull String permissions[], @NonNull int[] grantResults) {
-        _logger.Debug(String.format(Locale.getDefault(), "onRequestPermissionsResult with id %s for permissions %s has result %s", callbackId, permissions, grantResults));
         int index = 0;
         for (String permission : permissions) {
-            _logger.Information(String.format("Permission %s has been granted: %s", permission, grantResults[index]));
+            Logger.getInstance().Information(TAG, String.format("Permission %s has been granted: %s", permission, grantResults[index]));
             index++;
         }
     }
 
     public void ShowTemperatureGraph(View view) {
-        _logger.Debug("ShowTemperatureGraph");
         _raspberryViewController.ShowTemperatureGraph(view);
     }
 
     private void install() {
-        _logger.Debug("install");
         SharedPrefController sharedPrefController = new SharedPrefController(this);
 
         if (!sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.SHARED_PREF_INSTALLED)) {
-            _logger.Information("Installing shared preferences!");
+            Logger.getInstance().Information(TAG, "Installing shared preferences!");
 
             sharedPrefController.SaveStringValue(SettingsController.PREF_USER_NAME, RaspPiConstants.USER);
             sharedPrefController.SaveStringValue(SettingsController.PREF_USER_PASS_PHRASE, RaspPiConstants.PASSWORD);
