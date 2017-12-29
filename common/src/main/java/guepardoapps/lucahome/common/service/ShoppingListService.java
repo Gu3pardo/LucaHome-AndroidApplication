@@ -319,12 +319,18 @@ public class ShoppingListService implements IDataService {
 
     public ArrayList<String> GetShoppingNameList() {
         ArrayList<String> nameList = new ArrayList<>();
-
         for (int index = 0; index < _shoppingList.getSize(); index++) {
             nameList.add(_shoppingList.getValue(index).GetName());
         }
-
         return nameList;
+    }
+
+    public ArrayList<String> GetShoppingUnitList() {
+        ArrayList<String> unitList = new ArrayList<>();
+        for (int index = 0; index < _shoppingList.getSize(); index++) {
+            unitList.add(_shoppingList.getValue(index).GetUnit());
+        }
+        return unitList;
     }
 
     public ArrayList<String> GetShoppingDetailList() {

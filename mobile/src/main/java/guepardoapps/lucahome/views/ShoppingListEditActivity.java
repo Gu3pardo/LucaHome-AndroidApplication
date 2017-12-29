@@ -78,11 +78,12 @@ public class ShoppingListEditActivity extends AppCompatActivity {
 
         _receiverController = new ReceiverController(this);
 
+        final AutoCompleteTextView shoppingNameEditTextView = findViewById(R.id.shopping_edit_name_textview);
         final Spinner entryGroupSelect = findViewById(R.id.shopping_entry_group_select);
         final TextView quantityTextView = findViewById(R.id.shopping_entry_quantity_textview);
+        final AutoCompleteTextView shoppingUnitEditTextView = findViewById(R.id.shopping_edit_unit_textview);
         FloatingActionButton increaseQuantityButton = findViewById(R.id.floating_action_button_increase_quantity);
         FloatingActionButton decreaseQuantityButton = findViewById(R.id.floating_action_button_decrease_quantity);
-        final AutoCompleteTextView shoppingNameEditTextView = findViewById(R.id.shopping_edit_name_textview);
 
         _saveButton = findViewById(R.id.save_shopping_edit_button);
 
@@ -107,6 +108,23 @@ public class ShoppingListEditActivity extends AppCompatActivity {
         groupDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         entryGroupSelect.setAdapter(groupDataAdapter);
 
+        shoppingUnitEditTextView.setAdapter(new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, _shoppingListService.GetShoppingUnitList()));
+        shoppingUnitEditTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                _propertyChanged = true;
+                _saveButton.setEnabled(true);
+            }
+        });
+
         increaseQuantityButton.setOnClickListener(view -> {
             _quantity++;
             quantityTextView.setText(String.valueOf(_quantity));
@@ -125,6 +143,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
             entryGroupSelect.setSelection(shoppingEntryDto.GetGroup().GetInt());
             _quantity = shoppingEntryDto.GetQuantity();
             quantityTextView.setText(String.valueOf(_quantity));
+            shoppingUnitEditTextView.setText(shoppingEntryDto.GetUnit());
         } else {
             displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
@@ -152,6 +171,8 @@ public class ShoppingListEditActivity extends AppCompatActivity {
             int entryGroupId = entryGroupSelect.getSelectedItemPosition();
             ShoppingEntryGroup entryGroup = ShoppingEntryGroup.GetById(entryGroupId);
 
+            String entryUnit = shoppingUnitEditTextView.getText().toString();
+
             if (cancel) {
                 focusView.requestFocus();
             } else {
@@ -162,7 +183,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
                     lastHighestId = _shoppingListService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                _shoppingListService.AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity, "", false, ILucaClass.LucaServerDbAction.Add));
+                _shoppingListService.AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity, entryUnit, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });

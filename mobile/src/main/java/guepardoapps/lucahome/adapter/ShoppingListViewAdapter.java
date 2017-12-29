@@ -24,6 +24,7 @@ public class ShoppingListViewAdapter extends BaseAdapter {
         private TextView _titleText;
         private TextView _groupText;
         private TextView _amountText;
+        private TextView _unitText;
         private ImageView _groupImageView;
         private CheckBox _boughtCheckbox;
         private FloatingActionButton _increaseButton;
@@ -66,6 +67,7 @@ public class ShoppingListViewAdapter extends BaseAdapter {
         holder._titleText = rowView.findViewById(R.id.shoppingCardTitleText);
         holder._groupText = rowView.findViewById(R.id.shoppingGroupText);
         holder._amountText = rowView.findViewById(R.id.shoppingAmountText);
+        holder._unitText = rowView.findViewById(R.id.shoppingUnitText);
 
         holder._groupImageView = rowView.findViewById(R.id.shoppingGroupCardImage);
         holder._boughtCheckbox = rowView.findViewById(R.id.shoppingCheckbox);
@@ -79,6 +81,7 @@ public class ShoppingListViewAdapter extends BaseAdapter {
         holder._titleText.setText(shoppingEntry.GetName());
         holder._groupText.setText(shoppingEntry.GetGroup().toString());
         holder._amountText.setText(String.valueOf(shoppingEntry.GetQuantity()));
+        holder._unitText.setText(shoppingEntry.GetUnit());
 
         holder._groupImageView.setImageResource(shoppingEntry.GetGroup().GetDrawable());
 

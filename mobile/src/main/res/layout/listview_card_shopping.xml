@@ -73,17 +73,28 @@
                         android:gravity="center"
                         android:text="@string/example"
                         app:layout_heightPercent="100%"
-                        app:layout_widthPercent="50%" />
+                        app:layout_widthPercent="40%" />
 
                     <TextView
                         android:id="@+id/shoppingAmountText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@+id/shoppingGroupText"
-                        android:gravity="center"
+                        android:gravity="end|center_vertical"
                         android:text="@string/example"
                         app:layout_heightPercent="100%"
-                        app:layout_widthPercent="50%" />
+                        app:layout_widthPercent="30%" />
+
+                    <TextView
+                        android:id="@+id/shoppingUnitText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_toEndOf="@+id/shoppingAmountText"
+                        android:gravity="start|center_vertical"
+                        android:padding="5dp"
+                        android:text="@string/example"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="30%" />
 
                 </android.support.percent.PercentRelativeLayout>
             </LinearLayout>
@@ -93,7 +104,6 @@
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_alignParentBottom="true"
-                android:layout_marginBottom="5dp"
                 android:layout_toStartOf="@+id/shoppingCardDecreaseButton"
                 app:fab_iconSize="25dp"
                 app:fab_iconSrc="@android:drawable/ic_menu_add"
@@ -109,7 +119,6 @@
                 android:layout_height="30dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentEnd="true"
-                android:layout_margin="5dp"
                 app:fab_iconSize="25dp"
                 app:fab_iconSrc="@mipmap/ic_remove_circle_outline_white_48dp"
                 app:fab_radius="17dp"

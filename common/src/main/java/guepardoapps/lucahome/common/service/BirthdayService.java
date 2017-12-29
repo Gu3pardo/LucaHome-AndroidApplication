@@ -331,12 +331,18 @@ public class BirthdayService implements IDataNotificationService {
 
     public ArrayList<String> GetBirthdayNameList() {
         ArrayList<String> birthdayNameList = new ArrayList<>();
-
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             birthdayNameList.add(_birthdayList.getValue(index).GetName());
         }
-
         return birthdayNameList;
+    }
+
+    public ArrayList<String> GetBirthdayGroupList() {
+        ArrayList<String> birthdayGroupList = new ArrayList<>();
+        for (int index = 0; index < _birthdayList.getSize(); index++) {
+            birthdayGroupList.add(_birthdayList.getValue(index).GetGroup());
+        }
+        return birthdayGroupList;
     }
 
     public LucaBirthday GetById(int id) {

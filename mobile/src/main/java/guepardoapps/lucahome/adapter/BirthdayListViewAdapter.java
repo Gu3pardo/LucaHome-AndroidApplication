@@ -33,6 +33,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
         private TextView _titleText;
         private TextView _dateText;
         private TextView _ageTextView;
+        private TextView _groupText;
         private CheckBox _remindMeCheckBox;
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
@@ -104,6 +105,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
         holder._titleText = rowView.findViewById(R.id.birthday_card_title_text_view);
         holder._dateText = rowView.findViewById(R.id.birthday_date_text_view);
         holder._ageTextView = rowView.findViewById(R.id.birthday_age_text_view);
+        holder._groupText = rowView.findViewById(R.id.birthday_group_text_view);
         holder._remindMeCheckBox = rowView.findViewById(R.id.birthday_remind_me_checkbox);
         holder._updateButton = rowView.findViewById(R.id.birthday_card_update_button);
         holder._deleteButton = rowView.findViewById(R.id.birthday_card_delete_button);
@@ -119,6 +121,8 @@ public class BirthdayListViewAdapter extends BaseAdapter {
         if (birthday.HasBirthday()) {
             holder._titleText.setBackgroundColor(_context.getResources().getColor(R.color.LightRed));
         }
+
+        holder._groupText.setText(birthday.GetGroup());
 
         holder._remindMeCheckBox.setChecked(birthday.GetRemindMe());
         holder._remindMeCheckBox.setOnCheckedChangeListener((compoundButton, isChecked) -> {

@@ -97,6 +97,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
         _receiverController = new ReceiverController(this);
 
         final AutoCompleteTextView birthdayEditTextView = findViewById(R.id.birthday_edit_textview);
+        final AutoCompleteTextView birthdayGroupEditTextView = findViewById(R.id.birthdayGroup_edit_textview);
         final DatePicker birthdayEditDatePicker = findViewById(R.id.birthday_edit_datePicker);
         final CheckBox birthdayRemindMeCheckBox = findViewById(R.id.birthday_edit_remindMeCheckBox);
 
@@ -104,6 +105,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
 
         if (_birthdayDto != null) {
             birthdayEditTextView.setText(_birthdayDto.GetName());
+            birthdayGroupEditTextView.setText(_birthdayDto.GetGroup());
             birthdayEditDatePicker.updateDate(_birthdayDto.GetDate().Year(), _birthdayDto.GetDate().Month(), _birthdayDto.GetDate().DayOfMonth());
             birthdayRemindMeCheckBox.setChecked(_birthdayDto.GetRemindMe());
         } else {
@@ -112,6 +114,23 @@ public class BirthdayEditActivity extends AppCompatActivity {
 
         birthdayEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, _birthdayService.GetBirthdayNameList()));
         birthdayEditTextView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                _propertyChanged = true;
+                _saveButton.setEnabled(true);
+            }
+        });
+
+        birthdayGroupEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, _birthdayService.GetBirthdayGroupList()));
+        birthdayGroupEditTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
             }
@@ -151,6 +170,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
             }
 
             String birthdayName = birthdayEditTextView.getText().toString();
+            String birthdayGroup = birthdayGroupEditTextView.getText().toString();
 
             if (TextUtils.isEmpty(birthdayName)) {
                 birthdayEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
@@ -182,10 +202,10 @@ public class BirthdayEditActivity extends AppCompatActivity {
                         lastHighestId = _birthdayService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _birthdayService.AddBirthday(new LucaBirthday(lastHighestId, birthdayName, birthdayDate, "", remindMe, false, null, false, ILucaClass.LucaServerDbAction.Add));
+                    _birthdayService.AddBirthday(new LucaBirthday(lastHighestId, birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_birthdayDto.GetAction() == BirthdayDto.Action.Update) {
-                    _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, "", remindMe, false, null, false, ILucaClass.LucaServerDbAction.Update));
+                    _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     birthdayEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _birthdayDto.GetAction())));

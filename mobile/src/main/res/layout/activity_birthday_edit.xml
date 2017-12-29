@@ -42,6 +42,27 @@
                         android:hint="@string/prompt_birthday_name"
                         android:inputType="textAutoComplete"
                         android:maxLines="1"
+                        android:nextFocusDown="@+id/birthdayGroup_edit_textview"
+                        android:nextFocusRight="@+id/birthdayGroup_edit_textview"
+                        android:textColor="@color/TextIcon" />
+
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/birthdayGroup_TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_below="@+id/birthday_TextInputLayout">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/birthdayGroup_edit_textview"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_birthday_group"
+                        android:inputType="textAutoComplete"
+                        android:maxLines="1"
                         android:nextFocusDown="@+id/birthday_edit_datePicker"
                         android:nextFocusRight="@+id/birthday_edit_datePicker"
                         android:textColor="@color/TextIcon" />
@@ -50,22 +71,20 @@
 
                 <DatePicker
                     android:id="@+id/birthday_edit_datePicker"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_below="@+id/birthday_TextInputLayout"
+                    android:layout_below="@+id/birthdayGroup_TextInputLayout"
+                    android:layout_centerHorizontal="true"
                     android:background="@color/colorPrimary"
                     android:nextFocusDown="@+id/birthday_edit_remindMeCheckBox"
                     android:nextFocusRight="@+id/birthday_edit_remindMeCheckBox" />
 
                 <CheckBox
                     android:id="@+id/birthday_edit_remindMeCheckBox"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentStart="true"
                     android:layout_below="@+id/birthday_edit_datePicker"
+                    android:layout_centerHorizontal="true"
                     android:nextFocusDown="@+id/save_birthday_edit_button"
                     android:nextFocusRight="@+id/save_birthday_edit_button"
                     android:text="@string/birthday_remind_me" />

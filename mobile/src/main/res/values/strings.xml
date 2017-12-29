@@ -14,6 +14,7 @@
     <!-- Strings related to edit -->
     <string name="save">Save</string>
     <string name="prompt_birthday_name">Birthday name</string>
+    <string name="prompt_birthday_group">Birthday group</string>
     <string name="birthday_remind_me">Remind me about this birthday</string>
     <string name="error_field_invalid_date">This date is not valid</string>
     <string name="error_nothing_changed">Nothing changed</string>
@@ -30,6 +31,7 @@
     <string name="prompt_socket_code">Socket code</string>
     <string name="prompt_shopping_name">Shopping name</string>
     <string name="prompt_shopping_quantity">Shopping quantity</string>
+    <string name="prompt_shopping_unit">Shopping unit</string>
     <string name="prompt_schedule_name">Schedule name</string>
     <string name="prompt_timer_name">Timer name</string>
     <string name="prompt_switch_name">Switch name</string>
