@@ -29,15 +29,6 @@ import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
 public class MovieService implements IDataService {
-    public static class MovieDownloadFinishedContent extends ObjectChangeFinishedContent {
-        public SerializableList<Movie> MovieList;
-
-        MovieDownloadFinishedContent(SerializableList<Movie> movieList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
-            MovieList = movieList;
-        }
-    }
-
     public static final String MovieIntent = "MovieIntent";
 
     public static final String MovieDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.movie.download.finished";
@@ -81,30 +72,31 @@ public class MovieService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Movie) {
                 return;
             }
 
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
+
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
             SerializableList<Movie> movieList = JsonDataToMovieConverter.getInstance().GetList(contentResponse);
             if (movieList == null) {
                 Logger.getInstance().Error(TAG, "Converted movieList is null!");
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -113,7 +105,7 @@ public class MovieService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MovieDownloadFinishedBroadcast,
                     MovieDownloadFinishedBundle,
-                    new MovieDownloadFinishedContent(_movieList, true, Tools.CompressStringToByteArray("")));
+                    new ObjectChangeFinishedContent(true));
         }
     };
 
@@ -121,11 +113,12 @@ public class MovieService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MovieUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -146,7 +139,7 @@ public class MovieService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MovieUpdateFinishedBroadcast,
                     MovieUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -281,7 +274,7 @@ public class MovieService implements IDataService {
     public void LoadData() {
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -348,11 +341,11 @@ public class MovieService implements IDataService {
         return _lastUpdate;
     }
 
-    private void sendFailedDownloadBroadcast(@NonNull String response) {
+    private void sendFailedDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 MovieDownloadFinishedBroadcast,
                 MovieDownloadFinishedBundle,
-                new MovieDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new ObjectChangeFinishedContent(false));
     }
 
     private void sendFailedUpdateBroadcast(@NonNull String response) {

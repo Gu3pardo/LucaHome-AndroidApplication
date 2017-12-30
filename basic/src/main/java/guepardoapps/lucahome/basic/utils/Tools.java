@@ -130,8 +130,9 @@ public class Tools {
             }
 
             return new String(byteArrayOutputStream.toByteArray(), "UTF-8");
-        } catch (IOException e) {
-            throw new AssertionError(e);
+        } catch (IOException exception) {
+            Logger.getInstance().Error(TAG, exception.getMessage());
+            return "";
         }
     }
 }

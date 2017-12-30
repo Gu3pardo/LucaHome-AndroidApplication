@@ -14,6 +14,8 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.classes.MainListViewItem;
+import guepardoapps.lucahome.common.classes.MeterData;
+import guepardoapps.lucahome.common.classes.MoneyMeterData;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
 import guepardoapps.lucahome.common.dto.CoinDto;
 import guepardoapps.lucahome.common.dto.ScheduleDto;
@@ -25,8 +27,11 @@ import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.service.BirthdayService;
 import guepardoapps.lucahome.common.service.CoinService;
+import guepardoapps.lucahome.common.service.MeterListService;
+import guepardoapps.lucahome.common.service.MoneyMeterListService;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.ShoppingListService;
+import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.service.NavigationService;
@@ -104,6 +109,34 @@ public class MainListViewBuilder {
                 MainListViewItem.Type.Menu
         );
 
+        MainListViewItem meterDataItem = new MainListViewItem(
+                "Meter data", "Log your current and water consumption", R.drawable.main_image_meter,
+                () -> navigateTo(MeterDataActivity.class),
+                () -> {
+                    int newHighestId = MeterListService.getInstance().GetHighestId() + 1;
+                    int newHighestTypeId = MeterListService.getInstance().GetHighestTypeId("") + 1;
+                    MeterData newMeterData = new MeterData(newHighestId, "", newHighestTypeId, new SerializableDate(), new SerializableTime(), "", "", 0, "");
+                    Bundle data = new Bundle();
+                    data.putSerializable(MeterListService.MeterDataIntent, newMeterData);
+                    navigateWithDataTo(MeterDataEditActivity.class, data);
+                },
+                MainListViewItem.Type.Meter
+        );
+
+        MainListViewItem moneyMeterDataItem = new MainListViewItem(
+                "Money meter data", "Log your money", R.drawable.main_image_money_meter,
+                () -> navigateTo(MoneyMeterDataActivity.class),
+                () -> {
+                    int newHighestId = MoneyMeterListService.getInstance().GetHighestId() + 1;
+                    int newHighestTypeId = MoneyMeterListService.getInstance().GetHighestTypeId("", "") + 1;
+                    MoneyMeterData newMoneyMeterData = new MoneyMeterData(newHighestId, newHighestTypeId, "", "", 0, "", new SerializableDate(), UserService.getInstance().GetUser().GetName());
+                    Bundle data = new Bundle();
+                    data.putSerializable(MoneyMeterListService.MoneyMeterDataIntent, newMoneyMeterData);
+                    navigateWithDataTo(MoneyMeterDataEditActivity.class, data);
+                },
+                MainListViewItem.Type.MoneyMeter
+        );
+
         MainListViewItem movieItem = new MainListViewItem(
                 "Movies", "Want to watch some blockbuster?", R.drawable.main_image_movies,
                 () -> navigateTo(MovieActivity.class),
@@ -177,11 +210,13 @@ public class MainListViewBuilder {
         _mainListViewItems.addValue(wirelessSwitchItem);
         _mainListViewItems.addValue(weatherItem);
         _mainListViewItems.addValue(coinItem);
+        _mainListViewItems.addValue(moneyMeterDataItem);
         _mainListViewItems.addValue(shoppingItem);
         _mainListViewItems.addValue(menuItem);
         _mainListViewItems.addValue(mediaMirrorItem);
         _mainListViewItems.addValue(movieItem);
         _mainListViewItems.addValue(birthdayItem);
+        _mainListViewItems.addValue(meterDataItem);
         _mainListViewItems.addValue(securityItem);
         _mainListViewItems.addValue(scheduleItem);
         _mainListViewItems.addValue(timerItem);

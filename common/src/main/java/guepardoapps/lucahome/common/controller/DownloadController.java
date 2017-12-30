@@ -1,22 +1,20 @@
 package guepardoapps.lucahome.common.controller;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Serializable;
-import java.net.URL;
-import java.net.URLConnection;
+import java.util.Locale;
 
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
-import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
+import guepardoapps.lucahome.common.service.DownloadStorageService;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class DownloadController {
     public enum DownloadType implements Serializable {
@@ -42,13 +40,14 @@ public class DownloadController {
         Canceled, NoNetwork, NoHomeNetwork, InvalidUrl, Success
     }
 
-    public static class DownloadFinishedBroadcastContent extends ObjectChangeFinishedContent {
+    public static class DownloadFinishedBroadcastContent implements Serializable {
+        public boolean Success;
         public DownloadType CurrentDownloadType;
         public DownloadState FinalDownloadState;
         public Serializable Additional;
 
-        public DownloadFinishedBroadcastContent(@NonNull byte[] response, boolean success, @NonNull DownloadType currentDownloadType, @NonNull DownloadState finalDownloadState, Serializable additional) {
-            super(success, response);
+        public DownloadFinishedBroadcastContent(boolean success, @NonNull DownloadType currentDownloadType, @NonNull DownloadState finalDownloadState, Serializable additional) {
+            Success = success;
             CurrentDownloadType = currentDownloadType;
             FinalDownloadState = finalDownloadState;
             Additional = additional;
@@ -60,122 +59,82 @@ public class DownloadController {
 
     private static final String TAG = DownloadController.class.getSimpleName();
 
-    private static final int TIMEOUT_MS = 3000;
-
     private BroadcastController _broadcastController;
     private NetworkController _networkController;
-    private SettingsController _settingsController;
+    private OkHttpClient _okHttpClient;
 
     public DownloadController(@NonNull Context context) {
         _broadcastController = new BroadcastController(context);
         _networkController = new NetworkController(context);
-        _settingsController = SettingsController.getInstance();
+        _okHttpClient = new OkHttpClient();
     }
 
     public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork, Serializable additional) {
+        Logger.getInstance().Information(TAG, String.format(Locale.getDefault(), "SendCommandToWebsiteAsync: %s", requestUrl));
+
         if (!canSendAction(downloadType, needsHomeNetwork, requestUrl, additional)) {
             return;
         }
 
-        SendActionTask task = new SendActionTask();
-        task.DownloadSuccess = false;
-        task.CurrentDownloadType = downloadType;
-        task.Additional = additional;
-        task.execute(requestUrl);
+        String result = "";
+        boolean downloadSuccess = false;
+        try {
+            Request request = new Request.Builder().url(requestUrl).build();
+            Response response = _okHttpClient.newCall(request).execute();
+            ResponseBody responseBody = response.body();
+
+            if (responseBody != null) {
+                result = responseBody.toString();
+                Logger.getInstance().Debug(TAG, result);
+                downloadSuccess = true;
+            } else {
+                Logger.getInstance().Error(TAG, "ResponseBody is null!");
+            }
+        } catch (Exception exception) {
+            Logger.getInstance().Error(TAG, exception.getMessage());
+        } finally {
+            byte[] byteArray = Tools.CompressStringToByteArray(result);
+            DownloadStorageService.getInstance().PutDownloadResult(downloadType, byteArray);
+            _broadcastController.SendSerializableBroadcast(
+                    DownloadFinishedBroadcast,
+                    DownloadFinishedBundle,
+                    new DownloadFinishedBroadcastContent(downloadSuccess, downloadType, DownloadState.Success, additional));
+        }
     }
 
     public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork) {
-        if (!canSendAction(downloadType, needsHomeNetwork, requestUrl, null)) {
-            return;
-        }
-
-        SendActionTask task = new SendActionTask();
-        task.DownloadSuccess = false;
-        task.CurrentDownloadType = downloadType;
-        task.execute(requestUrl);
+        SendCommandToWebsiteAsync(requestUrl, downloadType, needsHomeNetwork, null);
     }
 
     private boolean canSendAction(@NonNull DownloadType downloadType, boolean needsHomeNetwork, @NonNull String requestUrl, Serializable additional) {
         if (!_networkController.IsNetworkAvailable()) {
+            DownloadStorageService.getInstance().PutDownloadResult(downloadType, Tools.CompressStringToByteArray("No network!"));
             _broadcastController.SendSerializableBroadcast(
                     DownloadFinishedBroadcast,
                     DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("No network!"), false, downloadType, DownloadState.NoNetwork, additional));
+                    new DownloadFinishedBroadcastContent(false, downloadType, DownloadState.NoNetwork, additional));
             return false;
         }
 
-        if (needsHomeNetwork && !_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (needsHomeNetwork && !_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
+            DownloadStorageService.getInstance().PutDownloadResult(downloadType, Tools.CompressStringToByteArray("No home network!"));
             _broadcastController.SendSerializableBroadcast(
                     DownloadFinishedBroadcast,
                     DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("No home network!"), false, downloadType, DownloadState.NoHomeNetwork, additional));
+                    new DownloadFinishedBroadcastContent(false, downloadType, DownloadState.NoHomeNetwork, additional));
             return false;
         }
 
         if (requestUrl.length() < 15) {
             Logger.getInstance().Error(TAG, "Invalid requestUrl length!");
+            DownloadStorageService.getInstance().PutDownloadResult(downloadType, Tools.CompressStringToByteArray("ERROR: Invalid requestUrl length!"));
             _broadcastController.SendSerializableBroadcast(
                     DownloadFinishedBroadcast,
                     DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("ERROR: Invalid requestUrl length!"), false, downloadType, DownloadState.InvalidUrl, additional));
+                    new DownloadFinishedBroadcastContent(false, downloadType, DownloadState.InvalidUrl, additional));
             return false;
         }
 
         return true;
-    }
-
-    private class SendActionTask extends AsyncTask<String, Void, String> {
-        boolean DownloadSuccess;
-        public DownloadType CurrentDownloadType;
-        Serializable Additional;
-
-        @Override
-        protected String doInBackground(String... actions) {
-            StringBuilder result = new StringBuilder();
-            for (String action : actions) {
-                try {
-                    URL url = new URL(action);
-                    URLConnection connection = url.openConnection();
-                    connection.setConnectTimeout(TIMEOUT_MS);
-                    InputStream inputStream = connection.getInputStream();
-
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader reader = new BufferedReader(inputStreamReader);
-
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        result.append(line);
-                    }
-
-                    reader.close();
-                    inputStreamReader.close();
-                    inputStream.close();
-
-                    DownloadSuccess = true;
-                } catch (IOException exception) {
-                    DownloadSuccess = false;
-                    Logger.getInstance().Error(TAG, exception.getMessage());
-                }
-            }
-
-            return result.toString();
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            byte[] byteArray = Tools.CompressStringToByteArray(result);
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(byteArray, DownloadSuccess, CurrentDownloadType, DownloadState.Success, Additional));
-        }
-
-        @Override
-        protected void onCancelled() {
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(Tools.CompressStringToByteArray("Canceled!"), false, CurrentDownloadType, DownloadState.Canceled, Additional));
-        }
     }
 }

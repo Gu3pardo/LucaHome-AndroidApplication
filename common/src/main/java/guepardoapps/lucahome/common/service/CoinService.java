@@ -41,8 +41,8 @@ public class CoinService implements IDataNotificationService {
     public static class CoinConversionDownloadFinishedContent extends ObjectChangeFinishedContent {
         SerializableList<SerializablePair<String, Double>> CoinConversionList;
 
-        CoinConversionDownloadFinishedContent(SerializableList<SerializablePair<String, Double>> coinConversionList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        CoinConversionDownloadFinishedContent(SerializableList<SerializablePair<String, Double>> coinConversionList, boolean succcess) {
+            super(succcess, new byte[]{});
             CoinConversionList = coinConversionList;
         }
     }
@@ -50,8 +50,8 @@ public class CoinService implements IDataNotificationService {
     public static class CoinDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Coin> CoinList;
 
-        CoinDownloadFinishedContent(SerializableList<Coin> coinList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        CoinDownloadFinishedContent(SerializableList<Coin> coinList, boolean succcess) {
+            super(succcess, new byte[]{});
             CoinList = coinList;
         }
     }
@@ -123,11 +123,12 @@ public class CoinService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinConversion) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             SerializableList<SerializablePair<String, Double>> coinConversionList = JsonDataToCoinConversionConverter.getInstance().GetList(contentResponse);
             if (coinConversionList == null) {
@@ -135,7 +136,7 @@ public class CoinService implements IDataNotificationService {
                 _broadcastController.SendSerializableBroadcast(
                         CoinConversionDownloadFinishedBroadcast,
                         CoinConversionDownloadFinishedBundle,
-                        new CoinConversionDownloadFinishedContent(_coinConversionList, false, content.Response));
+                        new CoinConversionDownloadFinishedContent(_coinConversionList, false));
                 return;
             }
 
@@ -148,7 +149,7 @@ public class CoinService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     CoinConversionDownloadFinishedBroadcast,
                     CoinConversionDownloadFinishedBundle,
-                    new CoinConversionDownloadFinishedContent(_coinConversionList, true, content.Response));
+                    new CoinConversionDownloadFinishedContent(_coinConversionList, true));
 
             LoadData();
         }
@@ -158,11 +159,12 @@ public class CoinService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinTrend) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             Coin coinDto = (Coin) content.Additional;
             try {
@@ -175,7 +177,7 @@ public class CoinService implements IDataNotificationService {
                         _broadcastController.SendSerializableBroadcast(
                                 CoinConversionDownloadFinishedBroadcast,
                                 CoinConversionDownloadFinishedBundle,
-                                new CoinConversionDownloadFinishedContent(_coinConversionList, false, content.Response));
+                                new CoinConversionDownloadFinishedContent(_coinConversionList, false));
 
                         ShowNotification();
 
@@ -194,25 +196,26 @@ public class CoinService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Coin) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _coinList = _databaseCoinList.GetCoinList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _coinList = _databaseCoinList.GetCoinList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -220,7 +223,7 @@ public class CoinService implements IDataNotificationService {
             if (coinList == null) {
                 Logger.getInstance().Error(TAG, "Converted CoinList is null!");
                 _coinList = _databaseCoinList.GetCoinList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -235,7 +238,7 @@ public class CoinService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     CoinDownloadFinishedBroadcast,
                     CoinDownloadFinishedBundle,
-                    new CoinDownloadFinishedContent(_coinList, true, content.Response));
+                    new CoinDownloadFinishedContent(_coinList, true));
 
             for (int index = 0; index < _coinList.getSize(); index++) {
                 LoadCoinTrend(_coinList.getValue(index));
@@ -249,11 +252,12 @@ public class CoinService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinAdd) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -274,7 +278,7 @@ public class CoinService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     CoinAddFinishedBroadcast,
                     CoinAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -284,11 +288,12 @@ public class CoinService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -309,7 +314,7 @@ public class CoinService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     CoinUpdateFinishedBroadcast,
                     CoinUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -319,11 +324,12 @@ public class CoinService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.CoinDelete) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -344,7 +350,7 @@ public class CoinService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     CoinDeleteFinishedBroadcast,
                     CoinDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -518,7 +524,7 @@ public class CoinService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     CoinDownloadFinishedBroadcast,
                     CoinDownloadFinishedBundle,
-                    new CoinDownloadFinishedContent(_coinList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+                    new CoinDownloadFinishedContent(_coinList, true));
 
             for (int index = 0; index < _coinList.getSize(); index++) {
                 LoadCoinTrend(_coinList.getValue(index));
@@ -529,7 +535,7 @@ public class CoinService implements IDataNotificationService {
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -755,15 +761,11 @@ public class CoinService implements IDataNotificationService {
         }
     }
 
-    private void sendFailedDownloadBroadcast(@NonNull String response) {
-        if (response.length() == 0) {
-            response = "Download for coins failed!";
-        }
-
+    private void sendFailedDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 CoinDownloadFinishedBroadcast,
                 CoinDownloadFinishedBundle,
-                new CoinDownloadFinishedContent(_coinList, false, Tools.CompressStringToByteArray(response)));
+                new CoinDownloadFinishedContent(_coinList, false));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

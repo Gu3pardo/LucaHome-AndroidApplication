@@ -28,8 +28,8 @@ public class SecurityService implements IDataNotificationService {
     public static class SecurityDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Security> SecurityList;
 
-        SecurityDownloadFinishedContent(SerializableList<Security> securityList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        SecurityDownloadFinishedContent(SerializableList<Security> securityList, boolean succcess) {
+            super(succcess, new byte[]{});
             SecurityList = securityList;
         }
     }
@@ -84,30 +84,31 @@ public class SecurityService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Security) {
                 return;
             }
 
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
+
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
             SerializableList<Security> securityList = JsonDataToSecurityConverter.getInstance().GetList(contentResponse);
             if (securityList == null) {
                 Logger.getInstance().Error(TAG, "Converted birthdayList is null!");
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -127,7 +128,7 @@ public class SecurityService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     SecurityDownloadFinishedBroadcast,
                     SecurityDownloadFinishedBundle,
-                    new SecurityDownloadFinishedContent(_securityList, true, content.Response));
+                    new SecurityDownloadFinishedContent(_securityList, true));
         }
     };
 
@@ -135,11 +136,12 @@ public class SecurityService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.SecurityCamera) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -160,7 +162,7 @@ public class SecurityService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     SecurityCameraStateFinishedBroadcast,
                     SecurityCameraStateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -170,11 +172,12 @@ public class SecurityService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.SecurityCameraControl) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -195,7 +198,7 @@ public class SecurityService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     SecurityMotionStateFinishedBroadcast,
                     SecurityMotionStateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -279,7 +282,7 @@ public class SecurityService implements IDataNotificationService {
     public void LoadData() {
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -295,7 +298,7 @@ public class SecurityService implements IDataNotificationService {
     public void SetCameraState(boolean state) {
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -311,7 +314,7 @@ public class SecurityService implements IDataNotificationService {
     public void SetMotionState(boolean state) {
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -411,11 +414,11 @@ public class SecurityService implements IDataNotificationService {
         return _lastUpdate;
     }
 
-    private void sendFailedDownloadBroadcast(@NonNull String response) {
+    private void sendFailedDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 SecurityDownloadFinishedBroadcast,
                 SecurityDownloadFinishedBundle,
-                new SecurityDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new SecurityDownloadFinishedContent(null, false));
     }
 
     private void sendFailedCameraStateBroadcast(@NonNull String response) {

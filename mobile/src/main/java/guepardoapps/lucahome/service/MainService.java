@@ -5,9 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
+import android.util.SparseArray;
 import android.widget.Toast;
 
 import java.io.Serializable;
@@ -15,12 +15,9 @@ import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
 import guepardoapps.library.openweather.service.OpenWeatherService;
-import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.classes.SerializablePair;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.*;
 import guepardoapps.lucahome.receiver.SocketActionReceiver;
@@ -38,12 +35,10 @@ public class MainService extends Service {
     }
 
     public static class MainServiceDownloadCountContent implements Serializable {
-        SerializableList<SerializablePair> DownloadResultList;
         public double DownloadProgress;
         public boolean DownloadFinished;
 
-        MainServiceDownloadCountContent(SerializableList<SerializablePair> downloadResultList, double downloadProgress, boolean downloadFinished) {
-            DownloadResultList = downloadResultList;
+        MainServiceDownloadCountContent(double downloadProgress, boolean downloadFinished) {
             DownloadProgress = downloadProgress;
             DownloadFinished = downloadFinished;
         }
@@ -56,6 +51,28 @@ public class MainService extends Service {
     public static final String MainServiceOnStartCommandBundle = "MainServiceOnStartCommandBundle";
 
     private static final String TAG = MainService.class.getSimpleName();
+
+    private static final SparseArray<Runnable> DOWNLOAD_HASH_MAP = new SparseArray<>();
+
+    static {
+        DOWNLOAD_HASH_MAP.append(0, () -> BirthdayService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(1, () -> CoinService.getInstance().LoadCoinConversionList());
+        DOWNLOAD_HASH_MAP.append(2, () -> CoinService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(3, () -> MenuService.getInstance().LoadListedMenuList());
+        DOWNLOAD_HASH_MAP.append(4, () -> MenuService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(5, () -> MeterListService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(6, () -> MoneyMeterListService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(7, () -> MovieService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(8, () -> OpenWeatherService.getInstance().LoadCurrentWeather());
+        DOWNLOAD_HASH_MAP.append(9, () -> OpenWeatherService.getInstance().LoadForecastWeather());
+        DOWNLOAD_HASH_MAP.append(10, () -> TemperatureService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(11, () -> SecurityService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(12, () -> ShoppingListService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(13, () -> WirelessSocketService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(14, () -> WirelessSwitchService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(15, () -> ScheduleService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(16, () -> MapContentService.getInstance().LoadData());
+    }
 
     private final IBinder _mainServiceBinder = new MainServiceBinder();
 
@@ -80,7 +97,6 @@ public class MainService extends Service {
     private ReceiverController _receiverController;
 
     private int _currentDownloadCount;
-    private SerializableList<SerializablePair> _downloadResultList;
     private boolean _downloading;
 
     private BroadcastReceiver _startDownloadAllReceiver = new BroadcastReceiver() {
@@ -93,12 +109,6 @@ public class MainService extends Service {
     private BroadcastReceiver _birthdayDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            BirthdayService.BirthdayDownloadFinishedContent result = (BirthdayService.BirthdayDownloadFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("Birthday", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("Birthday", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -106,12 +116,6 @@ public class MainService extends Service {
     private BroadcastReceiver _coinConversionDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            CoinService.CoinConversionDownloadFinishedContent result = (CoinService.CoinConversionDownloadFinishedContent) intent.getSerializableExtra(CoinService.CoinConversionDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("CoinConversion", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("CoinConversion", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -119,12 +123,6 @@ public class MainService extends Service {
     private BroadcastReceiver _coinDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            CoinService.CoinDownloadFinishedContent result = (CoinService.CoinDownloadFinishedContent) intent.getSerializableExtra(CoinService.CoinDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("Coin", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("Coin", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -132,12 +130,6 @@ public class MainService extends Service {
     private BroadcastReceiver _mapContentDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MapContentService.MapContentDownloadFinishedContent result = (MapContentService.MapContentDownloadFinishedContent) intent.getSerializableExtra(MapContentService.MapContentDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("MapContent", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("MapContent", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -145,12 +137,6 @@ public class MainService extends Service {
     private BroadcastReceiver _listedMenuDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MenuService.ListedMenuDownloadFinishedContent result = (MenuService.ListedMenuDownloadFinishedContent) intent.getSerializableExtra(MenuService.ListedMenuDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("ListedMenu", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("ListedMenu", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -158,12 +144,6 @@ public class MainService extends Service {
     private BroadcastReceiver _menuDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MenuService.MenuDownloadFinishedContent result = (MenuService.MenuDownloadFinishedContent) intent.getSerializableExtra(MenuService.MenuDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("Menu", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("Menu", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -171,12 +151,6 @@ public class MainService extends Service {
     private BroadcastReceiver _meterListDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MeterListService.MeterDataListDownloadFinishedContent result = (MeterListService.MeterDataListDownloadFinishedContent) intent.getSerializableExtra(MeterListService.MeterDataListDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("MeterDataList", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("MeterDataList", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -184,12 +158,6 @@ public class MainService extends Service {
     private BroadcastReceiver _moneyMeterListDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MoneyMeterListService.MoneyMeterDataListDownloadFinishedContent result = (MoneyMeterListService.MoneyMeterDataListDownloadFinishedContent) intent.getSerializableExtra(MoneyMeterListService.MoneyMeterDataListDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("MoneyMeterDataList", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("MoneyMeterDataList", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -197,12 +165,6 @@ public class MainService extends Service {
     private BroadcastReceiver _movieDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MovieService.MovieDownloadFinishedContent result = (MovieService.MovieDownloadFinishedContent) intent.getSerializableExtra(MovieService.MovieDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("Movie", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("Movie", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -210,27 +172,13 @@ public class MainService extends Service {
     private BroadcastReceiver _openWeatherCurrentWeatherDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            OpenWeatherService.CurrentWeatherDownloadFinishedContent result = (OpenWeatherService.CurrentWeatherDownloadFinishedContent) intent.getSerializableExtra(OpenWeatherService.CurrentWeatherDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("CurrentWeather", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("CurrentWeather", false));
-            }
             broadcastDownloadCount();
-
-            _temperatureService.LoadData();
         }
     };
 
     private BroadcastReceiver _openWeatherForecastWeatherDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            OpenWeatherService.ForecastWeatherDownloadFinishedContent result = (OpenWeatherService.ForecastWeatherDownloadFinishedContent) intent.getSerializableExtra(OpenWeatherService.ForecastWeatherDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("ForecastWeather", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("ForecastWeather", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -238,29 +186,13 @@ public class MainService extends Service {
     private BroadcastReceiver _scheduleDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ScheduleService.ScheduleDownloadFinishedContent result = (ScheduleService.ScheduleDownloadFinishedContent) intent.getSerializableExtra(ScheduleService.ScheduleDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("Schedule", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("Schedule", false));
-            }
             broadcastDownloadCount();
-
-            if (_temperatureService.GetDataList() != null) {
-                _mapContentService.LoadData();
-            }
         }
     };
 
     private BroadcastReceiver _securityDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            SecurityService.SecurityDownloadFinishedContent result = (SecurityService.SecurityDownloadFinishedContent) intent.getSerializableExtra(SecurityService.SecurityDownloadFinishedBroadcast);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("Security", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("Security", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -268,12 +200,6 @@ public class MainService extends Service {
     private BroadcastReceiver _shoppingListDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ShoppingListService.ShoppingListDownloadFinishedContent result = (ShoppingListService.ShoppingListDownloadFinishedContent) intent.getSerializableExtra(ShoppingListService.ShoppingListDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("ShoppingList", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("ShoppingList", false));
-            }
             broadcastDownloadCount();
         }
     };
@@ -281,74 +207,32 @@ public class MainService extends Service {
     private BroadcastReceiver _temperatureDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            TemperatureService.TemperatureDownloadFinishedContent result = (TemperatureService.TemperatureDownloadFinishedContent) intent.getSerializableExtra(TemperatureService.TemperatureDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("Temperature", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("Temperature", false));
-            }
             broadcastDownloadCount();
-
-            if (_scheduleService.GetDataList() != null) {
-                _mapContentService.LoadData();
-            }
         }
     };
 
     private BroadcastReceiver _wirelessSocketDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            WirelessSocketService.WirelessSocketDownloadFinishedContent result = (WirelessSocketService.WirelessSocketDownloadFinishedContent) intent.getSerializableExtra(WirelessSocketService.WirelessSocketDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("WirelessSocket", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("WirelessSocket", false));
-            }
             broadcastDownloadCount();
-
-            _scheduleService.LoadData();
         }
     };
 
     private BroadcastReceiver _wirelessSwitchDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            WirelessSwitchService.WirelessSwitchDownloadFinishedContent result = (WirelessSwitchService.WirelessSwitchDownloadFinishedContent) intent.getSerializableExtra(WirelessSwitchService.WirelessSwitchDownloadFinishedBundle);
-            if (result != null) {
-                _downloadResultList.addValue(new SerializablePair("WirelessSwitch", result.Success));
-            } else {
-                _downloadResultList.addValue(new SerializablePair("WirelessSwitch", false));
-            }
             broadcastDownloadCount();
-
-            _scheduleService.LoadData();
         }
     };
 
     public void StartDownloadAll(@NonNull String caller) {
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "StartDownloadAll by caller %s", caller));
-
         if (_downloading) {
             return;
         }
-
         _currentDownloadCount = 0;
-        _downloadResultList = new SerializableList<>();
         _downloading = true;
-
-        _birthdayService.LoadData();
-        _coinService.LoadCoinConversionList();
-        _menuService.LoadListedMenuList();
-        _menuService.LoadData();
-        _meterListService.LoadData();
-        _moneyMeterListService.LoadData();
-        _movieService.LoadData();
-        _openWeatherService.LoadCurrentWeather();
-        _openWeatherService.LoadForecastWeather();
-        _securityService.LoadData();
-        _shoppingListService.LoadData();
-        _wirelessSocketService.LoadData();
-        _wirelessSwitchService.LoadData();
+        DOWNLOAD_HASH_MAP.get(_currentDownloadCount).run();
     }
 
     public void Cancel() {
@@ -357,13 +241,16 @@ public class MainService extends Service {
 
     private void broadcastDownloadCount() {
         _currentDownloadCount++;
-        double downloadPercentage = (_currentDownloadCount * 100) / Constants.DOWNLOAD_STEPS;
+        double downloadPercentage = (_currentDownloadCount * 100) / DOWNLOAD_HASH_MAP.size();
         _downloading = !(downloadPercentage >= 100);
         _broadcastController.SendSerializableBroadcast(
                 MainServiceDownloadCountBroadcast,
                 MainServiceDownloadCountBundle,
-                new MainServiceDownloadCountContent(_downloadResultList, downloadPercentage, downloadPercentage >= 100)
+                new MainServiceDownloadCountContent(downloadPercentage, downloadPercentage >= 100)
         );
+        if (_currentDownloadCount < DOWNLOAD_HASH_MAP.size()) {
+            DOWNLOAD_HASH_MAP.get(_currentDownloadCount).run();
+        }
     }
 
     @Override
@@ -385,11 +272,11 @@ public class MainService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        Bundle extras = intent.getExtras();
+        /*Bundle extras = intent.getExtras();
         if (extras != null) {
             // _messenger = (Messenger) extras.get("MESSENGER");
-            /*TODO do something with extras*/
-        }
+            // TODO do something with extras
+        }*/
         return _mainServiceBinder;
     }
 
@@ -537,7 +424,6 @@ public class MainService extends Service {
         );
 
         _currentDownloadCount = 0;
-        _downloadResultList = new SerializableList<>();
     }
 
     @Override

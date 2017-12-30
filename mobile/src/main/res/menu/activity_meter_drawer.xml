@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Remote">
+        <menu>
+            <item
+                android:id="@+id/nav_socket"
+                android:icon="@mipmap/ic_settings_remote_black_48dp"
+                android:title="Wireless Socket" />
+            <item
+                android:id="@+id/nav_switch"
+                android:icon="@mipmap/ic_lightbulb_outline_black_48dp"
+                android:title="Wireless Switch" />
+            <item
+                android:id="@+id/nav_schedule"
+                android:icon="@mipmap/ic_schedule_black_48dp"
+                android:title="Schedule" />
+            <item
+                android:id="@+id/nav_timer"
+                android:icon="@mipmap/ic_timer_black_48dp"
+                android:title="Timer" />
+        </menu>
+    </item>
+
+    <item android:title="Media">
+        <menu>
+            <item
+                android:id="@+id/nav_movie"
+                android:icon="@mipmap/ic_video_library_black_48dp"
+                android:title="Movie" />
+            <item
+                android:id="@+id/nav_mediamirror"
+                android:icon="@mipmap/ic_photo_library_black_48dp"
+                android:title="MediaMirror" />
+        </menu>
+    </item>
+
+    <item android:title="Money">
+        <menu>
+            <item
+                android:id="@+id/nav_coins"
+                android:icon="@mipmap/ic_monetization_on_black_48dp"
+                android:title="View coins" />
+            <item
+                android:id="@+id/nav_money"
+                android:icon="@mipmap/ic_euro_symbol_black_48dp"
+                android:title="View money" />
+        </menu>
+    </item>
+
+    <item android:title="Living">
+        <menu>
+            <item
+                android:id="@+id/nav_menu"
+                android:icon="@mipmap/ic_restaurant_menu_black_48dp"
+                android:title="Menu" />
+            <item
+                android:id="@+id/nav_shopping"
+                android:icon="@mipmap/ic_shopping_cart_black_48dp"
+                android:title="Shopping" />
+        </menu>
+    </item>
+
+    <item android:title="Weather">
+        <menu>
+            <item
+                android:id="@+id/nav_forecast_weather"
+                android:icon="@mipmap/ic_looks_black_48dp"
+                android:title="Forecast Weather" />
+        </menu>
+    </item>
+
+    <item android:title="Birthdays">
+        <menu>
+            <item
+                android:id="@+id/nav_birthday"
+                android:icon="@mipmap/ic_face_black_48dp"
+                android:title="Who's next?" />
+        </menu>
+    </item>
+
+    <item android:title="Security">
+        <menu>
+            <item
+                android:id="@+id/nav_security"
+                android:icon="@mipmap/ic_security_black_48dp"
+                android:title="Secure your home" />
+        </menu>
+    </item>
+
+    <item android:title="Settings">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="Configure" />
+        </menu>
+    </item>
+
+</menu>

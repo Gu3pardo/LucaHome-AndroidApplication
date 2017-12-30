@@ -33,8 +33,8 @@ public class WirelessSocketService implements IDataNotificationService {
     public static class WirelessSocketDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<WirelessSocket> WirelessSocketList;
 
-        WirelessSocketDownloadFinishedContent(SerializableList<WirelessSocket> wirelessSocketList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        WirelessSocketDownloadFinishedContent(SerializableList<WirelessSocket> wirelessSocketList, boolean succcess) {
+            super(succcess, new byte[]{});
             WirelessSocketList = wirelessSocketList;
         }
     }
@@ -104,25 +104,26 @@ public class WirelessSocketService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocket) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
-                sendFailedSocketDownloadBroadcast(contentResponse);
+                sendFailedSocketDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
-                sendFailedSocketDownloadBroadcast(contentResponse);
+                sendFailedSocketDownloadBroadcast();
                 return;
             }
 
@@ -130,7 +131,7 @@ public class WirelessSocketService implements IDataNotificationService {
             if (wirelessSocketList == null) {
                 Logger.getInstance().Error(TAG, "Converted wirelessSocketList is null!");
                 _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
-                sendFailedSocketDownloadBroadcast(contentResponse);
+                sendFailedSocketDownloadBroadcast();
                 return;
             }
 
@@ -145,7 +146,7 @@ public class WirelessSocketService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketDownloadFinishedBroadcast,
                     WirelessSocketDownloadFinishedBundle,
-                    new WirelessSocketDownloadFinishedContent(_wirelessSocketList, true, content.Response));
+                    new WirelessSocketDownloadFinishedContent(_wirelessSocketList, true));
         }
     };
 
@@ -153,11 +154,12 @@ public class WirelessSocketService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocketSet) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -178,7 +180,7 @@ public class WirelessSocketService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketSetFinishedBroadcast,
                     WirelessSocketSetFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -188,11 +190,12 @@ public class WirelessSocketService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocketAdd) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -213,7 +216,7 @@ public class WirelessSocketService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketAddFinishedBroadcast,
                     WirelessSocketAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -223,11 +226,12 @@ public class WirelessSocketService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocketUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -248,7 +252,7 @@ public class WirelessSocketService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketUpdateFinishedBroadcast,
                     WirelessSocketUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -258,11 +262,12 @@ public class WirelessSocketService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSocketDelete) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -283,7 +288,7 @@ public class WirelessSocketService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketDeleteFinishedBroadcast,
                     WirelessSocketDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -454,13 +459,13 @@ public class WirelessSocketService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketDownloadFinishedBroadcast,
                     WirelessSocketDownloadFinishedBundle,
-                    new WirelessSocketDownloadFinishedContent(_wirelessSocketList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+                    new WirelessSocketDownloadFinishedContent(_wirelessSocketList, true));
             return;
         }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedSocketDownloadBroadcast("No user");
+            sendFailedSocketDownloadBroadcast();
             return;
         }
 
@@ -763,15 +768,11 @@ public class WirelessSocketService implements IDataNotificationService {
         }
     }
 
-    private void sendFailedSocketDownloadBroadcast(@NonNull String response) {
-        if (response.length() == 0) {
-            response = "Download for sockets failed!";
-        }
-
+    private void sendFailedSocketDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 WirelessSocketDownloadFinishedBroadcast,
                 WirelessSocketDownloadFinishedBundle,
-                new WirelessSocketDownloadFinishedContent(_wirelessSocketList, false, Tools.CompressStringToByteArray(response)));
+                new WirelessSocketDownloadFinishedContent(_wirelessSocketList, false));
     }
 
     private void sendFailedSocketSetBroadcast(@NonNull String response) {

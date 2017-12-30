@@ -39,11 +39,12 @@ public class UserService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.User) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -67,7 +68,7 @@ public class UserService {
             _broadcastController.SendSerializableBroadcast(
                     UserCheckedFinishedBroadcast,
                     UserCheckedFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
         }
     };
 
@@ -121,6 +122,7 @@ public class UserService {
     public boolean IsAnUserSaved() {
         LucaUser user = _settingsController.GetUser();
         return !(user.GetName() == null || user.GetPassphrase() == null
+                || user.GetName().length() == 0 || user.GetPassphrase().length() == 0
                 || user.GetName().contentEquals("NA") || user.GetPassphrase().contentEquals("NA")
                 || user.GetName().contentEquals("Dummy") || user.GetPassphrase().contentEquals("Dummy")
                 || user.GetName().contentEquals("DUMMY") || user.GetPassphrase().contentEquals("DUMMY"));

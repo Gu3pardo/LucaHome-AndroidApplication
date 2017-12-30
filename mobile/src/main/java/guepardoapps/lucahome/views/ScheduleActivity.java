@@ -286,6 +286,10 @@ public class ScheduleActivity extends AppCompatActivity implements NavigationVie
             navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
         } else if (id == R.id.nav_switch) {
             navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
+        } else if (id == R.id.nav_meter) {
+            navigationResult = _navigationService.NavigateToActivity(_context, MeterDataActivity.class);
+        } else if (id == R.id.nav_money) {
+            navigationResult = _navigationService.NavigateToActivity(_context, MoneyMeterDataActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

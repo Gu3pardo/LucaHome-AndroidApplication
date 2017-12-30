@@ -35,6 +35,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Movie;
 import guepardoapps.lucahome.common.service.MovieService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class MovieActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -79,8 +80,7 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
     private BroadcastReceiver _movieUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MovieService.MovieDownloadFinishedContent result =
-                    (MovieService.MovieDownloadFinishedContent) intent.getSerializableExtra(MovieService.MovieDownloadFinishedBundle);
+            ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(MovieService.MovieDownloadFinishedBundle);
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
@@ -89,16 +89,18 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
             if (result.Success) {
                 _lastUpdateTextView.setText(_movieService.GetLastUpdate().toString());
 
-                if (result.MovieList != null) {
-                    if (result.MovieList.getSize() > 0) {
-                        _movieListViewAdapter = new MovieListViewAdapter(_context, result.MovieList);
+                SerializableList<Movie> movieList = _movieService.GetDataList();
+
+                if (movieList != null) {
+                    if (movieList.getSize() > 0) {
+                        _movieListViewAdapter = new MovieListViewAdapter(_context, movieList);
                         _listView.setAdapter(_movieListViewAdapter);
 
                         _noDataFallback.setVisibility(View.GONE);
                         _listView.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.VISIBLE);
 
-                        _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d movies", result.MovieList.getSize()));
+                        _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d movies", movieList.getSize()));
                     } else {
                         _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d movies", 0));
                         _noDataFallback.setVisibility(View.VISIBLE);
@@ -269,6 +271,10 @@ public class MovieActivity extends AppCompatActivity implements NavigationView.O
             navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
         } else if (id == R.id.nav_switch) {
             navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
+        } else if (id == R.id.nav_meter) {
+            navigationResult = _navigationService.NavigateToActivity(_context, MeterDataActivity.class);
+        } else if (id == R.id.nav_money) {
+            navigationResult = _navigationService.NavigateToActivity(_context, MoneyMeterDataActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

@@ -7,10 +7,13 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class MoneyMeterData implements Serializable {
     private static final long serialVersionUID = 8799048598384442111L;
     private static final String TAG = MoneyMeterData.class.getSimpleName();
+
+    public enum ServerAction {Null, Add, Update}
 
     private int _id;
     private int _typeId;
@@ -22,6 +25,9 @@ public class MoneyMeterData implements Serializable {
 
     private SerializableDate _saveDate;
     private String _user;
+
+    private ServerAction _serverAction;
+    private ILucaClass.LucaServerDbAction _serverDbAction;
 
     public MoneyMeterData(
             int id,
@@ -44,6 +50,9 @@ public class MoneyMeterData implements Serializable {
 
         _saveDate = saveDate;
         _user = user;
+
+        _serverAction = MoneyMeterData.ServerAction.Null;
+        _serverDbAction = ILucaClass.LucaServerDbAction.Null;
     }
 
     public int GetId() {
@@ -108,6 +117,22 @@ public class MoneyMeterData implements Serializable {
 
     public void SetUser(@NonNull String user) {
         _user = user;
+    }
+
+    public MoneyMeterData.ServerAction GetServerAction() {
+        return _serverAction;
+    }
+
+    public void SetServerAction(@NonNull MoneyMeterData.ServerAction serverAction) {
+        _serverAction = serverAction;
+    }
+
+    public void SetServerDbAction(@NonNull ILucaClass.LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    public ILucaClass.LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
     }
 
     public String CommandAdd() {

@@ -33,8 +33,8 @@ public class WirelessSwitchService implements IDataNotificationService {
     public static class WirelessSwitchDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<WirelessSwitch> WirelessSwitchList;
 
-        WirelessSwitchDownloadFinishedContent(SerializableList<WirelessSwitch> wirelessSwitchList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        WirelessSwitchDownloadFinishedContent(SerializableList<WirelessSwitch> wirelessSwitchList, boolean succcess) {
+            super(succcess, new byte[]{});
             WirelessSwitchList = wirelessSwitchList;
         }
     }
@@ -104,25 +104,26 @@ public class WirelessSwitchService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitch) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
-                sendFailedWirelessSwitchDownloadBroadcast(contentResponse);
+                sendFailedWirelessSwitchDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
-                sendFailedWirelessSwitchDownloadBroadcast(contentResponse);
+                sendFailedWirelessSwitchDownloadBroadcast();
                 return;
             }
 
@@ -130,7 +131,7 @@ public class WirelessSwitchService implements IDataNotificationService {
             if (wirelessSwitchList == null) {
                 Logger.getInstance().Error(TAG, "Converted wirelessSwitchList is null!");
                 _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
-                sendFailedWirelessSwitchDownloadBroadcast(contentResponse);
+                sendFailedWirelessSwitchDownloadBroadcast();
                 return;
             }
 
@@ -145,7 +146,7 @@ public class WirelessSwitchService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSwitchDownloadFinishedBroadcast,
                     WirelessSwitchDownloadFinishedBundle,
-                    new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, true, content.Response));
+                    new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, true));
         }
     };
 
@@ -153,11 +154,12 @@ public class WirelessSwitchService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitchToggle) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -178,7 +180,7 @@ public class WirelessSwitchService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSwitchToggleFinishedBroadcast,
                     WirelessSwitchToggleFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -188,11 +190,12 @@ public class WirelessSwitchService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitchAdd) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -213,7 +216,7 @@ public class WirelessSwitchService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSwitchAddFinishedBroadcast,
                     WirelessSwitchAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -223,11 +226,12 @@ public class WirelessSwitchService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitchUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -248,7 +252,7 @@ public class WirelessSwitchService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSwitchUpdateFinishedBroadcast,
                     WirelessSwitchUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -258,11 +262,12 @@ public class WirelessSwitchService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.WirelessSwitchDelete) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -283,7 +288,7 @@ public class WirelessSwitchService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSwitchDeleteFinishedBroadcast,
                     WirelessSwitchDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -471,13 +476,13 @@ public class WirelessSwitchService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSwitchDownloadFinishedBroadcast,
                     WirelessSwitchDownloadFinishedBundle,
-                    new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+                    new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, true));
             return;
         }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedWirelessSwitchDownloadBroadcast("No user");
+            sendFailedWirelessSwitchDownloadBroadcast();
             return;
         }
 
@@ -764,15 +769,11 @@ public class WirelessSwitchService implements IDataNotificationService {
         }
     }
 
-    private void sendFailedWirelessSwitchDownloadBroadcast(@NonNull String response) {
-        if (response.length() == 0) {
-            response = "Download for wireless switches failed!";
-        }
-
+    private void sendFailedWirelessSwitchDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 WirelessSwitchDownloadFinishedBroadcast,
                 WirelessSwitchDownloadFinishedBundle,
-                new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, false, Tools.CompressStringToByteArray(response)));
+                new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, false));
     }
 
     private void sendFailedWirelessSwitchToggleBroadcast(@NonNull String response) {

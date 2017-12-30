@@ -18,6 +18,10 @@
                 android:id="@+id/nav_timer"
                 android:icon="@mipmap/ic_timer_black_48dp"
                 android:title="Timer" />
+            <item
+                android:id="@+id/nav_meter"
+                android:icon="@mipmap/ic_straighten_black_48dp"
+                android:title="Meter data" />
         </menu>
     </item>
 
@@ -40,6 +44,10 @@
                 android:id="@+id/nav_coins"
                 android:icon="@mipmap/ic_monetization_on_black_48dp"
                 android:title="View coins" />
+            <item
+                android:id="@+id/nav_money"
+                android:icon="@mipmap/ic_euro_symbol_black_48dp"
+                android:title="View money" />
         </menu>
     </item>
 

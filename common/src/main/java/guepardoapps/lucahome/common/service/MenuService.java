@@ -37,8 +37,8 @@ public class MenuService implements IDataService {
     public static class ListedMenuDownloadFinishedContent extends ObjectChangeFinishedContent {
         SerializableList<ListedMenu> ListedMenuList;
 
-        ListedMenuDownloadFinishedContent(SerializableList<ListedMenu> listedMenuList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        ListedMenuDownloadFinishedContent(SerializableList<ListedMenu> listedMenuList, boolean succcess) {
+            super(succcess, new byte[]{});
             ListedMenuList = listedMenuList;
         }
     }
@@ -46,8 +46,8 @@ public class MenuService implements IDataService {
     public static class MenuDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<LucaMenu> MenuList;
 
-        MenuDownloadFinishedContent(SerializableList<LucaMenu> menuList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        MenuDownloadFinishedContent(SerializableList<LucaMenu> menuList, boolean succcess) {
+            super(succcess, new byte[]{});
             MenuList = menuList;
         }
     }
@@ -119,11 +119,12 @@ public class MenuService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenu) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -159,7 +160,7 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ListedMenuDownloadFinishedBroadcast,
                     ListedMenuDownloadFinishedBundle,
-                    new ListedMenuDownloadFinishedContent(_listedMenuList, true, content.Response));
+                    new ListedMenuDownloadFinishedContent(_listedMenuList, true));
         }
     };
 
@@ -167,11 +168,12 @@ public class MenuService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuAdd) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -192,7 +194,7 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ListedMenuAddFinishedBroadcast,
                     ListedMenuAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadListedMenuList();
         }
@@ -202,11 +204,12 @@ public class MenuService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -227,7 +230,7 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ListedMenuUpdateFinishedBroadcast,
                     ListedMenuUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadListedMenuList();
         }
@@ -237,11 +240,12 @@ public class MenuService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuDelete) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -262,7 +266,7 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ListedMenuDeleteFinishedBroadcast,
                     ListedMenuDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadListedMenuList();
         }
@@ -272,25 +276,26 @@ public class MenuService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Menu) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _menuList = _databaseMenuList.GetMenuList();
-                sendFailedMenuDownloadBroadcast(contentResponse);
+                sendFailedMenuDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _menuList = _databaseMenuList.GetMenuList();
-                sendFailedMenuDownloadBroadcast(contentResponse);
+                sendFailedMenuDownloadBroadcast();
                 return;
             }
 
@@ -298,7 +303,7 @@ public class MenuService implements IDataService {
             if (menuList == null) {
                 Logger.getInstance().Error(TAG, "Converted menuList is null!");
                 _menuList = _databaseMenuList.GetMenuList();
-                sendFailedMenuDownloadBroadcast(contentResponse);
+                sendFailedMenuDownloadBroadcast();
                 return;
             }
 
@@ -335,7 +340,7 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MenuDownloadFinishedBroadcast,
                     MenuDownloadFinishedBundle,
-                    new MenuDownloadFinishedContent(_menuList, true, content.Response));
+                    new MenuDownloadFinishedContent(_menuList, true));
         }
     };
 
@@ -343,11 +348,12 @@ public class MenuService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MenuUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -368,7 +374,7 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MenuUpdateFinishedBroadcast,
                     MenuUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -378,11 +384,12 @@ public class MenuService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MenuClear) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -403,7 +410,7 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MenuClearFinishedBroadcast,
                     MenuClearFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -561,7 +568,7 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ListedMenuDownloadFinishedBroadcast,
                     ListedMenuDownloadFinishedBundle,
-                    new ListedMenuDownloadFinishedContent(_listedMenuList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+                    new ListedMenuDownloadFinishedContent(_listedMenuList, true));
             return;
         }
 
@@ -669,13 +676,13 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MenuDownloadFinishedBroadcast,
                     MenuDownloadFinishedBundle,
-                    new MenuDownloadFinishedContent(_menuList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+                    new MenuDownloadFinishedContent(_menuList, true));
             return;
         }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedMenuDownloadBroadcast("No user");
+            sendFailedMenuDownloadBroadcast();
             return;
         }
 
@@ -859,7 +866,7 @@ public class MenuService implements IDataService {
         _broadcastController.SendSerializableBroadcast(
                 ListedMenuDownloadFinishedBroadcast,
                 ListedMenuDownloadFinishedBundle,
-                new ListedMenuDownloadFinishedContent(_listedMenuList, false, Tools.CompressStringToByteArray(response)));
+                new ListedMenuDownloadFinishedContent(_listedMenuList, false));
     }
 
     private void sendFailedListedMenuAddBroadcast(@NonNull String response) {
@@ -895,15 +902,11 @@ public class MenuService implements IDataService {
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
     }
 
-    private void sendFailedMenuDownloadBroadcast(@NonNull String response) {
-        if (response.length() == 0) {
-            response = "Download for menu failed!";
-        }
-
+    private void sendFailedMenuDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 MenuDownloadFinishedBroadcast,
                 MenuDownloadFinishedBundle,
-                new MenuDownloadFinishedContent(_menuList, false, Tools.CompressStringToByteArray(response)));
+                new MenuDownloadFinishedContent(_menuList, false));
     }
 
     private void sendFailedMenuUpdateBroadcast(@NonNull String response) {

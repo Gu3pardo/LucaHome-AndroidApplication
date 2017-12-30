@@ -8,12 +8,12 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 50100
-        versionName "5.1.0.171229"
+        versionName "5.1.0.171230"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_10
-        targetCompatibility JavaVersion.VERSION_1_10
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {

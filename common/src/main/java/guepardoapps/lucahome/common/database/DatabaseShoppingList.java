@@ -47,6 +47,7 @@ public class DatabaseShoppingList {
                     + KEY_NAME + " TEXT NOT NULL, "
                     + KEY_GROUP + " TEXT NOT NULL, "
                     + KEY_QUANTITY + " TEXT NOT NULL, "
+                    + KEY_UNIT + " TEXT NOT NULL, "
                     + KEY_BOUGHT + " TEXT NOT NULL, "
                     + KEY_IS_ON_SERVER + " TEXT NOT NULL, "
                     + KEY_SERVER_ACTION + " TEXT NOT NULL); ");

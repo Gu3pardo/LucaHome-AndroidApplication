@@ -17,6 +17,7 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaUser;
+import guepardoapps.lucahome.common.classes.MoneyMeter;
 import guepardoapps.lucahome.common.classes.MoneyMeterData;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.DownloadController;
@@ -28,16 +29,28 @@ import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
 public class MoneyMeterListService implements IDataService {
+    public static class MoneyMeterListDownloadFinishedContent extends ObjectChangeFinishedContent {
+        public SerializableList<MoneyMeter> MoneyMeterList;
+
+        MoneyMeterListDownloadFinishedContent(SerializableList<MoneyMeter> moneyMeterList, boolean succcess) {
+            super(succcess, new byte[]{});
+            MoneyMeterList = moneyMeterList;
+        }
+    }
+
     public static class MoneyMeterDataListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<MoneyMeterData> MoneyMeterDataList;
 
-        MoneyMeterDataListDownloadFinishedContent(SerializableList<MoneyMeterData> moneyMeterDataList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        MoneyMeterDataListDownloadFinishedContent(SerializableList<MoneyMeterData> moneyMeterDataList, boolean succcess) {
+            super(succcess, new byte[]{});
             MoneyMeterDataList = moneyMeterDataList;
         }
     }
 
     public static final String MoneyMeterDataIntent = "MoneyMeterDataIntent";
+
+    public static final String MoneyMeterListDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.moneymeterlist.download.finished";
+    public static final String MoneyMeterListDownloadFinishedBundle = "MoneyMeterListDownloadFinishedBundle";
 
     public static final String MoneyMeterDataListDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.moneymeterdatalist.download.finished";
     public static final String MoneyMeterDataListDownloadFinishedBundle = "MoneyMeterDataListDownloadFinishedBundle";
@@ -84,31 +97,38 @@ public class MoneyMeterListService implements IDataService {
 
     private DatabaseMoneyMeterDataList _databaseMoneyMeterDataList;
 
+    private MoneyMeter _activeMoneyMeter;
+    private SerializableList<MoneyMeter> _moneyMeterList = new SerializableList<>();
     private SerializableList<MoneyMeterData> _moneyMeterDataList = new SerializableList<>();
 
     private BroadcastReceiver _moneyMeterDataListDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MoneyMeterData) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _moneyMeterDataList = _databaseMoneyMeterDataList.GetMoneyMeterDataList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
+                createMoneyMeterList();
+                sendFailedDownloadMeterBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _moneyMeterDataList = _databaseMoneyMeterDataList.GetMoneyMeterDataList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
+                createMoneyMeterList();
+                sendFailedDownloadMeterBroadcast();
                 return;
             }
 
@@ -116,13 +136,16 @@ public class MoneyMeterListService implements IDataService {
             if (moneyMeterDataList == null) {
                 Logger.getInstance().Error(TAG, "Converted moneyMeterDataList is null!");
                 _moneyMeterDataList = _databaseMoneyMeterDataList.GetMoneyMeterDataList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
+                createMoneyMeterList();
+                sendFailedDownloadMeterBroadcast();
                 return;
             }
 
             _lastUpdate = new Date();
 
             _moneyMeterDataList = moneyMeterDataList;
+            createMoneyMeterList();
 
             clearMoneyMeterDataListFromDatabase();
             saveMoneyMeterDataListToDatabase();
@@ -130,7 +153,7 @@ public class MoneyMeterListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MoneyMeterDataListDownloadFinishedBroadcast,
                     MoneyMeterDataListDownloadFinishedBundle,
-                    new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, true, content.Response));
+                    new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, true));
         }
     };
 
@@ -138,11 +161,12 @@ public class MoneyMeterListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MoneyMeterDataAdd) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -163,7 +187,7 @@ public class MoneyMeterListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MoneyMeterDataListAddFinishedBroadcast,
                     MoneyMeterDataListAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -173,11 +197,12 @@ public class MoneyMeterListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MoneyMeterDataUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -198,7 +223,7 @@ public class MoneyMeterListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MoneyMeterDataListUpdateFinishedBroadcast,
                     MoneyMeterDataListUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -208,11 +233,12 @@ public class MoneyMeterListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MoneyMeterDataDelete) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -233,7 +259,7 @@ public class MoneyMeterListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MoneyMeterDataListDeleteFinishedBroadcast,
                     MoneyMeterDataListDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -311,6 +337,36 @@ public class MoneyMeterListService implements IDataService {
         return _moneyMeterDataList;
     }
 
+    public SerializableList<MoneyMeter> GetMoneyMeterList() {
+        return _moneyMeterList;
+    }
+
+    public MoneyMeter GetActiveMoneyMeter() {
+        return _activeMoneyMeter;
+    }
+
+    public void SetActiveMoneyMeter(@NonNull MoneyMeter moneyMeter) {
+        _activeMoneyMeter = moneyMeter;
+    }
+
+    public void SetActiveMoneyMeter(int typeId) {
+        for (int index = 0; index < _moneyMeterList.getSize(); index++) {
+            if (_moneyMeterList.getValue(index).GetTypeId() == typeId) {
+                _activeMoneyMeter = _moneyMeterList.getValue(index);
+                break;
+            }
+        }
+    }
+
+    public ArrayList<String> GetMoneyMeterDescriptionList() {
+        ArrayList<String> descriptionList = new ArrayList<>();
+        for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
+            String description = String.format(Locale.getDefault(), "%s - %s", _moneyMeterDataList.getValue(index).GetBank(), _moneyMeterDataList.getValue(index).GetPlan());
+            descriptionList.add(description);
+        }
+        return descriptionList;
+    }
+
     public ArrayList<String> GetMoneyMeterBankList() {
         ArrayList<String> bankList = new ArrayList<>();
         for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
@@ -327,6 +383,14 @@ public class MoneyMeterListService implements IDataService {
         return planList;
     }
 
+    public ArrayList<String> GetMoneyMeterUnitList() {
+        ArrayList<String> unitList = new ArrayList<>();
+        for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
+            unitList.add(_moneyMeterDataList.getValue(index).GetUnit());
+        }
+        return unitList;
+    }
+
     public MoneyMeterData GetById(int id) {
         for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
             MoneyMeterData entry = _moneyMeterDataList.getValue(index);
@@ -335,6 +399,31 @@ public class MoneyMeterListService implements IDataService {
             }
         }
         return null;
+    }
+
+    public int GetHighestId() {
+        int highestId = -1;
+        for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
+            int id = _moneyMeterDataList.getValue(index).GetId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
+    }
+
+    public int GetHighestTypeId(@NonNull String bank, @NonNull String plan) {
+        int highestTypeId = -1;
+        for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
+            MoneyMeterData moneyMeterData = _moneyMeterDataList.getValue(index);
+            if (moneyMeterData.GetBank().equals(bank) && moneyMeterData.GetPlan().equals(plan)) {
+                int typeId = moneyMeterData.GetTypeId();
+                if (typeId > highestTypeId) {
+                    highestTypeId = typeId;
+                }
+            }
+        }
+        return highestTypeId;
     }
 
     @Override
@@ -357,16 +446,17 @@ public class MoneyMeterListService implements IDataService {
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _moneyMeterDataList = _databaseMoneyMeterDataList.GetMoneyMeterDataList();
+            createMoneyMeterList();
             _broadcastController.SendSerializableBroadcast(
                     MoneyMeterDataListDownloadFinishedBroadcast,
                     MoneyMeterDataListDownloadFinishedBundle,
-                    new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+                    new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, true));
             return;
         }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -493,15 +583,60 @@ public class MoneyMeterListService implements IDataService {
         }
     }
 
-    private void sendFailedDownloadBroadcast(@NonNull String response) {
-        if (response.length() == 0) {
-            response = "Download for money meter data failed!";
+    private void createMoneyMeterList() {
+        SerializableList<MoneyMeter> moneyMeterList = new SerializableList<>();
+
+        for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
+            MoneyMeterData moneyMeterData = _moneyMeterDataList.getValue(index);
+            int typeId = moneyMeterData.GetTypeId();
+
+            boolean moneyMeterAlreadyExists = false;
+            int moneyMeterIndex;
+            for (moneyMeterIndex = 0; moneyMeterIndex < _moneyMeterDataList.getSize(); moneyMeterIndex++) {
+                MoneyMeter moneyMeter = moneyMeterList.getValue(moneyMeterIndex);
+                if (moneyMeter != null) {
+                    if (moneyMeter.GetTypeId() == typeId) {
+                        moneyMeterAlreadyExists = true;
+                        break;
+                    }
+                }
+            }
+
+            if (moneyMeterAlreadyExists) {
+                MoneyMeter moneyMeter = moneyMeterList.getValue(moneyMeterIndex);
+                SerializableList<MoneyMeterData> moneyMeterDataList = moneyMeter.GetMoneyMeterDataList();
+                moneyMeterDataList.addValue(moneyMeterData);
+                moneyMeter.SetMoneyMeterDataList(moneyMeterDataList);
+                moneyMeterList.setValue(moneyMeterIndex, moneyMeter);
+            } else {
+                SerializableList<MoneyMeterData> moneyMeterDataList = new SerializableList<>();
+                moneyMeterDataList.addValue(moneyMeterData);
+                MoneyMeter moneyMeter = new MoneyMeter(moneyMeterData.GetTypeId(), moneyMeterData.GetBank(), moneyMeterData.GetPlan(), moneyMeterData.GetUser(), moneyMeterDataList);
+                moneyMeterList.addValue(moneyMeter);
+            }
         }
 
+        _moneyMeterList = moneyMeterList;
+        _activeMoneyMeter = _moneyMeterList.getSize() > 0 ? _moneyMeterList.getValue(0) : null;
+
+        _broadcastController.SendSerializableBroadcast(
+                MoneyMeterListDownloadFinishedBroadcast,
+                MoneyMeterListDownloadFinishedBundle,
+                new MoneyMeterListDownloadFinishedContent(_moneyMeterList, true));
+    }
+
+    private void sendFailedDownloadMeterBroadcast() {
+        _broadcastController.SendSerializableBroadcast(
+                MoneyMeterListDownloadFinishedBroadcast,
+                MoneyMeterListDownloadFinishedBundle,
+                new MoneyMeterListDownloadFinishedContent(_moneyMeterList, false));
+    }
+
+    private void sendFailedDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 MoneyMeterDataListDownloadFinishedBroadcast,
                 MoneyMeterDataListDownloadFinishedBundle,
-                new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, false, Tools.CompressStringToByteArray(response)));
+                new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, false));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

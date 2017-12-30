@@ -23,6 +23,15 @@
     <string name="prompt_coin_amount">Coin amount</string>
     <string name="prompt_menu_title">Menu title</string>
     <string name="prompt_menu_description">Menu description</string>
+    <string name="prompt_meterdata_type">Meter type</string>
+    <string name="prompt_meterdata_meterid">Meter ID</string>
+    <string name="prompt_meterdata_area">Meter area</string>
+    <string name="prompt_meterdata_imagename">Meter image name</string>
+    <string name="prompt_meterdata_value">Meter value</string>
+    <string name="prompt_moneymeterdata_bank">Bank</string>
+    <string name="prompt_moneymeterdata_plan">Plan</string>
+    <string name="prompt_moneymeterdata_amount">Amount</string>
+    <string name="prompt_moneymeterdata_unit">Unit</string>
     <string name="prompt_movie_title">Movie title</string>
     <string name="prompt_movie_genre">Movie genre</string>
     <string name="prompt_movie_description">Movie description</string>
@@ -207,6 +216,10 @@
     <string name="title_activity_coin_edit">Edit Coins</string>
     <string name="title_activity_menu">Menu</string>
     <string name="title_activity_menu_edit">Edit Menu</string>
+    <string name="title_activity_meter_data">Meter data</string>
+    <string name="title_activity_meter_data_edit">Edit meter data</string>
+    <string name="title_activity_money_meter_data">Money meter data</string>
+    <string name="title_activity_money_meter_data_edit">Edit money meter data</string>
     <string name="title_activity_movie">Movies</string>
     <string name="title_activity_movie_edit">Edit Movies</string>
     <string name="title_activity_shopping_list">Shopping List</string>

@@ -47,6 +47,7 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
 import guepardoapps.lucahome.common.service.BirthdayService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class BirthdayActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -91,8 +92,7 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
     private BroadcastReceiver _birthdayUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            BirthdayService.BirthdayDownloadFinishedContent result =
-                    (BirthdayService.BirthdayDownloadFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
+            ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
@@ -101,16 +101,18 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
             if (result.Success) {
                 _lastUpdateTextView.setText(_birthdayService.GetLastUpdate().toString());
 
-                if (result.BirthdayList != null) {
-                    if (result.BirthdayList.getSize() > 0) {
-                        _birthdayListViewAdapter = new BirthdayListViewAdapter(_context, result.BirthdayList);
+                SerializableList<LucaBirthday> birthdayList = _birthdayService.GetDataList();
+
+                if (birthdayList != null) {
+                    if (birthdayList.getSize() > 0) {
+                        _birthdayListViewAdapter = new BirthdayListViewAdapter(_context, birthdayList);
                         _listView.setAdapter(_birthdayListViewAdapter);
 
                         _noDataFallback.setVisibility(View.GONE);
                         _listView.setVisibility(View.VISIBLE);
                         _searchField.setVisibility(View.VISIBLE);
 
-                        _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d birthdays", result.BirthdayList.getSize()));
+                        _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d birthdays", birthdayList.getSize()));
                     } else {
                         _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d birthdays", 0));
                         _noDataFallback.setVisibility(View.VISIBLE);
@@ -311,6 +313,10 @@ public class BirthdayActivity extends AppCompatActivity implements NavigationVie
             navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
         } else if (id == R.id.nav_switch) {
             navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
+        } else if (id == R.id.nav_meter) {
+            navigationResult = _navigationService.NavigateToActivity(_context, MeterDataActivity.class);
+        } else if (id == R.id.nav_money) {
+            navigationResult = _navigationService.NavigateToActivity(_context, MoneyMeterDataActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

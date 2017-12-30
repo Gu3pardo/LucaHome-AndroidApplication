@@ -29,8 +29,8 @@ public class MapContentService implements IDataService {
     public static class MapContentDownloadFinishedContent extends ObjectChangeFinishedContent {
         SerializableList<MapContent> MapContentList;
 
-        MapContentDownloadFinishedContent(SerializableList<MapContent> mapContentList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        MapContentDownloadFinishedContent(SerializableList<MapContent> mapContentList, boolean succcess) {
+            super(succcess, new byte[]{});
             MapContentList = mapContentList;
         }
     }
@@ -75,11 +75,12 @@ public class MapContentService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.MapContent) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -91,7 +92,7 @@ public class MapContentService implements IDataService {
                         TemperatureService.getInstance().GetDataList(),
                         WirelessSocketService.getInstance().GetDataList(),
                         WirelessSwitchService.getInstance().GetDataList());
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -103,7 +104,7 @@ public class MapContentService implements IDataService {
                         TemperatureService.getInstance().GetDataList(),
                         WirelessSocketService.getInstance().GetDataList(),
                         WirelessSwitchService.getInstance().GetDataList());
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -120,7 +121,7 @@ public class MapContentService implements IDataService {
                     WirelessSwitchService.getInstance().GetDataList());
             if (mapContentList == null) {
                 Logger.getInstance().Error(TAG, "Converted mapContentList is null!");
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -134,7 +135,7 @@ public class MapContentService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MapContentDownloadFinishedBroadcast,
                     MapContentDownloadFinishedBundle,
-                    new MapContentDownloadFinishedContent(_mapContentList, true, content.Response));
+                    new MapContentDownloadFinishedContent(_mapContentList, true));
         }
     };
 
@@ -249,13 +250,13 @@ public class MapContentService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MapContentDownloadFinishedBroadcast,
                     MapContentDownloadFinishedBundle,
-                    new MapContentDownloadFinishedContent(_mapContentList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+                    new MapContentDownloadFinishedContent(_mapContentList, true));
             return;
         }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -327,15 +328,11 @@ public class MapContentService implements IDataService {
         }
     }
 
-    private void sendFailedDownloadBroadcast(@NonNull String response) {
-        if (response.length() == 0) {
-            response = "Download for mapcontent failed!";
-        }
-
+    private void sendFailedDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 MapContentDownloadFinishedBroadcast,
                 MapContentDownloadFinishedBundle,
-                new MapContentDownloadFinishedContent(_mapContentList, false, Tools.CompressStringToByteArray(response)));
+                new MapContentDownloadFinishedContent(_mapContentList, false));
     }
 
     private SerializableList<MapContent> notOnServerMapContent() {

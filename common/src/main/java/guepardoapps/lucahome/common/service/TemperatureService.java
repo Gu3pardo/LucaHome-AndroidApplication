@@ -36,8 +36,8 @@ public class TemperatureService implements IDataNotificationService {
     public static class TemperatureDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Temperature> TemperatureList;
 
-        TemperatureDownloadFinishedContent(SerializableList<Temperature> temperatureList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        TemperatureDownloadFinishedContent(SerializableList<Temperature> temperatureList, boolean succcess) {
+            super(succcess, new byte[]{});
             TemperatureList = temperatureList;
         }
     }
@@ -87,30 +87,31 @@ public class TemperatureService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Temperature) {
                 return;
             }
 
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
+
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
             SerializableList<Temperature> temperatureList = JsonDataToTemperatureConverter.getInstance().GetList(contentResponse);
             if (temperatureList == null) {
                 Logger.getInstance().Error(TAG, "Converted temperatureList is null!");
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -135,7 +136,7 @@ public class TemperatureService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     TemperatureDownloadFinishedBroadcast,
                     TemperatureDownloadFinishedBundle,
-                    new TemperatureDownloadFinishedContent(_temperatureList, true, content.Response));
+                    new TemperatureDownloadFinishedContent(_temperatureList, true));
         }
     };
 
@@ -262,7 +263,7 @@ public class TemperatureService implements IDataNotificationService {
     public void LoadData() {
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -364,10 +365,10 @@ public class TemperatureService implements IDataNotificationService {
         return _lastUpdate;
     }
 
-    private void sendFailedDownloadBroadcast(@NonNull String response) {
+    private void sendFailedDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 TemperatureDownloadFinishedBroadcast,
                 TemperatureDownloadFinishedBundle,
-                new TemperatureDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new TemperatureDownloadFinishedContent(null, false));
     }
 }

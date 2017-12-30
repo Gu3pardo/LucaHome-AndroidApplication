@@ -97,12 +97,12 @@ public final class JsonDataToMapContentConverter {
                     SerializableList<LucaMenu> _menuList = ((name.equals("Menu") && drawingType == MapContent.DrawingType.Menu) ? menuList : null);
                     SerializableList<ShoppingEntry> _shoppingList = ((name.equals("ShoppingList") && drawingType == MapContent.DrawingType.ShoppingList) ? shoppingList : null);
 
-                    MediaServerData _mediaServer = drawingType == MapContent.DrawingType.MediaServer ? (mediaServerList.getSize() > 0 ? mediaServerList.getValue(typeId - 1) : null) : null;
+                    MediaServerData _mediaServer = drawingType == MapContent.DrawingType.MediaServer ? (mediaServerList.getSize() > 0 ? mediaServerList.getValue(typeId) : null) : null;
                     Security _security = drawingType == MapContent.DrawingType.Camera ? security : null;
 
-                    Temperature _temperature = drawingType == MapContent.DrawingType.Temperature ? (temperatureList.getSize() > 0 ? temperatureList.getValue(typeId - 1) : null) : null;
-                    WirelessSocket _wirelessSocket = drawingType == MapContent.DrawingType.Socket ? (wirelessSocketList.getSize() > 0 ? wirelessSocketList.getValue(typeId - 1) : null) : null;
-                    WirelessSwitch _wirelessSwitch = drawingType == MapContent.DrawingType.LightSwitch ? (wirelessSwitchList.getSize() > 0 ? wirelessSwitchList.getValue(typeId - 1) : null) : null;
+                    Temperature _temperature = drawingType == MapContent.DrawingType.Temperature ? (temperatureList.getSize() > 0 ? temperatureList.getValue(typeId) : null) : null;
+                    WirelessSocket _wirelessSocket = drawingType == MapContent.DrawingType.Socket ? (wirelessSocketList.getSize() > 0 ? wirelessSocketList.getValue(typeId) : null) : null;
+                    WirelessSwitch _wirelessSwitch = drawingType == MapContent.DrawingType.LightSwitch ? (wirelessSwitchList.getSize() > 0 ? wirelessSwitchList.getValue(typeId) : null) : null;
 
                     MapContent newMapContent = new MapContent(id, drawingType, typeId, position, name, shortName, area, visibility,
                             _listedMenuList, _menuList, _shoppingList, _mediaServer, _security, _temperature, _wirelessSocket, _wirelessSwitch,

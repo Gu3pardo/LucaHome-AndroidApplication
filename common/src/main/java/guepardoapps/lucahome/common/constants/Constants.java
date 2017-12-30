@@ -1,9 +1,6 @@
 package guepardoapps.lucahome.common.constants;
 
 public class Constants {
-    // ========== DOWNLOADS ==========
-    public static final int DOWNLOAD_STEPS = 14;
-
     // ========== RASPBERRY CONNECTION ==========
     public static final String ACTION_PATH = "/lib/lucahome.php?user=";
     // public static final String REST_PASSWORD = "&password=";

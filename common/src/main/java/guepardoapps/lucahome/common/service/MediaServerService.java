@@ -12,7 +12,6 @@ import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.MediaServerData;
 import guepardoapps.lucahome.common.classes.PlayedYoutubeVideo;
 import guepardoapps.lucahome.common.constants.Constants;
@@ -26,8 +25,8 @@ public class MediaServerService {
     public static class MediaServerDownloadFinishedContent extends ObjectChangeFinishedContent {
         public MediaServerData MediaServer;
 
-        MediaServerDownloadFinishedContent(MediaServerData mediaServer, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        MediaServerDownloadFinishedContent(MediaServerData mediaServer, boolean succcess) {
+            super(succcess, new byte[]{});
             MediaServer = mediaServer;
         }
     }
@@ -161,12 +160,12 @@ public class MediaServerService {
             @NonNull String command,
             @NonNull String data) {
         if (!_isInitialized) {
-            sendFailedDownloadBroadcast("Not initialized!");
+            sendFailedDownloadBroadcast();
             return;
         }
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
-            sendFailedDownloadBroadcast("No home network!");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -395,7 +394,7 @@ public class MediaServerService {
                             _broadcastController.SendSerializableBroadcast(
                                     MediaServerDownloadFinishedBroadcast,
                                     MediaServerDownloadFinishedBundle,
-                                    new MediaServerDownloadFinishedContent(_mediaServerData, true, Tools.CompressStringToByteArray(response)));
+                                    new MediaServerDownloadFinishedContent(_mediaServerData, true));
 
                         } else {
                             Logger.getInstance().Warning(TAG, String.format("Length %s for MediaServerData is invalid!", mediaServerData.length));
@@ -411,10 +410,10 @@ public class MediaServerService {
         }
     }
 
-    private void sendFailedDownloadBroadcast(@NonNull String response) {
+    private void sendFailedDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 MediaServerDownloadFinishedBroadcast,
                 MediaServerDownloadFinishedBundle,
-                new MediaServerDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new MediaServerDownloadFinishedContent(null, false));
     }
 }

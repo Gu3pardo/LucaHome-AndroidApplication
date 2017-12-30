@@ -7,13 +7,13 @@ android {
         minSdkVersion 21
         targetSdkVersion 27
         versionCode 50100
-        versionName "5.1.0.171229"
+        versionName "5.1.0.171230"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_10
-        targetCompatibility JavaVersion.VERSION_1_10
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {
@@ -51,6 +51,7 @@ dependencies {
     implementation 'com.android.support:support-v4:27.0.2'
     implementation 'com.github.GrenderG:Toasty:1.2.5'
     implementation 'com.github.rey5137:material:1.2.4'
+    implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
     implementation 'org.jsoup:jsoup:1.10.3'
     testImplementation 'junit:junit:4.12'

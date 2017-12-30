@@ -8,10 +8,13 @@ import java.util.Locale;
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
+import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public class MeterData implements Serializable {
     private static final long serialVersionUID = 8793748598384442111L;
     private static final String TAG = MeterData.class.getSimpleName();
+
+    public enum ServerAction {Null, Add, Update}
 
     private int _id;
     private String _type;
@@ -24,6 +27,9 @@ public class MeterData implements Serializable {
     private String _area;
     private double _value;
     private String _imageName;
+
+    private ServerAction _serverAction;
+    private ILucaClass.LucaServerDbAction _serverDbAction;
 
     public MeterData(
             int id,
@@ -48,6 +54,9 @@ public class MeterData implements Serializable {
         _area = area;
         _value = value;
         _imageName = imageName;
+
+        _serverAction = ServerAction.Null;
+        _serverDbAction = ILucaClass.LucaServerDbAction.Null;
     }
 
     public int GetId() {
@@ -120,6 +129,22 @@ public class MeterData implements Serializable {
 
     public void SetImageName(@NonNull String imageName) {
         _imageName = imageName;
+    }
+
+    public ServerAction GetServerAction() {
+        return _serverAction;
+    }
+
+    public void SetServerAction(@NonNull ServerAction serverAction) {
+        _serverAction = serverAction;
+    }
+
+    public void SetServerDbAction(@NonNull ILucaClass.LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
+    }
+
+    public ILucaClass.LucaServerDbAction GetServerDbAction() {
+        return _serverDbAction;
     }
 
     public String CommandAdd() {

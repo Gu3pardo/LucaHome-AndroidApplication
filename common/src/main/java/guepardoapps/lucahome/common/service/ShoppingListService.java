@@ -33,8 +33,8 @@ public class ShoppingListService implements IDataService {
     public static class ShoppingListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<ShoppingEntry> ShoppingList;
 
-        ShoppingListDownloadFinishedContent(SerializableList<ShoppingEntry> shoppingList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        ShoppingListDownloadFinishedContent(SerializableList<ShoppingEntry> shoppingList, boolean succcess) {
+            super(succcess, new byte[]{});
             ShoppingList = shoppingList;
         }
     }
@@ -94,25 +94,26 @@ public class ShoppingListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingList) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -120,7 +121,7 @@ public class ShoppingListService implements IDataService {
             if (shoppingList == null) {
                 Logger.getInstance().Error(TAG, "Converted shoppingList is null!");
                 _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast(contentResponse);
+                sendFailedDownloadBroadcast();
                 return;
             }
 
@@ -134,7 +135,7 @@ public class ShoppingListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListDownloadFinishedBroadcast,
                     ShoppingListDownloadFinishedBundle,
-                    new ShoppingListDownloadFinishedContent(_shoppingList, true, content.Response));
+                    new ShoppingListDownloadFinishedContent(_shoppingList, true));
         }
     };
 
@@ -142,11 +143,12 @@ public class ShoppingListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListAdd) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -167,7 +169,7 @@ public class ShoppingListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListAddFinishedBroadcast,
                     ShoppingListAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -177,11 +179,12 @@ public class ShoppingListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -202,7 +205,7 @@ public class ShoppingListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListUpdateFinishedBroadcast,
                     ShoppingListUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -212,11 +215,12 @@ public class ShoppingListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListDelete) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -237,7 +241,7 @@ public class ShoppingListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListDeleteFinishedBroadcast,
                     ShoppingListDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -398,13 +402,13 @@ public class ShoppingListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListDownloadFinishedBroadcast,
                     ShoppingListDownloadFinishedBundle,
-                    new ShoppingListDownloadFinishedContent(_shoppingList, true, Tools.CompressStringToByteArray("Loaded from database!")));
+                    new ShoppingListDownloadFinishedContent(_shoppingList, true));
             return;
         }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast("No user");
+            sendFailedDownloadBroadcast();
             return;
         }
 
@@ -593,15 +597,11 @@ public class ShoppingListService implements IDataService {
         }
     }
 
-    private void sendFailedDownloadBroadcast(@NonNull String response) {
-        if (response.length() == 0) {
-            response = "Download for shopping entry failed!";
-        }
-
+    private void sendFailedDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 ShoppingListDownloadFinishedBroadcast,
                 ShoppingListDownloadFinishedBundle,
-                new ShoppingListDownloadFinishedContent(_shoppingList, false, Tools.CompressStringToByteArray(response)));
+                new ShoppingListDownloadFinishedContent(_shoppingList, false));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

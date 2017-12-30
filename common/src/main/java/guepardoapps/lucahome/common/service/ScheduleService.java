@@ -32,8 +32,8 @@ public class ScheduleService implements IDataService {
     public static class ScheduleDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Schedule> ScheduleList;
 
-        ScheduleDownloadFinishedContent(SerializableList<Schedule> scheduleList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        ScheduleDownloadFinishedContent(SerializableList<Schedule> scheduleList, boolean succcess) {
+            super(succcess, new byte[]{});
             ScheduleList = scheduleList;
         }
     }
@@ -41,8 +41,8 @@ public class ScheduleService implements IDataService {
     public static class TimerDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<LucaTimer> TimerList;
 
-        TimerDownloadFinishedContent(SerializableList<LucaTimer> timerList, boolean succcess, @NonNull byte[] response) {
-            super(succcess, response);
+        TimerDownloadFinishedContent(SerializableList<LucaTimer> timerList, boolean succcess) {
+            super(succcess, new byte[]{});
             TimerList = timerList;
         }
     }
@@ -112,52 +112,53 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.Schedule) {
                 return;
             }
 
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
+
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedTimerDownloadBroadcast(contentResponse);
-                sendFailedScheduleDownloadBroadcast(contentResponse);
+                sendFailedTimerDownloadBroadcast();
+                sendFailedScheduleDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedTimerDownloadBroadcast(contentResponse);
-                sendFailedScheduleDownloadBroadcast(contentResponse);
+                sendFailedTimerDownloadBroadcast();
+                sendFailedScheduleDownloadBroadcast();
                 return;
             }
 
             SerializableList<Schedule> scheduleList = JsonDataToScheduleConverter.getInstance().GetList(contentResponse, WirelessSocketService.getInstance().GetDataList(), WirelessSwitchService.getInstance().GetDataList());
             if (scheduleList == null) {
                 Logger.getInstance().Error(TAG, "Converted scheduleList is null!");
-                sendFailedScheduleDownloadBroadcast(contentResponse);
+                sendFailedScheduleDownloadBroadcast();
             } else {
                 _lastUpdate = new Date();
                 _scheduleList = scheduleList;
                 _broadcastController.SendSerializableBroadcast(
                         ScheduleDownloadFinishedBroadcast,
                         ScheduleDownloadFinishedBundle,
-                        new ScheduleDownloadFinishedContent(_scheduleList, true, content.Response));
+                        new ScheduleDownloadFinishedContent(_scheduleList, true));
             }
 
             SerializableList<LucaTimer> timerList = JsonDataToTimerConverter.getInstance().GetList(contentResponse, WirelessSocketService.getInstance().GetDataList(), WirelessSwitchService.getInstance().GetDataList());
             if (timerList == null) {
                 Logger.getInstance().Error(TAG, "Converted timerList is null!");
-                sendFailedTimerDownloadBroadcast(contentResponse);
+                sendFailedTimerDownloadBroadcast();
             } else {
                 _lastUpdate = new Date();
                 _timerList = timerList;
                 _broadcastController.SendSerializableBroadcast(
                         TimerDownloadFinishedBroadcast,
                         TimerDownloadFinishedBundle,
-                        new TimerDownloadFinishedContent(_timerList, true, content.Response));
+                        new TimerDownloadFinishedContent(_timerList, true));
             }
 
         }
@@ -167,11 +168,12 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ScheduleSet) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -192,7 +194,7 @@ public class ScheduleService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ScheduleSetFinishedBroadcast,
                     ScheduleSetFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -202,11 +204,12 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ScheduleAdd) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -227,7 +230,7 @@ public class ScheduleService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ScheduleAddFinishedBroadcast,
                     ScheduleAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -237,11 +240,12 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ScheduleUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -262,7 +266,7 @@ public class ScheduleService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ScheduleUpdateFinishedBroadcast,
                     ScheduleUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -272,11 +276,12 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.ScheduleDelete) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -297,7 +302,7 @@ public class ScheduleService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ScheduleDeleteFinishedBroadcast,
                     ScheduleDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -307,11 +312,12 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.TimerAdd) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -332,7 +338,7 @@ public class ScheduleService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     TimerAddFinishedBroadcast,
                     TimerAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -342,11 +348,12 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.TimerUpdate) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -367,7 +374,7 @@ public class ScheduleService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     TimerUpdateFinishedBroadcast,
                     TimerUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -377,11 +384,12 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
-            String contentResponse = Tools.DecompressByteArrayToString(content.Response);
 
             if (content.CurrentDownloadType != DownloadController.DownloadType.TimerDelete) {
                 return;
             }
+
+            String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
             if (contentResponse.contains("Error") || contentResponse.contains("ERROR")
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
@@ -402,7 +410,7 @@ public class ScheduleService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     TimerDeleteFinishedBroadcast,
                     TimerDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true, content.Response));
+                    new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
@@ -598,7 +606,7 @@ public class ScheduleService implements IDataService {
     public void LoadData() {
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedScheduleDownloadBroadcast("No user");
+            sendFailedScheduleDownloadBroadcast();
             return;
         }
 
@@ -771,11 +779,11 @@ public class ScheduleService implements IDataService {
         return _lastUpdate;
     }
 
-    private void sendFailedScheduleDownloadBroadcast(@NonNull String response) {
+    private void sendFailedScheduleDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 ScheduleDownloadFinishedBroadcast,
                 ScheduleDownloadFinishedBundle,
-                new ScheduleDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new ScheduleDownloadFinishedContent(null, false));
     }
 
     private void sendFailedScheduleSetBroadcast(@NonNull String response) {
@@ -806,11 +814,11 @@ public class ScheduleService implements IDataService {
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
     }
 
-    private void sendFailedTimerDownloadBroadcast(@NonNull String response) {
+    private void sendFailedTimerDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
                 TimerDownloadFinishedBroadcast,
                 TimerDownloadFinishedBundle,
-                new ScheduleDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
+                new ScheduleDownloadFinishedContent(null, false));
     }
 
     private void sendFailedTimerAddBroadcast(@NonNull String response) {

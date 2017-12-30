@@ -101,6 +101,44 @@
                 android:value="guepardoapps.lucahome.views.MenuActivity" />
         </activity>
         <activity
+            android:name=".views.MeterDataActivity"
+            android:label="@string/title_activity_meter_data"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.MeterDataEditActivity"
+            android:label="@string/title_activity_meter_data_edit"
+            android:parentActivityName=".views.MeterDataActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MeterDataActivity" />
+        </activity>
+        <activity
+            android:name=".views.MoneyMeterDataActivity"
+            android:label="@string/title_activity_money_meter_data"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.MoneyMeterDataEditActivity"
+            android:label="@string/title_activity_money_meter_data_edit"
+            android:parentActivityName=".views.MoneyMeterDataActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MoneyMeterDataActivity" />
+        </activity>
+        <activity
             android:name=".views.MovieActivity"
             android:label="@string/title_activity_movie"
             android:parentActivityName=".views.MainActivity"

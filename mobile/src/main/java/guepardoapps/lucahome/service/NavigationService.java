@@ -99,6 +99,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -134,6 +136,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -161,6 +165,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -188,6 +194,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -209,6 +217,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuEditActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -236,6 +246,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -249,6 +261,64 @@ public class NavigationService {
 
             return NavigationResult.PERMITTED;
 
+        } else if (startActivityContext.getClass() == MeterDataActivity.class) {
+            if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(CoinActivity.class)
+                    || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
+                    || endActivity.getClass().isInstance(LoginActivity.class)
+                    || endActivity.getClass().isInstance(MainActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
+                    || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(ScheduleActivity.class)
+                    || endActivity.getClass().isInstance(SecurityActivity.class)
+                    || endActivity.getClass().isInstance(SettingsActivity.class)
+                    || endActivity.getClass().isInstance(ShoppingListActivity.class)
+                    || endActivity.getClass().isInstance(TimerActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
+        } else if (startActivityContext.getClass() == MeterDataEditActivity.class) {
+            if (endActivity.getClass().isInstance(MeterDataActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
+        } else if (startActivityContext.getClass() == MoneyMeterDataActivity.class) {
+            if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(CoinActivity.class)
+                    || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
+                    || endActivity.getClass().isInstance(LoginActivity.class)
+                    || endActivity.getClass().isInstance(MainActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
+                    || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(ScheduleActivity.class)
+                    || endActivity.getClass().isInstance(SecurityActivity.class)
+                    || endActivity.getClass().isInstance(SettingsActivity.class)
+                    || endActivity.getClass().isInstance(ShoppingListActivity.class)
+                    || endActivity.getClass().isInstance(TimerActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
+        } else if (startActivityContext.getClass() == MoneyMeterDataEditActivity.class) {
+            if (endActivity.getClass().isInstance(MoneyMeterDataActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
         } else if (startActivityContext.getClass() == MovieActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
@@ -257,6 +327,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieEditActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -285,6 +357,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleEditActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -313,6 +387,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -333,6 +409,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -354,6 +432,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -382,6 +462,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -410,6 +492,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
@@ -438,6 +522,8 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MainActivity.class)
                     || endActivity.getClass().isInstance(MediaServerActivity.class)
                     || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
