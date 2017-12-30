@@ -25,7 +25,9 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
+
 import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -50,16 +52,6 @@ public class BootActivity extends AppCompatActivity {
     private ReceiverController _receiverController;
 
     /**
-     * NavigationService manages navigation between activities
-     */
-    private NavigationService _navigationService;
-
-    /**
-     * UserService manages the handles for the user: validation, etc.
-     */
-    private UserService _userService;
-
-    /**
      * Binder for MainService
      */
     private MainService _mainServiceBinder;
@@ -70,9 +62,9 @@ public class BootActivity extends AppCompatActivity {
     private ServiceConnection _mainServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
             _mainServiceBinder = ((MainService.MainServiceBinder) binder).getService();
-            if (!_userService.IsAnUserSaved()) {
+            if (!UserService.getInstance().IsAnUserSaved()) {
                 _loginAttempt = true;
-                NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(BootActivity.this, LoginActivity.class);
+                NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivity(BootActivity.this, LoginActivity.class);
                 if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                     Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                     displayErrorSnackBar("Failed to navigate to LoginActivity! Please contact LucaHome support!");
@@ -98,7 +90,7 @@ public class BootActivity extends AppCompatActivity {
                 _percentProgressBar.setProgress((int) progress.DownloadProgress);
                 _percentProgressTextView.setText(String.format(Locale.getDefault(), "%.0f %%", progress.DownloadProgress));
                 if (progress.DownloadFinished) {
-                    NavigationService.NavigationResult navigationResult = _navigationService.NavigateToActivity(BootActivity.this, MainActivity.class);
+                    NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivity(BootActivity.this, MainActivity.class);
                     if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                         Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                         displayErrorSnackBar("Failed to navigate back to MainActivity! Please contact LucaHome support!");
@@ -121,8 +113,6 @@ public class BootActivity extends AppCompatActivity {
         _percentProgressTextView.setText("0%");
 
         _receiverController = new ReceiverController(this);
-        _navigationService = NavigationService.getInstance();
-        _userService = UserService.getInstance();
 
         Dexter.withActivity(this)
                 .withPermission(Manifest.permission.READ_CONTACTS)

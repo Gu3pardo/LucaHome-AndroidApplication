@@ -38,6 +38,12 @@ public class BirthdayListViewAdapter extends BaseAdapter {
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
 
+        private void navigateToEditActivity(@NonNull final LucaBirthday birthday) {
+            Bundle data = new Bundle();
+            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(birthday.GetId(), birthday.GetName(), birthday.GetDate(), birthday.GetGroup(), birthday.GetRemindMe(), BirthdayDto.Action.Update));
+            NavigationService.getInstance().NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
+        }
+
         private void displayDeleteDialog(@NonNull final LucaBirthday birthday) {
             final Dialog deleteDialog = new Dialog(_context);
 
@@ -49,7 +55,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _birthdayService.DeleteBirthday(birthday);
+                BirthdayService.getInstance().DeleteBirthday(birthday);
                 deleteDialog.dismiss();
             });
 
@@ -60,9 +66,6 @@ public class BirthdayListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private BirthdayService _birthdayService;
-    private NavigationService _navigationService;
-
     private SerializableList<LucaBirthday> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -70,9 +73,6 @@ public class BirthdayListViewAdapter extends BaseAdapter {
 
     public BirthdayListViewAdapter(@NonNull Context context, @NonNull SerializableList<LucaBirthday> listViewItems) {
         _context = context;
-        _birthdayService = BirthdayService.getInstance();
-        _navigationService = NavigationService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -130,12 +130,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
             BirthdayService.getInstance().UpdateBirthday(birthday);
         });
 
-        holder._updateButton.setOnClickListener(view -> {
-            Bundle data = new Bundle();
-            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(birthday.GetId(), birthday.GetName(), birthday.GetDate(), birthday.GetGroup(), birthday.GetRemindMe(), BirthdayDto.Action.Update));
-            _navigationService.NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
-        });
-
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(birthday));
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(birthday));
 
         rowView.setVisibility((birthday.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);

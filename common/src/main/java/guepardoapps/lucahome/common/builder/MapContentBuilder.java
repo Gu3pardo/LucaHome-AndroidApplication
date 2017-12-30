@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.builder;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
@@ -32,6 +33,37 @@ import guepardoapps.lucahome.common.service.WirelessSocketService;
 public class MapContentBuilder {
     private static String TAG = MapContentBuilder.class.getSimpleName();
 
+    public static MapContent.DrawingType GetDrawingType(@NonNull String typeString) {
+        switch (typeString) {
+            case "WirelessSocket":
+                return MapContent.DrawingType.Socket;
+            case "LAN":
+                return MapContent.DrawingType.LAN;
+            case "MediaServer":
+                return MapContent.DrawingType.MediaServer;
+            case "RaspberryPi":
+                return MapContent.DrawingType.RaspberryPi;
+            case "NAS":
+                return MapContent.DrawingType.NAS;
+            case "LightSwitch":
+                return MapContent.DrawingType.LightSwitch;
+            case "Temperature":
+                return MapContent.DrawingType.Temperature;
+            case "PuckJS":
+                return MapContent.DrawingType.PuckJS;
+            case "Menu":
+                return MapContent.DrawingType.Menu;
+            case "ShoppingList":
+                return MapContent.DrawingType.ShoppingList;
+            case "Camera":
+                return MapContent.DrawingType.Camera;
+            case "Meter":
+                return MapContent.DrawingType.Meter;
+            default:
+                return MapContent.DrawingType.Null;
+        }
+    }
+
     public static int GetDrawable(@NonNull MapContent mapContent) {
         switch (mapContent.GetDrawingType()) {
             case Socket:
@@ -46,8 +78,7 @@ public class MapContentBuilder {
                 }
 
             case LAN:
-                // TODO add drawable for LAN
-                return R.drawable.drawing_socket_off;
+                return R.drawable.drawing_lan;
 
             case MediaServer:
                 if (mapContent.GetWirelessSocket() == null) {
@@ -61,16 +92,13 @@ public class MapContentBuilder {
                 }
 
             case RaspberryPi:
-                // TODO add drawable for RaspberryPi
-                return R.drawable.drawing_socket_off;
+                return R.drawable.drawing_raspberry;
 
             case NAS:
-                // TODO add drawable for NAS
-                return R.drawable.drawing_socket_off;
+                return R.drawable.drawing_nas;
 
             case LightSwitch:
-                // TODO add drawable for LightSwitch
-                return R.drawable.drawing_socket_off;
+                return R.drawable.drawing_lightswitch;
 
             case Temperature:
                 return (mapContent.GetTemperature() != null ? mapContent.GetTemperature().GetDrawable() : R.drawable.drawing_temperature);
@@ -87,9 +115,56 @@ public class MapContentBuilder {
             case Camera:
                 return R.drawable.drawing_camera;
 
+            case Meter:
+                return R.drawable.drawing_meter;
+
             case Null:
             default:
                 return R.drawable.drawing_socket_off;
+        }
+    }
+
+    public static int GetTextColor(@NonNull MapContent mapContent) {
+        switch (mapContent.GetDrawingType()) {
+            case Socket:
+                return Color.WHITE;
+
+            case LAN:
+                return Color.BLACK;
+
+            case MediaServer:
+                return Color.BLACK;
+
+            case RaspberryPi:
+                return Color.BLACK;
+
+            case NAS:
+                return Color.WHITE;
+
+            case LightSwitch:
+                return Color.BLACK;
+
+            case Temperature:
+                return Color.BLACK;
+
+            case PuckJS:
+                return Color.WHITE;
+
+            case Menu:
+                return Color.BLACK;
+
+            case ShoppingList:
+                return Color.WHITE;
+
+            case Camera:
+                return Color.WHITE;
+
+            case Meter:
+                return Color.WHITE;
+
+            case Null:
+            default:
+                return Color.BLACK;
         }
     }
 
@@ -126,13 +201,17 @@ public class MapContentBuilder {
                 return null;
 
             case Menu:
-                return createMenuRunnable(context);
+                return createMenuRunnable(context, mapContent);
 
             case ShoppingList:
                 return createShoppingListRunnable(context);
 
             case Camera:
                 return createCameraRunnable(context);
+
+            case Meter:
+                // TODO add Runnable for Meter
+                return null;
 
             case Null:
             default:
@@ -227,8 +306,15 @@ public class MapContentBuilder {
         return () -> displayListViewDialog(context, "Shopping list", ShoppingListService.getInstance().GetShoppingDetailList());
     }
 
-    private static Runnable createMenuRunnable(@NonNull final Context context) {
-        return () -> displayListViewDialog(context, "Menu", MenuService.getInstance().GetMenuNameList());
+    private static Runnable createMenuRunnable(@NonNull final Context context, @NonNull final MapContent mapContent) {
+        if (mapContent.GetListedMenuList() != null) {
+            return () -> displayListViewDialog(context, "ListedMenu", MenuService.getInstance().GetListedMenuNameList());
+        } else if (mapContent.GetMenuList() != null) {
+            return () -> displayListViewDialog(context, "Menu", MenuService.getInstance().GetMenuNameList());
+        } else {
+            Logger.getInstance().Error(TAG, "Error in createMenuRunnable! ListedMenu and Menu are null!");
+            return null;
+        }
     }
 
     private static Runnable createCameraRunnable(@NonNull final Context context) {

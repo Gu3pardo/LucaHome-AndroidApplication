@@ -30,15 +30,25 @@ public class ShoppingListViewAdapter extends BaseAdapter {
         private FloatingActionButton _increaseButton;
         private FloatingActionButton _decreaseButton;
         private FloatingActionButton _deleteButton;
+
+        private void increaseCount(@NonNull final ShoppingEntry shoppingEntry) {
+            shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() + 1);
+            shoppingEntry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
+            ShoppingListService.getInstance().UpdateShoppingEntry(shoppingEntry);
+        }
+
+        private void decreaseCount(@NonNull final ShoppingEntry shoppingEntry) {
+            shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() - 1);
+            shoppingEntry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
+            ShoppingListService.getInstance().UpdateShoppingEntry(shoppingEntry);
+        }
     }
 
     private SerializableList<ShoppingEntry> _listViewItems;
-    private ShoppingListService _shoppingListService;
     private static LayoutInflater _inflater = null;
 
     public ShoppingListViewAdapter(@NonNull Context context, @NonNull SerializableList<ShoppingEntry> listViewItems) {
         _listViewItems = listViewItems;
-        _shoppingListService = ShoppingListService.getInstance();
         _inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -86,20 +96,12 @@ public class ShoppingListViewAdapter extends BaseAdapter {
         holder._groupImageView.setImageResource(shoppingEntry.GetGroup().GetDrawable());
 
         holder._boughtCheckbox.setChecked(shoppingEntry.GetBought());
-        holder._boughtCheckbox.setOnCheckedChangeListener((compoundButton, checked) -> _shoppingListService.GetDataList().getValue(index).SetBought(checked));
+        holder._boughtCheckbox.setOnCheckedChangeListener((compoundButton, checked) -> ShoppingListService.getInstance().GetDataList().getValue(index).SetBought(checked));
 
-        holder._increaseButton.setOnClickListener(view -> {
-            shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() + 1);
-            shoppingEntry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
-            _shoppingListService.UpdateShoppingEntry(shoppingEntry);
-        });
-        holder._decreaseButton.setOnClickListener(view -> {
-            shoppingEntry.SetQuantity(shoppingEntry.GetQuantity() - 1);
-            shoppingEntry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
-            _shoppingListService.UpdateShoppingEntry(shoppingEntry);
-        });
+        holder._increaseButton.setOnClickListener(view -> holder.increaseCount(shoppingEntry));
+        holder._decreaseButton.setOnClickListener(view -> holder.decreaseCount(shoppingEntry));
 
-        holder._deleteButton.setOnClickListener(view -> _shoppingListService.DeleteShoppingEntry(shoppingEntry));
+        holder._deleteButton.setOnClickListener(view -> ShoppingListService.getInstance().DeleteShoppingEntry(shoppingEntry));
 
         rowView.setVisibility((shoppingEntry.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);
 

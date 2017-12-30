@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rey.material.app.Dialog;
 import com.rey.material.app.ThemeManager;
@@ -18,8 +19,10 @@ import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
+import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
+import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.dto.WirelessSwitchDto;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
@@ -28,6 +31,8 @@ import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.WirelessSwitchEditActivity;
 
 public class SwitchListViewAdapter extends BaseAdapter {
+    private static final String TAG = SwitchListViewAdapter.class.getSimpleName();
+
     private class Holder {
         private TextView _titleText;
         private TextView _areaText;
@@ -38,6 +43,21 @@ public class SwitchListViewAdapter extends BaseAdapter {
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
         private View _actionView;
+
+        private void toggleWirelessSwitchState(@NonNull final WirelessSwitch wirelessSwitch) {
+            try {
+                WirelessSwitchService.getInstance().ToggleWirelessSwitch(wirelessSwitch);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.getMessage());
+                Toasty.error(_context, exception.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+
+        private void navigateToEditActivity(@NonNull final WirelessSwitch wirelessSwitch) {
+            Bundle data = new Bundle();
+            data.putSerializable(WirelessSwitchService.WirelessSwitchIntent, new WirelessSwitchDto(wirelessSwitch.GetId(), wirelessSwitch.GetName(), wirelessSwitch.GetArea(), wirelessSwitch.GetRemoteId(), wirelessSwitch.GetKeyCode(), WirelessSwitchDto.Action.Update));
+            NavigationService.getInstance().NavigateToActivityWithData(_context, WirelessSwitchEditActivity.class, data);
+        }
 
         private void displayDeleteDialog(@NonNull final WirelessSwitch wirelessSwitch) {
             final Dialog deleteDialog = new Dialog(_context);
@@ -50,7 +70,7 @@ public class SwitchListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _wirelessSwitchService.DeleteWirelessSwitch(wirelessSwitch);
+                WirelessSwitchService.getInstance().DeleteWirelessSwitch(wirelessSwitch);
                 deleteDialog.dismiss();
             });
 
@@ -61,9 +81,6 @@ public class SwitchListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private NavigationService _navigationService;
-    private WirelessSwitchService _wirelessSwitchService;
-
     private SerializableList<WirelessSwitch> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -71,9 +88,6 @@ public class SwitchListViewAdapter extends BaseAdapter {
 
     public SwitchListViewAdapter(@NonNull Context context, @NonNull SerializableList<WirelessSwitch> listViewItems) {
         _context = context;
-        _navigationService = NavigationService.getInstance();
-        _wirelessSwitchService = WirelessSwitchService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -124,20 +138,9 @@ public class SwitchListViewAdapter extends BaseAdapter {
         holder._actionView.setBackgroundResource(wirelessSwitch.GetAction() ? R.drawable.circle_green : R.drawable.circle_red);
 
         holder._cardSwitch.setChecked(wirelessSwitch.GetAction());
-        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            try {
-                _wirelessSwitchService.ToggleWirelessSwitch(wirelessSwitch);
-            } catch (Exception exception) {
-                // TODO perhaps log exception or make a notification...
-            }
-        });
+        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> holder.toggleWirelessSwitchState(wirelessSwitch));
 
-        holder._updateButton.setOnClickListener(view -> {
-            Bundle data = new Bundle();
-            data.putSerializable(WirelessSwitchService.WirelessSwitchIntent, new WirelessSwitchDto(wirelessSwitch.GetId(), wirelessSwitch.GetName(), wirelessSwitch.GetArea(), wirelessSwitch.GetRemoteId(), wirelessSwitch.GetKeyCode(), WirelessSwitchDto.Action.Update));
-            _navigationService.NavigateToActivityWithData(_context, WirelessSwitchEditActivity.class, data);
-        });
-
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(wirelessSwitch));
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(wirelessSwitch));
 
         rowView.setVisibility((wirelessSwitch.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);

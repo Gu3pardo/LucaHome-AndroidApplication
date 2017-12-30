@@ -27,21 +27,23 @@ public class MovieListViewAdapter extends BaseAdapter {
         private TextView _descriptionText;
         private TextView _ratingText;
         private FloatingActionButton _updateButton;
+
+        private void navigateToEditActivity(@NonNull final Movie movie) {
+            Bundle data = new Bundle();
+            data.putSerializable(MovieService.MovieIntent, new MovieDto(movie.GetId(), movie.GetTitle(), movie.GetGenre(), movie.GetDescription(), movie.GetRating(), movie.GetWatched()));
+            NavigationService.getInstance().NavigateToActivityWithData(_context, MovieEditActivity.class, data);
+        }
     }
 
     private Context _context;
-    private NavigationService _navigationService;
 
     private SerializableList<Movie> _listViewItems;
-
     private static LayoutInflater _inflater = null;
 
     public MovieListViewAdapter(@NonNull Context context, @NonNull SerializableList<Movie> listViewItems) {
         _context = context;
-        _navigationService = NavigationService.getInstance();
 
         _listViewItems = listViewItems;
-
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
@@ -80,11 +82,7 @@ public class MovieListViewAdapter extends BaseAdapter {
         holder._descriptionText.setText(movie.GetDescription());
         holder._ratingText.setText(movie.GetRatingString());
 
-        holder._updateButton.setOnClickListener(view -> {
-            Bundle data = new Bundle();
-            data.putSerializable(MovieService.MovieIntent, new MovieDto(movie.GetId(), movie.GetTitle(), movie.GetGenre(), movie.GetDescription(), movie.GetRating(), movie.GetWatched()));
-            _navigationService.NavigateToActivityWithData(_context, MovieEditActivity.class, data);
-        });
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(movie));
 
         return rowView;
     }

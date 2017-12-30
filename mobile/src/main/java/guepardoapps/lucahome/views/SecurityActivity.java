@@ -56,16 +56,6 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
     private ReceiverController _receiverController;
 
     /**
-     * NavigationService manages navigation between activities
-     */
-    private NavigationService _navigationService;
-
-    /**
-     * BirthdayService manages data for birthdays
-     */
-    private SecurityService _securityService;
-
-    /**
      * BroadcastReceiver to receive updates for the security
      */
     private BroadcastReceiver _securityUpdateReceiver = new BroadcastReceiver() {
@@ -100,9 +90,6 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
 
         _receiverController = new ReceiverController(_context);
 
-        _navigationService = NavigationService.getInstance();
-        _securityService = SecurityService.getInstance();
-
         _cameraStateTextView = findViewById(R.id.cameraStateTextView);
         _cameraWebView = findViewById(R.id.cameraWebView);
         _registeredEventsListView = findViewById(R.id.registeredEventsListView);
@@ -121,14 +108,14 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         cookieManager.setAcceptCookie(false);
 
         _setCameraButton.setOnClickListener(view -> {
-            SerializableList<Security> securityList = _securityService.GetDataList();
+            SerializableList<Security> securityList = SecurityService.getInstance().GetDataList();
             if (securityList != null) {
                 if (securityList.getSize() > 0) {
                     boolean newState = !securityList.getValue(0).IsCameraActive();
                     if (!newState) {
-                        _securityService.SetMotionState(false);
+                        SecurityService.getInstance().SetMotionState(false);
                     }
-                    _securityService.SetCameraState(newState);
+                    SecurityService.getInstance().SetCameraState(newState);
                     return;
                 }
             }
@@ -138,10 +125,10 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
             displayWarningSnackBar(message);
         });
         _setMotionControlButton.setOnClickListener(view -> {
-            SerializableList<Security> securityList = _securityService.GetDataList();
+            SerializableList<Security> securityList = SecurityService.getInstance().GetDataList();
             if (securityList != null) {
                 if (securityList.getSize() > 0) {
-                    _securityService.SetMotionState(!securityList.getValue(0).IsMotionControlActive());
+                    SecurityService.getInstance().SetMotionState(!securityList.getValue(0).IsMotionControlActive());
                     return;
                 }
             }
@@ -171,7 +158,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
 
         _receiverController.RegisterReceiver(_securityUpdateReceiver, new String[]{SecurityService.SecurityDownloadFinishedBroadcast});
 
-        SerializableList<Security> securityList = _securityService.GetDataList();
+        SerializableList<Security> securityList = SecurityService.getInstance().GetDataList();
         if (securityList != null) {
             if (securityList.getSize() > 0) {
                 setUI(securityList.getValue(0));
@@ -197,7 +184,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            _navigationService.GoBack(this);
+            NavigationService.getInstance().GoBack(this);
         }
     }
 
@@ -209,33 +196,33 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         NavigationService.NavigationResult navigationResult = NavigationService.NavigationResult.NULL;
 
         if (id == R.id.nav_schedule) {
-            navigationResult = _navigationService.NavigateToActivity(_context, ScheduleActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, ScheduleActivity.class);
         } else if (id == R.id.nav_timer) {
-            navigationResult = _navigationService.NavigateToActivity(_context, TimerActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, TimerActivity.class);
         } else if (id == R.id.nav_socket) {
-            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSocketActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, WirelessSocketActivity.class);
         } else if (id == R.id.nav_movie) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MovieActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MovieActivity.class);
         } else if (id == R.id.nav_mediamirror) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MediaServerActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MediaServerActivity.class);
         } else if (id == R.id.nav_coins) {
-            navigationResult = _navigationService.NavigateToActivity(_context, CoinActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, CoinActivity.class);
         } else if (id == R.id.nav_menu) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MenuActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MenuActivity.class);
         } else if (id == R.id.nav_shopping) {
-            navigationResult = _navigationService.NavigateToActivity(_context, ShoppingListActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, ShoppingListActivity.class);
         } else if (id == R.id.nav_forecast_weather) {
-            navigationResult = _navigationService.NavigateToActivity(_context, ForecastWeatherActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, ForecastWeatherActivity.class);
         } else if (id == R.id.nav_birthday) {
-            navigationResult = _navigationService.NavigateToActivity(_context, BirthdayActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, BirthdayActivity.class);
         } else if (id == R.id.nav_settings) {
-            navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, SettingsActivity.class);
         } else if (id == R.id.nav_switch) {
-            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, WirelessSwitchActivity.class);
         } else if (id == R.id.nav_meter) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MeterDataActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MeterDataActivity.class);
         } else if (id == R.id.nav_money) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MoneyMeterDataActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MoneyMeterDataActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

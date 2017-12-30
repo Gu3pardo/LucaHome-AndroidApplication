@@ -33,6 +33,12 @@ public class MenuListViewAdapter extends BaseAdapter {
         private FloatingActionButton _clearButton;
         private FloatingActionButton _updateButton;
 
+        private void navigateToEditActivity(@NonNull final LucaMenu menu) {
+            Bundle data = new Bundle();
+            data.putSerializable(MenuService.MenuIntent, new MenuDto(menu.GetId(), menu.GetTitle(), menu.GetDescription(), menu.GetWeekday(), menu.GetDate()));
+            NavigationService.getInstance().NavigateToActivityWithData(_context, MenuEditActivity.class, data);
+        }
+
         private void displayDeleteDialog(@NonNull final LucaMenu menu) {
             final Dialog deleteDialog = new Dialog(_context);
 
@@ -44,7 +50,7 @@ public class MenuListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _menuService.ClearMenu(menu);
+                MenuService.getInstance().ClearMenu(menu);
                 deleteDialog.dismiss();
             });
 
@@ -55,9 +61,6 @@ public class MenuListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private MenuService _menuService;
-    private NavigationService _navigationService;
-
     private SerializableList<LucaMenu> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -65,9 +68,6 @@ public class MenuListViewAdapter extends BaseAdapter {
 
     public MenuListViewAdapter(@NonNull Context context, @NonNull SerializableList<LucaMenu> listViewItems) {
         _context = context;
-        _menuService = MenuService.getInstance();
-        _navigationService = NavigationService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -109,12 +109,7 @@ public class MenuListViewAdapter extends BaseAdapter {
         holder._dateText.setText(menu.GetDate().DDMMYYYY());
 
         holder._clearButton.setOnClickListener(view -> holder.displayDeleteDialog(menu));
-
-        holder._updateButton.setOnClickListener(view -> {
-            Bundle data = new Bundle();
-            data.putSerializable(MenuService.MenuIntent, new MenuDto(menu.GetId(), menu.GetTitle(), menu.GetDescription(), menu.GetWeekday(), menu.GetDate()));
-            _navigationService.NavigateToActivityWithData(_context, MenuEditActivity.class, data);
-        });
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(menu));
 
         rowView.setVisibility((menu.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);
 

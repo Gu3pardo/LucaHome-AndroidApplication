@@ -14,7 +14,7 @@ public class MapContent implements Serializable, ILucaClass {
     private static final long serialVersionUID = 8796770534384442492L;
     private static final String TAG = MapContent.class.getSimpleName();
 
-    public enum DrawingType {Null, Socket, LAN, MediaServer, RaspberryPi, NAS, LightSwitch, Temperature, PuckJS, Menu, ShoppingList, Camera, Meter }
+    public enum DrawingType {Null, Socket, LAN, MediaServer, RaspberryPi, NAS, LightSwitch, Temperature, PuckJS, Menu, ShoppingList, Camera, Meter}
 
     private int _id;
     private DrawingType _drawingType;
@@ -185,6 +185,10 @@ public class MapContent implements Serializable, ILucaClass {
 
     public Runnable GetButtonClick(@NonNull Context context) {
         return MapContentBuilder.GetRunnable(this, context);
+    }
+
+    public int GetTextColor() {
+        return MapContentBuilder.GetTextColor(this);
     }
 
     public int GetDrawable() {

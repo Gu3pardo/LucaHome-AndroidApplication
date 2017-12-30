@@ -43,7 +43,7 @@ public class TimerListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _scheduleService.DeleteTimer(timer);
+                ScheduleService.getInstance().DeleteTimer(timer);
                 deleteDialog.dismiss();
             });
 
@@ -54,8 +54,6 @@ public class TimerListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private ScheduleService _scheduleService;
-
     private SerializableList<LucaTimer> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -63,8 +61,6 @@ public class TimerListViewAdapter extends BaseAdapter {
 
     public TimerListViewAdapter(@NonNull Context context, @NonNull SerializableList<LucaTimer> listViewItems) {
         _context = context;
-        _scheduleService = ScheduleService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);

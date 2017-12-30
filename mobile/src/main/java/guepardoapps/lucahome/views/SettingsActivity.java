@@ -64,26 +64,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private ReceiverController _receiverController;
     private static SharedPrefController _sharedPrefController;
-    private static SettingsController _settingsController;
-
-    //private NavigationService _navigationService;
-
-    private static BirthdayService _birthdayService;
-    private static CoinService _coinService;
-    private static MapContentService _mapContentService;
-    private static MediaServerService _mediaServerService;
-    private static MenuService _menuService;
-    private static MeterListService _meterListService;
-    private static MoneyMeterListService _moneyMeterListService;
-    private static MovieService _movieService;
-    private static OpenWeatherService _openWeatherService;
-    private static ScheduleService _scheduleService;
-    private static SecurityService _securityService;
-    private static ShoppingListService _shoppingListService;
-    private static TemperatureService _temperatureService;
-    private static UserService _userService;
-    private static WirelessSocketService _wirelessSocketService;
-    private static WirelessSwitchService _wirelessSwitchService;
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -104,64 +84,64 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             } else if (preference instanceof EditTextPreference) {
                 if (preference.getKey().contentEquals(SettingsController.PREF_USER_NAME)) {
-                    _userService.ValidateUserName(value.toString());
+                    UserService.getInstance().ValidateUserName(value.toString());
                     preference.setSummary(value.toString());
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_USER_PASS_PHRASE)) {
-                    _userService.ValidateUserPassphrase(value.toString());
+                    UserService.getInstance().ValidateUserPassphrase(value.toString());
                     preference.setSummary(value.toString().replaceAll("[A-Za-z0-9]", "*"));
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_OPEN_WEATHER_CITY)) {
-                    _openWeatherService.SetCity(value.toString());
+                    OpenWeatherService.getInstance().SetCity(value.toString());
                     preference.setSummary(value.toString());
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_BIRTHDAY_TIMEOUT)) {
-                    _birthdayService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    BirthdayService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_COIN_TIMEOUT)) {
-                    _coinService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    CoinService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MAPCONTENT_TIMEOUT)) {
-                    _mapContentService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    MapContentService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MEDIASERVER_TIMEOUT)) {
-                    _mediaServerService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    MediaServerService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MENU_TIMEOUT)) {
-                    _menuService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    MenuService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_METER_DATA_TIMEOUT)) {
-                    _meterListService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    MeterListService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MONEY_METER_DATA_TIMEOUT)) {
-                    _moneyMeterListService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    MoneyMeterListService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MOVIE_TIMEOUT)) {
-                    _movieService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    MovieService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_SCHEDULE_TIMEOUT)) {
-                    _scheduleService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    ScheduleService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_SECURITY_TIMEOUT)) {
-                    _securityService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    SecurityService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_SHOPPING_TIMEOUT)) {
-                    _shoppingListService.SetReloadTimeout(Integer.parseInt((String) value));
+                    ShoppingListService.getInstance().SetReloadTimeout(Integer.parseInt((String) value));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_TEMPERATURE_TIMEOUT)) {
-                    _temperatureService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    TemperatureService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_WEATHER_TIMEOUT)) {
-                    _openWeatherService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    OpenWeatherService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_WIRELESSSOCKET_TIMEOUT)) {
-                    _wirelessSocketService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    WirelessSocketService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_WIRELESSSWITCH_TIMEOUT)) {
-                    _wirelessSwitchService.SetReloadTimeout((Integer.parseInt((String) value)));
+                    WirelessSwitchService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_COIN_HOURS_TREND)) {
                     int integerValue = Integer.parseInt((String) value);
-                    _coinService.SetCoinHoursTrend(integerValue);
+                    CoinService.getInstance().SetCoinHoursTrend(integerValue);
                     preference.setSummary((String) value);
                 }
 
@@ -170,82 +150,82 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE)) {
                     if ((boolean) value) {
-                        _birthdayService.SetDisplayNotification(_settingsController.IsBirthdayNotificationEnabled());
-                        _coinService.SetDisplayNotification(_settingsController.IsCoinsNotificationEnabled());
-                        _openWeatherService.SetDisplayCurrentWeatherNotification(_settingsController.IsCurrentWeatherNotificationEnabled());
-                        _openWeatherService.SetDisplayForecastWeatherNotification(_settingsController.IsForecastWeatherNotificationEnabled());
-                        _securityService.SetDisplayNotification(_settingsController.IsCameraNotificationEnabled());
-                        _temperatureService.SetDisplayNotification(_settingsController.IsTemperatureNotificationEnabled());
-                        _wirelessSocketService.SetDisplayNotification(_settingsController.IsSocketNotificationEnabled());
-                        _wirelessSwitchService.SetDisplayNotification(_settingsController.IsSwitchNotificationEnabled());
+                        BirthdayService.getInstance().SetDisplayNotification(SettingsController.getInstance().IsBirthdayNotificationEnabled());
+                        CoinService.getInstance().SetDisplayNotification(SettingsController.getInstance().IsCoinsNotificationEnabled());
+                        OpenWeatherService.getInstance().SetDisplayCurrentWeatherNotification(SettingsController.getInstance().IsCurrentWeatherNotificationEnabled());
+                        OpenWeatherService.getInstance().SetDisplayForecastWeatherNotification(SettingsController.getInstance().IsForecastWeatherNotificationEnabled());
+                        SecurityService.getInstance().SetDisplayNotification(SettingsController.getInstance().IsCameraNotificationEnabled());
+                        TemperatureService.getInstance().SetDisplayNotification(SettingsController.getInstance().IsTemperatureNotificationEnabled());
+                        WirelessSocketService.getInstance().SetDisplayNotification(SettingsController.getInstance().IsSocketNotificationEnabled());
+                        WirelessSwitchService.getInstance().SetDisplayNotification(SettingsController.getInstance().IsSwitchNotificationEnabled());
                     } else {
-                        _birthdayService.SetDisplayNotification(false);
-                        _coinService.SetDisplayNotification(false);
-                        _openWeatherService.SetDisplayCurrentWeatherNotification(false);
-                        _openWeatherService.SetDisplayForecastWeatherNotification(false);
-                        _securityService.SetDisplayNotification(false);
-                        _temperatureService.SetDisplayNotification(false);
-                        _wirelessSocketService.SetDisplayNotification(false);
-                        _wirelessSwitchService.SetDisplayNotification(false);
+                        BirthdayService.getInstance().SetDisplayNotification(false);
+                        CoinService.getInstance().SetDisplayNotification(false);
+                        OpenWeatherService.getInstance().SetDisplayCurrentWeatherNotification(false);
+                        OpenWeatherService.getInstance().SetDisplayForecastWeatherNotification(false);
+                        SecurityService.getInstance().SetDisplayNotification(false);
+                        TemperatureService.getInstance().SetDisplayNotification(false);
+                        WirelessSocketService.getInstance().SetDisplayNotification(false);
+                        WirelessSwitchService.getInstance().SetDisplayNotification(false);
                     }
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_BIRTHDAY)) {
-                    _birthdayService.SetDisplayNotification((boolean) value);
+                    BirthdayService.getInstance().SetDisplayNotification((boolean) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_COINS)) {
-                    _coinService.SetDisplayNotification((boolean) value);
+                    CoinService.getInstance().SetDisplayNotification((boolean) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER)) {
-                    _openWeatherService.SetDisplayCurrentWeatherNotification((boolean) value);
+                    OpenWeatherService.getInstance().SetDisplayCurrentWeatherNotification((boolean) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER)) {
-                    _openWeatherService.SetDisplayForecastWeatherNotification((boolean) value);
+                    OpenWeatherService.getInstance().SetDisplayForecastWeatherNotification((boolean) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_SOCKETS)) {
-                    _wirelessSocketService.SetDisplayNotification((boolean) value);
+                    WirelessSocketService.getInstance().SetDisplayNotification((boolean) value);
                 } else if (preference.getKey().contains(WirelessSocket.SETTINGS_HEADER)) {
-                    _wirelessSocketService.ShowNotification();
+                    WirelessSocketService.getInstance().ShowNotification();
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_SWITCHES)) {
-                    _wirelessSwitchService.SetDisplayNotification((boolean) value);
+                    WirelessSwitchService.getInstance().SetDisplayNotification((boolean) value);
                 } else if (preference.getKey().contains(WirelessSwitch.SETTINGS_HEADER)) {
-                    _wirelessSwitchService.ShowNotification();
+                    WirelessSwitchService.getInstance().ShowNotification();
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_CAMERA)) {
-                    _securityService.SetDisplayNotification((boolean) value);
+                    SecurityService.getInstance().SetDisplayNotification((boolean) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_NOTIFICATION_MESSAGE_TEMPERATURE)) {
-                    _temperatureService.SetDisplayNotification((boolean) value);
+                    TemperatureService.getInstance().SetDisplayNotification((boolean) value);
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_CHANGE_WEATHER_WALLPAPER)) {
-                    _openWeatherService.SetChangeWallpaper((boolean) value);
+                    OpenWeatherService.getInstance().SetChangeWallpaper((boolean) value);
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_DATA_ENABLED)) {
                     if ((boolean) value) {
-                        _birthdayService.SetReloadEnabled(_settingsController.IsReloadBirthdayEnabled());
-                        _coinService.SetReloadEnabled(_settingsController.IsReloadCoinEnabled());
-                        _mapContentService.SetReloadEnabled(_settingsController.IsReloadMapContentEnabled());
-                        _mediaServerService.SetReloadEnabled(_settingsController.IsReloadMediaServerEnabled());
-                        _menuService.SetReloadEnabled(_settingsController.IsReloadMenuEnabled());
-                        _meterListService.SetReloadEnabled(_settingsController.IsReloadMeterDataEnabled());
-                        _moneyMeterListService.SetReloadEnabled(_settingsController.IsReloadMoneyMeterDataEnabled());
-                        _movieService.SetReloadEnabled(_settingsController.IsReloadMovieEnabled());
-                        _openWeatherService.SetReloadEnabled(_settingsController.IsReloadWeatherEnabled());
-                        _scheduleService.SetReloadEnabled(_settingsController.IsReloadScheduleEnabled());
-                        _securityService.SetReloadEnabled(_settingsController.IsReloadSecurityEnabled());
-                        _shoppingListService.SetReloadEnabled(_settingsController.IsReloadShoppingEnabled());
-                        _temperatureService.SetReloadEnabled(_settingsController.IsReloadTemperatureEnabled());
-                        _wirelessSocketService.SetReloadEnabled(_settingsController.IsReloadWirelessSocketEnabled());
-                        _wirelessSwitchService.SetReloadEnabled(_settingsController.IsReloadWirelessSwitchEnabled());
+                        BirthdayService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadBirthdayEnabled());
+                        CoinService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadCoinEnabled());
+                        MapContentService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadMapContentEnabled());
+                        MediaServerService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadMediaServerEnabled());
+                        MenuService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadMenuEnabled());
+                        MeterListService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadMeterDataEnabled());
+                        MoneyMeterListService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadMoneyMeterDataEnabled());
+                        MovieService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadMovieEnabled());
+                        OpenWeatherService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadWeatherEnabled());
+                        ScheduleService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadScheduleEnabled());
+                        SecurityService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadSecurityEnabled());
+                        ShoppingListService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadShoppingEnabled());
+                        TemperatureService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadTemperatureEnabled());
+                        WirelessSocketService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadWirelessSocketEnabled());
+                        WirelessSwitchService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadWirelessSwitchEnabled());
                     } else {
-                        _birthdayService.SetReloadEnabled(false);
-                        _coinService.SetReloadEnabled(false);
-                        _mapContentService.SetReloadEnabled(false);
-                        _mediaServerService.SetReloadEnabled(false);
-                        _menuService.SetReloadEnabled(false);
-                        _meterListService.SetReloadEnabled(false);
-                        _moneyMeterListService.SetReloadEnabled(false);
-                        _movieService.SetReloadEnabled(false);
-                        _openWeatherService.SetReloadEnabled(false);
-                        _scheduleService.SetReloadEnabled(false);
-                        _securityService.SetReloadEnabled(false);
-                        _shoppingListService.SetReloadEnabled(false);
-                        _temperatureService.SetReloadEnabled(false);
-                        _wirelessSocketService.SetReloadEnabled(false);
-                        _wirelessSwitchService.SetReloadEnabled(false);
+                        BirthdayService.getInstance().SetReloadEnabled(false);
+                        CoinService.getInstance().SetReloadEnabled(false);
+                        MapContentService.getInstance().SetReloadEnabled(false);
+                        MediaServerService.getInstance().SetReloadEnabled(false);
+                        MenuService.getInstance().SetReloadEnabled(false);
+                        MeterListService.getInstance().SetReloadEnabled(false);
+                        MoneyMeterListService.getInstance().SetReloadEnabled(false);
+                        MovieService.getInstance().SetReloadEnabled(false);
+                        OpenWeatherService.getInstance().SetReloadEnabled(false);
+                        ScheduleService.getInstance().SetReloadEnabled(false);
+                        SecurityService.getInstance().SetReloadEnabled(false);
+                        ShoppingListService.getInstance().SetReloadEnabled(false);
+                        TemperatureService.getInstance().SetReloadEnabled(false);
+                        WirelessSocketService.getInstance().SetReloadEnabled(false);
+                        WirelessSwitchService.getInstance().SetReloadEnabled(false);
                     }
                 }
             }
@@ -259,8 +239,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * example, 10" tablets are extra-large.
      */
     private static boolean isXLargeTablet(@NonNull Context context) {
-        return (context.getResources().getConfiguration().screenLayout
-                & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+        return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
     }
 
     /**
@@ -321,27 +300,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         super.onCreate(savedInstanceState);
 
         _receiverController = new ReceiverController(this);
-        _settingsController = SettingsController.getInstance();
         _sharedPrefController = new SharedPrefController(this);
-
-        //_navigationService = NavigationService.getInstance();
-
-        _birthdayService = BirthdayService.getInstance();
-        _coinService = CoinService.getInstance();
-        _mapContentService = MapContentService.getInstance();
-        _mediaServerService = MediaServerService.getInstance();
-        _menuService = MenuService.getInstance();
-        _meterListService = MeterListService.getInstance();
-        _moneyMeterListService = MoneyMeterListService.getInstance();
-        _movieService = MovieService.getInstance();
-        _openWeatherService = OpenWeatherService.getInstance();
-        _scheduleService = ScheduleService.getInstance();
-        _securityService = SecurityService.getInstance();
-        _shoppingListService = ShoppingListService.getInstance();
-        _temperatureService = TemperatureService.getInstance();
-        _userService = UserService.getInstance();
-        _wirelessSocketService = WirelessSocketService.getInstance();
-        _wirelessSwitchService = WirelessSwitchService.getInstance();
 
         setupActionBar();
     }
@@ -685,8 +644,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             preferenceCategory.setTitle("Wireless sockets");
             preferenceScreen.addPreference(preferenceCategory);
 
-            for (int index = 0; index < _wirelessSocketService.GetDataList().getSize(); index++) {
-                WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(index);
+            for (int index = 0; index < WirelessSocketService.getInstance().GetDataList().getSize(); index++) {
+                WirelessSocket wirelessSocket = WirelessSocketService.getInstance().GetDataList().getValue(index);
 
                 SwitchPreference preference = new SwitchPreference(preferenceScreen.getContext());
 
@@ -729,8 +688,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             preferenceCategory.setTitle("Wireless switches");
             preferenceScreen.addPreference(preferenceCategory);
 
-            for (int index = 0; index < _wirelessSwitchService.GetDataList().getSize(); index++) {
-                WirelessSwitch wirelessSwitch = _wirelessSwitchService.GetDataList().getValue(index);
+            for (int index = 0; index < WirelessSwitchService.getInstance().GetDataList().getSize(); index++) {
+                WirelessSwitch wirelessSwitch = WirelessSwitchService.getInstance().GetDataList().getValue(index);
 
                 SwitchPreference preference = new SwitchPreference(preferenceScreen.getContext());
 

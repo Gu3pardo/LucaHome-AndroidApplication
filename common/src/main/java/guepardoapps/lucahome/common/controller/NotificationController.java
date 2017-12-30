@@ -31,8 +31,12 @@ public class NotificationController {
     public static final String ACTION = "Action";
 
     public static final String SOCKET_ALL = "All_Sockets";
-    public static final String SOCKET_SINGLE = "Single_Sockets";
+    public static final String SOCKET_SINGLE = "Single_Socket";
     public static final String SOCKET_DATA = "SOCKET_DATA";
+
+    public static final String SWITCH_ALL = "All_Switches";
+    public static final String SWITCH_SINGLE = "Single_Switch";
+    public static final String SWITCH_DATA = "SWITCH_DATA";
 
     protected Context _context;
 

@@ -32,6 +32,13 @@ public class MoneyMeterListViewAdapter extends BaseAdapter {
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
 
+        private void navigateToEditActivity(@NonNull final MoneyMeterData moneyMeterData) {
+            Bundle data = new Bundle();
+            moneyMeterData.SetServerAction(MoneyMeterData.ServerAction.Update);
+            data.putSerializable(MoneyMeterListService.MoneyMeterDataIntent, moneyMeterData);
+            NavigationService.getInstance().NavigateToActivityWithData(_context, MoneyMeterDataEditActivity.class, data);
+        }
+
         private void displayDeleteDialog(@NonNull final MoneyMeterData moneyMeterData) {
             final Dialog deleteDialog = new Dialog(_context);
 
@@ -43,7 +50,7 @@ public class MoneyMeterListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _moneyMeterListService.DeleteMoneyMeterData(moneyMeterData);
+                MoneyMeterListService.getInstance().DeleteMoneyMeterData(moneyMeterData);
                 deleteDialog.dismiss();
             });
 
@@ -54,9 +61,6 @@ public class MoneyMeterListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private MoneyMeterListService _moneyMeterListService;
-    private NavigationService _navigationService;
-
     private SerializableList<MoneyMeterData> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -64,9 +68,6 @@ public class MoneyMeterListViewAdapter extends BaseAdapter {
 
     public MoneyMeterListViewAdapter(@NonNull Context context, @NonNull SerializableList<MoneyMeterData> listViewItems) {
         _context = context;
-        _moneyMeterListService = MoneyMeterListService.getInstance();
-        _navigationService = NavigationService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -107,13 +108,7 @@ public class MoneyMeterListViewAdapter extends BaseAdapter {
         holder._valueText.setText(String.valueOf(moneyMeterData.GetAmount()));
         holder._unitText.setText(moneyMeterData.GetUnit());
 
-        holder._updateButton.setOnClickListener(view -> {
-            Bundle data = new Bundle();
-            moneyMeterData.SetServerAction(MoneyMeterData.ServerAction.Update);
-            data.putSerializable(MoneyMeterListService.MoneyMeterDataIntent, moneyMeterData);
-            _navigationService.NavigateToActivityWithData(_context, MoneyMeterDataEditActivity.class, data);
-        });
-
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(moneyMeterData));
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(moneyMeterData));
 
         rowView.setVisibility((moneyMeterData.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);

@@ -7,13 +7,14 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 import es.dmoral.toasty.Toasty;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.controller.NotificationController;
-import guepardoapps.lucahome.common.service.WirelessSocketService;
 
-public class SocketActionReceiver extends BroadcastReceiver {
-    private static final String TAG = SocketActionReceiver.class.getSimpleName();
+import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
+import guepardoapps.lucahome.common.controller.NotificationController;
+import guepardoapps.lucahome.common.service.WirelessSwitchService;
+
+public class SwitchActionReceiver extends BroadcastReceiver {
+    private static final String TAG = SwitchActionReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -30,21 +31,21 @@ public class SocketActionReceiver extends BroadcastReceiver {
         }
 
         switch (action) {
-            case NotificationController.SOCKET_ALL:
-                WirelessSocketService.getInstance().DeactivateAllWirelessSockets();
+            case NotificationController.SWITCH_ALL:
+                WirelessSwitchService.getInstance().ToggleAllWirelessSwitches();
                 break;
 
-            case NotificationController.SOCKET_SINGLE:
-                WirelessSocket socket = (WirelessSocket) details.getSerializable(NotificationController.SOCKET_DATA);
+            case NotificationController.SWITCH_SINGLE:
+                WirelessSwitch wirelessSwitch = (WirelessSwitch) details.getSerializable(NotificationController.SWITCH_DATA);
 
-                if (socket == null) {
-                    Logger.getInstance().Error(TAG, "Socket is null!");
-                    Toasty.error(context, "Socket is null!", Toast.LENGTH_LONG).show();
+                if (wirelessSwitch == null) {
+                    Logger.getInstance().Error(TAG, "WirelessSwitch is null!");
+                    Toasty.error(context, "WirelessSwitch is null!", Toast.LENGTH_LONG).show();
                     return;
                 }
 
                 try {
-                    WirelessSocketService.getInstance().ChangeWirelessSocketState(socket);
+                    WirelessSwitchService.getInstance().ToggleWirelessSwitch(wirelessSwitch);
                 } catch (Exception exception) {
                     Logger.getInstance().Error(TAG, exception.getMessage());
                 }

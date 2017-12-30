@@ -520,6 +520,16 @@ public class MenuService implements IDataService {
         return nameList;
     }
 
+    public ArrayList<String> GetListedMenuNameList() {
+        ArrayList<String> nameList = new ArrayList<>();
+
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            nameList.add(_listedMenuList.getValue(index).GetTitle());
+        }
+
+        return nameList;
+    }
+
     public ListedMenu GetListedMenuById(int id) {
         for (int index = 0; index < _listedMenuList.getSize(); index++) {
             ListedMenu entry = _listedMenuList.getValue(index);

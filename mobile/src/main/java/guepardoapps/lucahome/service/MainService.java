@@ -14,13 +14,16 @@ import java.io.Serializable;
 import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
+
 import guepardoapps.library.openweather.service.OpenWeatherService;
+
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.*;
 import guepardoapps.lucahome.receiver.SocketActionReceiver;
+import guepardoapps.lucahome.receiver.SwitchActionReceiver;
 import guepardoapps.lucahome.views.BirthdayActivity;
 import guepardoapps.lucahome.views.CoinActivity;
 import guepardoapps.lucahome.views.ForecastWeatherActivity;
@@ -28,11 +31,7 @@ import guepardoapps.lucahome.views.MainActivity;
 import guepardoapps.lucahome.views.SecurityActivity;
 
 public class MainService extends Service {
-    public class MainServiceBinder extends Binder {
-        public MainService getService() {
-            return MainService.this;
-        }
-    }
+    private static final String TAG = MainService.class.getSimpleName();
 
     public static class MainServiceDownloadCountContent implements Serializable {
         public double DownloadProgress;
@@ -50,7 +49,13 @@ public class MainService extends Service {
     public static final String MainServiceDownloadCountBundle = "MainServiceDownloadCountBundle";
     public static final String MainServiceOnStartCommandBundle = "MainServiceOnStartCommandBundle";
 
-    private static final String TAG = MainService.class.getSimpleName();
+    public class MainServiceBinder extends Binder {
+        public MainService getService() {
+            return MainService.this;
+        }
+    }
+
+    private final IBinder _mainServiceBinder = new MainServiceBinder();
 
     private static final SparseArray<Runnable> DOWNLOAD_HASH_MAP = new SparseArray<>();
 
@@ -74,25 +79,6 @@ public class MainService extends Service {
         DOWNLOAD_HASH_MAP.append(16, () -> MapContentService.getInstance().LoadData());
     }
 
-    private final IBinder _mainServiceBinder = new MainServiceBinder();
-
-    private BirthdayService _birthdayService;
-    private CoinService _coinService;
-    private MapContentService _mapContentService;
-    private MediaServerService _mediaServerService;
-    private MenuService _menuService;
-    private MeterListService _meterListService;
-    private MoneyMeterListService _moneyMeterListService;
-    private MovieService _movieService;
-    private OpenWeatherService _openWeatherService;
-    private ScheduleService _scheduleService;
-    private SecurityService _securityService;
-    private ShoppingListService _shoppingListService;
-    private TemperatureService _temperatureService;
-    private UserService _userService;
-    private WirelessSocketService _wirelessSocketService;
-    private WirelessSwitchService _wirelessSwitchService;
-
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
 
@@ -110,6 +96,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -117,6 +104,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -124,6 +112,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -131,6 +120,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -138,6 +128,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -145,6 +136,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -152,6 +144,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -159,6 +152,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -166,6 +160,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -173,6 +168,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -180,6 +176,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -187,6 +184,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -194,6 +192,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -201,6 +200,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -208,6 +208,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -215,6 +216,7 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
@@ -222,40 +224,57 @@ public class MainService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
         }
     };
 
     public void StartDownloadAll(@NonNull String caller) {
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "StartDownloadAll by caller %s", caller));
+
         if (_downloading) {
             return;
         }
+
+        registerReceiver();
+
         _currentDownloadCount = 0;
         _downloading = true;
+
         DOWNLOAD_HASH_MAP.get(_currentDownloadCount).run();
     }
 
     public void Cancel() {
+        Logger.getInstance().Warning(TAG, "Cancel");
         stopSelf();
     }
 
     private void broadcastDownloadCount() {
         _currentDownloadCount++;
+
         double downloadPercentage = (_currentDownloadCount * 100) / DOWNLOAD_HASH_MAP.size();
         _downloading = !(downloadPercentage >= 100);
+
+        Logger.getInstance().Information(TAG, String.format(Locale.getDefault(),
+                "broadcastDownloadCount: _currentDownloadCount: %d | downloadPercentage: %.2f | _downloading: %s",
+                _currentDownloadCount, downloadPercentage, _downloading));
+
         _broadcastController.SendSerializableBroadcast(
                 MainServiceDownloadCountBroadcast,
                 MainServiceDownloadCountBundle,
-                new MainServiceDownloadCountContent(downloadPercentage, downloadPercentage >= 100)
+                new MainServiceDownloadCountContent(downloadPercentage, !_downloading)
         );
+
         if (_currentDownloadCount < DOWNLOAD_HASH_MAP.size()) {
             DOWNLOAD_HASH_MAP.get(_currentDownloadCount).run();
+        } else {
+            _receiverController.Dispose();
         }
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
+        Logger.getInstance().Information(TAG, "onStartCommand");
 
         try {
             boolean downloadAll = intent.getBooleanExtra(MainServiceOnStartCommandBundle, false);
@@ -272,21 +291,148 @@ public class MainService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        /*Bundle extras = intent.getExtras();
-        if (extras != null) {
-            // _messenger = (Messenger) extras.get("MESSENGER");
-            // TODO do something with extras
-        }*/
+        Logger.getInstance().Information(TAG, "onBind");
         return _mainServiceBinder;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Logger.getInstance().Information(TAG, "onCreate");
 
         _broadcastController = new BroadcastController(this);
         _receiverController = new ReceiverController(this);
+
         SettingsController.getInstance().Initialize(this);
+
+        BirthdayService.getInstance().Initialize(
+                this,
+                BirthdayActivity.class,
+                SettingsController.getInstance().IsBirthdayNotificationEnabled(),
+                SettingsController.getInstance().IsReloadBirthdayEnabled(),
+                SettingsController.getInstance().GetReloadBirthdayTimeout());
+
+        CoinService.getInstance().Initialize(
+                this,
+                CoinActivity.class,
+                SettingsController.getInstance().IsCoinsNotificationEnabled(),
+                SettingsController.getInstance().IsReloadCoinEnabled(),
+                SettingsController.getInstance().GetReloadCoinTimeout());
+
+        MapContentService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMapContentEnabled(),
+                SettingsController.getInstance().GetReloadMapContentTimeout());
+
+        MediaServerService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMediaServerEnabled(),
+                SettingsController.getInstance().GetReloadMediaServerTimeout());
+
+        MenuService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMenuEnabled(),
+                SettingsController.getInstance().GetReloadMenuTimeout());
+
+        MeterListService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMeterDataEnabled(),
+                SettingsController.getInstance().GetReloadMeterDataTimeout()
+        );
+
+        MoneyMeterListService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMoneyMeterDataEnabled(),
+                SettingsController.getInstance().GetReloadMoneyMeterDataTimeout()
+        );
+
+        MovieService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMovieEnabled(),
+                SettingsController.getInstance().GetReloadMovieTimeout());
+
+        OpenWeatherService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().GetOpenWeatherCity(),
+                SettingsController.getInstance().IsCurrentWeatherNotificationEnabled(),
+                SettingsController.getInstance().IsForecastWeatherNotificationEnabled(),
+                MainActivity.class,
+                ForecastWeatherActivity.class,
+                SettingsController.getInstance().IsChangeWeatherWallpaperActive(),
+                SettingsController.getInstance().IsReloadWeatherEnabled(),
+                SettingsController.getInstance().GetReloadWeatherTimeout());
+
+        ScheduleService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadScheduleEnabled(),
+                SettingsController.getInstance().GetReloadScheduleTimeout());
+
+        SecurityService.getInstance().Initialize(
+                this,
+                SecurityActivity.class,
+                SettingsController.getInstance().IsCameraNotificationEnabled(),
+                SettingsController.getInstance().IsReloadSecurityEnabled(),
+                SettingsController.getInstance().GetReloadSecurityTimeout());
+
+        ShoppingListService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadShoppingEnabled(),
+                SettingsController.getInstance().GetReloadShoppingTimeout());
+
+        TemperatureService.getInstance().Initialize(
+                this,
+                MainActivity.class,
+                SettingsController.getInstance().IsTemperatureNotificationEnabled(),
+                SettingsController.getInstance().IsReloadTemperatureEnabled(),
+                SettingsController.getInstance().GetReloadTemperatureTimeout());
+
+        UserService.getInstance().Initialize(this);
+
+        WirelessSocketService.getInstance().Initialize(
+                this,
+                SocketActionReceiver.class,
+                SettingsController.getInstance().IsSocketNotificationEnabled(),
+                SettingsController.getInstance().IsReloadWirelessSocketEnabled(),
+                SettingsController.getInstance().GetReloadWirelessSocketTimeout());
+
+        WirelessSwitchService.getInstance().Initialize(
+                this,
+                SwitchActionReceiver.class,
+                SettingsController.getInstance().IsSwitchNotificationEnabled(),
+                SettingsController.getInstance().IsReloadWirelessSwitchEnabled(),
+                SettingsController.getInstance().GetReloadWirelessSwitchTimeout()
+        );
+
+        _currentDownloadCount = 0;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Logger.getInstance().Information(TAG, "onDestroy");
+
+        _receiverController.Dispose();
+
+        BirthdayService.getInstance().Dispose();
+        CoinService.getInstance().Dispose();
+        MapContentService.getInstance().Dispose();
+        MediaServerService.getInstance().Dispose();
+        MenuService.getInstance().Dispose();
+        MeterListService.getInstance().Dispose();
+        MoneyMeterListService.getInstance().Dispose();
+        MovieService.getInstance().Dispose();
+        OpenWeatherService.getInstance().Dispose();
+        ScheduleService.getInstance().Dispose();
+        SecurityService.getInstance().Dispose();
+        ShoppingListService.getInstance().Dispose();
+        TemperatureService.getInstance().Dispose();
+        UserService.getInstance().Dispose();
+        WirelessSocketService.getInstance().Dispose();
+        WirelessSwitchService.getInstance().Dispose();
+    }
+
+    private void registerReceiver() {
+        Logger.getInstance().Information(TAG, "registerReceiver");
 
         _receiverController.RegisterReceiver(_startDownloadAllReceiver, new String[]{MainServiceStartDownloadAllBroadcast});
         _receiverController.RegisterReceiver(_birthdayDownloadFinishedReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
@@ -306,146 +452,5 @@ public class MainService extends Service {
         _receiverController.RegisterReceiver(_temperatureDownloadFinishedReceiver, new String[]{TemperatureService.TemperatureDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_wirelessSocketDownloadFinishedReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_wirelessSwitchDownloadFinishedReceiver, new String[]{WirelessSwitchService.WirelessSwitchDownloadFinishedBroadcast});
-
-        _birthdayService = BirthdayService.getInstance();
-        _coinService = CoinService.getInstance();
-        _mapContentService = MapContentService.getInstance();
-        _mediaServerService = MediaServerService.getInstance();
-        _menuService = MenuService.getInstance();
-        _meterListService = MeterListService.getInstance();
-        _moneyMeterListService = MoneyMeterListService.getInstance();
-        _movieService = MovieService.getInstance();
-        _openWeatherService = OpenWeatherService.getInstance();
-        _scheduleService = ScheduleService.getInstance();
-        _securityService = SecurityService.getInstance();
-        _shoppingListService = ShoppingListService.getInstance();
-        _temperatureService = TemperatureService.getInstance();
-        _userService = UserService.getInstance();
-        _wirelessSocketService = WirelessSocketService.getInstance();
-        _wirelessSwitchService = WirelessSwitchService.getInstance();
-
-        _birthdayService.Initialize(
-                this,
-                BirthdayActivity.class,
-                SettingsController.getInstance().IsBirthdayNotificationEnabled(),
-                SettingsController.getInstance().IsReloadBirthdayEnabled(),
-                SettingsController.getInstance().GetReloadBirthdayTimeout());
-
-        _coinService.Initialize(
-                this,
-                CoinActivity.class,
-                SettingsController.getInstance().IsCoinsNotificationEnabled(),
-                SettingsController.getInstance().IsReloadCoinEnabled(),
-                SettingsController.getInstance().GetReloadCoinTimeout());
-
-        _mapContentService.Initialize(
-                this,
-                SettingsController.getInstance().IsReloadMapContentEnabled(),
-                SettingsController.getInstance().GetReloadMapContentTimeout());
-
-        _mediaServerService.Initialize(
-                this,
-                SettingsController.getInstance().IsReloadMediaServerEnabled(),
-                SettingsController.getInstance().GetReloadMediaServerTimeout());
-
-        _menuService.Initialize(
-                this,
-                SettingsController.getInstance().IsReloadMenuEnabled(),
-                SettingsController.getInstance().GetReloadMenuTimeout());
-
-        _meterListService.Initialize(
-                this,
-                SettingsController.getInstance().IsReloadMeterDataEnabled(),
-                SettingsController.getInstance().GetReloadMeterDataTimeout()
-        );
-
-        _moneyMeterListService.Initialize(
-                this,
-                SettingsController.getInstance().IsReloadMoneyMeterDataEnabled(),
-                SettingsController.getInstance().GetReloadMoneyMeterDataTimeout()
-        );
-
-        _movieService.Initialize(
-                this,
-                SettingsController.getInstance().IsReloadMovieEnabled(),
-                SettingsController.getInstance().GetReloadMovieTimeout());
-
-        _openWeatherService.Initialize(
-                this,
-                SettingsController.getInstance().GetOpenWeatherCity(),
-                SettingsController.getInstance().IsCurrentWeatherNotificationEnabled(),
-                SettingsController.getInstance().IsForecastWeatherNotificationEnabled(),
-                MainActivity.class,
-                ForecastWeatherActivity.class,
-                SettingsController.getInstance().IsChangeWeatherWallpaperActive(),
-                SettingsController.getInstance().IsReloadWeatherEnabled(),
-                SettingsController.getInstance().GetReloadWeatherTimeout());
-
-        _scheduleService.Initialize(
-                this,
-                SettingsController.getInstance().IsReloadScheduleEnabled(),
-                SettingsController.getInstance().GetReloadScheduleTimeout());
-
-        _securityService.Initialize(
-                this,
-                SecurityActivity.class,
-                SettingsController.getInstance().IsCameraNotificationEnabled(),
-                SettingsController.getInstance().IsReloadSecurityEnabled(),
-                SettingsController.getInstance().GetReloadSecurityTimeout());
-
-        _shoppingListService.Initialize(
-                this,
-                SettingsController.getInstance().IsReloadShoppingEnabled(),
-                SettingsController.getInstance().GetReloadShoppingTimeout());
-
-        _temperatureService.Initialize(
-                this,
-                MainActivity.class,
-                SettingsController.getInstance().IsTemperatureNotificationEnabled(),
-                SettingsController.getInstance().IsReloadTemperatureEnabled(),
-                SettingsController.getInstance().GetReloadTemperatureTimeout());
-
-        _userService.Initialize(this);
-
-        _wirelessSocketService.Initialize(
-                this,
-                SocketActionReceiver.class,
-                SettingsController.getInstance().IsSocketNotificationEnabled(),
-                SettingsController.getInstance().IsReloadWirelessSocketEnabled(),
-                SettingsController.getInstance().GetReloadWirelessSocketTimeout());
-
-        _wirelessSwitchService.Initialize(
-                this,
-                /* TODO add ReceiverClass! */
-                null,
-                SettingsController.getInstance().IsSwitchNotificationEnabled(),
-                SettingsController.getInstance().IsReloadWirelessSwitchEnabled(),
-                SettingsController.getInstance().GetReloadWirelessSwitchTimeout()
-        );
-
-        _currentDownloadCount = 0;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        _receiverController.Dispose();
-
-        _birthdayService.Dispose();
-        _coinService.Dispose();
-        _mapContentService.Dispose();
-        _mediaServerService.Dispose();
-        _menuService.Dispose();
-        _meterListService.Dispose();
-        _moneyMeterListService.Dispose();
-        _movieService.Dispose();
-        _openWeatherService.Dispose();
-        _scheduleService.Dispose();
-        _securityService.Dispose();
-        _shoppingListService.Dispose();
-        _temperatureService.Dispose();
-        _userService.Dispose();
-        _wirelessSocketService.Dispose();
-        _wirelessSwitchService.Dispose();
     }
 }

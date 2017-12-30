@@ -22,6 +22,7 @@ import android.widget.DatePicker;
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
@@ -39,9 +40,6 @@ public class BirthdayEditActivity extends AppCompatActivity {
 
     private boolean _propertyChanged;
     private BirthdayDto _birthdayDto;
-
-    private BirthdayService _birthdayService;
-    private NavigationService _navigationService;
 
     private ReceiverController _receiverController;
 
@@ -91,17 +89,14 @@ public class BirthdayEditActivity extends AppCompatActivity {
 
         _birthdayDto = (BirthdayDto) getIntent().getSerializableExtra(BirthdayService.BirthdayIntent);
 
-        _birthdayService = BirthdayService.getInstance();
-        _navigationService = NavigationService.getInstance();
-
         _receiverController = new ReceiverController(this);
+
+        _saveButton = findViewById(R.id.save_birthday_edit_button);
 
         final AutoCompleteTextView birthdayEditTextView = findViewById(R.id.birthday_edit_textview);
         final AutoCompleteTextView birthdayGroupEditTextView = findViewById(R.id.birthdayGroup_edit_textview);
         final DatePicker birthdayEditDatePicker = findViewById(R.id.birthday_edit_datePicker);
         final CheckBox birthdayRemindMeCheckBox = findViewById(R.id.birthday_edit_remindMeCheckBox);
-
-        _saveButton = findViewById(R.id.save_birthday_edit_button);
 
         if (_birthdayDto != null) {
             birthdayEditTextView.setText(_birthdayDto.GetName());
@@ -112,7 +107,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
             displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
 
-        birthdayEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, _birthdayService.GetBirthdayNameList()));
+        birthdayEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, BirthdayService.getInstance().GetBirthdayNameList()));
         birthdayEditTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -129,7 +124,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
             }
         });
 
-        birthdayGroupEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, _birthdayService.GetBirthdayGroupList()));
+        birthdayGroupEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, BirthdayService.getInstance().GetBirthdayGroupList()));
         birthdayGroupEditTextView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
@@ -195,17 +190,11 @@ public class BirthdayEditActivity extends AppCompatActivity {
                 focusView.requestFocus();
             } else {
                 if (_birthdayDto.GetAction() == BirthdayDto.Action.Add) {
-                    int lastHighestId = 0;
-
-                    int dataListSize = _birthdayService.GetDataList().getSize();
-                    if (dataListSize > 0) {
-                        lastHighestId = _birthdayService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
-                    }
-
-                    _birthdayService.AddBirthday(new LucaBirthday(lastHighestId, birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Add));
+                    int highestId = BirthdayService.getInstance().GetHighestId();
+                    BirthdayService.getInstance().AddBirthday(new LucaBirthday(highestId, birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_birthdayDto.GetAction() == BirthdayDto.Action.Update) {
-                    _birthdayService.UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Update));
+                    BirthdayService.getInstance().UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     birthdayEditTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _birthdayDto.GetAction())));
@@ -240,7 +229,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -272,7 +261,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(BirthdayEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(BirthdayEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");

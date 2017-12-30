@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.rey.material.app.Dialog;
 import com.rey.material.app.ThemeManager;
@@ -18,8 +19,10 @@ import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
+import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
+import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.dto.WirelessSocketDto;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
@@ -28,6 +31,8 @@ import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.WirelessSocketEditActivity;
 
 public class SocketListViewAdapter extends BaseAdapter {
+    private static final String TAG = SocketListViewAdapter.class.getSimpleName();
+
     private class Holder {
         private TextView _titleText;
         private TextView _areaText;
@@ -37,6 +42,21 @@ public class SocketListViewAdapter extends BaseAdapter {
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
         private View _stateView;
+
+        private void switchWirelessSocketState(@NonNull final WirelessSocket wirelessSocket, boolean isChecked) {
+            try {
+                WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, isChecked);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.getMessage());
+                Toasty.error(_context, exception.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        }
+
+        private void navigateToEditActivity(@NonNull final WirelessSocket wirelessSocket) {
+            Bundle data = new Bundle();
+            data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(wirelessSocket.GetId(), wirelessSocket.GetName(), wirelessSocket.GetArea(), wirelessSocket.GetCode(), wirelessSocket.IsActivated(), WirelessSocketDto.Action.Update));
+            NavigationService.getInstance().NavigateToActivityWithData(_context, WirelessSocketEditActivity.class, data);
+        }
 
         private void displayDeleteDialog(@NonNull final WirelessSocket wirelessSocket) {
             final Dialog deleteDialog = new Dialog(_context);
@@ -49,7 +69,7 @@ public class SocketListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _wirelessSocketService.DeleteWirelessSocket(wirelessSocket);
+                WirelessSocketService.getInstance().DeleteWirelessSocket(wirelessSocket);
                 deleteDialog.dismiss();
             });
 
@@ -60,9 +80,6 @@ public class SocketListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private NavigationService _navigationService;
-    private WirelessSocketService _wirelessSocketService;
-
     private SerializableList<WirelessSocket> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -70,9 +87,6 @@ public class SocketListViewAdapter extends BaseAdapter {
 
     public SocketListViewAdapter(@NonNull Context context, @NonNull SerializableList<WirelessSocket> listViewItems) {
         _context = context;
-        _navigationService = NavigationService.getInstance();
-        _wirelessSocketService = WirelessSocketService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -121,20 +135,9 @@ public class SocketListViewAdapter extends BaseAdapter {
         holder._stateView.setBackgroundResource(wirelessSocket.IsActivated() ? R.drawable.circle_green : R.drawable.circle_red);
 
         holder._cardSwitch.setChecked(wirelessSocket.IsActivated());
-        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> {
-            try {
-                _wirelessSocketService.SetWirelessSocketState(wirelessSocket, isChecked);
-            } catch (Exception exception) {
-                // TODO perhaps log exception or make a notification...
-            }
-        });
+        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, isChecked) -> holder.switchWirelessSocketState(wirelessSocket, isChecked));
 
-        holder._updateButton.setOnClickListener(view -> {
-            Bundle data = new Bundle();
-            data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(wirelessSocket.GetId(), wirelessSocket.GetName(), wirelessSocket.GetArea(), wirelessSocket.GetCode(), wirelessSocket.IsActivated(), WirelessSocketDto.Action.Update));
-            _navigationService.NavigateToActivityWithData(_context, WirelessSocketEditActivity.class, data);
-        });
-
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(wirelessSocket));
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(wirelessSocket));
 
         rowView.setVisibility((wirelessSocket.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);

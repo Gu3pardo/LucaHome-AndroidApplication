@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
+import guepardoapps.lucahome.common.builder.MapContentBuilder;
 import guepardoapps.lucahome.common.classes.*;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
@@ -76,7 +77,7 @@ public final class JsonDataToMapContentConverter {
                     int id = child.getInt("Id");
 
                     String typeString = child.getString("Type");
-                    MapContent.DrawingType drawingType = getDrawingType(typeString);
+                    MapContent.DrawingType drawingType = MapContentBuilder.GetDrawingType(typeString);
                     int typeId = child.getInt("TypeId");
 
                     String name = child.getString("Name");
@@ -119,36 +120,5 @@ public final class JsonDataToMapContentConverter {
 
         Logger.getInstance().Error(TAG, value + " has an error!");
         return new SerializableList<>();
-    }
-
-    private MapContent.DrawingType getDrawingType(@NonNull String typeString) {
-        switch (typeString) {
-            case "WirelessSocket":
-                return MapContent.DrawingType.Socket;
-            case "LAN":
-                return MapContent.DrawingType.LAN;
-            case "MediaServer":
-                return MapContent.DrawingType.MediaServer;
-            case "RaspberryPi":
-                return MapContent.DrawingType.RaspberryPi;
-            case "NAS":
-                return MapContent.DrawingType.NAS;
-            case "LightSwitch":
-                return MapContent.DrawingType.LightSwitch;
-            case "Temperature":
-                return MapContent.DrawingType.Temperature;
-            case "PuckJS":
-                return MapContent.DrawingType.PuckJS;
-            case "Menu":
-                return MapContent.DrawingType.Menu;
-            case "ShoppingList":
-                return MapContent.DrawingType.ShoppingList;
-            case "Camera":
-                return MapContent.DrawingType.Camera;
-            case "Meter":
-                return MapContent.DrawingType.Meter;
-            default:
-                return MapContent.DrawingType.Null;
-        }
     }
 }

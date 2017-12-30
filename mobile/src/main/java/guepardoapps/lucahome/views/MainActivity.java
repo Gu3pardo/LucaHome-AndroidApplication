@@ -53,24 +53,9 @@ public class MainActivity extends AppCompatActivity {
     private MapContentViewBuilder _mapContentViewBuilder;
 
     /**
-     * MapContentService manages data for mapContent
-     */
-    private MapContentService _mapContentService;
-
-    /**
      * ReceiverController to register and unregister from broadcasts of the UserService
      */
     private ReceiverController _receiverController;
-
-    /**
-     * NavigationService manages navigation between activities
-     */
-    private NavigationService _navigationService;
-
-    /**
-     * Services to handle data
-     */
-    private OpenWeatherService _openWeatherService;
 
     /**
      * Binder for MainService
@@ -118,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
                     _listView.setAdapter(new MainListViewAdapter(MainActivity.this, _mainListViewBuilder.GetList()));
 
-                    _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
+                    _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
                     _mapContentViewBuilder.AddViewsToMap();
                 }
             }
@@ -131,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver _mapContentUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
+            _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
             _mapContentViewBuilder.AddViewsToMap();
         }
     };
@@ -141,10 +126,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        _mapContentService = MapContentService.getInstance();
-        _navigationService = NavigationService.getInstance();
-        _openWeatherService = OpenWeatherService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -166,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
         FloatingActionButton imageButtonSettings = findViewById(R.id.floating_action_button_settings);
-        imageButtonSettings.setOnClickListener(view -> _navigationService.NavigateToActivity(MainActivity.this, SettingsActivity.class));
+        imageButtonSettings.setOnClickListener(view -> NavigationService.getInstance().NavigateToActivity(MainActivity.this, SettingsActivity.class));
 
         FloatingActionButton imageButtonAbout = findViewById(R.id.floating_action_button_about);
         imageButtonAbout.setOnClickListener(view -> new LibsBuilder()
@@ -208,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        _navigationService.ClearGoBackList();
+        NavigationService.getInstance().ClearGoBackList();
 
         _receiverController.RegisterReceiver(_openWeatherUpdateReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast, OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_mainServiceDownloadProgressReceiver, new String[]{MainService.MainServiceDownloadCountBroadcast});
@@ -219,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         _mapContentViewBuilder.Initialize();
-        _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
+        _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
         _mapContentViewBuilder.AddViewsToMap();
     }
 
@@ -249,8 +230,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            _navigationService.ClearCurrentActivity();
-            _navigationService.ClearGoBackList();
+            NavigationService.getInstance().ClearCurrentActivity();
+            NavigationService.getInstance().ClearGoBackList();
             finish();
             return true;
         }
@@ -261,12 +242,12 @@ public class MainActivity extends AppCompatActivity {
         _mainListViewBuilder.UpdateItemDescription(MainListViewItem.Type.Weather, String.format(
                 Locale.getDefault(),
                 "Current temperature: %.2f degree Celsius\nCurrent condition: %s",
-                _openWeatherService.CurrentWeather().GetTemperature(), _openWeatherService.CurrentWeather().GetDescription()));
-        _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, _openWeatherService.CurrentWeather().GetCondition().GetWallpaper());
+                OpenWeatherService.getInstance().CurrentWeather().GetTemperature(), OpenWeatherService.getInstance().CurrentWeather().GetDescription()));
+        _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, OpenWeatherService.getInstance().CurrentWeather().GetCondition().GetWallpaper());
     }
 
     private void updateMapContent() {
-        _mapContentViewBuilder.CreateMapContentViewList(_mapContentService.GetDataList());
+        _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
         _mapContentViewBuilder.AddViewsToMap();
     }
 }

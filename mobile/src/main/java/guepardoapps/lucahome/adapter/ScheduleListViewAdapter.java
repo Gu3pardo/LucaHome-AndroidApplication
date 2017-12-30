@@ -39,6 +39,12 @@ public class ScheduleListViewAdapter extends BaseAdapter {
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
 
+        private void navigateToEditActivity(@NonNull final Schedule schedule) {
+            Bundle data = new Bundle();
+            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(schedule.GetId(), schedule.GetName(), schedule.GetWirelessSocket(), schedule.GetWirelessSwitch(), schedule.GetWeekday(), schedule.GetTime(), schedule.GetAction(), ScheduleDto.Action.Update));
+            NavigationService.getInstance().NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
+        }
+
         private void displayDeleteDialog(@NonNull final Schedule schedule) {
             final Dialog deleteDialog = new Dialog(_context);
 
@@ -50,7 +56,7 @@ public class ScheduleListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _scheduleService.DeleteSchedule(schedule);
+                ScheduleService.getInstance().DeleteSchedule(schedule);
                 deleteDialog.dismiss();
             });
 
@@ -61,9 +67,6 @@ public class ScheduleListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private NavigationService _navigationService;
-    private ScheduleService _scheduleService;
-
     private SerializableList<Schedule> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -71,9 +74,6 @@ public class ScheduleListViewAdapter extends BaseAdapter {
 
     public ScheduleListViewAdapter(@NonNull Context context, @NonNull SerializableList<Schedule> listViewItems) {
         _context = context;
-        _navigationService = NavigationService.getInstance();
-        _scheduleService = ScheduleService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -125,14 +125,9 @@ public class ScheduleListViewAdapter extends BaseAdapter {
         holder._actionText.setText(schedule.GetAction().toString());
 
         holder._cardSwitch.setChecked(schedule.IsActive());
-        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, value) -> _scheduleService.SetScheduleState(schedule, value));
+        holder._cardSwitch.setOnCheckedChangeListener((compoundButton, value) -> ScheduleService.getInstance().SetScheduleState(schedule, value));
 
-        holder._updateButton.setOnClickListener(view -> {
-            Bundle data = new Bundle();
-            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(schedule.GetId(), schedule.GetName(), schedule.GetWirelessSocket(), schedule.GetWirelessSwitch(), schedule.GetWeekday(), schedule.GetTime(), schedule.GetAction(), ScheduleDto.Action.Update));
-            _navigationService.NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
-        });
-
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(schedule));
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(schedule));
 
         return rowView;

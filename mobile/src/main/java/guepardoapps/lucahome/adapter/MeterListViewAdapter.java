@@ -32,6 +32,13 @@ public class MeterListViewAdapter extends BaseAdapter {
         private FloatingActionButton _updateButton;
         private FloatingActionButton _deleteButton;
 
+        private void navigateToEditActivity(@NonNull final MeterData meterData) {
+            Bundle data = new Bundle();
+            meterData.SetServerAction(MeterData.ServerAction.Update);
+            data.putSerializable(MeterListService.MeterDataIntent, meterData);
+            NavigationService.getInstance().NavigateToActivityWithData(_context, MeterDataEditActivity.class, data);
+        }
+
         private void displayDeleteDialog(@NonNull final MeterData meterData) {
             final Dialog deleteDialog = new Dialog(_context);
 
@@ -43,7 +50,7 @@ public class MeterListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _meterListService.DeleteMeterData(meterData);
+                MeterListService.getInstance().DeleteMeterData(meterData);
                 deleteDialog.dismiss();
             });
 
@@ -54,9 +61,6 @@ public class MeterListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private MeterListService _meterListService;
-    private NavigationService _navigationService;
-
     private SerializableList<MeterData> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -64,9 +68,6 @@ public class MeterListViewAdapter extends BaseAdapter {
 
     public MeterListViewAdapter(@NonNull Context context, @NonNull SerializableList<MeterData> listViewItems) {
         _context = context;
-        _meterListService = MeterListService.getInstance();
-        _navigationService = NavigationService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -107,13 +108,7 @@ public class MeterListViewAdapter extends BaseAdapter {
         holder._timeText.setText(meterData.GetSaveTime().HHMM());
         holder._valueText.setText(String.valueOf(meterData.GetValue()));
 
-        holder._updateButton.setOnClickListener(view -> {
-            Bundle data = new Bundle();
-            meterData.SetServerAction(MeterData.ServerAction.Update);
-            data.putSerializable(MeterListService.MeterDataIntent, meterData);
-            _navigationService.NavigateToActivityWithData(_context, MeterDataEditActivity.class, data);
-        });
-
+        holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(meterData));
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(meterData));
 
         rowView.setVisibility((meterData.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);

@@ -1,7 +1,6 @@
 package guepardoapps.lucahome.builders;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -81,7 +80,7 @@ public class MapContentViewBuilder {
 
             newTextView.setGravity(Gravity.CENTER);
             newTextView.setTextSize(10);
-            newTextView.setTextColor(Color.WHITE);
+            newTextView.setTextColor(mapContent.GetTextColor());
             newTextView.setText(mapContent.GetShortName());
 
             newTextView.setBackgroundResource(mapContent.GetDrawable());

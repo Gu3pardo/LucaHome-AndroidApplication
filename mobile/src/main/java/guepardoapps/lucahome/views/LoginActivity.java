@@ -45,16 +45,6 @@ public class LoginActivity extends AppCompatActivity {
      */
     private ReceiverController _receiverController;
 
-    /**
-     * NavigationService manages navigation between activities
-     */
-    private NavigationService _navigationService;
-
-    /**
-     * UserService manages the handles for the user: validation, etc.
-     */
-    private UserService _userService;
-
     // UI references.
     private AutoCompleteTextView _userView;
     private EditText _passwordView;
@@ -88,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
                         .show();
 
                 new Handler().postDelayed(() -> {
-                    NavigationService.NavigationResult navigationResult = _navigationService.GoBack(LoginActivity.this);
+                    NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(LoginActivity.this);
                     if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                         Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                         displayFailSnacky("Failed to navigate back to BootActivity! Please contact LucaHome support!");
@@ -104,12 +94,10 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         _receiverController = new ReceiverController(this);
-        _navigationService = NavigationService.getInstance();
-        _userService = UserService.getInstance();
 
-        if (_userService.IsAnUserSaved()) {
+        if (UserService.getInstance().IsAnUserSaved()) {
             List<String> userList = new ArrayList<>();
-            userList.add(_userService.GetUser().GetName());
+            userList.add(UserService.getInstance().GetUser().GetName());
             _userView.setAdapter(new ArrayAdapter<>(LoginActivity.this, android.R.layout.simple_dropdown_item_1line, userList));
         }
 
@@ -158,8 +146,8 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            _navigationService.ClearCurrentActivity();
-            _navigationService.ClearGoBackList();
+            NavigationService.getInstance().ClearCurrentActivity();
+            NavigationService.getInstance().ClearGoBackList();
             finish();
             return true;
         }
@@ -172,7 +160,7 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
-        if (_userService.ValidatingUser()) {
+        if (UserService.getInstance().ValidatingUser()) {
             return;
         }
 
@@ -188,7 +176,7 @@ public class LoginActivity extends AppCompatActivity {
         View focusView = null;
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(password) && !_userService.IsEnteredPasswordValid(password)) {
+        if (!TextUtils.isEmpty(password) && !UserService.getInstance().IsEnteredPasswordValid(password)) {
             _passwordView.setError(createErrorText(getString(R.string.error_invalid_password)));
             focusView = _passwordView;
             cancel = true;
@@ -199,7 +187,7 @@ public class LoginActivity extends AppCompatActivity {
             _userView.setError(createErrorText(getString(R.string.error_field_required)));
             focusView = _userView;
             cancel = true;
-        } else if (!_userService.IsEnteredUserValid(user)) {
+        } else if (!UserService.getInstance().IsEnteredUserValid(user)) {
             _userView.setError(createErrorText(getString(R.string.error_invalid_user)));
             focusView = _userView;
             cancel = true;
@@ -211,7 +199,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             // Show a progress spinner, and kick off a background task to perform the user login attempt.
             showProgress(true);
-            _userService.ValidateUser(new LucaUser(user, password));
+            UserService.getInstance().ValidateUser(new LucaUser(user, password));
         }
     }
 

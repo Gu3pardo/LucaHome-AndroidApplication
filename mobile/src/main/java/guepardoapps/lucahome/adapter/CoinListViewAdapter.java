@@ -40,7 +40,7 @@ public class CoinListViewAdapter extends BaseAdapter {
         private void navigateToEditActivity(@NonNull final Coin coin) {
             Bundle data = new Bundle();
             data.putSerializable(CoinService.CoinIntent, new CoinDto(coin.GetId(), coin.GetUser(), coin.GetType(), coin.GetAmount(), CoinDto.Action.Update));
-            _navigationService.NavigateToActivityWithData(_context, CoinEditActivity.class, data);
+            NavigationService.getInstance().NavigateToActivityWithData(_context, CoinEditActivity.class, data);
         }
 
         private void displayDeleteDialog(@NonNull final Coin coin) {
@@ -54,7 +54,7 @@ public class CoinListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                _coinService.DeleteCoin(coin);
+                CoinService.getInstance().DeleteCoin(coin);
                 deleteDialog.dismiss();
             });
 
@@ -65,9 +65,6 @@ public class CoinListViewAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private CoinService _coinService;
-    private NavigationService _navigationService;
-
     private SerializableList<Coin> _listViewItems;
 
     private static LayoutInflater _inflater = null;
@@ -75,9 +72,6 @@ public class CoinListViewAdapter extends BaseAdapter {
 
     public CoinListViewAdapter(@NonNull Context context, @NonNull SerializableList<Coin> listViewItems) {
         _context = context;
-        _coinService = CoinService.getInstance();
-        _navigationService = NavigationService.getInstance();
-
         _listViewItems = listViewItems;
 
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -133,7 +127,6 @@ public class CoinListViewAdapter extends BaseAdapter {
         }
 
         holder._updateButton.setOnClickListener(view -> holder.navigateToEditActivity(coin));
-
         holder._deleteButton.setOnClickListener(view -> holder.displayDeleteDialog(coin));
 
         rowView.setVisibility((coin.GetServerDbAction() == ILucaClass.LucaServerDbAction.Delete) ? View.GONE : View.VISIBLE);

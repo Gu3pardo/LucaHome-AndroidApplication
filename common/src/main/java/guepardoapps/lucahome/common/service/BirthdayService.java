@@ -352,6 +352,17 @@ public class BirthdayService implements IDataNotificationService {
         return null;
     }
 
+    public int GetHighestId() {
+        int highestId = -1;
+        for (int index = 0; index < _birthdayList.getSize(); index++) {
+            int id = _birthdayList.getValue(index).GetId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
+    }
+
     @Override
     public SerializableList<LucaBirthday> SearchDataList(@NonNull String searchKey) {
         SerializableList<LucaBirthday> foundBirthdays = new SerializableList<>();
