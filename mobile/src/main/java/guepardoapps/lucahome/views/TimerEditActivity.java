@@ -46,11 +46,6 @@ public class TimerEditActivity extends AppCompatActivity {
 
     private boolean _propertyChanged;
 
-    private NavigationService _navigationService;
-    private ScheduleService _scheduleService;
-    private WirelessSocketService _wirelessSocketService;
-    private WirelessSwitchService _wirelessSwitchService;
-
     private ReceiverController _receiverController;
 
     private com.rey.material.widget.Button _saveButton;
@@ -62,7 +57,6 @@ public class TimerEditActivity extends AppCompatActivity {
             if (result != null) {
                 if (result.Success) {
                     navigateBack("Added new timer!");
-                    _wirelessSocketService.LoadData();
                 } else {
                     displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                     _saveButton.setEnabled(true);
@@ -74,15 +68,26 @@ public class TimerEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timer_edit);
-
-        _navigationService = NavigationService.getInstance();
-        _scheduleService = ScheduleService.getInstance();
-        _wirelessSocketService = WirelessSocketService.getInstance();
-        _wirelessSwitchService = WirelessSwitchService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -93,28 +98,14 @@ public class TimerEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_timer_edit_button);
 
-        timerNameEditTextView.setAdapter(new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_dropdown_item_1line, _scheduleService.GetTimerNameList()));
-        timerNameEditTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        timerNameEditTextView.setAdapter(new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_dropdown_item_1line, ScheduleService.getInstance().GetTimerNameList()));
+        timerNameEditTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
-
-        ArrayAdapter<String> socketDataAdapter = new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_spinner_item, _wirelessSocketService.GetNameList());
+        ArrayAdapter<String> socketDataAdapter = new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_spinner_item, WirelessSocketService.getInstance().GetNameList());
         socketDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timerSocketSelect.setAdapter(socketDataAdapter);
 
-        ArrayAdapter<String> switchDataAdapter = new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_spinner_item, _wirelessSwitchService.GetNameList());
+        ArrayAdapter<String> switchDataAdapter = new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_spinner_item, WirelessSwitchService.getInstance().GetNameList());
         switchDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         timerSwitchSelect.setAdapter(switchDataAdapter);
 
@@ -150,10 +141,10 @@ public class TimerEditActivity extends AppCompatActivity {
             }
 
             int socketId = timerSocketSelect.getSelectedItemPosition();
-            WirelessSocket wirelessSocket = _wirelessSocketService.GetDataList().getValue(socketId);
+            WirelessSocket wirelessSocket = WirelessSocketService.getInstance().GetDataList().getValue(socketId);
 
             int switchId = timerSwitchSelect.getSelectedItemPosition();
-            WirelessSwitch wirelessSwitch = _wirelessSwitchService.GetDataList().getValue(switchId);
+            WirelessSwitch wirelessSwitch = WirelessSwitchService.getInstance().GetDataList().getValue(switchId);
 
             int countdownId = timerCountdownSelect.getSelectedItemPosition();
 
@@ -205,12 +196,12 @@ public class TimerEditActivity extends AppCompatActivity {
             } else {
                 int lastHighestId = 0;
 
-                int dataListSize = _scheduleService.GetTimerList().getSize();
+                int dataListSize = ScheduleService.getInstance().GetTimerList().getSize();
                 if (dataListSize > 0) {
-                    lastHighestId = _scheduleService.GetTimerList().getValue(dataListSize - 1).GetId() + 1;
+                    lastHighestId = ScheduleService.getInstance().GetTimerList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                _scheduleService.AddTimer(new LucaTimer(lastHighestId, timerName, wirelessSocket, wirelessSwitch, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true, false, ILucaClass.LucaServerDbAction.Add));
+                ScheduleService.getInstance().AddTimer(new LucaTimer(lastHighestId, timerName, wirelessSocket, wirelessSwitch, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });
@@ -241,7 +232,7 @@ public class TimerEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -273,7 +264,7 @@ public class TimerEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(TimerEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(TimerEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");

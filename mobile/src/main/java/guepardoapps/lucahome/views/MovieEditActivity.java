@@ -37,9 +37,6 @@ public class MovieEditActivity extends AppCompatActivity {
     private boolean _propertyChanged;
     private MovieDto _movieDto;
 
-    private MovieService _movieService;
-    private NavigationService _navigationService;
-
     private ReceiverController _receiverController;
 
     private com.rey.material.widget.Button _saveButton;
@@ -63,15 +60,28 @@ public class MovieEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_edit);
 
         _movieDto = (MovieDto) getIntent().getSerializableExtra(MovieService.MovieIntent);
-
-        _movieService = MovieService.getInstance();
-        _navigationService = NavigationService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -82,30 +92,14 @@ public class MovieEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_movie_edit_button);
 
-        TextWatcher sharedTextWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        movieTitleTypeTextView.setAdapter(new ArrayAdapter<>(MovieEditActivity.this, android.R.layout.simple_dropdown_item_1line, MovieService.getInstance().GetTitleList()));
+        movieTitleTypeTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        movieGenreTypeTextView.setAdapter(new ArrayAdapter<>(MovieEditActivity.this, android.R.layout.simple_dropdown_item_1line, MovieService.getInstance().GetGenreList()));
+        movieGenreTypeTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        };
-
-        movieTitleTypeTextView.setAdapter(new ArrayAdapter<>(MovieEditActivity.this, android.R.layout.simple_dropdown_item_1line, _movieService.GetTitleList()));
-        movieTitleTypeTextView.addTextChangedListener(sharedTextWatcher);
-
-        movieGenreTypeTextView.setAdapter(new ArrayAdapter<>(MovieEditActivity.this, android.R.layout.simple_dropdown_item_1line, _movieService.GetGenreList()));
-        movieGenreTypeTextView.addTextChangedListener(sharedTextWatcher);
-
-        movieDescriptionTypeTextView.setAdapter(new ArrayAdapter<>(MovieEditActivity.this, android.R.layout.simple_dropdown_item_1line, _movieService.GetDescriptionList()));
-        movieDescriptionTypeTextView.addTextChangedListener(sharedTextWatcher);
+        movieDescriptionTypeTextView.setAdapter(new ArrayAdapter<>(MovieEditActivity.this, android.R.layout.simple_dropdown_item_1line, MovieService.getInstance().GetDescriptionList()));
+        movieDescriptionTypeTextView.addTextChangedListener(_textWatcher);
 
 
         if (_movieDto != null) {
@@ -158,7 +152,7 @@ public class MovieEditActivity extends AppCompatActivity {
             if (cancel) {
                 focusView.requestFocus();
             } else {
-                _movieService.UpdateMovie(new Movie(_movieDto.GetId(), title, genre, description, (int) movieRatingBar.getRating(), _movieDto.GetWatched()));
+                MovieService.getInstance().UpdateMovie(new Movie(_movieDto.GetId(), title, genre, description, (int) movieRatingBar.getRating(), _movieDto.GetWatched()));
                 _saveButton.setEnabled(false);
             }
         });
@@ -189,7 +183,7 @@ public class MovieEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -221,7 +215,7 @@ public class MovieEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MovieEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(MovieEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");

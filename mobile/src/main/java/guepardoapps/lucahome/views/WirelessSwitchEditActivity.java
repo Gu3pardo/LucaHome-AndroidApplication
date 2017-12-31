@@ -39,9 +39,6 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
     private boolean _propertyChanged;
     private WirelessSwitchDto _wirelessSwitchDto;
 
-    private NavigationService _navigationService;
-    private WirelessSwitchService _wirelessSwitchService;
-
     private ReceiverController _receiverController;
 
     private com.rey.material.widget.Button _saveButton;
@@ -82,15 +79,28 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wireless_switch_edit);
 
         _wirelessSwitchDto = (WirelessSwitchDto) getIntent().getSerializableExtra(WirelessSwitchService.WirelessSwitchIntent);
-
-        _navigationService = NavigationService.getInstance();
-        _wirelessSwitchService = WirelessSwitchService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -101,33 +111,17 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_switch_edit_button);
 
-        TextWatcher sharedTextWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        switchNameTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSwitchEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSwitchService.getInstance().GetNameList()));
+        switchNameTypeTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        switchAreaTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSwitchEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSwitchService.getInstance().GetAreaList()));
+        switchAreaTypeTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        };
+        switchRemoteIdTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSwitchEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSwitchService.getInstance().GetRemoteIdList()));
+        switchRemoteIdTypeTextView.addTextChangedListener(_textWatcher);
 
-        switchNameTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSwitchEditActivity.this, android.R.layout.simple_dropdown_item_1line, _wirelessSwitchService.GetNameList()));
-        switchNameTypeTextView.addTextChangedListener(sharedTextWatcher);
-
-        switchAreaTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSwitchEditActivity.this, android.R.layout.simple_dropdown_item_1line, _wirelessSwitchService.GetAreaList()));
-        switchAreaTypeTextView.addTextChangedListener(sharedTextWatcher);
-
-        switchRemoteIdTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSwitchEditActivity.this, android.R.layout.simple_dropdown_item_1line, _wirelessSwitchService.GetRemoteIdList()));
-        switchRemoteIdTypeTextView.addTextChangedListener(sharedTextWatcher);
-
-        switchKeyCodeTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSwitchEditActivity.this, android.R.layout.simple_dropdown_item_1line, _wirelessSwitchService.GetKeyCodeList()));
-        switchKeyCodeTypeTextView.addTextChangedListener(sharedTextWatcher);
+        switchKeyCodeTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSwitchEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSwitchService.getInstance().GetKeyCodeList()));
+        switchKeyCodeTypeTextView.addTextChangedListener(_textWatcher);
 
         if (_wirelessSwitchDto != null) {
             switchNameTypeTextView.setText(_wirelessSwitchDto.GetName());
@@ -191,15 +185,15 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
                 if (_wirelessSwitchDto.GetAction() == WirelessSwitchDto.Action.Add) {
                     int lastHighestId = 0;
 
-                    int dataListSize = _wirelessSwitchService.GetDataList().getSize();
+                    int dataListSize = WirelessSwitchService.getInstance().GetDataList().getSize();
                     if (dataListSize > 0) {
-                        lastHighestId = _wirelessSwitchService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
+                        lastHighestId = WirelessSwitchService.getInstance().GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _wirelessSwitchService.AddWirelessSwitch(new WirelessSwitch(lastHighestId, name, area, Integer.parseInt(remoteIdString), keyCodeString.charAt(0), true, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Add));
+                    WirelessSwitchService.getInstance().AddWirelessSwitch(new WirelessSwitch(lastHighestId, name, area, Integer.parseInt(remoteIdString), keyCodeString.charAt(0), true, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_wirelessSwitchDto.GetAction() == WirelessSwitchDto.Action.Update) {
-                    _wirelessSwitchService.UpdateWirelessSwitch(new WirelessSwitch(_wirelessSwitchDto.GetId(), name, area, Integer.parseInt(remoteIdString), keyCodeString.charAt(0), true, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Update));
+                    WirelessSwitchService.getInstance().UpdateWirelessSwitch(new WirelessSwitch(_wirelessSwitchDto.GetId(), name, area, Integer.parseInt(remoteIdString), keyCodeString.charAt(0), true, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     switchNameTypeTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _wirelessSwitchDto.GetAction())));
@@ -234,7 +228,7 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -266,7 +260,7 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(WirelessSwitchEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(WirelessSwitchEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");

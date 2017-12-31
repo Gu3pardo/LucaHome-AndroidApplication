@@ -41,9 +41,6 @@ public class MeterDataEditActivity extends AppCompatActivity {
     private boolean _propertyChanged;
     private MeterData _meterData;
 
-    private MeterListService _meterListService;
-    private NavigationService _navigationService;
-
     private ReceiverController _receiverController;
 
     private com.rey.material.widget.Button _saveButton;
@@ -85,15 +82,28 @@ public class MeterDataEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_meterdata_edit);
 
         _meterData = (MeterData) getIntent().getSerializableExtra(MeterListService.MeterDataIntent);
-
-        _meterListService = MeterListService.getInstance();
-        _navigationService = NavigationService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -121,73 +131,17 @@ public class MeterDataEditActivity extends AppCompatActivity {
             displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
 
-        editTypeTextView.setAdapter(new ArrayAdapter<>(MeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, _meterListService.GetMeterTypeList()));
-        editTypeTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        editTypeTextView.setAdapter(new ArrayAdapter<>(MeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, MeterListService.getInstance().GetMeterTypeList()));
+        editTypeTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        meterIdTextView.setAdapter(new ArrayAdapter<>(MeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, MeterListService.getInstance().GetMeterIdList()));
+        meterIdTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
+        areaTextView.setAdapter(new ArrayAdapter<>(MeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, MeterListService.getInstance().GetAreaList()));
+        areaTextView.addTextChangedListener(_textWatcher);
 
-        meterIdTextView.setAdapter(new ArrayAdapter<>(MeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, _meterListService.GetMeterIdList()));
-        meterIdTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
-
-        areaTextView.setAdapter(new ArrayAdapter<>(MeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, _meterListService.GetAreaList()));
-        areaTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
-
-        imageNameTextView.setAdapter(new ArrayAdapter<>(MeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, _meterListService.GetImageNameList()));
-        imageNameTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
+        imageNameTextView.setAdapter(new ArrayAdapter<>(MeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, MeterListService.getInstance().GetImageNameList()));
+        imageNameTextView.addTextChangedListener(_textWatcher);
 
         editDatePicker.setOnClickListener(view -> {
             _propertyChanged = true;
@@ -262,18 +216,18 @@ public class MeterDataEditActivity extends AppCompatActivity {
                 focusView.requestFocus();
             } else {
                 if (_meterData.GetServerAction() == MeterData.ServerAction.Add) {
-                    int newHighestId = _meterListService.GetHighestId() + 1;
-                    int newHighestTypeId = _meterListService.GetHighestTypeId(type) + 1;
+                    int newHighestId = MeterListService.getInstance().GetHighestId() + 1;
+                    int newHighestTypeId = MeterListService.getInstance().GetHighestTypeId(type) + 1;
                     MeterData newMeterData = new MeterData(newHighestId, type, newHighestTypeId, saveDate, saveTime, meterId, area, value, imageName);
                     newMeterData.SetServerAction(MeterData.ServerAction.Add);
                     newMeterData.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
-                    _meterListService.AddMeterData(newMeterData);
+                    MeterListService.getInstance().AddMeterData(newMeterData);
                     _saveButton.setEnabled(false);
                 } else if (_meterData.GetServerAction() == MeterData.ServerAction.Update) {
                     MeterData newMeterData = new MeterData(_meterData.GetId(), type, _meterData.GetTypeId(), saveDate, saveTime, meterId, area, value, imageName);
                     newMeterData.SetServerAction(MeterData.ServerAction.Update);
                     newMeterData.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
-                    _meterListService.UpdateMeterData(newMeterData);
+                    MeterListService.getInstance().UpdateMeterData(newMeterData);
                     _saveButton.setEnabled(false);
                 } else {
                     editTypeTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _meterData.GetServerAction())));
@@ -308,7 +262,7 @@ public class MeterDataEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -340,7 +294,7 @@ public class MeterDataEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MeterDataEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(MeterDataEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");

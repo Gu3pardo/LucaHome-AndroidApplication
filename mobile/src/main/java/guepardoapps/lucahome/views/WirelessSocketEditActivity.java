@@ -39,9 +39,6 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
     private boolean _propertyChanged;
     private WirelessSocketDto _wirelessSocketDto;
 
-    private NavigationService _navigationService;
-    private WirelessSocketService _wirelessSocketService;
-
     private ReceiverController _receiverController;
 
     private com.rey.material.widget.Button _saveButton;
@@ -82,15 +79,28 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wireless_socket_edit);
 
         _wirelessSocketDto = (WirelessSocketDto) getIntent().getSerializableExtra(WirelessSocketService.WirelessSocketIntent);
-
-        _navigationService = NavigationService.getInstance();
-        _wirelessSocketService = WirelessSocketService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -100,30 +110,14 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_socket_edit_button);
 
-        TextWatcher sharedTextWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        socketNameTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSocketEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketService.getInstance().GetNameList()));
+        socketNameTypeTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        socketAreaTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSocketEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketService.getInstance().GetAreaList()));
+        socketAreaTypeTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        };
-
-        socketNameTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSocketEditActivity.this, android.R.layout.simple_dropdown_item_1line, _wirelessSocketService.GetNameList()));
-        socketNameTypeTextView.addTextChangedListener(sharedTextWatcher);
-
-        socketAreaTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSocketEditActivity.this, android.R.layout.simple_dropdown_item_1line, _wirelessSocketService.GetAreaList()));
-        socketAreaTypeTextView.addTextChangedListener(sharedTextWatcher);
-
-        socketCodeTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSocketEditActivity.this, android.R.layout.simple_dropdown_item_1line, _wirelessSocketService.GetCodeList()));
-        socketCodeTypeTextView.addTextChangedListener(sharedTextWatcher);
+        socketCodeTypeTextView.setAdapter(new ArrayAdapter<>(WirelessSocketEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketService.getInstance().GetCodeList()));
+        socketCodeTypeTextView.addTextChangedListener(_textWatcher);
 
         if (_wirelessSocketDto != null) {
             socketNameTypeTextView.setText(_wirelessSocketDto.GetName());
@@ -177,15 +171,15 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
                 if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Add) {
                     int lastHighestId = 0;
 
-                    int dataListSize = _wirelessSocketService.GetDataList().getSize();
+                    int dataListSize = WirelessSocketService.getInstance().GetDataList().getSize();
                     if (dataListSize > 0) {
-                        lastHighestId = _wirelessSocketService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
+                        lastHighestId = WirelessSocketService.getInstance().GetDataList().getValue(dataListSize - 1).GetId() + 1;
                     }
 
-                    _wirelessSocketService.AddWirelessSocket(new WirelessSocket(lastHighestId, name, area, code, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Add));
+                    WirelessSocketService.getInstance().AddWirelessSocket(new WirelessSocket(lastHighestId, name, area, code, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Update) {
-                    _wirelessSocketService.UpdateWirelessSocket(new WirelessSocket(_wirelessSocketDto.GetId(), name, area, code, _wirelessSocketDto.IsActivated(), new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Update));
+                    WirelessSocketService.getInstance().UpdateWirelessSocket(new WirelessSocket(_wirelessSocketDto.GetId(), name, area, code, _wirelessSocketDto.IsActivated(), new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     socketNameTypeTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _wirelessSocketDto.GetAction())));
@@ -220,7 +214,7 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -252,7 +246,7 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(WirelessSocketEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(WirelessSocketEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");

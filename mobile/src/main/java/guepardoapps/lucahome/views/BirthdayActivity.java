@@ -124,6 +124,7 @@ public class BirthdayActivity extends AppCompatBaseActivity {
             }
         });
 
+        _drawerLayout = findViewById(R.id.drawer_layout_birthday);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, _drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         _drawerLayout.addDrawerListener(toggle);
         toggle.syncState();

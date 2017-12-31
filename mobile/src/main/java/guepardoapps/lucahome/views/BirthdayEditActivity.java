@@ -82,6 +82,22 @@ public class BirthdayEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,38 +124,10 @@ public class BirthdayEditActivity extends AppCompatActivity {
         }
 
         birthdayEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, BirthdayService.getInstance().GetBirthdayNameList()));
-        birthdayEditTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
+        birthdayEditTextView.addTextChangedListener(_textWatcher);
 
         birthdayGroupEditTextView.setAdapter(new ArrayAdapter<>(BirthdayEditActivity.this, android.R.layout.simple_dropdown_item_1line, BirthdayService.getInstance().GetBirthdayGroupList()));
-        birthdayGroupEditTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
+        birthdayGroupEditTextView.addTextChangedListener(_textWatcher);
 
         birthdayEditDatePicker.setOnClickListener(view -> {
             _propertyChanged = true;

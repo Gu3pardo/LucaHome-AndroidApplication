@@ -84,6 +84,22 @@ public class MoneyMeterDataEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,55 +131,13 @@ public class MoneyMeterDataEditActivity extends AppCompatActivity {
         }
 
         bankTextView.setAdapter(new ArrayAdapter<>(MoneyMeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, _moneyMeterListService.GetMoneyMeterBankList()));
-        bankTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
+        bankTextView.addTextChangedListener(_textWatcher);
 
         planTextView.setAdapter(new ArrayAdapter<>(MoneyMeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, _moneyMeterListService.GetMoneyMeterPlanList()));
-        planTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
+        planTextView.addTextChangedListener(_textWatcher);
 
         unitTextView.setAdapter(new ArrayAdapter<>(MoneyMeterDataEditActivity.this, android.R.layout.simple_dropdown_item_1line, _moneyMeterListService.GetMoneyMeterUnitList()));
-        unitTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
+        unitTextView.addTextChangedListener(_textWatcher);
 
         editDatePicker.setOnClickListener(view -> {
             _propertyChanged = true;

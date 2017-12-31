@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.baoyz.widget.PullRefreshLayout;
+import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
@@ -40,6 +41,8 @@ public abstract class AppCompatBaseActivity extends AppCompatActivity implements
     protected CollapsingToolbarLayout _collapsingToolbar;
     protected PullRefreshLayout _pullRefreshLayout;
     protected ImageView _mainImageView;
+    protected FloatingActionButton _addButton;
+    protected FloatingActionButton _shareButton;
 
     protected Context _context;
 

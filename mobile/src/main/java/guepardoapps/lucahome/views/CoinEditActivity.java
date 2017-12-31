@@ -85,6 +85,22 @@ public class CoinEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,23 +119,7 @@ public class CoinEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_coin_edit_button);
 
-        TextWatcher sharedTextWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        };
-
-        coinEditUserTextView.addTextChangedListener(sharedTextWatcher);
+        coinEditUserTextView.addTextChangedListener(_textWatcher);
         if (UserService.getInstance().IsAnUserSaved()) {
             List<String> userList = new ArrayList<>();
             userList.add(UserService.getInstance().GetUser().GetName());
@@ -127,9 +127,9 @@ public class CoinEditActivity extends AppCompatActivity {
         }
 
         coinEditUserTextView.setAdapter(new ArrayAdapter<>(CoinEditActivity.this, android.R.layout.simple_dropdown_item_1line, _coinService.GetTypeList()));
-        coinEditTypeTextView.addTextChangedListener(sharedTextWatcher);
+        coinEditTypeTextView.addTextChangedListener(_textWatcher);
 
-        coinAmountEditText.addTextChangedListener(sharedTextWatcher);
+        coinAmountEditText.addTextChangedListener(_textWatcher);
 
         if (_coinDto != null) {
             coinEditUserTextView.setText(_coinDto.GetUser());

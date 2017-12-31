@@ -41,9 +41,6 @@ public class ShoppingListEditActivity extends AppCompatActivity {
     private boolean _propertyChanged;
     private int _quantity = 1;
 
-    private NavigationService _navigationService;
-    private ShoppingListService _shoppingListService;
-
     private ReceiverController _receiverController;
 
     private com.rey.material.widget.Button _saveButton;
@@ -66,15 +63,28 @@ public class ShoppingListEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_shopping_edit);
 
         ShoppingEntryDto shoppingEntryDto = (ShoppingEntryDto) getIntent().getSerializableExtra(ShoppingListService.ShoppingIntent);
-
-        _navigationService = NavigationService.getInstance();
-        _shoppingListService = ShoppingListService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -87,43 +97,15 @@ public class ShoppingListEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_shopping_edit_button);
 
-        shoppingNameEditTextView.setAdapter(new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, _shoppingListService.GetShoppingNameList()));
-        shoppingNameEditTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        shoppingNameEditTextView.setAdapter(new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, ShoppingListService.getInstance().GetShoppingNameList()));
+        shoppingNameEditTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
-
-        ArrayAdapter<String> groupDataAdapter = new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_spinner_item, _shoppingListService.GetShoppingGroupList());
+        ArrayAdapter<String> groupDataAdapter = new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_spinner_item, ShoppingListService.getInstance().GetShoppingGroupList());
         groupDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         entryGroupSelect.setAdapter(groupDataAdapter);
 
-        shoppingUnitEditTextView.setAdapter(new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, _shoppingListService.GetShoppingUnitList()));
-        shoppingUnitEditTextView.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        });
+        shoppingUnitEditTextView.setAdapter(new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, ShoppingListService.getInstance().GetShoppingUnitList()));
+        shoppingUnitEditTextView.addTextChangedListener(_textWatcher);
 
         increaseQuantityButton.setOnClickListener(view -> {
             _quantity++;
@@ -178,12 +160,12 @@ public class ShoppingListEditActivity extends AppCompatActivity {
             } else {
                 int lastHighestId = 0;
 
-                int dataListSize = _shoppingListService.GetDataList().getSize();
+                int dataListSize = ShoppingListService.getInstance().GetDataList().getSize();
                 if (dataListSize > 0) {
-                    lastHighestId = _shoppingListService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
+                    lastHighestId = ShoppingListService.getInstance().GetDataList().getValue(dataListSize - 1).GetId() + 1;
                 }
 
-                _shoppingListService.AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity, entryUnit, false, ILucaClass.LucaServerDbAction.Add));
+                ShoppingListService.getInstance().AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity, entryUnit, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });
@@ -214,7 +196,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -246,7 +228,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(ShoppingListEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(ShoppingListEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");

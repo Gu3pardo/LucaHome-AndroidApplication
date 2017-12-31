@@ -64,9 +64,6 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
     private ReceiverController _receiverController;
 
-    private MediaServerService _mediaServerService;
-    private NavigationService _navigationService;
-
     /**
      * Variable for received MediaServerData
      */
@@ -79,6 +76,8 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     private boolean _mediaServerSelectionSpinnerEnabled = true;
     private boolean _youtubePlayPositionSeekBarEnabled = true;
     private boolean _radioStreamSelectionSpinnerEnabled = true;
+
+    private DrawerLayout _drawerLayout;
 
     /**
      * UI variables for CardView MediaServer Selection, battery and version
@@ -206,12 +205,9 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _receiverController = new ReceiverController(_context);
 
-        _mediaServerService = MediaServerService.getInstance();
-        _navigationService = NavigationService.getInstance();
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout_mediamirror);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+        _drawerLayout = findViewById(R.id.drawer_layout_mediamirror);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, _drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        _drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = findViewById(R.id.nav_view_mediamirror);
@@ -297,11 +293,10 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = findViewById(R.id.drawer_layout_mediamirror);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (_drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            _drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            _navigationService.GoBack(this);
+            NavigationService.getInstance().GoBack(this);
         }
     }
 
@@ -313,33 +308,33 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         NavigationService.NavigationResult navigationResult = NavigationService.NavigationResult.NULL;
 
         if (id == R.id.nav_schedule) {
-            navigationResult = _navigationService.NavigateToActivity(_context, ScheduleActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, ScheduleActivity.class);
         } else if (id == R.id.nav_timer) {
-            navigationResult = _navigationService.NavigateToActivity(_context, TimerActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, TimerActivity.class);
         } else if (id == R.id.nav_socket) {
-            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSocketActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, WirelessSocketActivity.class);
         } else if (id == R.id.nav_movie) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MovieActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MovieActivity.class);
         } else if (id == R.id.nav_coins) {
-            navigationResult = _navigationService.NavigateToActivity(_context, CoinActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, CoinActivity.class);
         } else if (id == R.id.nav_menu) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MenuActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MenuActivity.class);
         } else if (id == R.id.nav_shopping) {
-            navigationResult = _navigationService.NavigateToActivity(_context, ShoppingListActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, ShoppingListActivity.class);
         } else if (id == R.id.nav_forecast_weather) {
-            navigationResult = _navigationService.NavigateToActivity(_context, ForecastWeatherActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, ForecastWeatherActivity.class);
         } else if (id == R.id.nav_birthday) {
-            navigationResult = _navigationService.NavigateToActivity(_context, BirthdayActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, BirthdayActivity.class);
         } else if (id == R.id.nav_security) {
-            navigationResult = _navigationService.NavigateToActivity(_context, SecurityActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, SecurityActivity.class);
         } else if (id == R.id.nav_settings) {
-            navigationResult = _navigationService.NavigateToActivity(_context, SettingsActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, SettingsActivity.class);
         } else if (id == R.id.nav_switch) {
-            navigationResult = _navigationService.NavigateToActivity(_context, WirelessSwitchActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, WirelessSwitchActivity.class);
         } else if (id == R.id.nav_meter) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MeterDataActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MeterDataActivity.class);
         } else if (id == R.id.nav_money) {
-            navigationResult = _navigationService.NavigateToActivity(_context, MoneyMeterDataActivity.class);
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MoneyMeterDataActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -347,8 +342,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
         }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout_mediamirror);
-        drawer.closeDrawer(GravityCompat.START);
+        _drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -385,7 +379,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 String selectedLocation = serverLocations.get(position);
                 String selectedIp = MediaServerSelection.GetByLocation(selectedLocation).GetIp();
 
-                _mediaServerService.SendCommand(selectedIp, MediaServerAction.GET_MEDIA_SERVER_DTO.toString(), "");
+                MediaServerService.getInstance().SendCommand(selectedIp, MediaServerAction.GET_MEDIA_SERVER_DTO.toString(), "");
             }
 
             @Override
@@ -420,12 +414,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -438,12 +432,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.PAUSE_YOUTUBE_VIDEO.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -456,12 +450,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.STOP_YOUTUBE_VIDEO.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -481,12 +475,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                     return;
                 }
 
-                _mediaServerService.SendCommand(
+                MediaServerService.getInstance().SendCommand(
                         _mediaServerData.GetMediaServerSelection().GetIp(),
                         MediaServerAction.SET_YOUTUBE_PLAY_POSITION.toString(),
                         String.valueOf(progressValue));
 
-                _mediaServerService.SendCommand(
+                MediaServerService.getInstance().SendCommand(
                         _mediaServerData.GetMediaServerSelection().GetIp(),
                         MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                         "");
@@ -510,18 +504,18 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             }
 
             if (_mediaServerData.IsSleepTimerEnabled()) {
-                _mediaServerService.SendCommand(
+                MediaServerService.getInstance().SendCommand(
                         _mediaServerData.GetMediaServerSelection().GetIp(),
                         MediaServerAction.STOP_SEA_SOUND.toString(),
                         "");
             } else {
-                _mediaServerService.SendCommand(
+                MediaServerService.getInstance().SendCommand(
                         _mediaServerData.GetMediaServerSelection().GetIp(),
                         MediaServerAction.PLAY_SEA_SOUND.toString(),
                         "");
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -605,12 +599,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 String selectedRadioStream = radioStreams.get(position);
                 RadioStreams radioStream = RadioStreams.GetByTitle(selectedRadioStream);
 
-                _mediaServerService.SendCommand(
+                MediaServerService.getInstance().SendCommand(
                         _mediaServerData.GetMediaServerSelection().GetIp(),
                         MediaServerAction.SHOW_RADIO_STREAM.toString(),
                         String.valueOf(radioStream.GetId()));
 
-                _mediaServerService.SendCommand(
+                MediaServerService.getInstance().SendCommand(
                         _mediaServerData.GetMediaServerSelection().GetIp(),
                         MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                         "");
@@ -628,12 +622,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.PLAY_RADIO_STREAM.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -646,12 +640,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.STOP_RADIO_STREAM.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -676,12 +670,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.INCREASE_VOLUME.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -694,12 +688,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.DECREASE_VOLUME.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -734,12 +728,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 String selectedRssStream = rssStreams.get(position);
                 RSSFeed rssFeed = RSSFeed.GetByTitle(selectedRssStream);
 
-                _mediaServerService.SendCommand(
+                MediaServerService.getInstance().SendCommand(
                         _mediaServerData.GetMediaServerSelection().GetIp(),
                         MediaServerAction.SET_RSS_FEED.toString(),
                         String.valueOf(rssFeed.GetId()));
 
-                _mediaServerService.SendCommand(
+                MediaServerService.getInstance().SendCommand(
                         _mediaServerData.GetMediaServerSelection().GetIp(),
                         MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                         "");
@@ -766,12 +760,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.SHOW_CENTER_TEXT.toString(),
                     sendText);
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -786,12 +780,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -804,12 +798,12 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.DECREASE_SCREEN_BRIGHTNESS.toString(),
                     "");
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
                     "");
@@ -828,7 +822,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.UPDATE_CURRENT_WEATHER.toString(),
                     "");
@@ -841,7 +835,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.UPDATE_FORECAST_WEATHER.toString(),
                     "");
@@ -854,7 +848,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(),
                     "");
@@ -867,7 +861,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.UPDATE_IP_ADDRESS.toString(),
                     "");
@@ -880,7 +874,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.UPDATE_BIRTHDAY_ALARM.toString(),
                     "");
@@ -893,7 +887,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            _mediaServerService.SendCommand(
+            MediaServerService.getInstance().SendCommand(
                     _mediaServerData.GetMediaServerSelection().GetIp(),
                     MediaServerAction.UPDATE_CALENDAR_ALARM.toString(),
                     "");
@@ -993,14 +987,14 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             if (playOnAllServer.isChecked()) {
                 for (MediaServerSelection entry : MediaServerSelection.values()) {
                     if (entry.GetId() > 0) {
-                        _mediaServerService.SendCommand(entry.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                        MediaServerService.getInstance().SendCommand(entry.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
                     }
                 }
             } else {
-                _mediaServerService.SendCommand(_mediaServerData.GetMediaServerSelection().GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
+                MediaServerService.getInstance().SendCommand(_mediaServerData.GetMediaServerSelection().GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
             }
 
-            _mediaServerService.SendCommand(_mediaServerData.GetMediaServerSelection().GetIp(), MediaServerAction.GET_MEDIA_SERVER_DTO.toString(), "");
+            MediaServerService.getInstance().SendCommand(_mediaServerData.GetMediaServerSelection().GetIp(), MediaServerAction.GET_MEDIA_SERVER_DTO.toString(), "");
 
             dialog.dismiss();
         });

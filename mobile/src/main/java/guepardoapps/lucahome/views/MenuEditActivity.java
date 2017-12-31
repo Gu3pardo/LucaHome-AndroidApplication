@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import de.mateware.snacky.Snacky;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
@@ -42,9 +43,6 @@ public class MenuEditActivity extends AppCompatActivity {
 
     private boolean _propertyChanged;
     private MenuDto _menuDto;
-
-    private MenuService _menuService;
-    private NavigationService _navigationService;
 
     private ReceiverController _receiverController;
 
@@ -69,15 +67,28 @@ public class MenuEditActivity extends AppCompatActivity {
         }
     };
 
+    private TextWatcher _textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            _propertyChanged = true;
+            _saveButton.setEnabled(true);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu_edit);
 
         _menuDto = (MenuDto) getIntent().getSerializableExtra(MenuService.MenuIntent);
-
-        _menuService = MenuService.getInstance();
-        _navigationService = NavigationService.getInstance();
 
         _receiverController = new ReceiverController(this);
 
@@ -87,27 +98,11 @@ public class MenuEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_menu_edit_button);
 
-        TextWatcher sharedTextWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
+        menuTitleTypeTextView.setAdapter(new ArrayAdapter<>(MenuEditActivity.this, android.R.layout.simple_dropdown_item_1line, MenuService.getInstance().GetDescriptionList()));
+        menuTitleTypeTextView.addTextChangedListener(_textWatcher);
 
-            @Override
-            public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-                _propertyChanged = true;
-                _saveButton.setEnabled(true);
-            }
-        };
-
-        menuTitleTypeTextView.setAdapter(new ArrayAdapter<>(MenuEditActivity.this, android.R.layout.simple_dropdown_item_1line, _menuService.GetDescriptionList()));
-        menuTitleTypeTextView.addTextChangedListener(sharedTextWatcher);
-
-        menuDescriptionTypeTextView.setAdapter(new ArrayAdapter<>(MenuEditActivity.this, android.R.layout.simple_dropdown_item_1line, _menuService.GetDescriptionList()));
-        menuDescriptionTypeTextView.addTextChangedListener(sharedTextWatcher);
+        menuDescriptionTypeTextView.setAdapter(new ArrayAdapter<>(MenuEditActivity.this, android.R.layout.simple_dropdown_item_1line, MenuService.getInstance().GetDescriptionList()));
+        menuDescriptionTypeTextView.addTextChangedListener(_textWatcher);
 
         if (_menuDto != null) {
             dateTextView.setText(_menuDto.GetDateString());
@@ -119,7 +114,7 @@ public class MenuEditActivity extends AppCompatActivity {
 
         FloatingActionButton randomMenuButton = findViewById(R.id.menuRandomEntry_Button);
         randomMenuButton.setOnClickListener(view -> {
-            SerializableList<ListedMenu> listedMenuList = _menuService.GetListedMenuList();
+            SerializableList<ListedMenu> listedMenuList = MenuService.getInstance().GetListedMenuList();
 
             Random randomMenuId = new Random();
             int menuId = randomMenuId.nextInt(listedMenuList.getSize());
@@ -160,7 +155,7 @@ public class MenuEditActivity extends AppCompatActivity {
             if (cancel) {
                 focusView.requestFocus();
             } else {
-                _menuService.UpdateMenu(new LucaMenu(_menuDto.GetId(), title, description, _menuDto.GetWeekday(), _menuDto.GetDate(), false, ILucaClass.LucaServerDbAction.Update));
+                MenuService.getInstance().UpdateMenu(new LucaMenu(_menuDto.GetId(), title, description, _menuDto.GetWeekday(), _menuDto.GetDate(), false, ILucaClass.LucaServerDbAction.Update));
                 _saveButton.setEnabled(false);
             }
         });
@@ -191,7 +186,7 @@ public class MenuEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -223,7 +218,7 @@ public class MenuEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(MenuEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(MenuEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayErrorSnackBar("Failed to navigate back! Please contact LucaHome support!");
