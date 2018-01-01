@@ -169,14 +169,8 @@ public class WirelessSocketEditActivity extends AppCompatActivity {
                 focusView.requestFocus();
             } else {
                 if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Add) {
-                    int lastHighestId = 0;
-
-                    int dataListSize = WirelessSocketService.getInstance().GetDataList().getSize();
-                    if (dataListSize > 0) {
-                        lastHighestId = WirelessSocketService.getInstance().GetDataList().getValue(dataListSize - 1).GetId() + 1;
-                    }
-
-                    WirelessSocketService.getInstance().AddWirelessSocket(new WirelessSocket(lastHighestId, name, area, code, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Add));
+                    int highestId = WirelessSocketService.getInstance().GetHighestId();
+                    WirelessSocketService.getInstance().AddWirelessSocket(new WirelessSocket(highestId + 1, name, area, code, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_wirelessSocketDto.GetAction() == WirelessSocketDto.Action.Update) {
                     WirelessSocketService.getInstance().UpdateWirelessSocket(new WirelessSocket(_wirelessSocketDto.GetId(), name, area, code, _wirelessSocketDto.IsActivated(), new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Update));

@@ -232,22 +232,19 @@ public class TemperatureService implements IDataNotificationService {
     }
 
     @Override
+    public int GetHighestId() {
+        return -1;
+    }
+
+    @Override
     public SerializableList<Temperature> SearchDataList(@NonNull String searchKey) {
         SerializableList<Temperature> foundTemperatures = new SerializableList<>();
-
         for (int index = 0; index < _temperatureList.getSize(); index++) {
             Temperature entry = _temperatureList.getValue(index);
-
-            if (entry.GetArea().contains(searchKey)
-                    || entry.GetDate().toString().contains(searchKey)
-                    || entry.GetGraphPath().contains(searchKey)
-                    || entry.GetSensorPath().contains(searchKey)
-                    || entry.GetTemperatureString().contains(searchKey)
-                    || String.valueOf(entry.GetTemperature()).contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 foundTemperatures.addValue(entry);
             }
         }
-
         return foundTemperatures;
     }
 

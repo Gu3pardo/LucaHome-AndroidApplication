@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.Date;
+import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -42,6 +43,8 @@ public class MapContentService implements IDataService {
     private boolean _isInitialized;
 
     private static final String TAG = MapContentService.class.getSimpleName();
+
+    private boolean _loadDataEnabled;
 
     private Date _lastUpdate;
 
@@ -110,7 +113,7 @@ public class MapContentService implements IDataService {
 
             SerializableList<MapContent> mapContentList = JsonDataToMapContentConverter.getInstance().GetList(
                     contentResponse,
-                    MenuService.getInstance().GetListedMenuList(),
+                    ListedMenuService.getInstance().GetDataList(),
                     MenuService.getInstance().GetDataList(),
                     ShoppingListService.getInstance().GetDataList(),
                     /* TODO add MediaServerData */
@@ -173,6 +176,7 @@ public class MapContentService implements IDataService {
         _lastUpdate = new Date();
 
         _reloadEnabled = reloadEnabled;
+        _loadDataEnabled = true;
 
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
@@ -209,37 +213,43 @@ public class MapContentService implements IDataService {
     public MapContent GetById(int id) {
         for (int index = 0; index < _mapContentList.getSize(); index++) {
             MapContent entry = _mapContentList.getValue(index);
-
             if (entry.GetId() == id) {
                 return entry;
             }
         }
-
         return null;
+    }
+
+    @Override
+    public int GetHighestId() {
+        int highestId = -1;
+        for (int index = 0; index < _mapContentList.getSize(); index++) {
+            int id = _mapContentList.getValue(index).GetId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
     }
 
     @Override
     public SerializableList<MapContent> SearchDataList(@NonNull String searchKey) {
         SerializableList<MapContent> foundMapContents = new SerializableList<>();
-
         for (int index = 0; index < _mapContentList.getSize(); index++) {
             MapContent entry = _mapContentList.getValue(index);
-
-            if (entry.GetArea().contains(searchKey)
-                    || String.valueOf(entry.GetId()).contains(searchKey)
-                    || entry.GetTemperature().toString().contains(searchKey)
-                    || entry.GetDrawingType().toString().contains(searchKey)
-                    || entry.GetWirelessSocket().toString().contains(searchKey)
-                    || entry.GetWirelessSwitch().toString().contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 foundMapContents.addValue(entry);
             }
         }
-
         return foundMapContents;
     }
 
     @Override
     public void LoadData() {
+        if (!_loadDataEnabled) {
+            return;
+        }
+
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             _mapContentList = _databaseMapContentList.GetMapContent(
                         /* TODO add MediaServerData */
@@ -258,6 +268,26 @@ public class MapContentService implements IDataService {
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
+        }
+
+        if (hasMapContentEntryNotOnServer()) {
+            _loadDataEnabled = false;
+
+            for (int index = 0; index < notOnServerMapContent().getSize(); index++) {
+                MapContent mapContent = notOnServerMapContent().getValue(index);
+
+                switch (mapContent.GetServerDbAction()) {
+                    case Update:
+                    case Delete:
+                    case Add:
+                    case Null:
+                    default:
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", mapContent));
+                        break;
+                }
+            }
+
+            _loadDataEnabled = true;
         }
 
         String requestUrl = "http://"

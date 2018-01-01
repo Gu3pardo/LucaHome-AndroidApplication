@@ -123,7 +123,7 @@ public class MeterDataEditActivity extends AppCompatActivity {
             areaTextView.setText(_meterData.GetArea());
             imageNameTextView.setText(_meterData.GetImageName());
             valueEditText.setText(String.valueOf(_meterData.GetValue()));
-            editDatePicker.updateDate(_meterData.GetSaveDate().Year(), _meterData.GetSaveDate().Month(), _meterData.GetSaveDate().DayOfMonth());
+            editDatePicker.updateDate(_meterData.GetSaveDate().Year(), _meterData.GetSaveDate().Month() - 1, _meterData.GetSaveDate().DayOfMonth());
             editTimePicker.setIs24HourView(true);
             editTimePicker.setCurrentHour(_meterData.GetSaveTime().Hour());
             editTimePicker.setCurrentMinute(_meterData.GetSaveTime().Minute());
@@ -197,7 +197,7 @@ public class MeterDataEditActivity extends AppCompatActivity {
             double value = Double.parseDouble(valueString);
 
             int dayOfMonth = editDatePicker.getDayOfMonth();
-            int month = editDatePicker.getMonth();
+            int month = editDatePicker.getMonth() + 1;
             int year = editDatePicker.getYear();
 
             SerializableDate saveDate = new SerializableDate(year, month, dayOfMonth);

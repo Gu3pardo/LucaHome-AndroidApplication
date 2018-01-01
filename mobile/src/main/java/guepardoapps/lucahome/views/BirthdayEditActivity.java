@@ -117,7 +117,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
         if (_birthdayDto != null) {
             birthdayEditTextView.setText(_birthdayDto.GetName());
             birthdayGroupEditTextView.setText(_birthdayDto.GetGroup());
-            birthdayEditDatePicker.updateDate(_birthdayDto.GetDate().Year(), _birthdayDto.GetDate().Month(), _birthdayDto.GetDate().DayOfMonth());
+            birthdayEditDatePicker.updateDate(_birthdayDto.GetDate().Year(), _birthdayDto.GetDate().Month() - 1, _birthdayDto.GetDate().DayOfMonth());
             birthdayRemindMeCheckBox.setChecked(_birthdayDto.GetRemindMe());
         } else {
             displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
@@ -162,7 +162,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
             }
 
             int dayOfMonth = birthdayEditDatePicker.getDayOfMonth();
-            int month = birthdayEditDatePicker.getMonth();
+            int month = birthdayEditDatePicker.getMonth() + 1;
             int year = birthdayEditDatePicker.getYear();
 
             SerializableDate birthdayDate = new SerializableDate(year, month, dayOfMonth);
@@ -179,7 +179,7 @@ public class BirthdayEditActivity extends AppCompatActivity {
             } else {
                 if (_birthdayDto.GetAction() == BirthdayDto.Action.Add) {
                     int highestId = BirthdayService.getInstance().GetHighestId();
-                    BirthdayService.getInstance().AddBirthday(new LucaBirthday(highestId, birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Add));
+                    BirthdayService.getInstance().AddBirthday(new LucaBirthday(highestId + 1, birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_birthdayDto.GetAction() == BirthdayDto.Action.Update) {
                     BirthdayService.getInstance().UpdateBirthday(new LucaBirthday(_birthdayDto.GetId(), birthdayName, birthdayDate, birthdayGroup, remindMe, false, null, false, ILucaClass.LucaServerDbAction.Update));

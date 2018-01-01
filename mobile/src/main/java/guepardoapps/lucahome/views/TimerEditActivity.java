@@ -35,7 +35,7 @@ import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
-import guepardoapps.lucahome.common.service.ScheduleService;
+import guepardoapps.lucahome.common.service.TimerService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
@@ -53,7 +53,7 @@ public class TimerEditActivity extends AppCompatActivity {
     private BroadcastReceiver _addFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(ScheduleService.TimerAddFinishedBundle);
+            ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(TimerService.TimerAddFinishedBundle);
             if (result != null) {
                 if (result.Success) {
                     navigateBack("Added new timer!");
@@ -98,7 +98,7 @@ public class TimerEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_timer_edit_button);
 
-        timerNameEditTextView.setAdapter(new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_dropdown_item_1line, ScheduleService.getInstance().GetTimerNameList()));
+        timerNameEditTextView.setAdapter(new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_dropdown_item_1line, TimerService.getInstance().GetTimerNameList()));
         timerNameEditTextView.addTextChangedListener(_textWatcher);
 
         ArrayAdapter<String> socketDataAdapter = new ArrayAdapter<>(TimerEditActivity.this, android.R.layout.simple_spinner_item, WirelessSocketService.getInstance().GetNameList());
@@ -194,14 +194,8 @@ public class TimerEditActivity extends AppCompatActivity {
             if (cancel) {
                 focusView.requestFocus();
             } else {
-                int lastHighestId = 0;
-
-                int dataListSize = ScheduleService.getInstance().GetTimerList().getSize();
-                if (dataListSize > 0) {
-                    lastHighestId = ScheduleService.getInstance().GetTimerList().getValue(dataListSize - 1).GetId() + 1;
-                }
-
-                ScheduleService.getInstance().AddTimer(new LucaTimer(lastHighestId, timerName, wirelessSocket, wirelessSwitch, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true, false, ILucaClass.LucaServerDbAction.Add));
+                int highestId = TimerService.getInstance().GetHighestId();
+                TimerService.getInstance().AddTimer(new LucaTimer(highestId + 1, timerName, wirelessSocket, wirelessSwitch, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });
@@ -215,7 +209,7 @@ public class TimerEditActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_addFinishedReceiver, new String[]{ScheduleService.TimerAddFinishedBroadcast});
+        _receiverController.RegisterReceiver(_addFinishedReceiver, new String[]{TimerService.TimerAddFinishedBroadcast});
     }
 
     @Override

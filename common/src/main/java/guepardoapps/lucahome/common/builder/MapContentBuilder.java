@@ -26,6 +26,7 @@ import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.MapContent;
 import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.service.ListedMenuService;
 import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.common.service.ShoppingListService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
@@ -308,9 +309,9 @@ public class MapContentBuilder {
 
     private static Runnable createMenuRunnable(@NonNull final Context context, @NonNull final MapContent mapContent) {
         if (mapContent.GetListedMenuList() != null) {
-            return () -> displayListViewDialog(context, "ListedMenu", MenuService.getInstance().GetListedMenuNameList());
+            return () -> displayListViewDialog(context, "ListedMenu", ListedMenuService.getInstance().GetListedMenuNameList());
         } else if (mapContent.GetMenuList() != null) {
-            return () -> displayListViewDialog(context, "Menu", MenuService.getInstance().GetMenuNameList());
+            return () -> displayListViewDialog(context, "Menu", MenuService.getInstance().GetMenuTitleList());
         } else {
             Logger.getInstance().Error(TAG, "Error in createMenuRunnable! ListedMenu and Menu are null!");
             return null;

@@ -158,14 +158,8 @@ public class ShoppingListEditActivity extends AppCompatActivity {
             if (cancel) {
                 focusView.requestFocus();
             } else {
-                int lastHighestId = 0;
-
-                int dataListSize = ShoppingListService.getInstance().GetDataList().getSize();
-                if (dataListSize > 0) {
-                    lastHighestId = ShoppingListService.getInstance().GetDataList().getValue(dataListSize - 1).GetId() + 1;
-                }
-
-                ShoppingListService.getInstance().AddShoppingEntry(new ShoppingEntry(lastHighestId, entryName, entryGroup, _quantity, entryUnit, false, ILucaClass.LucaServerDbAction.Add));
+                int highestId = ShoppingListService.getInstance().GetHighestId();
+                ShoppingListService.getInstance().AddShoppingEntry(new ShoppingEntry(highestId + 1, entryName, entryGroup, _quantity, entryUnit, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });

@@ -27,26 +27,26 @@ public final class JsonDataToTemperatureConverter implements IJsonDataConverter 
     }
 
     @Override
-    public SerializableList<Temperature> GetList(@NonNull String[] stringArray) {
-        if (StringHelper.StringsAreEqual(stringArray)) {
-            return parseStringToList(stringArray[0]);
+    public SerializableList<Temperature> GetList(@NonNull String[] jsonStringArray) {
+        if (StringHelper.StringsAreEqual(jsonStringArray)) {
+            return parseStringToList(jsonStringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
+            String usedEntry = StringHelper.SelectString(jsonStringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry);
         }
     }
 
     @Override
-    public SerializableList<Temperature> GetList(@NonNull String responseString) {
-        return parseStringToList(responseString);
+    public SerializableList<Temperature> GetList(@NonNull String jsonString) {
+        return parseStringToList(jsonString);
     }
 
-    private SerializableList<Temperature> parseStringToList(@NonNull String value) {
-        if (!value.contains("Error")) {
+    private SerializableList<Temperature> parseStringToList(@NonNull String jsonString) {
+        if (!jsonString.contains("Error")) {
             SerializableList<Temperature> list = new SerializableList<>();
 
             try {
-                JSONObject jsonObject = new JSONObject(value);
+                JSONObject jsonObject = new JSONObject(jsonString);
                 JSONObject jsonObjectData = jsonObject.getJSONObject("Temperature");
 
                 double temperatureValue = jsonObjectData.getDouble("Value");
@@ -65,7 +65,7 @@ public final class JsonDataToTemperatureConverter implements IJsonDataConverter 
             return list;
         }
 
-        Logger.getInstance().Error(TAG, value + " has an error!");
+        Logger.getInstance().Error(TAG, jsonString + " has an error!");
         return new SerializableList<>();
     }
 }

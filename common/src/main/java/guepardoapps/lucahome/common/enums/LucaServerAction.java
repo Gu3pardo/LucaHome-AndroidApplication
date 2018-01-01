@@ -19,7 +19,7 @@ public enum LucaServerAction implements Serializable {
     SET_MOTION_CONTROL_TASK(23, "setcontroltaskcamera&state="),
 
     //CHANGE
-    GET_CHANGES(30, "getchangesrest"),
+    GET_CHANGES(30, "getchanges"),
 
     //COINS
     GET_COINS_ALL(130, "getcoinsall"),
@@ -29,7 +29,7 @@ public enum LucaServerAction implements Serializable {
     DELETE_COIN(134, "deletecoin&id="),
 
     //INFORMATION
-    GET_INFORMATIONS(40, "getinformationsrest"),
+    GET_INFORMATIONS(40, "getinformations"),
 
     //LISTED MENU
     GET_LISTEDMENU(50, "getlistedmenu"),
@@ -96,7 +96,7 @@ public enum LucaServerAction implements Serializable {
     DELETE_MONEY_METER_DATA(134, "deletemoneymeterdata&id="),
 
     //TEMPERATURE
-    GET_TEMPERATURES(140, "getcurrenttemperaturerest"),
+    GET_TEMPERATURES(140, "getcurrenttemperature"),
 
     //USER
     VALIDATE_USER(150, "validateuser");

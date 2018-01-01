@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -342,6 +343,9 @@ public class MeterListService implements IDataService {
     }
 
     public Meter GetActiveMeter() {
+        if (_activeMeter == null) {
+            _activeMeter = _meterList.getSize() > 0 ? _meterList.getValue(0) : new Meter(-1, "Error", "Error", "Error", new SerializableList<>());
+        }
         return _activeMeter;
     }
 
@@ -363,7 +367,7 @@ public class MeterListService implements IDataService {
         for (int index = 0; index < _meterDataList.getSize(); index++) {
             meterIdList.add(_meterDataList.getValue(index).GetMeterId());
         }
-        return meterIdList;
+        return new ArrayList<>(meterIdList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetMeterTypeList() {
@@ -371,7 +375,7 @@ public class MeterListService implements IDataService {
         for (int index = 0; index < _meterDataList.getSize(); index++) {
             meterTypeList.add(_meterDataList.getValue(index).GetType());
         }
-        return meterTypeList;
+        return new ArrayList<>(meterTypeList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetAreaList() {
@@ -379,7 +383,7 @@ public class MeterListService implements IDataService {
         for (int index = 0; index < _meterDataList.getSize(); index++) {
             areaList.add(_meterDataList.getValue(index).GetArea());
         }
-        return areaList;
+        return new ArrayList<>(areaList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetImageNameList() {
@@ -387,7 +391,7 @@ public class MeterListService implements IDataService {
         for (int index = 0; index < _meterDataList.getSize(); index++) {
             imageNameList.add(_meterDataList.getValue(index).GetImageName());
         }
-        return imageNameList;
+        return new ArrayList<>(imageNameList.stream().distinct().collect(Collectors.toList()));
     }
 
     public MeterData GetById(int id) {
@@ -400,6 +404,7 @@ public class MeterListService implements IDataService {
         return null;
     }
 
+    @Override
     public int GetHighestId() {
         int highestId = -1;
         for (int index = 0; index < _meterDataList.getSize(); index++) {
@@ -430,7 +435,7 @@ public class MeterListService implements IDataService {
         SerializableList<MeterData> foundMeterDataList = new SerializableList<>();
         for (int index = 0; index < _meterDataList.getSize(); index++) {
             MeterData entry = _meterDataList.getValue(index);
-            if (String.valueOf(entry.toString()).contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 foundMeterDataList.addValue(entry);
             }
         }
@@ -616,7 +621,7 @@ public class MeterListService implements IDataService {
         }
 
         _meterList = meterList;
-        _activeMeter = _meterList.getSize() > 0 ? _meterList.getValue(0) : null;
+        _activeMeter = _meterList.getSize() > 0 ? _meterList.getValue(0) : new Meter(-1, "Error", "Error", "Error", new SerializableList<>());
 
         _broadcastController.SendSerializableBroadcast(
                 MeterListDownloadFinishedBroadcast,

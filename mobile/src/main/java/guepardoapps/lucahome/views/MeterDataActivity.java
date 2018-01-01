@@ -217,7 +217,7 @@ public class MeterDataActivity extends AppCompatBaseActivity {
         for (int index = 0; index < meterDataListSize; index++) {
             SerializableDate saveDate = meterDataList.getValue(index).GetSaveDate();
             SerializableTime saveTime = meterDataList.getValue(index).GetSaveTime();
-            Date date = new Date(saveDate.Year(), saveDate.Month(), saveDate.DayOfMonth(), saveTime.Hour(), saveTime.Minute());
+            Date date = new Date(saveDate.Year(), saveDate.Month() - 1, saveDate.DayOfMonth(), saveTime.Hour(), saveTime.Minute());
             dataPoints[index] = new DataPoint(date, meterDataList.getValue(index).GetValue());
             if (index == 0) {
                 firstDate = date;

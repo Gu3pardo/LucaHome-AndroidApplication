@@ -14,6 +14,8 @@ public interface IDataService {
 
     SerializableList<?> SearchDataList(@NonNull String searchKey);
 
+    int GetHighestId();
+
     void LoadData();
 
     boolean GetReloadEnabled();

@@ -8,7 +8,9 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -364,7 +366,7 @@ public class MoneyMeterListService implements IDataService {
             String description = String.format(Locale.getDefault(), "%s - %s", _moneyMeterDataList.getValue(index).GetBank(), _moneyMeterDataList.getValue(index).GetPlan());
             descriptionList.add(description);
         }
-        return descriptionList;
+        return new ArrayList<>(descriptionList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetMoneyMeterBankList() {
@@ -372,7 +374,7 @@ public class MoneyMeterListService implements IDataService {
         for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
             bankList.add(_moneyMeterDataList.getValue(index).GetBank());
         }
-        return bankList;
+        return new ArrayList<>(bankList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetMoneyMeterPlanList() {
@@ -380,7 +382,7 @@ public class MoneyMeterListService implements IDataService {
         for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
             planList.add(_moneyMeterDataList.getValue(index).GetPlan());
         }
-        return planList;
+        return new ArrayList<>(planList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetMoneyMeterUnitList() {
@@ -388,7 +390,7 @@ public class MoneyMeterListService implements IDataService {
         for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
             unitList.add(_moneyMeterDataList.getValue(index).GetUnit());
         }
-        return unitList;
+        return new ArrayList<>(unitList.stream().distinct().collect(Collectors.toList()));
     }
 
     public MoneyMeterData GetById(int id) {
@@ -401,6 +403,7 @@ public class MoneyMeterListService implements IDataService {
         return null;
     }
 
+    @Override
     public int GetHighestId() {
         int highestId = -1;
         for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
@@ -431,7 +434,7 @@ public class MoneyMeterListService implements IDataService {
         SerializableList<MoneyMeterData> foundMoneyMeterDataList = new SerializableList<>();
         for (int index = 0; index < _moneyMeterDataList.getSize(); index++) {
             MoneyMeterData entry = _moneyMeterDataList.getValue(index);
-            if (String.valueOf(entry.toString()).contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 foundMoneyMeterDataList.addValue(entry);
             }
         }

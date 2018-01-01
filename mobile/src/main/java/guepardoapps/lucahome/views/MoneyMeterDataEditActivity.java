@@ -125,7 +125,7 @@ public class MoneyMeterDataEditActivity extends AppCompatActivity {
             planTextView.setText(_moneyMeterData.GetPlan());
             amountEditText.setText(String.valueOf(_moneyMeterData.GetAmount()));
             unitTextView.setText(_moneyMeterData.GetUnit());
-            editDatePicker.updateDate(_moneyMeterData.GetSaveDate().Year(), _moneyMeterData.GetSaveDate().Month(), _moneyMeterData.GetSaveDate().DayOfMonth());
+            editDatePicker.updateDate(_moneyMeterData.GetSaveDate().Year(), _moneyMeterData.GetSaveDate().Month() - 1, _moneyMeterData.GetSaveDate().DayOfMonth());
         } else {
             displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
         }
@@ -181,7 +181,7 @@ public class MoneyMeterDataEditActivity extends AppCompatActivity {
             double amount = Double.parseDouble(amountString);
 
             int dayOfMonth = editDatePicker.getDayOfMonth();
-            int month = editDatePicker.getMonth();
+            int month = editDatePicker.getMonth() + 1;
             int year = editDatePicker.getYear();
 
             SerializableDate saveDate = new SerializableDate(year, month, dayOfMonth);

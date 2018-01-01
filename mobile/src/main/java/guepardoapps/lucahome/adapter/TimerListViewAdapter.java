@@ -19,7 +19,7 @@ import java.util.Locale;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.LucaTimer;
-import guepardoapps.lucahome.common.service.ScheduleService;
+import guepardoapps.lucahome.common.service.TimerService;
 
 public class TimerListViewAdapter extends BaseAdapter {
     private class Holder {
@@ -43,7 +43,7 @@ public class TimerListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                ScheduleService.getInstance().DeleteTimer(timer);
+                TimerService.getInstance().DeleteTimer(timer);
                 deleteDialog.dismiss();
             });
 

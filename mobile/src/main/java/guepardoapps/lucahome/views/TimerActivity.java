@@ -26,7 +26,7 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaTimer;
-import guepardoapps.lucahome.common.service.ScheduleService;
+import guepardoapps.lucahome.common.service.TimerService;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class TimerActivity extends AppCompatBaseActivity {
@@ -36,14 +36,14 @@ public class TimerActivity extends AppCompatBaseActivity {
     private BroadcastReceiver _timerUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ScheduleService.TimerDownloadFinishedContent result = (ScheduleService.TimerDownloadFinishedContent) intent.getSerializableExtra(ScheduleService.TimerDownloadFinishedBroadcast);
+            TimerService.TimerDownloadFinishedContent result = (TimerService.TimerDownloadFinishedContent) intent.getSerializableExtra(TimerService.TimerDownloadFinishedBroadcast);
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
             _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
-                _lastUpdateTextView.setText(ScheduleService.getInstance().GetLastUpdate().toString());
+                _lastUpdateTextView.setText(TimerService.getInstance().GetLastUpdate().toString());
                 updateList();
             } else {
                 displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
@@ -77,7 +77,7 @@ public class TimerActivity extends AppCompatBaseActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-                SerializableList<LucaTimer> filteredTimerList = ScheduleService.getInstance().FoundTimer(charSequence.toString());
+                SerializableList<LucaTimer> filteredTimerList = TimerService.getInstance().SearchDataList(charSequence.toString());
                 _listView.setAdapter(new TimerListViewAdapter(_context, filteredTimerList));
                 _collapsingToolbar.setTitle(String.format(Locale.getDefault(), "%d timer", filteredTimerList.getSize()));
             }
@@ -95,7 +95,7 @@ public class TimerActivity extends AppCompatBaseActivity {
 
         _receiverController = new ReceiverController(_context);
 
-        _lastUpdateTextView.setText(ScheduleService.getInstance().GetLastUpdate().toString());
+        _lastUpdateTextView.setText(TimerService.getInstance().GetLastUpdate().toString());
         updateList();
 
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_timer);
@@ -120,7 +120,7 @@ public class TimerActivity extends AppCompatBaseActivity {
             _listView.setVisibility(View.GONE);
             _progressBar.setVisibility(View.VISIBLE);
             _searchField.setVisibility(View.INVISIBLE);
-            ScheduleService.getInstance().LoadData();
+            TimerService.getInstance().LoadData();
         });
     }
 
@@ -132,7 +132,7 @@ public class TimerActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_timerUpdateReceiver, new String[]{ScheduleService.TimerDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_timerUpdateReceiver, new String[]{TimerService.TimerDownloadFinishedBroadcast});
         updateList();
     }
 
@@ -148,7 +148,7 @@ public class TimerActivity extends AppCompatBaseActivity {
     }
 
     private void updateList() {
-        SerializableList<LucaTimer> timerList = ScheduleService.getInstance().GetTimerList();
+        SerializableList<LucaTimer> timerList = TimerService.getInstance().GetDataList();
         if (timerList.getSize() > 0) {
             _listView.setAdapter(new TimerListViewAdapter(_context, timerList));
 

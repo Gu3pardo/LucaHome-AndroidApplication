@@ -1,6 +1,7 @@
 package guepardoapps.lucahome.common.controller;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
@@ -30,7 +31,7 @@ public class DownloadController {
         Security, SecurityCamera, SecurityCameraControl,
         ShoppingList, ShoppingListAdd, ShoppingListDelete, ShoppingListUpdate,
         Temperature,
-        TimerAdd, TimerUpdate, TimerDelete,
+        Timer, TimerAdd, TimerUpdate, TimerDelete,
         User,
         WirelessSocket, WirelessSocketSet, WirelessSocketAdd, WirelessSocketUpdate, WirelessSocketDelete,
         WirelessSwitch, WirelessSwitchToggle, WirelessSwitchAdd, WirelessSwitchUpdate, WirelessSwitchDelete
@@ -76,30 +77,10 @@ public class DownloadController {
             return;
         }
 
-        String result = "";
-        boolean downloadSuccess = false;
-        try {
-            Request request = new Request.Builder().url(requestUrl).build();
-            Response response = _okHttpClient.newCall(request).execute();
-            ResponseBody responseBody = response.body();
-
-            if (responseBody != null) {
-                result = responseBody.toString();
-                Logger.getInstance().Debug(TAG, result);
-                downloadSuccess = true;
-            } else {
-                Logger.getInstance().Error(TAG, "ResponseBody is null!");
-            }
-        } catch (Exception exception) {
-            Logger.getInstance().Error(TAG, exception.getMessage());
-        } finally {
-            byte[] byteArray = Tools.CompressStringToByteArray(result);
-            DownloadStorageService.getInstance().PutDownloadResult(downloadType, byteArray);
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(downloadSuccess, downloadType, DownloadState.Success, additional));
-        }
+        SendActionTask sendActionTask = new SendActionTask();
+        sendActionTask.CurrentDownloadType = downloadType;
+        sendActionTask.Additional = additional;
+        sendActionTask.execute(requestUrl);
     }
 
     public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork) {
@@ -136,5 +117,43 @@ public class DownloadController {
         }
 
         return true;
+    }
+
+    private class SendActionTask extends AsyncTask<String, Void, String> {
+        public DownloadType CurrentDownloadType;
+        public Serializable Additional;
+
+        @Override
+        protected String doInBackground(String... requestUrls) {
+            for (String requestUrl : requestUrls) {
+                String result = "";
+                boolean downloadSuccess = false;
+
+                try {
+                    Request request = new Request.Builder().url(requestUrl).build();
+                    Response response = _okHttpClient.newCall(request).execute();
+                    ResponseBody responseBody = response.body();
+
+                    if (responseBody != null) {
+                        result = responseBody.string();
+                        Logger.getInstance().Debug(TAG, result);
+                        downloadSuccess = true;
+                    } else {
+                        Logger.getInstance().Error(TAG, "ResponseBody is null!");
+                    }
+                } catch (Exception exception) {
+                    Logger.getInstance().Error(TAG, exception.toString());
+                } finally {
+                    byte[] byteArray = Tools.CompressStringToByteArray(result);
+                    DownloadStorageService.getInstance().PutDownloadResult(CurrentDownloadType, byteArray);
+                    _broadcastController.SendSerializableBroadcast(
+                            DownloadFinishedBroadcast,
+                            DownloadFinishedBundle,
+                            new DownloadFinishedBroadcastContent(downloadSuccess, CurrentDownloadType, DownloadState.Success, Additional));
+                }
+            }
+
+            return "";
+        }
     }
 }

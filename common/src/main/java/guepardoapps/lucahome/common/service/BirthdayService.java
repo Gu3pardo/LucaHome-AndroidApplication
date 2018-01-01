@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -329,7 +330,7 @@ public class BirthdayService implements IDataNotificationService {
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             birthdayNameList.add(_birthdayList.getValue(index).GetName());
         }
-        return birthdayNameList;
+        return new ArrayList<>(birthdayNameList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetBirthdayGroupList() {
@@ -337,21 +338,20 @@ public class BirthdayService implements IDataNotificationService {
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             birthdayGroupList.add(_birthdayList.getValue(index).GetGroup());
         }
-        return birthdayGroupList;
+        return new ArrayList<>(birthdayGroupList.stream().distinct().collect(Collectors.toList()));
     }
 
     public LucaBirthday GetById(int id) {
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday entry = _birthdayList.getValue(index);
-
             if (entry.GetId() == id) {
                 return entry;
             }
         }
-
         return null;
     }
 
+    @Override
     public int GetHighestId() {
         int highestId = -1;
         for (int index = 0; index < _birthdayList.getSize(); index++) {
@@ -366,18 +366,12 @@ public class BirthdayService implements IDataNotificationService {
     @Override
     public SerializableList<LucaBirthday> SearchDataList(@NonNull String searchKey) {
         SerializableList<LucaBirthday> foundBirthdays = new SerializableList<>();
-
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday entry = _birthdayList.getValue(index);
-
-            if (String.valueOf(entry.GetId()).contains(searchKey)
-                    || entry.GetName().contains(searchKey)
-                    || entry.GetDate().toString().contains(searchKey)
-                    || String.valueOf(entry.GetAge()).contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 foundBirthdays.addValue(entry);
             }
         }
-
         return foundBirthdays;
     }
 

@@ -14,6 +14,8 @@ public interface IDataNotificationService {
 
     SerializableList<?> SearchDataList(@NonNull String searchKey);
 
+    int GetHighestId();
+
     void LoadData();
 
     void ShowNotification();

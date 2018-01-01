@@ -13,6 +13,7 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.classes.SerializablePair;
@@ -436,55 +437,52 @@ public class CoinService implements IDataNotificationService {
 
     public ArrayList<String> GetTypeList() {
         ArrayList<String> typeList = new ArrayList<>();
-
         for (int index = 0; index < _coinConversionList.getSize(); index++) {
             typeList.add(_coinConversionList.getValue(index).GetKey());
         }
-
-        return typeList;
+        return new ArrayList<>(typeList.stream().distinct().collect(Collectors.toList()));
     }
 
     public Coin GetById(int id) {
         for (int index = 0; index < _coinList.getSize(); index++) {
             Coin entry = _coinList.getValue(index);
-
             if (entry.GetId() == id) {
                 return entry;
             }
         }
-
         return null;
+    }
+
+    @Override
+    public int GetHighestId() {
+        int highestId = -1;
+        for (int index = 0; index < _coinList.getSize(); index++) {
+            int id = _coinList.getValue(index).GetId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
     }
 
     @Override
     public SerializableList<Coin> SearchDataList(@NonNull String searchKey) {
         _filteredCoinList = new SerializableList<>();
-
         for (int index = 0; index < _coinList.getSize(); index++) {
             Coin entry = _coinList.getValue(index);
-
-            if (String.valueOf(entry.GetId()).contains(searchKey)
-                    || entry.GetType().contains(searchKey)
-                    || entry.GetUser().contains(searchKey)
-                    || String.valueOf(entry.GetAmount()).contains(searchKey)
-                    || entry.GetValueString().contains(searchKey)
-                    || String.valueOf(entry.GetValue()).contains(searchKey)
-                    || String.valueOf(entry.GetCurrentConversion()).contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 _filteredCoinList.addValue(entry);
             }
         }
-
         return _filteredCoinList;
     }
 
     public String AllCoinsValue() {
         double value = 0;
-
         for (int index = 0; index < _coinList.getSize(); index++) {
             Coin entry = _coinList.getValue(index);
             value += entry.GetValue();
         }
-
         return String.format(Locale.getDefault(), "Sum: %.2f €", value);
     }
 

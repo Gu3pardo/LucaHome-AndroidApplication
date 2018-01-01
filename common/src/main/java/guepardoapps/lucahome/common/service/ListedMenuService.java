@@ -17,54 +17,53 @@ import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
+import guepardoapps.lucahome.common.classes.ListedMenu;
 import guepardoapps.lucahome.common.classes.LucaUser;
-import guepardoapps.lucahome.common.classes.ShoppingEntry;
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.converter.JsonDataToShoppingListConverter;
-import guepardoapps.lucahome.common.database.DatabaseShoppingList;
-import guepardoapps.lucahome.common.enums.LucaServerAction;
-import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.converter.JsonDataToListedMenuConverter;
+import guepardoapps.lucahome.common.database.DatabaseListedMenuList;
+import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-public class ShoppingListService implements IDataService {
-    public static class ShoppingListDownloadFinishedContent extends ObjectChangeFinishedContent {
-        public SerializableList<ShoppingEntry> ShoppingList;
+public class ListedMenuService implements IDataService {
+    public static class ListedMenuDownloadFinishedContent extends ObjectChangeFinishedContent {
+        SerializableList<ListedMenu> ListedMenuList;
 
-        ShoppingListDownloadFinishedContent(SerializableList<ShoppingEntry> shoppingList, boolean succcess) {
+        ListedMenuDownloadFinishedContent(SerializableList<ListedMenu> listedMenuList, boolean succcess) {
             super(succcess, new byte[]{});
-            ShoppingList = shoppingList;
+            ListedMenuList = listedMenuList;
         }
     }
 
-    public static final String ShoppingIntent = "ShoppingIntent";
+    public static final String ListedMenuIntent = "ListedMenuIntent";
 
-    public static final String ShoppingListDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.shoppinglist.download.finished";
-    public static final String ShoppingListDownloadFinishedBundle = "ShoppingListDownloadFinishedBundle";
+    public static final String ListedMenuDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.listedmenu.download.finished";
+    public static final String ListedMenuDownloadFinishedBundle = "ListedMenuDownloadFinishedBundle";
 
-    public static final String ShoppingListAddFinishedBroadcast = "guepardoapps.lucahome.data.service.shoppinglist.add.finished";
-    public static final String ShoppingListAddFinishedBundle = "ShoppingListAddFinishedBundle";
+    public static final String ListedMenuAddFinishedBroadcast = "guepardoapps.lucahome.data.service.listedmenu.add.finished";
+    public static final String ListedMenuAddFinishedBundle = "ListedMenuAddFinishedBundle";
 
-    public static final String ShoppingListUpdateFinishedBroadcast = "guepardoapps.lucahome.data.service.shoppinglist.update.finished";
-    public static final String ShoppingListUpdateFinishedBundle = "ShoppingListUpdateFinishedBundle";
+    public static final String ListedMenuUpdateFinishedBroadcast = "guepardoapps.lucahome.data.service.listedmenu.update.finished";
+    public static final String ListedMenuUpdateFinishedBundle = "ListedMenuUpdateFinishedBundle";
 
-    public static final String ShoppingListDeleteFinishedBroadcast = "guepardoapps.lucahome.data.service.shoppinglist.delete.finished";
-    public static final String ShoppingListDeleteFinishedBundle = "ShoppingListDeleteFinishedBundle";
+    public static final String ListedMenuDeleteFinishedBroadcast = "guepardoapps.lucahome.data.service.listedmenu.delete.finished";
+    public static final String ListedMenuDeleteFinishedBundle = "ListedMenuDeleteFinishedBundle";
 
-    private static final ShoppingListService SINGLETON = new ShoppingListService();
+    private static final ListedMenuService SINGLETON = new ListedMenuService();
     private boolean _isInitialized;
 
-    private static final String TAG = ShoppingListService.class.getSimpleName();
-
-    private static final int MIN_TIMEOUT_MIN = 60;
-    private static final int MAX_TIMEOUT_MIN = 24 * 60;
+    private static final String TAG = ListedMenuService.class.getSimpleName();
 
     private boolean _loadDataEnabled;
 
     private Date _lastUpdate;
+
+    private static final int MIN_TIMEOUT_MIN = 2 * 60;
+    private static final int MAX_TIMEOUT_MIN = 24 * 60;
 
     private boolean _reloadEnabled;
     private int _reloadTimeout;
@@ -79,24 +78,22 @@ public class ShoppingListService implements IDataService {
         }
     };
 
-    private Context _context;
-
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
     private SettingsController _settingsController;
 
-    private DatabaseShoppingList _databaseShoppingList;
+    private DatabaseListedMenuList _databaseListedMenuList;
 
-    private SerializableList<ShoppingEntry> _shoppingList = new SerializableList<>();
+    private SerializableList<ListedMenu> _listedMenuList = new SerializableList<>();
 
-    private BroadcastReceiver _shoppingListDownloadFinishedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _listedMenuDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
 
-            if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingList) {
+            if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenu) {
                 return;
             }
 
@@ -106,46 +103,46 @@ public class ShoppingListService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast();
+                _listedMenuList = _databaseListedMenuList.GetListedMenuList();
+                sendFailedListedMenuDownloadBroadcast();
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast();
+                _listedMenuList = _databaseListedMenuList.GetListedMenuList();
+                sendFailedListedMenuDownloadBroadcast();
                 return;
             }
 
-            SerializableList<ShoppingEntry> shoppingList = JsonDataToShoppingListConverter.getInstance().GetList(contentResponse);
-            if (shoppingList == null) {
-                Logger.getInstance().Error(TAG, "Converted shoppingList is null!");
-                _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast();
+            SerializableList<ListedMenu> listedMenuList = JsonDataToListedMenuConverter.getInstance().GetList(contentResponse);
+            if (listedMenuList == null) {
+                Logger.getInstance().Error(TAG, "Converted listedMenuList is null!");
+                _listedMenuList = _databaseListedMenuList.GetListedMenuList();
+                sendFailedListedMenuDownloadBroadcast();
                 return;
             }
 
             _lastUpdate = new Date();
 
-            _shoppingList = shoppingList;
+            _listedMenuList = listedMenuList;
 
-            clearShoppingListFromDatabase();
-            saveShoppingListToDatabase();
+            clearListedMenuListFromDatabase();
+            saveListedMenuListToDatabase();
 
             _broadcastController.SendSerializableBroadcast(
-                    ShoppingListDownloadFinishedBroadcast,
-                    ShoppingListDownloadFinishedBundle,
-                    new ShoppingListDownloadFinishedContent(_shoppingList, true));
+                    ListedMenuDownloadFinishedBroadcast,
+                    ListedMenuDownloadFinishedBundle,
+                    new ListedMenuDownloadFinishedContent(_listedMenuList, true));
         }
     };
 
-    private BroadcastReceiver _shoppingListAddFinishedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _listedMenuAddFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
 
-            if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListAdd) {
+            if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuAdd) {
                 return;
             }
 
@@ -155,33 +152,33 @@ public class ShoppingListService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedAddBroadcast(contentResponse);
+                sendFailedListedMenuAddBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedAddBroadcast(contentResponse);
+                sendFailedListedMenuAddBroadcast(contentResponse);
                 return;
             }
 
             _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
-                    ShoppingListAddFinishedBroadcast,
-                    ShoppingListAddFinishedBundle,
+                    ListedMenuAddFinishedBroadcast,
+                    ListedMenuAddFinishedBundle,
                     new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
     };
 
-    private BroadcastReceiver _shoppingListUpdateFinishedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _listedMenuUpdateFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
 
-            if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListUpdate) {
+            if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuUpdate) {
                 return;
             }
 
@@ -191,33 +188,33 @@ public class ShoppingListService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedUpdateBroadcast(contentResponse);
+                sendFailedListedMenuUpdateBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedUpdateBroadcast(contentResponse);
+                sendFailedListedMenuUpdateBroadcast(contentResponse);
                 return;
             }
 
             _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
-                    ShoppingListUpdateFinishedBroadcast,
-                    ShoppingListUpdateFinishedBundle,
+                    ListedMenuUpdateFinishedBroadcast,
+                    ListedMenuUpdateFinishedBundle,
                     new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
         }
     };
 
-    private BroadcastReceiver _shoppingListDeleteFinishedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _listedMenuDeleteFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
 
-            if (content.CurrentDownloadType != DownloadController.DownloadType.ShoppingListDelete) {
+            if (content.CurrentDownloadType != DownloadController.DownloadType.ListedMenuDelete) {
                 return;
             }
 
@@ -227,21 +224,21 @@ public class ShoppingListService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedDeleteBroadcast(contentResponse);
+                sendFailedListedMenuDeleteBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedDeleteBroadcast(contentResponse);
+                sendFailedListedMenuDeleteBroadcast(contentResponse);
                 return;
             }
 
             _lastUpdate = new Date();
 
             _broadcastController.SendSerializableBroadcast(
-                    ShoppingListDeleteFinishedBroadcast,
-                    ShoppingListDeleteFinishedBundle,
+                    ListedMenuDeleteFinishedBroadcast,
+                    ListedMenuDeleteFinishedBundle,
                     new ObjectChangeFinishedContent(true, new byte[]{}));
 
             LoadData();
@@ -265,10 +262,10 @@ public class ShoppingListService implements IDataService {
         }
     };
 
-    private ShoppingListService() {
+    private ListedMenuService() {
     }
 
-    public static ShoppingListService getInstance() {
+    public static ListedMenuService getInstance() {
         return SINGLETON;
     }
 
@@ -281,25 +278,22 @@ public class ShoppingListService implements IDataService {
 
         _lastUpdate = new Date();
 
-        _loadDataEnabled = true;
         _reloadEnabled = reloadEnabled;
+        _loadDataEnabled = true;
 
-        _context = context;
-
-        _broadcastController = new BroadcastController(_context);
-        _downloadController = new DownloadController(_context);
-        _networkController = new NetworkController(_context);
-        _receiverController = new ReceiverController(_context);
+        _broadcastController = new BroadcastController(context);
+        _downloadController = new DownloadController(context);
+        _networkController = new NetworkController(context);
+        _receiverController = new ReceiverController(context);
         _settingsController = SettingsController.getInstance();
-        _settingsController.Initialize(_context);
 
-        _databaseShoppingList = new DatabaseShoppingList(_context);
-        _databaseShoppingList.Open();
+        _databaseListedMenuList = new DatabaseListedMenuList(context);
+        _databaseListedMenuList.Open();
 
-        _receiverController.RegisterReceiver(_shoppingListDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_shoppingListAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_shoppingListUpdateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_shoppingListDeleteFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuUpdateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuDeleteFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
 
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
@@ -313,54 +307,34 @@ public class ShoppingListService implements IDataService {
     public void Dispose() {
         _reloadHandler.removeCallbacks(_reloadListRunnable);
         _receiverController.Dispose();
-        _databaseShoppingList.Close();
+        _databaseListedMenuList.Close();
         _isInitialized = false;
     }
 
     @Override
-    public SerializableList<ShoppingEntry> GetDataList() {
-        return _shoppingList;
+    public SerializableList<ListedMenu> GetDataList() {
+        return _listedMenuList;
     }
 
-    public ArrayList<String> GetShoppingNameList() {
+    public ArrayList<String> GetListedMenuNameList() {
         ArrayList<String> nameList = new ArrayList<>();
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            nameList.add(_shoppingList.getValue(index).GetName());
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            nameList.add(_listedMenuList.getValue(index).GetTitle());
         }
         return new ArrayList<>(nameList.stream().distinct().collect(Collectors.toList()));
     }
 
-    public ArrayList<String> GetShoppingUnitList() {
-        ArrayList<String> unitList = new ArrayList<>();
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            unitList.add(_shoppingList.getValue(index).GetUnit());
+    public ArrayList<String> GetListedMenuDescriptionList() {
+        ArrayList<String> descriptionList = new ArrayList<>();
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            descriptionList.add(_listedMenuList.getValue(index).GetDescription());
         }
-        return new ArrayList<>(unitList.stream().distinct().collect(Collectors.toList()));
+        return new ArrayList<>(descriptionList.stream().distinct().collect(Collectors.toList()));
     }
 
-    public ArrayList<String> GetShoppingDetailList() {
-        ArrayList<String> detailList = new ArrayList<>();
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            String detail = String.format(
-                    Locale.getDefault(),
-                    "%d x %s",
-                    _shoppingList.getValue(index).GetQuantity(), _shoppingList.getValue(index).GetName());
-            detailList.add(detail);
-        }
-        return new ArrayList<>(detailList.stream().distinct().collect(Collectors.toList()));
-    }
-
-    public ArrayList<String> GetShoppingGroupList() {
-        ArrayList<String> groupList = new ArrayList<>();
-        for (int index = 0; index < ShoppingEntryGroup.values().length; index++) {
-            groupList.add(ShoppingEntryGroup.GetById(index).toString());
-        }
-        return new ArrayList<>(groupList.stream().distinct().collect(Collectors.toList()));
-    }
-
-    public ShoppingEntry GetById(int id) {
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            ShoppingEntry entry = _shoppingList.getValue(index);
+    public ListedMenu GetListedMenuById(int id) {
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            ListedMenu entry = _listedMenuList.getValue(index);
             if (entry.GetId() == id) {
                 return entry;
             }
@@ -371,8 +345,8 @@ public class ShoppingListService implements IDataService {
     @Override
     public int GetHighestId() {
         int highestId = -1;
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            int id = _shoppingList.getValue(index).GetId();
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            int id = _listedMenuList.getValue(index).GetId();
             if (id > highestId) {
                 highestId = id;
             }
@@ -381,15 +355,15 @@ public class ShoppingListService implements IDataService {
     }
 
     @Override
-    public SerializableList<ShoppingEntry> SearchDataList(@NonNull String searchKey) {
-        SerializableList<ShoppingEntry> foundShoppingEntries = new SerializableList<>();
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            ShoppingEntry entry = _shoppingList.getValue(index);
+    public SerializableList<ListedMenu> SearchDataList(@NonNull String searchKey) {
+        SerializableList<ListedMenu> foundListedMenus = new SerializableList<>();
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            ListedMenu entry = _listedMenuList.getValue(index);
             if (entry.toString().contains(searchKey)) {
-                foundShoppingEntries.addValue(entry);
+                foundListedMenus.addValue(entry);
             }
         }
-        return foundShoppingEntries;
+        return foundListedMenus;
     }
 
     @Override
@@ -399,42 +373,41 @@ public class ShoppingListService implements IDataService {
         }
 
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
-            _shoppingList = _databaseShoppingList.GetShoppingList();
+            _listedMenuList = _databaseListedMenuList.GetListedMenuList();
             _broadcastController.SendSerializableBroadcast(
-                    ShoppingListDownloadFinishedBroadcast,
-                    ShoppingListDownloadFinishedBundle,
-                    new ShoppingListDownloadFinishedContent(_shoppingList, true));
+                    ListedMenuDownloadFinishedBroadcast,
+                    ListedMenuDownloadFinishedBundle,
+                    new ListedMenuDownloadFinishedContent(_listedMenuList, true));
             return;
         }
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedListedMenuDownloadBroadcast();
             return;
         }
 
-        if (hasEntryNotOnServer()) {
+        if (hasListedMenuEntryNotOnServer()) {
             _loadDataEnabled = false;
 
-            for (int index = 0; index < notOnServerShoppingEntry().getSize(); index++) {
-                ShoppingEntry shoppingEntry = notOnServerShoppingEntry().getValue(index);
+            for (int index = 0; index < notOnServerListedMenu().getSize(); index++) {
+                ListedMenu listedMenu = notOnServerListedMenu().getValue(index);
 
-                switch (shoppingEntry.GetServerDbAction()) {
-                    case Add:
-                        AddShoppingEntry(shoppingEntry);
-                        break;
+                switch (listedMenu.GetServerDbAction()) {
                     case Update:
-                        UpdateShoppingEntry(shoppingEntry);
+                        UpdateListedMenu(listedMenu);
                         break;
                     case Delete:
-                        DeleteShoppingEntry(shoppingEntry);
+                        DeleteListedMenu(listedMenu);
+                        break;
+                    case Add:
+                        AddListedMenu(listedMenu);
                         break;
                     case Null:
                     default:
-                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", shoppingEntry));
+                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Nothing todo with %s.", listedMenu));
                         break;
                 }
-
             }
 
             _loadDataEnabled = true;
@@ -444,17 +417,17 @@ public class ShoppingListService implements IDataService {
                 + _settingsController.GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
-                + "&action=" + LucaServerAction.GET_SHOPPING_LIST.toString();
+                + "&action=" + LucaServerAction.GET_LISTEDMENU.toString();
 
-        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingList, true);
+        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenu, true);
     }
 
-    public void AddShoppingEntry(@NonNull ShoppingEntry entry) {
+    public void AddListedMenu(@NonNull ListedMenu entry) {
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
 
-            _databaseShoppingList.CreateEntry(entry);
+            _databaseListedMenuList.CreateEntry(entry);
 
             LoadData();
 
@@ -463,7 +436,7 @@ public class ShoppingListService implements IDataService {
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedAddBroadcast("No user");
+            sendFailedListedMenuAddBroadcast("No user");
             return;
         }
 
@@ -472,15 +445,15 @@ public class ShoppingListService implements IDataService {
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
-        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingListAdd, true);
+        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenuAdd, true);
     }
 
-    public void UpdateShoppingEntry(@NonNull ShoppingEntry entry) {
+    public void UpdateListedMenu(@NonNull ListedMenu entry) {
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
 
-            _databaseShoppingList.Update(entry);
+            _databaseListedMenuList.Update(entry);
 
             LoadData();
 
@@ -489,7 +462,7 @@ public class ShoppingListService implements IDataService {
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedUpdateBroadcast("No user");
+            sendFailedListedMenuUpdateBroadcast("No user");
             return;
         }
 
@@ -498,15 +471,15 @@ public class ShoppingListService implements IDataService {
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
-        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingListUpdate, true);
+        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenuUpdate, true);
     }
 
-    public void DeleteShoppingEntry(@NonNull ShoppingEntry entry) {
+    public void DeleteListedMenu(@NonNull ListedMenu entry) {
         if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
 
-            _databaseShoppingList.Update(entry);
+            _databaseListedMenuList.Update(entry);
 
             LoadData();
 
@@ -515,7 +488,7 @@ public class ShoppingListService implements IDataService {
 
         LucaUser user = _settingsController.GetUser();
         if (user == null) {
-            sendFailedDeleteBroadcast("No user");
+            sendFailedListedMenuDeleteBroadcast("No user");
             return;
         }
 
@@ -524,7 +497,7 @@ public class ShoppingListService implements IDataService {
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 
-        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ShoppingListDelete, true);
+        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.ListedMenuDelete, true);
     }
 
     @Override
@@ -562,95 +535,78 @@ public class ShoppingListService implements IDataService {
         }
     }
 
-    public void ShareShoppingList() {
-        StringBuilder shareText = new StringBuilder("ShoppingList:\n");
-
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            ShoppingEntry entry = _shoppingList.getValue(index);
-            shareText.append(String.valueOf(entry.GetQuantity())).append("x ").append(entry.GetName()).append("\n");
-        }
-
-        Intent sendIntent = new Intent();
-
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, shareText.toString());
-        sendIntent.setType("text/plain");
-
-        _context.startActivity(sendIntent);
-    }
-
     public Date GetLastUpdate() {
         return _lastUpdate;
     }
 
-    private void clearShoppingListFromDatabase() {
-        SerializableList<ShoppingEntry> shoppingList = _databaseShoppingList.GetShoppingList();
-        for (int index = 0; index < shoppingList.getSize(); index++) {
-            ShoppingEntry shoppingEntry = shoppingList.getValue(index);
-            _databaseShoppingList.Delete(shoppingEntry);
+    private void clearListedMenuListFromDatabase() {
+        SerializableList<ListedMenu> listedMenuList = _databaseListedMenuList.GetListedMenuList();
+        for (int index = 0; index < listedMenuList.getSize(); index++) {
+            ListedMenu listedMenu = listedMenuList.getValue(index);
+            _databaseListedMenuList.Delete(listedMenu);
         }
     }
 
-    private void saveShoppingListToDatabase() {
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            ShoppingEntry shoppingEntry = _shoppingList.getValue(index);
-            _databaseShoppingList.CreateEntry(shoppingEntry);
+    private void saveListedMenuListToDatabase() {
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            ListedMenu listedMenu = _listedMenuList.getValue(index);
+            _databaseListedMenuList.CreateEntry(listedMenu);
         }
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedListedMenuDownloadBroadcast() {
         _broadcastController.SendSerializableBroadcast(
-                ShoppingListDownloadFinishedBroadcast,
-                ShoppingListDownloadFinishedBundle,
-                new ShoppingListDownloadFinishedContent(_shoppingList, false));
+                ListedMenuDownloadFinishedBroadcast,
+                ListedMenuDownloadFinishedBundle,
+                new ListedMenuDownloadFinishedContent(_listedMenuList, false));
     }
 
-    private void sendFailedAddBroadcast(@NonNull String response) {
+    private void sendFailedListedMenuAddBroadcast(@NonNull String response) {
         if (response.length() == 0) {
-            response = "Add for shopping entry failed!";
+            response = "Add for listedmenu failed!";
         }
 
         _broadcastController.SendSerializableBroadcast(
-                ShoppingListAddFinishedBroadcast,
-                ShoppingListAddFinishedBundle,
+                ListedMenuAddFinishedBroadcast,
+                ListedMenuAddFinishedBundle,
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
     }
 
-    private void sendFailedUpdateBroadcast(@NonNull String response) {
+    private void sendFailedListedMenuUpdateBroadcast(@NonNull String response) {
         if (response.length() == 0) {
-            response = "Update of shopping entry failed!";
+            response = "Update for listedmenu failed!";
         }
 
         _broadcastController.SendSerializableBroadcast(
-                ShoppingListUpdateFinishedBroadcast,
-                ShoppingListUpdateFinishedBundle,
+                ListedMenuUpdateFinishedBroadcast,
+                ListedMenuUpdateFinishedBundle,
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
     }
 
-    private void sendFailedDeleteBroadcast(@NonNull String response) {
+    private void sendFailedListedMenuDeleteBroadcast(@NonNull String response) {
         if (response.length() == 0) {
-            response = "Delete for shopping entry failed!";
+            response = "Delete for listedmenu failed!";
         }
 
         _broadcastController.SendSerializableBroadcast(
-                ShoppingListDeleteFinishedBroadcast,
-                ShoppingListDeleteFinishedBundle,
+                ListedMenuDeleteFinishedBroadcast,
+                ListedMenuDeleteFinishedBundle,
                 new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
     }
 
-    private SerializableList<ShoppingEntry> notOnServerShoppingEntry() {
-        SerializableList<ShoppingEntry> notOnServerShoppingList = new SerializableList<>();
+    private SerializableList<ListedMenu> notOnServerListedMenu() {
+        SerializableList<ListedMenu> notOnServerListedMenuList = new SerializableList<>();
 
-        for (int index = 0; index < _shoppingList.getSize(); index++) {
-            if (!_shoppingList.getValue(index).GetIsOnServer()) {
-                notOnServerShoppingList.addValue(_shoppingList.getValue(index));
+        for (int index = 0; index < _listedMenuList.getSize(); index++) {
+            if (!_listedMenuList.getValue(index).GetIsOnServer()) {
+                notOnServerListedMenuList.addValue(_listedMenuList.getValue(index));
             }
         }
 
-        return notOnServerShoppingList;
+        return notOnServerListedMenuList;
     }
 
-    private boolean hasEntryNotOnServer() {
-        return notOnServerShoppingEntry().getSize() > 0;
+    private boolean hasListedMenuEntryNotOnServer() {
+        return notOnServerListedMenu().getSize() > 0;
     }
 }

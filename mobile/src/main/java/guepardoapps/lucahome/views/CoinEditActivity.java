@@ -41,9 +41,6 @@ public class CoinEditActivity extends AppCompatActivity {
     private boolean _propertyChanged;
     private CoinDto _coinDto;
 
-    private CoinService _coinService;
-    private NavigationService _navigationService;
-
     private ReceiverController _receiverController;
 
     private com.rey.material.widget.Button _saveButton;
@@ -108,9 +105,6 @@ public class CoinEditActivity extends AppCompatActivity {
 
         _coinDto = (CoinDto) getIntent().getSerializableExtra(CoinService.CoinIntent);
 
-        _coinService = CoinService.getInstance();
-        _navigationService = NavigationService.getInstance();
-
         _receiverController = new ReceiverController(this);
 
         final AutoCompleteTextView coinEditUserTextView = findViewById(R.id.coin_edit_user_textview);
@@ -126,7 +120,7 @@ public class CoinEditActivity extends AppCompatActivity {
             coinEditUserTextView.setAdapter(new ArrayAdapter<>(CoinEditActivity.this, android.R.layout.simple_dropdown_item_1line, userList));
         }
 
-        coinEditUserTextView.setAdapter(new ArrayAdapter<>(CoinEditActivity.this, android.R.layout.simple_dropdown_item_1line, _coinService.GetTypeList()));
+        coinEditUserTextView.setAdapter(new ArrayAdapter<>(CoinEditActivity.this, android.R.layout.simple_dropdown_item_1line, CoinService.getInstance().GetTypeList()));
         coinEditTypeTextView.addTextChangedListener(_textWatcher);
 
         coinAmountEditText.addTextChangedListener(_textWatcher);
@@ -179,17 +173,11 @@ public class CoinEditActivity extends AppCompatActivity {
                 focusView.requestFocus();
             } else {
                 if (_coinDto.GetAction() == CoinDto.Action.Add) {
-                    int lastHighestId = 0;
-
-                    int dataListSize = _coinService.GetDataList().getSize();
-                    if (dataListSize > 0) {
-                        lastHighestId = _coinService.GetDataList().getValue(dataListSize - 1).GetId() + 1;
-                    }
-
-                    _coinService.AddCoin(new Coin(lastHighestId, userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1, false, ILucaClass.LucaServerDbAction.Add));
+                    int highestId = CoinService.getInstance().GetHighestId();
+                    CoinService.getInstance().AddCoin(new Coin(highestId + 1, userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_coinDto.GetAction() == CoinDto.Action.Update) {
-                    _coinService.UpdateCoin(new Coin(_coinDto.GetId(), userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1, false, ILucaClass.LucaServerDbAction.Update));
+                    CoinService.getInstance().UpdateCoin(new Coin(_coinDto.GetId(), userName, coinType, Double.parseDouble(coinAmountString), -1, Coin.Trend.NULL, -1, false, ILucaClass.LucaServerDbAction.Update));
                     _saveButton.setEnabled(false);
                 } else {
                     coinEditUserTextView.setError(createErrorText(String.format(Locale.getDefault(), "Invalid action %s", _coinDto.GetAction())));
@@ -224,7 +212,7 @@ public class CoinEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        _navigationService.GoBack(this);
+        NavigationService.getInstance().GoBack(this);
     }
 
     /**
@@ -256,7 +244,7 @@ public class CoinEditActivity extends AppCompatActivity {
                 .show();
 
         new Handler().postDelayed(() -> {
-            NavigationService.NavigationResult navigationResult = _navigationService.GoBack(CoinEditActivity.this);
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(CoinEditActivity.this);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
                 displayFailSnacky("Failed to navigate back! Please contact LucaHome support!");

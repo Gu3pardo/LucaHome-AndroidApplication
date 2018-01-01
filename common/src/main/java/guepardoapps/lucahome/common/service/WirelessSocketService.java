@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -372,79 +373,69 @@ public class WirelessSocketService implements IDataNotificationService {
 
     public ArrayList<String> GetNameList() {
         ArrayList<String> nameList = new ArrayList<>();
-
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
             nameList.add(_wirelessSocketList.getValue(index).GetName());
         }
-
-        return nameList;
+        return new ArrayList<>(nameList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetAreaList() {
         ArrayList<String> areaList = new ArrayList<>();
-
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
-            String area = _wirelessSocketList.getValue(index).GetArea();
-            if (!areaList.contains(area)) {
-                areaList.add(area);
-            }
+            areaList.add(_wirelessSocketList.getValue(index).GetArea());
         }
-
-        return areaList;
+        return new ArrayList<>(areaList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetCodeList() {
         ArrayList<String> codeList = new ArrayList<>();
-
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
             codeList.add(_wirelessSocketList.getValue(index).GetCode());
         }
-
-        return codeList;
-    }
-
-    public WirelessSocket GetSocketById(int id) {
-        for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
-            WirelessSocket entry = _wirelessSocketList.getValue(index);
-
-            if (entry.GetId() == id) {
-                return entry;
-            }
-        }
-
-        return null;
+        return new ArrayList<>(codeList.stream().distinct().collect(Collectors.toList()));
     }
 
     public WirelessSocket GetSocketByName(@NonNull String name) {
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
             WirelessSocket entry = _wirelessSocketList.getValue(index);
-
             if (entry.GetName().contains(name)) {
                 return entry;
             }
         }
-
         return null;
+    }
+
+    public WirelessSocket GetSocketById(int id) {
+        for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
+            WirelessSocket entry = _wirelessSocketList.getValue(index);
+            if (entry.GetId() == id) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int GetHighestId() {
+        int highestId = -1;
+        for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
+            int id = _wirelessSocketList.getValue(index).GetId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
     }
 
     @Override
     public SerializableList<WirelessSocket> SearchDataList(@NonNull String searchKey) {
         SerializableList<WirelessSocket> foundWirelessSockets = new SerializableList<>();
-
         for (int index = 0; index < _wirelessSocketList.getSize(); index++) {
             WirelessSocket entry = _wirelessSocketList.getValue(index);
-
-            if (String.valueOf(entry.GetId()).contains(searchKey)
-                    || entry.GetName().contains(searchKey)
-                    || entry.GetShortName().contains(searchKey)
-                    || entry.GetArea().contains(searchKey)
-                    || entry.GetCode().contains(searchKey)
-                    || entry.GetActivationString().contains(searchKey)
-                    || String.valueOf(entry.IsActivated()).contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 foundWirelessSockets.addValue(entry);
             }
         }
-
         return foundWirelessSockets;
     }
 

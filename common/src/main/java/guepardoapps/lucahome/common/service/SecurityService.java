@@ -279,6 +279,11 @@ public class SecurityService implements IDataNotificationService {
     }
 
     @Override
+    public int GetHighestId() {
+        return -1;
+    }
+
+    @Override
     public void LoadData() {
         LucaUser user = _settingsController.GetUser();
         if (user == null) {

@@ -227,14 +227,8 @@ public class ScheduleEditActivity extends AppCompatActivity {
                 focusView.requestFocus();
             } else {
                 if (_scheduleDto.GetAction() == ScheduleDto.Action.Add) {
-                    int lastHighestId = 0;
-
-                    int dataListSize = ScheduleService.getInstance().GetDataList().getSize();
-                    if (dataListSize > 0) {
-                        lastHighestId = ScheduleService.getInstance().GetDataList().getValue(dataListSize - 1).GetId() + 1;
-                    }
-
-                    ScheduleService.getInstance().AddSchedule(new Schedule(lastHighestId, scheduleName, wirelessSocket, wirelessSwitch, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Add));
+                    int highestId = ScheduleService.getInstance().GetHighestId();
+                    ScheduleService.getInstance().AddSchedule(new Schedule(highestId + 1, scheduleName, wirelessSocket, wirelessSwitch, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_scheduleDto.GetAction() == ScheduleDto.Action.Update) {
                     ScheduleService.getInstance().UpdateSchedule(new Schedule(_scheduleDto.GetId(), scheduleName, wirelessSocket, wirelessSwitch, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Update));

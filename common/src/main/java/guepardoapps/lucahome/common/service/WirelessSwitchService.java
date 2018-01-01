@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -372,96 +373,77 @@ public class WirelessSwitchService implements IDataNotificationService {
 
     public ArrayList<String> GetNameList() {
         ArrayList<String> nameList = new ArrayList<>();
-
         for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
             nameList.add(_wirelessSwitchList.getValue(index).GetName());
         }
-
-        return nameList;
+        return new ArrayList<>(nameList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetAreaList() {
         ArrayList<String> areaList = new ArrayList<>();
-
         for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
-            String area = _wirelessSwitchList.getValue(index).GetArea();
-            if (!areaList.contains(area)) {
-                areaList.add(area);
-            }
+            areaList.add(_wirelessSwitchList.getValue(index).GetArea());
         }
-
-        return areaList;
+        return new ArrayList<>(areaList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetRemoteIdList() {
         ArrayList<String> remoteIdList = new ArrayList<>();
-
         for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
-            String remoteId = String.valueOf(_wirelessSwitchList.getValue(index).GetRemoteId());
-            if (!remoteIdList.contains(remoteId)) {
-                remoteIdList.add(remoteId);
-            }
+            remoteIdList.add(String.valueOf(_wirelessSwitchList.getValue(index).GetRemoteId()));
         }
-
-        return remoteIdList;
+        return new ArrayList<>(remoteIdList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetKeyCodeList() {
         ArrayList<String> keyCodeList = new ArrayList<>();
-
         for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
-            String keyCode = String.valueOf(_wirelessSwitchList.getValue(index).GetKeyCode());
-            if (!keyCodeList.contains(keyCode)) {
-                keyCodeList.add(keyCode);
-            }
+            keyCodeList.add(String.valueOf(_wirelessSwitchList.getValue(index).GetKeyCode()));
         }
-
-        return keyCodeList;
-    }
-
-    public WirelessSwitch GetSocketById(int id) {
-        for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
-            WirelessSwitch entry = _wirelessSwitchList.getValue(index);
-
-            if (entry.GetId() == id) {
-                return entry;
-            }
-        }
-
-        return null;
+        return new ArrayList<>(keyCodeList.stream().distinct().collect(Collectors.toList()));
     }
 
     public WirelessSwitch GetWirelessSwitchByName(@NonNull String name) {
         for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
             WirelessSwitch entry = _wirelessSwitchList.getValue(index);
-
             if (entry.GetName().contains(name)) {
                 return entry;
             }
         }
-
         return null;
+    }
+
+    public WirelessSwitch GetSocketById(int id) {
+        for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
+            WirelessSwitch entry = _wirelessSwitchList.getValue(index);
+            if (entry.GetId() == id) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public int GetHighestId() {
+        int highestId = -1;
+        for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
+            int id = _wirelessSwitchList.getValue(index).GetId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
     }
 
     @Override
     public SerializableList<WirelessSwitch> SearchDataList(@NonNull String searchKey) {
         SerializableList<WirelessSwitch> foundWirelessSwitches = new SerializableList<>();
-
         for (int index = 0; index < _wirelessSwitchList.getSize(); index++) {
             WirelessSwitch entry = _wirelessSwitchList.getValue(index);
-
-            if (String.valueOf(entry.GetId()).contains(searchKey)
-                    || entry.GetName().contains(searchKey)
-                    || entry.GetShortName().contains(searchKey)
-                    || entry.GetArea().contains(searchKey)
-                    || String.valueOf(entry.GetRemoteId()).contains(searchKey)
-                    || String.valueOf(entry.GetKeyCode()).contains(searchKey)
-                    || entry.GetActivationString().contains(searchKey)
-                    || String.valueOf(entry.IsActivated()).contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 foundWirelessSwitches.addValue(entry);
             }
         }
-
         return foundWirelessSwitches;
     }
 

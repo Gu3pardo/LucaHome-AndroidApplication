@@ -33,11 +33,11 @@ public class JsonDataToBirthdayConverter implements IJsonContextDataConverter {
     private JsonDataToBirthdayConverter() {
     }
 
-    public SerializableList<LucaBirthday> GetList(@NonNull String[] stringArray, @NonNull Context context) {
-        if (StringHelper.StringsAreEqual(stringArray)) {
-            return parseStringToList(stringArray[0], context);
+    public SerializableList<LucaBirthday> GetList(@NonNull String[] jsonStringArray, @NonNull Context context) {
+        if (StringHelper.StringsAreEqual(jsonStringArray)) {
+            return parseStringToList(jsonStringArray[0], context);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
+            String usedEntry = StringHelper.SelectString(jsonStringArray, SEARCH_PARAMETER);
             return parseStringToList(usedEntry, context);
         }
     }
@@ -46,12 +46,12 @@ public class JsonDataToBirthdayConverter implements IJsonContextDataConverter {
         return parseStringToList(responseString, context);
     }
 
-    private SerializableList<LucaBirthday> parseStringToList(@NonNull String value, @NonNull Context context) {
-        if (!value.contains("Error")) {
+    private SerializableList<LucaBirthday> parseStringToList(@NonNull String jsonString, @NonNull Context context) {
+        if (!jsonString.contains("Error")) {
             SerializableList<LucaBirthday> list = new SerializableList<>();
 
             try {
-                JSONObject jsonObject = new JSONObject(value);
+                JSONObject jsonObject = new JSONObject(jsonString);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
                 for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
@@ -89,7 +89,7 @@ public class JsonDataToBirthdayConverter implements IJsonContextDataConverter {
             return list;
         }
 
-        Logger.getInstance().Error(TAG, value + " has an error!");
+        Logger.getInstance().Error(TAG, jsonString + " has an error!");
         return new SerializableList<>();
     }
 }

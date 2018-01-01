@@ -4,12 +4,14 @@ android {
     compileSdkVersion 27
     buildToolsVersion '27.0.2'
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 24
         targetSdkVersion 27
         versionCode 50100
-        versionName "5.1.0.171231"
+        versionName "5.1.0.180101"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        testOptions {
+            unitTests.returnDefaultValues = true
+        }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

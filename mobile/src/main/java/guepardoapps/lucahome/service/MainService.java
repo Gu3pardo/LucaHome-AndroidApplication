@@ -63,7 +63,7 @@ public class MainService extends Service {
         DOWNLOAD_HASH_MAP.append(0, () -> BirthdayService.getInstance().LoadData());
         DOWNLOAD_HASH_MAP.append(1, () -> CoinService.getInstance().LoadCoinConversionList());
         DOWNLOAD_HASH_MAP.append(2, () -> CoinService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(3, () -> MenuService.getInstance().LoadListedMenuList());
+        DOWNLOAD_HASH_MAP.append(3, () -> ListedMenuService.getInstance().LoadData());
         DOWNLOAD_HASH_MAP.append(4, () -> MenuService.getInstance().LoadData());
         DOWNLOAD_HASH_MAP.append(5, () -> MeterListService.getInstance().LoadData());
         DOWNLOAD_HASH_MAP.append(6, () -> MoneyMeterListService.getInstance().LoadData());
@@ -76,7 +76,8 @@ public class MainService extends Service {
         DOWNLOAD_HASH_MAP.append(13, () -> WirelessSocketService.getInstance().LoadData());
         DOWNLOAD_HASH_MAP.append(14, () -> WirelessSwitchService.getInstance().LoadData());
         DOWNLOAD_HASH_MAP.append(15, () -> ScheduleService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(16, () -> MapContentService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(16, () -> TimerService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(17, () -> MapContentService.getInstance().LoadData());
     }
 
     private BroadcastController _broadcastController;
@@ -212,6 +213,14 @@ public class MainService extends Service {
         }
     };
 
+    private BroadcastReceiver _timerDownloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
+        }
+    };
+
     private BroadcastReceiver _wirelessSocketDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -319,6 +328,11 @@ public class MainService extends Service {
                 SettingsController.getInstance().IsReloadCoinEnabled(),
                 SettingsController.getInstance().GetReloadCoinTimeout());
 
+        ListedMenuService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadMenuEnabled(),
+                SettingsController.getInstance().GetReloadMenuTimeout());
+
         MapContentService.getInstance().Initialize(
                 this,
                 SettingsController.getInstance().IsReloadMapContentEnabled(),
@@ -386,6 +400,11 @@ public class MainService extends Service {
                 SettingsController.getInstance().IsReloadTemperatureEnabled(),
                 SettingsController.getInstance().GetReloadTemperatureTimeout());
 
+        TimerService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadScheduleEnabled(),
+                SettingsController.getInstance().GetReloadScheduleTimeout());
+
         UserService.getInstance().Initialize(this);
 
         WirelessSocketService.getInstance().Initialize(
@@ -415,6 +434,7 @@ public class MainService extends Service {
 
         BirthdayService.getInstance().Dispose();
         CoinService.getInstance().Dispose();
+        ListedMenuService.getInstance().Dispose();
         MapContentService.getInstance().Dispose();
         MediaServerService.getInstance().Dispose();
         MenuService.getInstance().Dispose();
@@ -426,6 +446,7 @@ public class MainService extends Service {
         SecurityService.getInstance().Dispose();
         ShoppingListService.getInstance().Dispose();
         TemperatureService.getInstance().Dispose();
+        TimerService.getInstance().Dispose();
         UserService.getInstance().Dispose();
         WirelessSocketService.getInstance().Dispose();
         WirelessSwitchService.getInstance().Dispose();
@@ -439,7 +460,7 @@ public class MainService extends Service {
         _receiverController.RegisterReceiver(_coinConversionDownloadFinishedReceiver, new String[]{CoinService.CoinConversionDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinDownloadFinishedReceiver, new String[]{CoinService.CoinDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_mapContentDownloadFinishedReceiver, new String[]{MapContentService.MapContentDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_listedMenuDownloadFinishedReceiver, new String[]{MenuService.ListedMenuDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_listedMenuDownloadFinishedReceiver, new String[]{ListedMenuService.ListedMenuDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_menuDownloadFinishedReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_meterListDownloadFinishedReceiver, new String[]{MeterListService.MeterDataListDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_moneyMeterListDownloadFinishedReceiver, new String[]{MoneyMeterListService.MoneyMeterDataListDownloadFinishedBroadcast});
@@ -450,6 +471,7 @@ public class MainService extends Service {
         _receiverController.RegisterReceiver(_securityDownloadFinishedReceiver, new String[]{SecurityService.SecurityDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_shoppingListDownloadFinishedReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_temperatureDownloadFinishedReceiver, new String[]{TemperatureService.TemperatureDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_timerDownloadFinishedReceiver, new String[]{TimerService.TimerDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_wirelessSocketDownloadFinishedReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_wirelessSwitchDownloadFinishedReceiver, new String[]{WirelessSwitchService.WirelessSwitchDownloadFinishedBroadcast});
     }

@@ -221,7 +221,7 @@ public class MoneyMeterDataActivity extends AppCompatBaseActivity {
 
         for (int index = 0; index < moneyMeterDataListSize; index++) {
             SerializableDate saveDate = moneyMeterDataList.getValue(index).GetSaveDate();
-            Date date = new Date(saveDate.Year(), saveDate.Month(), saveDate.DayOfMonth());
+            Date date = new Date(saveDate.Year(), saveDate.Month() - 1, saveDate.DayOfMonth());
             dataPoints[index] = new DataPoint(date, moneyMeterDataList.getValue(index).GetAmount());
             if (index == 0) {
                 firstDate = date;

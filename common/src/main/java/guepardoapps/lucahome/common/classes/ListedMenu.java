@@ -112,6 +112,6 @@ public class ListedMenu implements Serializable, ILucaClass {
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Title: %s );(Description: %s );(Rating: %d );(LastSuggestion: %s ))", TAG, _id, _title, _description, _rating, _useCounter);
+        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Title: %s );(Description: %s );(Rating: %d );(UseCounter: %s ))", TAG, _id, _title, _description, _rating, _useCounter);
     }
 }

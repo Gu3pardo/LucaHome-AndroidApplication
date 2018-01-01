@@ -183,14 +183,8 @@ public class WirelessSwitchEditActivity extends AppCompatActivity {
                 focusView.requestFocus();
             } else {
                 if (_wirelessSwitchDto.GetAction() == WirelessSwitchDto.Action.Add) {
-                    int lastHighestId = 0;
-
-                    int dataListSize = WirelessSwitchService.getInstance().GetDataList().getSize();
-                    if (dataListSize > 0) {
-                        lastHighestId = WirelessSwitchService.getInstance().GetDataList().getValue(dataListSize - 1).GetId() + 1;
-                    }
-
-                    WirelessSwitchService.getInstance().AddWirelessSwitch(new WirelessSwitch(lastHighestId, name, area, Integer.parseInt(remoteIdString), keyCodeString.charAt(0), true, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Add));
+                    int highestId = WirelessSwitchService.getInstance().GetHighestId();
+                    WirelessSwitchService.getInstance().AddWirelessSwitch(new WirelessSwitch(highestId + 1, name, area, Integer.parseInt(remoteIdString), keyCodeString.charAt(0), true, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_wirelessSwitchDto.GetAction() == WirelessSwitchDto.Action.Update) {
                     WirelessSwitchService.getInstance().UpdateWirelessSwitch(new WirelessSwitch(_wirelessSwitchDto.GetId(), name, area, Integer.parseInt(remoteIdString), keyCodeString.charAt(0), true, false, new SerializableDate(), new SerializableTime(), "", false, ILucaClass.LucaServerDbAction.Update));

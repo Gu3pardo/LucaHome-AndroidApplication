@@ -34,6 +34,7 @@ import guepardoapps.lucahome.common.classes.ListedMenu;
 import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.dto.MenuDto;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+import guepardoapps.lucahome.common.service.ListedMenuService;
 import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
@@ -98,10 +99,10 @@ public class MenuEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_menu_edit_button);
 
-        menuTitleTypeTextView.setAdapter(new ArrayAdapter<>(MenuEditActivity.this, android.R.layout.simple_dropdown_item_1line, MenuService.getInstance().GetDescriptionList()));
+        menuTitleTypeTextView.setAdapter(new ArrayAdapter<>(MenuEditActivity.this, android.R.layout.simple_dropdown_item_1line, MenuService.getInstance().GetMenuTitleList()));
         menuTitleTypeTextView.addTextChangedListener(_textWatcher);
 
-        menuDescriptionTypeTextView.setAdapter(new ArrayAdapter<>(MenuEditActivity.this, android.R.layout.simple_dropdown_item_1line, MenuService.getInstance().GetDescriptionList()));
+        menuDescriptionTypeTextView.setAdapter(new ArrayAdapter<>(MenuEditActivity.this, android.R.layout.simple_dropdown_item_1line, MenuService.getInstance().GetMenuDescriptionList()));
         menuDescriptionTypeTextView.addTextChangedListener(_textWatcher);
 
         if (_menuDto != null) {
@@ -114,7 +115,7 @@ public class MenuEditActivity extends AppCompatActivity {
 
         FloatingActionButton randomMenuButton = findViewById(R.id.menuRandomEntry_Button);
         randomMenuButton.setOnClickListener(view -> {
-            SerializableList<ListedMenu> listedMenuList = MenuService.getInstance().GetListedMenuList();
+            SerializableList<ListedMenu> listedMenuList = ListedMenuService.getInstance().GetDataList();
 
             Random randomMenuId = new Random();
             int menuId = randomMenuId.nextInt(listedMenuList.getSize());

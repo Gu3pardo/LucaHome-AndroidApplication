@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -211,62 +212,59 @@ public class MovieService implements IDataService {
 
     public ArrayList<String> GetTitleList() {
         ArrayList<String> titleList = new ArrayList<>();
-
         for (int index = 0; index < _movieList.getSize(); index++) {
             titleList.add(_movieList.getValue(index).GetTitle());
         }
-
-        return titleList;
+        return new ArrayList<>(titleList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetGenreList() {
         ArrayList<String> genreList = new ArrayList<>();
-
         for (int index = 0; index < _movieList.getSize(); index++) {
             genreList.add(_movieList.getValue(index).GetGenre());
         }
-
-        return genreList;
+        return new ArrayList<>(genreList.stream().distinct().collect(Collectors.toList()));
     }
 
     public ArrayList<String> GetDescriptionList() {
         ArrayList<String> descriptionList = new ArrayList<>();
-
         for (int index = 0; index < _movieList.getSize(); index++) {
             descriptionList.add(_movieList.getValue(index).GetDescription());
         }
-
-        return descriptionList;
+        return new ArrayList<>(descriptionList.stream().distinct().collect(Collectors.toList()));
     }
 
     public Movie GetById(int id) {
         for (int index = 0; index < _movieList.getSize(); index++) {
             Movie entry = _movieList.getValue(index);
-
             if (entry.GetId() == id) {
                 return entry;
             }
         }
-
         return null;
+    }
+
+    @Override
+    public int GetHighestId() {
+        int highestId = -1;
+        for (int index = 0; index < _movieList.getSize(); index++) {
+            int id = _movieList.getValue(index).GetId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
     }
 
     @Override
     public SerializableList<Movie> SearchDataList(@NonNull String searchKey) {
         SerializableList<Movie> foundMovies = new SerializableList<>();
-
         for (int index = 0; index < _movieList.getSize(); index++) {
             Movie entry = _movieList.getValue(index);
-
-            if (String.valueOf(entry.GetId()).contains(searchKey)
-                    || entry.GetTitle().contains(searchKey)
-                    || entry.GetGenre().contains(searchKey)
-                    || entry.GetDescription().contains(searchKey)
-                    || String.valueOf(entry.GetRating()).contains(searchKey)) {
+            if (entry.toString().contains(searchKey)) {
                 foundMovies.addValue(entry);
             }
         }
-
         return sortListAlphabetically(foundMovies);
     }
 
