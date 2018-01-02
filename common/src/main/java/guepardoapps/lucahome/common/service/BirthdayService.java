@@ -549,7 +549,7 @@ public class BirthdayService implements IDataNotificationService {
 
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
-            if (birthday.HasBirthday() && _settingsController.IsBirthdayNotificationEnabled()) {
+            if (birthday.HasBirthday() && birthday.GetRemindMe() && _settingsController.IsBirthdayNotificationEnabled()) {
                 _notificationController.CreateSimpleNotification(birthday.GetNotificationId(), R.drawable.birthday, _receiverActivity, birthday.GetPhoto(), birthday.GetName(), birthday.GetNotificationBody(), true);
             }
         }

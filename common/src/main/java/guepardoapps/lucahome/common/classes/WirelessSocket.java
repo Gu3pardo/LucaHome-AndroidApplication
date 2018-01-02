@@ -156,11 +156,11 @@ public class WirelessSocket implements Serializable, ILucaClass {
     }
 
     public String CommandSetState() throws Exception {
-        return String.format(Locale.getDefault(), "%s%d%s", LucaServerAction.SET_SOCKET.toString(), _typeId, ((_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
+        return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
     }
 
     public String CommandChangeState() throws Exception {
-        return String.format(Locale.getDefault(), "%s%d%s", LucaServerAction.SET_SOCKET.toString(), _typeId, ((!_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
+        return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((!_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
     }
 
     @Override
