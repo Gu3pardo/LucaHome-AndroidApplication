@@ -37,4 +37,9 @@
         android:icon="@mipmap/ic_copyright_black_48dp"
         android:title="@string/pref_header_coins" />
 
+    <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$PositionPreferenceFragment"
+        android:icon="@mipmap/ic_place_black_48dp"
+        android:title="@string/pref_header_positioning" />
+
 </preference-headers>

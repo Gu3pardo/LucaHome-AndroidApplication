@@ -77,7 +77,8 @@ public class MainService extends Service {
         DOWNLOAD_HASH_MAP.append(14, () -> WirelessSwitchService.getInstance().LoadData());
         DOWNLOAD_HASH_MAP.append(15, () -> ScheduleService.getInstance().LoadData());
         DOWNLOAD_HASH_MAP.append(16, () -> TimerService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(17, () -> MapContentService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(17, () -> PuckJsListService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(18, () -> MapContentService.getInstance().LoadData());
     }
 
     private BroadcastController _broadcastController;
@@ -166,6 +167,14 @@ public class MainService extends Service {
     };
 
     private BroadcastReceiver _openWeatherCurrentWeatherDownloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
+        }
+    };
+
+    private BroadcastReceiver _puckJsDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
@@ -376,6 +385,11 @@ public class MainService extends Service {
                 SettingsController.getInstance().IsReloadWeatherEnabled(),
                 SettingsController.getInstance().GetReloadWeatherTimeout());
 
+        PuckJsListService.getInstance().Initialize(
+                this,
+                SettingsController.getInstance().IsReloadPuckJsEnabled(),
+                SettingsController.getInstance().GetReloadPuckJsTimeout());
+
         ScheduleService.getInstance().Initialize(
                 this,
                 SettingsController.getInstance().IsReloadScheduleEnabled(),
@@ -442,6 +456,7 @@ public class MainService extends Service {
         MoneyMeterListService.getInstance().Dispose();
         MovieService.getInstance().Dispose();
         OpenWeatherService.getInstance().Dispose();
+        PuckJsListService.getInstance().Dispose();
         ScheduleService.getInstance().Dispose();
         SecurityService.getInstance().Dispose();
         ShoppingListService.getInstance().Dispose();
@@ -467,6 +482,7 @@ public class MainService extends Service {
         _receiverController.RegisterReceiver(_movieDownloadFinishedReceiver, new String[]{MovieService.MovieDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_openWeatherCurrentWeatherDownloadFinishedReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_openWeatherForecastWeatherDownloadFinishedReceiver, new String[]{OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_puckJsDownloadFinishedReceiver, new String[]{PuckJsListService.PuckJsListDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_scheduleDownloadFinishedReceiver, new String[]{ScheduleService.ScheduleDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_securityDownloadFinishedReceiver, new String[]{SecurityService.SecurityDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_shoppingListDownloadFinishedReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});

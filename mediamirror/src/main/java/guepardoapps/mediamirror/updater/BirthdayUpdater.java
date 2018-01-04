@@ -13,6 +13,7 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 import guepardoapps.lucahome.common.service.BirthdayService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
 
@@ -31,11 +32,10 @@ public class BirthdayUpdater {
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            BirthdayService.BirthdayDownloadFinishedContent result =
-                    (BirthdayService.BirthdayDownloadFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
+            ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
 
             if (result != null) {
-                SerializableList<LucaBirthday> loadedBirthdayList = result.BirthdayList;
+                SerializableList<LucaBirthday> loadedBirthdayList = BirthdayService.getInstance().GetDataList();
                 SerializableList<LucaBirthday> _nextBirthdaysList = new SerializableList<>();
 
                 if (loadedBirthdayList != null) {

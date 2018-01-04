@@ -7,12 +7,13 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
+import android.telephony.TelephonyManager;
 
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
@@ -42,11 +43,20 @@ public class NetworkController {
         if (connectivityManager == null) {
             return false;
         }
-        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        return activeNetwork != null && activeNetwork.isConnectedOrConnecting();
     }
 
     public boolean IsWifiConnected() {
+        return IsNetworkTypeEnabled(ConnectivityManager.TYPE_WIFI);
+    }
+
+    public boolean IsMobileDataEnabled() {
+        return IsNetworkTypeEnabled(ConnectivityManager.TYPE_MOBILE);
+    }
+
+    public boolean IsNetworkTypeEnabled(int networkType) {
         if (!IsNetworkAvailable()) {
             return false;
         }
@@ -58,7 +68,7 @@ public class NetworkController {
 
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
         if (activeNetwork != null) {
-            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+            if (activeNetwork.getType() == networkType) {
                 return true;
             }
         }
@@ -102,6 +112,61 @@ public class NetworkController {
         }
 
         return false;
+    }
+
+    public boolean SetWifiState(boolean newWifiState) {
+        WifiManager wifiManager = (WifiManager) _context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (wifiManager == null) {
+            return false;
+        }
+        wifiManager.setWifiEnabled(newWifiState);
+        return true;
+    }
+
+    public boolean SetMobileDataState(boolean newMobileDataState) {
+        try {
+            TelephonyManager telephonyManager = (TelephonyManager) _context.getSystemService(Context.TELEPHONY_SERVICE);
+            if (telephonyManager == null) {
+                return false;
+            }
+
+            Method setMobileDataEnabledMethod = telephonyManager.getClass().getDeclaredMethod("setDataEnabled", boolean.class);
+            if (setMobileDataEnabledMethod != null) {
+                setMobileDataEnabledMethod.invoke(telephonyManager, newMobileDataState);
+                return true;
+            }
+        } catch (Exception exception) {
+            Logger.getInstance().Error(TAG, exception.toString());
+        }
+        return false;
+    }
+
+    public String GetWifiSsid() {
+        if (!IsWifiConnected()) {
+            return "";
+        }
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager == null) {
+            return "";
+        }
+
+        NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+        if (activeNetwork != null) {
+            if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI) {
+                WifiManager wifiManager = (WifiManager) _context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if (wifiManager == null) {
+                    return "";
+                }
+
+                WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+                return wifiInfo.getSSID();
+            } else {
+                Logger.getInstance().Warning(TAG, "Active network is not wifi: " + String.valueOf(activeNetwork.getType()));
+            }
+        }
+
+        return "";
     }
 
     public String GetIpAddress() {

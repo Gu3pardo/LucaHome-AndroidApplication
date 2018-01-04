@@ -27,6 +27,7 @@ public class DownloadController {
         MeterData, MeterDataAdd, MeterDataUpdate, MeterDataDelete,
         MoneyMeterData, MoneyMeterDataAdd, MoneyMeterDataUpdate, MoneyMeterDataDelete,
         Movie, MovieUpdate,
+        PuckJsList, PuckJsAdd, PuckJsDelete, PuckJsUpdate,
         Schedule, ScheduleSet, ScheduleAdd, ScheduleUpdate, ScheduleDelete,
         Security, SecurityCamera, SecurityCameraControl,
         ShoppingList, ShoppingListAdd, ShoppingListDelete, ShoppingListUpdate,

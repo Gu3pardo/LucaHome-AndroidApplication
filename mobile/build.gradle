@@ -7,8 +7,8 @@ android {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 50101
-        versionName "5.1.1.180102"
+        versionCode 50200
+        versionName "5.2.0.180104"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     compileOptions {

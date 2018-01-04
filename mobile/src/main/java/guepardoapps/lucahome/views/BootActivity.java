@@ -16,12 +16,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
+import java.util.List;
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
@@ -38,7 +38,16 @@ import guepardoapps.lucahome.service.NavigationService;
 public class BootActivity extends AppCompatActivity {
     private static final String TAG = BootActivity.class.getSimpleName();
 
+    private static final String[] PERMISSIONS_TO_REQUEST = new String[]{
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.MODIFY_PHONE_STATE,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+    private boolean _downloadFinished;
     private boolean _loginAttempt;
+    private boolean _permissionCheckedFinished;
 
     /**
      * Initiate UI
@@ -89,15 +98,8 @@ public class BootActivity extends AppCompatActivity {
             if (progress != null) {
                 _percentProgressBar.setProgress((int) progress.DownloadProgress);
                 _percentProgressTextView.setText(String.format(Locale.getDefault(), "%.0f %%", progress.DownloadProgress));
-                if (progress.DownloadFinished) {
-                    NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivity(BootActivity.this, MainActivity.class);
-                    if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
-                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                        displayErrorSnackBar("Failed to navigate back to MainActivity! Please contact LucaHome support!");
-                    } else {
-                        finish();
-                    }
-                }
+                _downloadFinished = progress.DownloadFinished;
+                checkNavigateToMain();
             }
         }
     };
@@ -115,20 +117,20 @@ public class BootActivity extends AppCompatActivity {
         _receiverController = new ReceiverController(this);
 
         Dexter.withActivity(this)
-                .withPermission(Manifest.permission.READ_CONTACTS)
-                .withListener(new PermissionListener() {
+                .withPermissions(PERMISSIONS_TO_REQUEST)
+                .withListener(new MultiplePermissionsListener() {
                     @Override
-                    public void onPermissionGranted(PermissionGrantedResponse response) {
-                        Toasty.success(BootActivity.this, "Permission READ_CONTACTS granted! Thanks!", Toast.LENGTH_LONG).show();
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            Toasty.success(BootActivity.this, "All permissions granted! Thanks!", Toast.LENGTH_LONG).show();
+                        }
+                        _permissionCheckedFinished = true;
+                        checkNavigateToMain();
                     }
 
                     @Override
-                    public void onPermissionDenied(PermissionDeniedResponse response) {
-                        displayErrorSnackBar("Read contacts is necessary for birthday list!");
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
                     }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {/* ... */}
                 }).check();
     }
 
@@ -195,6 +197,18 @@ public class BootActivity extends AppCompatActivity {
         }
 
         return super.onKeyDown(keyCode, event);
+    }
+
+    private void checkNavigateToMain() {
+        if (_downloadFinished && _permissionCheckedFinished) {
+            NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivity(BootActivity.this, MainActivity.class);
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate back to MainActivity! Please contact LucaHome support!");
+            } else {
+                finish();
+            }
+        }
     }
 
     private void displayErrorSnackBar(@NonNull String message) {

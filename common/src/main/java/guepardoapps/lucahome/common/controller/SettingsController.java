@@ -14,7 +14,7 @@ public class SettingsController {
 
     private static final String TAG = SettingsController.class.getSimpleName();
 
-    private static final String PREF_SETTINGS_INSTALLED = "settings_v5.1.0.171229_installed";
+    private static final String PREF_SETTINGS_INSTALLED = "settings_v5.2.0.180104_installed";
 
     public static final String PREF_USER_NAME = "user_name";
     public static final String PREF_USER_PASS_PHRASE = "user_passphrase";
@@ -44,6 +44,7 @@ public class SettingsController {
     public static final String PREF_RELOAD_METER_DATA_ENABLED = "reload_meter_data_enabled";
     public static final String PREF_RELOAD_MONEY_METER_DATA_ENABLED = "reload_money_meter_data_enabled";
     public static final String PREF_RELOAD_MOVIE_ENABLED = "reload_movie_enabled";
+    public static final String PREF_RELOAD_PUCKJS_ENABLED = "reload_puckjs_enabled";
     public static final String PREF_RELOAD_SCHEDULE_ENABLED = "reload_schedule_enabled";
     public static final String PREF_RELOAD_SECURITY_ENABLED = "reload_security_enabled";
     public static final String PREF_RELOAD_SHOPPING_ENABLED = "reload_shopping_enabled";
@@ -60,6 +61,7 @@ public class SettingsController {
     public static final String PREF_RELOAD_METER_DATA_TIMEOUT = "reload_meter_data_timeout";
     public static final String PREF_RELOAD_MONEY_METER_DATA_TIMEOUT = "reload_money_meter_data_timeout";
     public static final String PREF_RELOAD_MOVIE_TIMEOUT = "reload_movie_timeout";
+    public static final String PREF_RELOAD_PUCKJS_TIMEOUT = "reload_puckjs_timeout";
     public static final String PREF_RELOAD_SCHEDULE_TIMEOUT = "reload_schedule_timeout";
     public static final String PREF_RELOAD_SECURITY_TIMEOUT = "reload_security_timeout";
     public static final String PREF_RELOAD_SHOPPING_TIMEOUT = "reload_shopping_timeout";
@@ -67,6 +69,9 @@ public class SettingsController {
     public static final String PREF_RELOAD_WEATHER_TIMEOUT = "reload_weather_timeout";
     public static final String PREF_RELOAD_WIRELESSSOCKET_TIMEOUT = "reload_wirelesssocket_timeout";
     public static final String PREF_RELOAD_WIRELESSSWITCH_TIMEOUT = "reload_wirelessswitch_timeout";
+
+    public static final String PREF_RELOAD_POSITION_ENABLED = "reload_position_enabled";
+    public static final String PREF_RELOAD_POSITION_TIMEOUT_SEC = "reload_position_timeout_sec";
 
     public static final String PREF_COIN_HOURS_TREND = "coin_hours_trend";
 
@@ -109,6 +114,7 @@ public class SettingsController {
         _sharedPrefController.SaveStringValue(PREF_RELOAD_METER_DATA_TIMEOUT, "240");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MONEY_METER_DATA_TIMEOUT, "240");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_MOVIE_TIMEOUT, "60");
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_PUCKJS_TIMEOUT, "60");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_SCHEDULE_TIMEOUT, "60");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_SECURITY_TIMEOUT, "15");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_SHOPPING_TIMEOUT, "60");
@@ -116,6 +122,8 @@ public class SettingsController {
         _sharedPrefController.SaveStringValue(PREF_RELOAD_WEATHER_TIMEOUT, "5");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT, "15");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT, "15");
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_POSITION_TIMEOUT_SEC, "30");
 
         _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED, true);
     }
@@ -300,6 +308,13 @@ public class SettingsController {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MOVIE_ENABLED);
     }
 
+    public boolean IsReloadPuckJsEnabled() {
+        if (!AreReloadsEnabled()) {
+            return false;
+        }
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_PUCKJS_ENABLED);
+    }
+
     public boolean IsReloadScheduleEnabled() {
         if (!AreReloadsEnabled()) {
             return false;
@@ -389,6 +404,11 @@ public class SettingsController {
         return Integer.parseInt(stringValue);
     }
 
+    public int GetReloadPuckJsTimeout() {
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_PUCKJS_TIMEOUT);
+        return Integer.parseInt(stringValue);
+    }
+
     public int GetReloadScheduleTimeout() {
         String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_SCHEDULE_TIMEOUT);
         return Integer.parseInt(stringValue);
@@ -421,6 +441,15 @@ public class SettingsController {
 
     public int GetReloadWirelessSwitchTimeout() {
         String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT);
+        return Integer.parseInt(stringValue);
+    }
+
+    public boolean IsReloadPositionEnabled() {
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_POSITION_ENABLED);
+    }
+
+    public int GetReloadPositionTimeoutSec() {
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_POSITION_TIMEOUT_SEC);
         return Integer.parseInt(stringValue);
     }
 

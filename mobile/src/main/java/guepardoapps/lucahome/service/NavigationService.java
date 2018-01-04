@@ -122,6 +122,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -159,6 +160,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -188,6 +190,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -217,6 +220,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -240,6 +244,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -269,6 +274,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -291,6 +297,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -320,6 +327,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MenuActivity.class)
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -350,6 +358,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieEditActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -369,6 +378,37 @@ public class NavigationService {
 
             return NavigationResult.PERMITTED;
 
+        } else if (startActivityContext.getClass() == PuckJsActivity.class) {
+            if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(CoinActivity.class)
+                    || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
+                    || endActivity.getClass().isInstance(LoginActivity.class)
+                    || endActivity.getClass().isInstance(MainActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
+                    || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsEditActivity.class)
+                    || endActivity.getClass().isInstance(ScheduleActivity.class)
+                    || endActivity.getClass().isInstance(SecurityActivity.class)
+                    || endActivity.getClass().isInstance(SettingsActivity.class)
+                    || endActivity.getClass().isInstance(ShoppingListActivity.class)
+                    || endActivity.getClass().isInstance(TimerActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
+        } else if (startActivityContext.getClass() == PuckJsEditActivity.class) {
+            if (endActivity.getClass().isInstance(PuckJsActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
         } else if (startActivityContext.getClass() == ScheduleActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
@@ -380,6 +420,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleEditActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -410,6 +451,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
                     || endActivity.getClass().isInstance(ShoppingListActivity.class)
@@ -432,6 +474,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -455,6 +498,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -485,6 +529,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -515,6 +560,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)
@@ -545,6 +591,7 @@ public class NavigationService {
                     || endActivity.getClass().isInstance(MeterDataActivity.class)
                     || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
                     || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
                     || endActivity.getClass().isInstance(ScheduleActivity.class)
                     || endActivity.getClass().isInstance(SecurityActivity.class)
                     || endActivity.getClass().isInstance(SettingsActivity.class)

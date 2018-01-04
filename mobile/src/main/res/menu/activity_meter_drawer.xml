@@ -18,6 +18,10 @@
                 android:id="@+id/nav_timer"
                 android:icon="@mipmap/ic_timer_black_48dp"
                 android:title="Timer" />
+            <item
+                android:id="@+id/nav_puckjs"
+                android:icon="@mipmap/ic_album_black_48dp"
+                android:title="PuckJs" />
         </menu>
     </item>
 

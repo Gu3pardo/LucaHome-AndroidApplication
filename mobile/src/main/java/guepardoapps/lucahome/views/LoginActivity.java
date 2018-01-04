@@ -1,5 +1,6 @@
 package guepardoapps.lucahome.views;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,13 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.karumi.dexter.Dexter;
+import com.karumi.dexter.MultiplePermissionsReport;
+import com.karumi.dexter.PermissionToken;
+import com.karumi.dexter.listener.PermissionRequest;
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +33,7 @@ import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
 
+import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
@@ -39,6 +48,13 @@ import guepardoapps.lucahome.service.NavigationService;
  */
 public class LoginActivity extends AppCompatActivity {
     private static String TAG = LoginActivity.class.getSimpleName();
+
+    private static final String[] PERMISSIONS_TO_REQUEST = new String[]{
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.MODIFY_PHONE_STATE,
+            Manifest.permission.READ_CONTACTS,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
     /**
      * ReceiverController to register and unregister from broadcasts of the UserService
@@ -64,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
             if (!result.Success) {
                 Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Login failed: %s!", Tools.DecompressByteArrayToString(result.Response)));
 
-                displayFailSnacky(Tools.DecompressByteArrayToString(result.Response));
+                displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
 
                 _passwordView.setError(createErrorText(getString(R.string.error_invalid_password)));
                 _userView.setError(createErrorText(getString(R.string.error_invalid_user)));
@@ -81,7 +97,7 @@ public class LoginActivity extends AppCompatActivity {
                     NavigationService.NavigationResult navigationResult = NavigationService.getInstance().GoBack(LoginActivity.this);
                     if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
                         Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
-                        displayFailSnacky("Failed to navigate back to BootActivity! Please contact LucaHome support!");
+                        displayErrorSnackBar("Failed to navigate back to BootActivity! Please contact LucaHome support!");
                     }
                 }, Snacky.LENGTH_LONG);
             }
@@ -118,6 +134,21 @@ public class LoginActivity extends AppCompatActivity {
 
         _loginFormView = findViewById(R.id.login_form);
         _progressView = findViewById(R.id.login_progress);
+
+        Dexter.withActivity(this)
+                .withPermissions(PERMISSIONS_TO_REQUEST)
+                .withListener(new MultiplePermissionsListener() {
+                    @Override
+                    public void onPermissionsChecked(MultiplePermissionsReport report) {
+                        if (report.areAllPermissionsGranted()) {
+                            Toasty.success(LoginActivity.this, "All permissions granted! Thanks!", Toast.LENGTH_LONG).show();
+                        }
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(List<PermissionRequest> permissions, PermissionToken token) {
+                    }
+                }).check();
     }
 
     @Override
@@ -222,7 +253,7 @@ public class LoginActivity extends AppCompatActivity {
         return spannableStringBuilder;
     }
 
-    private void displayFailSnacky(@NonNull String message) {
+    private void displayErrorSnackBar(@NonNull String message) {
         Snacky.builder()
                 .setActivty(LoginActivity.this)
                 .setText(message)

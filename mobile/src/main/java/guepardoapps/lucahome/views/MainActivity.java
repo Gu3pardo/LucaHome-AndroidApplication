@@ -33,6 +33,7 @@ import guepardoapps.lucahome.builders.MainListViewBuilder;
 import guepardoapps.lucahome.builders.MapContentViewBuilder;
 import guepardoapps.lucahome.classes.MainListViewItem;
 import guepardoapps.lucahome.common.service.MapContentService;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.service.MainService;
 import guepardoapps.lucahome.service.NavigationService;
 
@@ -76,17 +77,6 @@ public class MainActivity extends AppCompatActivity {
     };
 
     /**
-     * BroadcastReceiver to receive updates for the current or forecast weather
-     */
-    private BroadcastReceiver _openWeatherUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            updateWeatherCard();
-            updateMapContent();
-        }
-    };
-
-    /**
      * BroadcastReceiver to receive progress and success state of initial app download
      */
     private BroadcastReceiver _mainServiceDownloadProgressReceiver = new BroadcastReceiver() {
@@ -118,6 +108,27 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
             _mapContentViewBuilder.AddViewsToMap();
+        }
+    };
+
+    /**
+     * BroadcastReceiver to receive updates for the current or forecast weather
+     */
+    private BroadcastReceiver _openWeatherUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            updateWeatherCard();
+            updateMapContent();
+        }
+    };
+
+    /**
+     * BroadcastReceiver to receive updates for the wirelessSockets
+     */
+    private BroadcastReceiver _wirelessSocketUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MapContentService.getInstance().LoadData();
         }
     };
 
@@ -191,9 +202,10 @@ public class MainActivity extends AppCompatActivity {
 
         NavigationService.getInstance().ClearGoBackList();
 
-        _receiverController.RegisterReceiver(_openWeatherUpdateReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast, OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_mainServiceDownloadProgressReceiver, new String[]{MainService.MainServiceDownloadCountBroadcast});
         _receiverController.RegisterReceiver(_mapContentUpdateReceiver, new String[]{MapContentService.MapContentDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_openWeatherUpdateReceiver, new String[]{OpenWeatherService.CurrentWeatherDownloadFinishedBroadcast, OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_wirelessSocketUpdateReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
 
         if (_mainServiceBinder == null) {
             bindService(new Intent(this, MainService.class), _mainServiceConnection, Context.BIND_AUTO_CREATE);
@@ -238,16 +250,16 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    private void updateMapContent() {
+        _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
+        _mapContentViewBuilder.AddViewsToMap();
+    }
+
     private void updateWeatherCard() {
         _mainListViewBuilder.UpdateItemDescription(MainListViewItem.Type.Weather, String.format(
                 Locale.getDefault(),
                 "Current temperature: %.2f degree Celsius\nCurrent condition: %s",
                 OpenWeatherService.getInstance().CurrentWeather().GetTemperature(), OpenWeatherService.getInstance().CurrentWeather().GetDescription()));
         _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, OpenWeatherService.getInstance().CurrentWeather().GetCondition().GetWallpaper());
-    }
-
-    private void updateMapContent() {
-        _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
-        _mapContentViewBuilder.AddViewsToMap();
     }
 }

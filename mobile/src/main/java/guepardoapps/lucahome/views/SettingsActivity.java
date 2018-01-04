@@ -37,6 +37,7 @@ import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.common.service.MeterListService;
 import guepardoapps.lucahome.common.service.MoneyMeterListService;
 import guepardoapps.lucahome.common.service.MovieService;
+import guepardoapps.lucahome.common.service.PuckJsListService;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.SecurityService;
 import guepardoapps.lucahome.common.service.ShoppingListService;
@@ -117,6 +118,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_MOVIE_TIMEOUT)) {
                     MovieService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_PUCKJS_TIMEOUT)) {
+                    PuckJsListService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
+                    preference.setSummary((String) value);
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_SCHEDULE_TIMEOUT)) {
                     ScheduleService.getInstance().SetReloadTimeout((Integer.parseInt((String) value)));
                     preference.setSummary((String) value);
@@ -142,6 +146,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_COIN_HOURS_TREND)) {
                     int integerValue = Integer.parseInt((String) value);
                     CoinService.getInstance().SetCoinHoursTrend(integerValue);
+                    preference.setSummary((String) value);
+
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_POSITION_TIMEOUT_SEC)) {
+                    // TODO add positioning service
                     preference.setSummary((String) value);
                 }
 
@@ -204,6 +212,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         MoneyMeterListService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadMoneyMeterDataEnabled());
                         MovieService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadMovieEnabled());
                         OpenWeatherService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadWeatherEnabled());
+                        PuckJsListService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadPuckJsEnabled());
                         ScheduleService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadScheduleEnabled());
                         SecurityService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadSecurityEnabled());
                         ShoppingListService.getInstance().SetReloadEnabled(SettingsController.getInstance().IsReloadShoppingEnabled());
@@ -220,6 +229,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         MoneyMeterListService.getInstance().SetReloadEnabled(false);
                         MovieService.getInstance().SetReloadEnabled(false);
                         OpenWeatherService.getInstance().SetReloadEnabled(false);
+                        PuckJsListService.getInstance().SetReloadEnabled(false);
                         ScheduleService.getInstance().SetReloadEnabled(false);
                         SecurityService.getInstance().SetReloadEnabled(false);
                         ShoppingListService.getInstance().SetReloadEnabled(false);
@@ -227,6 +237,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         WirelessSocketService.getInstance().SetReloadEnabled(false);
                         WirelessSwitchService.getInstance().SetReloadEnabled(false);
                     }
+
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_POSITION_ENABLED)) {
+                    // TODO add positioning service
                 }
             }
 
@@ -363,18 +376,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         loadHeadersFromResource(R.xml.pref_headers, target);
     }
 
-    /*@Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        _logger.Debug(String.format("onKeyDown: keyCode: %s | event: %s", keyCode, event));
-
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            _navigationService.GoBack(this);
-            return true;
-        }
-
-        return super.onKeyDown(keyCode, event);
-    }*/
-
     /**
      * This method stops fragment injection in malicious applications.
      * Make sure to deny any unknown fragments here.
@@ -388,7 +389,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 || OpenWeatherPreferenceFragment.class.getName().equals(fragmentName)
                 || WirelessSocketPreferenceFragment.class.getName().equals(fragmentName)
                 || CoinPreferenceFragment.class.getName().equals(fragmentName)
-                || WirelessSwitchPreferenceFragment.class.getName().equals(fragmentName);
+                || WirelessSwitchPreferenceFragment.class.getName().equals(fragmentName)
+                || PositionPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
@@ -531,6 +533,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MOVIE_ENABLED));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_MOVIE_TIMEOUT));
+
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_PUCKJS_ENABLED));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_PUCKJS_TIMEOUT));
 
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_SCHEDULE_ENABLED));
             bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_SCHEDULE_TIMEOUT));
@@ -701,6 +706,37 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 bindPreferenceSummaryToValue(preference);
             }
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    /**
+     * This fragment shows reload preferences only. It is used when the
+     * activity is showing a two-pane settings UI.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class PositionPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_positioning);
+            setHasOptionsMenu(true);
+
+            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
+            // to their values. When their values change, their summaries are
+            // updated to reflect the new value, per the Android Design
+            // guidelines.
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_POSITION_ENABLED));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_POSITION_TIMEOUT_SEC));
         }
 
         @Override

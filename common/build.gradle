@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 50101
-        versionName "5.1.1.180102"
+        versionCode 50200
+        versionName "5.2.0.180104"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testOptions {
             unitTests.returnDefaultValues = true
@@ -55,6 +55,7 @@ dependencies {
     implementation 'com.github.rey5137:material:1.2.4'
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'org.altbeacon:android-beacon-library:2.12.4'
     implementation 'org.jsoup:jsoup:1.10.3'
     testImplementation 'junit:junit:4.12'
 }

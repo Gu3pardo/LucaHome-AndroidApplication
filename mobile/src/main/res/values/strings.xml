@@ -35,6 +35,9 @@
     <string name="prompt_movie_title">Movie title</string>
     <string name="prompt_movie_genre">Movie genre</string>
     <string name="prompt_movie_description">Movie description</string>
+    <string name="prompt_puckjs_name">PuckJs name</string>
+    <string name="prompt_puckjs_area">PuckJs area</string>
+    <string name="prompt_puckjs_mac">PuckJs mac</string>
     <string name="prompt_socket_name">Socket name</string>
     <string name="prompt_socket_area">Socket area</string>
     <string name="prompt_socket_code">Socket code</string>
@@ -158,6 +161,10 @@
     <string name="pref_title_reload_movie_timeout">Enter movie reload timeout in min</string>
     <integer name="pref_default_movie_timeout_min">60</integer>
 
+    <string name="pref_title_reload_puckjs">Reload puckjs data</string>
+    <string name="pref_title_reload_puckjs_timeout">Enter puckjs reload timeout in min</string>
+    <integer name="pref_default_puckjs_timeout_min">60</integer>
+
     <string name="pref_title_reload_schedule">Reload schedule data</string>
     <string name="pref_title_reload_schedule_timeout">Enter schedule reload timeout in min</string>
     <integer name="pref_default_schedule_timeout_min">60</integer>
@@ -186,6 +193,10 @@
     <string name="pref_title_reload_wireless_switch_timeout">Enter wireless switch reload timeout in min</string>
     <integer name="pref_default_wireless_switch_timeout_min">15</integer>
 
+    <string name="pref_title_reload_positioning">Reload positioning data</string>
+    <string name="pref_title_reload_positioning_timeout_sec">Enter positioning reload timeout in sec</string>
+    <integer name="pref_default_positioning_timeout_sec">30</integer>
+
     <!-- Settings for Open Weather -->
     <string name="pref_header_open_weather">Open Weather</string>
 
@@ -194,12 +205,15 @@
 
     <string name="pref_title_change_weather_wallpaper">Change wallpaper</string>
 
-    <!-- Settings for User -->
+    <!-- Settings for Wireless socket -->
     <string name="pref_header_wireless_socket">Wireless socket</string>
 
     <!-- Settings for coins -->
     <string name="pref_header_coins">Coins</string>
     <string name="pref_title_enter_coin_hour_trend">Enter hours for trend</string>
+
+    <!-- Settings for positioning -->
+    <string name="pref_header_positioning">Positioning</string>
 
     <!-- Title for activities -->
     <string name="title_activity_wireless_socket">Wireless Sockets</string>
@@ -222,6 +236,8 @@
     <string name="title_activity_money_meter_data_edit">Edit money meter data</string>
     <string name="title_activity_movie">Movies</string>
     <string name="title_activity_movie_edit">Edit Movies</string>
+    <string name="title_activity_puckjs">PuckJs</string>
+    <string name="title_activity_puckjs_edit">Edit PuckJs</string>
     <string name="title_activity_shopping_list">Shopping List</string>
     <string name="title_activity_shopping_list_edit">Edit Shopping List</string>
     <string name="title_activity_forecast_weather">Forecast weather</string>

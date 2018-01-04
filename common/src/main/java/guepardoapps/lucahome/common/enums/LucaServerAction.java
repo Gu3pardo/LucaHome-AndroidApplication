@@ -95,11 +95,17 @@ public enum LucaServerAction implements Serializable {
     UPDATE_MONEY_METER_DATA(133, "updatemoneymeterdata&id="),
     DELETE_MONEY_METER_DATA(134, "deletemoneymeterdata&id="),
 
+    //PUCKJS
+    GET_PUCKJS_LIST(140, "getpuckjs"),
+    ADD_PUCKJS_F(141, "addpuckjs&id=%d&name=%s&area=%s&group=%s"),
+    UPDATE_PUCKJS_F(142, "updatepuckjs&id=%d&name=%s&area=%s&group=%s"),
+    DELETE_PUCKJS_F(143, "deletepuckjs&id=%d"),
+
     //TEMPERATURE
-    GET_TEMPERATURES(140, "getcurrenttemperature"),
+    GET_TEMPERATURES(150, "getcurrenttemperature"),
 
     //USER
-    VALIDATE_USER(150, "validateuser");
+    VALIDATE_USER(160, "validateuser");
 
     private int _id;
     private String _action;

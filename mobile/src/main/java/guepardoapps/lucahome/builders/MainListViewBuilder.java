@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
@@ -16,6 +17,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.classes.MainListViewItem;
 import guepardoapps.lucahome.common.classes.MeterData;
 import guepardoapps.lucahome.common.classes.MoneyMeterData;
+import guepardoapps.lucahome.common.classes.PuckJs;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
 import guepardoapps.lucahome.common.dto.CoinDto;
 import guepardoapps.lucahome.common.dto.ScheduleDto;
@@ -29,6 +31,7 @@ import guepardoapps.lucahome.common.service.BirthdayService;
 import guepardoapps.lucahome.common.service.CoinService;
 import guepardoapps.lucahome.common.service.MeterListService;
 import guepardoapps.lucahome.common.service.MoneyMeterListService;
+import guepardoapps.lucahome.common.service.PuckJsListService;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.ShoppingListService;
 import guepardoapps.lucahome.common.service.UserService;
@@ -80,7 +83,8 @@ public class MainListViewBuilder {
                 () -> navigateTo(BirthdayActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetDataList().getSize(), "", new SerializableDate(), "", true, BirthdayDto.Action.Add));
+                    int newHighestId = BirthdayService.getInstance().GetHighestId() + 1;
+                    data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(newHighestId, "", new SerializableDate(), "", true, BirthdayDto.Action.Add));
                     navigateWithDataTo(BirthdayEditActivity.class, data);
                 },
                 MainListViewItem.Type.Birthday
@@ -91,7 +95,8 @@ public class MainListViewBuilder {
                 () -> navigateTo(CoinActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(CoinService.CoinIntent, new CoinDto(CoinService.getInstance().GetDataList().getSize(), "", "", -1, CoinDto.Action.Add));
+                    int newHighestId = CoinService.getInstance().GetHighestId() + 1;
+                    data.putSerializable(CoinService.CoinIntent, new CoinDto(newHighestId, "", "", -1, CoinDto.Action.Add));
                     navigateWithDataTo(CoinEditActivity.class, data);
                 },
                 MainListViewItem.Type.Coin
@@ -143,12 +148,27 @@ public class MainListViewBuilder {
                 MainListViewItem.Type.Movie
         );
 
+        MainListViewItem puckJsItem = new MainListViewItem(
+                "PuckJs", "View all PuckJs", R.drawable.main_image_puckjs,
+                () -> navigateTo(PuckJsActivity.class),
+                () -> {
+                    int newHighestId = PuckJsListService.getInstance().GetHighestId() + 1;
+                    PuckJs puckJs = new PuckJs(newHighestId, "", "", "", false, PuckJs.LucaServerDbAction.Add);
+                    Bundle data = new Bundle();
+                    data.putSerializable(PuckJsListService.PuckJsIntent, puckJs);
+                    navigateWithDataTo(PuckJsEditActivity.class, data);
+                },
+                MainListViewItem.Type.PuckJs
+        );
+
         MainListViewItem scheduleItem = new MainListViewItem(
                 "Schedules", "Manage sockets using schedules", R.drawable.main_image_schedule,
                 () -> navigateTo(ScheduleActivity.class),
                 () -> {
+                    int newHighestId = ScheduleService.getInstance().GetHighestId() + 1;
+                    ScheduleDto schedule = new ScheduleDto(newHighestId, "", null, null, Weekday.NULL, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add);
                     Bundle data = new Bundle();
-                    data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(ScheduleService.getInstance().GetDataList().getSize(), "", null, null, Weekday.NULL, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
+                    data.putSerializable(ScheduleService.ScheduleIntent, schedule);
                     navigateWithDataTo(ScheduleEditActivity.class, data);
                 },
                 MainListViewItem.Type.Schedule
@@ -165,7 +185,8 @@ public class MainListViewBuilder {
                 () -> navigateTo(ShoppingListActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(ShoppingListService.getInstance().GetDataList().getSize(), "", ShoppingEntryGroup.OTHER, 1, ""));
+                    int newHighestId = ShoppingListService.getInstance().GetHighestId() + 1;
+                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(newHighestId, "", ShoppingEntryGroup.OTHER, 1, ""));
                     navigateWithDataTo(ShoppingListEditActivity.class, data);
                 },
                 MainListViewItem.Type.Shopping
@@ -189,7 +210,8 @@ public class MainListViewBuilder {
                 () -> navigateTo(WirelessSocketActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(WirelessSocketService.getInstance().GetDataList().getSize(), "", "", "", false, WirelessSocketDto.Action.Add));
+                    int newHighestId = WirelessSocketService.getInstance().GetHighestId() + 1;
+                    data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(newHighestId, "", "", "", false, WirelessSocketDto.Action.Add));
                     navigateWithDataTo(WirelessSocketEditActivity.class, data);
                 },
                 true, MainListViewItem.Type.WirelessSocket
@@ -200,7 +222,8 @@ public class MainListViewBuilder {
                 () -> navigateTo(WirelessSwitchActivity.class),
                 () -> {
                     Bundle data = new Bundle();
-                    data.putSerializable(WirelessSwitchService.WirelessSwitchIntent, new WirelessSwitchDto(WirelessSwitchService.getInstance().GetDataList().getSize(), "", "", -1, '1', WirelessSwitchDto.Action.Add));
+                    int newHighestId = WirelessSwitchService.getInstance().GetHighestId() + 1;
+                    data.putSerializable(WirelessSwitchService.WirelessSwitchIntent, new WirelessSwitchDto(newHighestId, "", "", -1, '1', WirelessSwitchDto.Action.Add));
                     navigateWithDataTo(WirelessSwitchEditActivity.class, data);
                 },
                 true, MainListViewItem.Type.WirelessSwitch
@@ -220,6 +243,7 @@ public class MainListViewBuilder {
         _mainListViewItems.addValue(securityItem);
         _mainListViewItems.addValue(scheduleItem);
         _mainListViewItems.addValue(timerItem);
+        _mainListViewItems.addValue(puckJsItem);
     }
 
     private void navigateTo(@NonNull Class<?> targetActivity) {
