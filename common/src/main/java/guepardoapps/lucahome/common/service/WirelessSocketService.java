@@ -84,7 +84,7 @@ public class WirelessSocketService implements IDataNotificationService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -95,7 +95,6 @@ public class WirelessSocketService implements IDataNotificationService {
     private NetworkController _networkController;
     private NotificationController _notificationController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private DatabaseWirelessSocketList _databaseWirelessSocketList;
 
@@ -299,7 +298,7 @@ public class WirelessSocketService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -339,7 +338,6 @@ public class WirelessSocketService implements IDataNotificationService {
         _networkController = new NetworkController(context);
         _notificationController = new NotificationController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
 
         _databaseWirelessSocketList = new DatabaseWirelessSocketList(context);
         _databaseWirelessSocketList.Open();
@@ -445,7 +443,7 @@ public class WirelessSocketService implements IDataNotificationService {
             return;
         }
 
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketDownloadFinishedBroadcast,
@@ -454,7 +452,7 @@ public class WirelessSocketService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketDownloadBroadcast();
             return;
@@ -488,7 +486,7 @@ public class WirelessSocketService implements IDataNotificationService {
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_SOCKETS.toString();
@@ -497,14 +495,14 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void ChangeWirelessSocketState(@NonNull WirelessSocket entry) throws Exception {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketSetBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandChangeState());
 
@@ -512,7 +510,7 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void SetWirelessSocketState(@NonNull WirelessSocket entry, boolean newState) throws Exception {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketSetBroadcast("No user");
             return;
@@ -520,7 +518,7 @@ public class WirelessSocketService implements IDataNotificationService {
 
         entry.SetActivated(newState);
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandSetState());
 
@@ -528,7 +526,7 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void SetWirelessSocketState(@NonNull String socketName, boolean newState) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketSetBroadcast("No user");
             return;
@@ -551,14 +549,14 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void DeactivateAllWirelessSockets() {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketSetBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 LucaServerAction.DEACTIVATE_ALL_SOCKETS);
 
@@ -566,7 +564,7 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void AddWirelessSocket(@NonNull WirelessSocket entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
 
@@ -577,14 +575,14 @@ public class WirelessSocketService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketAddBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
@@ -592,7 +590,7 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void UpdateWirelessSocket(@NonNull WirelessSocket entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
 
@@ -603,14 +601,14 @@ public class WirelessSocketService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -618,7 +616,7 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public void DeleteWirelessSocket(@NonNull WirelessSocket entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
 
@@ -629,14 +627,14 @@ public class WirelessSocketService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketDeleteBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 
@@ -644,7 +642,7 @@ public class WirelessSocketService implements IDataNotificationService {
     }
 
     public boolean GetWirelessSocketState(@NonNull String socketName) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedSocketGetBroadcast("No user");
             return false;
@@ -668,7 +666,7 @@ public class WirelessSocketService implements IDataNotificationService {
             Logger.getInstance().Warning(TAG, "_displayNotification is false!");
             return;
         }
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             Logger.getInstance().Warning(TAG, "No home network!");
             return;
         }

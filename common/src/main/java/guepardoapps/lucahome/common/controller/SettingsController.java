@@ -14,7 +14,7 @@ public class SettingsController {
 
     private static final String TAG = SettingsController.class.getSimpleName();
 
-    private static final String PREF_SETTINGS_INSTALLED = "settings_v5.2.0.180104_installed";
+    private static final String PREF_SETTINGS_INSTALLED = "settings_v5.2.0.180105_installed";
 
     public static final String PREF_USER_NAME = "user_name";
     public static final String PREF_USER_PASS_PHRASE = "user_passphrase";
@@ -70,8 +70,10 @@ public class SettingsController {
     public static final String PREF_RELOAD_WIRELESSSOCKET_TIMEOUT = "reload_wirelesssocket_timeout";
     public static final String PREF_RELOAD_WIRELESSSWITCH_TIMEOUT = "reload_wirelessswitch_timeout";
 
-    public static final String PREF_RELOAD_POSITION_ENABLED = "reload_position_enabled";
-    public static final String PREF_RELOAD_POSITION_TIMEOUT_SEC = "reload_position_timeout_sec";
+    public static final String PREF_HANDLE_BLUETOOTH_AUTOMATICALLY = "handle_bluetooth_automatically";
+    public static final String PREF_BEACONS_SCAN_ENABLED = "beacons_scan_enabled";
+    public static final String PREF_BEACONS_TIME_BETWEEN_SCANS_SEC = "beacons_time_between_scans_sec";
+    public static final String PREF_BEACONS_TIME_SCANS_MSEC = "beacons_time_scans_msec";
 
     public static final String PREF_COIN_HOURS_TREND = "coin_hours_trend";
 
@@ -123,7 +125,8 @@ public class SettingsController {
         _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT, "15");
         _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT, "15");
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_POSITION_TIMEOUT_SEC, "30");
+        _sharedPrefController.SaveStringValue(PREF_BEACONS_TIME_BETWEEN_SCANS_SEC, "15");
+        _sharedPrefController.SaveStringValue(PREF_BEACONS_TIME_SCANS_MSEC, "30000");
 
         _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED, true);
     }
@@ -444,12 +447,21 @@ public class SettingsController {
         return Integer.parseInt(stringValue);
     }
 
-    public boolean IsReloadPositionEnabled() {
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_POSITION_ENABLED);
+    public boolean HandleBluetoothAutomatically() {
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_HANDLE_BLUETOOTH_AUTOMATICALLY);
     }
 
-    public int GetReloadPositionTimeoutSec() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_POSITION_TIMEOUT_SEC);
+    public boolean IsBeaconScanEnabled() {
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_BEACONS_SCAN_ENABLED);
+    }
+
+    public int GetTimeBetweenBeaconScansSec() {
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_BEACONS_TIME_BETWEEN_SCANS_SEC);
+        return Integer.parseInt(stringValue);
+    }
+
+    public int GetTimeBeaconScansMsec() {
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_BEACONS_TIME_SCANS_MSEC);
         return Integer.parseInt(stringValue);
     }
 

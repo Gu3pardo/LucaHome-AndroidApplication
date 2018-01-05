@@ -72,7 +72,7 @@ public class ListedMenuService implements IDataService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -82,7 +82,6 @@ public class ListedMenuService implements IDataService {
     private DownloadController _downloadController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private DatabaseListedMenuList _databaseListedMenuList;
 
@@ -249,7 +248,7 @@ public class ListedMenuService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -285,7 +284,6 @@ public class ListedMenuService implements IDataService {
         _downloadController = new DownloadController(context);
         _networkController = new NetworkController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
 
         _databaseListedMenuList = new DatabaseListedMenuList(context);
         _databaseListedMenuList.Open();
@@ -372,7 +370,7 @@ public class ListedMenuService implements IDataService {
             return;
         }
 
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             _listedMenuList = _databaseListedMenuList.GetListedMenuList();
             _broadcastController.SendSerializableBroadcast(
                     ListedMenuDownloadFinishedBroadcast,
@@ -381,7 +379,7 @@ public class ListedMenuService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedListedMenuDownloadBroadcast();
             return;
@@ -414,7 +412,7 @@ public class ListedMenuService implements IDataService {
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_LISTEDMENU.toString();
@@ -423,7 +421,7 @@ public class ListedMenuService implements IDataService {
     }
 
     public void AddListedMenu(@NonNull ListedMenu entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
 
@@ -434,14 +432,14 @@ public class ListedMenuService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedListedMenuAddBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
@@ -449,7 +447,7 @@ public class ListedMenuService implements IDataService {
     }
 
     public void UpdateListedMenu(@NonNull ListedMenu entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
 
@@ -460,14 +458,14 @@ public class ListedMenuService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedListedMenuUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -475,7 +473,7 @@ public class ListedMenuService implements IDataService {
     }
 
     public void DeleteListedMenu(@NonNull ListedMenu entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
 
@@ -486,14 +484,14 @@ public class ListedMenuService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedListedMenuDeleteBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 

@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings("WeakerAccess")
 public class WirelessSocketRequirement {
     private static final String TAG = WirelessSocketRequirement.class.getSimpleName();
 

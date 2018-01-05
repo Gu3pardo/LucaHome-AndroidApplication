@@ -186,7 +186,7 @@ public class MainListViewBuilder {
                 () -> {
                     Bundle data = new Bundle();
                     int newHighestId = ShoppingListService.getInstance().GetHighestId() + 1;
-                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(newHighestId, "", ShoppingEntryGroup.OTHER, 1, ""));
+                    data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(newHighestId, "", ShoppingEntryGroup.OTHER, 1, "e"));
                     navigateWithDataTo(ShoppingListEditActivity.class, data);
                 },
                 MainListViewItem.Type.Shopping

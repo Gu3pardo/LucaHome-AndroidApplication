@@ -67,7 +67,7 @@ public class MediaServerService {
         @Override
         public void run() {
             //TODO reload method
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -76,7 +76,6 @@ public class MediaServerService {
     private BroadcastController _broadcastController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private Context _context;
     private MediaServerData _mediaServerData;
@@ -101,7 +100,7 @@ public class MediaServerService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -134,7 +133,6 @@ public class MediaServerService {
         _broadcastController = new BroadcastController(_context);
         _networkController = new NetworkController(_context);
         _receiverController = new ReceiverController(_context);
-        _settingsController = SettingsController.getInstance();
 
         _receiverController.RegisterReceiver(_mediaServerDownloadFinishedReceiver, new String[]{ClientTask.ClientTaskBroadcast});
 
@@ -164,7 +162,7 @@ public class MediaServerService {
             return;
         }
 
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             sendFailedDownloadBroadcast();
             return;
         }

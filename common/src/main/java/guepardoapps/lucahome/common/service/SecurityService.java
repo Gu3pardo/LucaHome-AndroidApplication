@@ -65,7 +65,7 @@ public class SecurityService implements IDataNotificationService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -76,7 +76,6 @@ public class SecurityService implements IDataNotificationService {
     private NetworkController _networkController;
     private NotificationController _notificationController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private SerializableList<Security> _securityList = new SerializableList<>();
 
@@ -208,7 +207,7 @@ public class SecurityService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -246,7 +245,6 @@ public class SecurityService implements IDataNotificationService {
         _networkController = new NetworkController(context);
         _notificationController = new NotificationController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
 
         _receiverController.RegisterReceiver(_securityDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_cameraStateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -285,14 +283,14 @@ public class SecurityService implements IDataNotificationService {
 
     @Override
     public void LoadData() {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_MOTION_DATA.toString();
@@ -301,14 +299,14 @@ public class SecurityService implements IDataNotificationService {
     }
 
     public void SetCameraState(boolean state) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + (state ? LucaServerAction.START_MOTION.toString() : LucaServerAction.STOP_MOTION.toString());
@@ -317,14 +315,14 @@ public class SecurityService implements IDataNotificationService {
     }
 
     public void SetMotionState(boolean state) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.SET_MOTION_CONTROL_TASK.toString() + (state ? "1" : "0");

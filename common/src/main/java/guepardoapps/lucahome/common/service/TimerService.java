@@ -68,7 +68,7 @@ public class TimerService implements IDataService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -78,7 +78,6 @@ public class TimerService implements IDataService {
     private DownloadController _downloadController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private SerializableList<LucaTimer> _timerList = new SerializableList<>();
 
@@ -235,7 +234,7 @@ public class TimerService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -270,7 +269,6 @@ public class TimerService implements IDataService {
         _downloadController = new DownloadController(context);
         _networkController = new NetworkController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
 
         _receiverController.RegisterReceiver(_timerDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_timerAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -351,14 +349,14 @@ public class TimerService implements IDataService {
 
     @Override
     public void LoadData() {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedTimerDownloadBroadcast();
             return;
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_SCHEDULES.toString();
@@ -367,14 +365,14 @@ public class TimerService implements IDataService {
     }
 
     public void AddTimer(@NonNull LucaTimer entry) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedTimerAddBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
@@ -382,14 +380,14 @@ public class TimerService implements IDataService {
     }
 
     public void UpdateTimer(@NonNull LucaTimer entry) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedTimerUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -397,14 +395,14 @@ public class TimerService implements IDataService {
     }
 
     public void DeleteTimer(@NonNull LucaTimer entry) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedTimerDeleteBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 

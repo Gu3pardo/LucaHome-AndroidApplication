@@ -72,7 +72,7 @@ public class PuckJsListService implements IDataService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -82,7 +82,6 @@ public class PuckJsListService implements IDataService {
     private DownloadController _downloadController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private DatabasePuckJsList _databasePuckJsList;
 
@@ -249,7 +248,7 @@ public class PuckJsListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -285,8 +284,6 @@ public class PuckJsListService implements IDataService {
         _downloadController = new DownloadController(context);
         _networkController = new NetworkController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
-        _settingsController.Initialize(context);
 
         _databasePuckJsList = new DatabasePuckJsList(context);
         _databasePuckJsList.Open();
@@ -381,7 +378,7 @@ public class PuckJsListService implements IDataService {
             return;
         }
 
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             _puckJsList = _databasePuckJsList.GetPuckJsList();
             _broadcastController.SendSerializableBroadcast(
                     PuckJsListDownloadFinishedBroadcast,
@@ -390,7 +387,7 @@ public class PuckJsListService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
@@ -424,7 +421,7 @@ public class PuckJsListService implements IDataService {
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_PUCKJS_LIST.toString();
@@ -433,7 +430,7 @@ public class PuckJsListService implements IDataService {
     }
 
     public void AddPuckJs(@NonNull PuckJs entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
 
@@ -444,14 +441,14 @@ public class PuckJsListService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedAddBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
@@ -459,7 +456,7 @@ public class PuckJsListService implements IDataService {
     }
 
     public void UpdatePuckJs(@NonNull PuckJs entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
 
@@ -470,14 +467,14 @@ public class PuckJsListService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -485,7 +482,7 @@ public class PuckJsListService implements IDataService {
     }
 
     public void DeletePuckJs(@NonNull PuckJs entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
 
@@ -496,14 +493,14 @@ public class PuckJsListService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDeleteBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 

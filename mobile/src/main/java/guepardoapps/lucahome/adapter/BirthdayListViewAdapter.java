@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -119,7 +120,7 @@ public class BirthdayListViewAdapter extends BaseAdapter {
         holder._ageTextView.setText(String.format(Locale.getDefault(), "%d years", birthday.GetAge()));
 
         if (birthday.HasBirthday()) {
-            holder._titleText.setBackgroundColor(_context.getResources().getColor(R.color.LightRed));
+            holder._titleText.setBackgroundColor(ContextCompat.getColor(_context, R.color.LightRed));
         }
 
         holder._groupText.setText(birthday.GetGroup());

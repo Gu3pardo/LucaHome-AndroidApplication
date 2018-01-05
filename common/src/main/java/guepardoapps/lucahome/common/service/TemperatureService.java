@@ -67,7 +67,7 @@ public class TemperatureService implements IDataNotificationService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -78,8 +78,6 @@ public class TemperatureService implements IDataNotificationService {
     private NetworkController _networkController;
     private NotificationController _notificationController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
-    private OpenWeatherService _openWeatherService;
 
     private SerializableList<Temperature> _temperatureList = new SerializableList<>();
 
@@ -119,7 +117,7 @@ public class TemperatureService implements IDataNotificationService {
 
             ShowNotification();
 
-            WeatherModel currentWeather = _openWeatherService.CurrentWeather();
+            WeatherModel currentWeather = OpenWeatherService.getInstance().CurrentWeather();
             if (currentWeather != null) {
                 Temperature currentWeatherTemperature = new Temperature(
                         currentWeather.GetTemperature(),
@@ -144,7 +142,7 @@ public class TemperatureService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -182,11 +180,8 @@ public class TemperatureService implements IDataNotificationService {
         _networkController = new NetworkController(context);
         _notificationController = new NotificationController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
-        _openWeatherService = OpenWeatherService.getInstance();
 
         _receiverController.RegisterReceiver(_temperatureDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
-
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
 
@@ -249,23 +244,23 @@ public class TemperatureService implements IDataNotificationService {
     }
 
     public String GetOpenWeatherCity() {
-        return _openWeatherService.GetCity();
+        return OpenWeatherService.getInstance().GetCity();
     }
 
     public void SetOpenWeatherCity(@NonNull String city) {
-        _openWeatherService.SetCity(city);
+        OpenWeatherService.getInstance().SetCity(city);
     }
 
     @Override
     public void LoadData() {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_TEMPERATURES.toString();

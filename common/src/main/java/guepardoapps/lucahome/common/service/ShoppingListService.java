@@ -73,7 +73,7 @@ public class ShoppingListService implements IDataService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -85,7 +85,6 @@ public class ShoppingListService implements IDataService {
     private DownloadController _downloadController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private DatabaseShoppingList _databaseShoppingList;
 
@@ -252,7 +251,7 @@ public class ShoppingListService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -290,8 +289,6 @@ public class ShoppingListService implements IDataService {
         _downloadController = new DownloadController(_context);
         _networkController = new NetworkController(_context);
         _receiverController = new ReceiverController(_context);
-        _settingsController = SettingsController.getInstance();
-        _settingsController.Initialize(_context);
 
         _databaseShoppingList = new DatabaseShoppingList(_context);
         _databaseShoppingList.Open();
@@ -398,7 +395,7 @@ public class ShoppingListService implements IDataService {
             return;
         }
 
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             _shoppingList = _databaseShoppingList.GetShoppingList();
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListDownloadFinishedBroadcast,
@@ -407,7 +404,7 @@ public class ShoppingListService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
@@ -441,7 +438,7 @@ public class ShoppingListService implements IDataService {
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_SHOPPING_LIST.toString();
@@ -450,7 +447,7 @@ public class ShoppingListService implements IDataService {
     }
 
     public void AddShoppingEntry(@NonNull ShoppingEntry entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
 
@@ -461,14 +458,14 @@ public class ShoppingListService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedAddBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
@@ -476,7 +473,7 @@ public class ShoppingListService implements IDataService {
     }
 
     public void UpdateShoppingEntry(@NonNull ShoppingEntry entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
 
@@ -487,14 +484,14 @@ public class ShoppingListService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -502,7 +499,7 @@ public class ShoppingListService implements IDataService {
     }
 
     public void DeleteShoppingEntry(@NonNull ShoppingEntry entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
 
@@ -513,14 +510,14 @@ public class ShoppingListService implements IDataService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDeleteBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 

@@ -1,6 +1,8 @@
 package guepardoapps.lucahome.bixby;
 
 import android.accessibilityservice.AccessibilityService;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -11,10 +13,14 @@ import java.lang.ref.WeakReference;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.NetworkController;
+import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.common.classes.Position;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.service.PositioningService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 
+@SuppressWarnings("unused")
 public class BixbyService extends AccessibilityService {
     private static final String TAG = BixbyService.class.getSimpleName();
     private static final String BIXBY_PACKAGE = "com.samsung.android.app.spage";
@@ -22,17 +28,40 @@ public class BixbyService extends AccessibilityService {
     private long _lastRunMillis = 0;
     private long _maxRunFrequencyMs = 500;
 
+    private Position _lastPosition;
+
     private NetworkController _networkController;
+    private ReceiverController _receiverController;
 
     private DatabaseBixbyActionList _databaseBixbyActionList;
     private DatabaseBixbyRequirementList _databaseBixbyRequirementList;
 
     private SerializableList<BixbyPair> _pairList;
 
+    @SuppressWarnings("FieldCanBeLocal")
+    private BroadcastReceiver _positioningUpdateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PositioningService.PositioningUpdateFinishedContent positionResult = (PositioningService.PositioningUpdateFinishedContent) intent.getSerializableExtra(PositioningService.PositioningCalulationFinishedBundle);
+            if (positionResult != null) {
+                if (positionResult.Success) {
+                    _lastPosition = positionResult.LatestPosition;
+                } else {
+                    Logger.getInstance().Warning(TAG, "Last calculation of position seems to be failed!");
+                }
+            } else {
+                Logger.getInstance().Error(TAG, "Received positionResult is null!");
+            }
+        }
+    };
+
     public BixbyService() {
         super();
         Logger.getInstance().Debug(TAG, "Constructor");
         _networkController = new NetworkController(this);
+        _receiverController = new ReceiverController(this);
+
+        _receiverController.RegisterReceiver(_positioningUpdateReceiver, new String[]{PositioningService.PositioningCalulationFinishedBroadcast});
 
         _databaseBixbyActionList = new DatabaseBixbyActionList(this);
         _databaseBixbyActionList.Open();
@@ -46,7 +75,8 @@ public class BixbyService extends AccessibilityService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Logger.getInstance().Error(TAG, "onDestroy");
+        _receiverController.Dispose();
+        Logger.getInstance().Warning(TAG, "onDestroy");
     }
 
     @Override
@@ -230,15 +260,11 @@ public class BixbyService extends AccessibilityService {
     }
 
     private boolean validatePositionRequirement(@NonNull BixbyRequirement bixbyRequirement) {
-        // TODO get position
-        String puckJsPosition = "Outside";
-        return puckJsPosition.contains(bixbyRequirement.GetPuckJsPosition());
+        return _lastPosition != null && bixbyRequirement.GetPuckJsPosition().contains(_lastPosition.GetPuckJs().GetArea());
     }
 
     private boolean validateLightRequirement(@NonNull LightRequirement lightRequirement) {
-        // TODO get light for position!!!
-        double puckJsLight = -1;
-        return lightRequirement.ValidateActualValue(puckJsLight);
+        return _lastPosition != null && lightRequirement.ValidateActualValue(_lastPosition.GetLightValue());
     }
 
     private boolean validateNetworkRequirement(@NonNull NetworkRequirement networkRequirement) {

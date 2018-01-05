@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.util.Locale;
 
+@SuppressWarnings("WeakerAccess")
 public class BixbyAction {
     private static final String TAG = BixbyAction.class.getSimpleName();
 

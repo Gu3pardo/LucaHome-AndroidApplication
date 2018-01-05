@@ -4,6 +4,7 @@
     <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/classes/SerializableDate.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/classes/SerializableList.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/classes/SerializableTime.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/BluetoothController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/BroadcastController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/NetworkController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/ReceiverController.java" charset="windows-1251" />
@@ -42,6 +43,6 @@
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/BroadcastController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/NotificationController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/ReceiverController.java" charset="windows-1251" />
-    <file url="PROJECT" charset="windows-1251" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

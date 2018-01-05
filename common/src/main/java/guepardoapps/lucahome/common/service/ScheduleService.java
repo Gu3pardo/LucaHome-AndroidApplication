@@ -71,7 +71,7 @@ public class ScheduleService implements IDataService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -81,7 +81,6 @@ public class ScheduleService implements IDataService {
     private DownloadController _downloadController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private SerializableList<Schedule> _scheduleList = new SerializableList<>();
 
@@ -273,7 +272,7 @@ public class ScheduleService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -308,7 +307,6 @@ public class ScheduleService implements IDataService {
         _downloadController = new DownloadController(context);
         _networkController = new NetworkController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
 
         _receiverController.RegisterReceiver(_scheduleDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_scheduleSetFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -390,14 +388,14 @@ public class ScheduleService implements IDataService {
 
     @Override
     public void LoadData() {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedScheduleDownloadBroadcast();
             return;
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_SCHEDULES.toString();
@@ -406,7 +404,7 @@ public class ScheduleService implements IDataService {
     }
 
     public void SetScheduleState(@NonNull Schedule entry, boolean newState) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedScheduleSetBroadcast("No user");
             return;
@@ -414,7 +412,7 @@ public class ScheduleService implements IDataService {
 
         entry.SetActive(newState);
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandSetState());
 
@@ -422,14 +420,14 @@ public class ScheduleService implements IDataService {
     }
 
     public void AddSchedule(@NonNull Schedule entry) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedScheduleAddBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
@@ -437,14 +435,14 @@ public class ScheduleService implements IDataService {
     }
 
     public void UpdateSchedule(@NonNull Schedule entry) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedScheduleUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -452,14 +450,14 @@ public class ScheduleService implements IDataService {
     }
 
     public void DeleteSchedule(@NonNull Schedule entry) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedScheduleDeleteBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 

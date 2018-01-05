@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class LightRequirement {
     private static final String TAG = LightRequirement.class.getSimpleName();
 

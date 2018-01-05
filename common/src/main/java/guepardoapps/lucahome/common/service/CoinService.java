@@ -101,7 +101,7 @@ public class CoinService implements IDataNotificationService {
         public void run() {
             LoadCoinConversionList();
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -112,7 +112,6 @@ public class CoinService implements IDataNotificationService {
     private NetworkController _networkController;
     private NotificationController _notificationController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private DatabaseCoinList _databaseCoinList;
 
@@ -361,7 +360,7 @@ public class CoinService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -402,7 +401,6 @@ public class CoinService implements IDataNotificationService {
         _networkController = new NetworkController(_context);
         _notificationController = new NotificationController(_context);
         _receiverController = new ReceiverController(_context);
-        _settingsController = SettingsController.getInstance();
 
         _databaseCoinList = new DatabaseCoinList(_context);
         _databaseCoinList.Open();
@@ -513,7 +511,7 @@ public class CoinService implements IDataNotificationService {
             return;
         }
 
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             _coinList = _databaseCoinList.GetCoinList();
             _filteredCoinList = new SerializableList<>();
 
@@ -531,7 +529,7 @@ public class CoinService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
@@ -565,7 +563,7 @@ public class CoinService implements IDataNotificationService {
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_COINS_USER.toString();
@@ -574,7 +572,7 @@ public class CoinService implements IDataNotificationService {
     }
 
     public void AddCoin(@NonNull Coin entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
 
@@ -585,14 +583,14 @@ public class CoinService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedAddBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
@@ -600,7 +598,7 @@ public class CoinService implements IDataNotificationService {
     }
 
     public void UpdateCoin(@NonNull Coin entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
 
@@ -611,14 +609,14 @@ public class CoinService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -626,7 +624,7 @@ public class CoinService implements IDataNotificationService {
     }
 
     public void DeleteCoin(@NonNull Coin entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
 
@@ -637,14 +635,14 @@ public class CoinService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDeleteBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 
@@ -737,7 +735,7 @@ public class CoinService implements IDataNotificationService {
             coinHoursTrend = 24;
         }
 
-        _settingsController.SetCoinHoursTrend(coinHoursTrend);
+        SettingsController.getInstance().SetCoinHoursTrend(coinHoursTrend);
     }
 
     public Date GetLastUpdate() {

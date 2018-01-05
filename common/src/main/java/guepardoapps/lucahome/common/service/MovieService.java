@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -55,7 +56,7 @@ public class MovieService implements IDataService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -65,7 +66,6 @@ public class MovieService implements IDataService {
     private DownloadController _downloadController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private SerializableList<Movie> _movieList = new SerializableList<>();
 
@@ -150,7 +150,7 @@ public class MovieService implements IDataService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -185,7 +185,6 @@ public class MovieService implements IDataService {
         _downloadController = new DownloadController(context);
         _networkController = new NetworkController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
 
         _receiverController.RegisterReceiver(_movieDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_movieUpdateFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -270,14 +269,14 @@ public class MovieService implements IDataService {
 
     @Override
     public void LoadData() {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_MOVIES.toString();
@@ -286,14 +285,14 @@ public class MovieService implements IDataService {
     }
 
     public void UpdateMovie(@NonNull Movie entry) {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -359,7 +358,7 @@ public class MovieService implements IDataService {
             tmpMovieList.add(movieList.getValue(index));
         }
 
-        Collections.sort(tmpMovieList, (movieOne, movieTwo) -> movieOne.GetTitle().compareTo(movieTwo.GetTitle()));
+        Collections.sort(tmpMovieList, Comparator.comparing(Movie::GetTitle));
 
         SerializableList<Movie> returnMovieList = new SerializableList<>();
         for (Movie returnMovie : tmpMovieList) {

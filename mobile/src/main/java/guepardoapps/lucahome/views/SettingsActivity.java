@@ -2,11 +2,14 @@ package guepardoapps.lucahome.views;
 
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -22,10 +25,13 @@ import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
 
 import de.mateware.snacky.Snacky;
+
 import guepardoapps.library.openweather.service.OpenWeatherService;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.controller.SharedPrefController;
+import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.controller.SettingsController;
@@ -37,6 +43,7 @@ import guepardoapps.lucahome.common.service.MenuService;
 import guepardoapps.lucahome.common.service.MeterListService;
 import guepardoapps.lucahome.common.service.MoneyMeterListService;
 import guepardoapps.lucahome.common.service.MovieService;
+import guepardoapps.lucahome.common.service.PositioningService;
 import guepardoapps.lucahome.common.service.PuckJsListService;
 import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.SecurityService;
@@ -61,10 +68,31 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends AppCompatPreferenceActivity {
-    // private static final String TAG = SettingsActivity.class.getSimpleName();
+    private static final String TAG = SettingsActivity.class.getSimpleName();
 
+    private static Context _context;
     private ReceiverController _receiverController;
     private static SharedPrefController _sharedPrefController;
+
+    /**
+     * Binder for PositioningService
+     */
+    private static PositioningService _positioningServiceBinder;
+
+    /**
+     * ServiceConnection for PositioningServiceBinder
+     */
+    private static ServiceConnection _positioningServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder binder) {
+            _positioningServiceBinder = ((PositioningService.PositioningServiceBinder) binder).getService();
+            _positioningServiceBinder.SetActiveActivityContext(_context);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            _positioningServiceBinder.SetActiveActivityContext(null);
+            _positioningServiceBinder = null;
+        }
+    };
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -148,8 +176,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     CoinService.getInstance().SetCoinHoursTrend(integerValue);
                     preference.setSummary((String) value);
 
-                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_POSITION_TIMEOUT_SEC)) {
-                    // TODO add positioning service
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_BEACONS_TIME_BETWEEN_SCANS_SEC)) {
+                    _positioningServiceBinder.SetBetweenScanPeriod(Long.parseLong((String) value));
+                    preference.setSummary((String) value);
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_BEACONS_TIME_SCANS_MSEC)) {
+                    _positioningServiceBinder.SetScanPeriod(Long.parseLong((String) value));
                     preference.setSummary((String) value);
                 }
 
@@ -238,8 +269,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         WirelessSwitchService.getInstance().SetReloadEnabled(false);
                     }
 
-                } else if (preference.getKey().contentEquals(SettingsController.PREF_RELOAD_POSITION_ENABLED)) {
-                    // TODO add positioning service
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_HANDLE_BLUETOOTH_AUTOMATICALLY)) {
+                    _positioningServiceBinder.SetScanEnabled((boolean) value);
+                } else if (preference.getKey().contentEquals(SettingsController.PREF_BEACONS_SCAN_ENABLED)) {
+                    _positioningServiceBinder.SetScanEnabled((boolean) value);
                 }
             }
 
@@ -312,8 +345,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        _receiverController = new ReceiverController(this);
-        _sharedPrefController = new SharedPrefController(this);
+        _context = this;
+        _receiverController = new ReceiverController(_context);
+        _sharedPrefController = new SharedPrefController(_context);
 
         setupActionBar();
     }
@@ -322,12 +356,27 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onResume() {
         super.onResume();
         _receiverController.RegisterReceiver(_validateUserReceiver, new String[]{UserService.UserCheckedFinishedBroadcast});
+
+        if (_positioningServiceBinder == null) {
+            bindService(new Intent(this, PositioningService.class), _positioningServiceConnection, Context.BIND_AUTO_CREATE);
+        }
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         _receiverController.Dispose();
+
+        if (_positioningServiceBinder != null) {
+            try {
+                unbindService(_positioningServiceConnection);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.getMessage());
+            } finally {
+                _positioningServiceBinder = null;
+            }
+        }
     }
 
     @Override
@@ -735,8 +784,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_POSITION_ENABLED));
-            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_RELOAD_POSITION_TIMEOUT_SEC));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_HANDLE_BLUETOOTH_AUTOMATICALLY));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_BEACONS_SCAN_ENABLED));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_BEACONS_TIME_BETWEEN_SCANS_SEC));
+            bindPreferenceSummaryToValue(findPreference(SettingsController.PREF_BEACONS_TIME_SCANS_MSEC));
         }
 
         @Override

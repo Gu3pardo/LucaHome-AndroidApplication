@@ -193,9 +193,12 @@
     <string name="pref_title_reload_wireless_switch_timeout">Enter wireless switch reload timeout in min</string>
     <integer name="pref_default_wireless_switch_timeout_min">15</integer>
 
-    <string name="pref_title_reload_positioning">Reload positioning data</string>
-    <string name="pref_title_reload_positioning_timeout_sec">Enter positioning reload timeout in sec</string>
-    <integer name="pref_default_positioning_timeout_sec">30</integer>
+    <string name="pref_title_handle_bluetooth_automatically">Let the app manage bluetooth?</string>
+    <string name="pref_title_beacons_scan_enabled">Activate/Deactivate scan for beacons</string>
+    <string name="pref_title_time_between_scans_sec">Enter time between scans in sec</string>
+    <string name="pref_title_time_scans_msec">Enter time of scans in msec</string>
+    <integer name="pref_default_positioning_between_scan_time_sec">15</integer>
+    <integer name="pref_default_positioning_scan_time_msec">30000</integer>
 
     <!-- Settings for Open Weather -->
     <string name="pref_header_open_weather">Open Weather</string>
@@ -214,6 +217,9 @@
 
     <!-- Settings for positioning -->
     <string name="pref_header_positioning">Positioning</string>
+
+    <!-- Settings for bixby actions -->
+    <string name="pref_header_bixby_actions">Bixby actions</string>
 
     <!-- Title for activities -->
     <string name="title_activity_wireless_socket">Wireless Sockets</string>

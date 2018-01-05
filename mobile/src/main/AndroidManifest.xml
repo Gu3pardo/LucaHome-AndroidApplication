@@ -323,6 +323,10 @@
             android:enabled="true"
             android:exported="true" />
         <service
+            android:name=".common.service.PositioningService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
             android:name=".service.MainService"
             android:enabled="true"
             android:exported="true" />

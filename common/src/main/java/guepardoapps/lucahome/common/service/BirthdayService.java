@@ -70,7 +70,7 @@ public class BirthdayService implements IDataNotificationService {
         @Override
         public void run() {
             LoadData();
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -83,7 +83,6 @@ public class BirthdayService implements IDataNotificationService {
     private NetworkController _networkController;
     private NotificationController _notificationController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private DatabaseBirthdayList _databaseBirthdayList;
 
@@ -252,7 +251,7 @@ public class BirthdayService implements IDataNotificationService {
         @Override
         public void onReceive(Context context, Intent intent) {
             _reloadHandler.removeCallbacks(_reloadListRunnable);
-            if (_reloadEnabled && _networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+            if (_reloadEnabled && _networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
                 _reloadHandler.postDelayed(_reloadListRunnable, _reloadTimeout);
             }
         }
@@ -294,7 +293,6 @@ public class BirthdayService implements IDataNotificationService {
         _networkController = new NetworkController(_context);
         _notificationController = new NotificationController(_context);
         _receiverController = new ReceiverController(_context);
-        _settingsController = SettingsController.getInstance();
 
         _databaseBirthdayList = new DatabaseBirthdayList(_context);
         _databaseBirthdayList.Open();
@@ -381,7 +379,7 @@ public class BirthdayService implements IDataNotificationService {
             return;
         }
 
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             _birthdayList = _databaseBirthdayList.GetBirthdayList();
             _broadcastController.SendSerializableBroadcast(
                     BirthdayDownloadFinishedBroadcast,
@@ -390,7 +388,7 @@ public class BirthdayService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDownloadBroadcast();
             return;
@@ -424,7 +422,7 @@ public class BirthdayService implements IDataNotificationService {
         }
 
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.GET_BIRTHDAYS.toString();
@@ -433,7 +431,7 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     public void AddBirthday(@NonNull LucaBirthday entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Add);
 
@@ -444,14 +442,14 @@ public class BirthdayService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedAddBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandAdd());
 
@@ -459,7 +457,7 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     public void UpdateBirthday(@NonNull LucaBirthday entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Update);
 
@@ -470,14 +468,14 @@ public class BirthdayService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedUpdateBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandUpdate());
 
@@ -485,7 +483,7 @@ public class BirthdayService implements IDataNotificationService {
     }
 
     public void DeleteBirthday(@NonNull LucaBirthday entry) {
-        if (!_networkController.IsHomeNetwork(_settingsController.GetHomeSsid())) {
+        if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
             entry.SetIsOnServer(false);
             entry.SetServerDbAction(ILucaClass.LucaServerDbAction.Delete);
 
@@ -496,14 +494,14 @@ public class BirthdayService implements IDataNotificationService {
             return;
         }
 
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
             sendFailedDeleteBroadcast("No user");
             return;
         }
 
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                _settingsController.GetServerIp(), Constants.ACTION_PATH,
+                SettingsController.getInstance().GetServerIp(), Constants.ACTION_PATH,
                 user.GetName(), user.GetPassphrase(),
                 entry.CommandDelete());
 
@@ -549,7 +547,7 @@ public class BirthdayService implements IDataNotificationService {
 
         for (int index = 0; index < _birthdayList.getSize(); index++) {
             LucaBirthday birthday = _birthdayList.getValue(index);
-            if (birthday.HasBirthday() && birthday.GetRemindMe() && _settingsController.IsBirthdayNotificationEnabled()) {
+            if (birthday.HasBirthday() && birthday.GetRemindMe() && SettingsController.getInstance().IsBirthdayNotificationEnabled()) {
                 _notificationController.CreateSimpleNotification(birthday.GetNotificationId(), R.drawable.birthday, _receiverActivity, birthday.GetPhoto(), birthday.GetName(), birthday.GetNotificationBody(), true);
             }
         }

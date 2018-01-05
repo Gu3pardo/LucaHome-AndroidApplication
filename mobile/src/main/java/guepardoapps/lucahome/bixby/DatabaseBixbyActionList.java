@@ -11,6 +11,7 @@ import android.support.annotation.NonNull;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class DatabaseBixbyActionList {
     private static final String TAG = DatabaseBixbyActionList.class.getSimpleName();
 

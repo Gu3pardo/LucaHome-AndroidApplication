@@ -31,7 +31,6 @@ public class UserService {
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private ReceiverController _receiverController;
-    private SettingsController _settingsController;
 
     private LucaUser _tempUser = null;
 
@@ -62,7 +61,7 @@ public class UserService {
                 return;
             }
 
-            _settingsController.SetUser(_tempUser);
+            SettingsController.getInstance().SetUser(_tempUser);
             _tempUser = null;
 
             _broadcastController.SendSerializableBroadcast(
@@ -88,7 +87,6 @@ public class UserService {
         _broadcastController = new BroadcastController(context);
         _downloadController = new DownloadController(context);
         _receiverController = new ReceiverController(context);
-        _settingsController = SettingsController.getInstance();
 
         _receiverController.RegisterReceiver(_userCheckedFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _isInitialized = true;
@@ -112,15 +110,15 @@ public class UserService {
     }
 
     public LucaUser GetUser() {
-        return _settingsController.GetUser();
+        return SettingsController.getInstance().GetUser();
     }
 
     public void SetUser(@NonNull LucaUser user) {
-        _settingsController.SetUser(user);
+        SettingsController.getInstance().SetUser(user);
     }
 
     public boolean IsAnUserSaved() {
-        LucaUser user = _settingsController.GetUser();
+        LucaUser user = SettingsController.getInstance().GetUser();
         return !(user.GetName() == null || user.GetPassphrase() == null
                 || user.GetName().length() == 0 || user.GetPassphrase().length() == 0
                 || user.GetName().contentEquals("NA") || user.GetPassphrase().contentEquals("NA")
@@ -129,7 +127,7 @@ public class UserService {
     }
 
     public void ValidateUser() {
-        validateUser(_settingsController.GetUser());
+        validateUser(SettingsController.getInstance().GetUser());
     }
 
     public void ValidateUser(@NonNull LucaUser user) {
@@ -142,11 +140,11 @@ public class UserService {
             return;
         }
 
-        if (userName.contentEquals(_settingsController.GetUser().GetName())) {
+        if (userName.contentEquals(SettingsController.getInstance().GetUser().GetName())) {
             return;
         }
 
-        validateUser(new LucaUser(userName, _settingsController.GetUser().GetPassphrase()));
+        validateUser(new LucaUser(userName, SettingsController.getInstance().GetUser().GetPassphrase()));
     }
 
     public void ValidateUserPassphrase(@NonNull String userPassphrase) {
@@ -155,16 +153,16 @@ public class UserService {
             return;
         }
 
-        if (userPassphrase.contentEquals(_settingsController.GetUser().GetPassphrase())) {
+        if (userPassphrase.contentEquals(SettingsController.getInstance().GetUser().GetPassphrase())) {
             return;
         }
 
-        validateUser(new LucaUser(_settingsController.GetUser().GetName(), userPassphrase));
+        validateUser(new LucaUser(SettingsController.getInstance().GetUser().GetName(), userPassphrase));
     }
 
     private void validateUser(@NonNull LucaUser user) {
         String requestUrl = "http://"
-                + _settingsController.GetServerIp()
+                + SettingsController.getInstance().GetServerIp()
                 + Constants.ACTION_PATH
                 + user.GetName() + "&password=" + user.GetPassphrase()
                 + "&action=" + LucaServerAction.VALIDATE_USER.toString();

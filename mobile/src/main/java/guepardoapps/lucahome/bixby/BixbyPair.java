@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class BixbyPair {
     private static final String TAG = BixbyPair.class.getSimpleName();
 

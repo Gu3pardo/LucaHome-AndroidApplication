@@ -52,6 +52,7 @@ public class LoginActivity extends AppCompatActivity {
     private static final String[] PERMISSIONS_TO_REQUEST = new String[]{
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.BLUETOOTH_ADMIN,
             Manifest.permission.MODIFY_PHONE_STATE,
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.WRITE_EXTERNAL_STORAGE};

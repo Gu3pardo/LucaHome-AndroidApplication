@@ -105,7 +105,7 @@ public class ShoppingListActivity extends AppCompatBaseActivity {
         _addButton = findViewById(R.id.floating_action_button_add_shoppingList);
         _addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1, ""));
+            data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1, "e"));
 
             NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, ShoppingListEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
