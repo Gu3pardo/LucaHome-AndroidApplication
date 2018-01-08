@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,10 +22,10 @@ import android.widget.TextView;
 import com.baoyz.widget.PullRefreshLayout;
 import com.mikepenz.aboutlibraries.Libs;
 import com.mikepenz.aboutlibraries.LibsBuilder;
-import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
+import de.mateware.snacky.Snacky;
 import guepardoapps.library.openweather.service.OpenWeatherService;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.adapter.MainListViewAdapter;
@@ -37,7 +39,9 @@ import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.service.MainService;
 import guepardoapps.lucahome.service.NavigationService;
 
-public class MainActivity extends AppCompatActivity {
+import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
+
+public class MainActivity extends AppCompatActivity implements BottomNavigation.OnMenuItemSelectionListener {
     private static final String TAG = MainActivity.class.getSimpleName();
 
     /**
@@ -157,13 +161,8 @@ public class MainActivity extends AppCompatActivity {
         collapsingToolbar.setExpandedTitleColor(android.graphics.Color.argb(0, 0, 0, 0));
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
-        FloatingActionButton imageButtonSettings = findViewById(R.id.floating_action_button_settings);
-        imageButtonSettings.setOnClickListener(view -> NavigationService.getInstance().NavigateToActivity(MainActivity.this, SettingsActivity.class));
-
-        FloatingActionButton imageButtonAbout = findViewById(R.id.floating_action_button_about);
-        imageButtonAbout.setOnClickListener(view -> new LibsBuilder()
-                .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
-                .start(MainActivity.this));
+        BottomNavigation bottomNavigation = findViewById(R.id.mainViewBottomNavigation);
+        bottomNavigation.setOnMenuItemClickListener(this);
 
         _listView.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -174,11 +173,9 @@ public class MainActivity extends AppCompatActivity {
             public void onScroll(AbsListView absListView, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
                 // Check if bottom has been reached
                 if (firstVisibleItem + visibleItemCount >= totalItemCount && totalItemCount > 0) {
-                    imageButtonSettings.setVisibility(View.GONE);
-                    imageButtonAbout.setVisibility(View.GONE);
+                    bottomNavigation.setVisibility(View.GONE);
                 } else {
-                    imageButtonSettings.setVisibility(View.VISIBLE);
-                    imageButtonAbout.setVisibility(View.VISIBLE);
+                    bottomNavigation.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -200,6 +197,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        NavigationService.getInstance().ClearCurrentActivity();
         NavigationService.getInstance().ClearGoBackList();
 
         _receiverController.RegisterReceiver(_mainServiceDownloadProgressReceiver, new String[]{MainService.MainServiceDownloadCountBroadcast});
@@ -250,6 +248,18 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    @Override
+    public void onMenuItemSelect(final int itemId, final int position, final boolean fromUser) {
+        Logger.getInstance().Information(TAG, String.format(Locale.getDefault(), "onMenuItemSelect: itemId: %d, position: %d, fromUser: %s", itemId, position, fromUser));
+        handleSelect(itemId, position, fromUser);
+    }
+
+    @Override
+    public void onMenuItemReselect(@IdRes final int itemId, final int position, final boolean fromUser) {
+        Logger.getInstance().Information(TAG, String.format(Locale.getDefault(), "onMenuItemReselect: itemId: %d, position: %d, fromUser: %s", itemId, position, fromUser));
+        handleSelect(itemId, position, fromUser);
+    }
+
     private void updateMapContent() {
         _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
         _mapContentViewBuilder.AddViewsToMap();
@@ -261,5 +271,45 @@ public class MainActivity extends AppCompatActivity {
                 "Current temperature: %.2f degree Celsius\nCurrent condition: %s",
                 OpenWeatherService.getInstance().CurrentWeather().GetTemperature(), OpenWeatherService.getInstance().CurrentWeather().GetDescription()));
         _mainListViewBuilder.UpdateItemImageResource(MainListViewItem.Type.Weather, OpenWeatherService.getInstance().CurrentWeather().GetCondition().GetWallpaper());
+    }
+
+    private void handleSelect(int itemId, int position, boolean fromUser) {
+        Logger.getInstance().Information(TAG, String.format(Locale.getDefault(), "handleSelect: itemId: %d, position: %d, fromUser: %s", itemId, position, fromUser));
+        if (fromUser) {
+            NavigationService.NavigationResult navigationResult = NavigationService.NavigationResult.NULL;
+
+            switch (itemId) {
+                case R.id.bottomNavigationBixby:
+                    Logger.getInstance().Error(TAG, "Not yet implemented!");
+                    navigationResult = NavigationService.NavigationResult.PERMITTED;
+                    break;
+                case R.id.bottomNavigationSettings:
+                    navigationResult = NavigationService.getInstance().NavigateToActivity(MainActivity.this, SettingsActivity.class);
+                    break;
+                case R.id.bottomNavigationDetails:
+                    new LibsBuilder()
+                            .withActivityStyle(Libs.ActivityStyle.LIGHT_DARK_TOOLBAR)
+                            .start(MainActivity.this);
+                    navigationResult = NavigationService.NavigationResult.SUCCESS;
+                    break;
+                default:
+                    break;
+            }
+
+            if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Navigation failed! navigationResult is %s!", navigationResult));
+                displayErrorSnackBar("Failed to navigate! Please contact LucaHome support!");
+            }
+        }
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(MainActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_INDEFINITE)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

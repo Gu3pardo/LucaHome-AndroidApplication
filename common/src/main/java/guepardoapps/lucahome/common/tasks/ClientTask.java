@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"WeakerAccess"})
 public class ClientTask extends AsyncTask<Void, Void, Void> {
     public static final String ClientTaskBroadcast = "guepardoapps.lucahome.common.tasks.clienttask.finished";
     public static final String ClientTaskBundle = "ClientTaskBundle";

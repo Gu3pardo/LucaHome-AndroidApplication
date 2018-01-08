@@ -39,6 +39,7 @@ import guepardoapps.lucahome.common.service.MoneyMeterListService;
 import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.service.NavigationService;
 
+@SuppressWarnings("deprecation")
 public class MoneyMeterDataActivity extends AppCompatBaseActivity {
     /**
      * Initiate UI
@@ -49,9 +50,9 @@ public class MoneyMeterDataActivity extends AppCompatBaseActivity {
     private boolean _spinnerEnabled = true;
 
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of money meter has finished
      */
-    private BroadcastReceiver _moneyMeterUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _moneyMeterDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             MoneyMeterListService.MoneyMeterListDownloadFinishedContent result = (MoneyMeterListService.MoneyMeterListDownloadFinishedContent) intent.getSerializableExtra(MoneyMeterListService.MoneyMeterListDownloadFinishedBundle);
@@ -135,7 +136,7 @@ public class MoneyMeterDataActivity extends AppCompatBaseActivity {
         addButton.setOnClickListener(view -> {
             int newHighestId = MoneyMeterListService.getInstance().GetHighestId() + 1;
             int newHighestTypeId = MoneyMeterListService.getInstance().GetHighestTypeId("", "") + 1;
-            MoneyMeterData newMoneyMeterData = new MoneyMeterData(newHighestId, newHighestTypeId, "", "", 0, "", new SerializableDate(), UserService.getInstance().GetUser().GetName());
+            MoneyMeterData newMoneyMeterData = new MoneyMeterData(newHighestId, newHighestTypeId, "", "", 0, "EUR", new SerializableDate(), UserService.getInstance().GetUser().GetName());
             Bundle data = new Bundle();
             data.putSerializable(MoneyMeterListService.MoneyMeterDataIntent, newMoneyMeterData);
 
@@ -170,7 +171,7 @@ public class MoneyMeterDataActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_moneyMeterUpdateReceiver, new String[]{MoneyMeterListService.MoneyMeterListDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_moneyMeterDownloadReceiver, new String[]{MoneyMeterListService.MoneyMeterListDownloadFinishedBroadcast});
         updateList();
     }
 

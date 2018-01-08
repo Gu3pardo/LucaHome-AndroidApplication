@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -29,12 +30,13 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MeterListService implements IDataService {
     public static class MeterDataListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<MeterData> MeterDataList;
 
-        MeterDataListDownloadFinishedContent(SerializableList<MeterData> meterDataList, boolean succcess) {
-            super(succcess, new byte[]{});
+        MeterDataListDownloadFinishedContent(@NonNull SerializableList<MeterData> meterDataList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             MeterDataList = meterDataList;
         }
     }
@@ -42,8 +44,8 @@ public class MeterListService implements IDataService {
     public static class MeterListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Meter> MeterList;
 
-        MeterListDownloadFinishedContent(SerializableList<Meter> meterList, boolean succcess) {
-            super(succcess, new byte[]{});
+        MeterListDownloadFinishedContent(@NonNull SerializableList<Meter> meterList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             MeterList = meterList;
         }
     }
@@ -90,6 +92,37 @@ public class MeterListService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<MeterData> meterDataList = JsonDataToMeterDataConverter.getInstance().GetList(contentResponse);
+                if (meterDataList == null) {
+                    Logger.getInstance().Error(TAG, "Converted meterDataList is null!");
+                    _meterDataList = _databaseMeterDataList.GetMeterDataList();
+                    sendFailedDownloadBroadcast("Converted meterDataList is null!");
+                    createMeterList();
+                    sendFailedDownloadMeterBroadcast("Converted meterDataList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _meterDataList = meterDataList;
+                createMeterList();
+
+                clearMeterDataListFromDatabase();
+                saveMeterDataListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        MeterDataListDownloadFinishedBroadcast,
+                        MeterDataListDownloadFinishedBundle,
+                        new MeterDataListDownloadFinishedContent(_meterDataList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -117,43 +150,22 @@ public class MeterListService implements IDataService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _meterDataList = _databaseMeterDataList.GetMeterDataList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 createMeterList();
-                sendFailedDownloadMeterBroadcast();
+                sendFailedDownloadMeterBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _meterDataList = _databaseMeterDataList.GetMeterDataList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 createMeterList();
-                sendFailedDownloadMeterBroadcast();
+                sendFailedDownloadMeterBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<MeterData> meterDataList = JsonDataToMeterDataConverter.getInstance().GetList(contentResponse);
-            if (meterDataList == null) {
-                Logger.getInstance().Error(TAG, "Converted meterDataList is null!");
-                _meterDataList = _databaseMeterDataList.GetMeterDataList();
-                sendFailedDownloadBroadcast();
-                createMeterList();
-                sendFailedDownloadMeterBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _meterDataList = meterDataList;
-            createMeterList();
-
-            clearMeterDataListFromDatabase();
-            saveMeterDataListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    MeterDataListDownloadFinishedBroadcast,
-                    MeterDataListDownloadFinishedBundle,
-                    new MeterDataListDownloadFinishedContent(_meterDataList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -401,6 +413,16 @@ public class MeterListService implements IDataService {
         return null;
     }
 
+    public Meter GetByTypeId(int typeId) {
+        for (int index = 0; index < _meterList.getSize(); index++) {
+            Meter entry = _meterList.getValue(index);
+            if (entry.GetTypeId() == typeId) {
+                return entry;
+            }
+        }
+        return null;
+    }
+
     @Override
     public int GetHighestId() {
         int highestId = -1;
@@ -451,13 +473,13 @@ public class MeterListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MeterDataListDownloadFinishedBroadcast,
                     MeterDataListDownloadFinishedBundle,
-                    new MeterDataListDownloadFinishedContent(_meterDataList, true));
+                    new MeterDataListDownloadFinishedContent(_meterDataList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user!");
             return;
         }
 
@@ -623,21 +645,29 @@ public class MeterListService implements IDataService {
         _broadcastController.SendSerializableBroadcast(
                 MeterListDownloadFinishedBroadcast,
                 MeterListDownloadFinishedBundle,
-                new MeterListDownloadFinishedContent(_meterList, true));
+                new MeterListDownloadFinishedContent(_meterList, true, Tools.CompressStringToByteArray("Conversion succeeded")));
     }
 
-    private void sendFailedDownloadMeterBroadcast() {
+    private void sendFailedDownloadMeterBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for meter failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MeterListDownloadFinishedBroadcast,
                 MeterListDownloadFinishedBundle,
-                new MeterListDownloadFinishedContent(_meterList, false));
+                new MeterListDownloadFinishedContent(_meterList, false, Tools.CompressStringToByteArray(response)));
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for meter data failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MeterDataListDownloadFinishedBroadcast,
                 MeterDataListDownloadFinishedBundle,
-                new MeterDataListDownloadFinishedContent(_meterDataList, false));
+                new MeterDataListDownloadFinishedContent(_meterDataList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

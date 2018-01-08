@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -29,12 +30,13 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class ListedMenuService implements IDataService {
     public static class ListedMenuDownloadFinishedContent extends ObjectChangeFinishedContent {
         SerializableList<ListedMenu> ListedMenuList;
 
-        ListedMenuDownloadFinishedContent(SerializableList<ListedMenu> listedMenuList, boolean succcess) {
-            super(succcess, new byte[]{});
+        ListedMenuDownloadFinishedContent(@NonNull SerializableList<ListedMenu> listedMenuList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             ListedMenuList = listedMenuList;
         }
     }
@@ -78,6 +80,34 @@ public class ListedMenuService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<ListedMenu> listedMenuList = JsonDataToListedMenuConverter.getInstance().GetList(contentResponse);
+                if (listedMenuList == null) {
+                    Logger.getInstance().Error(TAG, "Converted listedMenuList is null!");
+                    _listedMenuList = _databaseListedMenuList.GetListedMenuList();
+                    sendFailedListedMenuDownloadBroadcast("Converted listedMenuList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _listedMenuList = listedMenuList;
+
+                clearListedMenuListFromDatabase();
+                saveListedMenuListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        ListedMenuDownloadFinishedBroadcast,
+                        ListedMenuDownloadFinishedBundle,
+                        new ListedMenuDownloadFinishedContent(_listedMenuList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -103,36 +133,18 @@ public class ListedMenuService implements IDataService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _listedMenuList = _databaseListedMenuList.GetListedMenuList();
-                sendFailedListedMenuDownloadBroadcast();
+                sendFailedListedMenuDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _listedMenuList = _databaseListedMenuList.GetListedMenuList();
-                sendFailedListedMenuDownloadBroadcast();
+                sendFailedListedMenuDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<ListedMenu> listedMenuList = JsonDataToListedMenuConverter.getInstance().GetList(contentResponse);
-            if (listedMenuList == null) {
-                Logger.getInstance().Error(TAG, "Converted listedMenuList is null!");
-                _listedMenuList = _databaseListedMenuList.GetListedMenuList();
-                sendFailedListedMenuDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _listedMenuList = listedMenuList;
-
-            clearListedMenuListFromDatabase();
-            saveListedMenuListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    ListedMenuDownloadFinishedBroadcast,
-                    ListedMenuDownloadFinishedBundle,
-                    new ListedMenuDownloadFinishedContent(_listedMenuList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -375,13 +387,13 @@ public class ListedMenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ListedMenuDownloadFinishedBroadcast,
                     ListedMenuDownloadFinishedBundle,
-                    new ListedMenuDownloadFinishedContent(_listedMenuList, true));
+                    new ListedMenuDownloadFinishedContent(_listedMenuList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedListedMenuDownloadBroadcast();
+            sendFailedListedMenuDownloadBroadcast("No user");
             return;
         }
 
@@ -552,11 +564,15 @@ public class ListedMenuService implements IDataService {
         }
     }
 
-    private void sendFailedListedMenuDownloadBroadcast() {
+    private void sendFailedListedMenuDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for listedmenu failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ListedMenuDownloadFinishedBroadcast,
                 ListedMenuDownloadFinishedBundle,
-                new ListedMenuDownloadFinishedContent(_listedMenuList, false));
+                new ListedMenuDownloadFinishedContent(_listedMenuList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedListedMenuAddBroadcast(@NonNull String response) {

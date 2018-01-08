@@ -7,9 +7,11 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings("unused")
 public class BroadcastController {
     private static String TAG = BroadcastController.class.getSimpleName();
 
@@ -77,14 +79,31 @@ public class BroadcastController {
         _context.sendBroadcast(broadcastIntent);
     }
 
+    public void SendBooleanBroadcast(
+            @NonNull String broadcast,
+            @NonNull String bundleName,
+            boolean data) {
+        Intent broadcastIntent = new Intent(broadcast);
+        Bundle broadcastData = new Bundle();
+        broadcastData.putBoolean(bundleName, data);
+        broadcastIntent.putExtras(broadcastData);
+        _context.sendBroadcast(broadcastIntent);
+    }
+
     public void SendStringBroadcast(
             @NonNull String broadcast,
             @NonNull String bundleName,
             @NonNull String data) {
+        if (data.length() >= 1024) {
+            Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Invalid data length %d!", data.length()));
+            return;
+        }
+
         Intent broadcastIntent = new Intent(broadcast);
         Bundle broadcastData = new Bundle();
         broadcastData.putString(bundleName, data);
         broadcastIntent.putExtras(broadcastData);
+
         _context.sendBroadcast(broadcastIntent);
     }
 

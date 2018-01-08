@@ -12,6 +12,7 @@ import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.MediaServerData;
 import guepardoapps.lucahome.common.classes.PlayedYoutubeVideo;
 import guepardoapps.lucahome.common.constants.Constants;
@@ -21,12 +22,13 @@ import guepardoapps.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.common.tasks.ClientTask;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MediaServerService {
     public static class MediaServerDownloadFinishedContent extends ObjectChangeFinishedContent {
         public MediaServerData MediaServer;
 
-        MediaServerDownloadFinishedContent(MediaServerData mediaServer, boolean succcess) {
-            super(succcess, new byte[]{});
+        MediaServerDownloadFinishedContent(MediaServerData mediaServer, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             MediaServer = mediaServer;
         }
     }
@@ -158,12 +160,12 @@ public class MediaServerService {
             @NonNull String command,
             @NonNull String data) {
         if (!_isInitialized) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("Not initialized!");
             return;
         }
 
         if (!_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No home network!");
             return;
         }
 
@@ -392,7 +394,7 @@ public class MediaServerService {
                             _broadcastController.SendSerializableBroadcast(
                                     MediaServerDownloadFinishedBroadcast,
                                     MediaServerDownloadFinishedBundle,
-                                    new MediaServerDownloadFinishedContent(_mediaServerData, true));
+                                    new MediaServerDownloadFinishedContent(_mediaServerData, true, Tools.CompressStringToByteArray("Download finished")));
 
                         } else {
                             Logger.getInstance().Warning(TAG, String.format("Length %s for MediaServerData is invalid!", mediaServerData.length));
@@ -408,10 +410,14 @@ public class MediaServerService {
         }
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for mediaserver failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MediaServerDownloadFinishedBroadcast,
                 MediaServerDownloadFinishedBundle,
-                new MediaServerDownloadFinishedContent(null, false));
+                new MediaServerDownloadFinishedContent(null, false, Tools.CompressStringToByteArray(response)));
     }
 }

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Locale;
 
+@SuppressWarnings({"unused"})
 public class LucaUser implements Serializable {
     private static final long serialVersionUID = 109475847363954820L;
     private static final String TAG = LucaUser.class.getSimpleName();

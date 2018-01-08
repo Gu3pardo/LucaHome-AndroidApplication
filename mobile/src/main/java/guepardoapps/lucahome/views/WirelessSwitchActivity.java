@@ -32,9 +32,9 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class WirelessSwitchActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of wireless switches data has finished
      */
-    private BroadcastReceiver _wirelessSwitchUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _wirelessSwitchDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             WirelessSwitchService.WirelessSwitchDownloadFinishedContent result = (WirelessSwitchService.WirelessSwitchDownloadFinishedContent) intent.getSerializableExtra(WirelessSwitchService.WirelessSwitchDownloadFinishedBundle);
@@ -102,7 +102,7 @@ public class WirelessSwitchActivity extends AppCompatBaseActivity {
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_wireless_switch);
         addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(WirelessSwitchService.WirelessSwitchIntent, new WirelessSwitchDto(-1, "", "", -1, '1', WirelessSwitchDto.Action.Add));
+            data.putSerializable(WirelessSwitchService.WirelessSwitchIntent, new WirelessSwitchDto(WirelessSwitchService.getInstance().GetHighestId() + 1, "", "", -1, '1', WirelessSwitchDto.Action.Add));
 
             NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, WirelessSwitchEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -135,7 +135,7 @@ public class WirelessSwitchActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_wirelessSwitchUpdateReceiver, new String[]{WirelessSwitchService.WirelessSwitchDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_wirelessSwitchDownloadReceiver, new String[]{WirelessSwitchService.WirelessSwitchDownloadFinishedBroadcast});
         updateList();
     }
 

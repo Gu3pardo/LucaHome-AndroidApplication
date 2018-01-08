@@ -10,8 +10,4 @@ public class ObjectChangeFinishedContent implements Serializable {
         Success = succcess;
         Response = response;
     }
-
-    public ObjectChangeFinishedContent(boolean succcess) {
-        this(succcess, new byte[]{});
-    }
 }

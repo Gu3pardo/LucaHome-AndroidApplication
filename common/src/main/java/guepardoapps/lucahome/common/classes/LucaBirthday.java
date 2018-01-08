@@ -10,6 +10,7 @@ import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class LucaBirthday implements Serializable, ILucaClass {
     private static final long serialVersionUID = 8796770534492842492L;
     private static final String TAG = LucaBirthday.class.getSimpleName();

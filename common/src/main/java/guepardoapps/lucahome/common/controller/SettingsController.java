@@ -9,6 +9,7 @@ import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.R;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SettingsController {
     private static final SettingsController SINGLETON = new SettingsController();
 

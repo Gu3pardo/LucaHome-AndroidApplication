@@ -23,6 +23,7 @@ import java.util.Locale;
 import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"deprecation", "unused"})
 public class DisplayController {
     private static final String TAG = DisplayController.class.getSimpleName();
 
@@ -67,7 +68,6 @@ public class DisplayController {
         return windowManager.getDefaultDisplay();
     }
 
-    @SuppressWarnings("deprecation")
     public void ScreenOn(int[] adFlags, int[] viewFlags) {
         Settings.System.putInt(_context.getContentResolver(), Settings.System.SCREEN_OFF_TIMEOUT, 30 * 60 * 1000);
         _screenOffHandler.removeCallbacks(_screenOffCountdownRunnable);

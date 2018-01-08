@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -26,12 +27,13 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MapContentService implements IDataService {
     public static class MapContentDownloadFinishedContent extends ObjectChangeFinishedContent {
         SerializableList<MapContent> MapContentList;
 
-        MapContentDownloadFinishedContent(SerializableList<MapContent> mapContentList, boolean succcess) {
-            super(succcess, new byte[]{});
+        MapContentDownloadFinishedContent(@NonNull SerializableList<MapContent> mapContentList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             MapContentList = mapContentList;
         }
     }
@@ -64,6 +66,43 @@ public class MapContentService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<MapContent> mapContentList = JsonDataToMapContentConverter.getInstance().GetList(
+                        contentResponse,
+                        ListedMenuService.getInstance().GetDataList(),
+                        MenuService.getInstance().GetDataList(),
+                        ShoppingListService.getInstance().GetDataList(),
+                    /* TODO add MediaServerData */
+                        new SerializableList<>(),
+                        SecurityService.getInstance().GetDataList().getValue(0),
+                        TemperatureService.getInstance().GetDataList(),
+                        WirelessSocketService.getInstance().GetDataList(),
+                        WirelessSwitchService.getInstance().GetDataList());
+                if (mapContentList == null) {
+                    Logger.getInstance().Error(TAG, "Converted mapContentList is null!");
+                    sendFailedDownloadBroadcast("Converted mapContentList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _mapContentList = mapContentList;
+
+                clearMapContentListFromDatabase();
+                saveMapContentListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        MapContentDownloadFinishedBroadcast,
+                        MapContentDownloadFinishedBundle,
+                        new MapContentDownloadFinishedContent(_mapContentList, true, Tools.CompressStringToByteArray("Download finished!")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -94,7 +133,7 @@ public class MapContentService implements IDataService {
                         TemperatureService.getInstance().GetDataList(),
                         WirelessSocketService.getInstance().GetDataList(),
                         WirelessSwitchService.getInstance().GetDataList());
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
@@ -106,38 +145,11 @@ public class MapContentService implements IDataService {
                         TemperatureService.getInstance().GetDataList(),
                         WirelessSocketService.getInstance().GetDataList(),
                         WirelessSwitchService.getInstance().GetDataList());
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<MapContent> mapContentList = JsonDataToMapContentConverter.getInstance().GetList(
-                    contentResponse,
-                    ListedMenuService.getInstance().GetDataList(),
-                    MenuService.getInstance().GetDataList(),
-                    ShoppingListService.getInstance().GetDataList(),
-                    /* TODO add MediaServerData */
-                    new SerializableList<>(),
-                    SecurityService.getInstance().GetDataList().getValue(0),
-                    TemperatureService.getInstance().GetDataList(),
-                    WirelessSocketService.getInstance().GetDataList(),
-                    WirelessSwitchService.getInstance().GetDataList());
-            if (mapContentList == null) {
-                Logger.getInstance().Error(TAG, "Converted mapContentList is null!");
-                sendFailedDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _mapContentList = mapContentList;
-
-            clearMapContentListFromDatabase();
-            saveMapContentListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    MapContentDownloadFinishedBroadcast,
-                    MapContentDownloadFinishedBundle,
-                    new MapContentDownloadFinishedContent(_mapContentList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -258,13 +270,13 @@ public class MapContentService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MapContentDownloadFinishedBroadcast,
                     MapContentDownloadFinishedBundle,
-                    new MapContentDownloadFinishedContent(_mapContentList, true));
+                    new MapContentDownloadFinishedContent(_mapContentList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user!");
             return;
         }
 
@@ -356,11 +368,15 @@ public class MapContentService implements IDataService {
         }
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for mapcontent failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MapContentDownloadFinishedBroadcast,
                 MapContentDownloadFinishedBundle,
-                new MapContentDownloadFinishedContent(_mapContentList, false));
+                new MapContentDownloadFinishedContent(_mapContentList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private SerializableList<MapContent> notOnServerMapContent() {

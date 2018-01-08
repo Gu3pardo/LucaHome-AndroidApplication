@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 
+@SuppressWarnings({"unused"})
 public interface IDataNotificationService {
     void Initialize(@NonNull Context context, @NonNull Class<?> receiverActivity, boolean displayNotification, boolean reloadEnabled, int reloadTimeout);
 

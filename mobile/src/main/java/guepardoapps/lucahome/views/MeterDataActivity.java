@@ -38,6 +38,7 @@ import guepardoapps.lucahome.common.classes.MeterData;
 import guepardoapps.lucahome.common.service.MeterListService;
 import guepardoapps.lucahome.service.NavigationService;
 
+@SuppressWarnings("deprecation")
 public class MeterDataActivity extends AppCompatBaseActivity {
     /**
      * Initiate UI
@@ -48,9 +49,9 @@ public class MeterDataActivity extends AppCompatBaseActivity {
     private boolean _spinnerEnabled = true;
 
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of meter data has finished
      */
-    private BroadcastReceiver _meterUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _meterDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             MeterListService.MeterListDownloadFinishedContent result = (MeterListService.MeterListDownloadFinishedContent) intent.getSerializableExtra(MeterListService.MeterListDownloadFinishedBundle);
@@ -77,6 +78,9 @@ public class MeterDataActivity extends AppCompatBaseActivity {
 
         setContentView(R.layout.activity_meterdata);
 
+        int typeId = getIntent().getIntExtra(MeterListService.MeterDataIntent, 0);
+        Meter meter = MeterListService.getInstance().GetByTypeId(typeId);
+
         Toolbar toolbar = findViewById(R.id.toolbar_meterdata);
         //setSupportActionBar(toolbar);
 
@@ -100,6 +104,9 @@ public class MeterDataActivity extends AppCompatBaseActivity {
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _spinner.setAdapter(dataAdapter);
         _spinnerEnabled = false;
+        if (meter != null) {
+            MeterListService.getInstance().SetActiveMeter(meter.GetMeterId());
+        }
         _spinner.setSelection(MeterListService.getInstance().GetActiveMeter().GetTypeId(), true);
         _spinnerEnabled = true;
         _spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -165,7 +172,7 @@ public class MeterDataActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_meterUpdateReceiver, new String[]{MeterListService.MeterListDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_meterDownloadReceiver, new String[]{MeterListService.MeterListDownloadFinishedBroadcast});
         updateList();
     }
 

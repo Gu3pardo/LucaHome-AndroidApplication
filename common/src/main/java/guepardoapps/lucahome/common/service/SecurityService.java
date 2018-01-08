@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -24,12 +25,13 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SecurityService implements IDataNotificationService {
     public static class SecurityDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Security> SecurityList;
 
-        SecurityDownloadFinishedContent(SerializableList<Security> securityList, boolean succcess) {
-            super(succcess, new byte[]{});
+        SecurityDownloadFinishedContent(@NonNull SerializableList<Security> securityList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             SecurityList = securityList;
         }
     }
@@ -71,6 +73,39 @@ public class SecurityService implements IDataNotificationService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<Security> securityList = JsonDataToSecurityConverter.getInstance().GetList(contentResponse);
+                if (securityList == null) {
+                    Logger.getInstance().Error(TAG, "Converted securityList is null!");
+                    sendFailedDownloadBroadcast("Converted securityList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new SerializableDate();
+
+                _securityList = securityList;
+
+                if (_securityList.getSize() > 0) {
+                    Security security = _securityList.getValue(0);
+                    if (security.IsCameraActive()) {
+                        ShowNotification();
+                    } else {
+                        CloseNotification();
+                    }
+                }
+
+                _broadcastController.SendSerializableBroadcast(
+                        SecurityDownloadFinishedBroadcast,
+                        SecurityDownloadFinishedBundle,
+                        new SecurityDownloadFinishedContent(_securityList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -94,40 +129,17 @@ public class SecurityService implements IDataNotificationService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<Security> securityList = JsonDataToSecurityConverter.getInstance().GetList(contentResponse);
-            if (securityList == null) {
-                Logger.getInstance().Error(TAG, "Converted birthdayList is null!");
-                sendFailedDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new SerializableDate();
-
-            _securityList = securityList;
-
-            if (_securityList.getSize() > 0) {
-                Security security = _securityList.getValue(0);
-                if (security.IsCameraActive()) {
-                    ShowNotification();
-                } else {
-                    CloseNotification();
-                }
-            }
-
-            _broadcastController.SendSerializableBroadcast(
-                    SecurityDownloadFinishedBroadcast,
-                    SecurityDownloadFinishedBundle,
-                    new SecurityDownloadFinishedContent(_securityList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -285,7 +297,7 @@ public class SecurityService implements IDataNotificationService {
     public void LoadData() {
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user");
             return;
         }
 
@@ -301,7 +313,7 @@ public class SecurityService implements IDataNotificationService {
     public void SetCameraState(boolean state) {
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user");
             return;
         }
 
@@ -317,7 +329,7 @@ public class SecurityService implements IDataNotificationService {
     public void SetMotionState(boolean state) {
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user");
             return;
         }
 
@@ -417,14 +429,22 @@ public class SecurityService implements IDataNotificationService {
         return _lastUpdate;
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download of security failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 SecurityDownloadFinishedBroadcast,
                 SecurityDownloadFinishedBundle,
-                new SecurityDownloadFinishedContent(null, false));
+                new SecurityDownloadFinishedContent(_securityList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedCameraStateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Set camera state failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 SecurityCameraStateFinishedBroadcast,
                 SecurityCameraStateFinishedBundle,
@@ -432,6 +452,10 @@ public class SecurityService implements IDataNotificationService {
     }
 
     private void sendFailedMotionStateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Set motion state failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 SecurityMotionStateFinishedBroadcast,
                 SecurityMotionStateFinishedBundle,

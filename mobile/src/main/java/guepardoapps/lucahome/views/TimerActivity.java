@@ -31,9 +31,9 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class TimerActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of timer data has finished
      */
-    private BroadcastReceiver _timerUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _timerDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             TimerService.TimerDownloadFinishedContent result = (TimerService.TimerDownloadFinishedContent) intent.getSerializableExtra(TimerService.TimerDownloadFinishedBroadcast);
@@ -132,7 +132,7 @@ public class TimerActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_timerUpdateReceiver, new String[]{TimerService.TimerDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_timerDownloadReceiver, new String[]{TimerService.TimerDownloadFinishedBroadcast});
         updateList();
     }
 

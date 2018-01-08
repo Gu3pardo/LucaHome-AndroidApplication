@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class TTSController {
     private static final String TAG = TTSController.class.getSimpleName();
 

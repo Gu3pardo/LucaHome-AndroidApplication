@@ -28,9 +28,9 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 
 public class ForecastWeatherActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of weather has finished
      */
-    private BroadcastReceiver _forecastUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _forecastDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             OpenWeatherService.ForecastWeatherDownloadFinishedContent result =
@@ -118,7 +118,7 @@ public class ForecastWeatherActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_forecastUpdateReceiver, new String[]{OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_forecastDownloadReceiver, new String[]{OpenWeatherService.ForecastWeatherDownloadFinishedBroadcast});
     }
 
     @Override

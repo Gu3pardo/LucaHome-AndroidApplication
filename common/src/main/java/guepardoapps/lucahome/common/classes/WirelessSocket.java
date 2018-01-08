@@ -12,6 +12,7 @@ import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WirelessSocket implements Serializable, ILucaClass {
     private static final long serialVersionUID = 5579389712706446580L;
     private static final String TAG = WirelessSocket.class.getSimpleName();

@@ -17,6 +17,7 @@ import java.util.Enumeration;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class NetworkController {
     private static final String TAG = NetworkController.class.getSimpleName();
 

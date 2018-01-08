@@ -120,6 +120,7 @@ public class DownloadController {
         return true;
     }
 
+    @SuppressWarnings({"WeakerAccess"})
     private class SendActionTask extends AsyncTask<String, Void, String> {
         public DownloadType CurrentDownloadType;
         public Serializable Additional;

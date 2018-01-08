@@ -9,6 +9,7 @@ import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class MoneyMeterData implements Serializable {
     private static final long serialVersionUID = 8799048598384442111L;
     private static final String TAG = MoneyMeterData.class.getSimpleName();

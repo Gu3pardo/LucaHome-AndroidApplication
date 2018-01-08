@@ -26,9 +26,9 @@ import guepardoapps.lucahome.common.service.MenuService;
 
 public class MenuActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of menus has finished
      */
-    private BroadcastReceiver _menuUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _menuDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             MenuService.MenuDownloadFinishedContent result = (MenuService.MenuDownloadFinishedContent) intent.getSerializableExtra(MenuService.MenuDownloadFinishedBundle);
@@ -117,7 +117,7 @@ public class MenuActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_menuUpdateReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_menuDownloadReceiver, new String[]{MenuService.MenuDownloadFinishedBroadcast});
         updateList();
     }
 

@@ -31,9 +31,9 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class ShoppingListActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of shopping data data has finished
      */
-    private BroadcastReceiver _shoppingListUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _shoppingListDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             ShoppingListService.ShoppingListDownloadFinishedContent result = (ShoppingListService.ShoppingListDownloadFinishedContent) intent.getSerializableExtra(ShoppingListService.ShoppingListDownloadFinishedBundle);
@@ -105,7 +105,7 @@ public class ShoppingListActivity extends AppCompatBaseActivity {
         _addButton = findViewById(R.id.floating_action_button_add_shoppingList);
         _addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(-1, "", ShoppingEntryGroup.OTHER, 1, "e"));
+            data.putSerializable(ShoppingListService.ShoppingIntent, new ShoppingEntryDto(ShoppingListService.getInstance().GetHighestId() + 1, "", ShoppingEntryGroup.OTHER, 1, "e"));
 
             NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, ShoppingListEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -136,7 +136,7 @@ public class ShoppingListActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_shoppingListUpdateReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_shoppingListDownloadReceiver, new String[]{ShoppingListService.ShoppingListDownloadFinishedBroadcast});
         updateList();
     }
 

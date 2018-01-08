@@ -9,6 +9,7 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.enums.ShoppingEntryGroup;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class ShoppingEntry implements Serializable, ILucaClass {
     private static final long serialVersionUID = 2455793897127065732L;
     private static final String TAG = ShoppingEntry.class.getSimpleName();
@@ -146,6 +147,6 @@ public class ShoppingEntry implements Serializable, ILucaClass {
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Name: %s );(Group: %s );(Quantity: %d );(Unit: %d );(Bought: %s ))", TAG, _id, _name, _group, _quantity, _unit, _bought);
+        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Name: %s );(Group: %s );(Quantity: %d );(Unit: %s );(Bought: %s ))", TAG, _id, _name, _group, _quantity, _unit, _bought);
     }
 }

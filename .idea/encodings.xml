@@ -36,6 +36,7 @@
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/Weekday.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/YoutubeId.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/tasks/ClientTask.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/tasks/ConverterTask.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/guepardoapps/lucahome/receiver/SocketActionReceiver.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/mobile/src/main/java/guepardoapps/lucahome/receiver/SwitchActionReceiver.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/common/classes/SerializableList.java" charset="windows-1251" />

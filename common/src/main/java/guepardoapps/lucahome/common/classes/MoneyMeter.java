@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 
+@SuppressWarnings({"unused"})
 public class MoneyMeter implements Serializable {
     private static final long serialVersionUID = 8799048598384903746L;
     private static final String TAG = MoneyMeter.class.getSimpleName();

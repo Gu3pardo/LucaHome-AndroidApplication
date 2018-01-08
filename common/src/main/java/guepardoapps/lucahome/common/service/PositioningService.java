@@ -37,6 +37,7 @@ import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Position;
 import guepardoapps.lucahome.common.classes.PuckJs;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
@@ -55,14 +56,14 @@ public class PositioningService extends Service implements BeaconConsumer {
     public static class PositioningUpdateFinishedContent extends ObjectChangeFinishedContent {
         public Position LatestPosition;
 
-        PositioningUpdateFinishedContent(Position latestPosition, boolean succcess) {
-            super(succcess, new byte[]{});
+        PositioningUpdateFinishedContent(@NonNull Position latestPosition, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             LatestPosition = latestPosition;
         }
     }
 
-    public static final String PositioningCalulationFinishedBroadcast = "guepardoapps.lucahome.common.service.positioning.calculation.finished";
-    public static final String PositioningCalulationFinishedBundle = "PositioningCalulationFinishedBundle";
+    public static final String PositioningCalculationFinishedBroadcast = "guepardoapps.lucahome.common.service.positioning.calculation.finished";
+    public static final String PositioningCalculationFinishedBundle = "PositioningCalculationFinishedBundle";
 
     private boolean _isInitialized;
     private boolean _permissionGranted;
@@ -376,11 +377,11 @@ public class PositioningService extends Service implements BeaconConsumer {
         Logger.getInstance().Information(TAG, "Calculating... TODO");
 
         _broadcastController.SendSerializableBroadcast(
-                PositioningCalulationFinishedBroadcast,
-                PositioningCalulationFinishedBundle,
+                PositioningCalculationFinishedBroadcast,
+                PositioningCalculationFinishedBundle,
                 new PositioningUpdateFinishedContent(
-                        new Position(
-                                new PuckJs(-1, "", "", "", false, ILucaClass.LucaServerDbAction.Null), -1)
-                        , true));
+                        new Position(new PuckJs(-1, "", "", "", false, ILucaClass.LucaServerDbAction.Null), -1),
+                        true,
+                        Tools.CompressStringToByteArray("Positioning finished")));
     }
 }

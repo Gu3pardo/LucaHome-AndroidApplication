@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SerializableList<T> implements Serializable {
     private static final long serialVersionUID = -7933419990581963085L;
 
@@ -22,7 +23,7 @@ public class SerializableList<T> implements Serializable {
         _dataList.add(newValue);
     }
 
-    public void setValue(int index, @NonNull T value) {
+    public void setValue(int index, T value) {
         if (_dataList == null) {
             _dataList = new ArrayList<>();
         }

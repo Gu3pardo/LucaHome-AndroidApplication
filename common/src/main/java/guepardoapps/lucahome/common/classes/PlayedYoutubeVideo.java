@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.Locale;
 
+@SuppressWarnings({"unused"})
 public class PlayedYoutubeVideo implements Serializable {
     private static final long serialVersionUID = 2691811435346489566L;
 

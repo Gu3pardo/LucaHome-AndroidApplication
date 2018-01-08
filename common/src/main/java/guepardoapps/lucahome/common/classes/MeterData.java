@@ -10,6 +10,7 @@ import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class MeterData implements Serializable {
     private static final long serialVersionUID = 8793748598384442111L;
     private static final String TAG = MeterData.class.getSimpleName();

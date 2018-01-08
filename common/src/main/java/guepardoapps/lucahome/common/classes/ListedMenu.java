@@ -8,6 +8,7 @@ import java.util.Locale;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class ListedMenu implements Serializable, ILucaClass {
     private static final long serialVersionUID = 3749104839275047381L;
     private static final String TAG = ListedMenu.class.getSimpleName();

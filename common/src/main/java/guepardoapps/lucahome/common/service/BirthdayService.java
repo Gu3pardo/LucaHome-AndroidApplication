@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -33,7 +34,17 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class BirthdayService implements IDataNotificationService {
+    public static class BirthdayDownloadFinishedContent extends ObjectChangeFinishedContent {
+        public SerializableList<LucaBirthday> BirthdayList;
+
+        BirthdayDownloadFinishedContent(@NonNull SerializableList<LucaBirthday> birthdayList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
+            BirthdayList = birthdayList;
+        }
+    }
+
     public static final String BirthdayIntent = "BirthdayIntent";
 
     public static final String BirthdayDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.birthday.download.finished";
@@ -76,6 +87,36 @@ public class BirthdayService implements IDataNotificationService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<LucaBirthday> birthdayList = JsonDataToBirthdayConverter.getInstance().GetList(contentResponse, _context);
+                if (birthdayList == null) {
+                    Logger.getInstance().Error(TAG, "Converted birthdayList is null!");
+                    _birthdayList = _databaseBirthdayList.GetBirthdayList();
+                    sendFailedDownloadBroadcast("Converted birthdayList is null!");
+                    return "";
+                }
+
+                _birthdayList = birthdayList;
+
+                ShowNotification();
+
+                clearBirthdayListFromDatabase();
+                saveBirthdayListToDatabase();
+
+                _lastUpdate = new Date();
+
+                _broadcastController.SendSerializableBroadcast(
+                        BirthdayDownloadFinishedBroadcast,
+                        BirthdayDownloadFinishedBundle,
+                        new BirthdayDownloadFinishedContent(_birthdayList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private Context _context;
 
     private BroadcastController _broadcastController;
@@ -104,38 +145,18 @@ public class BirthdayService implements IDataNotificationService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _birthdayList = _databaseBirthdayList.GetBirthdayList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _birthdayList = _databaseBirthdayList.GetBirthdayList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<LucaBirthday> birthdayList = JsonDataToBirthdayConverter.getInstance().GetList(contentResponse, _context);
-            if (birthdayList == null) {
-                Logger.getInstance().Error(TAG, "Converted birthdayList is null!");
-                _birthdayList = _databaseBirthdayList.GetBirthdayList();
-                sendFailedDownloadBroadcast();
-                return;
-            }
-
-            _birthdayList = birthdayList;
-
-            ShowNotification();
-
-            clearBirthdayListFromDatabase();
-            saveBirthdayListToDatabase();
-
-            _lastUpdate = new Date();
-
-            _broadcastController.SendSerializableBroadcast(
-                    BirthdayDownloadFinishedBroadcast,
-                    BirthdayDownloadFinishedBundle,
-                    new ObjectChangeFinishedContent(true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -169,7 +190,7 @@ public class BirthdayService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     BirthdayAddFinishedBroadcast,
                     BirthdayAddFinishedBundle,
-                    new ObjectChangeFinishedContent(true));
+                    new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Add finished")));
 
             LoadData();
         }
@@ -205,7 +226,7 @@ public class BirthdayService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     BirthdayUpdateFinishedBroadcast,
                     BirthdayUpdateFinishedBundle,
-                    new ObjectChangeFinishedContent(true));
+                    new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Update finished")));
 
             LoadData();
         }
@@ -241,7 +262,7 @@ public class BirthdayService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     BirthdayDeleteFinishedBroadcast,
                     BirthdayDeleteFinishedBundle,
-                    new ObjectChangeFinishedContent(true));
+                    new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Delete finished")));
 
             LoadData();
         }
@@ -384,13 +405,13 @@ public class BirthdayService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     BirthdayDownloadFinishedBroadcast,
                     BirthdayDownloadFinishedBundle,
-                    new ObjectChangeFinishedContent(true));
+                    new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Loaded from database!")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user!");
             return;
         }
 
@@ -525,7 +546,7 @@ public class BirthdayService implements IDataNotificationService {
         _broadcastController.SendSerializableBroadcast(
                 BirthdayDownloadFinishedBroadcast,
                 BirthdayDownloadFinishedBundle,
-                new ObjectChangeFinishedContent(true));
+                new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Retrieved images!")));
     }
 
     @Override
@@ -631,11 +652,15 @@ public class BirthdayService implements IDataNotificationService {
         }
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download of birthdays failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 BirthdayDownloadFinishedBroadcast,
                 BirthdayDownloadFinishedBundle,
-                new ObjectChangeFinishedContent(false));
+                new BirthdayDownloadFinishedContent(_birthdayList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

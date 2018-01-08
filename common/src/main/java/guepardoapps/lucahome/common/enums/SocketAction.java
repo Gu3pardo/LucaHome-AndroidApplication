@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
+@SuppressWarnings({"unused"})
 public enum SocketAction implements Serializable {
 
     NULL(-1, "", false, "0"),

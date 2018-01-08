@@ -8,6 +8,7 @@ import java.util.Locale;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class PuckJs implements Serializable, ILucaClass {
     private static final long serialVersionUID = 3784902949363954860L;
     private static final String TAG = PuckJs.class.getSimpleName();

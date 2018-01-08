@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -31,12 +32,15 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+import static guepardoapps.lucahome.common.service.BirthdayService.BirthdayDownloadFinishedBroadcast;
+
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MenuService implements IDataService {
     public static class MenuDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<LucaMenu> MenuList;
 
-        MenuDownloadFinishedContent(SerializableList<LucaMenu> menuList, boolean succcess) {
-            super(succcess, new byte[]{});
+        MenuDownloadFinishedContent(@NonNull SerializableList<LucaMenu> menuList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             MenuList = menuList;
         }
     }
@@ -77,6 +81,57 @@ public class MenuService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<LucaMenu> menuList = JsonDataToMenuConverter.getInstance().GetList(contentResponse);
+                if (menuList == null) {
+                    Logger.getInstance().Error(TAG, "Converted menuList is null!");
+                    _menuList = _databaseMenuList.GetMenuList();
+                    sendFailedMenuDownloadBroadcast("Converted menuList is null!");
+                    return "";
+                }
+
+                // Sort list
+                int dayOfMonth = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+                int startIndex = -1;
+                for (int index = 0; index < menuList.getSize(); index++) {
+                    if (menuList.getValue(index).GetDate().DayOfMonth() == dayOfMonth) {
+                        startIndex = index;
+                        break;
+                    }
+                }
+                if (startIndex != -1) {
+                    SerializableList<LucaMenu> sortedList = new SerializableList<>();
+                    int selectedIndex = startIndex;
+                    for (int index = 0; index < menuList.getSize(); index++) {
+                        if (selectedIndex >= menuList.getSize()) {
+                            selectedIndex = selectedIndex - menuList.getSize();
+                        }
+                        sortedList.addValue(menuList.getValue(selectedIndex));
+                        selectedIndex++;
+                    }
+                    menuList = sortedList;
+                }
+                _menuList = menuList;
+
+                _lastUpdate = new Date();
+
+                controlMenus();
+
+                clearMenuListFromDatabase();
+                saveMenuListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        MenuDownloadFinishedBroadcast,
+                        MenuDownloadFinishedBundle,
+                        new MenuDownloadFinishedContent(_menuList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private Context _context;
 
     private BroadcastController _broadcastController;
@@ -104,59 +159,18 @@ public class MenuService implements IDataService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _menuList = _databaseMenuList.GetMenuList();
-                sendFailedMenuDownloadBroadcast();
+                sendFailedMenuDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _menuList = _databaseMenuList.GetMenuList();
-                sendFailedMenuDownloadBroadcast();
+                sendFailedMenuDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<LucaMenu> menuList = JsonDataToMenuConverter.getInstance().GetList(contentResponse);
-            if (menuList == null) {
-                Logger.getInstance().Error(TAG, "Converted menuList is null!");
-                _menuList = _databaseMenuList.GetMenuList();
-                sendFailedMenuDownloadBroadcast();
-                return;
-            }
-
-            // Sort list
-            int dayOfMonth = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-            int startIndex = -1;
-            for (int index = 0; index < menuList.getSize(); index++) {
-                if (menuList.getValue(index).GetDate().DayOfMonth() == dayOfMonth) {
-                    startIndex = index;
-                    break;
-                }
-            }
-            if (startIndex != -1) {
-                SerializableList<LucaMenu> sortedList = new SerializableList<>();
-                int selectedIndex = startIndex;
-                for (int index = 0; index < menuList.getSize(); index++) {
-                    if (selectedIndex >= menuList.getSize()) {
-                        selectedIndex = selectedIndex - menuList.getSize();
-                    }
-                    sortedList.addValue(menuList.getValue(selectedIndex));
-                    selectedIndex++;
-                }
-                menuList = sortedList;
-            }
-            _menuList = menuList;
-
-            _lastUpdate = new Date();
-
-            controlMenus();
-
-            clearMenuListFromDatabase();
-            saveMenuListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    MenuDownloadFinishedBroadcast,
-                    MenuDownloadFinishedBundle,
-                    new MenuDownloadFinishedContent(_menuList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -365,13 +379,13 @@ public class MenuService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MenuDownloadFinishedBroadcast,
                     MenuDownloadFinishedBundle,
-                    new MenuDownloadFinishedContent(_menuList, true));
+                    new MenuDownloadFinishedContent(_menuList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedMenuDownloadBroadcast();
+            sendFailedMenuDownloadBroadcast("No user");
             return;
         }
 
@@ -531,11 +545,15 @@ public class MenuService implements IDataService {
         }
     }
 
-    private void sendFailedMenuDownloadBroadcast() {
+    private void sendFailedMenuDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for menu failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MenuDownloadFinishedBroadcast,
                 MenuDownloadFinishedBundle,
-                new MenuDownloadFinishedContent(_menuList, false));
+                new MenuDownloadFinishedContent(_menuList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedMenuUpdateBroadcast(@NonNull String response) {

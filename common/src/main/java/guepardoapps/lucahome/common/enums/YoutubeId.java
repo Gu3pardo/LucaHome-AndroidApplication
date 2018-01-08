@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.enums;
 
 import java.io.Serializable;
 
+@SuppressWarnings({"unused"})
 public enum YoutubeId implements Serializable {
 
     DEFAULT(0, "The Good Life Live Stream", "dyLV6gnu-wg"),

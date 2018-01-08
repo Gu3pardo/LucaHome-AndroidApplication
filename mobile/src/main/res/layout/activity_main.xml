@@ -11,7 +11,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/skeletonList.appbar.main"
         android:layout_width="match_parent"
-        android:layout_height="450dp"
+        android:layout_height="400dp"
         android:background="@android:color/background_light"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -27,7 +27,7 @@
             <ImageView
                 android:id="@+id/skeletonList.backdrop.image.main"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="?attr/actionBarSize"
                 android:contentDescription="@string/contentDescription"
                 android:fitsSystemWindows="true"
@@ -96,29 +96,13 @@
         </com.baoyz.widget.PullRefreshLayout>
     </RelativeLayout>
 
-    <com.rey.material.widget.FloatingActionButton
-        android:id="@+id/floating_action_button_settings"
-        android:layout_width="wrap_content"
+    <it.sephiroth.android.library.bottomnavigation.BottomNavigation
+        android:id="@+id/mainViewBottomNavigation"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:fab_iconSrc="@android:drawable/ic_menu_preferences"
-        app:layout_anchor="@id/relativeLayoutMain"
-        app:layout_anchorGravity="bottom|left|start"
-        app:rd_delayClick="none"
-        app:rd_enable="true"
-        app:rd_rippleColor="@color/colorPrimary"
-        app:rd_rippleType="touch" />
-
-    <com.rey.material.widget.FloatingActionButton
-        android:id="@+id/floating_action_button_about"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        app:fab_iconSrc="@android:drawable/ic_menu_info_details"
-        app:layout_anchor="@id/relativeLayoutMain"
-        app:layout_anchorGravity="bottom|right|end"
-        app:rd_delayClick="none"
-        app:rd_enable="true"
-        app:rd_rippleColor="@color/colorPrimary"
-        app:rd_rippleType="touch" />
+        android:layout_gravity="bottom"
+        app:bbn_badgeProvider="@string/bbn_badgeProvider"
+        app:bbn_entries="@menu/activity_main_bottom_navigation"
+        app:bbn_scrollEnabled="true"
+        app:layout_behavior="@string/bbn_phone_view_behavior" />
 </android.support.design.widget.CoordinatorLayout>

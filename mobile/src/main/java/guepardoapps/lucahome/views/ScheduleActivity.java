@@ -35,9 +35,9 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class ScheduleActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of schedules has finished
      */
-    private BroadcastReceiver _scheduleUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _scheduleDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             ScheduleService.ScheduleDownloadFinishedContent result = (ScheduleService.ScheduleDownloadFinishedContent) intent.getSerializableExtra(ScheduleService.ScheduleDownloadFinishedBundle);
@@ -105,7 +105,7 @@ public class ScheduleActivity extends AppCompatBaseActivity {
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_schedule);
         addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(-1, "", null, null, Weekday.NULL, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
+            data.putSerializable(ScheduleService.ScheduleIntent, new ScheduleDto(ScheduleService.getInstance().GetHighestId() + 1, "", null, null, Weekday.NULL, new SerializableTime(), SocketAction.Activate, ScheduleDto.Action.Add));
 
             NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, ScheduleEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -134,7 +134,7 @@ public class ScheduleActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_scheduleUpdateReceiver, new String[]{ScheduleService.ScheduleDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_scheduleDownloadReceiver, new String[]{ScheduleService.ScheduleDownloadFinishedBroadcast});
         updateList();
     }
 

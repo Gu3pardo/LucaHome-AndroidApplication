@@ -24,16 +24,15 @@ import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Movie;
 import guepardoapps.lucahome.common.service.MovieService;
-import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
 public class MovieActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of movies has finished
      */
-    private BroadcastReceiver _movieUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _movieDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(MovieService.MovieDownloadFinishedBundle);
+            MovieService.MovieListDownloadFinishedContent result = (MovieService.MovieListDownloadFinishedContent) intent.getSerializableExtra(MovieService.MovieDownloadFinishedBundle);
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
@@ -115,7 +114,7 @@ public class MovieActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_movieUpdateReceiver, new String[]{MovieService.MovieDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_movieDownloadReceiver, new String[]{MovieService.MovieDownloadFinishedBroadcast});
         updateList();
     }
 

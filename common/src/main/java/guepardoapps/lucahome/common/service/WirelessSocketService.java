@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -30,12 +31,13 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WirelessSocketService implements IDataNotificationService {
     public static class WirelessSocketDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<WirelessSocket> WirelessSocketList;
 
-        WirelessSocketDownloadFinishedContent(SerializableList<WirelessSocket> wirelessSocketList, boolean succcess) {
-            super(succcess, new byte[]{});
+        WirelessSocketDownloadFinishedContent(@NonNull SerializableList<WirelessSocket> wirelessSocketList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             WirelessSocketList = wirelessSocketList;
         }
     }
@@ -90,6 +92,35 @@ public class WirelessSocketService implements IDataNotificationService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<WirelessSocket> wirelessSocketList = JsonDataToWirelessSocketConverter.getInstance().GetList(contentResponse);
+                if (wirelessSocketList == null) {
+                    Logger.getInstance().Error(TAG, "Converted wirelessSocketList is null!");
+                    _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
+                    sendFailedSocketDownloadBroadcast("Converted wirelessSocketList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _wirelessSocketList = wirelessSocketList;
+                ShowNotification();
+
+                clearSocketListFromDatabase();
+                saveSocketListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        WirelessSocketDownloadFinishedBroadcast,
+                        WirelessSocketDownloadFinishedBundle,
+                        new WirelessSocketDownloadFinishedContent(_wirelessSocketList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -116,37 +147,18 @@ public class WirelessSocketService implements IDataNotificationService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
-                sendFailedSocketDownloadBroadcast();
+                sendFailedSocketDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
-                sendFailedSocketDownloadBroadcast();
+                sendFailedSocketDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<WirelessSocket> wirelessSocketList = JsonDataToWirelessSocketConverter.getInstance().GetList(contentResponse);
-            if (wirelessSocketList == null) {
-                Logger.getInstance().Error(TAG, "Converted wirelessSocketList is null!");
-                _wirelessSocketList = _databaseWirelessSocketList.GetWirelessSocketList();
-                sendFailedSocketDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _wirelessSocketList = wirelessSocketList;
-            ShowNotification();
-
-            clearSocketListFromDatabase();
-            saveSocketListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    WirelessSocketDownloadFinishedBroadcast,
-                    WirelessSocketDownloadFinishedBundle,
-                    new WirelessSocketDownloadFinishedContent(_wirelessSocketList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -448,13 +460,13 @@ public class WirelessSocketService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSocketDownloadFinishedBroadcast,
                     WirelessSocketDownloadFinishedBundle,
-                    new WirelessSocketDownloadFinishedContent(_wirelessSocketList, true));
+                    new WirelessSocketDownloadFinishedContent(_wirelessSocketList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedSocketDownloadBroadcast();
+            sendFailedSocketDownloadBroadcast("No user");
             return;
         }
 
@@ -757,11 +769,15 @@ public class WirelessSocketService implements IDataNotificationService {
         }
     }
 
-    private void sendFailedSocketDownloadBroadcast() {
+    private void sendFailedSocketDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for sockets failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 WirelessSocketDownloadFinishedBroadcast,
                 WirelessSocketDownloadFinishedBundle,
-                new WirelessSocketDownloadFinishedContent(_wirelessSocketList, false));
+                new WirelessSocketDownloadFinishedContent(_wirelessSocketList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedSocketSetBroadcast(@NonNull String response) {

@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -27,12 +28,13 @@ import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class ScheduleService implements IDataService {
     public static class ScheduleDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Schedule> ScheduleList;
 
-        ScheduleDownloadFinishedContent(SerializableList<Schedule> scheduleList, boolean succcess) {
-            super(succcess, new byte[]{});
+        ScheduleDownloadFinishedContent(@NonNull SerializableList<Schedule> scheduleList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             ScheduleList = scheduleList;
         }
     }
@@ -77,6 +79,30 @@ public class ScheduleService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<Schedule> scheduleList = JsonDataToScheduleConverter.getInstance().GetList(contentResponse, WirelessSocketService.getInstance().GetDataList(), WirelessSwitchService.getInstance().GetDataList());
+                if (scheduleList == null) {
+                    Logger.getInstance().Error(TAG, "Converted scheduleList is null!");
+                    sendFailedScheduleDownloadBroadcast("Converted scheduleList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _scheduleList = scheduleList;
+
+                _broadcastController.SendSerializableBroadcast(
+                        ScheduleDownloadFinishedBroadcast,
+                        ScheduleDownloadFinishedBundle,
+                        new ScheduleDownloadFinishedContent(_scheduleList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -99,28 +125,17 @@ public class ScheduleService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedScheduleDownloadBroadcast();
+                sendFailedScheduleDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedScheduleDownloadBroadcast();
+                sendFailedScheduleDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<Schedule> scheduleList = JsonDataToScheduleConverter.getInstance().GetList(contentResponse, WirelessSocketService.getInstance().GetDataList(), WirelessSwitchService.getInstance().GetDataList());
-            if (scheduleList == null) {
-                Logger.getInstance().Error(TAG, "Converted scheduleList is null!");
-                sendFailedScheduleDownloadBroadcast();
-            } else {
-                _lastUpdate = new Date();
-                _scheduleList = scheduleList;
-                _broadcastController.SendSerializableBroadcast(
-                        ScheduleDownloadFinishedBroadcast,
-                        ScheduleDownloadFinishedBundle,
-                        new ScheduleDownloadFinishedContent(_scheduleList, true));
-            }
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -390,7 +405,7 @@ public class ScheduleService implements IDataService {
     public void LoadData() {
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedScheduleDownloadBroadcast();
+            sendFailedScheduleDownloadBroadcast("No user");
             return;
         }
 
@@ -503,14 +518,22 @@ public class ScheduleService implements IDataService {
         return _lastUpdate;
     }
 
-    private void sendFailedScheduleDownloadBroadcast() {
+    private void sendFailedScheduleDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for schedules failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ScheduleDownloadFinishedBroadcast,
                 ScheduleDownloadFinishedBundle,
-                new ScheduleDownloadFinishedContent(null, false));
+                new ScheduleDownloadFinishedContent(_scheduleList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedScheduleSetBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Set of schedule failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ScheduleSetFinishedBroadcast,
                 ScheduleSetFinishedBundle,
@@ -518,6 +541,10 @@ public class ScheduleService implements IDataService {
     }
 
     private void sendFailedScheduleAddBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Adding of schedule failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ScheduleAddFinishedBroadcast,
                 ScheduleAddFinishedBundle,
@@ -525,6 +552,10 @@ public class ScheduleService implements IDataService {
     }
 
     private void sendFailedScheduleUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update for schedule failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ScheduleUpdateFinishedBroadcast,
                 ScheduleUpdateFinishedBundle,
@@ -532,6 +563,10 @@ public class ScheduleService implements IDataService {
     }
 
     private void sendFailedScheduleDeleteBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Delete for schedule failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ScheduleDeleteFinishedBroadcast,
                 ScheduleDeleteFinishedBundle,

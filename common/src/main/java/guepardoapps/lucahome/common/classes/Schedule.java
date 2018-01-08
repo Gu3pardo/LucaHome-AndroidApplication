@@ -13,6 +13,7 @@ import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Schedule implements Serializable, ILucaClass {
     private static final long serialVersionUID = 7735669237381408318L;
     private static final String TAG = Schedule.class.getSimpleName();

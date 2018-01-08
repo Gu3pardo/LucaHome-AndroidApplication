@@ -28,17 +28,16 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.PuckJs;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.PuckJsListService;
-import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class PuckJsActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of puckjs has finished
      */
-    private BroadcastReceiver _puckJsUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _puckJsDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(PuckJsListService.PuckJsListDownloadFinishedBroadcast);
+            PuckJsListService.PuckJsListDownloadFinishedContent result = (PuckJsListService.PuckJsListDownloadFinishedContent) intent.getSerializableExtra(PuckJsListService.PuckJsListDownloadFinishedBroadcast);
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
@@ -134,7 +133,7 @@ public class PuckJsActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_puckJsUpdateReceiver, new String[]{PuckJsListService.PuckJsListDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_puckJsDownloadReceiver, new String[]{PuckJsListService.PuckJsListDownloadFinishedBroadcast});
         updateList();
     }
 

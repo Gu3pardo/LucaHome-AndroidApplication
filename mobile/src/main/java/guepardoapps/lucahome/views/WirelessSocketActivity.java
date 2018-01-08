@@ -32,9 +32,9 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class WirelessSocketActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of wireless sockets data has finished
      */
-    private BroadcastReceiver _wirelessSocketUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _wirelessSocketDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             WirelessSocketService.WirelessSocketDownloadFinishedContent result = (WirelessSocketService.WirelessSocketDownloadFinishedContent) intent.getSerializableExtra(WirelessSocketService.WirelessSocketDownloadFinishedBundle);
@@ -102,7 +102,7 @@ public class WirelessSocketActivity extends AppCompatBaseActivity {
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_wireless_socket);
         addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(-1, "", "", "", false, WirelessSocketDto.Action.Add));
+            data.putSerializable(WirelessSocketService.WirelessSocketIntent, new WirelessSocketDto(WirelessSocketService.getInstance().GetHighestId() + 1, "", "", "", false, WirelessSocketDto.Action.Add));
 
             NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, WirelessSocketEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -135,7 +135,7 @@ public class WirelessSocketActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_wirelessSocketUpdateReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_wirelessSocketDownloadReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
         updateList();
     }
 

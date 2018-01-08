@@ -10,6 +10,7 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class LucaMenu implements Serializable, ILucaClass {
     private static final long serialVersionUID = 3749147384275047381L;
     private static final String TAG = LucaMenu.class.getSimpleName();

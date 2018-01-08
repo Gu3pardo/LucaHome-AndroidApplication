@@ -8,6 +8,7 @@ import java.util.Locale;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class Coin implements Serializable, ILucaClass {
     private static final long serialVersionUID = 1027483947363954860L;
     private static final String TAG = Coin.class.getSimpleName();

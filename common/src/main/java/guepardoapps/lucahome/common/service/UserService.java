@@ -16,6 +16,7 @@ import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings("unused")
 public class UserService {
     public static final String UserCheckedFinishedBroadcast = "guepardoapps.lucahome.data.service.user.checked.finished";
     public static final String UserCheckedFinishedBundle = "UserCheckedFinishedBundle";
@@ -67,7 +68,7 @@ public class UserService {
             _broadcastController.SendSerializableBroadcast(
                     UserCheckedFinishedBroadcast,
                     UserCheckedFinishedBundle,
-                    new ObjectChangeFinishedContent(true, new byte[]{}));
+                    new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Download finished")));
         }
     };
 
@@ -172,6 +173,10 @@ public class UserService {
     }
 
     private void sendFailedCheckBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Check failed";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 UserCheckedFinishedBroadcast,
                 UserCheckedFinishedBundle,

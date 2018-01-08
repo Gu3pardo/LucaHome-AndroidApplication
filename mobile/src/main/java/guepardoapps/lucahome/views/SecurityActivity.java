@@ -56,9 +56,9 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
     private ReceiverController _receiverController;
 
     /**
-     * BroadcastReceiver to receive updates for the security
+     * BroadcastReceiver to receive the event after download of security data has finished
      */
-    private BroadcastReceiver _securityUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _securityDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             SecurityService.SecurityDownloadFinishedContent result =
@@ -156,7 +156,7 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
     protected void onResume() {
         super.onResume();
 
-        _receiverController.RegisterReceiver(_securityUpdateReceiver, new String[]{SecurityService.SecurityDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_securityDownloadReceiver, new String[]{SecurityService.SecurityDownloadFinishedBroadcast});
 
         SerializableList<Security> securityList = SecurityService.getInstance().GetDataList();
         if (securityList != null) {

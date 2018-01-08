@@ -23,6 +23,7 @@ import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
 
+@SuppressWarnings({"deprecation", "unused"})
 public class NotificationController {
     private static final String TAG = NotificationController.class.getSimpleName();
 

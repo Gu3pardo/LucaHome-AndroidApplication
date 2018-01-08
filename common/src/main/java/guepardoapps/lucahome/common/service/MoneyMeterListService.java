@@ -3,12 +3,12 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
@@ -30,12 +30,13 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MoneyMeterListService implements IDataService {
     public static class MoneyMeterListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<MoneyMeter> MoneyMeterList;
 
-        MoneyMeterListDownloadFinishedContent(SerializableList<MoneyMeter> moneyMeterList, boolean succcess) {
-            super(succcess, new byte[]{});
+        MoneyMeterListDownloadFinishedContent(@NonNull SerializableList<MoneyMeter> moneyMeterList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             MoneyMeterList = moneyMeterList;
         }
     }
@@ -43,8 +44,8 @@ public class MoneyMeterListService implements IDataService {
     public static class MoneyMeterDataListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<MoneyMeterData> MoneyMeterDataList;
 
-        MoneyMeterDataListDownloadFinishedContent(SerializableList<MoneyMeterData> moneyMeterDataList, boolean succcess) {
-            super(succcess, new byte[]{});
+        MoneyMeterDataListDownloadFinishedContent(@NonNull SerializableList<MoneyMeterData> moneyMeterDataList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             MoneyMeterDataList = moneyMeterDataList;
         }
     }
@@ -91,6 +92,37 @@ public class MoneyMeterListService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<MoneyMeterData> moneyMeterDataList = JsonDataToMoneyMeterDataConverter.getInstance().GetList(contentResponse);
+                if (moneyMeterDataList == null) {
+                    Logger.getInstance().Error(TAG, "Converted moneyMeterDataList is null!");
+                    _moneyMeterDataList = _databaseMoneyMeterDataList.GetMoneyMeterDataList();
+                    sendFailedDownloadBroadcast("Converted moneyMeterDataList is null!");
+                    createMoneyMeterList();
+                    sendFailedDownloadMeterBroadcast("Converted moneyMeterDataList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _moneyMeterDataList = moneyMeterDataList;
+                createMoneyMeterList();
+
+                clearMoneyMeterDataListFromDatabase();
+                saveMoneyMeterDataListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        MoneyMeterDataListDownloadFinishedBroadcast,
+                        MoneyMeterDataListDownloadFinishedBundle,
+                        new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -118,43 +150,22 @@ public class MoneyMeterListService implements IDataService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _moneyMeterDataList = _databaseMoneyMeterDataList.GetMoneyMeterDataList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 createMoneyMeterList();
-                sendFailedDownloadMeterBroadcast();
+                sendFailedDownloadMeterBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _moneyMeterDataList = _databaseMoneyMeterDataList.GetMoneyMeterDataList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 createMoneyMeterList();
-                sendFailedDownloadMeterBroadcast();
+                sendFailedDownloadMeterBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<MoneyMeterData> moneyMeterDataList = JsonDataToMoneyMeterDataConverter.getInstance().GetList(contentResponse);
-            if (moneyMeterDataList == null) {
-                Logger.getInstance().Error(TAG, "Converted moneyMeterDataList is null!");
-                _moneyMeterDataList = _databaseMoneyMeterDataList.GetMoneyMeterDataList();
-                sendFailedDownloadBroadcast();
-                createMoneyMeterList();
-                sendFailedDownloadMeterBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _moneyMeterDataList = moneyMeterDataList;
-            createMoneyMeterList();
-
-            clearMoneyMeterDataListFromDatabase();
-            saveMoneyMeterDataListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    MoneyMeterDataListDownloadFinishedBroadcast,
-                    MoneyMeterDataListDownloadFinishedBundle,
-                    new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -450,13 +461,13 @@ public class MoneyMeterListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     MoneyMeterDataListDownloadFinishedBroadcast,
                     MoneyMeterDataListDownloadFinishedBundle,
-                    new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, true));
+                    new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user");
             return;
         }
 
@@ -622,21 +633,29 @@ public class MoneyMeterListService implements IDataService {
         _broadcastController.SendSerializableBroadcast(
                 MoneyMeterListDownloadFinishedBroadcast,
                 MoneyMeterListDownloadFinishedBundle,
-                new MoneyMeterListDownloadFinishedContent(_moneyMeterList, true));
+                new MoneyMeterListDownloadFinishedContent(_moneyMeterList, true, Tools.CompressStringToByteArray("Conversion finished")));
     }
 
-    private void sendFailedDownloadMeterBroadcast() {
+    private void sendFailedDownloadMeterBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for money meter failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MoneyMeterListDownloadFinishedBroadcast,
                 MoneyMeterListDownloadFinishedBundle,
-                new MoneyMeterListDownloadFinishedContent(_moneyMeterList, false));
+                new MoneyMeterListDownloadFinishedContent(_moneyMeterList, false, Tools.CompressStringToByteArray(response)));
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for money meter data failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MoneyMeterDataListDownloadFinishedBroadcast,
                 MoneyMeterDataListDownloadFinishedBundle,
-                new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, false));
+                new MoneyMeterDataListDownloadFinishedContent(_moneyMeterDataList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 
+@SuppressWarnings({"unused"})
 public class Meter implements Serializable {
     private static final long serialVersionUID = 5647348598384442492L;
     private static final String TAG = Meter.class.getSimpleName();

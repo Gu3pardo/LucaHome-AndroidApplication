@@ -42,7 +42,7 @@ public class BixbyService extends AccessibilityService {
     private BroadcastReceiver _positioningUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            PositioningService.PositioningUpdateFinishedContent positionResult = (PositioningService.PositioningUpdateFinishedContent) intent.getSerializableExtra(PositioningService.PositioningCalulationFinishedBundle);
+            PositioningService.PositioningUpdateFinishedContent positionResult = (PositioningService.PositioningUpdateFinishedContent) intent.getSerializableExtra(PositioningService.PositioningCalculationFinishedBundle);
             if (positionResult != null) {
                 if (positionResult.Success) {
                     _lastPosition = positionResult.LatestPosition;
@@ -61,7 +61,7 @@ public class BixbyService extends AccessibilityService {
         _networkController = new NetworkController(this);
         _receiverController = new ReceiverController(this);
 
-        _receiverController.RegisterReceiver(_positioningUpdateReceiver, new String[]{PositioningService.PositioningCalulationFinishedBroadcast});
+        _receiverController.RegisterReceiver(_positioningUpdateReceiver, new String[]{PositioningService.PositioningCalculationFinishedBroadcast});
 
         _databaseBixbyActionList = new DatabaseBixbyActionList(this);
         _databaseBixbyActionList.Open();

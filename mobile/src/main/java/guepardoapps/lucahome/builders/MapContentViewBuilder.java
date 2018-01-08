@@ -2,11 +2,13 @@ package guepardoapps.lucahome.builders;
 
 import android.content.Context;
 import android.graphics.Point;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +22,10 @@ import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.MapContent;
+import guepardoapps.lucahome.common.service.MeterListService;
+import guepardoapps.lucahome.service.NavigationService;
+import guepardoapps.lucahome.views.MeterDataActivity;
+import guepardoapps.lucahome.views.PuckJsActivity;
 
 public class MapContentViewBuilder {
     private static final String TAG = MapContentViewBuilder.class.getSimpleName();
@@ -32,6 +38,7 @@ public class MapContentViewBuilder {
     /**
      * Initiate UI
      */
+    private ImageView _imageView;
     private RelativeLayout _relativeLayoutMapPaint;
     private Point _size;
 
@@ -40,23 +47,27 @@ public class MapContentViewBuilder {
     }
 
     public void Initialize() {
-        _relativeLayoutMapPaint = ((AppCompatActivity) _context).findViewById(R.id.skeletonList_backdrop_relativeLayoutPaint_main);
-
-        ViewTreeObserver viewTreeObserver = _relativeLayoutMapPaint.getViewTreeObserver();
-        viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+        _imageView = ((AppCompatActivity) _context).findViewById(R.id.skeletonList_backdrop_image_main);
+        ViewTreeObserver imageViewViewTreeObserver = _imageView.getViewTreeObserver();
+        imageViewViewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @SuppressWarnings("deprecation")
             @Override
             public void onGlobalLayout() {
-                init();
-                _relativeLayoutMapPaint.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                Logger.getInstance().Debug(TAG, "_imageView imageViewViewTreeObserver onGlobalLayout");
+                calculateReferenceSize();
+                _imageView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
             }
+        });
 
-            private void init() {
-                _size = new Point(_relativeLayoutMapPaint.getWidth() - 100, _relativeLayoutMapPaint.getHeight() - 100);
-                if (_tempMapContentList != null) {
-                    CreateMapContentViewList(_tempMapContentList);
-                    AddViewsToMap();
-                }
+        _relativeLayoutMapPaint = ((AppCompatActivity) _context).findViewById(R.id.skeletonList_backdrop_relativeLayoutPaint_main);
+        ViewTreeObserver relativeLayoutViewTreeObserver = _relativeLayoutMapPaint.getViewTreeObserver();
+        relativeLayoutViewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @SuppressWarnings("deprecation")
+            @Override
+            public void onGlobalLayout() {
+                Logger.getInstance().Debug(TAG, "_relativeLayoutMapPaint relativeLayoutViewTreeObserver onGlobalLayout");
+                calculateReferenceSize();
+                _relativeLayoutMapPaint.getViewTreeObserver().removeGlobalOnLayoutListener(this);
             }
         });
     }
@@ -89,7 +100,25 @@ public class MapContentViewBuilder {
                 if (mapContent.GetButtonClick(_context) != null) {
                     mapContent.GetButtonClick(_context).run();
                 } else {
-                    Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.GetShortName()), Toast.LENGTH_LONG).show();
+                    switch (mapContent.GetDrawingType()) {
+                        case Meter:
+                            Bundle meterData = new Bundle();
+                            meterData.putSerializable(MeterListService.MeterDataIntent, mapContent.GetDrawingTypeId());
+                            NavigationService.getInstance().NavigateToActivityWithData(_context, MeterDataActivity.class, meterData);
+                            break;
+
+                        case PuckJS:
+                            /* TODO
+                            Bundle puckJsData = new Bundle();
+                            puckJsData.putSerializable(PuckJsListService.PuckJsIntent, mapContent.GetDrawingTypeId());
+                            NavigationService.getInstance().NavigateToActivityWithData(_context, PuckJsActivity.class, puckJsData);*/
+                            NavigationService.getInstance().NavigateToActivity(_context, PuckJsActivity.class);
+                            break;
+
+                        default:
+                            Toasty.warning(_context, String.format(Locale.getDefault(), "No button action for %s", mapContent.GetShortName()), Toast.LENGTH_LONG).show();
+                            break;
+                    }
                 }
             });
 
@@ -103,6 +132,8 @@ public class MapContentViewBuilder {
 
             newTextView.setTag(mapContent.GetId());
 
+            Logger.getInstance().Information(TAG, String.format(Locale.getDefault(), "Created new TextView: %s", newTextView));
+
             _mapContentViewList.add(newTextView);
         }
 
@@ -113,6 +144,28 @@ public class MapContentViewBuilder {
         _relativeLayoutMapPaint.removeAllViews();
         for (TextView mapContentView : _mapContentViewList) {
             _relativeLayoutMapPaint.addView(mapContentView);
+        }
+    }
+
+    private void calculateReferenceSize() {
+        if (_imageView == null || _relativeLayoutMapPaint == null) {
+            Logger.getInstance().Warning(TAG, "ImageView or RelativeLayoutMapPaint is null!");
+            return;
+        }
+
+        int width = _imageView.getWidth() > _relativeLayoutMapPaint.getWidth() ? _imageView.getWidth() : _relativeLayoutMapPaint.getWidth();
+        int height = _imageView.getHeight() > _relativeLayoutMapPaint.getHeight() ? _imageView.getHeight() : _relativeLayoutMapPaint.getHeight();
+        _size = new Point(width - 75, height - 75);
+
+        Logger.getInstance().Information(TAG, String.format(Locale.getDefault(),
+                "_relativeLayoutMapPaint: Width: %d Height: %d; _imageView: Width: %d Height: %d; _size: x: %d y: %d",
+                _relativeLayoutMapPaint.getWidth(), _relativeLayoutMapPaint.getHeight(),
+                _imageView.getWidth(), _imageView.getHeight(),
+                _size.x, _size.y));
+
+        if (_tempMapContentList != null) {
+            CreateMapContentViewList(_tempMapContentList);
+            AddViewsToMap();
         }
     }
 }

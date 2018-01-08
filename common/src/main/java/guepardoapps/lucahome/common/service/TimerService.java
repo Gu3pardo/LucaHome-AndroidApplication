@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -27,12 +28,13 @@ import guepardoapps.lucahome.common.enums.LucaServerAction;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class TimerService implements IDataService {
     public static class TimerDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<LucaTimer> TimerList;
 
-        TimerDownloadFinishedContent(SerializableList<LucaTimer> timerList, boolean succcess) {
-            super(succcess, new byte[]{});
+        TimerDownloadFinishedContent(@NonNull SerializableList<LucaTimer> timerList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             TimerList = timerList;
         }
     }
@@ -74,6 +76,30 @@ public class TimerService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<LucaTimer> timerList = JsonDataToTimerConverter.getInstance().GetList(contentResponse, WirelessSocketService.getInstance().GetDataList(), WirelessSwitchService.getInstance().GetDataList());
+                if (timerList == null) {
+                    Logger.getInstance().Error(TAG, "Converted timerList is null!");
+                    sendFailedTimerDownloadBroadcast("Converted timerList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _timerList = timerList;
+
+                _broadcastController.SendSerializableBroadcast(
+                        TimerDownloadFinishedBroadcast,
+                        TimerDownloadFinishedBundle,
+                        new TimerDownloadFinishedContent(_timerList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -96,29 +122,17 @@ public class TimerService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedTimerDownloadBroadcast();
+                sendFailedTimerDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedTimerDownloadBroadcast();
+                sendFailedTimerDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<LucaTimer> timerList = JsonDataToTimerConverter.getInstance().GetList(contentResponse, WirelessSocketService.getInstance().GetDataList(), WirelessSwitchService.getInstance().GetDataList());
-            if (timerList == null) {
-                Logger.getInstance().Error(TAG, "Converted timerList is null!");
-                sendFailedTimerDownloadBroadcast();
-            } else {
-                _lastUpdate = new Date();
-                _timerList = timerList;
-                _broadcastController.SendSerializableBroadcast(
-                        TimerDownloadFinishedBroadcast,
-                        TimerDownloadFinishedBundle,
-                        new TimerDownloadFinishedContent(_timerList, true));
-            }
-
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -351,7 +365,7 @@ public class TimerService implements IDataService {
     public void LoadData() {
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedTimerDownloadBroadcast();
+            sendFailedTimerDownloadBroadcast("No user");
             return;
         }
 
@@ -448,14 +462,22 @@ public class TimerService implements IDataService {
         return _lastUpdate;
     }
 
-    private void sendFailedTimerDownloadBroadcast() {
+    private void sendFailedTimerDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download of timer failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 TimerDownloadFinishedBroadcast,
                 TimerDownloadFinishedBundle,
-                new TimerDownloadFinishedContent(null, false));
+                new TimerDownloadFinishedContent(_timerList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedTimerAddBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Add of timer failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 TimerAddFinishedBroadcast,
                 TimerAddFinishedBundle,
@@ -463,6 +485,10 @@ public class TimerService implements IDataService {
     }
 
     private void sendFailedTimerUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update of timer failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 TimerUpdateFinishedBroadcast,
                 TimerUpdateFinishedBundle,
@@ -470,6 +496,10 @@ public class TimerService implements IDataService {
     }
 
     private void sendFailedTimerDeleteBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Delete for timer failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 TimerDeleteFinishedBroadcast,
                 TimerDeleteFinishedBundle,

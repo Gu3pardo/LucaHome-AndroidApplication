@@ -11,6 +11,7 @@ import android.text.format.Formatter;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"deprecation", "unused"})
 public class UserInformationController {
     private static final String TAG = UserInformationController.class.getSimpleName();
 
@@ -34,7 +35,6 @@ public class UserInformationController {
         return _wifiManager.getConnectionInfo().toString();
     }
 
-    @SuppressWarnings("deprecation")
     public String GetIp() {
         return Formatter.formatIpAddress(_wifiManager.getConnectionInfo().getIpAddress());
     }

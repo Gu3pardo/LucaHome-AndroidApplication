@@ -9,6 +9,7 @@ import java.util.Locale;
 import guepardoapps.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.lucahome.common.enums.RadioStreams;
 
+@SuppressWarnings({"unused"})
 public class MediaServerData implements Serializable {
     private static final long serialVersionUID = -6336573950675481913L;
 

@@ -7,6 +7,7 @@ import java.util.Date;
 import android.support.annotation.NonNull;
 import android.text.format.DateFormat;
 
+@SuppressWarnings({"deprecation", "unused"})
 public class CalendarEntryDto implements Serializable {
     private static final long serialVersionUID = 4362557847817468433L;
 
@@ -50,21 +51,18 @@ public class CalendarEntryDto implements Serializable {
         return _allDay;
     }
 
-    @SuppressWarnings("deprecation")
     public boolean IsToday() {
         Calendar calendar = Calendar.getInstance();
         Date now = calendar.getTime();
         return _begin.getDay() == now.getDay() && _begin.getMonth() == now.getMonth() && _begin.getYear() == now.getYear();
     }
 
-    @SuppressWarnings("deprecation")
     public boolean BeginIsAfterNow() {
         Calendar calendar = Calendar.getInstance();
         Date now = calendar.getTime();
         return _begin.after(now);
     }
 
-    @SuppressWarnings("deprecation")
     public boolean EndIsAfterNow() {
         Calendar calendar = Calendar.getInstance();
         Date now = calendar.getTime();

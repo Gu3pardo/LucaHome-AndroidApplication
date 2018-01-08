@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"WeakerAccess"})
 public class KeyController {
     private static final String TAG = KeyController.class.getSimpleName();
 

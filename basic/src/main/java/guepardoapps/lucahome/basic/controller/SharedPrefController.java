@@ -10,6 +10,7 @@ import java.util.List;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SharedPrefController {
     private static final String TAG = SharedPrefController.class.getSimpleName();
 

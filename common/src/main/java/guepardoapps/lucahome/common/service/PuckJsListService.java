@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -29,12 +30,13 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class PuckJsListService implements IDataService {
     public static class PuckJsListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<PuckJs> PuckJsList;
 
-        PuckJsListDownloadFinishedContent(SerializableList<PuckJs> puckJsList, boolean succcess) {
-            super(succcess, new byte[]{});
+        PuckJsListDownloadFinishedContent(@NonNull SerializableList<PuckJs> puckJsList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             PuckJsList = puckJsList;
         }
     }
@@ -78,6 +80,34 @@ public class PuckJsListService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<PuckJs> puckJsList = JsonDataToPuckJsConverter.getInstance().GetList(contentResponse);
+                if (puckJsList == null) {
+                    Logger.getInstance().Error(TAG, "Converted puckJsList is null!");
+                    _puckJsList = _databasePuckJsList.GetPuckJsList();
+                    sendFailedDownloadBroadcast("Converted puckJsList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _puckJsList = puckJsList;
+
+                clearPuckJsListFromDatabase();
+                savePuckJsListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        PuckJsListDownloadFinishedBroadcast,
+                        PuckJsListDownloadFinishedBundle,
+                        new PuckJsListDownloadFinishedContent(_puckJsList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -103,36 +133,18 @@ public class PuckJsListService implements IDataService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _puckJsList = _databasePuckJsList.GetPuckJsList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _puckJsList = _databasePuckJsList.GetPuckJsList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<PuckJs> puckJsList = JsonDataToPuckJsConverter.getInstance().GetList(contentResponse);
-            if (puckJsList == null) {
-                Logger.getInstance().Error(TAG, "Converted puckJsList is null!");
-                _puckJsList = _databasePuckJsList.GetPuckJsList();
-                sendFailedDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _puckJsList = puckJsList;
-
-            clearPuckJsListFromDatabase();
-            savePuckJsListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    PuckJsListDownloadFinishedBroadcast,
-                    PuckJsListDownloadFinishedBundle,
-                    new PuckJsListDownloadFinishedContent(_puckJsList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -383,13 +395,13 @@ public class PuckJsListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     PuckJsListDownloadFinishedBroadcast,
                     PuckJsListDownloadFinishedBundle,
-                    new PuckJsListDownloadFinishedContent(_puckJsList, true));
+                    new PuckJsListDownloadFinishedContent(_puckJsList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user");
             return;
         }
 
@@ -561,11 +573,15 @@ public class PuckJsListService implements IDataService {
         }
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for puck js failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 PuckJsListDownloadFinishedBroadcast,
                 PuckJsListDownloadFinishedBundle,
-                new PuckJsListDownloadFinishedContent(_puckJsList, false));
+                new PuckJsListDownloadFinishedContent(_puckJsList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

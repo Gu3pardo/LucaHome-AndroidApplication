@@ -35,6 +35,7 @@ import guepardoapps.lucahome.common.service.MeterListService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
+@SuppressWarnings("deprecation")
 public class MeterDataEditActivity extends AppCompatActivity {
     private static final String TAG = MeterDataEditActivity.class.getSimpleName();
 

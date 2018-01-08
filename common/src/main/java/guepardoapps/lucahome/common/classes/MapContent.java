@@ -10,6 +10,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.builder.MapContentBuilder;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
+@SuppressWarnings({"unused"})
 public class MapContent implements Serializable, ILucaClass {
     private static final long serialVersionUID = 8796770534384442492L;
     private static final String TAG = MapContent.class.getSimpleName();

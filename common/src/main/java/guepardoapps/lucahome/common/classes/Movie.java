@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 
+@SuppressWarnings({"unused"})
 public class Movie implements Serializable {
     private static final long serialVersionUID = -7601101130730680392L;
     private static final String TAG = Movie.class.getSimpleName();

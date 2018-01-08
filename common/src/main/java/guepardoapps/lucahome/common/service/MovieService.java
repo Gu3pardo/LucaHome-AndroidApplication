@@ -3,11 +3,11 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +30,17 @@ import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MovieService implements IDataService {
+    public static class MovieListDownloadFinishedContent extends ObjectChangeFinishedContent {
+        public SerializableList<Movie> MovieList;
+
+        MovieListDownloadFinishedContent(@NonNull SerializableList<Movie> movieList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
+            MovieList = movieList;
+        }
+    }
+
     public static final String MovieIntent = "MovieIntent";
 
     public static final String MovieDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.movie.download.finished";
@@ -62,6 +72,28 @@ public class MovieService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<Movie> movieList = JsonDataToMovieConverter.getInstance().GetList(contentResponse);
+                if (movieList == null) {
+                    Logger.getInstance().Error(TAG, "Converted movieList is null!");
+                    sendFailedDownloadBroadcast("Converted movieList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+                _movieList = sortListAlphabetically(movieList);
+                _broadcastController.SendSerializableBroadcast(
+                        MovieDownloadFinishedBroadcast,
+                        MovieDownloadFinishedBundle,
+                        new MovieListDownloadFinishedContent(_movieList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -84,29 +116,17 @@ public class MovieService implements IDataService {
                     || contentResponse.contains("Canceled") || contentResponse.contains("CANCELED")
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<Movie> movieList = JsonDataToMovieConverter.getInstance().GetList(contentResponse);
-            if (movieList == null) {
-                Logger.getInstance().Error(TAG, "Converted movieList is null!");
-                sendFailedDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-            _movieList = sortListAlphabetically(movieList);
-            _broadcastController.SendSerializableBroadcast(
-                    MovieDownloadFinishedBroadcast,
-                    MovieDownloadFinishedBundle,
-                    new ObjectChangeFinishedContent(true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -271,7 +291,7 @@ public class MovieService implements IDataService {
     public void LoadData() {
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user");
             return;
         }
 
@@ -338,14 +358,22 @@ public class MovieService implements IDataService {
         return _lastUpdate;
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for movies failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MovieDownloadFinishedBroadcast,
                 MovieDownloadFinishedBundle,
-                new ObjectChangeFinishedContent(false));
+                new MovieListDownloadFinishedContent(_movieList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update of movie failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 MovieUpdateFinishedBroadcast,
                 MovieUpdateFinishedBundle,
@@ -358,7 +386,7 @@ public class MovieService implements IDataService {
             tmpMovieList.add(movieList.getValue(index));
         }
 
-        Collections.sort(tmpMovieList, Comparator.comparing(Movie::GetTitle));
+        tmpMovieList.sort(Comparator.comparing(Movie::GetTitle));
 
         SerializableList<Movie> returnMovieList = new SerializableList<>();
         for (Movie returnMovie : tmpMovieList) {

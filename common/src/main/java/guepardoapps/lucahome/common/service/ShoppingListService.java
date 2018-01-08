@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -30,12 +31,13 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class ShoppingListService implements IDataService {
     public static class ShoppingListDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<ShoppingEntry> ShoppingList;
 
-        ShoppingListDownloadFinishedContent(SerializableList<ShoppingEntry> shoppingList, boolean succcess) {
-            super(succcess, new byte[]{});
+        ShoppingListDownloadFinishedContent(@NonNull SerializableList<ShoppingEntry> shoppingList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             ShoppingList = shoppingList;
         }
     }
@@ -79,6 +81,34 @@ public class ShoppingListService implements IDataService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<ShoppingEntry> shoppingList = JsonDataToShoppingListConverter.getInstance().GetList(contentResponse);
+                if (shoppingList == null) {
+                    Logger.getInstance().Error(TAG, "Converted shoppingList is null!");
+                    _shoppingList = _databaseShoppingList.GetShoppingList();
+                    sendFailedDownloadBroadcast("Converted shoppingList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _shoppingList = shoppingList;
+
+                clearShoppingListFromDatabase();
+                saveShoppingListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        ShoppingListDownloadFinishedBroadcast,
+                        ShoppingListDownloadFinishedBundle,
+                        new ShoppingListDownloadFinishedContent(_shoppingList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private Context _context;
 
     private BroadcastController _broadcastController;
@@ -106,36 +136,18 @@ public class ShoppingListService implements IDataService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<ShoppingEntry> shoppingList = JsonDataToShoppingListConverter.getInstance().GetList(contentResponse);
-            if (shoppingList == null) {
-                Logger.getInstance().Error(TAG, "Converted shoppingList is null!");
-                _shoppingList = _databaseShoppingList.GetShoppingList();
-                sendFailedDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _shoppingList = shoppingList;
-
-            clearShoppingListFromDatabase();
-            saveShoppingListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    ShoppingListDownloadFinishedBroadcast,
-                    ShoppingListDownloadFinishedBundle,
-                    new ShoppingListDownloadFinishedContent(_shoppingList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -400,13 +412,13 @@ public class ShoppingListService implements IDataService {
             _broadcastController.SendSerializableBroadcast(
                     ShoppingListDownloadFinishedBroadcast,
                     ShoppingListDownloadFinishedBundle,
-                    new ShoppingListDownloadFinishedContent(_shoppingList, true));
+                    new ShoppingListDownloadFinishedContent(_shoppingList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user");
             return;
         }
 
@@ -595,11 +607,15 @@ public class ShoppingListService implements IDataService {
         }
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download of shopping entries failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 ShoppingListDownloadFinishedBroadcast,
                 ShoppingListDownloadFinishedBundle,
-                new ShoppingListDownloadFinishedContent(_shoppingList, false));
+                new ShoppingListDownloadFinishedContent(_shoppingList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

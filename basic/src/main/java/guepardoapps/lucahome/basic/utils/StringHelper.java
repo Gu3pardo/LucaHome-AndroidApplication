@@ -2,6 +2,9 @@ package guepardoapps.lucahome.basic.utils;
 
 import android.support.annotation.NonNull;
 
+import java.util.Objects;
+
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class StringHelper {
     public static int GetStringCount(
             @NonNull String stringToTest,
@@ -47,7 +50,7 @@ public class StringHelper {
         int stringCount = stringArray.length;
 
         for (int index = 1; index < stringCount; index++) {
-            areEqual &= stringArray[index] == stringArray[index - 1];
+            areEqual &= Objects.equals(stringArray[index], stringArray[index - 1]);
         }
 
         return areEqual;

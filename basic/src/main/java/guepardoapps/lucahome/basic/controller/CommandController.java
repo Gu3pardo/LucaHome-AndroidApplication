@@ -13,6 +13,7 @@ import android.widget.Toast;
 import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CommandController {
     private static final String TAG = CommandController.class.getSimpleName();
 
@@ -142,10 +143,7 @@ public class CommandController {
         try {
             process = Runtime.getRuntime().exec(new String[]{"/system/xbin/which", "su"});
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            if (bufferedReader.readLine() != null) {
-                return true;
-            }
-            return false;
+            return bufferedReader.readLine() != null;
         } catch (Throwable throwable) {
             Logger.getInstance().Debug(TAG, "No root detected with method process and error detected!");
             return false;

@@ -9,6 +9,7 @@ import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.enums.LucaServerAction;
 
+@SuppressWarnings({"unused"})
 public class WirelessSwitch extends WirelessSocket {
     private static final long serialVersionUID = 5579389712706412340L;
     private static final String TAG = WirelessSwitch.class.getSimpleName();

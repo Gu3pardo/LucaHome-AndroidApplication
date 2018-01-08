@@ -16,6 +16,7 @@ import java.util.List;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"deprecation", "unused"})
 public class AndroidSystemController {
     private static final String TAG = AndroidSystemController.class.getSimpleName();
 
@@ -62,7 +63,6 @@ public class AndroidSystemController {
         return false;
     }
 
-    @SuppressWarnings("deprecation")
     public boolean IsBaseActivityRunningPreAPI23() {
         ActivityManager activityManager = (ActivityManager) _context.getSystemService(Context.ACTIVITY_SERVICE);
 

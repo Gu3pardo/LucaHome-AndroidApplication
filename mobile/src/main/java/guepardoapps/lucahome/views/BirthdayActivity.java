@@ -40,17 +40,16 @@ import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.LucaBirthday;
 import guepardoapps.lucahome.common.dto.BirthdayDto;
 import guepardoapps.lucahome.common.service.BirthdayService;
-import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
 public class BirthdayActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of birthdays has finished
      */
-    private BroadcastReceiver _birthdayUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _birthdayDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
+            BirthdayService.BirthdayDownloadFinishedContent result = (BirthdayService.BirthdayDownloadFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
 
             _progressBar.setVisibility(View.GONE);
             _searchField.setText("");
@@ -115,7 +114,7 @@ public class BirthdayActivity extends AppCompatBaseActivity {
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_birthday);
         addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetDataList().getSize(), "", new SerializableDate(), "", true, BirthdayDto.Action.Add));
+            data.putSerializable(BirthdayService.BirthdayIntent, new BirthdayDto(BirthdayService.getInstance().GetHighestId() + 1, "", new SerializableDate(), "", true, BirthdayDto.Action.Add));
 
             NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, BirthdayEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -164,7 +163,7 @@ public class BirthdayActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_birthdayUpdateReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_birthdayDownloadReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
         updateList();
     }
 

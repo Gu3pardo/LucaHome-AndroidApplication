@@ -32,9 +32,9 @@ import guepardoapps.lucahome.service.NavigationService;
 
 public class CoinActivity extends AppCompatBaseActivity {
     /**
-     * BroadcastReceiver to receive updates
+     * BroadcastReceiver to receive the event after download of coins has finished
      */
-    private BroadcastReceiver _coinUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _coinDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             CoinService.CoinDownloadFinishedContent result = (CoinService.CoinDownloadFinishedContent) intent.getSerializableExtra(CoinService.CoinDownloadFinishedBundle);
@@ -103,7 +103,7 @@ public class CoinActivity extends AppCompatBaseActivity {
         FloatingActionButton addButton = findViewById(R.id.floating_action_button_add_coin);
         addButton.setOnClickListener(view -> {
             Bundle data = new Bundle();
-            data.putSerializable(CoinService.CoinIntent, new CoinDto(-1, "", "", 0, CoinDto.Action.Add));
+            data.putSerializable(CoinService.CoinIntent, new CoinDto(CoinService.getInstance().GetHighestId() + 1, "", "", 0, CoinDto.Action.Add));
 
             NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, CoinEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {
@@ -134,7 +134,7 @@ public class CoinActivity extends AppCompatBaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_coinUpdateReceiver, new String[]{CoinService.CoinDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_coinDownloadReceiver, new String[]{CoinService.CoinDownloadFinishedBroadcast});
         updateList();
     }
 

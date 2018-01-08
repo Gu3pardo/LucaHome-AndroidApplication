@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SerializableDate implements Serializable {
     private static final String TAG = SerializableDate.class.getSimpleName();
 

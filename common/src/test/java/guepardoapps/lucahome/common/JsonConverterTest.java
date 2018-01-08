@@ -145,6 +145,17 @@ public class JsonConverterTest {
     }
 
     @Test
+    public void JsonDataToPuckJsConverterTest() throws Exception {
+        String response = "{\"Data\":[{\"PuckJs\":{\"Id\":0,\"Name\":\"Puck.js e4d\",\"Area\":\"Kitchen\",\"Mac\":\"D4:62:F7:46:E4:D3\"}},{\"PuckJs\":{\"Id\":1,\"Name\":\"Puck.js bf7\",\"Area\":\"Living_Room\",\"Mac\":\"E0:06:19:E9:BF:7E\"}},{\"PuckJs\":{\"Id\":2,\"Name\":\"Puck.js 448\",\"Area\":\"Hall\",\"Mac\":\"FB:0A:16:D5:44:88\"}},{\"PuckJs\":{\"Id\":3,\"Name\":\"Puck.js b8e\",\"Area\":\"Sleeping_Room\",\"Mac\":\"F4:E3:C5:E9\"}}]}";
+
+        SerializableList<PuckJs> puckJsList = JsonDataToPuckJsConverter.getInstance().GetList(response);
+
+        assertNotNull(puckJsList);
+        assertEquals(puckJsList.getSize(), 4);
+        assertEquals(puckJsList.getValue(0).GetArea(), "Kitchen");
+    }
+
+    @Test
     public void JsonDataToScheduleConverterTest() throws Exception {
         String response = "{\"Data\":[{\"Schedule\":{\"Id\":0,\"Name\":\"Enable_Sleep_Light\",\"Socket\":\"Light_Sleeping\",\"Gpio\":\"\",\"Switch\":\"\",\"Weekday\":0,\"Hour\":20,\"Minute\":33,\"Action\":1,\"IsTimer\":0,\"IsActive\":1}},{\"Schedule\":{\"Id\":1,\"Name\":\"Disable_Living\",\"Socket\":\"Light_Living\",\"Gpio\":\"\",\"Switch\":\"\",\"Weekday\":2,\"Hour\":11,\"Minute\":15,\"Action\":0,\"IsTimer\":1,\"IsActive\":1}}]} ";
 

@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.Locale;
 
 public class MainListViewItem {
-    public enum Type {Birthday, Coin, MediaServer, Menu, Meter, MoneyMeter, Movie, PuckJs, Schedule, Security, Settings, Shopping, Timer, Weather, WirelessSocket, WirelessSwitch}
+    public enum Type {Null, Birthday, Coin, MediaServer, Menu, Meter, MoneyMeter, Movie, PuckJs, Schedule, Security, Settings, Shopping, Timer, Weather, WirelessSocket, WirelessSwitch}
 
     private static final String TAG = MainListViewItem.class.getSimpleName();
 
@@ -68,6 +68,10 @@ public class MainListViewItem {
                 mainTouchRunnable,
                 null,
                 type);
+    }
+
+    public void SetTitle(@NonNull String title) {
+        _title = title;
     }
 
     public String GetTitle() {

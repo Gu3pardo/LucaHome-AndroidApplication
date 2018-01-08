@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -38,12 +39,13 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CoinService implements IDataNotificationService {
     public static class CoinConversionDownloadFinishedContent extends ObjectChangeFinishedContent {
         SerializableList<SerializablePair<String, Double>> CoinConversionList;
 
-        CoinConversionDownloadFinishedContent(SerializableList<SerializablePair<String, Double>> coinConversionList, boolean succcess) {
-            super(succcess, new byte[]{});
+        CoinConversionDownloadFinishedContent(@NonNull SerializableList<SerializablePair<String, Double>> coinConversionList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             CoinConversionList = coinConversionList;
         }
     }
@@ -51,8 +53,8 @@ public class CoinService implements IDataNotificationService {
     public static class CoinDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<Coin> CoinList;
 
-        CoinDownloadFinishedContent(SerializableList<Coin> coinList, boolean succcess) {
-            super(succcess, new byte[]{});
+        CoinDownloadFinishedContent(@NonNull SerializableList<Coin> coinList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             CoinList = coinList;
         }
     }
@@ -107,6 +109,105 @@ public class CoinService implements IDataNotificationService {
         }
     };
 
+    private class AsyncTrendConverterTask extends AsyncTask<String, String, String> {
+        Coin coin;
+
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                try {
+                    coin = JsonDataToCoinTrendConverter.UpdateTrend(coin, contentResponse, "EUR");
+
+                    for (int index = 0; index < _coinList.getSize(); index++) {
+                        if (_coinList.getValue(index).GetId() == coin.GetId()) {
+                            _coinList.setValue(index, coin);
+
+                            _broadcastController.SendSerializableBroadcast(
+                                    CoinConversionDownloadFinishedBroadcast,
+                                    CoinConversionDownloadFinishedBundle,
+                                    new CoinConversionDownloadFinishedContent(_coinConversionList, false, Tools.CompressStringToByteArray("Conversion failed!")));
+
+                            ShowNotification();
+
+                            break;
+                        }
+                    }
+                } catch (JSONException jsonException) {
+                    Logger.getInstance().Error(TAG, jsonException.getMessage());
+                }
+
+                _lastUpdate = new Date();
+            }
+            return "Success";
+        }
+    }
+
+    private class AsyncConversionConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<SerializablePair<String, Double>> coinConversionList = JsonDataToCoinConversionConverter.getInstance().GetList(contentResponse);
+                if (coinConversionList == null) {
+                    Logger.getInstance().Error(TAG, "Converted coinConversionList is null!");
+                    _broadcastController.SendSerializableBroadcast(
+                            CoinConversionDownloadFinishedBroadcast,
+                            CoinConversionDownloadFinishedBundle,
+                            new CoinConversionDownloadFinishedContent(_coinConversionList, false, Tools.CompressStringToByteArray("Converted coinConversionList is null!")));
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _coinConversionList = coinConversionList;
+
+                mergeCoinConversionWithCoinList();
+
+                _broadcastController.SendSerializableBroadcast(
+                        CoinConversionDownloadFinishedBroadcast,
+                        CoinConversionDownloadFinishedBundle,
+                        new CoinConversionDownloadFinishedContent(_coinConversionList, true, Tools.CompressStringToByteArray("Download finished")));
+
+                LoadData();
+            }
+            return "Success";
+        }
+    }
+
+    private class AsyncDownloadConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<Coin> coinList = JsonDataToCoinConverter.getInstance().GetList(contentResponse, _coinConversionList);
+                if (coinList == null) {
+                    Logger.getInstance().Error(TAG, "Converted CoinList is null!");
+                    _coinList = _databaseCoinList.GetCoinList();
+                    sendFailedDownloadBroadcast("Converted CoinList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _coinList = coinList;
+                _filteredCoinList = new SerializableList<>();
+
+                clearCoinListFromDatabase();
+                saveCoinListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        CoinDownloadFinishedBroadcast,
+                        CoinDownloadFinishedBundle,
+                        new CoinDownloadFinishedContent(_coinList, true, Tools.CompressStringToByteArray("Download finished")));
+
+                for (int index = 0; index < _coinList.getSize(); index++) {
+                    LoadCoinTrend(_coinList.getValue(index));
+                }
+
+                ShowNotification();
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -129,33 +230,11 @@ public class CoinService implements IDataNotificationService {
             }
 
             String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
-
-            SerializableList<SerializablePair<String, Double>> coinConversionList = JsonDataToCoinConversionConverter.getInstance().GetList(contentResponse);
-            if (coinConversionList == null) {
-                Logger.getInstance().Error(TAG, "Converted coinConversionList is null!");
-                _broadcastController.SendSerializableBroadcast(
-                        CoinConversionDownloadFinishedBroadcast,
-                        CoinConversionDownloadFinishedBundle,
-                        new CoinConversionDownloadFinishedContent(_coinConversionList, false));
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _coinConversionList = coinConversionList;
-
-            mergeCoinConversionWithCoinList();
-
-            _broadcastController.SendSerializableBroadcast(
-                    CoinConversionDownloadFinishedBroadcast,
-                    CoinConversionDownloadFinishedBundle,
-                    new CoinConversionDownloadFinishedContent(_coinConversionList, true));
-
-            LoadData();
+            new AsyncConversionConverterTask().execute(contentResponse);
         }
     };
 
-    private BroadcastReceiver _coinAggregateDownloadFinishedReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _coinTrendDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             DownloadController.DownloadFinishedBroadcastContent content = (DownloadController.DownloadFinishedBroadcastContent) intent.getSerializableExtra(DownloadController.DownloadFinishedBundle);
@@ -166,29 +245,9 @@ public class CoinService implements IDataNotificationService {
 
             String contentResponse = Tools.DecompressByteArrayToString(DownloadStorageService.getInstance().GetDownloadResult(content.CurrentDownloadType));
 
-            Coin coinDto = (Coin) content.Additional;
-            try {
-                coinDto = JsonDataToCoinTrendConverter.UpdateTrend(coinDto, contentResponse, "EUR");
-
-                for (int index = 0; index < _coinList.getSize(); index++) {
-                    if (_coinList.getValue(index).GetId() == coinDto.GetId()) {
-                        _coinList.setValue(index, coinDto);
-
-                        _broadcastController.SendSerializableBroadcast(
-                                CoinConversionDownloadFinishedBroadcast,
-                                CoinConversionDownloadFinishedBundle,
-                                new CoinConversionDownloadFinishedContent(_coinConversionList, false));
-
-                        ShowNotification();
-
-                        break;
-                    }
-                }
-            } catch (JSONException jsonException) {
-                Logger.getInstance().Error(TAG, jsonException.getMessage());
-            }
-
-            _lastUpdate = new Date();
+            AsyncTrendConverterTask asyncTrendConverterTask = new AsyncTrendConverterTask();
+            asyncTrendConverterTask.coin = (Coin) content.Additional;
+            asyncTrendConverterTask.execute(contentResponse);
         }
     };
 
@@ -208,43 +267,17 @@ public class CoinService implements IDataNotificationService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _coinList = _databaseCoinList.GetCoinList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _coinList = _databaseCoinList.GetCoinList();
-                sendFailedDownloadBroadcast();
+                sendFailedDownloadBroadcast("Download was not successful!");
                 return;
             }
-
-            SerializableList<Coin> coinList = JsonDataToCoinConverter.getInstance().GetList(contentResponse, _coinConversionList);
-            if (coinList == null) {
-                Logger.getInstance().Error(TAG, "Converted CoinList is null!");
-                _coinList = _databaseCoinList.GetCoinList();
-                sendFailedDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _coinList = coinList;
-            _filteredCoinList = new SerializableList<>();
-
-            clearCoinListFromDatabase();
-            saveCoinListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    CoinDownloadFinishedBroadcast,
-                    CoinDownloadFinishedBundle,
-                    new CoinDownloadFinishedContent(_coinList, true));
-
-            for (int index = 0; index < _coinList.getSize(); index++) {
-                LoadCoinTrend(_coinList.getValue(index));
-            }
-
-            ShowNotification();
+            new AsyncDownloadConverterTask().execute(contentResponse);
         }
     };
 
@@ -405,7 +438,7 @@ public class CoinService implements IDataNotificationService {
         _databaseCoinList = new DatabaseCoinList(_context);
         _databaseCoinList.Open();
 
-        _receiverController.RegisterReceiver(_coinAggregateDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_coinTrendDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinConversionDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinDownloadFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinAddFinishedReceiver, new String[]{DownloadController.DownloadFinishedBroadcast});
@@ -520,7 +553,7 @@ public class CoinService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     CoinDownloadFinishedBroadcast,
                     CoinDownloadFinishedBundle,
-                    new CoinDownloadFinishedContent(_coinList, true));
+                    new CoinDownloadFinishedContent(_coinList, true, Tools.CompressStringToByteArray("Loaded from database!")));
 
             for (int index = 0; index < _coinList.getSize(); index++) {
                 LoadCoinTrend(_coinList.getValue(index));
@@ -531,7 +564,7 @@ public class CoinService implements IDataNotificationService {
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedDownloadBroadcast();
+            sendFailedDownloadBroadcast("No user!");
             return;
         }
 
@@ -757,11 +790,15 @@ public class CoinService implements IDataNotificationService {
         }
     }
 
-    private void sendFailedDownloadBroadcast() {
+    private void sendFailedDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download for coins failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 CoinDownloadFinishedBroadcast,
                 CoinDownloadFinishedBundle,
-                new CoinDownloadFinishedContent(_coinList, false));
+                new CoinDownloadFinishedContent(_coinList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedAddBroadcast(@NonNull String response) {

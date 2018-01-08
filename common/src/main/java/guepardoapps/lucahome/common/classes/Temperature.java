@@ -9,6 +9,7 @@ import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.common.R;
 
+@SuppressWarnings({"unused"})
 public class Temperature implements Serializable {
     private static final long serialVersionUID = 8405839534384442492L;
     private static final String TAG = Temperature.class.getSimpleName();

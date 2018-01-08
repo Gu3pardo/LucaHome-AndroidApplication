@@ -149,7 +149,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     /**
      * BroadcastReceiver for receiving update of MediaServerData
      */
-    private BroadcastReceiver _mediaServerUpdateReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _mediaServerDownloadReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             MediaServerService.MediaServerDownloadFinishedContent result = (MediaServerService.MediaServerDownloadFinishedContent) intent.getSerializableExtra(MediaServerService.MediaServerDownloadFinishedBundle);
@@ -275,7 +275,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_mediaServerUpdateReceiver, new String[]{MediaServerService.MediaServerDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_mediaServerDownloadReceiver, new String[]{MediaServerService.MediaServerDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_youtubeVideoImageReceiver, new String[]{MediaServerService.MediaServerYoutubeVideoBroadcast});
     }
 

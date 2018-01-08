@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
@@ -30,12 +31,13 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataNotificationService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WirelessSwitchService implements IDataNotificationService {
     public static class WirelessSwitchDownloadFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<WirelessSwitch> WirelessSwitchList;
 
-        WirelessSwitchDownloadFinishedContent(SerializableList<WirelessSwitch> wirelessSwitchList, boolean succcess) {
-            super(succcess, new byte[]{});
+        WirelessSwitchDownloadFinishedContent(@NonNull SerializableList<WirelessSwitch> wirelessSwitchList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
             WirelessSwitchList = wirelessSwitchList;
         }
     }
@@ -90,6 +92,35 @@ public class WirelessSwitchService implements IDataNotificationService {
         }
     };
 
+    private class AsyncConverterTask extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            for (String contentResponse : strings) {
+                SerializableList<WirelessSwitch> wirelessSwitchList = JsonDataToWirelessSwitchConverter.getInstance().GetList(contentResponse);
+                if (wirelessSwitchList == null) {
+                    Logger.getInstance().Error(TAG, "Converted wirelessSwitchList is null!");
+                    _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
+                    sendFailedWirelessSwitchDownloadBroadcast("Converted wirelessSwitchList is null!");
+                    return "";
+                }
+
+                _lastUpdate = new Date();
+
+                _wirelessSwitchList = wirelessSwitchList;
+                ShowNotification();
+
+                clearSwitchListFromDatabase();
+                saveSwitchListToDatabase();
+
+                _broadcastController.SendSerializableBroadcast(
+                        WirelessSwitchDownloadFinishedBroadcast,
+                        WirelessSwitchDownloadFinishedBundle,
+                        new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, true, Tools.CompressStringToByteArray("Download finished")));
+            }
+            return "Success";
+        }
+    }
+
     private BroadcastController _broadcastController;
     private DownloadController _downloadController;
     private NetworkController _networkController;
@@ -116,37 +147,18 @@ public class WirelessSwitchService implements IDataNotificationService {
                     || content.FinalDownloadState != DownloadController.DownloadState.Success) {
                 Logger.getInstance().Error(TAG, contentResponse);
                 _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
-                sendFailedWirelessSwitchDownloadBroadcast();
+                sendFailedWirelessSwitchDownloadBroadcast(contentResponse);
                 return;
             }
 
             if (!content.Success) {
                 Logger.getInstance().Error(TAG, "Download was not successful!");
                 _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
-                sendFailedWirelessSwitchDownloadBroadcast();
+                sendFailedWirelessSwitchDownloadBroadcast("Download was not successful!");
                 return;
             }
 
-            SerializableList<WirelessSwitch> wirelessSwitchList = JsonDataToWirelessSwitchConverter.getInstance().GetList(contentResponse);
-            if (wirelessSwitchList == null) {
-                Logger.getInstance().Error(TAG, "Converted wirelessSwitchList is null!");
-                _wirelessSwitchList = _databaseWirelessSwitchList.GetWirelessSwitchList();
-                sendFailedWirelessSwitchDownloadBroadcast();
-                return;
-            }
-
-            _lastUpdate = new Date();
-
-            _wirelessSwitchList = wirelessSwitchList;
-            ShowNotification();
-
-            clearSwitchListFromDatabase();
-            saveSwitchListToDatabase();
-
-            _broadcastController.SendSerializableBroadcast(
-                    WirelessSwitchDownloadFinishedBroadcast,
-                    WirelessSwitchDownloadFinishedBundle,
-                    new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, true));
+            new AsyncConverterTask().execute(contentResponse);
         }
     };
 
@@ -456,13 +468,13 @@ public class WirelessSwitchService implements IDataNotificationService {
             _broadcastController.SendSerializableBroadcast(
                     WirelessSwitchDownloadFinishedBroadcast,
                     WirelessSwitchDownloadFinishedBundle,
-                    new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, true));
+                    new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, true, Tools.CompressStringToByteArray("Loaded from database")));
             return;
         }
 
         LucaUser user = SettingsController.getInstance().GetUser();
         if (user == null) {
-            sendFailedWirelessSwitchDownloadBroadcast();
+            sendFailedWirelessSwitchDownloadBroadcast("No user");
             return;
         }
 
@@ -749,11 +761,15 @@ public class WirelessSwitchService implements IDataNotificationService {
         }
     }
 
-    private void sendFailedWirelessSwitchDownloadBroadcast() {
+    private void sendFailedWirelessSwitchDownloadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Download of wireless switches failed!";
+        }
+
         _broadcastController.SendSerializableBroadcast(
                 WirelessSwitchDownloadFinishedBroadcast,
                 WirelessSwitchDownloadFinishedBundle,
-                new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, false));
+                new WirelessSwitchDownloadFinishedContent(_wirelessSwitchList, false, Tools.CompressStringToByteArray(response)));
     }
 
     private void sendFailedWirelessSwitchToggleBroadcast(@NonNull String response) {

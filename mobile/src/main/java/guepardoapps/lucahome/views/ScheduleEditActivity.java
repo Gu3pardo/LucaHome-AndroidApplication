@@ -38,11 +38,13 @@ import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.ScheduleService;
+import guepardoapps.lucahome.common.service.TimerService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
+@SuppressWarnings("deprecation")
 public class ScheduleEditActivity extends AppCompatActivity {
     private static final String TAG = ScheduleEditActivity.class.getSimpleName();
 
@@ -227,7 +229,16 @@ public class ScheduleEditActivity extends AppCompatActivity {
                 focusView.requestFocus();
             } else {
                 if (_scheduleDto.GetAction() == ScheduleDto.Action.Add) {
-                    int highestId = ScheduleService.getInstance().GetHighestId();
+                    int highestId;
+
+                    int highestScheduleId = ScheduleService.getInstance().GetHighestId();
+                    int highestTimerId = TimerService.getInstance().GetHighestId();
+                    if (highestScheduleId > highestTimerId) {
+                        highestId = highestScheduleId;
+                    } else {
+                        highestId = highestTimerId;
+                    }
+
                     ScheduleService.getInstance().AddSchedule(new Schedule(highestId + 1, scheduleName, wirelessSocket, wirelessSwitch, weekday, time, socketAction, true, false, ILucaClass.LucaServerDbAction.Add));
                     _saveButton.setEnabled(false);
                 } else if (_scheduleDto.GetAction() == ScheduleDto.Action.Update) {

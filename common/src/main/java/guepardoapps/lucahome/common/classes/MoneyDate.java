@@ -8,6 +8,7 @@ import java.util.Locale;
 import guepardoapps.lucahome.basic.classes.SerializableDate;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 
+@SuppressWarnings({"unused"})
 public class MoneyDate implements Serializable {
     private static final long serialVersionUID = 8709304673384442111L;
     private static final String TAG = MoneyDate.class.getSimpleName();

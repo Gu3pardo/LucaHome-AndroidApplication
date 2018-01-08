@@ -35,6 +35,7 @@ import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.enums.SocketAction;
 import guepardoapps.lucahome.common.enums.Weekday;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+import guepardoapps.lucahome.common.service.ScheduleService;
 import guepardoapps.lucahome.common.service.TimerService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.WirelessSwitchService;
@@ -194,7 +195,16 @@ public class TimerEditActivity extends AppCompatActivity {
             if (cancel) {
                 focusView.requestFocus();
             } else {
-                int highestId = TimerService.getInstance().GetHighestId();
+                int highestId;
+
+                int highestScheduleId = ScheduleService.getInstance().GetHighestId();
+                int highestTimerId = TimerService.getInstance().GetHighestId();
+                if (highestScheduleId > highestTimerId) {
+                    highestId = highestScheduleId;
+                } else {
+                    highestId = highestTimerId;
+                }
+
                 TimerService.getInstance().AddTimer(new LucaTimer(highestId + 1, timerName, wirelessSocket, wirelessSwitch, weekday, new SerializableTime(hour, minute, 0, 0), SocketAction.Activate, true, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }

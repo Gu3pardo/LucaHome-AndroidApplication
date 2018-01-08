@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
+@SuppressWarnings({"unused"})
 public enum Weekday implements Serializable {
 
     NULL("NULL", -1, "", ""),
