@@ -11,6 +11,7 @@
     <string name="pref_default_coin_hour_trend">24</string>
 
     <string name="all_sockets_off">All Sockets Off</string>
+    <string name="all_switches_off">All Switches Off</string>
 
     <string name="select_youtube_video">Select a video</string>
     <string name="play_video_on_all_mirror">Play on all mirror</string>

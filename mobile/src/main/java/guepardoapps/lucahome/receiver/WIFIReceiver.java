@@ -14,6 +14,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.service.TemperatureService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.lucahome.service.MainService;
 
 public class WIFIReceiver extends BroadcastReceiver {
@@ -44,6 +45,7 @@ public class WIFIReceiver extends BroadcastReceiver {
             } else {
                 TemperatureService.getInstance().CloseNotification();
                 WirelessSocketService.getInstance().CloseNotification();
+                WirelessSwitchService.getInstance().CloseNotification();
                 broadcastController.SendSimpleBroadcast(NetworkController.WIFIReceiverNoHomeNetworkBroadcast);
             }
         }, 10 * 1000);

@@ -102,6 +102,11 @@ public class WirelessSwitch extends WirelessSocket {
     }
 
     @Override
+    public String GetSettingsKey() {
+        return String.format(Locale.getDefault(), "%s%s", SETTINGS_HEADER, _name);
+    }
+
+    @Override
     public String toString() {
         return String.format(Locale.getDefault(), "( %s: (Name: %s );(Area: %s );(KeyCode: %s );(Action: %s ))", TAG, _name, _area, _keyCode, (_action ? "1" : "0"));
     }

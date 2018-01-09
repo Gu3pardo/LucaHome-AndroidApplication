@@ -70,7 +70,6 @@ import java.util.List;
 public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final String TAG = SettingsActivity.class.getSimpleName();
 
-    private static Context _context;
     private ReceiverController _receiverController;
     private static SharedPrefController _sharedPrefController;
 
@@ -82,14 +81,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     /**
      * ServiceConnection for PositioningServiceBinder
      */
-    private static ServiceConnection _positioningServiceConnection = new ServiceConnection() {
+    private ServiceConnection _positioningServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder binder) {
+            Logger.getInstance().Information(TAG, "onServiceConnected PositioningService");
             _positioningServiceBinder = ((PositioningService.PositioningServiceBinder) binder).getService();
-            _positioningServiceBinder.SetActiveActivityContext(_context);
+            _positioningServiceBinder.SetActiveActivityContext(SettingsActivity.this);
         }
 
         public void onServiceDisconnected(ComponentName className) {
-            _positioningServiceBinder.SetActiveActivityContext(null);
+            Logger.getInstance().Information(TAG, "onServiceDisconnected PositioningService");
             _positioningServiceBinder = null;
         }
     };
@@ -172,16 +172,23 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     preference.setSummary((String) value);
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_COIN_HOURS_TREND)) {
-                    int integerValue = Integer.parseInt((String) value);
-                    CoinService.getInstance().SetCoinHoursTrend(integerValue);
+                    CoinService.getInstance().SetCoinHoursTrend(Integer.parseInt((String) value));
                     preference.setSummary((String) value);
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_BEACONS_TIME_BETWEEN_SCANS_SEC)) {
-                    _positioningServiceBinder.SetBetweenScanPeriod(Long.parseLong((String) value));
-                    preference.setSummary((String) value);
+                    try {
+                        _positioningServiceBinder.SetBetweenScanPeriod(Long.parseLong((String) value));
+                        preference.setSummary((String) value);
+                    } catch (Exception exception) {
+                        Logger.getInstance().Error(TAG, exception.toString());
+                    }
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_BEACONS_TIME_SCANS_MSEC)) {
-                    _positioningServiceBinder.SetScanPeriod(Long.parseLong((String) value));
-                    preference.setSummary((String) value);
+                    try {
+                        _positioningServiceBinder.SetScanPeriod(Long.parseLong((String) value));
+                        preference.setSummary((String) value);
+                    } catch (Exception exception) {
+                        Logger.getInstance().Error(TAG, exception.toString());
+                    }
                 }
 
             } else {
@@ -270,9 +277,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     }
 
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_HANDLE_BLUETOOTH_AUTOMATICALLY)) {
-                    _positioningServiceBinder.SetScanEnabled((boolean) value);
+                    try {
+                        _positioningServiceBinder.SetScanEnabled((boolean) value);
+                    } catch (Exception exception) {
+                        Logger.getInstance().Error(TAG, exception.toString());
+                    }
                 } else if (preference.getKey().contentEquals(SettingsController.PREF_BEACONS_SCAN_ENABLED)) {
-                    _positioningServiceBinder.SetScanEnabled((boolean) value);
+                    try {
+                        _positioningServiceBinder.SetScanEnabled((boolean) value);
+                    } catch (Exception exception) {
+                        Logger.getInstance().Error(TAG, exception.toString());
+                    }
                 }
             }
 
@@ -345,9 +360,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        _context = this;
-        _receiverController = new ReceiverController(_context);
-        _sharedPrefController = new SharedPrefController(_context);
+        _receiverController = new ReceiverController(this);
+        _sharedPrefController = new SharedPrefController(this);
 
         setupActionBar();
     }
@@ -360,29 +374,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         if (_positioningServiceBinder == null) {
             bindService(new Intent(this, PositioningService.class), _positioningServiceConnection, Context.BIND_AUTO_CREATE);
         }
-
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         _receiverController.Dispose();
-
-        if (_positioningServiceBinder != null) {
-            try {
-                unbindService(_positioningServiceConnection);
-            } catch (Exception exception) {
-                Logger.getInstance().Error(TAG, exception.getMessage());
-            } finally {
-                _positioningServiceBinder = null;
-            }
-        }
+        unbindService();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         _receiverController.Dispose();
+        unbindService();
     }
 
     /**
@@ -798,6 +803,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void unbindService() {
+        Logger.getInstance().Debug(TAG, "unbindServices");
+
+        if (_positioningServiceBinder != null) {
+            try {
+                unbindService(_positioningServiceConnection);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.getMessage());
+            } finally {
+                _positioningServiceBinder = null;
+            }
         }
     }
 }

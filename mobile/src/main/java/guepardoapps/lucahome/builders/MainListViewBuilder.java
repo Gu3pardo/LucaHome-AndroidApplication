@@ -192,6 +192,12 @@ public class MainListViewBuilder {
                 MainListViewItem.Type.Shopping
         );
 
+        MainListViewItem temperatureItem = new MainListViewItem(
+                "Temperature", "Watch your temperature in your flat", R.drawable.main_image_temperature,
+                () -> navigateTo(TemperatureActivity.class),
+                MainListViewItem.Type.Temperature
+        );
+
         MainListViewItem timerItem = new MainListViewItem(
                 "Timer", "Manage sockets using timer", R.drawable.main_image_timer,
                 () -> navigateTo(TimerActivity.class),
@@ -232,6 +238,7 @@ public class MainListViewBuilder {
         _mainListViewItems.addValue(wirelessSocketItem);
         _mainListViewItems.addValue(wirelessSwitchItem);
         _mainListViewItems.addValue(weatherItem);
+        _mainListViewItems.addValue(temperatureItem);
         _mainListViewItems.addValue(coinItem);
         _mainListViewItems.addValue(moneyMeterDataItem);
         _mainListViewItems.addValue(shoppingItem);

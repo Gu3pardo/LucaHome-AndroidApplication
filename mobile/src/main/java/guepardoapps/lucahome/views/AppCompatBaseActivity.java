@@ -121,6 +121,8 @@ public abstract class AppCompatBaseActivity extends AppCompatActivity implements
             navigationResult = NavigationService.getInstance().NavigateToActivity(_context, MoneyMeterDataActivity.class);
         } else if (id == R.id.nav_puckjs) {
             navigationResult = NavigationService.getInstance().NavigateToActivity(_context, PuckJsActivity.class);
+        } else if (id == R.id.nav_temperature) {
+            navigationResult = NavigationService.getInstance().NavigateToActivity(_context, TemperatureActivity.class);
         }
 
         if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

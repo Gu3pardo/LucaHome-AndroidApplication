@@ -66,6 +66,10 @@
                 android:id="@+id/nav_forecast_weather"
                 android:icon="@mipmap/ic_looks_black_48dp"
                 android:title="Forecast Weather" />
+            <item
+                android:id="@+id/nav_temperature"
+                android:icon="@mipmap/ic_satellite_black_48dp"
+                android:title="Temperature" />
         </menu>
     </item>
 

@@ -26,6 +26,7 @@ import com.mikepenz.aboutlibraries.LibsBuilder;
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
+
 import guepardoapps.library.openweather.service.OpenWeatherService;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.adapter.MainListViewAdapter;
@@ -35,6 +36,7 @@ import guepardoapps.lucahome.builders.MainListViewBuilder;
 import guepardoapps.lucahome.builders.MapContentViewBuilder;
 import guepardoapps.lucahome.classes.MainListViewItem;
 import guepardoapps.lucahome.common.service.MapContentService;
+import guepardoapps.lucahome.common.service.PositioningService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.service.MainService;
 import guepardoapps.lucahome.service.NavigationService;
@@ -77,6 +79,27 @@ public class MainActivity extends AppCompatActivity implements BottomNavigation.
 
         public void onServiceDisconnected(ComponentName className) {
             _mainServiceBinder = null;
+        }
+    };
+
+    /**
+     * Binder for PositioningService
+     */
+    private PositioningService _positioningServiceBinder;
+
+    /**
+     * ServiceConnection for PositioningServiceBinder
+     */
+    private ServiceConnection _positioningServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder binder) {
+            Logger.getInstance().Information(TAG, "onServiceConnected PositioningService");
+            _positioningServiceBinder = ((PositioningService.PositioningServiceBinder) binder).getService();
+            _positioningServiceBinder.SetActiveActivityContext(MainActivity.this);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            Logger.getInstance().Information(TAG, "onServiceDisconnected PositioningService");
+            _positioningServiceBinder = null;
         }
     };
 
@@ -209,6 +232,10 @@ public class MainActivity extends AppCompatActivity implements BottomNavigation.
             bindService(new Intent(this, MainService.class), _mainServiceConnection, Context.BIND_AUTO_CREATE);
         }
 
+        if (_positioningServiceBinder == null) {
+            bindService(new Intent(this, PositioningService.class), _positioningServiceConnection, Context.BIND_AUTO_CREATE);
+        }
+
         _mapContentViewBuilder.Initialize();
         _mapContentViewBuilder.CreateMapContentViewList(MapContentService.getInstance().GetDataList());
         _mapContentViewBuilder.AddViewsToMap();
@@ -217,24 +244,15 @@ public class MainActivity extends AppCompatActivity implements BottomNavigation.
     @Override
     protected void onPause() {
         super.onPause();
-
         _receiverController.Dispose();
-
-        if (_mainServiceBinder != null) {
-            try {
-                unbindService(_mainServiceConnection);
-            } catch (Exception exception) {
-                Logger.getInstance().Error(TAG, exception.getMessage());
-            } finally {
-                _mainServiceBinder = null;
-            }
-        }
+        unbindServices();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         _receiverController.Dispose();
+        unbindServices();
     }
 
     @Override
@@ -311,5 +329,29 @@ public class MainActivity extends AppCompatActivity implements BottomNavigation.
                 .setActionText(android.R.string.ok)
                 .error()
                 .show();
+    }
+
+    private void unbindServices() {
+        Logger.getInstance().Debug(TAG, "unbindServices");
+
+        if (_mainServiceBinder != null) {
+            try {
+                unbindService(_mainServiceConnection);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.getMessage());
+            } finally {
+                _mainServiceBinder = null;
+            }
+        }
+
+        if (_positioningServiceBinder != null) {
+            try {
+                unbindService(_positioningServiceConnection);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.getMessage());
+            } finally {
+                _positioningServiceBinder = null;
+            }
+        }
     }
 }

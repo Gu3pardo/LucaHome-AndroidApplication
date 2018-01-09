@@ -28,6 +28,7 @@ public class NotificationController {
     private static final String TAG = NotificationController.class.getSimpleName();
 
     private static final int MAX_NOTIFICATION_SOCKETS = 10;
+    private static final int MAX_NOTIFICATION_SWITCHES = 5;
 
     public static final String ACTION = "Action";
 
@@ -129,7 +130,7 @@ public class NotificationController {
         }
 
         if (wirelessSocketList.getSize() > MAX_NOTIFICATION_SOCKETS) {
-            Logger.getInstance().Warning(TAG, String.format(Locale.getDefault(), "Too many sockets: %S! Cutting sockets to display!", wirelessSocketList.getSize()));
+            Logger.getInstance().Warning(TAG, String.format(Locale.getDefault(), "Too many sockets: %d! Cutting sockets to display!", wirelessSocketList.getSize()));
 
             SerializableList<WirelessSocket> tempWirelessSocketList = new SerializableList<>();
             for (int index = 0; index < wirelessSocketList.getSize(); index++) {
@@ -187,15 +188,13 @@ public class NotificationController {
             socketIntentData[index].putSerializable(SOCKET_DATA, wirelessSocketList.getValue(index));
             socketIntents[index].putExtras(socketIntentData[index]);
 
-            socketPendingIntents[index] = PendingIntent.getBroadcast(_context, index * 1234, socketIntents[index],
-                    PendingIntent.FLAG_UPDATE_CURRENT);
+            socketPendingIntents[index] = PendingIntent.getBroadcast(_context, index * 1234, socketIntents[index], PendingIntent.FLAG_UPDATE_CURRENT);
 
             int iconId = wirelessSocketList.getValue(index).GetDrawable();
             String text = ((wirelessSocketList.getValue(index).IsActivated()) ? "ON" : "OFF");
             Bitmap icon = BitmapFactory.decodeResource(_context.getResources(), iconId);
 
-            wearActions[index] = new NotificationCompat.Action.Builder(iconId, text, socketPendingIntents[index])
-                    .build();
+            wearActions[index] = new NotificationCompat.Action.Builder(iconId, text, socketPendingIntents[index]).build();
 
             if (socketVisibility[index]) {
                 if (wirelessSocketList.getValue(index).IsActivated()) {
@@ -212,7 +211,7 @@ public class NotificationController {
             }
         }
 
-        for (int visibilityIndex = 0; visibilityIndex < 10; visibilityIndex++) {
+        for (int visibilityIndex = 0; visibilityIndex < MAX_NOTIFICATION_SOCKETS; visibilityIndex++) {
             if (!socketVisibility[visibilityIndex]) {
                 remoteViews.setViewVisibility(imageButtonArray[(visibilityIndex * 2)], View.GONE);
                 remoteViews.setViewVisibility(imageButtonArray[(visibilityIndex * 2) + 1], View.GONE);
@@ -254,8 +253,125 @@ public class NotificationController {
     }
 
     public void CreateWirelessSwitchNotification(int notificationId, SerializableList<WirelessSwitch> wirelessSwitchList, Class<?> receiverClass) {
-        // TODO implement method
-        Logger.getInstance().Error(TAG, "TODO: Implement method!");
+        if (!_settingsController.IsSwitchNotificationEnabled()) {
+            Logger.getInstance().Warning(TAG, "Not allowed to display switch notification!");
+            return;
+        }
+
+        if (wirelessSwitchList.getSize() > MAX_NOTIFICATION_SWITCHES) {
+            Logger.getInstance().Warning(TAG, String.format(Locale.getDefault(), "Too many switches: %d! Cutting switches to display!", wirelessSwitchList.getSize()));
+
+            SerializableList<WirelessSwitch> tempWirelessSwitchList = new SerializableList<>();
+            for (int index = 0; index < wirelessSwitchList.getSize(); index++) {
+                WirelessSwitch entry = wirelessSwitchList.getValue(index);
+                boolean isVisible = _settingsController.IsWirelessSwitchVisible(entry);
+                if (isVisible) {
+                    tempWirelessSwitchList.addValue(entry);
+                }
+            }
+
+            wirelessSwitchList = tempWirelessSwitchList;
+
+            if (wirelessSwitchList.getSize() > MAX_NOTIFICATION_SWITCHES) {
+                tempWirelessSwitchList = new SerializableList<>();
+                for (int index = 0; index < MAX_NOTIFICATION_SWITCHES; index++) {
+                    WirelessSwitch entry = wirelessSwitchList.getValue(index);
+                    tempWirelessSwitchList.addValue(entry);
+                }
+                wirelessSwitchList = tempWirelessSwitchList;
+            }
+        }
+
+        final int LINEAR_LAYOUT_INDEX = 0;
+        final int IMAGE_BUTTON_INDEX = 1;
+        final int TEXT_VIEW_INDEX = 2;
+
+        int[][] layoutArray = new int[][]{
+                {R.id.switch_1_linearLayout, R.id.switch_1_button, R.id.switch_1_text},
+                {R.id.switch_2_linearLayout, R.id.switch_2_button, R.id.switch_2_text},
+                {R.id.switch_3_linearLayout, R.id.switch_3_button, R.id.switch_3_text},
+                {R.id.switch_4_linearLayout, R.id.switch_4_button, R.id.switch_4_text},
+                {R.id.switch_5_linearLayout, R.id.switch_5_button, R.id.switch_5_text}};
+
+        boolean[] switchVisibility = new boolean[]{false, false, false, false, false};
+
+        Intent[] switchIntents = new Intent[wirelessSwitchList.getSize()];
+        Bundle[] switchIntentData = new Bundle[wirelessSwitchList.getSize()];
+        PendingIntent[] switchPendingIntents = new PendingIntent[wirelessSwitchList.getSize()];
+
+        NotificationCompat.Action[] wearActions = new NotificationCompat.Action[wirelessSwitchList.getSize()];
+
+        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), R.drawable.main_image_switches);
+        NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender().setHintHideIcon(true).setBackground(bitmap);
+
+        RemoteViews remoteViews = new RemoteViews(_context.getPackageName(), R.layout.notification_wireless_switch);
+
+        for (int index = 0; index < wirelessSwitchList.getSize(); index++) {
+            WirelessSwitch wirelessSwitch = wirelessSwitchList.getValue(index);
+
+            switchVisibility[index] = _settingsController.IsWirelessSwitchVisible(wirelessSwitch);
+
+            switchIntents[index] = new Intent(_context, receiverClass);
+
+            switchIntentData[index] = new Bundle();
+            switchIntentData[index].putString(ACTION, SWITCH_SINGLE);
+            switchIntentData[index].putSerializable(SWITCH_DATA, wirelessSwitch);
+            switchIntents[index].putExtras(switchIntentData[index]);
+
+            switchPendingIntents[index] = PendingIntent.getBroadcast(_context, index * 2468, switchIntents[index], PendingIntent.FLAG_UPDATE_CURRENT);
+
+            int iconId = wirelessSwitch.GetDrawable();
+            String text = String.format(Locale.getDefault(), "%s is %s", wirelessSwitch.GetName(), wirelessSwitch.IsActivated() ? "ON" : "OFF");
+            Bitmap icon = BitmapFactory.decodeResource(_context.getResources(), iconId);
+
+            wearActions[index] = new NotificationCompat.Action.Builder(iconId, text, switchPendingIntents[index]).build();
+
+            if (switchVisibility[index]) {
+                remoteViews.setViewVisibility(layoutArray[index][LINEAR_LAYOUT_INDEX], View.GONE);
+                remoteViews.setOnClickPendingIntent(layoutArray[index][IMAGE_BUTTON_INDEX], switchPendingIntents[index]);
+                remoteViews.setImageViewBitmap(layoutArray[index][IMAGE_BUTTON_INDEX], icon);
+                remoteViews.setTextViewText(layoutArray[index][TEXT_VIEW_INDEX], text);
+            }
+        }
+
+        for (int visibilityIndex = 0; visibilityIndex < MAX_NOTIFICATION_SWITCHES; visibilityIndex++) {
+            if (!switchVisibility[visibilityIndex]) {
+                remoteViews.setViewVisibility(layoutArray[visibilityIndex][LINEAR_LAYOUT_INDEX], View.GONE);
+            }
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context);
+        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle(_context.getString(R.string.application_name)).setContentText("Toggle Switches").setTicker("Toggle Switches");
+        builder.extend(wearableExtender);
+        for (int index = 0; index < wirelessSwitchList.getSize(); index++) {
+            if (switchVisibility[index]) {
+                builder.addAction(wearActions[index]);
+            }
+        }
+
+        // Hack for disabling all switches at once!
+
+        Bundle allSwitchesData = new Bundle();
+        allSwitchesData.putString(ACTION, SWITCH_ALL);
+
+        Intent allSwitchesIntent = new Intent(_context, receiverClass);
+        allSwitchesIntent.putExtras(allSwitchesData);
+
+        PendingIntent allSwitchesPendingIntent = PendingIntent.getBroadcast(_context, 60, allSwitchesIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationCompat.Action action_all_switches_off = new NotificationCompat.Action.Builder(R.drawable.all_power_off, _context.getString(R.string.all_switches_off), allSwitchesPendingIntent).build();
+
+        remoteViews.setOnClickPendingIntent(R.id.switch_all_off, allSwitchesPendingIntent);
+        builder.addAction(action_all_switches_off);
+
+        // End Hack
+
+        Notification notification = builder.build();
+        notification.contentView = remoteViews;
+        notification.bigContentView = remoteViews;
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
+        notificationManager.notify(notificationId, notification);
     }
 
     public void CreateTemperatureNotification(

@@ -1,14 +1,10 @@
 package guepardoapps.lucahome.common.builder;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
-import android.webkit.CookieManager;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,10 +17,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.MapContent;
-import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.service.ListedMenuService;
 import guepardoapps.lucahome.common.service.MenuService;
@@ -195,7 +191,9 @@ public class MapContentBuilder {
                 return null;
 
             case Temperature:
-                return (mapContent.GetTemperature() != null ? createTemperatureRunnable(context, mapContent.GetTemperature()) : null);
+                return null;
+                // Deactivated to navigate to TemperatureActivity instead of displaying dialog
+                // return (mapContent.GetTemperature() != null ? createTemperatureRunnable(context, mapContent.GetTemperature()) : null);
 
             case PuckJS:
                 // TODO add Runnable for PuckJS
@@ -254,7 +252,7 @@ public class MapContentBuilder {
         };
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    /*@SuppressLint("SetJavaScriptEnabled")
     private static Runnable createTemperatureRunnable(@NonNull final Context context, @NonNull final Temperature temperature) {
         return () -> {
             if (temperature.GetGraphPath().length() > 0) {
@@ -301,7 +299,7 @@ public class MapContentBuilder {
                 Toasty.info(context, String.format(Locale.getDefault(), "No action for temperature in area %s", temperature.GetArea()), Toast.LENGTH_LONG).show();
             }
         };
-    }
+    }*/
 
     private static Runnable createShoppingListRunnable(@NonNull final Context context) {
         return () -> displayListViewDialog(context, "Shopping list", ShoppingListService.getInstance().GetShoppingDetailList());

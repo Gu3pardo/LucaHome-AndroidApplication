@@ -36,6 +36,7 @@ import guepardoapps.lucahome.common.classes.Security;
 import guepardoapps.lucahome.common.service.SecurityService;
 import guepardoapps.lucahome.service.NavigationService;
 
+@SuppressLint("SetJavaScriptEnabled")
 public class SecurityActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = SecurityActivity.class.getSimpleName();
 
@@ -77,7 +78,6 @@ public class SecurityActivity extends AppCompatActivity implements NavigationVie
         }
     };
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

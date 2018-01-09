@@ -23,9 +23,11 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.MapContent;
 import guepardoapps.lucahome.common.service.MeterListService;
+import guepardoapps.lucahome.common.service.TemperatureService;
 import guepardoapps.lucahome.service.NavigationService;
 import guepardoapps.lucahome.views.MeterDataActivity;
 import guepardoapps.lucahome.views.PuckJsActivity;
+import guepardoapps.lucahome.views.TemperatureActivity;
 
 public class MapContentViewBuilder {
     private static final String TAG = MapContentViewBuilder.class.getSimpleName();
@@ -113,6 +115,12 @@ public class MapContentViewBuilder {
                             puckJsData.putSerializable(PuckJsListService.PuckJsIntent, mapContent.GetDrawingTypeId());
                             NavigationService.getInstance().NavigateToActivityWithData(_context, PuckJsActivity.class, puckJsData);*/
                             NavigationService.getInstance().NavigateToActivity(_context, PuckJsActivity.class);
+                            break;
+
+                        case Temperature:
+                            Bundle temperatureData = new Bundle();
+                            temperatureData.putSerializable(TemperatureService.TemperatureDataIntent, mapContent.GetDrawingTypeId());
+                            NavigationService.getInstance().NavigateToActivityWithData(_context, TemperatureActivity.class, temperatureData);
                             break;
 
                         default:

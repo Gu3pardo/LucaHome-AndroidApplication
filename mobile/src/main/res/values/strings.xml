@@ -141,9 +141,9 @@
     <string name="pref_title_reload_mapcontent_timeout">Enter mapcontent reload timeout in min</string>
     <integer name="pref_default_mapcontent_timeout_min">240</integer>
 
-    <string name="pref_title_reload_mediamirror">Reload mediamirror data</string>
-    <string name="pref_title_reload_mediamirror_timeout">Enter mediamirror reload timeout in min</string>
-    <integer name="pref_default_mediamirror_timeout_min">30</integer>
+    <string name="pref_title_reload_mediaserver">Reload mediaserver data</string>
+    <string name="pref_title_reload_mediaserver_timeout">Enter mediaserver reload timeout in min</string>
+    <integer name="pref_default_mediaserver_timeout_min">30</integer>
 
     <string name="pref_title_reload_menu">Reload menu data</string>
     <string name="pref_title_reload_menu_timeout">Enter menu reload timeout in min</string>
@@ -211,6 +211,9 @@
     <!-- Settings for Wireless socket -->
     <string name="pref_header_wireless_socket">Wireless socket</string>
 
+    <!-- Settings for Wireless switches -->
+    <string name="pref_header_wireless_switch">Wireless switch</string>
+
     <!-- Settings for coins -->
     <string name="pref_header_coins">Coins</string>
     <string name="pref_title_enter_coin_hour_trend">Enter hours for trend</string>
@@ -249,6 +252,7 @@
     <string name="title_activity_forecast_weather">Forecast weather</string>
     <string name="title_activity_mediaserver">Media server</string>
     <string name="title_activity_security">Security</string>
+    <string name="title_activity_temperature">Temperature</string>
 
 
     <!-- Example settings for Data & Sync -->

@@ -33,6 +33,11 @@
         android:title="@string/pref_header_wireless_socket" />
 
     <header
+        android:fragment="guepardoapps.lucahome.views.SettingsActivity$WirelessSwitchPreferenceFragment"
+        android:icon="@mipmap/ic_settings_remote_black_48dp"
+        android:title="@string/pref_header_wireless_switch" />
+
+    <header
         android:fragment="guepardoapps.lucahome.views.SettingsActivity$CoinPreferenceFragment"
         android:icon="@mipmap/ic_copyright_black_48dp"
         android:title="@string/pref_header_coins" />

@@ -7,8 +7,10 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import guepardoapps.library.openweather.models.WeatherModel;
 import guepardoapps.library.openweather.service.OpenWeatherService;
@@ -45,6 +47,8 @@ public class TemperatureService implements IDataNotificationService {
     }
 
     public static final int NOTIFICATION_ID = 64371930;
+
+    public static final String TemperatureDataIntent = "TemperatureDataIntent";
 
     public static final String TemperatureDownloadFinishedBroadcast = "guepardoapps.lucahome.data.service.temperature.download.finished";
     public static final String TemperatureDownloadFinishedBundle = "TemperatureDownloadFinishedBundle";
@@ -93,6 +97,7 @@ public class TemperatureService implements IDataNotificationService {
                 WeatherModel currentWeather = OpenWeatherService.getInstance().CurrentWeather();
                 if (currentWeather != null) {
                     Temperature currentWeatherTemperature = new Temperature(
+                            GetHighestId() + 1,
                             currentWeather.GetTemperature(),
                             "Outdoor",
                             new SerializableDate(), new SerializableTime(),
@@ -119,6 +124,7 @@ public class TemperatureService implements IDataNotificationService {
     private NotificationController _notificationController;
     private ReceiverController _receiverController;
 
+    private Temperature _activeTemperature;
     private SerializableList<Temperature> _temperatureList = new SerializableList<>();
 
     private BroadcastReceiver _temperatureDownloadFinishedReceiver = new BroadcastReceiver() {
@@ -214,6 +220,41 @@ public class TemperatureService implements IDataNotificationService {
         return _temperatureList;
     }
 
+    public Temperature GetActiveTemperature() {
+        if (_activeTemperature == null) {
+            _activeTemperature = _temperatureList.getSize() > 0 ?
+                    _temperatureList.getValue(0)
+                    : new Temperature(-1, -273.15, "Null", new SerializableDate(), new SerializableTime(), "", Temperature.TemperatureType.DUMMY, "");
+        }
+        return _activeTemperature;
+    }
+
+    public void SetActiveTemperature(@NonNull Temperature activeTemperature) {
+        _activeTemperature = activeTemperature;
+    }
+
+    public void SetActiveTemperature(int id) {
+        for (int index = 0; index < _temperatureList.getSize(); index++) {
+            if (_temperatureList.getValue(index).GetId() == id) {
+                _activeTemperature = _temperatureList.getValue(index);
+                ShowNotification();
+                break;
+            }
+        }
+    }
+
+    public Temperature GetById(int id) {
+        for (int index = 0; index < _temperatureList.getSize(); index++) {
+            Temperature entry = _temperatureList.getValue(index);
+
+            if (entry.GetId() == id) {
+                return entry;
+            }
+        }
+
+        return null;
+    }
+
     public Temperature GetByArea(@NonNull String area) {
         for (int index = 0; index < _temperatureList.getSize(); index++) {
             Temperature entry = _temperatureList.getValue(index);
@@ -240,7 +281,14 @@ public class TemperatureService implements IDataNotificationService {
 
     @Override
     public int GetHighestId() {
-        return -1;
+        int highestId = -1;
+        for (int index = 0; index < _temperatureList.getSize(); index++) {
+            int id = _temperatureList.getValue(index).GetId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
     }
 
     @Override
@@ -254,6 +302,15 @@ public class TemperatureService implements IDataNotificationService {
         }
         return foundTemperatures;
     }
+
+    public ArrayList<String> GetAreaList() {
+        ArrayList<String> areaList = new ArrayList<>();
+        for (int index = 0; index < _temperatureList.getSize(); index++) {
+            areaList.add(_temperatureList.getValue(index).GetArea());
+        }
+        return new ArrayList<>(areaList.stream().distinct().collect(Collectors.toList()));
+    }
+
 
     public String GetOpenWeatherCity() {
         return OpenWeatherService.getInstance().GetCity();
@@ -292,19 +349,13 @@ public class TemperatureService implements IDataNotificationService {
 
     @Override
     public void ShowNotification() {
-        if (_temperatureList == null) {
-            Logger.getInstance().Error(TAG, "_temperatureList is null!");
+        if (_activeTemperature == null) {
+            Logger.getInstance().Error(TAG, "_activeTemperature is null!");
             return;
         }
 
-        if (_temperatureList.getSize() < 1) {
-            Logger.getInstance().Error(TAG, "_temperatureList is empty!");
-            return;
-        }
-
-        Temperature temperature = _temperatureList.getValue(0);
-        String title = String.format(Locale.getDefault(), "%s", temperature.GetTime().HHMM());
-        String body = String.format(Locale.getDefault(), "%s: %s", temperature.GetArea(), temperature.GetTemperatureString());
+        String title = String.format(Locale.getDefault(), "%s", _activeTemperature.GetTime().HHMM());
+        String body = String.format(Locale.getDefault(), "%s: %s", _activeTemperature.GetArea(), _activeTemperature.GetTemperatureString());
 
         _notificationController.CreateTemperatureNotification(NOTIFICATION_ID, _receiverActivity, R.drawable.weather_dummy, title, body, true);
     }

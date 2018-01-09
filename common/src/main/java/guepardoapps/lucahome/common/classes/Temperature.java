@@ -14,7 +14,9 @@ public class Temperature implements Serializable {
     private static final long serialVersionUID = 8405839534384442492L;
     private static final String TAG = Temperature.class.getSimpleName();
 
-    public enum TemperatureType {DUMMY, RASPBERRY, CITY}
+    public enum TemperatureType {DUMMY, RASPBERRY, PUCK_JS, CITY}
+
+    private int _id;
 
     private double _temperature;
     private String _area;
@@ -25,6 +27,7 @@ public class Temperature implements Serializable {
     private String _graphPath;
 
     public Temperature(
+            int id,
             double temperature,
             @NonNull String area,
             @NonNull SerializableDate date,
@@ -32,6 +35,7 @@ public class Temperature implements Serializable {
             @NonNull String sensorPath,
             @NonNull TemperatureType temperatureType,
             @NonNull String graphPath) {
+        _id = id;
         _temperature = temperature;
         _area = area;
         _date = date;
@@ -39,6 +43,10 @@ public class Temperature implements Serializable {
         _sensorPath = sensorPath;
         _temperatureType = temperatureType;
         _graphPath = graphPath;
+    }
+
+    public int GetId() {
+        return _id;
     }
 
     public double GetTemperature() {
@@ -101,6 +109,6 @@ public class Temperature implements Serializable {
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Temperature: %s );(Area: %s );(Date: %s );(Time: %s );(SensorPath: %s );(TemperatureType: %s );(GraphPath: %s ))", TAG, GetTemperatureString(), _area, _date, _time, _sensorPath, _temperatureType, _graphPath);
+        return String.format(Locale.getDefault(), "( %s: (Id: %d );(Temperature: %s );(Area: %s );(Date: %s );(Time: %s );(SensorPath: %s );(TemperatureType: %s );(GraphPath: %s ))", TAG, _id, GetTemperatureString(), _area, _date, _time, _sensorPath, _temperatureType, _graphPath);
     }
 }

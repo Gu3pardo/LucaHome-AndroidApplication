@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Media">
-        <menu>
-            <item
-                android:id="@+id/nav_mediamirror"
-                android:icon="@mipmap/ic_photo_library_black_48dp"
-                android:title="MediaMirror" />
-        </menu>
-    </item>
+    <item
+        android:id="@+id/nav_forecast_weather"
+        android:icon="@mipmap/ic_looks_black_48dp"
+        android:title="Forecast Weather" />
 
     <item android:title="Remote">
         <menu>
@@ -38,7 +34,20 @@
         </menu>
     </item>
 
-    <item android:title="Coins">
+    <item android:title="Media">
+        <menu>
+            <item
+                android:id="@+id/nav_movie"
+                android:icon="@mipmap/ic_video_library_black_48dp"
+                android:title="Movie" />
+            <item
+                android:id="@+id/nav_mediamirror"
+                android:icon="@mipmap/ic_photo_library_black_48dp"
+                android:title="MediaMirror" />
+        </menu>
+    </item>
+
+    <item android:title="Money">
         <menu>
             <item
                 android:id="@+id/nav_coins"
@@ -61,19 +70,6 @@
                 android:id="@+id/nav_shopping"
                 android:icon="@mipmap/ic_shopping_cart_black_48dp"
                 android:title="Shopping" />
-        </menu>
-    </item>
-
-    <item android:title="Weather">
-        <menu>
-            <item
-                android:id="@+id/nav_forecast_weather"
-                android:icon="@mipmap/ic_looks_black_48dp"
-                android:title="Forecast Weather" />
-            <item
-                android:id="@+id/nav_temperature"
-                android:icon="@mipmap/ic_satellite_black_48dp"
-                android:title="Temperature" />
         </menu>
     </item>
 

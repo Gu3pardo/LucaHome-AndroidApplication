@@ -3,11 +3,14 @@ package guepardoapps.lucahome.common.controller;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import java.util.Locale;
+
 import guepardoapps.lucahome.basic.controller.SharedPrefController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.R;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class SettingsController {
@@ -15,7 +18,8 @@ public class SettingsController {
 
     private static final String TAG = SettingsController.class.getSimpleName();
 
-    private static final String PREF_SETTINGS_INSTALLED = "settings_v5.2.0.180105_installed";
+    private static final String PREF_SETTINGS_INSTALLED_V5_2_0_180109 = "settings_v5.2.0.180109_installed";
+    private static final String PREF_SETTINGS_INSTALLED_V5_2_1_180109 = "settings_v5.2.1.180109_installed";
 
     public static final String PREF_USER_NAME = "user_name";
     public static final String PREF_USER_PASS_PHRASE = "user_passphrase";
@@ -102,34 +106,6 @@ public class SettingsController {
         _isInitialized = true;
 
         install();
-    }
-
-    private void install() {
-        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_SETTINGS_INSTALLED)) {
-            return;
-        }
-
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_BIRTHDAY_TIMEOUT, "240");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_COIN_TIMEOUT, "30");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MAPCONTENT_TIMEOUT, "240");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MEDIASERVER_TIMEOUT, "30");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MENU_TIMEOUT, "120");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_METER_DATA_TIMEOUT, "240");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MONEY_METER_DATA_TIMEOUT, "240");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MOVIE_TIMEOUT, "60");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_PUCKJS_TIMEOUT, "60");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_SCHEDULE_TIMEOUT, "60");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_SECURITY_TIMEOUT, "15");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_SHOPPING_TIMEOUT, "60");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_TEMPERATURE_TIMEOUT, "15");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_WEATHER_TIMEOUT, "5");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT, "15");
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT, "15");
-
-        _sharedPrefController.SaveStringValue(PREF_BEACONS_TIME_BETWEEN_SCANS_SEC, "15");
-        _sharedPrefController.SaveStringValue(PREF_BEACONS_TIME_SCANS_MSEC, "30000");
-
-        _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED, true);
     }
 
     public LucaUser GetUser() {
@@ -225,6 +201,10 @@ public class SettingsController {
 
     public boolean IsWirelessSocketVisible(@NonNull WirelessSocket wirelessSocket) {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(wirelessSocket.GetSettingsKey());
+    }
+
+    public boolean IsWirelessSwitchVisible(@NonNull WirelessSwitch wirelessSwitch) {
+        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(wirelessSwitch.GetSettingsKey());
     }
 
     public boolean IsCameraNotificationEnabled() {
@@ -467,10 +447,111 @@ public class SettingsController {
     }
 
     public void SetCoinHoursTrend(int hours) {
-        _sharedPrefController.SaveIntegerValue(PREF_COIN_HOURS_TREND, hours);
+        _sharedPrefController.SaveStringValue(PREF_COIN_HOURS_TREND, String.valueOf(hours));
     }
 
     public int GetCoinHoursTrend() {
-        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_COIN_HOURS_TREND);
+        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_COIN_HOURS_TREND);
+        return Integer.parseInt(stringValue);
+    }
+
+    private void install() {
+        installV5_2_0_180109();
+        installV5_2_1_180109();
+    }
+
+    private void installV5_2_0_180109() {
+        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_SETTINGS_INSTALLED_V5_2_0_180109)) {
+            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Already installed preferences %s", PREF_SETTINGS_INSTALLED_V5_2_0_180109));
+            return;
+        }
+
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Installing preferences %s", PREF_SETTINGS_INSTALLED_V5_2_0_180109));
+
+        _sharedPrefController.SaveStringValue(PREF_IP, _context.getResources().getString(R.string.pref_default_ip));
+        _sharedPrefController.SaveStringValue(PREF_SSID, _context.getResources().getString(R.string.pref_default_ssid));
+
+        _sharedPrefController.SaveStringValue(PREF_OPEN_WEATHER_CITY, _context.getResources().getString(R.string.pref_default_open_weather_city));
+        _sharedPrefController.SaveBooleanValue(PREF_CHANGE_WEATHER_WALLPAPER, true);
+
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_SOCKETS, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_BIRTHDAY, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_TEMPERATURE, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_CAMERA, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_COINS, false);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_SWITCHES, true);
+
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_DATA_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_BIRTHDAY_TIMEOUT, "240");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_BIRTHDAY_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_COIN_TIMEOUT, "30");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_COIN_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MAPCONTENT_TIMEOUT, "240");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MAPCONTENT_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MEDIASERVER_TIMEOUT, "30");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MEDIASERVER_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MENU_TIMEOUT, "120");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MENU_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_METER_DATA_TIMEOUT, "240");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_METER_DATA_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MONEY_METER_DATA_TIMEOUT, "240");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MONEY_METER_DATA_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_MOVIE_TIMEOUT, "60");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MOVIE_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_PUCKJS_TIMEOUT, "60");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_PUCKJS_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_SCHEDULE_TIMEOUT, "60");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_SCHEDULE_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_SECURITY_TIMEOUT, "15");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_SECURITY_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_SHOPPING_TIMEOUT, "60");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_SHOPPING_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_TEMPERATURE_TIMEOUT, "15");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_TEMPERATURE_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_WEATHER_TIMEOUT, "5");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WEATHER_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT, "15");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WIRELESSSOCKET_ENABLED, true);
+
+        _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT, "15");
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WIRELESSSWITCH_ENABLED, true);
+
+        _sharedPrefController.SaveBooleanValue(PREF_HANDLE_BLUETOOTH_AUTOMATICALLY, false);
+        _sharedPrefController.SaveBooleanValue(PREF_BEACONS_SCAN_ENABLED, false);
+        _sharedPrefController.SaveStringValue(PREF_BEACONS_TIME_BETWEEN_SCANS_SEC, "15");
+        _sharedPrefController.SaveStringValue(PREF_BEACONS_TIME_SCANS_MSEC, "30000");
+
+        _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED_V5_2_0_180109, true);
+    }
+
+    private void installV5_2_1_180109() {
+        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_SETTINGS_INSTALLED_V5_2_1_180109)) {
+            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Already installed preferences %s", PREF_SETTINGS_INSTALLED_V5_2_1_180109));
+            return;
+        }
+
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Installing preferences %s", PREF_SETTINGS_INSTALLED_V5_2_1_180109));
+
+        _sharedPrefController.SaveStringValue(PREF_COIN_HOURS_TREND, "24");
+
+        _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED_V5_2_1_180109, true);
     }
 }

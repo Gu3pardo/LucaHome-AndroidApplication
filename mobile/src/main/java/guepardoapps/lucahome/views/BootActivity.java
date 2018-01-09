@@ -31,6 +31,7 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.common.service.PositioningService;
 import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.service.MainService;
 import guepardoapps.lucahome.service.NavigationService;
@@ -90,6 +91,27 @@ public class BootActivity extends AppCompatActivity {
     };
 
     /**
+     * Binder for PositioningService
+     */
+    private PositioningService _positioningServiceBinder;
+
+    /**
+     * ServiceConnection for PositioningServiceBinder
+     */
+    private ServiceConnection _positioningServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder binder) {
+            Logger.getInstance().Information(TAG, "onServiceConnected PositioningService");
+            _positioningServiceBinder = ((PositioningService.PositioningServiceBinder) binder).getService();
+            _positioningServiceBinder.SetActiveActivityContext(BootActivity.this);
+        }
+
+        public void onServiceDisconnected(ComponentName className) {
+            Logger.getInstance().Information(TAG, "onServiceDisconnected PositioningService");
+            _positioningServiceBinder = null;
+        }
+    };
+
+    /**
      * BroadcastReceiver to receive progress and success state of initial app download
      */
     private BroadcastReceiver _mainServiceDownloadProgressReceiver = new BroadcastReceiver() {
@@ -140,6 +162,7 @@ public class BootActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
         startService(new Intent(BootActivity.this, MainService.class));
+        startService(new Intent(BootActivity.this, PositioningService.class));
     }
 
     @Override
@@ -148,6 +171,10 @@ public class BootActivity extends AppCompatActivity {
 
         if (_mainServiceBinder == null) {
             bindService(new Intent(this, MainService.class), _mainServiceConnection, Context.BIND_AUTO_CREATE);
+        }
+
+        if (_positioningServiceBinder == null) {
+            bindService(new Intent(this, PositioningService.class), _positioningServiceConnection, Context.BIND_AUTO_CREATE);
         }
 
         _receiverController.RegisterReceiver(_mainServiceDownloadProgressReceiver, new String[]{MainService.MainServiceDownloadCountBroadcast});
@@ -162,19 +189,14 @@ public class BootActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         _receiverController.Dispose();
-        if (_mainServiceBinder != null) {
-            try {
-                unbindService(_mainServiceConnection);
-            } catch (Exception exception) {
-                Logger.getInstance().Error(TAG, exception.getMessage());
-            }
-        }
+        unbindServices();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         _receiverController.Dispose();
+        unbindServices();
         _loginAttempt = false;
     }
 
@@ -220,5 +242,29 @@ public class BootActivity extends AppCompatActivity {
                 .setActionText(android.R.string.ok)
                 .error()
                 .show();
+    }
+
+    private void unbindServices() {
+        Logger.getInstance().Debug(TAG, "unbindServices");
+
+        if (_mainServiceBinder != null) {
+            try {
+                unbindService(_mainServiceConnection);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.getMessage());
+            } finally {
+                _mainServiceBinder = null;
+            }
+        }
+
+        if (_positioningServiceBinder != null) {
+            try {
+                unbindService(_positioningServiceConnection);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.getMessage());
+            } finally {
+                _positioningServiceBinder = null;
+            }
+        }
     }
 }

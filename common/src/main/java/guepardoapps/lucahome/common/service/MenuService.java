@@ -32,8 +32,6 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-import static guepardoapps.lucahome.common.service.BirthdayService.BirthdayDownloadFinishedBroadcast;
-
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class MenuService implements IDataService {
     public static class MenuDownloadFinishedContent extends ObjectChangeFinishedContent {

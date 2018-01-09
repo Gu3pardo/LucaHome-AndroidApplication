@@ -12,6 +12,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
+import guepardoapps.lucahome.common.service.TemperatureService;
 
 public final class JsonDataToTemperatureConverter implements IJsonDataConverter {
     private static final String TAG = JsonDataToTemperatureConverter.class.getSimpleName();
@@ -56,7 +57,7 @@ public final class JsonDataToTemperatureConverter implements IJsonDataConverter 
                 String sensorPath = jsonObjectData.getString("SensorPath");
                 String graphPath = jsonObjectData.getString("GraphPath");
 
-                Temperature temperature = new Temperature(temperatureValue, area, new SerializableDate(), new SerializableTime(), sensorPath, Temperature.TemperatureType.RASPBERRY, graphPath);
+                Temperature temperature = new Temperature(TemperatureService.getInstance().GetHighestId() + 1, temperatureValue, area, new SerializableDate(), new SerializableTime(), sensorPath, Temperature.TemperatureType.RASPBERRY, graphPath);
                 list.addValue(temperature);
 
             } catch (JSONException jsonException) {
