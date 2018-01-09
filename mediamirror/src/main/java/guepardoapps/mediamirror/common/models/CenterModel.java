@@ -11,7 +11,7 @@ import guepardoapps.lucahome.common.enums.YoutubeId;
 public class CenterModel implements Serializable {
     private static final String TAG = CenterModel.class.getSimpleName();
 
-    private static final String DEFAULT_CENTER_TEXT = "Hello, this is your media mirror!";
+    private static final String DEFAULT_CENTER_TEXT = "Hello, this is your media server!";
     private static final String DEFAULT_YOUTUBE_VIDEO_ID = YoutubeId.DEFAULT.GetYoutubeId();
     private static final String DEFAULT_WEB_VIEW_URL = "http://imgur.com/";
     private static final RadioStreams DEFAULT_RADIO_STREAM = RadioStreams.BAYERN_3;

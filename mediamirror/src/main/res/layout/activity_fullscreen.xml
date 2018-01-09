@@ -834,6 +834,20 @@
             app:rd_rippleType="touch" />
 
         <com.rey.material.widget.FloatingActionButton
+            android:id="@+id/floating_action_button_switch"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_margin="5dp"
+            app:fab_iconSize="25dp"
+            app:fab_iconSrc="@drawable/wirelessswitch"
+            app:fab_radius="17dp"
+            app:rd_backgroundColor="@color/colorPrimaryDark"
+            app:rd_delayClick="none"
+            app:rd_enable="true"
+            app:rd_rippleColor="@color/colorPrimary"
+            app:rd_rippleType="touch" />
+
+        <com.rey.material.widget.FloatingActionButton
             android:id="@+id/floating_action_button_reload"
             android:layout_width="35dp"
             android:layout_height="35dp"

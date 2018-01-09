@@ -13,6 +13,7 @@ import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
 import guepardoapps.mediamirror.observer.SettingsContentObserver;
 
+@SuppressWarnings({"deprecation", "unused"})
 public class MediaVolumeController {
     private static final MediaVolumeController SINGLETON_CONTROLLER = new MediaVolumeController();
 
@@ -136,7 +137,6 @@ public class MediaVolumeController {
         return true;
     }
 
-    @SuppressWarnings("deprecation")
     public boolean MuteVolume() {
         if (!_isInitialized) {
             Logger.getInstance().Error(TAG, "not initialized!");
@@ -155,7 +155,6 @@ public class MediaVolumeController {
         return true;
     }
 
-    @SuppressWarnings("deprecation")
     public boolean UnMuteVolume() {
         if (!_isInitialized) {
             Logger.getInstance().Error(TAG, "not initialized!");
@@ -186,7 +185,6 @@ public class MediaVolumeController {
         return _isInitialized;
     }
 
-    @SuppressWarnings("deprecation")
     public boolean SetCurrentVolume(int currentVolume) {
         if (!_isInitialized) {
             Logger.getInstance().Error(TAG, "not initialized!");
@@ -223,8 +221,7 @@ public class MediaVolumeController {
         _currentVolume = _audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         _mute = _audioManager.isStreamMute(AudioManager.STREAM_MUSIC);
 
-        SettingsContentObserver.VolumeChangeModel volumeChangeModel = new SettingsContentObserver.VolumeChangeModel();
-        volumeChangeModel.CurrentVolume = _currentVolume;
+        SettingsContentObserver.VolumeChangeModel volumeChangeModel = new SettingsContentObserver.VolumeChangeModel(_currentVolume, -1, -1, SettingsContentObserver.VolumeChangeState.NULL);
 
         String volumeText;
         if (_mute) {

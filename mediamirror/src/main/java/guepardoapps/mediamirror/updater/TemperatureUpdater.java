@@ -19,8 +19,6 @@ public class TemperatureUpdater {
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
 
-    private TemperatureService _temperatureService;
-
     private boolean _isRunning;
 
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
@@ -64,8 +62,7 @@ public class TemperatureUpdater {
     public TemperatureUpdater(@NonNull Context context) {
         _broadcastController = new BroadcastController(context);
         _receiverController = new ReceiverController(context);
-        _temperatureService = TemperatureService.getInstance();
-        _temperatureService.Initialize(context, null, false, true, 15);
+        TemperatureService.getInstance().Initialize(context, null, false, true, 15);
     }
 
     public void Start() {
@@ -80,11 +77,12 @@ public class TemperatureUpdater {
     }
 
     public void Dispose() {
+        TemperatureService.getInstance().Dispose();
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadTemperature() {
-        _temperatureService.LoadData();
+        TemperatureService.getInstance().LoadData();
     }
 }

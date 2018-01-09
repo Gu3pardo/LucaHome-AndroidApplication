@@ -37,11 +37,10 @@ public class DatabaseYoutubeIds {
 
         @Override
         public void onCreate(SQLiteDatabase database) {
-            database.execSQL(
-                    " CREATE TABLE " + DATABASE_TABLE + " ( "
-                            + KEY_ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                            + KEY_YOUTUBE_ID + " TEXT NOT NULL, "
-                            + KEY_PLAY_COUNT + " TEXT NOT NULL); ");
+            database.execSQL(" CREATE TABLE " + DATABASE_TABLE + " ( "
+                    + KEY_ROW_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                    + KEY_YOUTUBE_ID + " TEXT NOT NULL, "
+                    + KEY_PLAY_COUNT + " TEXT NOT NULL); ");
         }
 
         @Override

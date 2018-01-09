@@ -1,25 +1,28 @@
 package guepardoapps.lucahome.common.enums;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 public enum MediaServerSelection implements Serializable {
 
-    MEDIAMIRROR_1(0, "192.168.178.147", "MediaMirror1", "Workspace Jonas", false),
-    MEDIAMIRROR_2(1, "192.168.178.20", "MediaMirror2", "Sleeping Room", true),
-    NULL(-1, "", "", "", false);
+    NULL(-1, "", "", "", false),
+    MEDIA_SERVER_KITCHEN(0, "192.168.178.22", "MediaServer_Kitchen", "Kitchen", false),
+    MEDIA_SERVER_SLEEPING(1, "192.168.178.24", "MediaServer_Sleeping", "Sleeping Room", true),
+    MEDIA_SERVER_LIVING(1, "192.168.178.20", "MediaServer_Living", "Living Room", false);
 
     private int _id;
     private String _ip;
     private String _socket;
     private String _location;
-    private boolean _isSleepingMirror;
+    private boolean _isSleepingServer;
 
-    MediaServerSelection(int id, String ip, String socket, String location, boolean isSleepingMirror) {
+    MediaServerSelection(int id, @NonNull String ip, @NonNull String socket, @NonNull String location, boolean isSleepingServer) {
         _id = id;
         _ip = ip;
         _socket = socket;
         _location = location;
-        _isSleepingMirror = isSleepingMirror;
+        _isSleepingServer = isSleepingServer;
     }
 
     public int GetId() {
@@ -38,13 +41,13 @@ public enum MediaServerSelection implements Serializable {
         return _location;
     }
 
-    public boolean IsSleepingMirror() {
-        return _isSleepingMirror;
+    public boolean IsSleepingServer() {
+        return _isSleepingServer;
     }
 
     @Override
     public String toString() {
-        return String.format("MediaMirrorSelection:{%s:%s:%s:%s:%s}", _id, _ip, _socket, _location, _isSleepingMirror);
+        return String.format("MediaMirrorSelection:{%s:%s:%s:%s:%s}", _id, _ip, _socket, _location, _isSleepingServer);
     }
 
     public static MediaServerSelection GetById(int id) {
@@ -56,7 +59,7 @@ public enum MediaServerSelection implements Serializable {
         return NULL;
     }
 
-    public static MediaServerSelection GetByIp(String ip) {
+    public static MediaServerSelection GetByIp(@NonNull String ip) {
         for (MediaServerSelection e : values()) {
             if (e._ip.equalsIgnoreCase(ip)) {
                 return e;
@@ -65,7 +68,7 @@ public enum MediaServerSelection implements Serializable {
         return NULL;
     }
 
-    public static MediaServerSelection GetByLocation(String location) {
+    public static MediaServerSelection GetByLocation(@NonNull String location) {
         for (MediaServerSelection e : values()) {
             if (e._location.contains(location)) {
                 return e;

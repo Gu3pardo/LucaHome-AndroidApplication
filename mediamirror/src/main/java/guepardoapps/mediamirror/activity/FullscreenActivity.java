@@ -11,15 +11,14 @@ import android.view.WindowManager;
 import com.google.android.youtube.player.YouTubeBaseActivity;
 
 import guepardoapps.lucahome.basic.controller.PermissionController;
-import guepardoapps.lucahome.basic.controller.SharedPrefController;
 import guepardoapps.lucahome.basic.controller.TTSController;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.common.classes.LucaUser;
 import guepardoapps.lucahome.common.constants.Enables;
 import guepardoapps.lucahome.common.controller.SettingsController;
+
 import guepardoapps.mediamirror.R;
 import guepardoapps.mediamirror.common.constants.Constants;
-import guepardoapps.mediamirror.common.constants.RaspPiConstants;
-import guepardoapps.mediamirror.common.constants.SharedPrefConstants;
 import guepardoapps.mediamirror.controller.*;
 import guepardoapps.mediamirror.interfaces.IViewController;
 import guepardoapps.mediamirror.services.ControlServiceStateService;
@@ -45,7 +44,9 @@ public class FullscreenActivity extends YouTubeBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        install();
+        SettingsController.getInstance().Initialize(this);
+        SettingsController.getInstance().SetUser(new LucaUser(Constants.USER, Constants.PASSWORD));
+
         checkPermissions();
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -175,18 +176,6 @@ public class FullscreenActivity extends YouTubeBaseActivity {
         _raspberryViewController.ShowTemperatureGraph(view);
     }
 
-    private void install() {
-        SharedPrefController sharedPrefController = new SharedPrefController(this);
-
-        if (!sharedPrefController.LoadBooleanValueFromSharedPreferences(SharedPrefConstants.SHARED_PREF_INSTALLED)) {
-            Logger.getInstance().Information(TAG, "Installing shared preferences!");
-
-            sharedPrefController.SaveStringValue(SettingsController.PREF_USER_NAME, RaspPiConstants.USER);
-            sharedPrefController.SaveStringValue(SettingsController.PREF_USER_PASS_PHRASE, RaspPiConstants.PASSWORD);
-            sharedPrefController.SaveBooleanValue(SharedPrefConstants.SHARED_PREF_INSTALLED, true);
-        }
-    }
-
     private void startServices() {
         startService(new Intent(this, MainService.class));
         startService(new Intent(this, ControlServiceStateService.class));
@@ -194,12 +183,6 @@ public class FullscreenActivity extends YouTubeBaseActivity {
 
     private void checkPermissions() {
         PermissionController permissionController = new PermissionController(this);
-        permissionController.CheckPermissions(
-                Constants.PERMISSION_REQUEST_READ_EXTERNAL_STORAGE_ID,
-                Manifest.permission.READ_EXTERNAL_STORAGE);
-        permissionController.CheckPermissions(
-                Constants.PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE_ID,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
         permissionController.CheckPermissions(
                 Constants.PERMISSION_REQUEST_WRITE_SETTINGS_ID,
                 Manifest.permission.WRITE_SETTINGS);

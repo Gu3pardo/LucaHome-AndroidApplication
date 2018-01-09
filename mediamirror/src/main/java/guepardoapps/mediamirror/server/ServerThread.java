@@ -14,6 +14,7 @@ import java.net.Socket;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings("WeakerAccess")
 public class ServerThread {
     private static final String TAG = ServerThread.class.getSimpleName();
 

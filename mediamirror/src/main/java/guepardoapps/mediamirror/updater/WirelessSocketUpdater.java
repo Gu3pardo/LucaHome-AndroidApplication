@@ -7,35 +7,33 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
+import guepardoapps.mediamirror.receiver.WirelessSocketActionReceiver;
 
-public class SocketListUpdater {
-    private static final String TAG = SocketListUpdater.class.getSimpleName();
+public class WirelessSocketUpdater {
+    private static final String TAG = WirelessSocketUpdater.class.getSimpleName();
 
     private Context _context;
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
-
-    private WirelessSocketService _wirelessSocketService;
 
     private boolean _isRunning;
 
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            WirelessSocketService.WirelessSocketDownloadFinishedContent result =
-                    (WirelessSocketService.WirelessSocketDownloadFinishedContent) intent.getSerializableExtra(WirelessSocketService.WirelessSocketDownloadFinishedBundle);
-
+            WirelessSocketService.WirelessSocketDownloadFinishedContent result = (WirelessSocketService.WirelessSocketDownloadFinishedContent) intent.getSerializableExtra(WirelessSocketService.WirelessSocketDownloadFinishedBundle);
             if (result != null) {
                 if (result.WirelessSocketList != null) {
                     _broadcastController.SendSerializableBroadcast(
-                            Broadcasts.SOCKET_LIST,
-                            Bundles.SOCKET_LIST,
+                            Broadcasts.WIRELESS_SOCKET_LIST,
+                            Bundles.WIRELESS_SOCKET_LIST,
                             result.WirelessSocketList);
                 } else {
                     Toasty.error(_context, "Failed to convert socket list from string array!", Toast.LENGTH_LONG).show();
@@ -47,16 +45,15 @@ public class SocketListUpdater {
     private BroadcastReceiver _performUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            DownloadSocketList();
+            DownloadWirelessSocketList();
         }
     };
 
-    public SocketListUpdater(@NonNull Context context) {
+    public WirelessSocketUpdater(@NonNull Context context) {
         _context = context;
         _broadcastController = new BroadcastController(_context);
         _receiverController = new ReceiverController(_context);
-        _wirelessSocketService = WirelessSocketService.getInstance();
-        _wirelessSocketService.Initialize(_context, null, false, true, 15);
+        WirelessSocketService.getInstance().Initialize(_context, WirelessSocketActionReceiver.class, false, true, 15);
     }
 
     public void Start() {
@@ -65,17 +62,18 @@ public class SocketListUpdater {
             return;
         }
         _receiverController.RegisterReceiver(_updateReceiver, new String[]{WirelessSocketService.WirelessSocketDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_SOCKET_UPDATE});
+        _receiverController.RegisterReceiver(_performUpdateReceiver, new String[]{Broadcasts.PERFORM_WIRELESS_SOCKET_UPDATE});
         _isRunning = true;
-        DownloadSocketList();
+        DownloadWirelessSocketList();
     }
 
     public void Dispose() {
+        WirelessSocketService.getInstance().Dispose();
         _receiverController.Dispose();
         _isRunning = false;
     }
 
-    public void DownloadSocketList() {
-        _wirelessSocketService.LoadData();
+    public void DownloadWirelessSocketList() {
+        WirelessSocketService.getInstance().LoadData();
     }
 }

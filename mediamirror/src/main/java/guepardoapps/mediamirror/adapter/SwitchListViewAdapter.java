@@ -14,12 +14,12 @@ import android.widget.TextView;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
+import guepardoapps.lucahome.common.service.WirelessSwitchService;
 import guepardoapps.mediamirror.R;
 
-public class SocketListViewAdapter extends BaseAdapter {
-    private static String TAG = SocketListViewAdapter.class.getSimpleName();
+public class SwitchListViewAdapter extends BaseAdapter {
+    private static String TAG = SwitchListViewAdapter.class.getSimpleName();
 
     private class Holder {
         private TextView _titleText;
@@ -30,12 +30,12 @@ public class SocketListViewAdapter extends BaseAdapter {
         private View _stateView;
     }
 
-    private SerializableList<WirelessSocket> _listViewItems;
+    private SerializableList<WirelessSwitch> _listViewItems;
 
     private Dialog _dialog;
     private static LayoutInflater _inflater = null;
 
-    public SocketListViewAdapter(@NonNull Context context, @NonNull SerializableList<WirelessSocket> listViewItems, @NonNull Dialog dialog) {
+    public SwitchListViewAdapter(@NonNull Context context, @NonNull SerializableList<WirelessSwitch> listViewItems, @NonNull Dialog dialog) {
         _listViewItems = listViewItems;
         _inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         _dialog = dialog;
@@ -70,20 +70,20 @@ public class SocketListViewAdapter extends BaseAdapter {
         holder._cardSwitch = rowView.findViewById(R.id.socketCardSwitch);
         holder._stateView = rowView.findViewById(R.id.socketCardStateView);
 
-        final WirelessSocket wirelessSocket = _listViewItems.getValue(index);
+        final WirelessSwitch wirelessSwitch = _listViewItems.getValue(index);
 
-        holder._titleText.setText(wirelessSocket.GetName());
-        holder._areaText.setText(wirelessSocket.GetArea());
-        holder._codeText.setText(wirelessSocket.GetCode());
+        holder._titleText.setText(wirelessSwitch.GetName());
+        holder._areaText.setText(wirelessSwitch.GetArea());
+        holder._codeText.setText(wirelessSwitch.GetCode());
 
-        holder._cardImage.setImageResource(wirelessSocket.GetWallpaper());
+        holder._cardImage.setImageResource(wirelessSwitch.GetWallpaper());
 
-        holder._stateView.setBackgroundResource(wirelessSocket.IsActivated() ? R.drawable.circle_green : R.drawable.circle_red);
+        holder._stateView.setBackgroundResource(wirelessSwitch.IsActivated() ? R.drawable.circle_green : R.drawable.circle_red);
 
-        holder._cardSwitch.setChecked(wirelessSocket.IsActivated());
+        holder._cardSwitch.setChecked(wirelessSwitch.IsActivated());
         holder._cardSwitch.setOnCheckedChangeListener((compoundButton, value) -> {
             try {
-                WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, value);
+                WirelessSwitchService.getInstance().ToggleWirelessSwitch(wirelessSwitch);
             } catch (Exception exception) {
                 Logger.getInstance().Error(TAG, exception.getMessage());
             }

@@ -20,11 +20,13 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.LucaMenu;
 import guepardoapps.lucahome.common.classes.ShoppingEntry;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.mediamirror.R;
 import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
 import guepardoapps.mediamirror.interfaces.IViewController;
 
+@SuppressWarnings("unchecked")
 public class BottomButtonViewController implements IViewController {
     private static final String TAG = BottomButtonViewController.class.getSimpleName();
 
@@ -37,12 +39,12 @@ public class BottomButtonViewController implements IViewController {
 
     private SerializableList<LucaMenu> _menu;
     private SerializableList<ShoppingEntry> _shoppingList;
-    private SerializableList<WirelessSocket> _socketList;
+    private SerializableList<WirelessSocket> _wirelessSocketList;
+    private SerializableList<WirelessSwitch> _wirelessSwitchList;
 
     private BroadcastReceiver _menuListReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            @SuppressWarnings("unchecked")
             SerializableList<LucaMenu> menu = (SerializableList<LucaMenu>) intent.getSerializableExtra(Bundles.MENU);
             if (menu != null) {
                 _menu = menu;
@@ -55,7 +57,6 @@ public class BottomButtonViewController implements IViewController {
     private BroadcastReceiver _shoppingListReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            @SuppressWarnings("unchecked")
             SerializableList<ShoppingEntry> shoppingList = (SerializableList<ShoppingEntry>) intent
                     .getSerializableExtra(Bundles.SHOPPING_LIST);
             if (shoppingList != null) {
@@ -66,16 +67,26 @@ public class BottomButtonViewController implements IViewController {
         }
     };
 
-    private BroadcastReceiver _socketListReceiver = new BroadcastReceiver() {
+    private BroadcastReceiver _wirelessSocketListReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            @SuppressWarnings("unchecked")
-            SerializableList<WirelessSocket> socketList = (SerializableList<WirelessSocket>) intent
-                    .getSerializableExtra(Bundles.SOCKET_LIST);
-            if (socketList != null) {
-                _socketList = socketList;
+            SerializableList<WirelessSocket> wirelessSocketList = (SerializableList<WirelessSocket>) intent.getSerializableExtra(Bundles.WIRELESS_SOCKET_LIST);
+            if (wirelessSocketList != null) {
+                _wirelessSocketList = wirelessSocketList;
             } else {
-                Logger.getInstance().Warning(TAG, "socketList is null!");
+                Logger.getInstance().Warning(TAG, "wirelessSocketList is null!");
+            }
+        }
+    };
+
+    private BroadcastReceiver _wirelessSwitchListReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            SerializableList<WirelessSwitch> wirelessSwitchList = (SerializableList<WirelessSwitch>) intent.getSerializableExtra(Bundles.WIRELESS_SWITCH_LIST);
+            if (wirelessSwitchList != null) {
+                _wirelessSwitchList = wirelessSwitchList;
+            } else {
+                Logger.getInstance().Warning(TAG, "wirelessSwitchList is null!");
             }
         }
     };
@@ -91,7 +102,8 @@ public class BottomButtonViewController implements IViewController {
     public void onCreate() {
         FloatingActionButton floatingActionButtonMenu = ((Activity) _context).findViewById(R.id.floating_action_button_menu);
         FloatingActionButton floatingActionButtonShopping = ((Activity) _context).findViewById(R.id.floating_action_button_shopping);
-        FloatingActionButton floatingActionButtonSocket = ((Activity) _context).findViewById(R.id.floating_action_button_socket);
+        FloatingActionButton floatingActionButtonWirelessSocket = ((Activity) _context).findViewById(R.id.floating_action_button_socket);
+        FloatingActionButton floatingActionButtonWirelessSwitch = ((Activity) _context).findViewById(R.id.floating_action_button_switch);
         FloatingActionButton floatingActionButtonReload = ((Activity) _context).findViewById(R.id.floating_action_button_reload);
 
         floatingActionButtonMenu.setOnClickListener(view -> {
@@ -122,12 +134,21 @@ public class BottomButtonViewController implements IViewController {
             }
         });
 
-        floatingActionButtonSocket.setOnClickListener(view -> {
-            if (_socketList != null) {
-                _dialogController.DisplaySocketListViewDialog(_socketList);
+        floatingActionButtonWirelessSocket.setOnClickListener(view -> {
+            if (_wirelessSocketList != null) {
+                _dialogController.DisplaySocketListViewDialog(_wirelessSocketList);
             } else {
-                Logger.getInstance().Error(TAG, "_socketList is null!");
-                Toasty.warning(_context, "SocketList is null!!", Toast.LENGTH_LONG).show();
+                Logger.getInstance().Error(TAG, "_wirelessSocketList is null!");
+                Toasty.warning(_context, "WirelessSocketList is null!!", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        floatingActionButtonWirelessSwitch.setOnClickListener(view -> {
+            if (_wirelessSocketList != null) {
+                _dialogController.DisplaySwitchListViewDialog(_wirelessSwitchList);
+            } else {
+                Logger.getInstance().Error(TAG, "_wirelessSwitchList is null!");
+                Toasty.warning(_context, "WirelessSwitchList is null!!", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -143,7 +164,8 @@ public class BottomButtonViewController implements IViewController {
         if (!_isInitialized) {
             _receiverController.RegisterReceiver(_menuListReceiver, new String[]{Broadcasts.MENU});
             _receiverController.RegisterReceiver(_shoppingListReceiver, new String[]{Broadcasts.SHOPPING_LIST});
-            _receiverController.RegisterReceiver(_socketListReceiver, new String[]{Broadcasts.SOCKET_LIST});
+            _receiverController.RegisterReceiver(_wirelessSocketListReceiver, new String[]{Broadcasts.WIRELESS_SOCKET_LIST});
+            _receiverController.RegisterReceiver(_wirelessSwitchListReceiver, new String[]{Broadcasts.WIRELESS_SWITCH_LIST});
             _isInitialized = true;
         } else {
             Logger.getInstance().Warning(TAG, "Is ALREADY initialized!");

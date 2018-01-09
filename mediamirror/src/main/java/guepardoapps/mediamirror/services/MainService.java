@@ -61,10 +61,9 @@ public class MainService extends Service {
     private MenuListUpdater _menuListUpdater;
     private RSSViewUpdater _rssViewUpdater;
     private ShoppingListUpdater _shoppingListUpdater;
-    private SocketListUpdater _socketListUpdater;
     private TemperatureUpdater _temperatureUpdater;
-
-    private ScheduleService _scheduleService;
+    private WirelessSocketUpdater _wirelessSocketUpdater;
+    private WirelessSwitchUpdater _wirelessSwitchUpdater;
 
     private PowerManager _powerManager;
     private PowerManager.WakeLock _wakeLock;
@@ -132,15 +131,14 @@ public class MainService extends Service {
             _menuListUpdater = new MenuListUpdater(_context);
             _rssViewUpdater = new RSSViewUpdater(_context);
             _shoppingListUpdater = new ShoppingListUpdater(_context);
-            _socketListUpdater = new SocketListUpdater(_context);
             _temperatureUpdater = new TemperatureUpdater(_context);
+            _wirelessSocketUpdater = new WirelessSocketUpdater(_context);
+            _wirelessSwitchUpdater = new WirelessSwitchUpdater(_context);
 
             SettingsController.getInstance().Initialize(_context);
 
             _ttsController = new TTSController(_context, Enables.TTS);
             _ttsController.Init();
-
-            _scheduleService = ScheduleService.getInstance();
 
             _serverThread = new ServerThread(Constants.SERVER_PORT, _context);
             _serverThread.Start();
@@ -155,8 +153,9 @@ public class MainService extends Service {
             _menuListUpdater.Start();
             _rssViewUpdater.Start(Timeouts.RSS_UPDATE);
             _shoppingListUpdater.Start(Timeouts.SHOPPING_LIST_UPDATE);
-            _socketListUpdater.Start();
             _temperatureUpdater.Start();
+            _wirelessSocketUpdater.Start();
+            _wirelessSwitchUpdater.Start();
 
             CenterModel centerModel = new CenterModel(
                     false, "",
@@ -221,12 +220,16 @@ public class MainService extends Service {
                 _shoppingListUpdater.Start(Timeouts.SHOPPING_LIST_UPDATE);
             }
 
-            if (_socketListUpdater != null) {
-                _socketListUpdater.Start();
-            }
-
             if (_temperatureUpdater != null) {
                 _temperatureUpdater.Start();
+            }
+
+            if (_wirelessSocketUpdater != null) {
+                _wirelessSocketUpdater.Start();
+            }
+
+            if (_wirelessSwitchUpdater != null) {
+                _wirelessSwitchUpdater.Start();
             }
 
             if (_broadcastController != null) {
@@ -276,15 +279,16 @@ public class MainService extends Service {
         _menuListUpdater.Dispose();
         _rssViewUpdater.Dispose();
         _shoppingListUpdater.Dispose();
-        _socketListUpdater.Dispose();
         _temperatureUpdater.Dispose();
+        _wirelessSocketUpdater.Dispose();
+        _wirelessSwitchUpdater.Dispose();
 
         _ttsController.Dispose();
 
         _wakeLock.release();
         _wifiLock.release();
 
-        _scheduleService.Dispose();
+        ScheduleService.getInstance().Dispose();
 
         restartActivity();
     }
@@ -322,8 +326,9 @@ public class MainService extends Service {
         _menuListUpdater.DownloadMenuList();
         _rssViewUpdater.LoadRss();
         _shoppingListUpdater.DownloadShoppingList();
-        _socketListUpdater.DownloadSocketList();
         _temperatureUpdater.DownloadTemperature();
+        _wirelessSocketUpdater.DownloadWirelessSocketList();
+        _wirelessSwitchUpdater.DownloadWirelessSwitchList();
     }
 
     private void restartActivity() {

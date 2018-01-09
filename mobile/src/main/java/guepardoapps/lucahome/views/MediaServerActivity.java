@@ -536,8 +536,8 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
         _youtubePlayPositionTextView.setVisibility(mediaServerData.IsYoutubePlaying() ? View.VISIBLE : View.GONE);
 
-        _sleepTimerButton.setVisibility((mediaServerData.IsSleepTimerEnabled() && mediaServerData.GetMediaServerSelection().IsSleepingMirror()) ? View.VISIBLE : View.GONE);
-        _sleepTimerButton.setEnabled(mediaServerData.IsSleepTimerEnabled() && mediaServerData.GetMediaServerSelection().IsSleepingMirror());
+        _sleepTimerButton.setVisibility((mediaServerData.IsSleepTimerEnabled() && mediaServerData.GetMediaServerSelection().IsSleepingServer()) ? View.VISIBLE : View.GONE);
+        _sleepTimerButton.setEnabled(mediaServerData.IsSleepTimerEnabled() && mediaServerData.GetMediaServerSelection().IsSleepingServer());
 
         if (mediaServerData.IsYoutubePlaying()) {
             int currentVideoPlayTime = mediaServerData.GetYoutubeVideoCurrentPlayTime();

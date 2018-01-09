@@ -20,8 +20,6 @@ public class CurrentWeatherUpdater {
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
 
-    private OpenWeatherService _openWeatherService;
-
     private boolean _isRunning;
 
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
@@ -52,8 +50,7 @@ public class CurrentWeatherUpdater {
     public CurrentWeatherUpdater(@NonNull Context context) {
         _broadcastController = new BroadcastController(context);
         _receiverController = new ReceiverController(context);
-        _openWeatherService = OpenWeatherService.getInstance();
-        _openWeatherService.Initialize(context, Constants.CITY, false, false, null, null, false, true, 5 * 60 * 1000);
+        OpenWeatherService.getInstance().Initialize(context, Constants.CITY, false, false, null, null, false, true, 5 * 60 * 1000);
     }
 
     public void Start() {
@@ -70,11 +67,12 @@ public class CurrentWeatherUpdater {
     }
 
     public void Dispose() {
+        OpenWeatherService.getInstance().Dispose();
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadWeather() {
-        _openWeatherService.LoadCurrentWeather();
+        OpenWeatherService.getInstance().LoadCurrentWeather();
     }
 }

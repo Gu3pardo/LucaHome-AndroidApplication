@@ -8,17 +8,20 @@ import android.support.annotation.NonNull;
 import android.widget.Toast;
 
 import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.mediamirror.receiver.WirelessSocketActionReceiver;
 
+@SuppressWarnings("WeakerAccess")
 public class BatterySocketController {
     private static final String TAG = BatterySocketController.class.getSimpleName();
 
     public static final int UPPER_BATTERY_LIMIT = 90;
-    public static final int LOWER_BATTERY_LIMIT = 10;
+    public static final int LOWER_BATTERY_LIMIT = 15;
 
     private boolean _isInitialized;
     private String _wirelessSocketName;
@@ -26,7 +29,6 @@ public class BatterySocketController {
     private Context _context;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
-    private WirelessSocketService _wirelessSocketService;
 
     private BroadcastReceiver _batteryInfoReceiver = new BroadcastReceiver() {
         @Override
@@ -46,8 +48,7 @@ public class BatterySocketController {
         _receiverController = new ReceiverController(_context);
         _networkController = new NetworkController(_context);
 
-        _wirelessSocketService = WirelessSocketService.getInstance();
-        _wirelessSocketService.Initialize(_context, null, false, true, 15);
+        WirelessSocketService.getInstance().Initialize(_context, WirelessSocketActionReceiver.class, false, true, 15);
 
         searchWirelessSocketName();
     }
@@ -62,7 +63,7 @@ public class BatterySocketController {
     }
 
     public void Dispose() {
-        _receiverController.UnregisterReceiver(_batteryInfoReceiver);
+        _receiverController.Dispose();
         _isInitialized = false;
     }
 
@@ -88,7 +89,7 @@ public class BatterySocketController {
         searchWirelessSocketName();
 
         if (_wirelessSocketName != null) {
-            _wirelessSocketService.SetWirelessSocketState(_wirelessSocketName, enable);
+            WirelessSocketService.getInstance().SetWirelessSocketState(_wirelessSocketName, enable);
 
             Toasty.success(_context,
                     String.format("Set socket %s to %s", _wirelessSocketName, enable ? "ON" : "OFF"),
@@ -123,6 +124,6 @@ public class BatterySocketController {
             return false;
         }
 
-        return _wirelessSocketService.GetWirelessSocketState(_wirelessSocketName);
+        return WirelessSocketService.getInstance().GetWirelessSocketState(_wirelessSocketName);
     }
 }

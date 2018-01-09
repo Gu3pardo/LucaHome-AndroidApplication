@@ -42,16 +42,16 @@ public class MediaServerService {
     public static final String MediaServerBrightnessBroadcast = "guepardoapps.lucahome.data.service.mediaServer.brightness";
     public static final String MediaServerBrightnessBundle = "MediaServerBrightnessBundle";
 
-    public static final String MediaServerPlayedYoutubeBroadcast = "guepardoapps.lucahome.data.service.mediaServer.playedyoutube";
+    public static final String MediaServerPlayedYoutubeBroadcast = "guepardoapps.lucahome.data.service.mediaServer.played_youtube";
     public static final String MediaServerPlayedYoutubeBundle = "MediaServerPlayedYoutubeBundle";
 
     public static final String MediaServerBatteryBroadcast = "guepardoapps.lucahome.data.service.mediaServer.battery";
     public static final String MediaServerBatteryBundle = "MediaServerBatteryBundle";
 
-    public static final String MediaServerServerVersionBroadcast = "guepardoapps.lucahome.data.service.mediaServer.serverversion";
+    public static final String MediaServerServerVersionBroadcast = "guepardoapps.lucahome.data.service.mediaServer.server_version";
     public static final String MediaServerServerVersionBundle = "MediaServerServerVersionBundle";
 
-    public static final String MediaServerYoutubeVideoBroadcast = "guepardoapps.lucahome.data.service.mediaServer.youtubevideo";
+    public static final String MediaServerYoutubeVideoBroadcast = "guepardoapps.lucahome.data.service.mediaServer.youtube_video";
     public static final String MediaServerYoutubeVideoBundle = "MediaServerYoutubeVideoBundle";
 
     private static final MediaServerService SINGLETON = new MediaServerService();
@@ -219,7 +219,7 @@ public class MediaServerService {
                 switch (responseAction) {
                     case INCREASE_VOLUME:
                     case DECREASE_VOLUME:
-                    case UNMUTE_VOLUME:
+                    case UN_MUTE_VOLUME:
                     case GET_CURRENT_VOLUME:
                         String currentVolume = responseData[responseData.length - 1];
                         _broadcastController.SendStringBroadcast(

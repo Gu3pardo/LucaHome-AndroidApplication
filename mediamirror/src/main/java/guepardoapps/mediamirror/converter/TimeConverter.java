@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.util.Calendar;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class TimeConverter {
     private static final String TAG = TimeConverter.class.getSimpleName();
 

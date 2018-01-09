@@ -2,6 +2,7 @@ package guepardoapps.mediamirror.rss;
 
 import android.support.annotation.NonNull;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class RssItem {
     private static final String TAG = RssItem.class.getSimpleName();
 

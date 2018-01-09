@@ -1,5 +1,6 @@
 package guepardoapps.mediamirror.converter;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MonthConverter {
     private static final String TAG = MonthConverter.class.getSimpleName();
 

@@ -19,6 +19,7 @@ import guepardoapps.mediamirror.common.models.RaspberryModel;
 import guepardoapps.mediamirror.helper.RaspberryTemperatureHelper;
 import guepardoapps.mediamirror.interfaces.IViewController;
 
+@SuppressWarnings("unused")
 public class RaspberryViewController implements IViewController {
     private static final String TAG = RaspberryViewController.class.getSimpleName();
 

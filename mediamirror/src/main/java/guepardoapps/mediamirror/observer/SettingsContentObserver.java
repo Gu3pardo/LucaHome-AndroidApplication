@@ -11,6 +11,7 @@ import java.io.Serializable;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings("WeakerAccess")
 public class SettingsContentObserver extends ContentObserver {
     private static final String TAG = SettingsContentObserver.class.getSimpleName();
 
@@ -23,11 +24,11 @@ public class SettingsContentObserver extends ContentObserver {
         public int Difference;
         public VolumeChangeState ChangeState;
 
-        public VolumeChangeModel() {
-            CurrentVolume = -1;
-            PreviousVolume = -1;
-            Difference = -1;
-            ChangeState = VolumeChangeState.NULL;
+        public VolumeChangeModel(int currentVolume, int previousVolume, int difference, @NonNull VolumeChangeState changeState) {
+            CurrentVolume = currentVolume;
+            PreviousVolume = previousVolume;
+            Difference = difference;
+            ChangeState = changeState;
         }
     }
 
@@ -66,10 +67,7 @@ public class SettingsContentObserver extends ContentObserver {
             int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
             int delta = _previousVolume - currentVolume;
 
-            VolumeChangeModel volumeChangeModel = new VolumeChangeModel();
-            volumeChangeModel.CurrentVolume = currentVolume;
-            volumeChangeModel.PreviousVolume = _previousVolume;
-            volumeChangeModel.Difference = delta;
+            VolumeChangeModel volumeChangeModel = new VolumeChangeModel(currentVolume, _previousVolume, delta, VolumeChangeState.NULL);
 
             if (delta > 0) {
                 _previousVolume = currentVolume;

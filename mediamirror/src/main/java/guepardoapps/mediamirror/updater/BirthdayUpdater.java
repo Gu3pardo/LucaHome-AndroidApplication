@@ -25,8 +25,6 @@ public class BirthdayUpdater {
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
 
-    private BirthdayService _birthdayService;
-
     private boolean _isRunning;
 
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
@@ -120,8 +118,7 @@ public class BirthdayUpdater {
     public BirthdayUpdater(@NonNull Context context) {
         _broadcastController = new BroadcastController(context);
         _receiverController = new ReceiverController(context);
-        _birthdayService = BirthdayService.getInstance();
-        _birthdayService.Initialize(context, null, false, true, 6 * 60);
+        BirthdayService.getInstance().Initialize(context, null, false, true, 6 * 60);
     }
 
     public void Start() {
@@ -138,11 +135,12 @@ public class BirthdayUpdater {
     }
 
     public void Dispose() {
+        BirthdayService.getInstance().Dispose();
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadBirthdays() {
-        _birthdayService.LoadData();
+        BirthdayService.getInstance().LoadData();
     }
 }

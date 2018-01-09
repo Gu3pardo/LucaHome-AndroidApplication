@@ -13,6 +13,7 @@ import java.util.List;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
+@SuppressWarnings("WeakerAccess")
 public class RssParser {
     private static final String TAG = RssParser.class.getSimpleName();
 

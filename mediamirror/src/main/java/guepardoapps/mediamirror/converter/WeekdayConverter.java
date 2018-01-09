@@ -1,5 +1,6 @@
 package guepardoapps.mediamirror.converter;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WeekdayConverter {
     private static final String TAG = WeekdayConverter.class.getSimpleName();
 

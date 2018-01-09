@@ -18,8 +18,6 @@ public class MenuListUpdater {
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
 
-    private MenuService _menuService;
-
     private boolean _isRunning;
 
     private BroadcastReceiver _updateReceiver = new BroadcastReceiver() {
@@ -46,8 +44,7 @@ public class MenuListUpdater {
     public MenuListUpdater(@NonNull Context context) {
         _broadcastController = new BroadcastController(context);
         _receiverController = new ReceiverController(context);
-        _menuService = MenuService.getInstance();
-        _menuService.Initialize(context, true, 2 * 60);
+        MenuService.getInstance().Initialize(context, true, 2 * 60);
     }
 
     public void Start() {
@@ -64,11 +61,12 @@ public class MenuListUpdater {
     }
 
     public void Dispose() {
+        MenuService.getInstance().Dispose();
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadMenuList() {
-        _menuService.LoadData();
+        MenuService.getInstance().LoadData();
     }
 }

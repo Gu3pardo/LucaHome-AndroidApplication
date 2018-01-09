@@ -5,7 +5,7 @@ import java.io.Serializable;
 @SuppressWarnings({"unused"})
 public enum YoutubeId implements Serializable {
 
-    DEFAULT(0, "The Good Life Live Stream", "dyLV6gnu-wg"),
+    DEFAULT(0, "The Good Life Live Stream", "ftJYyevC6Us"),
 
     THE_GOOD_LIFE_NO_1(1, "The Good Life No.1", "02PzGpODB1E"),
     THE_GOOD_LIFE_NO_2(2, "The Good Life No.2", "Zg0vgeSb2h0"),
@@ -35,7 +35,7 @@ public enum YoutubeId implements Serializable {
     THE_GOOD_LIFE_NO_26(26, "The Good Life No.26", "Z8wZxgAd07s"),
     THE_GOOD_LIFE_NO_27(27, "The Good Life No.27", "dGWsd8-BB84"),
 
-    THE_GOOD_LIFE_STREAM(28, "The Good Life Live Stream", "dyLV6gnu-wg"),
+    THE_GOOD_LIFE_STREAM(28, "The Good Life Live Stream", "ftJYyevC6Us"),
 
     LUCKY_CHOPS_LIVE_DANZA(29, "Lucky Chops - Danza 2016 (LIVE at Grand Central Station, NYC)", "ddijvwAMw0o"),
     LUCKY_CHOPS_LIVE_BUYO(30, "Lucky Chops - Buyo (LIVE)", "gFrCyU_1zw0"),

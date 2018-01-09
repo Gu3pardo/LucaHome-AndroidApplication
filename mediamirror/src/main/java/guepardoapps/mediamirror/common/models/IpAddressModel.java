@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
+@SuppressWarnings("unused")
 public class IpAddressModel implements Serializable {
     private static final long serialVersionUID = 2738438227273452818L;
 

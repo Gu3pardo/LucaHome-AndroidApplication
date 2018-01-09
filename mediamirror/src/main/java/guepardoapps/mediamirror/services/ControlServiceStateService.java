@@ -17,13 +17,13 @@ public class ControlServiceStateService extends Service {
     private boolean _isInitialized;
 
     private Context _context;
-    private AndroidSystemController _systemController;
+    private AndroidSystemController _androidSystemController;
 
     private Handler _checkServicesHandler;
 
     private Runnable _checkServices = new Runnable() {
         public void run() {
-            if (!_systemController.IsServiceRunning(MainService.class)) {
+            if (!_androidSystemController.IsServiceRunning(MainService.class)) {
                 Logger.getInstance().Warning(TAG, "MainService not running! Restarting!");
                 startService(new Intent(_context, MainService.class));
             }
@@ -36,7 +36,7 @@ public class ControlServiceStateService extends Service {
         if (!_isInitialized) {
             _isInitialized = true;
             _context = this;
-            _systemController = new AndroidSystemController(_context);
+            _androidSystemController = new AndroidSystemController(_context);
             _checkServicesHandler = new Handler();
             _checkServices.run();
         }

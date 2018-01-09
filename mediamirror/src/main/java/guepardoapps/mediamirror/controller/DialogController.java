@@ -17,9 +17,12 @@ import java.util.ArrayList;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.mediamirror.R;
 import guepardoapps.mediamirror.adapter.SocketListViewAdapter;
+import guepardoapps.mediamirror.adapter.SwitchListViewAdapter;
 
+@SuppressWarnings("WeakerAccess")
 public class DialogController {
     // private static final String TAG = DialogController.class.getSimpleName();
 
@@ -78,7 +81,7 @@ public class DialogController {
         displayDialog(dialog);
     }
 
-    public void DisplaySocketListViewDialog(SerializableList<WirelessSocket> socketList) {
+    public void DisplaySocketListViewDialog(SerializableList<WirelessSocket> wirelessSocketList) {
         final Dialog dialog = createDialog();
         dialog.setContentView(R.layout.dialog_listview);
 
@@ -89,7 +92,23 @@ public class DialogController {
         closeButton.setOnClickListener(v -> dialog.dismiss());
 
         ListView listView = dialog.findViewById(R.id.dialog_list_view);
-        listView.setAdapter(new SocketListViewAdapter(_context, socketList, dialog));
+        listView.setAdapter(new SocketListViewAdapter(_context, wirelessSocketList, dialog));
+
+        displayDialog(dialog);
+    }
+
+    public void DisplaySwitchListViewDialog(SerializableList<WirelessSwitch> wirelessSwitchList) {
+        final Dialog dialog = createDialog();
+        dialog.setContentView(R.layout.dialog_listview);
+
+        TextView titleView = dialog.findViewById(R.id.dialog_title_text_view);
+        titleView.setText("Wireless Switches");
+
+        com.rey.material.widget.Button closeButton = dialog.findViewById(R.id.dialog_button_close);
+        closeButton.setOnClickListener(v -> dialog.dismiss());
+
+        ListView listView = dialog.findViewById(R.id.dialog_list_view);
+        listView.setAdapter(new SwitchListViewAdapter(_context, wirelessSwitchList, dialog));
 
         displayDialog(dialog);
     }

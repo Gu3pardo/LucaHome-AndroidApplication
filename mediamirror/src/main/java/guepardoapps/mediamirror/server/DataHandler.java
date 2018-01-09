@@ -33,6 +33,7 @@ import guepardoapps.mediamirror.controller.CenterViewController;
 import guepardoapps.mediamirror.controller.MediaVolumeController;
 import guepardoapps.mediamirror.controller.ScreenController;
 
+@SuppressWarnings({"unchecked", "WeakerAccess"})
 public class DataHandler {
     private static final String TAG = DataHandler.class.getSimpleName();
 
@@ -89,16 +90,16 @@ public class DataHandler {
                 _batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             }
         }, new String[]{Intent.ACTION_BATTERY_CHANGED});
+
         _receiverController.RegisterReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                @SuppressWarnings("unchecked")
-                SerializableList<WirelessSocket> socketList = (SerializableList<WirelessSocket>) intent.getSerializableExtra(Bundles.SOCKET_LIST);
+                SerializableList<WirelessSocket> socketList = (SerializableList<WirelessSocket>) intent.getSerializableExtra(Bundles.WIRELESS_SOCKET_LIST);
                 if (socketList != null) {
                     _socketList = socketList;
                 }
             }
-        }, new String[]{Broadcasts.SOCKET_LIST});
+        }, new String[]{Broadcasts.WIRELESS_SOCKET_LIST});
     }
 
     public String PerformAction(@NonNull String command) {
@@ -466,20 +467,12 @@ public class DataHandler {
                         _mediaVolumeController.MuteVolume();
                         return action.toString() + ":Muted";
 
-                    case UNMUTE_VOLUME:
+                    case UN_MUTE_VOLUME:
                         _mediaVolumeController.UnMuteVolume();
                         return action.toString() + ":" + _mediaVolumeController.GetCurrentVolume();
 
                     case GET_CURRENT_VOLUME:
                         return action.toString() + ":" + _mediaVolumeController.GetCurrentVolume();
-
-                    case PLAY_ALARM:
-                        // TODO implement
-                        break;
-
-                    case STOP_ALARM:
-                        // TODO implement
-                        break;
 
                     case INCREASE_SCREEN_BRIGHTNESS:
                         if (!_screenController.IsScreenOn()) {

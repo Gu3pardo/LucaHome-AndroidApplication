@@ -9,6 +9,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.mediamirror.common.models.YoutubeDatabaseModel;
 import guepardoapps.mediamirror.database.DatabaseYoutubeIds;
 
+@SuppressWarnings("unused")
 public class DatabaseController {
     private static final String TAG = DatabaseController.class.getSimpleName();
 

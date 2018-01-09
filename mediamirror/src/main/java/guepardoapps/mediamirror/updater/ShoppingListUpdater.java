@@ -24,8 +24,6 @@ public class ShoppingListUpdater {
     private BroadcastController _broadcastController;
     private ReceiverController _receiverController;
 
-    private ShoppingListService _shoppingListService;
-
     private int _updateTime;
     private boolean _isRunning;
 
@@ -65,8 +63,7 @@ public class ShoppingListUpdater {
         _context = context;
         _broadcastController = new BroadcastController(_context);
         _receiverController = new ReceiverController(_context);
-        _shoppingListService = ShoppingListService.getInstance();
-        _shoppingListService.Initialize(_context, true, 60);
+        ShoppingListService.getInstance().Initialize(_context, true, 60);
     }
 
     public void Start(int updateTime) {
@@ -84,11 +81,12 @@ public class ShoppingListUpdater {
 
     public void Dispose() {
         _updater.removeCallbacks(_updateRunnable);
+        ShoppingListService.getInstance().Dispose();
         _receiverController.Dispose();
         _isRunning = false;
     }
 
     public void DownloadShoppingList() {
-        _shoppingListService.LoadData();
+        ShoppingListService.getInstance().LoadData();
     }
 }
