@@ -1,10 +1,12 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.bixby.classes;
 
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
 
+import guepardoapps.bixby.classes.actions.BixbyAction;
+import guepardoapps.bixby.classes.requirements.BixbyRequirement;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
@@ -47,6 +49,10 @@ public class BixbyPair implements Serializable {
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "{%s:{ActionId:%d,Action:%s,Requirements:%s}}", TAG, _actionId, _action, _requirements);
+        StringBuilder requirementString = new StringBuilder();
+        for (int requirementIndex = 0; requirementIndex < _requirements.getSize(); requirementIndex++) {
+            requirementString.append(_requirements.getValue(requirementIndex).toString());
+        }
+        return String.format(Locale.getDefault(), "{%s:{ActionId:%d,Action:%s,Requirements:%s}}", TAG, _actionId, _action, requirementString.toString());
     }
 }

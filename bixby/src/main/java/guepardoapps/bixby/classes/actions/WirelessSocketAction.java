@@ -1,32 +1,33 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.bixby.classes.actions;
 
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
 
+import guepardoapps.bixby.interfaces.IBixbyAction;
+
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.bixby.interfaces.IBixbyRequirement;
 
 @SuppressWarnings("WeakerAccess")
-public class WirelessSocketRequirement implements IBixbyRequirement, Serializable {
-    private static final String TAG = WirelessSocketRequirement.class.getSimpleName();
+public class WirelessSocketAction implements IBixbyAction, Serializable {
+    private static final String TAG = WirelessSocketAction.class.getSimpleName();
 
     public enum StateType {OFF, ON, NULL}
 
     private StateType _stateType;
     private String _wirelessSocketName;
 
-    public WirelessSocketRequirement(@NonNull StateType stateType, @NonNull String wirelessSocketName) {
+    public WirelessSocketAction(@NonNull StateType stateType, @NonNull String wirelessSocketName) {
         _stateType = stateType;
         _wirelessSocketName = wirelessSocketName;
     }
 
-    public WirelessSocketRequirement() {
+    public WirelessSocketAction() {
         this(StateType.NULL, "");
     }
 
-    public WirelessSocketRequirement(@NonNull String databaseString) {
+    public WirelessSocketAction(@NonNull String databaseString) {
         String[] data = databaseString.split(":");
         if (data.length == 2) {
             try {
@@ -60,7 +61,7 @@ public class WirelessSocketRequirement implements IBixbyRequirement, Serializabl
 
     @Override
     public String GetInformationString() {
-        return String.format(Locale.getDefault(), "%s: %s should be %s", TAG, _wirelessSocketName, _stateType);
+        return String.format(Locale.getDefault(), "%s for %s -> %s", TAG, _wirelessSocketName, _stateType);
     }
 
     @Override

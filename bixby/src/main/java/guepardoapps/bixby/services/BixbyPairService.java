@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.bixby.services;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -6,26 +6,62 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
+import java.util.Date;
 import java.util.Locale;
 
+import guepardoapps.bixby.classes.BixbyPair;
+import guepardoapps.bixby.classes.actions.*;
+import guepardoapps.bixby.classes.requirements.*;
+import guepardoapps.bixby.database.*;
+
 import guepardoapps.lucahome.basic.classes.SerializableList;
+import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Position;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.interfaces.services.IDataService;
 import guepardoapps.lucahome.common.service.PositioningService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
+import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
 @SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
-public class BixbyPairService {
+public class BixbyPairService implements IDataService {
+    public static class BixbyPairUpdateFinishedContent extends ObjectChangeFinishedContent {
+        public SerializableList<BixbyPair> BixbyPairList;
+
+        BixbyPairUpdateFinishedContent(@NonNull SerializableList<BixbyPair> bixbyPairList, boolean succcess, @NonNull byte[] response) {
+            super(succcess, response);
+            BixbyPairList = bixbyPairList;
+        }
+    }
+
+    public final static String BIXBY_PAIR_INTENT = "BIXBY_PAIR_INTENT";
+
+    public static final String BixbyPairLoadFinishedBroadcast = "guepardoapps.bixby.services.bixpypair.load.finished";
+    public static final String BixbyPairLoadFinishedBundle = "BixbyPairLoadFinishedBundle";
+
+    public static final String BixbyPairAddFinishedBroadcast = "guepardoapps.bixby.services.bixpypair.add.finished";
+    public static final String BixbyPairAddFinishedBundle = "BixbyPairAddFinishedBundle";
+
+    public static final String BixbyPairUpdateFinishedBroadcast = "guepardoapps.bixby.services.bixpypair.update.finished";
+    public static final String BixbyPairUpdateFinishedBundle = "BixbyPairUpdateFinishedBundle";
+
+    public static final String BixbyPairDeleteFinishedBroadcast = "guepardoapps.bixby.services.bixpypair.delete.finished";
+    public static final String BixbyPairDeleteFinishedBundle = "BixbyPairDeleteFinishedBundle";
+
     private static final String TAG = BixbyPairService.class.getSimpleName();
 
     private static final BixbyPairService SINGLETON = new BixbyPairService();
     private boolean _isInitialized;
 
+    private Date _lastUpdate;
+
     private Context _context;
 
+    private BroadcastController _broadcastController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
 
@@ -43,6 +79,7 @@ public class BixbyPairService {
             if (positionResult != null) {
                 if (positionResult.Success) {
                     _lastPosition = positionResult.LatestPosition;
+                    _lastUpdate = new Date();
                 } else {
                     Logger.getInstance().Warning(TAG, "Last calculation of position seems to be failed!");
                 }
@@ -59,14 +96,17 @@ public class BixbyPairService {
         return SINGLETON;
     }
 
-    public void Initialize(@NonNull Context context) {
+    @Override
+    public void Initialize(@NonNull Context context, boolean reloadEnabled, int reloadTimeout) {
         if (_isInitialized) {
             Logger.getInstance().Warning(TAG, "Already initialized!");
             return;
         }
+        Logger.getInstance().Debug(TAG, "Initialize");
 
         _context = context;
 
+        _broadcastController = new BroadcastController(_context);
         _networkController = new NetworkController(_context);
         _receiverController = new ReceiverController(_context);
 
@@ -79,16 +119,107 @@ public class BixbyPairService {
         _databaseBixbyRequirementList.Open();
 
         _pairList = createPairList();
+        _broadcastController.SendSerializableBroadcast(
+                BixbyPairLoadFinishedBroadcast,
+                BixbyPairLoadFinishedBundle,
+                new BixbyPairUpdateFinishedContent(_pairList, true, Tools.CompressStringToByteArray("Successfully loaded")));
+
+        _lastUpdate = new Date();
 
         _isInitialized = true;
     }
 
+    @Override
     public void Dispose() {
         Logger.getInstance().Warning(TAG, "Dispose");
         _receiverController.Dispose();
         _databaseBixbyActionList.Close();
         _databaseBixbyRequirementList.Close();
         _isInitialized = false;
+    }
+
+    @Override
+    public SerializableList<BixbyPair> GetDataList() {
+        return _pairList;
+    }
+
+    @Override
+    public SerializableList<BixbyPair> SearchDataList(@NonNull String searchKey) {
+        SerializableList<BixbyPair> foundBixbyPairs = new SerializableList<>();
+        for (int index = 0; index < _pairList.getSize(); index++) {
+            BixbyPair entry = _pairList.getValue(index);
+            if (entry.toString().contains(searchKey)) {
+                foundBixbyPairs.addValue(entry);
+            }
+        }
+        return foundBixbyPairs;
+    }
+
+    @Override
+    public int GetHighestId() {
+        int highestId = -1;
+        for (int index = 0; index < _pairList.getSize(); index++) {
+            int id = _pairList.getValue(index).GetActionId();
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId;
+    }
+
+    public int GetHighestActionId() {
+        SerializableList<BixbyAction> actionList = _databaseBixbyActionList.GetBixbyActionList();
+        int highestActionId = -1;
+        for (int index = 0; index < actionList.getSize(); index++) {
+            int id = actionList.getValue(index).GetId();
+            if (id > highestActionId) {
+                highestActionId = id;
+            }
+        }
+        return highestActionId;
+    }
+
+    public int GetHighestRequirementId() {
+        SerializableList<BixbyRequirement> requirementList = _databaseBixbyRequirementList.GetBixbyRequirementList();
+        int highestRequirementId = -1;
+        for (int index = 0; index < requirementList.getSize(); index++) {
+            int id = requirementList.getValue(index).GetId();
+            if (id > highestRequirementId) {
+                highestRequirementId = id;
+            }
+        }
+        return highestRequirementId;
+    }
+
+    @Override
+    public void LoadData() {
+        _pairList = createPairList();
+        _broadcastController.SendSerializableBroadcast(
+                BixbyPairLoadFinishedBroadcast,
+                BixbyPairLoadFinishedBundle,
+                new BixbyPairUpdateFinishedContent(_pairList, true, Tools.CompressStringToByteArray("Successfully loaded")));
+    }
+
+    @Override
+    public boolean GetReloadEnabled() {
+        Logger.getInstance().Warning(TAG, "method not necessary!");
+        return false;
+    }
+
+    @Override
+    public void SetReloadEnabled(boolean reloadEnabled) {
+        Logger.getInstance().Warning(TAG, "method not necessary!");
+    }
+
+    @Override
+    public int GetReloadTimeout() {
+        Logger.getInstance().Warning(TAG, "method not necessary!");
+        return 0;
+    }
+
+    @Override
+    public void SetReloadTimeout(int reloadTimeout) {
+        Logger.getInstance().Warning(TAG, "method not necessary!");
     }
 
     public void BixbyButtonPressed() {
@@ -111,16 +242,6 @@ public class BixbyPairService {
         }
     }
 
-    public SerializableList<BixbyPair> GetPairList() {
-        return _pairList;
-    }
-
-    public void SetPairList(@NonNull SerializableList<BixbyPair> pairList) {
-        _pairList = pairList;
-        clearDatabases();
-        saveToDatabases();
-    }
-
     public void AddBixbyPair(@NonNull BixbyPair bixbyPair) {
         _pairList.addValue(bixbyPair);
 
@@ -130,10 +251,15 @@ public class BixbyPairService {
             for (int index = 0; index < requirementList.getSize(); index++) {
                 _databaseBixbyRequirementList.CreateEntry(requirementList.getValue(index));
             }
+            _broadcastController.SendSerializableBroadcast(
+                    BixbyPairAddFinishedBroadcast,
+                    BixbyPairAddFinishedBundle,
+                    new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Add finished")));
         } catch (Exception exception) {
             Logger.getInstance().Error(TAG, exception.toString());
             clearDatabases();
             saveToDatabases();
+            sendFailedAddBroadcast(exception.toString());
         }
     }
 
@@ -146,10 +272,15 @@ public class BixbyPairService {
             for (int index = 0; index < requirementList.getSize(); index++) {
                 _databaseBixbyRequirementList.Update(requirementList.getValue(index));
             }
+            _broadcastController.SendSerializableBroadcast(
+                    BixbyPairUpdateFinishedBroadcast,
+                    BixbyPairUpdateFinishedBundle,
+                    new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Update finished")));
         } catch (Exception exception) {
             Logger.getInstance().Error(TAG, exception.toString());
             clearDatabases();
             saveToDatabases();
+            sendFailedUpdateBroadcast(exception.toString());
         }
     }
 
@@ -162,33 +293,47 @@ public class BixbyPairService {
             for (int index = 0; index < requirementList.getSize(); index++) {
                 _databaseBixbyRequirementList.Delete(requirementList.getValue(index));
             }
+            _broadcastController.SendSerializableBroadcast(
+                    BixbyPairDeleteFinishedBroadcast,
+                    BixbyPairDeleteFinishedBundle,
+                    new ObjectChangeFinishedContent(true, Tools.CompressStringToByteArray("Delete finished")));
         } catch (Exception exception) {
             Logger.getInstance().Error(TAG, exception.toString());
             clearDatabases();
             saveToDatabases();
+            sendFailedDeleteBroadcast(exception.toString());
         }
     }
 
-    private SerializableList<BixbyPair> createPairList() {
-        SerializableList<BixbyAction> actionList = _databaseBixbyActionList.GetBixbyActionList();
-        SerializableList<BixbyRequirement> requirementList = _databaseBixbyRequirementList.GetBixbyRequirementList();
+    public Date GetLastUpdate() {
+        return _lastUpdate;
+    }
 
+    private SerializableList<BixbyPair> createPairList() {
         SerializableList<BixbyPair> pairList = new SerializableList<>();
 
-        for (int actionIndex = 0; actionIndex < actionList.getSize(); actionIndex++) {
-            BixbyAction bixbyAction = actionList.getValue(actionIndex);
-            int actionId = bixbyAction.GetActionId();
-            SerializableList<BixbyRequirement> pairRequirementList = new SerializableList<>();
+        try {
+            SerializableList<BixbyAction> actionList = _databaseBixbyActionList.GetBixbyActionList();
+            SerializableList<BixbyRequirement> requirementList = _databaseBixbyRequirementList.GetBixbyRequirementList();
 
-            for (int requirementIndex = 0; requirementIndex < requirementList.getSize(); requirementIndex++) {
-                BixbyRequirement bixbyRequirement = requirementList.getValue(requirementIndex);
-                if (bixbyRequirement.GetActionId() == actionId) {
-                    pairRequirementList.addValue(bixbyRequirement);
+            for (int actionIndex = 0; actionIndex < actionList.getSize(); actionIndex++) {
+                BixbyAction bixbyAction = actionList.getValue(actionIndex);
+                int actionId = bixbyAction.GetActionId();
+                SerializableList<BixbyRequirement> pairRequirementList = new SerializableList<>();
+
+                for (int requirementIndex = 0; requirementIndex < requirementList.getSize(); requirementIndex++) {
+                    BixbyRequirement bixbyRequirement = requirementList.getValue(requirementIndex);
+                    if (bixbyRequirement.GetActionId() == actionId) {
+                        pairRequirementList.addValue(bixbyRequirement);
+                    }
                 }
-            }
 
-            BixbyPair bixbyPair = new BixbyPair(actionId, bixbyAction, pairRequirementList);
-            pairList.addValue(bixbyPair);
+                BixbyPair bixbyPair = new BixbyPair(actionId, bixbyAction, pairRequirementList);
+                pairList.addValue(bixbyPair);
+            }
+        } catch (Exception exception) {
+            Logger.getInstance().Error(TAG, exception.toString());
+            sendFailedLoadBroadcast(exception.toString());
         }
 
         return pairList;
@@ -306,7 +451,6 @@ public class BixbyPairService {
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "performApplicationAction for %s", applicationAction));
 
         String packageName = applicationAction.GetPackageName();
-
         PackageManager packageManager = _context.getPackageManager();
 
         Intent startApplicationIntent = packageManager.getLaunchIntentForPackage(packageName);
@@ -408,5 +552,50 @@ public class BixbyPairService {
                 _databaseBixbyRequirementList.CreateEntry(requirementList.getValue(requirementIndex));
             }
         }
+        _lastUpdate = new Date();
+    }
+
+    private void sendFailedLoadBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Load for bixbypair failed!";
+        }
+
+        _broadcastController.SendSerializableBroadcast(
+                BixbyPairLoadFinishedBroadcast,
+                BixbyPairLoadFinishedBundle,
+                new BixbyPairUpdateFinishedContent(_pairList, false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private void sendFailedAddBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Add for bixbypair failed!";
+        }
+
+        _broadcastController.SendSerializableBroadcast(
+                BixbyPairAddFinishedBroadcast,
+                BixbyPairAddFinishedBundle,
+                new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private void sendFailedUpdateBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Update for bixbypair failed!";
+        }
+
+        _broadcastController.SendSerializableBroadcast(
+                BixbyPairUpdateFinishedBroadcast,
+                BixbyPairUpdateFinishedBundle,
+                new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
+    }
+
+    private void sendFailedDeleteBroadcast(@NonNull String response) {
+        if (response.length() == 0) {
+            response = "Delete for bixbypair failed!";
+        }
+
+        _broadcastController.SendSerializableBroadcast(
+                BixbyPairDeleteFinishedBroadcast,
+                BixbyPairDeleteFinishedBundle,
+                new ObjectChangeFinishedContent(false, Tools.CompressStringToByteArray(response)));
     }
 }

@@ -49,7 +49,6 @@ public class TemperatureActivity extends AppCompatBaseActivity {
             TemperatureService.TemperatureDownloadFinishedContent result = (TemperatureService.TemperatureDownloadFinishedContent) intent.getSerializableExtra(TemperatureService.TemperatureDownloadFinishedBundle);
 
             _progressBar.setVisibility(View.GONE);
-            _pullRefreshLayout.setRefreshing(false);
 
             if (result.Success) {
                 _lastUpdateTextView.setText(TemperatureService.getInstance().GetLastUpdate().toString());
@@ -140,16 +139,6 @@ public class TemperatureActivity extends AppCompatBaseActivity {
 
         NavigationView navigationView = findViewById(R.id.nav_view_temperature);
         navigationView.setNavigationItemSelectedListener(this);
-
-        _pullRefreshLayout = findViewById(R.id.pullRefreshLayout_temperature);
-        _pullRefreshLayout.setOnRefreshListener(() -> {
-            _currentTemperatureTextView.setVisibility(View.GONE);
-            _temperatureWebView.setVisibility(View.GONE);
-
-            _progressBar.setVisibility(View.VISIBLE);
-
-            TemperatureService.getInstance().LoadData();
-        });
     }
 
     @Override

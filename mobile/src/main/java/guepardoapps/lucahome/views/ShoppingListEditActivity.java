@@ -17,8 +17,8 @@ import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import java.util.Locale;
 
@@ -39,7 +39,6 @@ public class ShoppingListEditActivity extends AppCompatActivity {
     private static final String TAG = ShoppingListEditActivity.class.getSimpleName();
 
     private boolean _propertyChanged;
-    private int _quantity = 1;
 
     private ReceiverController _receiverController;
 
@@ -90,7 +89,7 @@ public class ShoppingListEditActivity extends AppCompatActivity {
 
         final AutoCompleteTextView shoppingNameEditTextView = findViewById(R.id.shopping_edit_name_textview);
         final Spinner entryGroupSelect = findViewById(R.id.shopping_entry_group_select);
-        final TextView quantityTextView = findViewById(R.id.shopping_entry_quantity_textview);
+        final EditText quantityEditText = findViewById(R.id.shopping_entry_quantity_edittext);
         final AutoCompleteTextView shoppingUnitEditTextView = findViewById(R.id.shopping_edit_unit_textview);
         FloatingActionButton increaseQuantityButton = findViewById(R.id.floating_action_button_increase_quantity);
         FloatingActionButton decreaseQuantityButton = findViewById(R.id.floating_action_button_decrease_quantity);
@@ -108,23 +107,27 @@ public class ShoppingListEditActivity extends AppCompatActivity {
         shoppingUnitEditTextView.addTextChangedListener(_textWatcher);
 
         increaseQuantityButton.setOnClickListener(view -> {
-            _quantity++;
-            quantityTextView.setText(String.valueOf(_quantity));
+            String quantityString = quantityEditText.getText().toString();
+            int quantity = Integer.parseInt(quantityString);
+            quantity++;
+            quantityEditText.setText(String.valueOf(quantity));
         });
 
         decreaseQuantityButton.setOnClickListener(view -> {
-            _quantity--;
-            if (_quantity < 1) {
-                _quantity = 1;
+            String quantityString = quantityEditText.getText().toString();
+            int quantity = Integer.parseInt(quantityString);
+            quantity--;
+            if (quantity < 1) {
+                quantity = 1;
             }
-            quantityTextView.setText(String.valueOf(_quantity));
+            quantityEditText.setText(String.valueOf(quantity));
         });
 
         if (shoppingEntryDto != null) {
             shoppingNameEditTextView.setText(shoppingEntryDto.GetName());
             entryGroupSelect.setSelection(shoppingEntryDto.GetGroup().GetInt());
-            _quantity = shoppingEntryDto.GetQuantity();
-            quantityTextView.setText(String.valueOf(_quantity));
+            int quantity = shoppingEntryDto.GetQuantity();
+            quantityEditText.setText(String.valueOf(quantity));
             shoppingUnitEditTextView.setText(shoppingEntryDto.GetUnit());
         } else {
             displayErrorSnackBar("Cannot work with data! Is corrupt! Please try again!");
@@ -143,7 +146,6 @@ public class ShoppingListEditActivity extends AppCompatActivity {
             }
 
             String entryName = shoppingNameEditTextView.getText().toString();
-
             if (TextUtils.isEmpty(entryName)) {
                 shoppingNameEditTextView.setError(createErrorText(getString(R.string.error_field_required)));
                 focusView = shoppingNameEditTextView;
@@ -153,13 +155,21 @@ public class ShoppingListEditActivity extends AppCompatActivity {
             int entryGroupId = entryGroupSelect.getSelectedItemPosition();
             ShoppingEntryGroup entryGroup = ShoppingEntryGroup.GetById(entryGroupId);
 
+            String entryQuantity = quantityEditText.getText().toString();
+            if (TextUtils.isEmpty(entryQuantity)) {
+                quantityEditText.setError(createErrorText(getString(R.string.error_field_required)));
+                focusView = quantityEditText;
+                cancel = true;
+            }
+
             String entryUnit = shoppingUnitEditTextView.getText().toString();
 
             if (cancel) {
                 focusView.requestFocus();
             } else {
+                int quantity = Integer.parseInt(entryQuantity);
                 int highestId = ShoppingListService.getInstance().GetHighestId();
-                ShoppingListService.getInstance().AddShoppingEntry(new ShoppingEntry(highestId + 1, entryName, entryGroup, _quantity, entryUnit, false, ILucaClass.LucaServerDbAction.Add));
+                ShoppingListService.getInstance().AddShoppingEntry(new ShoppingEntry(highestId + 1, entryName, entryGroup, quantity, entryUnit, false, ILucaClass.LucaServerDbAction.Add));
                 _saveButton.setEnabled(false);
             }
         });

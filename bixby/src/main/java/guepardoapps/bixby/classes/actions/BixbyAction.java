@@ -1,11 +1,12 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.bixby.classes.actions;
 
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.lucahome.bixby.interfaces.IBixbyAction;
+import guepardoapps.bixby.classes.BixbyPair;
+import guepardoapps.bixby.interfaces.IBixbyAction;
 
 @SuppressWarnings("WeakerAccess")
 public class BixbyAction implements IBixbyAction, Serializable {
@@ -37,6 +38,18 @@ public class BixbyAction implements IBixbyAction, Serializable {
         _applicationAction = applicationAction;
         _networkAction = networkAction;
         _wirelessSocketAction = wirelessSocketAction;
+    }
+
+    public BixbyAction(int id, int actionId) {
+
+        _id = id;
+        _actionId = actionId;
+
+        _actionType = ActionType.Null;
+
+        _applicationAction = new ApplicationAction();
+        _networkAction = new NetworkAction();
+        _wirelessSocketAction = new WirelessSocketAction();
     }
 
     public int GetId() {

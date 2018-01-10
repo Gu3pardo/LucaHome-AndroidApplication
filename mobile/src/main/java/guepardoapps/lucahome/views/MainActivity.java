@@ -299,8 +299,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigation.
 
             switch (itemId) {
                 case R.id.bottomNavigationBixby:
-                    Logger.getInstance().Error(TAG, "Not yet implemented!");
-                    navigationResult = NavigationService.NavigationResult.PERMITTED;
+                    navigationResult = NavigationService.getInstance().NavigateToActivity(MainActivity.this, BixbyActivity.class);
                     break;
                 case R.id.bottomNavigationSettings:
                     navigationResult = NavigationService.getInstance().NavigateToActivity(MainActivity.this, SettingsActivity.class);

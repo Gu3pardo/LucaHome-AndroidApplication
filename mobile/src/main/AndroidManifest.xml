@@ -2,10 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="guepardoapps.lucahome">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -32,6 +29,25 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="guepardoapps.lucahome.views.BirthdayActivity" />
+        </activity>
+        <activity
+            android:name=".views.BixbyActivity"
+            android:label="@string/title_activity_bixby"
+            android:parentActivityName=".views.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.MainActivity" />
+        </activity>
+        <activity
+            android:name=".views.BixbyEditActivity"
+            android:label="@string/title_activity_bixby_edit"
+            android:parentActivityName=".views.BixbyActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="guepardoapps.lucahome.views.BixbyActivity" />
         </activity>
         <activity android:name=".views.BootActivity">
             <intent-filter>
@@ -300,45 +316,29 @@
         </activity>
 
         <receiver
-            android:name="guepardoapps.lucahome.receiver.BootReceiver"
+            android:name=".receiver.BootReceiver"
             android:enabled="true"
-            android:exported="false"
-            android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+            android:exported="false">
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
         <receiver
-            android:name="guepardoapps.lucahome.receiver.SocketActionReceiver"
+            android:name=".receiver.SocketActionReceiver"
             android:enabled="true"
             android:exported="false" />
         <receiver
-            android:name="guepardoapps.lucahome.receiver.SwitchActionReceiver"
+            android:name=".receiver.SwitchActionReceiver"
             android:enabled="true"
             android:exported="false" />
         <receiver
-            android:name="guepardoapps.lucahome.receiver.WIFIReceiver"
+            android:name=".receiver.WIFIReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.net.wifi.supplicant.CONNECTION_CHANGE" />
             </intent-filter>
         </receiver>
-
-        <service
-            android:name=".bixby.BixbyService"
-            android:label="@string/app_name"
-            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
-            <intent-filter>
-                <action android:name="android.accessibilityservice.AccessibilityService" />
-            </intent-filter>
-            <meta-data
-                android:name="android.accessibilityservice"
-                android:resource="@xml/bixby_service_config" />
-        </service>
 
         <service
             android:name=".common.service.PositioningService"

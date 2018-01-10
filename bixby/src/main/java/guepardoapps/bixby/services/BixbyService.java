@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.bixby.services;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
@@ -20,10 +20,11 @@ public class BixbyService extends AccessibilityService {
     private long _lastRunMillis = 0;
     private long _maxRunFrequencyMs = 500;
 
-    public BixbyService() {
-        super();
-        Logger.getInstance().Debug(TAG, "Constructor");
-        BixbyPairService.getInstance().Initialize(this);
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Logger.getInstance().Debug(TAG, "onCreate");
+        BixbyPairService.getInstance().Initialize(this, true, -1);
     }
 
     @Override

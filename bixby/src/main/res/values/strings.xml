@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Bixby</string>
+
+    <string name="bixby_service_description">Enable BixbyService to remap the Bixby button to toggle some actions</string>
+</resources>

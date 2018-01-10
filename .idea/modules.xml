@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/LucaHome-v5.iml" filepath="$PROJECT_DIR$/LucaHome-v5.iml" />
       <module fileurl="file://$PROJECT_DIR$/basic/basic.iml" filepath="$PROJECT_DIR$/basic/basic.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bixby/bixby.iml" filepath="$PROJECT_DIR$/bixby/bixby.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
       <module fileurl="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/lib_openweather.iml" filepath="$PROJECT_DIR$/../OpenWeather/lib_openweather/lib_openweather.iml" />
       <module fileurl="file://$PROJECT_DIR$/mediamirror/mediamirror.iml" filepath="$PROJECT_DIR$/mediamirror/mediamirror.iml" />

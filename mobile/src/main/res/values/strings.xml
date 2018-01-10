@@ -233,6 +233,8 @@
     <string name="title_activity_schedule_edit">Edit Schedules</string>
     <string name="title_activity_timer">Timer</string>
     <string name="title_activity_timer_edit">Edit Timer</string>
+    <string name="title_activity_bixby">Bixby</string>
+    <string name="title_activity_bixby_edit">Edit Bixby</string>
     <string name="title_activity_birthday">Birthdays</string>
     <string name="title_activity_birthday_edit">Edit Birthday</string>
     <string name="title_activity_coin">Coins</string>
@@ -298,6 +300,4 @@
     <string name="action_settings">Settings</string>
     <string name="action_details">Details</string>
     <string name="action_bixby">Bixby</string>
-
-    <string name="bixby_service_description">Enable BixbyService to remap the Bixby button to toggle some actions</string>
 </resources>

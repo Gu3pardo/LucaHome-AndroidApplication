@@ -58,16 +58,17 @@
                     android:nextFocusDown="@+id/shopping_entry_quantity_textview"
                     android:nextFocusRight="@+id/shopping_entry_quantity_textview" />
 
-                <TextView
-                    android:id="@+id/shopping_entry_quantity_textview"
+                <EditText
+                    android:id="@+id/shopping_entry_quantity_edittext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
                     android:layout_below="@+id/shopping_entry_group_select"
-                    android:textColor="@color/TextIcon"
+                    android:inputType="number"
                     android:nextFocusDown="@+id/shopping_edit_unit_textview"
-                    android:nextFocusRight="@+id/shopping_edit_unit_textview" />
+                    android:nextFocusRight="@+id/shopping_edit_unit_textview"
+                    android:textColor="@color/TextIcon" />
 
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/shoppingUnit_TextInputLayout"
@@ -75,7 +76,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentStart="true"
-                    android:layout_below="@+id/shopping_entry_quantity_textview">
+                    android:layout_below="@+id/shopping_entry_quantity_edittext">
 
                     <AutoCompleteTextView
                         android:id="@+id/shopping_edit_unit_textview"
@@ -99,11 +100,11 @@
                     android:layout_toStartOf="@+id/floating_action_button_decrease_quantity"
                     android:nextFocusDown="@+id/floating_action_button_decrease_quantity"
                     android:nextFocusRight="@+id/floating_action_button_decrease_quantity"
-                    app:srcCompat="@mipmap/ic_add_white_48dp"
                     app:rd_delayClick="none"
                     app:rd_enable="true"
                     app:rd_rippleColor="@color/colorPrimary"
-                    app:rd_rippleType="touch" />
+                    app:rd_rippleType="touch"
+                    app:srcCompat="@mipmap/ic_add_white_48dp" />
 
                 <android.support.design.widget.FloatingActionButton
                     android:id="@+id/floating_action_button_decrease_quantity"
@@ -114,11 +115,11 @@
                     android:layout_margin="5dp"
                     android:nextFocusDown="@+id/save_shopping_edit_button"
                     android:nextFocusRight="@+id/save_shopping_edit_button"
-                    app:srcCompat="@mipmap/ic_remove_circle_outline_white_48dp"
                     app:rd_delayClick="none"
                     app:rd_enable="true"
                     app:rd_rippleColor="@color/colorPrimary"
-                    app:rd_rippleType="touch" />
+                    app:rd_rippleType="touch"
+                    app:srcCompat="@mipmap/ic_remove_circle_outline_white_48dp" />
 
                 <com.rey.material.widget.Button
                     android:id="@+id/save_shopping_edit_button"

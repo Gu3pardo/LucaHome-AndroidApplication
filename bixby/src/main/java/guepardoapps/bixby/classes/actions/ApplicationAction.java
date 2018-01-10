@@ -1,11 +1,11 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.bixby.classes.actions;
 
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.lucahome.bixby.interfaces.IBixbyAction;
+import guepardoapps.bixby.interfaces.IBixbyAction;
 
 @SuppressWarnings("WeakerAccess")
 public class ApplicationAction implements IBixbyAction, Serializable {
@@ -15,6 +15,10 @@ public class ApplicationAction implements IBixbyAction, Serializable {
 
     public ApplicationAction(@NonNull String packageName) {
         _packageName = packageName;
+    }
+
+    public ApplicationAction() {
+        this("");
     }
 
     public String GetPackageName() {

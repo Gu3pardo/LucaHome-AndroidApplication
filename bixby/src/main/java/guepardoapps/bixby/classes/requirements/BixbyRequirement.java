@@ -1,11 +1,11 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.bixby.classes.requirements;
 
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.lucahome.bixby.interfaces.IBixbyRequirement;
+import guepardoapps.bixby.interfaces.IBixbyRequirement;
 
 @SuppressWarnings("WeakerAccess")
 public class BixbyRequirement implements IBixbyRequirement, Serializable {

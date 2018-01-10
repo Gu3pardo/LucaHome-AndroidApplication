@@ -31,11 +31,12 @@ import de.mateware.snacky.Snacky;
 
 import es.dmoral.toasty.Toasty;
 
+import guepardoapps.bixby.services.BixbyService;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.AndroidSystemController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.bixby.BixbyService;
 import guepardoapps.lucahome.common.service.PositioningService;
 import guepardoapps.lucahome.common.service.UserService;
 import guepardoapps.lucahome.service.MainService;
@@ -205,6 +206,8 @@ public class BootActivity extends AppCompatActivity {
             _loginAttempt = false;
             _mainServiceBinder.StartDownloadAll("onResume after _loginAttempt");
         }
+
+        checkNavigateToMain();
     }
 
     @Override

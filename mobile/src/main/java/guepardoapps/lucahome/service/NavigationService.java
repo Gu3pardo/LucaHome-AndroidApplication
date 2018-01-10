@@ -113,6 +113,7 @@ public class NavigationService {
 
         if (startActivityContext.getClass() == BirthdayActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayEditActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -143,6 +144,38 @@ public class NavigationService {
 
             return NavigationResult.PERMITTED;
 
+        } else if (startActivityContext.getClass() == BixbyActivity.class) {
+            if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(CoinActivity.class)
+                    || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
+                    || endActivity.getClass().isInstance(LoginActivity.class)
+                    || endActivity.getClass().isInstance(MainActivity.class)
+                    || endActivity.getClass().isInstance(MediaServerActivity.class)
+                    || endActivity.getClass().isInstance(MenuActivity.class)
+                    || endActivity.getClass().isInstance(MeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MoneyMeterDataActivity.class)
+                    || endActivity.getClass().isInstance(MovieActivity.class)
+                    || endActivity.getClass().isInstance(PuckJsActivity.class)
+                    || endActivity.getClass().isInstance(ScheduleActivity.class)
+                    || endActivity.getClass().isInstance(SecurityActivity.class)
+                    || endActivity.getClass().isInstance(SettingsActivity.class)
+                    || endActivity.getClass().isInstance(ShoppingListActivity.class)
+                    || endActivity.getClass().isInstance(TemperatureActivity.class)
+                    || endActivity.getClass().isInstance(TimerActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSocketActivity.class)
+                    || endActivity.getClass().isInstance(WirelessSwitchActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
+        } else if (startActivityContext.getClass() == BixbyEditActivity.class) {
+            if (endActivity.getClass().isInstance(BixbyActivity.class)) {
+                return NavigationResult.POSSIBLE;
+            }
+
+            return NavigationResult.PERMITTED;
+
         } else if (startActivityContext.getClass() == BootActivity.class) {
             if (endActivity.getClass().isInstance(LoginActivity.class)) {
                 return NavigationResult.POSSIBLE;
@@ -152,6 +185,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == CoinActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinEditActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -184,6 +218,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == ForecastWeatherActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
                     || endActivity.getClass().isInstance(MainActivity.class)
@@ -215,6 +250,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == MainActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -239,6 +275,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == MenuActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -271,6 +308,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == MediaServerActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -295,6 +333,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == MeterDataActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -326,6 +365,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == MoneyMeterDataActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -357,6 +397,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == MovieActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -389,6 +430,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == PuckJsActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -421,6 +463,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == ScheduleActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -453,6 +496,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == SecurityActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -477,6 +521,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == SettingsActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -502,6 +547,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == ShoppingListActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -534,6 +580,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == TemperatureActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -558,6 +605,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == TimerActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -590,6 +638,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == WirelessSocketActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)
@@ -622,6 +671,7 @@ public class NavigationService {
 
         } else if (startActivityContext.getClass() == WirelessSwitchActivity.class) {
             if (endActivity.getClass().isInstance(BirthdayActivity.class)
+                    || endActivity.getClass().isInstance(BixbyActivity.class)
                     || endActivity.getClass().isInstance(CoinActivity.class)
                     || endActivity.getClass().isInstance(ForecastWeatherActivity.class)
                     || endActivity.getClass().isInstance(LoginActivity.class)

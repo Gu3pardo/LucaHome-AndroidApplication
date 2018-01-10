@@ -1,6 +1,6 @@
-package guepardoapps.lucahome.bixby.interfaces;
+package guepardoapps.bixby.interfaces;
 
-public interface IBixbyAction {
+public interface IBixbyRequirement {
     String GetDatabaseString() throws NoSuchMethodException;
 
     String GetInformationString();

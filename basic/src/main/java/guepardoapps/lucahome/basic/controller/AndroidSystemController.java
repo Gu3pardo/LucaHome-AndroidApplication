@@ -112,6 +112,7 @@ public class AndroidSystemController {
 
         List<AccessibilityServiceInfo> runningServices = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityEvent.TYPES_ALL_MASK);
         for (AccessibilityServiceInfo service : runningServices) {
+            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Found active service %s", service.getId()));
             if (serviceId.equals(service.getId())) {
                 return true;
             }

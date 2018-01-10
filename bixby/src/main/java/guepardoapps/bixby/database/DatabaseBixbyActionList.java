@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.bixby.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
+import guepardoapps.bixby.classes.actions.*;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 

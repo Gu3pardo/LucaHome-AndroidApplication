@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.bixby;
+package guepardoapps.lucahome.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -16,14 +16,19 @@ import com.rey.material.widget.FloatingActionButton;
 
 import java.util.Locale;
 
+import guepardoapps.bixby.classes.BixbyPair;
+import guepardoapps.bixby.classes.requirements.BixbyRequirement;
+
+import guepardoapps.bixby.services.BixbyPairService;
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.service.NavigationService;
+import guepardoapps.lucahome.views.BixbyEditActivity;
 
 @SuppressWarnings("WeakerAccess")
-public class BixbypairListViewAdapter extends BaseAdapter {
-    private static final String TAG = BixbypairListViewAdapter.class.getSimpleName();
+public class BixbyPairListViewAdapter extends BaseAdapter {
+    private static final String TAG = BixbyPairListViewAdapter.class.getSimpleName();
 
     private class Holder {
         public static final int MAX_REQUIREMENTS = 5;
@@ -36,8 +41,8 @@ public class BixbypairListViewAdapter extends BaseAdapter {
 
         private void navigateToEditActivity(@NonNull final BixbyPair bixbyPair) {
             Bundle data = new Bundle();
-            data.putSerializable(null/*TODO*/, bixbyPair);
-            NavigationService.getInstance().NavigateToActivityWithData(_context, null /*TODO*/, data);
+            data.putSerializable(BixbyPairService.BIXBY_PAIR_INTENT, bixbyPair);
+            NavigationService.getInstance().NavigateToActivityWithData(_context, BixbyEditActivity.class, data);
         }
 
         private void displayDeleteDialog(@NonNull final BixbyPair bixbyPair) {
@@ -51,7 +56,7 @@ public class BixbypairListViewAdapter extends BaseAdapter {
                     .setCancelable(true);
 
             deleteDialog.positiveActionClickListener(view -> {
-                /*TODO add delete method*/
+                BixbyPairService.getInstance().DeleteBixbyPair(bixbyPair);
                 deleteDialog.dismiss();
             });
 
@@ -67,7 +72,7 @@ public class BixbypairListViewAdapter extends BaseAdapter {
     private static LayoutInflater _inflater = null;
     private boolean _isLightTheme;
 
-    public BixbypairListViewAdapter(@NonNull Context context, @NonNull SerializableList<BixbyPair> listViewItems) {
+    public BixbyPairListViewAdapter(@NonNull Context context, @NonNull SerializableList<BixbyPair> listViewItems) {
         _context = context;
         _listViewItems = listViewItems;
 

@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
@@ -23,10 +24,12 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import org.altbeacon.beacon.Beacon;
 import org.altbeacon.beacon.BeaconConsumer;
 import org.altbeacon.beacon.BeaconManager;
+import org.altbeacon.beacon.BeaconParser;
 import org.altbeacon.beacon.MonitorNotifier;
 import org.altbeacon.beacon.RangeNotifier;
 import org.altbeacon.beacon.Region;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 
@@ -46,7 +49,7 @@ import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
 @SuppressWarnings("unused")
-public class PositioningService extends Service implements BeaconConsumer {
+public class PositioningService extends Service implements BeaconConsumer, MonitorNotifier, RangeNotifier {
     private static final String TAG = PositioningService.class.getSimpleName();
 
     public class PositioningServiceBinder extends Binder {
@@ -89,42 +92,11 @@ public class PositioningService extends Service implements BeaconConsumer {
     private boolean _scanEnabled;
     private boolean _handleBluetoothAutomatically;
 
+    private ArrayList<Region> _previousRegionList = new ArrayList<>();
+    private ArrayList<Region> _activeRegionList = new ArrayList<>();
     private Collection<Beacon> _beaconList;
 
     private BeaconManager _beaconManager;
-
-    private MonitorNotifier _monitorNotifier = new MonitorNotifier() {
-        @Override
-        public void didEnterRegion(Region region) {
-            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "didEnterRegion Region: %s", region.toString()));
-            //calculatePosition();
-        }
-
-        @Override
-        public void didExitRegion(Region region) {
-            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "didExitRegion Region: %s", region.toString()));
-            //calculatePosition();
-        }
-
-        @Override
-        public void didDetermineStateForRegion(int state, Region region) {
-            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "didDetermineStateForRegion Region: %s, State: %d", region.toString(), state));
-        }
-    };
-
-    private RangeNotifier _rangeNotifier = (beaconList, region) -> {
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "RangeNotifier: BeaconList: %s | Region: %s", beaconList, region));
-
-        _beaconList = beaconList;
-
-        if (_beaconList.size() > 0) {
-            for (int beaconIndex = 0; beaconIndex < _beaconList.size(); beaconIndex++) {
-                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "didRangeBeaconsInRegion: Found Beacon %s", _beaconList.toArray()[beaconIndex].toString()));
-            }
-        }
-
-        calculatePosition();
-    };
 
     private BroadcastReceiver _bluetoothChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -181,6 +153,13 @@ public class PositioningService extends Service implements BeaconConsumer {
         }
     };
 
+    private BroadcastReceiver _puckJsDownloadReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            setActiveRegionList();
+        }
+    };
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
@@ -201,7 +180,14 @@ public class PositioningService extends Service implements BeaconConsumer {
         Logger.getInstance().Information(TAG, "onCreate");
 
         _context = this;
-        _beaconManager = BeaconManager.getInstanceForApplication(_context);
+        _beaconManager = BeaconManager.getInstanceForApplication(_context.getApplicationContext());
+
+        BeaconParser beaconParser = new BeaconParser();
+        _beaconManager.getBeaconParsers().add(beaconParser.setBeaconLayout(BeaconParser.ALTBEACON_LAYOUT));
+        _beaconManager.getBeaconParsers().add(beaconParser.setBeaconLayout(BeaconParser.EDDYSTONE_TLM_LAYOUT));
+        _beaconManager.getBeaconParsers().add(beaconParser.setBeaconLayout(BeaconParser.EDDYSTONE_UID_LAYOUT));
+        _beaconManager.getBeaconParsers().add(beaconParser.setBeaconLayout(BeaconParser.EDDYSTONE_URL_LAYOUT));
+        _beaconManager.getBeaconParsers().add(beaconParser.setBeaconLayout(BeaconParser.URI_BEACON_LAYOUT));
 
         _bluetoothController = new BluetoothController();
         _broadcastController = new BroadcastController(_context);
@@ -210,6 +196,7 @@ public class PositioningService extends Service implements BeaconConsumer {
         _receiverController.RegisterReceiver(_bluetoothChangedReceiver, new String[]{BluetoothAdapter.ACTION_STATE_CHANGED});
         _receiverController.RegisterReceiver(_homeNetworkAvailableReceiver, new String[]{NetworkController.WIFIReceiverInHomeNetworkBroadcast});
         _receiverController.RegisterReceiver(_homeNetworkNotAvailableReceiver, new String[]{NetworkController.WIFIReceiverNoHomeNetworkBroadcast});
+        _receiverController.RegisterReceiver(_puckJsDownloadReceiver, new String[]{PuckJsListService.PuckJsListDownloadFinishedBroadcast});
 
         _bluetoothIsEnabled = _bluetoothController.IsBluetoothEnabled();
 
@@ -232,11 +219,42 @@ public class PositioningService extends Service implements BeaconConsumer {
     @Override
     public void onBeaconServiceConnect() {
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "onBeaconServiceConnect, _scanEnabled: %s", _scanEnabled));
-        _beaconManager.addMonitorNotifier(_monitorNotifier);
-        _beaconManager.addRangeNotifier(_rangeNotifier);
+        setActiveRegionList();
     }
 
-    public void SetActiveActivityContext(Context activeActivityContext) {
+    @Override
+    public void didEnterRegion(Region region) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "didEnterRegion Region: %s", region.toString()));
+        //calculatePosition();
+    }
+
+    @Override
+    public void didExitRegion(Region region) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "didExitRegion Region: %s", region.toString()));
+        //calculatePosition();
+    }
+
+    @Override
+    public void didDetermineStateForRegion(int state, Region region) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "didDetermineStateForRegion Region: %s, State: %d", region.toString(), state));
+    }
+
+    @Override
+    public void didRangeBeaconsInRegion(Collection<Beacon> beaconList, Region region) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "RangeNotifier: BeaconList: %s | Region: %s", beaconList, region));
+
+        _beaconList = beaconList;
+
+        if (_beaconList.size() > 0) {
+            for (int beaconIndex = 0; beaconIndex < _beaconList.size(); beaconIndex++) {
+                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "didRangeBeaconsInRegion: Found Beacon %s", _beaconList.toArray()[beaconIndex].toString()));
+            }
+        }
+
+        calculatePosition();
+    }
+
+    public void SetActiveActivityContext(@NonNull Context activeActivityContext) {
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "SetActiveActivityContext: %s", activeActivityContext));
         _activeActivityContext = activeActivityContext;
         askForPermission();
@@ -265,8 +283,16 @@ public class PositioningService extends Service implements BeaconConsumer {
     public void SetScanEnabled(boolean scanEnabled) {
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "SetScanEnabled: %s", scanEnabled));
         _scanEnabled = scanEnabled;
-        if (validateBluetooth() && _scanEnabled && !_beaconManager.isBound(this)) {
-            _beaconManager.bind(this);
+        if (_scanEnabled && !_beaconManager.isBound(this)) {
+            if (validateBluetooth()) {
+                Logger.getInstance().Debug(TAG, "Binding beaconManager");
+                _beaconManager.bind(this);
+            } else {
+                Logger.getInstance().Warning(TAG, "Validating bluetooth failed!");
+            }
+        } else if (!_scanEnabled && _beaconManager.isBound(this)) {
+            Logger.getInstance().Debug(TAG, "Unbinding beaconManager");
+            _beaconManager.unbind(this);
         }
     }
 
@@ -377,7 +403,6 @@ public class PositioningService extends Service implements BeaconConsumer {
                         @Override
                         public void onPermissionGranted(PermissionGrantedResponse response) {
                             _permissionGranted = true;
-                            SetScanEnabled(_scanEnabled);
                         }
 
                         @Override
@@ -393,6 +418,79 @@ public class PositioningService extends Service implements BeaconConsumer {
         } catch (Exception exception) {
             Logger.getInstance().Error(TAG, exception.toString());
             Toasty.error(_context, exception.toString(), Toast.LENGTH_LONG).show();
+        } finally {
+            SetScanEnabled(_scanEnabled);
+        }
+    }
+
+    private void setActiveRegionList() {
+        Logger.getInstance().Debug(TAG, "setActiveRegionList");
+
+        _previousRegionList = _activeRegionList;
+        _activeRegionList.clear();
+
+        SerializableList<PuckJs> puckJsList = PuckJsListService.getInstance().GetDataList();
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "setActiveRegionList for %d PuckJss", puckJsList.getSize()));
+
+        for (int index = 0; index < puckJsList.getSize(); index++) {
+            PuckJs puckJs = puckJsList.getValue(index);
+            Region region = new Region(puckJs.GetArea(), puckJs.GetMac());
+            _activeRegionList.add(region);
+        }
+
+        setMonitorNotifiers();
+        setRangeNotifiers();
+    }
+
+    private void setMonitorNotifiers() {
+        Logger.getInstance().Debug(TAG, "setMonitorNotifiers");
+
+        // Remove previous notifier
+        try {
+            for (Region region : _previousRegionList) {
+                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "stopMonitoringBeaconsInRegion for region %s", region));
+                _beaconManager.stopMonitoringBeaconsInRegion(region);
+            }
+        } catch (RemoteException remoteException) {
+            Logger.getInstance().Error(TAG, remoteException.toString());
+        }
+        _beaconManager.removeAllMonitorNotifiers();
+
+        // Add new notifier
+        _beaconManager.addMonitorNotifier(this);
+        try {
+            for (Region region : _activeRegionList) {
+                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "startMonitoringBeaconsInRegion for region %s", region));
+                _beaconManager.startMonitoringBeaconsInRegion(region);
+            }
+        } catch (RemoteException remoteException) {
+            Logger.getInstance().Error(TAG, remoteException.toString());
+        }
+    }
+
+    private void setRangeNotifiers() {
+        Logger.getInstance().Debug(TAG, "setRangeNotifiers");
+
+        // Remove previous notifier
+        try {
+            for (Region region : _previousRegionList) {
+                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "stopRangingBeaconsInRegion for region %s", region));
+                _beaconManager.stopRangingBeaconsInRegion(region);
+            }
+        } catch (RemoteException remoteException) {
+            Logger.getInstance().Error(TAG, remoteException.toString());
+        }
+        _beaconManager.removeAllRangeNotifiers();
+
+        // Add new notifier
+        _beaconManager.addRangeNotifier(this);
+        try {
+            for (Region region : _activeRegionList) {
+                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "startRangingBeaconsInRegion for region %s", region));
+                _beaconManager.startRangingBeaconsInRegion(region);
+            }
+        } catch (RemoteException remoteException) {
+            Logger.getInstance().Error(TAG, remoteException.toString());
         }
     }
 }

@@ -121,7 +121,8 @@ public class MenuEditActivity extends AppCompatActivity {
             int menuId = randomMenuId.nextInt(listedMenuList.getSize());
 
             ListedMenu menu = listedMenuList.getValue(menuId);
-            menuTitleTypeTextView.setText(menu.GetDescription());
+            menuTitleTypeTextView.setText(menu.GetTitle());
+            menuDescriptionTypeTextView.setText(menu.GetDescription());
         });
 
         _saveButton.setEnabled(false);
