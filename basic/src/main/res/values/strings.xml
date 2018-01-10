@@ -19,5 +19,7 @@
     <string name="close">Close</string>
     <string name="example">Example</string>
 
+    <string name="requirement">Requirement</string>
+
     <string name="contentDescription">This is an image</string>
 </resources>

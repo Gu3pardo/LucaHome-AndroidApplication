@@ -2,10 +2,13 @@ package guepardoapps.lucahome.bixby;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
+import guepardoapps.lucahome.bixby.interfaces.IBixbyRequirement;
+
 @SuppressWarnings("WeakerAccess")
-public class BixbyRequirement {
+public class BixbyRequirement implements IBixbyRequirement, Serializable {
     private static final String TAG = BixbyRequirement.class.getSimpleName();
 
     public enum RequirementType {Null, Position, Light, Network, WirelessSocket}
@@ -67,6 +70,28 @@ public class BixbyRequirement {
 
     public WirelessSocketRequirement GetWirelessSocketRequirement() {
         return _wirelessSocketRequirement;
+    }
+
+    @Override
+    public String GetDatabaseString() throws NoSuchMethodException {
+        throw new NoSuchMethodException("This method is not available!");
+    }
+
+    @Override
+    public String GetInformationString() {
+        switch (_requirementType) {
+            case Light:
+                return _lightRequirement.GetInformationString();
+            case Network:
+                return _networkRequirement.GetInformationString();
+            case Position:
+                return String.format(Locale.getDefault(), "Position: %s", _puckJsPosition);
+            case WirelessSocket:
+                return _wirelessSocketRequirement.GetInformationString();
+            case Null:
+            default:
+                return "No information available!";
+        }
     }
 
     @Override

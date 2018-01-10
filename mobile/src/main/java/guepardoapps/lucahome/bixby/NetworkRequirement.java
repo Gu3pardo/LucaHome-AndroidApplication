@@ -2,12 +2,14 @@ package guepardoapps.lucahome.bixby;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.bixby.interfaces.IBixbyRequirement;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class NetworkRequirement {
+public class NetworkRequirement implements IBixbyRequirement, Serializable {
     private static final String TAG = NetworkRequirement.class.getSimpleName();
 
     public enum NetworkType {NULL, MOBILE, WIFI}
@@ -54,10 +56,6 @@ public class NetworkRequirement {
         }
     }
 
-    public String GetDatabaseString() {
-        return String.format(Locale.getDefault(), "%d:%d:%s", _networkType.ordinal(), _stateType.ordinal(), _wifiSsid);
-    }
-
     public NetworkType GetNetworkType() {
         return _networkType;
     }
@@ -68,6 +66,16 @@ public class NetworkRequirement {
 
     public String GetWifiSsid() {
         return _wifiSsid;
+    }
+
+    @Override
+    public String GetDatabaseString() {
+        return String.format(Locale.getDefault(), "%d:%d:%s", _networkType.ordinal(), _stateType.ordinal(), _wifiSsid);
+    }
+
+    @Override
+    public String GetInformationString() {
+        return String.format(Locale.getDefault(), "%s: %s should be %s and %s", TAG, _networkType, _wifiSsid, _stateType);
     }
 
     @Override

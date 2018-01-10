@@ -2,12 +2,13 @@ package guepardoapps.lucahome.bixby;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.classes.SerializableList;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
-public class BixbyPair {
+public class BixbyPair implements Serializable {
     private static final String TAG = BixbyPair.class.getSimpleName();
 
     private int _actionId;

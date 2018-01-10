@@ -2,12 +2,14 @@ package guepardoapps.lucahome.bixby;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.bixby.interfaces.IBixbyAction;
 
 @SuppressWarnings("WeakerAccess")
-public class NetworkAction {
+public class NetworkAction implements IBixbyAction, Serializable {
     private static final String TAG = NetworkAction.class.getSimpleName();
 
     public enum NetworkType {NULL, MOBILE, WIFI}
@@ -45,16 +47,22 @@ public class NetworkAction {
         }
     }
 
-    public String GetDatabaseString() {
-        return String.format(Locale.getDefault(), "%d:%d", _networkType.ordinal(), _stateType.ordinal());
-    }
-
     public NetworkType GetNetworkType() {
         return _networkType;
     }
 
     public StateType GetStateType() {
         return _stateType;
+    }
+
+    @Override
+    public String GetDatabaseString() {
+        return String.format(Locale.getDefault(), "%d:%d", _networkType.ordinal(), _stateType.ordinal());
+    }
+
+    @Override
+    public String GetInformationString() {
+        return String.format(Locale.getDefault(), "%s for %s -> %s", TAG, _networkType, _stateType);
     }
 
     @Override

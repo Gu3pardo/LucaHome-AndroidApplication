@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements BottomNavigation.
         collapsingToolbar.setCollapsedTitleTextColor(ContextCompat.getColor(this, R.color.TextIcon));
 
         BottomNavigation bottomNavigation = findViewById(R.id.mainViewBottomNavigation);
+        bottomNavigation.setSelectedIndex(1, true);
         bottomNavigation.setOnMenuItemClickListener(this);
 
         _listView.setOnScrollListener(new AbsListView.OnScrollListener() {

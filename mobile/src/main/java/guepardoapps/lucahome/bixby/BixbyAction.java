@@ -2,19 +2,23 @@ package guepardoapps.lucahome.bixby;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
+import guepardoapps.lucahome.bixby.interfaces.IBixbyAction;
+
 @SuppressWarnings("WeakerAccess")
-public class BixbyAction {
+public class BixbyAction implements IBixbyAction, Serializable {
     private static final String TAG = BixbyAction.class.getSimpleName();
 
-    public enum ActionType {Null, Network, WirelessSocket}
+    public enum ActionType {Null, Application, Network, WirelessSocket}
 
     private int _id;
     private int _actionId;
 
     private ActionType _actionType;
 
+    private ApplicationAction _applicationAction;
     private NetworkAction _networkAction;
     private WirelessSocketAction _wirelessSocketAction;
 
@@ -22,6 +26,7 @@ public class BixbyAction {
             int id,
             int actionId,
             @NonNull ActionType actionType,
+            @NonNull ApplicationAction applicationAction,
             @NonNull NetworkAction networkAction,
             @NonNull WirelessSocketAction wirelessSocketAction) {
         _id = id;
@@ -29,6 +34,7 @@ public class BixbyAction {
 
         _actionType = actionType;
 
+        _applicationAction = applicationAction;
         _networkAction = networkAction;
         _wirelessSocketAction = wirelessSocketAction;
     }
@@ -45,6 +51,10 @@ public class BixbyAction {
         return _actionType;
     }
 
+    public ApplicationAction GetApplicationAction() {
+        return _applicationAction;
+    }
+
     public NetworkAction GetNetworkAction() {
         return _networkAction;
     }
@@ -54,9 +64,29 @@ public class BixbyAction {
     }
 
     @Override
+    public String GetDatabaseString() throws NoSuchMethodException {
+        throw new NoSuchMethodException("This method is not available!");
+    }
+
+    @Override
+    public String GetInformationString() {
+        switch (_actionType) {
+            case Application:
+                return _applicationAction.GetInformationString();
+            case Network:
+                return _networkAction.GetInformationString();
+            case WirelessSocket:
+                return _wirelessSocketAction.GetInformationString();
+            case Null:
+            default:
+                return "No information available!";
+        }
+    }
+
+    @Override
     public String toString() {
         return String.format(Locale.getDefault(),
-                "{%s:{Id:%d,ActionId:%d,ActionType:%s,NetworkAction:%s,WirelessSocketAction:%s}}",
-                TAG, _id, _actionId, _actionType, _networkAction, _wirelessSocketAction);
+                "{%s:{Id:%d,ActionId:%d,ActionType:%s,ApplicationAction:%s,NetworkAction:%s,WirelessSocketAction:%s}}",
+                TAG, _id, _actionId, _actionType, _applicationAction, _networkAction, _wirelessSocketAction);
     }
 }

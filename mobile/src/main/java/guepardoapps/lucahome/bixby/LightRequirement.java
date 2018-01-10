@@ -2,12 +2,14 @@ package guepardoapps.lucahome.bixby;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.bixby.interfaces.IBixbyRequirement;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class LightRequirement {
+public class LightRequirement implements IBixbyRequirement, Serializable {
     private static final String TAG = LightRequirement.class.getSimpleName();
 
     public enum CompareType {NULL, BELOW, NEAR, ABOVE}
@@ -48,10 +50,6 @@ public class LightRequirement {
         }
     }
 
-    public String GetDatabaseString() {
-        return String.format(Locale.getDefault(), "%d:%.2f:%.2f", _compareType.ordinal(), _compareValue, _toleranceInPercent);
-    }
-
     public CompareType GetCompareType() {
         return _compareType;
     }
@@ -76,6 +74,16 @@ public class LightRequirement {
             default:
                 return true;
         }
+    }
+
+    @Override
+    public String GetDatabaseString() {
+        return String.format(Locale.getDefault(), "%d:%.2f:%.2f", _compareType.ordinal(), _compareValue, _toleranceInPercent);
+    }
+
+    @Override
+    public String GetInformationString() {
+        return String.format(Locale.getDefault(), "%s: %s with %.2f +/- %.1f%%", TAG, _compareType, _compareValue, _toleranceInPercent);
     }
 
     @Override

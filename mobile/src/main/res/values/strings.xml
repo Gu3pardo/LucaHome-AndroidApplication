@@ -299,4 +299,5 @@
     <string name="action_details">Details</string>
     <string name="action_bixby">Bixby</string>
 
+    <string name="bixby_service_description">Enable BixbyService to remap the Bixby button to toggle some actions</string>
 </resources>

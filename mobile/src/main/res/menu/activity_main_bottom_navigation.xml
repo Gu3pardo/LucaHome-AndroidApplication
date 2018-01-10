@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/colorPrimaryDark"
     app:bbn_badgeColor="#FFFF0000"
-    app:bbn_rippleColor="#33ffffff">
+    app:bbn_rippleColor="@color/colorAccent">
     <item
         android:id="@+id/bottomNavigationBixby"
-        android:color="@android:color/holo_purple"
+        android:color="@color/colorPrimary"
         android:icon="@android:drawable/ic_menu_mapmode"
         android:title="@string/action_bixby" />
     <item
@@ -16,7 +16,7 @@
         android:title="@string/action_settings" />
     <item
         android:id="@+id/bottomNavigationDetails"
-        android:color="@android:color/holo_green_dark"
+        android:color="@color/colorPrimary"
         android:icon="@android:drawable/ic_menu_info_details"
         android:title="@string/action_details" />
 </menu>

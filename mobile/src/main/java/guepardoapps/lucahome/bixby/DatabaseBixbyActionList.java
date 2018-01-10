@@ -18,12 +18,13 @@ public class DatabaseBixbyActionList {
     private static final String KEY_ROW_ID = "_id";
     private static final String KEY_ACTION_ID = "_actionId";
     private static final String KEY_ACTION_TYPE = "_actionType";
+    private static final String KEY_APPLICATION_ACTION = "_applicationAction";
     private static final String KEY_NETWORK_ACTION = "_networkAction";
     private static final String KEY_WIRELESSSOCKET_ACTION = "_wirelessSocketAction";
 
     private static final String DATABASE_NAME = "DatabaseBixbyActionListDb";
     private static final String DATABASE_TABLE = "DatabaseBixbyActionListTable";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -41,6 +42,7 @@ public class DatabaseBixbyActionList {
                     + KEY_ROW_ID + " TEXT NOT NULL, "
                     + KEY_ACTION_ID + " TEXT NOT NULL, "
                     + KEY_ACTION_TYPE + " TEXT NOT NULL, "
+                    + KEY_APPLICATION_ACTION + " TEXT NOT NULL, "
                     + KEY_NETWORK_ACTION + " TEXT NOT NULL, "
                     + KEY_WIRELESSSOCKET_ACTION + " TEXT NOT NULL); ");
         }
@@ -72,6 +74,7 @@ public class DatabaseBixbyActionList {
         contentValues.put(KEY_ROW_ID, newEntry.GetId());
         contentValues.put(KEY_ACTION_ID, newEntry.GetActionId());
         contentValues.put(KEY_ACTION_TYPE, String.valueOf(newEntry.GetActionType().ordinal()));
+        contentValues.put(KEY_APPLICATION_ACTION, newEntry.GetApplicationAction().GetDatabaseString());
         contentValues.put(KEY_NETWORK_ACTION, newEntry.GetNetworkAction().GetDatabaseString());
         contentValues.put(KEY_WIRELESSSOCKET_ACTION, newEntry.GetWirelessSocketAction().GetDatabaseString());
 
@@ -84,6 +87,7 @@ public class DatabaseBixbyActionList {
         contentValues.put(KEY_ROW_ID, updateEntry.GetId());
         contentValues.put(KEY_ACTION_ID, updateEntry.GetActionId());
         contentValues.put(KEY_ACTION_TYPE, String.valueOf(updateEntry.GetActionType().ordinal()));
+        contentValues.put(KEY_APPLICATION_ACTION, updateEntry.GetApplicationAction().GetDatabaseString());
         contentValues.put(KEY_NETWORK_ACTION, updateEntry.GetNetworkAction().GetDatabaseString());
         contentValues.put(KEY_WIRELESSSOCKET_ACTION, updateEntry.GetWirelessSocketAction().GetDatabaseString());
 
@@ -97,6 +101,7 @@ public class DatabaseBixbyActionList {
                 KEY_ROW_ID,
                 KEY_ACTION_ID,
                 KEY_ACTION_TYPE,
+                KEY_APPLICATION_ACTION,
                 KEY_NETWORK_ACTION,
                 KEY_WIRELESSSOCKET_ACTION};
 
@@ -106,6 +111,7 @@ public class DatabaseBixbyActionList {
         int idIndex = cursor.getColumnIndex(KEY_ROW_ID);
         int actionIdIndex = cursor.getColumnIndex(KEY_ACTION_ID);
         int actionTypeIndex = cursor.getColumnIndex(KEY_ACTION_TYPE);
+        int applicationActionIndex = cursor.getColumnIndex(KEY_APPLICATION_ACTION);
         int networkActionIndex = cursor.getColumnIndex(KEY_NETWORK_ACTION);
         int wirelessSocketActionIndex = cursor.getColumnIndex(KEY_WIRELESSSOCKET_ACTION);
 
@@ -113,6 +119,7 @@ public class DatabaseBixbyActionList {
             String idString = cursor.getString(idIndex);
             String actionIdString = cursor.getString(actionIdIndex);
             String actionTypeString = cursor.getString(actionTypeIndex);
+            String applicationActionString = cursor.getString(applicationActionIndex);
             String networkActionString = cursor.getString(networkActionIndex);
             String wirelessSocketActionString = cursor.getString(wirelessSocketActionIndex);
 
@@ -121,6 +128,7 @@ public class DatabaseBixbyActionList {
 
             BixbyAction.ActionType actionType = BixbyAction.ActionType.Null;
 
+            ApplicationAction applicationAction = new ApplicationAction(applicationActionString);
             NetworkAction networkAction = new NetworkAction();
             WirelessSocketAction wirelessSocketAction = new WirelessSocketAction();
 
@@ -136,7 +144,7 @@ public class DatabaseBixbyActionList {
                 Logger.getInstance().Error(TAG, ex.getMessage());
             }
 
-            BixbyAction entry = new BixbyAction(id, actionId, actionType, networkAction, wirelessSocketAction);
+            BixbyAction entry = new BixbyAction(id, actionId, actionType, applicationAction, networkAction, wirelessSocketAction);
             result.addValue(entry);
         }
 

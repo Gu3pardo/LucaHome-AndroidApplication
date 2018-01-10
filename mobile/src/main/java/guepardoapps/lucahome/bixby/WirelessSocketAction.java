@@ -2,12 +2,14 @@ package guepardoapps.lucahome.bixby;
 
 import android.support.annotation.NonNull;
 
+import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.bixby.interfaces.IBixbyAction;
 
 @SuppressWarnings("WeakerAccess")
-public class WirelessSocketAction {
+public class WirelessSocketAction implements IBixbyAction, Serializable {
     private static final String TAG = WirelessSocketAction.class.getSimpleName();
 
     public enum StateType {OFF, ON, NULL}
@@ -43,16 +45,22 @@ public class WirelessSocketAction {
         }
     }
 
-    public String GetDatabaseString() {
-        return String.format(Locale.getDefault(), "%d:%s", _stateType.ordinal(), _wirelessSocketName);
-    }
-
     public StateType GetStateType() {
         return _stateType;
     }
 
     public String GetWirelessSocketName() {
         return _wirelessSocketName;
+    }
+
+    @Override
+    public String GetDatabaseString() {
+        return String.format(Locale.getDefault(), "%d:%s", _stateType.ordinal(), _wirelessSocketName);
+    }
+
+    @Override
+    public String GetInformationString() {
+        return String.format(Locale.getDefault(), "%s for %s -> %s", TAG, _wirelessSocketName, _stateType);
     }
 
     @Override
