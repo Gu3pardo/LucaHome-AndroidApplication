@@ -38,7 +38,7 @@ public class CommandController {
                 return;
             }
 
-            Toasty.info(_context, String.format(Locale.GERMAN, "Performing command in %d seconds!", timeToCmdPerform), 950).show();
+            Toasty.info(_context, String.format(Locale.GERMAN, "Performing command in %d seconds!", timeToCmdPerform), 750).show();
             _performCmdHandler.postDelayed(_performCmdCountdownRunnable, RUNNABLE_TIMEOUT);
         }
     };

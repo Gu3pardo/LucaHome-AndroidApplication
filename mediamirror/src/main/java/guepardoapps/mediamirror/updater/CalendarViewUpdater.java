@@ -7,12 +7,14 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.text.format.DateUtils;
 
-import guepardoapps.lucahome.basic.classes.SerializableList;
+import java.util.ArrayList;
+
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.CalendarController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.dto.CalendarEntryDto;
 import guepardoapps.lucahome.basic.utils.Logger;
+
 import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
 
@@ -30,7 +32,7 @@ public class CalendarViewUpdater {
 
     private Runnable _updateRunnable = new Runnable() {
         public void run() {
-            SerializableList<CalendarEntryDto> calendarList = _calendarController.ReadCalendar(DateUtils.YEAR_IN_MILLIS * 10000);
+            ArrayList<CalendarEntryDto> calendarList = _calendarController.ReadCalendar(DateUtils.YEAR_IN_MILLIS * 10000);
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CALENDAR_MODEL,
                     Bundles.CALENDAR_MODEL,
@@ -42,7 +44,7 @@ public class CalendarViewUpdater {
     private BroadcastReceiver _performUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            SerializableList<CalendarEntryDto> calendarList = _calendarController.ReadCalendar(DateUtils.YEAR_IN_MILLIS * 10000);
+            ArrayList<CalendarEntryDto> calendarList = _calendarController.ReadCalendar(DateUtils.YEAR_IN_MILLIS * 10000);
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CALENDAR_MODEL,
                     Bundles.CALENDAR_MODEL,

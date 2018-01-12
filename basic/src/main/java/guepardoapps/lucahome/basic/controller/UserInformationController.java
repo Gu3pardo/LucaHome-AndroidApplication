@@ -1,5 +1,6 @@
 package guepardoapps.lucahome.basic.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -29,6 +30,14 @@ public class UserInformationController {
             Logger.getInstance().Debug(TAG, entry.toString());
         }
         return apkList;
+    }
+
+    public ArrayList<String> GetApkPackageNameArrayList() {
+        ArrayList<String> apkPackageNameList = new ArrayList<>();
+        for (ApplicationInfo applicationInfo : GetApkList()) {
+            apkPackageNameList.add(applicationInfo.packageName);
+        }
+        return apkPackageNameList;
     }
 
     public String GetWifiSSID() {

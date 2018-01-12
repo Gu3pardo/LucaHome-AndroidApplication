@@ -6,10 +6,10 @@ import java.io.Serializable;
 
 public enum MediaServerSelection implements Serializable {
 
-    NULL(-1, "", "", "", false),
-    MEDIA_SERVER_KITCHEN(0, "192.168.178.22", "MediaServer_Kitchen", "Kitchen", false),
-    MEDIA_SERVER_SLEEPING(1, "192.168.178.24", "MediaServer_Sleeping", "Sleeping Room", true),
-    MEDIA_SERVER_LIVING(1, "192.168.178.20", "MediaServer_Living", "Living Room", false);
+    NULL(0, "", "", "", false),
+    MEDIA_SERVER_KITCHEN(1, "192.168.178.22", "MediaServer_Kitchen", "Kitchen", false),
+    MEDIA_SERVER_SLEEPING(2, "192.168.178.24", "MediaServer_Sleeping", "Sleeping Room", true),
+    MEDIA_SERVER_LIVING(3, "192.168.178.20", "MediaServer_Living", "Living Room", false);
 
     private int _id;
     private String _ip;

@@ -15,7 +15,7 @@ public class BixbyService extends AccessibilityService {
     private static final String TAG = BixbyService.class.getSimpleName();
 
     private static final String BIXBY_PACKAGE = "com.samsung.android.app.spage";
-    public static final String SERVICE_ID = String.format("guepardoapps.lucahome.bixby/.%s", TAG);
+    public static final String SERVICE_ID = String.format("guepardoapps.bixby.services/.%s", TAG);
 
     private long _lastRunMillis = 0;
     private long _maxRunFrequencyMs = 500;

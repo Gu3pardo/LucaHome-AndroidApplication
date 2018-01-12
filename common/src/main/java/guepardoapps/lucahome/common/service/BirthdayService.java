@@ -344,6 +344,17 @@ public class BirthdayService implements IDataNotificationService {
         return _birthdayList;
     }
 
+    public SerializableList<LucaBirthday> GetRemindMeList() {
+        SerializableList<LucaBirthday> remindMeList = new SerializableList<>();
+        for (int index = 0; index < _birthdayList.getSize(); index++) {
+            LucaBirthday birthday = _birthdayList.getValue(index);
+            if (birthday.GetRemindMe()) {
+                remindMeList.addValue(birthday);
+            }
+        }
+        return remindMeList;
+    }
+
     public ArrayList<String> GetBirthdayNameList() {
         ArrayList<String> birthdayNameList = new ArrayList<>();
         for (int index = 0; index < _birthdayList.getSize(); index++) {

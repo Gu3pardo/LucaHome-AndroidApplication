@@ -31,7 +31,6 @@ public class SwitchListViewAdapter extends BaseAdapter {
     }
 
     private SerializableList<WirelessSwitch> _listViewItems;
-
     private Dialog _dialog;
     private static LayoutInflater _inflater = null;
 

@@ -10,12 +10,12 @@ public class Broadcasts {
     // CENTER VIEW
     public static final String SHOW_CENTER_MODEL = "guepardoapps.media_server.show.center_model";
     public static final String PLAY_VIDEO = "guepardoapps.media_server.video.play";
-    public static final String PLAY_BIRTHDAY_SONG = "guepardoapps.media_server.video.play.birthday_song";
     public static final String PAUSE_VIDEO = "guepardoapps.media_server.video.pause";
     public static final String STOP_VIDEO = "guepardoapps.media_server.video.stop";
     public static final String SET_VIDEO_POSITION = "guepardoapps.media_server.video_view.set.position";
     public static final String PLAY_RADIO_STREAM = "guepardoapps.media_server.radio_stream.play";
     public static final String STOP_RADIO_STREAM = "guepardoapps.media_server.radio_stream.stop";
+    public static final String PLAY_BIRTHDAY_SONG = "guepardoapps.media_server.video.play.birthday_song";
     // CURRENT WEATHER VIEW
     public static final String SHOW_CURRENT_WEATHER_MODEL = "guepardoapps.media_server.show.current_weather_model";
     public static final String PERFORM_CURRENT_WEATHER_UPDATE = "guepardoapps.media_server.broadcast.perform.update.current_weather";
@@ -55,8 +55,6 @@ public class Broadcasts {
     public static final String WIRELESS_SWITCH_LIST = "guepardoapps.media_server.broadcast.wireless_switch_list";
     // VOLUME VIEW
     public static final String SHOW_VOLUME_MODEL = "guepardoapps.media_server.show.volume_model";
-    // YOUTUBE VIEW
-    public static final String YOUTUBE_ID = "guepardoapps.media_server.youtube_id";
     // MAIN SERVICE
     public static final String RELOAD_ALL = "guepardoapps.media_server.reload_all";
 }

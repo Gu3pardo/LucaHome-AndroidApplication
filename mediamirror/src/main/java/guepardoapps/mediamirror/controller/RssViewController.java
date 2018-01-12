@@ -29,6 +29,8 @@ import guepardoapps.mediamirror.rss.RssService;
 public class RssViewController implements IViewController {
     private static final String TAG = RssViewController.class.getSimpleName();
 
+    private static final RssViewController SINGLETON = new RssViewController();
+
     private Context _context;
     private ReceiverController _receiverController;
 
@@ -45,6 +47,7 @@ public class RssViewController implements IViewController {
     private boolean _isInitialized;
     private boolean _screenEnabled;
 
+    private RSSFeed _currentRssFeed = RSSFeed.DEFAULT;
     private int _index;
     private List<RssItem> _items;
 
@@ -146,9 +149,20 @@ public class RssViewController implements IViewController {
         }
     };
 
-    public RssViewController(@NonNull Context context) {
+    private RssViewController() {
+    }
+
+    public static RssViewController getInstance() {
+        return SINGLETON;
+    }
+
+    public void Initialize(@NonNull Context context) {
         _context = context;
         _receiverController = new ReceiverController(_context);
+    }
+
+    public RSSFeed GetCurrentRssFeed() {
+        return _currentRssFeed;
     }
 
     @Override
@@ -194,6 +208,7 @@ public class RssViewController implements IViewController {
         intent.putExtra(RssService.RECEIVER, _resultReceiver);
         intent.putExtra(RssService.FEED, rssFeed);
         _context.startService(intent);
+        _currentRssFeed = rssFeed;
     }
 
     private void setVisibility(int visibility) {

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -18,6 +19,7 @@ import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.NetworkController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
+import guepardoapps.lucahome.basic.controller.UserInformationController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
 import guepardoapps.lucahome.common.classes.Position;
@@ -64,6 +66,7 @@ public class BixbyPairService implements IDataService {
     private BroadcastController _broadcastController;
     private NetworkController _networkController;
     private ReceiverController _receiverController;
+    private UserInformationController _userInformationController;
 
     private DatabaseBixbyActionList _databaseBixbyActionList;
     private DatabaseBixbyRequirementList _databaseBixbyRequirementList;
@@ -109,6 +112,7 @@ public class BixbyPairService implements IDataService {
         _broadcastController = new BroadcastController(_context);
         _networkController = new NetworkController(_context);
         _receiverController = new ReceiverController(_context);
+        _userInformationController = new UserInformationController(_context);
 
         _receiverController.RegisterReceiver(_positioningUpdateReceiver, new String[]{PositioningService.PositioningCalculationFinishedBroadcast});
 
@@ -189,6 +193,10 @@ public class BixbyPairService implements IDataService {
             }
         }
         return highestRequirementId;
+    }
+
+    public ArrayList<String> GetPackageNameList() {
+        return _userInformationController.GetApkPackageNameArrayList();
     }
 
     @Override

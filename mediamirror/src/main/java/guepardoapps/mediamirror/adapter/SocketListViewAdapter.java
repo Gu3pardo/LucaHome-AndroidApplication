@@ -31,7 +31,6 @@ public class SocketListViewAdapter extends BaseAdapter {
     }
 
     private SerializableList<WirelessSocket> _listViewItems;
-
     private Dialog _dialog;
     private static LayoutInflater _inflater = null;
 

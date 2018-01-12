@@ -1,9 +1,13 @@
 package guepardoapps.lucahome.common.enums;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 
 @SuppressWarnings({"unused"})
 public enum YoutubeId implements Serializable {
+
+    NULL(-1, "Null", ""),
 
     DEFAULT(0, "The Good Life Live Stream", "ftJYyevC6Us"),
 
@@ -75,6 +79,10 @@ public enum YoutubeId implements Serializable {
 
     public String GetYoutubeId() {
         return _youtubeId;
+    }
+
+    public void SetYoutubeId(@NonNull String youtubeId) {
+        _youtubeId = youtubeId;
     }
 
     public static YoutubeId GetById(int id) {

@@ -4,17 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="guepardoapps.lucahome.views.MediaMirrorActivity">
+    tools:context="guepardoapps.lucahome.views.MediaServerActivity">
 
     <android.support.design.widget.AppBarLayout
-        android:id="@+id/appbar_media_mirror"
+        android:id="@+id/appbar_media_server"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.design.widget.CollapsingToolbarLayout
-            android:id="@+id/collapsing_toolbar_media_mirror"
+            android:id="@+id/collapsing_toolbar_media_server"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
@@ -22,7 +22,7 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar_media_mirror"
+                android:id="@+id/toolbar_media_server"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:fitsSystemWindows="true"
@@ -46,7 +46,7 @@
             android:layout_height="wrap_content">
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/media_mirror_selection_card_view"
+                android:id="@+id/media_server_selection_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -58,29 +58,29 @@
                     android:layout_height="wrap_content">
 
                     <Spinner
-                        android:id="@+id/media_mirror_selection_spinner"
+                        android:id="@+id/media_server_selection_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="45dp"
                         android:layout_gravity="center"
                         android:layout_margin="3dp" />
 
                     <TextView
-                        android:id="@+id/media_mirror_battery_text_view"
+                        android:id="@+id/media_server_battery_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
-                        android:layout_below="@+id/media_mirror_selection_spinner"
+                        android:layout_below="@+id/media_server_selection_spinner"
                         android:layout_margin="5dp"
                         android:text="@string/battery_example"
                         android:textAppearance="?android:attr/textAppearanceMedium"
                         android:textColor="@color/PrimaryText" />
 
                     <TextView
-                        android:id="@+id/media_mirror_version_text_view"
+                        android:id="@+id/media_server_version_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:layout_below="@+id/media_mirror_selection_spinner"
+                        android:layout_below="@+id/media_server_selection_spinner"
                         android:layout_margin="5dp"
                         android:text="@string/media_mirror_version_example"
                         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -90,10 +90,10 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/media_mirror_youtube_card_view"
+                android:id="@+id/media_server_youtube_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/media_mirror_selection_card_view"
+                android:layout_below="@+id/media_server_selection_card_view"
                 android:layout_gravity="center"
                 android:layout_marginTop="15dp"
                 android:background="@color/cardview_light_background"
@@ -218,10 +218,10 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/media_mirror_radio_stream_card_view"
+                android:id="@+id/media_server_radio_stream_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/media_mirror_youtube_card_view"
+                android:layout_below="@+id/media_server_youtube_card_view"
                 android:layout_gravity="center"
                 android:layout_marginTop="15dp"
                 android:background="@color/cardview_light_background"
@@ -229,14 +229,23 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="70dp"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/radio_stream_title_textView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:text="Radio stream" />
 
                     <Spinner
                         android:id="@+id/radio_stream_selection_spinner"
                         android:layout_width="wrap_content"
                         android:layout_height="45dp"
                         android:layout_alignParentStart="true"
+                        android:layout_below="@+id/radio_stream_title_textView"
                         android:layout_centerVertical="true"
                         android:layout_margin="5dp"
                         android:layout_toStartOf="@+id/radio_stream_play_button" />
@@ -245,6 +254,7 @@
                         android:id="@+id/radio_stream_play_button"
                         android:layout_width="35dp"
                         android:layout_height="35dp"
+                        android:layout_below="@+id/radio_stream_title_textView"
                         android:layout_marginEnd="5dp"
                         android:layout_toStartOf="@+id/radio_stream_stop_button"
                         android:contentDescription="@string/contentDescription"
@@ -259,6 +269,70 @@
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:layout_alignParentEnd="true"
+                        android:layout_below="@+id/radio_stream_title_textView"
+                        android:layout_marginEnd="5dp"
+                        android:contentDescription="@string/contentDescription"
+                        app:fab_iconSrc="@android:drawable/editbox_dropdown_light_frame"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+                </RelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/media_server_media_notification_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/media_server_radio_stream_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/media_notification_title_textView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:text="Notification data" />
+
+                    <TextView
+                        android:id="@+id/media_notification_information_textView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="45dp"
+                        android:layout_alignParentStart="true"
+                        android:layout_below="@+id/media_notification_title_textView"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="5dp"
+                        android:layout_toStartOf="@+id/media_notification_play_button" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/media_notification_play_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_below="@+id/media_notification_title_textView"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toStartOf="@+id/media_notification_stop_button"
+                        android:contentDescription="@string/contentDescription"
+                        app:fab_iconSrc="@android:drawable/ic_media_play"
+                        app:rd_delayClick="none"
+                        app:rd_enable="true"
+                        app:rd_rippleColor="@color/colorPrimary"
+                        app:rd_rippleType="touch" />
+
+                    <com.rey.material.widget.FloatingActionButton
+                        android:id="@+id/media_notification_stop_button"
+                        android:layout_width="35dp"
+                        android:layout_height="35dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_below="@+id/media_notification_title_textView"
                         android:layout_marginEnd="5dp"
                         android:contentDescription="@string/contentDescription"
                         app:fab_iconSrc="@android:drawable/editbox_dropdown_light_frame"
@@ -273,18 +347,33 @@
                 android:id="@+id/rss_selection_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/media_mirror_radio_stream_card_view"
+                android:layout_below="@+id/media_server_media_notification_card_view"
                 android:layout_gravity="center"
                 android:layout_marginTop="15dp"
                 android:background="@color/cardview_light_background"
                 card_view:cardCornerRadius="4dp">
 
-                <Spinner
-                    android:id="@+id/rss_selection_spinner"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
-                    android:layout_gravity="center"
-                    android:layout_margin="3dp" />
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/rss_title_textView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:text="RSS feed" />
+
+                    <Spinner
+                        android:id="@+id/rss_selection_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:layout_below="@+id/rss_title_textView"
+                        android:layout_gravity="center"
+                        android:layout_margin="5dp" />
+                </RelativeLayout>
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
@@ -299,14 +388,23 @@
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="70dp"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/text_title_textView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:gravity="center"
+                        android:text="Edit displayed text" />
 
                     <EditText
                         android:id="@+id/text_edit_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentStart="true"
+                        android:layout_below="@+id/text_title_textView"
                         android:layout_centerVertical="true"
                         android:layout_gravity="center"
                         android:layout_margin="5dp"
@@ -319,6 +417,7 @@
                         android:layout_width="35dp"
                         android:layout_height="35dp"
                         android:layout_alignParentEnd="true"
+                        android:layout_below="@+id/text_title_textView"
                         android:layout_marginEnd="5dp"
                         app:fab_iconSrc="@android:drawable/ic_menu_send"
                         app:rd_delayClick="none"
@@ -329,7 +428,7 @@
             </android.support.v7.widget.CardView>
 
             <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/media_mirror_volume_card_view"
+                android:id="@+id/media_server_volume_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/set_text_card_view"
@@ -386,7 +485,7 @@
                 android:id="@+id/screen_brightness_card_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/media_mirror_volume_card_view"
+                android:layout_below="@+id/media_server_volume_card_view"
                 android:layout_gravity="center"
                 android:layout_marginTop="15dp"
                 android:background="@color/cardview_light_background"
@@ -534,6 +633,52 @@
                         android:textColor="@color/PrimaryText"
                         app:layout_heightPercent="45%"
                         app:layout_widthPercent="30%" />
+                </android.support.percent.PercentRelativeLayout>
+            </android.support.v7.widget.CardView>
+
+            <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/system_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/update_card_view"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:background="@color/cardview_light_background"
+                card_view:cardCornerRadius="4dp">
+
+                <android.support.percent.PercentRelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:padding="5dp">
+
+                    <com.rey.material.widget.Button
+                        android:id="@+id/system_reboot_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:padding="5dp"
+                        android:text="@string/reboot"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="50%" />
+
+                    <com.rey.material.widget.Button
+                        android:id="@+id/system_shutdown_button"
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="5dp"
+                        android:layout_toEndOf="@+id/system_reboot_button"
+                        android:padding="5dp"
+                        android:text="@string/shutdown"
+                        android:textAppearance="?android:attr/textAppearanceSmall"
+                        android:textColor="@color/PrimaryText"
+                        app:layout_heightPercent="100%"
+                        app:layout_widthPercent="50%" />
                 </android.support.percent.PercentRelativeLayout>
             </android.support.v7.widget.CardView>
 

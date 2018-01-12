@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
+import guepardoapps.lucahome.common.classes.mediaserver.PlayedYoutubeVideoData;
 import guepardoapps.lucahome.common.constants.Keys;
 import guepardoapps.lucahome.common.enums.RadioStreams;
 import guepardoapps.lucahome.common.enums.YoutubeId;
@@ -35,7 +37,6 @@ import guepardoapps.mediamirror.R;
 import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
 import guepardoapps.mediamirror.common.models.CenterModel;
-import guepardoapps.mediamirror.common.models.YoutubeDatabaseModel;
 import guepardoapps.mediamirror.interfaces.IViewController;
 
 public class CenterViewController implements IViewController, YouTubePlayer.OnInitializedListener {
@@ -63,22 +64,12 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
     private boolean _youTubePlayerIsInitialized;
     private YouTubePlayer _youtubePlayer;
     private boolean _loadingVideo;
-    private String _youtubeId = YoutubeId.DEFAULT.GetYoutubeId();
+    private YoutubeId _youtubeId = YoutubeId.DEFAULT;
 
     private RadioStreams _radioStream = RadioStreams.BAYERN_3;
     private MediaPlayer _radioPlayer;
 
     private boolean _loadingUrl;
-
-    private BroadcastReceiver _pauseVideoReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (!_screenEnabled) {
-                return;
-            }
-            pauseVideo();
-        }
-    };
 
     private BroadcastReceiver _playBirthdaySongReceiver = new BroadcastReceiver() {
         @Override
@@ -86,7 +77,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
             if (!_screenEnabled) {
                 return;
             }
-            startVideo(YoutubeId.BIRTHDAY_SONG.toString());
+            startVideo(YoutubeId.BIRTHDAY_SONG);
         }
     };
 
@@ -97,65 +88,17 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                 return;
             }
 
-            String radioStreamId = intent.getStringExtra(Bundles.RADIO_STREAM_ID);
-            if (radioStreamId != null) {
-                if (radioStreamId.length() > 0) {
-                    try {
-                        int id = Integer.parseInt(radioStreamId);
-                        _radioStream = RadioStreams.GetById(id);
-                    } catch (Exception exception) {
-                        Logger.getInstance().Error(TAG, exception.getMessage());
-                        _radioStream = RadioStreams.BAYERN_3;
-                    }
-                }
+            RadioStreams radioStream = (RadioStreams) intent.getSerializableExtra(Bundles.RADIO_STREAM);
+            if (radioStream != null) {
+                _radioStream = radioStream;
+                stopVideo();
+                stopWebViewLoading();
+                startRadioPlaying();
+            } else {
+                Logger.getInstance().Warning(TAG, "RadioStream is null!");
+                Toasty.error(_context, "RadioStream is null!", Toast.LENGTH_LONG).show();
             }
 
-            stopVideo();
-            stopWebViewLoading();
-
-            startRadioPlaying();
-        }
-    };
-
-    private BroadcastReceiver _playVideoReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (!_screenEnabled) {
-                return;
-            }
-
-            String youtubeId = intent.getStringExtra(Bundles.YOUTUBE_ID);
-            if (youtubeId != null) {
-                if (youtubeId.length() > 0) {
-                    _youtubeId = youtubeId;
-                }
-            }
-
-            stopRadioPlaying();
-            stopWebViewLoading();
-
-            startVideo(_youtubeId);
-        }
-    };
-
-    private BroadcastReceiver _screenDisableReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _screenEnabled = false;
-            pauseVideo();
-            _youtubePlayer.release();
-            _youTubePlayerIsInitialized = false;
-            stopRadioPlaying();
-        }
-    };
-
-    private BroadcastReceiver _screenEnableReceiver = new BroadcastReceiver() {
-        @SuppressLint("SetJavaScriptEnabled")
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            _screenEnabled = true;
-            initializeWebView();
-            activateYoutube();
         }
     };
 
@@ -169,6 +112,44 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         }
     };
 
+    private BroadcastReceiver _videoPositionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!_screenEnabled) {
+                return;
+            }
+            int positionPercent = intent.getIntExtra(Bundles.VIDEO_POSITION_PERCENT, -1);
+            if (positionPercent != -1) {
+                if (_youtubePlayer.isPlaying()) {
+                    int duration = _youtubePlayer.getDurationMillis();
+                    _youtubePlayer.seekToMillis((duration * positionPercent) / 100);
+                }
+            }
+        }
+    };
+
+    private BroadcastReceiver _playVideoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!_screenEnabled) {
+                return;
+            }
+            stopRadioPlaying();
+            stopWebViewLoading();
+            startVideo(_youtubeId);
+        }
+    };
+
+    private BroadcastReceiver _pauseVideoReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!_screenEnabled) {
+                return;
+            }
+            pauseVideo();
+        }
+    };
+
     private BroadcastReceiver _stopVideoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -176,6 +157,28 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                 return;
             }
             stopVideo();
+        }
+    };
+
+    private BroadcastReceiver _screenEnableReceiver = new BroadcastReceiver() {
+        @SuppressLint("SetJavaScriptEnabled")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _screenEnabled = true;
+            initializeWebView();
+            activateYoutube();
+        }
+    };
+
+    private BroadcastReceiver _screenDisableReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            _screenEnabled = false;
+            stopVideo();
+            _youtubePlayer.release();
+            _youTubePlayerIsInitialized = false;
+            stopRadioPlaying();
+            stopWebViewLoading();
         }
     };
 
@@ -269,35 +272,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         }
     };
 
-    private BroadcastReceiver _videoPositionReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (!_screenEnabled) {
-                return;
-            }
-            int positionPercent = intent.getIntExtra(Bundles.VIDEO_POSITION_PERCENT, -1);
-            if (positionPercent != -1) {
-                if (_youtubePlayer.isPlaying()) {
-                    int duration = _youtubePlayer.getDurationMillis();
-                    _youtubePlayer.seekToMillis((duration * positionPercent) / 100);
-                }
-            }
-        }
-    };
-
-    private BroadcastReceiver _youtubeIdReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String youtubeId = intent.getStringExtra(Bundles.YOUTUBE_ID);
-            if (youtubeId != null) {
-                _youtubeId = youtubeId;
-                startVideo(_youtubeId);
-            }
-        }
-    };
-
     private YouTubePlayer.PlaybackEventListener _playbackEventListener = new YouTubePlayer.PlaybackEventListener() {
-
         @Override
         public void onBuffering(boolean buffering) {
         }
@@ -317,7 +292,6 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         @Override
         public void onStopped() {
         }
-
     };
 
     private YouTubePlayer.PlayerStateChangeListener _playerStateChangeListener = new YouTubePlayer.PlayerStateChangeListener() {
@@ -332,9 +306,9 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
             Logger.getInstance().Error(TAG, errorReason.toString());
 
             if (errorReason == YouTubePlayer.ErrorReason.USER_DECLINED_RESTRICTED_CONTENT) {
-                if (YoutubeId.GetByYoutubeId(_youtubeId) == YoutubeId.THE_GOOD_LIFE_STREAM) {
+                if (_youtubeId == YoutubeId.THE_GOOD_LIFE_STREAM) {
                     String url = "https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=The+Good+Life+24+7&key=" + Keys.YOUTUBE_API_KEY;
-                    DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(_context, null, "", false, false);
+                    DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(_context, null, false, false);
                     task.execute(url);
                 }
             }
@@ -423,7 +397,6 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
             _receiverController.RegisterReceiver(_stopVideoReceiver, new String[]{Broadcasts.STOP_VIDEO});
             _receiverController.RegisterReceiver(_updateViewReceiver, new String[]{Broadcasts.SHOW_CENTER_MODEL});
             _receiverController.RegisterReceiver(_videoPositionReceiver, new String[]{Broadcasts.SET_VIDEO_POSITION});
-            _receiverController.RegisterReceiver(_youtubeIdReceiver, new String[]{Broadcasts.YOUTUBE_ID});
             _isInitialized = true;
         } else {
             Logger.getInstance().Warning(TAG, "Is ALREADY initialized!");
@@ -471,20 +444,12 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         }
     }
 
-    public boolean IsRadioStreamPlaying() {
-        return _radioPlayer.isPlaying();
-    }
-
-    public int GetRadioStreamId() {
-        return _radioStream.GetId();
+    public YoutubeId GetYoutubeId() {
+        return _youtubeId;
     }
 
     public boolean IsYoutubePlaying() {
         return _youtubePlayer.isPlaying();
-    }
-
-    public ArrayList<YoutubeDatabaseModel> GetYoutubeIds() {
-        return _databaseController.GetYoutubeIds();
     }
 
     public int GetCurrentPlayPosition() {
@@ -503,7 +468,23 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         return _youtubePlayer.getDurationMillis() / 1000;
     }
 
-    private void startVideo(@NonNull String youtubeId) {
+    public ArrayList<PlayedYoutubeVideoData> GetYoutubeIds() {
+        return _databaseController.GetYoutubeIds();
+    }
+
+    public RadioStreams GetRadioStream() {
+        return _radioStream;
+    }
+
+    public boolean IsRadioStreamPlaying() {
+        return _radioPlayer.isPlaying();
+    }
+
+    public String GetCenterText() {
+        return _centerTextView.getText().toString();
+    }
+
+    private void startVideo(@NonNull YoutubeId youtubeId) {
         if (!_screenEnabled) {
             return;
         }
@@ -525,8 +506,8 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         }
 
         if (_youtubePlayer != null) {
-            _databaseController.SaveYoutubeId(new YoutubeDatabaseModel(_databaseController.GetHighestId() + 1, youtubeId, 0));
-            _youtubePlayer.cueVideo(youtubeId);
+            _databaseController.SaveYoutubeId(new PlayedYoutubeVideoData(_databaseController.GetHighestId() + 1, youtubeId.GetYoutubeId(), 0));
+            _youtubePlayer.cueVideo(youtubeId.GetYoutubeId());
         }
 
         _youTubePlayerView.setVisibility(View.VISIBLE);

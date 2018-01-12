@@ -6,12 +6,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +21,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -38,14 +39,21 @@ import java.util.List;
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
+
 import es.dmoral.toasty.Toasty;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
-import guepardoapps.lucahome.common.classes.MediaServerData;
-import guepardoapps.lucahome.common.classes.PlayedYoutubeVideo;
-import guepardoapps.lucahome.common.classes.YoutubeVideo;
+import guepardoapps.lucahome.common.classes.mediaserver.MediaNotificationData;
+import guepardoapps.lucahome.common.classes.mediaserver.MediaServerData;
+import guepardoapps.lucahome.common.classes.mediaserver.MediaServerInformationData;
+import guepardoapps.lucahome.common.classes.mediaserver.PlayedYoutubeVideoData;
+import guepardoapps.lucahome.common.classes.mediaserver.RadioStreamData;
+import guepardoapps.lucahome.common.classes.mediaserver.SleepTimerData;
+import guepardoapps.lucahome.common.classes.mediaserver.YoutubeData;
+import guepardoapps.lucahome.common.classes.mediaserver.YoutubeVideoData;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.constants.Keys;
 import guepardoapps.lucahome.common.enums.MediaServerAction;
@@ -61,13 +69,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     private static final String TAG = MediaServerActivity.class.getSimpleName();
 
     private Context _context;
-
     private ReceiverController _receiverController;
-
-    /**
-     * Variable for received MediaServerData
-     */
-    private MediaServerData _mediaServerData;
 
     /**
      * Enables for selection spinner or seekBars
@@ -76,6 +78,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     private boolean _mediaServerSelectionSpinnerEnabled = true;
     private boolean _youtubePlayPositionSeekBarEnabled = true;
     private boolean _radioStreamSelectionSpinnerEnabled = true;
+    private boolean _rssFeedSelectionSpinnerEnabled = true;
 
     private DrawerLayout _drawerLayout;
 
@@ -110,6 +113,14 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     private Spinner _radioStreamSelectionSpinner;
     private FloatingActionButton _radioStreamPlayButton;
     private FloatingActionButton _radioStreamStopButton;
+
+    /**
+     * UI variables for CardView MediaNotification information textView, play and stop
+     */
+    private CardView _mediaNotificationCardView;
+    private TextView _mediaNotificationInformationTextView;
+    private FloatingActionButton _mediaNotificationPlayButton;
+    private FloatingActionButton _mediaNotificationStopButton;
 
     /**
      * UI variables for CardView Volume display, increase and decrease
@@ -147,32 +158,40 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     private Button _updateCalendarButton;
 
     /**
-     * BroadcastReceiver for receiving update of MediaServerData
+     * UI variables for CardView system reboot and shutdown
      */
-    private BroadcastReceiver _mediaServerDownloadReceiver = new BroadcastReceiver() {
+    private Button _systemRebootButton;
+    private Button _systemShutdownButton;
+
+    /**
+     * BroadcastReceiver for receiving response of command
+     */
+    private BroadcastReceiver _commandResponseReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            MediaServerService.MediaServerDownloadFinishedContent result = (MediaServerService.MediaServerDownloadFinishedContent) intent.getSerializableExtra(MediaServerService.MediaServerDownloadFinishedBundle);
+            Logger.getInstance().Debug(TAG, "_commandResponseReceiver onReceive");
+            MediaServerService.MediaServerDownloadFinishedContent result = (MediaServerService.MediaServerDownloadFinishedContent) intent.getSerializableExtra(MediaServerService.MediaServerCommandResponseBundle);
             if (result != null) {
                 if (result.Success) {
-                    if (result.MediaServer != null) {
-                        _mediaServerData = result.MediaServer;
-
-                        displayCommonMediaServerUi(_mediaServerData);
-                        displayYoutubeMediaServerUi(_mediaServerData);
-                        displayRadioStreamUi(_mediaServerData);
-                        displayVolumeUi(_mediaServerData);
-                        displayBrightnessUi(_mediaServerData);
-
-                        return;
-                    }
+                    displaySuccessSnackBar(Tools.DecompressByteArrayToString(result.Response));
+                } else {
+                    displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
                 }
-
-                displayErrorSnackBar(Tools.DecompressByteArrayToString(result.Response));
-                return;
+            } else {
+                displayErrorSnackBar("Received command response is null!");
             }
+        }
+    };
 
-            displayErrorSnackBar("Result is null!");
+    /**
+     * BroadcastReceiver for receiving updates for youtube data
+     */
+    private BroadcastReceiver _youtubeDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logger.getInstance().Debug(TAG, "_youtubeDataReceiver onReceive");
+            MediaServerData mediaServerData = MediaServerService.getInstance().GetActiveMediaServer();
+            updateYoutubeUi(mediaServerData);
         }
     };
 
@@ -182,13 +201,88 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     private BroadcastReceiver _youtubeVideoImageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            YoutubeVideo youtubeVideo = (YoutubeVideo) intent.getSerializableExtra(MediaServerService.MediaServerYoutubeVideoBundle);
-            if (youtubeVideo != null) {
-                Picasso.with(context).load(youtubeVideo.GetMediumImageUrl()).into(_youtubeVideoImageView);
-                _youtubeIdSelectionButton.setText(youtubeVideo.GetTitle());
+            Logger.getInstance().Debug(TAG, "_youtubeVideoImageReceiver onReceive");
+            YoutubeVideoData youtubeVideoData = (YoutubeVideoData) intent.getSerializableExtra(MediaServerService.MediaServerYoutubeVideoDataBundle);
+            if (youtubeVideoData != null) {
+                Picasso.with(context).load(youtubeVideoData.GetMediumImageUrl()).into(_youtubeVideoImageView);
+                _youtubeIdSelectionButton.setText(youtubeVideoData.GetTitle());
             } else {
                 Logger.getInstance().Warning(TAG, "youtubeVideo is null");
             }
+        }
+    };
+
+    /**
+     * BroadcastReceiver for receiving updates for center text data
+     */
+    private BroadcastReceiver _centerTextDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logger.getInstance().Debug(TAG, "_centerTextDataReceiver onReceive");
+            String centerText = MediaServerService.getInstance().GetActiveMediaServer().GetCenterText();
+            updateEditTextUi(centerText);
+        }
+    };
+
+    /**
+     * BroadcastReceiver for receiving updates for radio stream data
+     */
+    private BroadcastReceiver _radioStreamDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logger.getInstance().Debug(TAG, "_radioStreamDataReceiver onReceive");
+            RadioStreamData radioStreamData = MediaServerService.getInstance().GetActiveMediaServer().GetRadioStreamData();
+            updateRadioStreamUi(radioStreamData);
+        }
+    };
+
+    /**
+     * BroadcastReceiver for receiving updates for media notification data
+     */
+    private BroadcastReceiver _mediaNotificationDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logger.getInstance().Debug(TAG, "_mediaNotificationDataReceiver onReceive");
+            MediaNotificationData mediaNotificationData = MediaServerService.getInstance().GetActiveMediaServer().GetMediaNotificationData();
+            updateMediaNotificationUi(mediaNotificationData);
+        }
+    };
+
+    /**
+     * BroadcastReceiver for receiving updates for sleep timer data
+     */
+    private BroadcastReceiver _sleepTimerDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logger.getInstance().Debug(TAG, "_sleepTimerDataReceiver onReceive");
+            MediaServerData mediaServerData = MediaServerService.getInstance().GetActiveMediaServer();
+            updateYoutubeUi(mediaServerData);
+        }
+    };
+
+    /**
+     * BroadcastReceiver for receiving updates for rss feed data
+     */
+    private BroadcastReceiver _rssFeedDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logger.getInstance().Debug(TAG, "_rssFeedDataReceiver onReceive");
+            RSSFeed rssFeed = MediaServerService.getInstance().GetActiveMediaServer().GetRSSFeed();
+            updateRssUi(rssFeed);
+        }
+    };
+
+    /**
+     * BroadcastReceiver for receiving updates for information data
+     */
+    private BroadcastReceiver _informationDataReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Logger.getInstance().Debug(TAG, "_informationDataReceiver onReceive");
+            MediaServerInformationData mediaServerInformationData = MediaServerService.getInstance().GetActiveMediaServer().GetMediaServerInformationData();
+            updateInformationUi(mediaServerInformationData);
+            updateVolumeUi(mediaServerInformationData);
+            updateBrightnessUi(mediaServerInformationData);
         }
     };
 
@@ -196,28 +290,27 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_mediamirror);
+        setContentView(R.layout.activity_media_server);
 
-        Toolbar toolbar = findViewById(R.id.toolbar_media_mirror);
+        Toolbar toolbar = findViewById(R.id.toolbar_media_server);
         //setSupportActionBar(toolbar);
 
         _context = this;
-
         _receiverController = new ReceiverController(_context);
 
-        _drawerLayout = findViewById(R.id.drawer_layout_mediamirror);
+        _drawerLayout = findViewById(R.id.drawer_layout_media_server);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, _drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         _drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view_mediamirror);
+        NavigationView navigationView = findViewById(R.id.nav_view_media_server);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Define variables for common MediaServer
-        _mediaServerSelectionSpinner = findViewById(R.id.media_mirror_selection_spinner);
-        _mediaServerBatteryTextView = findViewById(R.id.media_mirror_battery_text_view);
-        _mediaServerVersionTextView = findViewById(R.id.media_mirror_version_text_view);
-        setUpCommonMediaServerUi();
+        //Define variables for information about MediaServer
+        _mediaServerSelectionSpinner = findViewById(R.id.media_server_selection_spinner);
+        _mediaServerBatteryTextView = findViewById(R.id.media_server_battery_text_view);
+        _mediaServerVersionTextView = findViewById(R.id.media_server_version_text_view);
+        setUpInformationUi();
 
         //Define variables to handle youtube on MediaServer
         _youtubeVideoImageView = findViewById(R.id.youtube_video_image_view);
@@ -228,13 +321,20 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         _youtubePlayPositionSeekBar = findViewById(R.id.youtube_duration_seek_bar);
         _youtubePlayPositionTextView = findViewById(R.id.youtube_video_time_text_view);
         _sleepTimerButton = findViewById(R.id.sleep_timer_button);
-        setUpYoutubeMediaServerUi();
+        setUpYoutubeUi();
 
         //Define variables for radio stream
         _radioStreamSelectionSpinner = findViewById(R.id.radio_stream_selection_spinner);
         _radioStreamPlayButton = findViewById(R.id.radio_stream_play_button);
         _radioStreamStopButton = findViewById(R.id.radio_stream_stop_button);
         setUpRadioStreamUi();
+
+        //Define variables for media notification
+        _mediaNotificationCardView = findViewById(R.id.media_server_media_notification_card_view);
+        _mediaNotificationInformationTextView = findViewById(R.id.media_notification_information_textView);
+        _mediaNotificationPlayButton = findViewById(R.id.media_notification_play_button);
+        _mediaNotificationStopButton = findViewById(R.id.media_notification_stop_button);
+        setUpMediaNotificationUi();
 
         //Define variables for volume
         _volumeTextView = findViewById(R.id.volume_text_view);
@@ -265,6 +365,11 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         _updateBirthdaysButton = findViewById(R.id.update_birthdays_button);
         _updateCalendarButton = findViewById(R.id.update_calendar_button);
         setUpUpdateUi();
+
+        //Define variables for system data
+        _systemRebootButton = findViewById(R.id.system_reboot_button);
+        _systemShutdownButton = findViewById(R.id.system_shutdown_button);
+        setUpSystemUi();
     }
 
     @Override
@@ -275,8 +380,15 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
     @Override
     protected void onResume() {
         super.onResume();
-        _receiverController.RegisterReceiver(_mediaServerDownloadReceiver, new String[]{MediaServerService.MediaServerDownloadFinishedBroadcast});
-        _receiverController.RegisterReceiver(_youtubeVideoImageReceiver, new String[]{MediaServerService.MediaServerYoutubeVideoBroadcast});
+        _receiverController.RegisterReceiver(_commandResponseReceiver, new String[]{MediaServerService.MediaServerCommandResponseBroadcast});
+        _receiverController.RegisterReceiver(_youtubeDataReceiver, new String[]{MediaServerService.MediaServerYoutubeDataBroadcast});
+        _receiverController.RegisterReceiver(_youtubeVideoImageReceiver, new String[]{MediaServerService.MediaServerYoutubeVideoDataBroadcast});
+        _receiverController.RegisterReceiver(_centerTextDataReceiver, new String[]{MediaServerService.MediaServerCenterTextDataBroadcast});
+        _receiverController.RegisterReceiver(_radioStreamDataReceiver, new String[]{MediaServerService.MediaServerRadioStreamDataBroadcast});
+        _receiverController.RegisterReceiver(_mediaNotificationDataReceiver, new String[]{MediaServerService.MediaServerMediaNotificationDataBroadcast});
+        _receiverController.RegisterReceiver(_sleepTimerDataReceiver, new String[]{MediaServerService.MediaServerSleepTimerDataBroadcast});
+        _receiverController.RegisterReceiver(_rssFeedDataReceiver, new String[]{MediaServerService.MediaServerRssFeedDataBroadcast});
+        _receiverController.RegisterReceiver(_informationDataReceiver, new String[]{MediaServerService.MediaServerInformationDataBroadcast});
     }
 
     @Override
@@ -346,40 +458,29 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         return true;
     }
 
-    private void displayErrorSnackBar(@NonNull String message) {
-        Snacky.builder()
-                .setActivty(MediaServerActivity.this)
-                .setText(message)
-                .setDuration(Snacky.LENGTH_LONG)
-                .setActionText(android.R.string.ok)
-                .error()
-                .show();
-    }
+    /**
+     * Setup for UI
+     */
 
-    private void setUpCommonMediaServerUi() {
-        final ArrayList<String> serverLocations = new ArrayList<>();
-        for (MediaServerSelection entry : MediaServerSelection.values()) {
-            if (entry != MediaServerSelection.NULL) {
-                serverLocations.add(entry.GetLocation());
-            }
-        }
+    private void setUpInformationUi() {
+        Logger.getInstance().Debug(TAG, "setUpInformationUi");
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(_context, android.R.layout.simple_spinner_item, serverLocations);
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(_context, android.R.layout.simple_spinner_item, MediaServerService.getInstance().GetServerLocations());
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
         _mediaServerSelectionSpinner.setAdapter(dataAdapter);
+
         _mediaServerSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Logger.getInstance().Debug(TAG, "_mediaServerSelectionSpinner onItemSelected _mediaServerSelectionSpinnerEnabled: " + String.valueOf(_mediaServerSelectionSpinnerEnabled));
+
                 if (!_mediaServerSelectionSpinnerEnabled) {
                     Logger.getInstance().Warning(TAG, "_mediaServerSelectionSpinner is disabled!");
-                    return;
+                } else {
+                    String selectedLocation = MediaServerService.getInstance().GetServerLocations().get(position);
+                    MediaServerSelection selectedMediaServer = MediaServerSelection.GetByLocation(selectedLocation);
+                    MediaServerService.getInstance().SetActiveMediaServer(selectedMediaServer);
                 }
-
-                String selectedLocation = serverLocations.get(position);
-                String selectedIp = MediaServerSelection.GetByLocation(selectedLocation).GetIp();
-
-                MediaServerService.getInstance().SendCommand(selectedIp, MediaServerAction.GET_MEDIA_SERVER_DTO.toString(), "");
             }
 
             @Override
@@ -388,102 +489,25 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         });
     }
 
-    private void displayCommonMediaServerUi(@NonNull MediaServerData mediaServerData) {
-        _mediaServerSelectionSpinnerEnabled = false;
-        _mediaServerSelectionSpinner.setSelection(mediaServerData.GetMediaServerSelection().GetId(), true);
-        _mediaServerBatteryTextView.setText(String.format(Locale.getDefault(), "Battery %d%%", mediaServerData.GetBatteryLevel()));
-        _mediaServerVersionTextView.setText(String.format(Locale.getDefault(), "Version: %s", mediaServerData.GetServerVersion()));
-        _mediaServerSelectionSpinnerEnabled = true;
-    }
+    private void setUpYoutubeUi() {
+        Logger.getInstance().Debug(TAG, "setUpYoutubeUi");
 
-    private void setUpYoutubeMediaServerUi() {
-        _youtubeIdSelectionButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
+        _youtubeIdSelectionButton.setOnClickListener(view -> displayYoutubeIdSelectionDialog());
 
-            displayYoutubeIdSelectionDialog();
-        });
-
-        _youtubePlayButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
-
-        _youtubePauseButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.PAUSE_YOUTUBE_VIDEO.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
-
-        _youtubeStopButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.STOP_YOUTUBE_VIDEO.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
+        _youtubePlayButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.YOUTUBE_PLAY.toString(), ""));
+        _youtubePauseButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.YOUTUBE_PAUSE.toString(), ""));
+        _youtubeStopButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.YOUTUBE_STOP.toString(), ""));
 
         _youtubePlayPositionSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progressValue, boolean fromUser) {
+                Logger.getInstance().Debug(TAG, "_youtubePlayPositionSeekBar onProgressChanged _youtubePlayPositionSeekBarEnabled: " + String.valueOf(_youtubePlayPositionSeekBarEnabled));
+
                 if (!_youtubePlayPositionSeekBarEnabled) {
                     Logger.getInstance().Warning(TAG, "_youtubePlayPositionSeekBar is disabled!");
-                    return;
+                } else {
+                    MediaServerService.getInstance().SendCommand(MediaServerAction.YOUTUBE_SET_POSITION.toString(), String.valueOf(progressValue));
                 }
-
-                if (_mediaServerData == null) {
-                    Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                    displayErrorSnackBar("_mediaServerData is null!");
-                    return;
-                }
-
-                MediaServerService.getInstance().SendCommand(
-                        _mediaServerData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.SET_YOUTUBE_PLAY_POSITION.toString(),
-                        String.valueOf(progressValue));
-
-                MediaServerService.getInstance().SendCommand(
-                        _mediaServerData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                        "");
             }
 
             @Override
@@ -494,59 +518,177 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-        _youtubePlayPositionSeekBar.setVisibility(View.GONE);
 
         _sleepTimerButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            if (_mediaServerData.IsSleepTimerEnabled()) {
-                MediaServerService.getInstance().SendCommand(
-                        _mediaServerData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.STOP_SEA_SOUND.toString(),
-                        "");
+            MediaServerData mediaServerData = MediaServerService.getInstance().GetActiveMediaServer();
+            SleepTimerData sleepTimerData = mediaServerData.GetSleepTimerData();
+            if (sleepTimerData.GetSleepTimerEnabled()) {
+                MediaServerService.getInstance().SendCommand(MediaServerAction.SLEEP_SOUND_STOP.toString(), "");
             } else {
-                MediaServerService.getInstance().SendCommand(
-                        _mediaServerData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.PLAY_SEA_SOUND.toString(),
-                        "");
+                MediaServerService.getInstance().SendCommand(MediaServerAction.SLEEP_SOUND_PLAY.toString(), "");
             }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
         });
+
+
+        _youtubePlayPositionSeekBar.setVisibility(View.GONE);
         _sleepTimerButton.setVisibility(View.GONE);
         _sleepTimerButton.setEnabled(false);
     }
 
-    private void displayYoutubeMediaServerUi(@NonNull MediaServerData mediaServerData) {
+    private void setUpRadioStreamUi() {
+        Logger.getInstance().Debug(TAG, "setUpRadioStreamUi");
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(_context, android.R.layout.simple_spinner_item, MediaServerService.getInstance().GetRadioStreamTitleList());
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        _radioStreamSelectionSpinner.setAdapter(dataAdapter);
+
+        _radioStreamSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Logger.getInstance().Debug(TAG, "_radioStreamSelectionSpinner onItemSelected _radioStreamSelectionSpinnerEnabled: " + String.valueOf(_radioStreamSelectionSpinnerEnabled));
+
+                if (!_radioStreamSelectionSpinnerEnabled) {
+                    Logger.getInstance().Warning(TAG, "_radioStreamSelectionSpinner is disabled!");
+                } else {
+                    String selectedRadioStream = MediaServerService.getInstance().GetRadioStreamTitleList().get(position);
+                    RadioStreams radioStream = RadioStreams.GetByTitle(selectedRadioStream);
+
+                    MediaServerService.getInstance().SendCommand(MediaServerAction.RADIO_STREAM_PLAY.toString(), String.valueOf(radioStream.GetId()));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        _radioStreamPlayButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.RADIO_STREAM_PLAY.toString(), ""));
+        _radioStreamStopButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.RADIO_STREAM_STOP.toString(), ""));
+    }
+
+    private void setUpMediaNotificationUi() {
+        Logger.getInstance().Debug(TAG, "setUpMediaNotificationUi");
+
+        _mediaNotificationPlayButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.MEDIA_NOTIFICATION_PLAY.toString(), ""));
+        _mediaNotificationStopButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.MEDIA_NOTIFICATION_STOP.toString(), ""));
+    }
+
+    private void setUpVolumeUi() {
+        Logger.getInstance().Debug(TAG, "setUpVolumeUi");
+
+        _volumeIncreaseButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.VOLUME_INCREASE.toString(), ""));
+        _volumeDecreaseButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.VOLUME_DECREASE.toString(), ""));
+    }
+
+    private void setUpRssUi() {
+        Logger.getInstance().Debug(TAG, "setUpRssUi");
+
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(_context, android.R.layout.simple_spinner_item, MediaServerService.getInstance().GetRssFeedTitleList());
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        _rssSelectionSpinner.setAdapter(dataAdapter);
+
+        _rssSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Logger.getInstance().Debug(TAG, "_rssSelectionSpinner onItemSelected _rssFeedSelectionSpinnerEnabled: " + _rssFeedSelectionSpinnerEnabled);
+
+                if (!_rssFeedSelectionSpinnerEnabled) {
+                    Logger.getInstance().Warning(TAG, "_radioStreamSelectionSpinner is disabled!");
+                } else {
+                    String selectedRssStream = MediaServerService.getInstance().GetRssFeedTitleList().get(position);
+                    RSSFeed rssFeed = RSSFeed.GetByTitle(selectedRssStream);
+                    MediaServerService.getInstance().SendCommand(MediaServerAction.RSS_FEED_SET.toString(), String.valueOf(rssFeed.GetId()));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    private void setUpEditTextUi() {
+        Logger.getInstance().Debug(TAG, "setUpEditTextUi");
+
+        _sendTextButton.setOnClickListener(view -> {
+            String sendText = _editText.getText().toString();
+            if (sendText.length() < 1 || sendText.length() > 500) {
+                Logger.getInstance().Error(TAG, "sendText is null!");
+                displayErrorSnackBar("sendText is null!");
+                return;
+            }
+            MediaServerService.getInstance().SendCommand(MediaServerAction.CENTER_TEXT_SET.toString(), sendText);
+        });
+    }
+
+    private void setUpBrightnessUi() {
+        Logger.getInstance().Debug(TAG, "setUpBrightnessUi");
+
+        _brightnessIncreaseButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.SCREEN_BRIGHTNESS_INCREASE.toString(), ""));
+        _brightnessDecreaseButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.SCREEN_BRIGHTNESS_DECREASE.toString(), ""));
+    }
+
+    private void setUpUpdateUi() {
+        Logger.getInstance().Debug(TAG, "setUpBrightnessUi");
+
+        _updateCurrentWeatherButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.UPDATE_CURRENT_WEATHER.toString(), ""));
+        _updateForecastWeatherButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.UPDATE_FORECAST_WEATHER.toString(), ""));
+        _updateTemperatureButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(), ""));
+        _updateIpButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.UPDATE_IP_ADDRESS.toString(), ""));
+        _updateBirthdaysButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.UPDATE_BIRTHDAY_ALARM.toString(), ""));
+        _updateCalendarButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.UPDATE_CALENDAR_ALARM.toString(), ""));
+    }
+
+    private void setUpSystemUi() {
+        Logger.getInstance().Debug(TAG, "setUpSystemUi");
+
+        _systemRebootButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.SYSTEM_REBOOT.toString(), ""));
+        _systemShutdownButton.setOnClickListener(view -> MediaServerService.getInstance().SendCommand(MediaServerAction.SYSTEM_SHUTDOWN.toString(), ""));
+    }
+
+    /**
+     * Update of UI elements
+     */
+    private void updateInformationUi(@NonNull MediaServerInformationData mediaServerInformationData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "updateMediaServerInformationUi with MediaServerInformationData %s", mediaServerInformationData));
+        _mediaServerSelectionSpinnerEnabled = false;
+        _mediaServerBatteryTextView.setText(String.format(Locale.getDefault(), "Battery %d%%", mediaServerInformationData.GetCurrentBatteryLevel()));
+        _mediaServerVersionTextView.setText(String.format(Locale.getDefault(), "Version: %s", mediaServerInformationData.GetServerVersion()));
+        _mediaServerSelectionSpinner.setSelection(mediaServerInformationData.GetMediaServerSelection().GetId());
+        new Handler().postDelayed(() -> _mediaServerSelectionSpinnerEnabled = true, 1000);
+    }
+
+    private void updateYoutubeUi(@NonNull MediaServerData mediaServerData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "updateYoutubeMediaServerUi with MediaServerData %s", mediaServerData));
+
+        YoutubeData youtubeData = mediaServerData.GetYoutubeData();
+        SleepTimerData sleepTimerData = mediaServerData.GetSleepTimerData();
+        MediaServerInformationData mediaServerInformationData = mediaServerData.GetMediaServerInformationData();
+
         _youtubePlayPositionSeekBarEnabled = false;
 
-        _youtubePlayPositionSeekBar.setVisibility(mediaServerData.IsYoutubePlaying() ? View.VISIBLE : View.GONE);
-        _youtubePlayPositionSeekBar.setEnabled(mediaServerData.IsYoutubePlaying());
+        _youtubePlayPositionSeekBar.setVisibility(youtubeData.IsYoutubePlaying() ? View.VISIBLE : View.GONE);
+        _youtubePlayPositionTextView.setVisibility(youtubeData.IsYoutubePlaying() ? View.VISIBLE : View.GONE);
+        _sleepTimerButton.setVisibility((sleepTimerData.GetSleepTimerEnabled() && mediaServerInformationData.GetMediaServerSelection().IsSleepingServer()) ? View.VISIBLE : View.GONE);
 
-        _youtubePlayButton.setEnabled(!mediaServerData.IsYoutubePlaying());
-        _youtubePauseButton.setEnabled(mediaServerData.IsYoutubePlaying());
-        _youtubeStopButton.setEnabled(mediaServerData.IsYoutubePlaying());
+        _youtubePlayPositionSeekBar.setEnabled(youtubeData.IsYoutubePlaying());
+        _youtubePlayButton.setEnabled(!youtubeData.IsYoutubePlaying());
+        _youtubePauseButton.setEnabled(youtubeData.IsYoutubePlaying());
+        _youtubeStopButton.setEnabled(youtubeData.IsYoutubePlaying());
+        _sleepTimerButton.setEnabled(sleepTimerData.GetSleepTimerEnabled() && mediaServerInformationData.GetMediaServerSelection().IsSleepingServer());
 
-        _youtubePlayPositionTextView.setVisibility(mediaServerData.IsYoutubePlaying() ? View.VISIBLE : View.GONE);
+        if (youtubeData.IsYoutubePlaying()) {
+            int currentVideoPlayTime = youtubeData.GetCurrentYoutubeVideoPosition();
+            int totalVideoPlayTime = youtubeData.GetCurrentYoutubeVideoDuration();
 
-        _sleepTimerButton.setVisibility((mediaServerData.IsSleepTimerEnabled() && mediaServerData.GetMediaServerSelection().IsSleepingServer()) ? View.VISIBLE : View.GONE);
-        _sleepTimerButton.setEnabled(mediaServerData.IsSleepTimerEnabled() && mediaServerData.GetMediaServerSelection().IsSleepingServer());
+            loadYoutubeVideoImage(youtubeData);
 
-        if (mediaServerData.IsYoutubePlaying()) {
-            int currentVideoPlayTime = mediaServerData.GetYoutubeVideoCurrentPlayTime();
-            int totalVideoPlayTime = mediaServerData.GetYoutubeVideoDuration();
+            if (currentVideoPlayTime == -1 || totalVideoPlayTime == -1
+                    || currentVideoPlayTime == 0 || totalVideoPlayTime == 0) {
+                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(),
+                        "Invalid values: currentVideoPlayTime: %d: totalVideoPlayTime: %d",
+                        currentVideoPlayTime, totalVideoPlayTime));
 
-            loadYoutubeVideoImage(_mediaServerData);
-
-            if (currentVideoPlayTime == -1 || totalVideoPlayTime == -1 || currentVideoPlayTime == 0 || totalVideoPlayTime == 0) {
-                Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Invalid values: currentVideoPlayTime: %d: totalVideoPlayTime: %d", currentVideoPlayTime, totalVideoPlayTime));
                 _youtubePlayPositionSeekBar.setVisibility(View.GONE);
                 _youtubePlayPositionTextView.setVisibility(View.GONE);
 
@@ -564,368 +706,65 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
 
                 String youtubePlayTimeText = String.format(Locale.getDefault(),
                         "%02d:%02d:%02d / %02d:%02d:%02d",
-                        currentVideoPlayTimeHour, currentVideoPlayTimeMinute, currentVideoPlayTimeSecond, totalVideoPlayTimeHour, totalVideoPlayTimeMinute, totalVideoPlayTimeSecond);
+                        currentVideoPlayTimeHour, currentVideoPlayTimeMinute, currentVideoPlayTimeSecond,
+                        totalVideoPlayTimeHour, totalVideoPlayTimeMinute, totalVideoPlayTimeSecond);
+
                 _youtubePlayPositionTextView.setText(youtubePlayTimeText);
             }
         }
 
-        _youtubePlayPositionSeekBarEnabled = true;
+        new Handler().postDelayed(() -> _youtubePlayPositionSeekBarEnabled = true, 1000);
     }
 
-    private void setUpRadioStreamUi() {
-        final ArrayList<String> radioStreams = new ArrayList<>();
-        for (RadioStreams entry : RadioStreams.values()) {
-            radioStreams.add(entry.GetTitle());
-        }
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(_context, android.R.layout.simple_spinner_item, radioStreams);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        _radioStreamSelectionSpinner.setAdapter(dataAdapter);
-        _radioStreamSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!_radioStreamSelectionSpinnerEnabled) {
-                    Logger.getInstance().Warning(TAG, "_radioStreamSelectionSpinner is disabled!");
-                    return;
-                }
-
-                if (_mediaServerData == null) {
-                    Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                    displayErrorSnackBar("_mediaServerData is null!");
-                    return;
-                }
-
-                String selectedRadioStream = radioStreams.get(position);
-                RadioStreams radioStream = RadioStreams.GetByTitle(selectedRadioStream);
-
-                MediaServerService.getInstance().SendCommand(
-                        _mediaServerData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.SHOW_RADIO_STREAM.toString(),
-                        String.valueOf(radioStream.GetId()));
-
-                MediaServerService.getInstance().SendCommand(
-                        _mediaServerData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                        "");
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-
-        _radioStreamPlayButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.PLAY_RADIO_STREAM.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
-
-        _radioStreamStopButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.STOP_RADIO_STREAM.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
-    }
-
-    private void displayRadioStreamUi(@NonNull MediaServerData mediaServerData) {
+    private void updateRadioStreamUi(@NonNull RadioStreamData radioStreamData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "updateRadioStreamUi with RadioStreamData %s", radioStreamData));
         _radioStreamSelectionSpinnerEnabled = false;
-
-        _radioStreamSelectionSpinner.setSelection(mediaServerData.GetRadioStreamId(), true);
-        _radioStreamPlayButton.setEnabled(!mediaServerData.IsRadioStreamPlaying());
-        _radioStreamStopButton.setEnabled(mediaServerData.IsRadioStreamPlaying());
-
-        _radioStreamSelectionSpinnerEnabled = true;
+        _radioStreamPlayButton.setEnabled(!radioStreamData.GetRadioStreamIsPlaying());
+        _radioStreamStopButton.setEnabled(radioStreamData.GetRadioStreamIsPlaying());
+        _radioStreamSelectionSpinner.setSelection(radioStreamData.GetRadioStreamFeed().GetId());
+        new Handler().postDelayed(() -> _radioStreamSelectionSpinnerEnabled = true, 1000);
     }
 
-    private void setUpVolumeUi() {
-        _volumeIncreaseButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.INCREASE_VOLUME.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
-
-        _volumeDecreaseButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.DECREASE_VOLUME.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
-    }
-
-    private void displayVolumeUi(@NonNull MediaServerData mediaServerData) {
-        _volumeTextView.setText(String.format(Locale.getDefault(), "Volume: %d", mediaServerData.GetVolume()));
-    }
-
-    private void setUpRssUi() {
-        final ArrayList<String> rssStreams = new ArrayList<>();
-        for (RSSFeed entry : RSSFeed.values()) {
-            if (entry.GetId() > 1) {
-                rssStreams.add(entry.GetTitle());
-            }
+    private void updateMediaNotificationUi(@NonNull MediaNotificationData mediaNotificationData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "updateMediaNotificationUi with MediaNotificationData %s", mediaNotificationData));
+        _mediaNotificationInformationTextView.setText(mediaNotificationData.GetInformationString());
+        if (mediaNotificationData.IsVisible()) {
+            _mediaNotificationCardView.setVisibility(View.VISIBLE);
+        } else {
+            _mediaNotificationCardView.setVisibility(View.GONE);
         }
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(_context, android.R.layout.simple_spinner_item, rssStreams);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        _rssSelectionSpinner.setAdapter(dataAdapter);
-        _rssSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (_mediaServerData == null) {
-                    Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                    displayErrorSnackBar("_mediaServerData is null!");
-                    return;
-                }
-
-                String selectedRssStream = rssStreams.get(position);
-                RSSFeed rssFeed = RSSFeed.GetByTitle(selectedRssStream);
-
-                MediaServerService.getInstance().SendCommand(
-                        _mediaServerData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.SET_RSS_FEED.toString(),
-                        String.valueOf(rssFeed.GetId()));
-
-                MediaServerService.getInstance().SendCommand(
-                        _mediaServerData.GetMediaServerSelection().GetIp(),
-                        MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                        "");
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
     }
 
-    private void setUpEditTextUi() {
-        _sendTextButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            String sendText = _editText.getText().toString();
-            if (sendText.length() < 1 || sendText.length() > 500) {
-                Logger.getInstance().Error(TAG, "sendText is null!");
-                displayErrorSnackBar("sendText is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.SHOW_CENTER_TEXT.toString(),
-                    sendText);
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
+    private void updateVolumeUi(@NonNull MediaServerInformationData mediaServerInformationData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "updateVolumeUi with MediaServerInformationData %s", mediaServerInformationData));
+        _volumeTextView.setText(String.format(Locale.getDefault(), "Volume: %d", mediaServerInformationData.GetCurrentVolume()));
     }
 
-    private void setUpBrightnessUi() {
-        _brightnessIncreaseButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
+    private void updateRssUi(@NonNull RSSFeed rssFeed) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "updateRssUi with RSSFeed %s", rssFeed));
+        _rssFeedSelectionSpinnerEnabled = false;
+        _rssSelectionSpinner.setSelection(rssFeed.GetId());
+        new Handler().postDelayed(() -> _rssFeedSelectionSpinnerEnabled = true, 1000);
 
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.INCREASE_SCREEN_BRIGHTNESS.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
-
-        _brightnessDecreaseButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.DECREASE_SCREEN_BRIGHTNESS.toString(),
-                    "");
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.GET_MEDIA_SERVER_DTO.toString(),
-                    "");
-        });
     }
 
-    private void displayBrightnessUi(@NonNull MediaServerData mediaServerData) {
-        _brightnessTextView.setText(String.format(Locale.getDefault(), "Brightness: %d%%", ((mediaServerData.GetScreenBrightness() * 100) / 255)));
+    private void updateEditTextUi(@NonNull String centerText) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "updateEditTextUi with CenterText %s", centerText));
+        _editText.setText(centerText);
     }
 
-    private void setUpUpdateUi() {
-        _updateCurrentWeatherButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.UPDATE_CURRENT_WEATHER.toString(),
-                    "");
-        });
-
-        _updateForecastWeatherButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.UPDATE_FORECAST_WEATHER.toString(),
-                    "");
-        });
-
-        _updateTemperatureButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.UPDATE_RASPBERRY_TEMPERATURE.toString(),
-                    "");
-        });
-
-        _updateIpButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.UPDATE_IP_ADDRESS.toString(),
-                    "");
-        });
-
-        _updateBirthdaysButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.UPDATE_BIRTHDAY_ALARM.toString(),
-                    "");
-        });
-
-        _updateCalendarButton.setOnClickListener(view -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
-            MediaServerService.getInstance().SendCommand(
-                    _mediaServerData.GetMediaServerSelection().GetIp(),
-                    MediaServerAction.UPDATE_CALENDAR_ALARM.toString(),
-                    "");
-        });
+    private void updateBrightnessUi(@NonNull MediaServerInformationData mediaServerInformationData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "updateBrightnessUi with MediaServerInformationData %s", mediaServerInformationData));
+        _brightnessTextView.setText(String.format(Locale.getDefault(), "Brightness: %d%%", ((mediaServerInformationData.GetCurrentScreenBrightness() * 100) / 255)));
     }
 
-    private void loadYoutubeVideoImage(@NonNull MediaServerData mediaServerData) {
-        String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, 1, mediaServerData.GetYoutubeId(), Keys.YOUTUBE_API_KEY);
-        DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(
-                _context,
-                null,
-                mediaServerData.GetMediaServerSelection().GetIp(),
-                true,
-                false);
-        task.execute(url);
-    }
-
-    private void searchYoutubeVideos(@NonNull MediaServerData mediaServerData, @NonNull String searchString) {
-        ProgressDialog loadingVideosDialog = ProgressDialog.show(_context, "Loading Videos...", "");
-        loadingVideosDialog.setCancelable(false);
-
-        searchString = searchString.replace(" ", "+");
-        String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, Constants.YOUTUBE_MAX_RESULTS, searchString, Keys.YOUTUBE_API_KEY);
-        DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(
-                _context,
-                loadingVideosDialog,
-                mediaServerData.GetMediaServerSelection().GetIp(),
-                false,
-                true);
-        task.execute(url);
-    }
-
+    /**
+     * Dialog methods
+     */
     private void displayYoutubeIdSelectionDialog() {
         final Dialog dialog = new Dialog(_context);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.dialog_select_youtube_id);
-
-        final CheckBox playOnAllServer = dialog.findViewById(R.id.dialog_select_youtube_play_on_all_mirror);
 
         ImageButton youtubeSearchButton = dialog.findViewById(R.id.dialog_enter_youtube_search_button);
         youtubeSearchButton.setOnClickListener(view -> {
@@ -949,12 +788,16 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
+        MediaServerData activeMediaServerData = MediaServerService.getInstance().GetActiveMediaServer();
+        YoutubeData youtubeData = activeMediaServerData.GetYoutubeData();
+        ArrayList<PlayedYoutubeVideoData> playedYoutubeVideoDataList = youtubeData.GetPlayedYoutubeVideos();
+
         final ArrayList<String> playedYoutubeIdStrings = new ArrayList<>();
-        for (PlayedYoutubeVideo entry : _mediaServerData.GetPlayedYoutubeIds()) {
+        for (PlayedYoutubeVideoData entry : playedYoutubeVideoDataList) {
             playedYoutubeIdStrings.add(entry.GetYoutubeId());
         }
 
@@ -984,17 +827,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
             }
             youtubeId = youtubeId.replace(" ", "");
 
-            if (playOnAllServer.isChecked()) {
-                for (MediaServerSelection entry : MediaServerSelection.values()) {
-                    if (entry.GetId() > 0) {
-                        MediaServerService.getInstance().SendCommand(entry.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
-                    }
-                }
-            } else {
-                MediaServerService.getInstance().SendCommand(_mediaServerData.GetMediaServerSelection().GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
-            }
-
-            MediaServerService.getInstance().SendCommand(_mediaServerData.GetMediaServerSelection().GetIp(), MediaServerAction.GET_MEDIA_SERVER_DTO.toString(), "");
+            MediaServerService.getInstance().SendCommand(MediaServerAction.YOUTUBE_PLAY.toString(), youtubeId);
 
             dialog.dismiss();
         });
@@ -1016,22 +849,16 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         dialog.setContentView(R.layout.dialog_edittext);
 
         TextView titleView = dialog.findViewById(R.id.dialog_title);
-        titleView.setText("Search youtube");
+        titleView.setText(R.string.searchYoutube);
 
         TextView promptView = dialog.findViewById(R.id.dialog_prompt);
-        promptView.setText("Enter your search below");
+        promptView.setText(R.string.promptEnterSearch);
 
         final EditText inputEditText = dialog.findViewById(R.id.dialog_edittext);
 
         Button closeButton = dialog.findViewById(R.id.dialog_button_close);
-        closeButton.setText("Search");
+        closeButton.setText(R.string.search);
         closeButton.setOnClickListener(v -> {
-            if (_mediaServerData == null) {
-                Logger.getInstance().Error(TAG, "_mediaServerData is null!");
-                displayErrorSnackBar("_mediaServerData is null!");
-                return;
-            }
-
             String input = inputEditText.getText().toString();
 
             if (input.length() == 0) {
@@ -1040,7 +867,7 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
                 return;
             }
 
-            searchYoutubeVideos(_mediaServerData, input);
+            searchYoutubeVideos(input);
         });
 
         dialog.setCancelable(true);
@@ -1052,5 +879,48 @@ public class MediaServerActivity extends AppCompatActivity implements Navigation
         } else {
             Logger.getInstance().Warning(TAG, "Window is null!");
         }
+    }
+
+    /**
+     * Youtube data methods
+     */
+    private void searchYoutubeVideos(@NonNull String searchString) {
+        ProgressDialog loadingVideosDialog = ProgressDialog.show(_context, "Loading Videos...", "");
+        loadingVideosDialog.setCancelable(false);
+
+        searchString = searchString.replace(" ", "+");
+        String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, Constants.YOUTUBE_MAX_RESULTS, searchString, Keys.YOUTUBE_API_KEY);
+
+        DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(_context, loadingVideosDialog, false, true);
+        task.execute(url);
+    }
+
+    private void loadYoutubeVideoImage(@NonNull YoutubeData youtubeData) {
+        String url = String.format(Locale.getDefault(), Constants.YOUTUBE_SEARCH, 1, youtubeData.GetCurrentYoutubeId(), Keys.YOUTUBE_API_KEY);
+        DownloadYoutubeVideoTask task = new DownloadYoutubeVideoTask(_context, null, true, false);
+        task.execute(url);
+    }
+
+    /**
+     * SnackBar methods
+     */
+    private void displaySuccessSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(MediaServerActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_LONG)
+                .setActionText(android.R.string.ok)
+                .success()
+                .show();
+    }
+
+    private void displayErrorSnackBar(@NonNull String message) {
+        Snacky.builder()
+                .setActivty(MediaServerActivity.this)
+                .setText(message)
+                .setDuration(Snacky.LENGTH_LONG)
+                .setActionText(android.R.string.ok)
+                .error()
+                .show();
     }
 }

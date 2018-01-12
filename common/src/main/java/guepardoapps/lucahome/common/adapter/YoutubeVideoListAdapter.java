@@ -15,9 +15,8 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import guepardoapps.lucahome.common.R;
-import guepardoapps.lucahome.common.classes.YoutubeVideo;
+import guepardoapps.lucahome.common.classes.mediaserver.YoutubeVideoData;
 import guepardoapps.lucahome.common.enums.MediaServerAction;
-import guepardoapps.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.lucahome.common.service.MediaServerService;
 
 public class YoutubeVideoListAdapter extends BaseAdapter {
@@ -28,35 +27,24 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
         private TextView _description;
     }
 
-    private ArrayList<YoutubeVideo> _youtubeVideoList;
-
-    private String _serverIp;
-    private boolean _playOnAllMirror = false;
-    private Runnable _closeDialogRunnable;
-
     private Context _context;
+    private ArrayList<YoutubeVideoData> _youtubeVideoDataList;
+    private Runnable _closeDialogRunnable;
     private static LayoutInflater _inflater = null;
 
     public YoutubeVideoListAdapter(
             @NonNull Context context,
-            @NonNull ArrayList<YoutubeVideo> youtubeVideoList,
-            @NonNull String serverIp,
+            @NonNull ArrayList<YoutubeVideoData> youtubeVideoDataList,
             @NonNull Runnable closeDialogRunnable) {
         _context = context;
-        _youtubeVideoList = youtubeVideoList;
-        _serverIp = serverIp;
+        _youtubeVideoDataList = youtubeVideoDataList;
         _closeDialogRunnable = closeDialogRunnable;
-
         _inflater = (LayoutInflater) _context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-    }
-
-    public void SetPlayOnAllMirror(boolean playOnAllMirror) {
-        _playOnAllMirror = playOnAllMirror;
     }
 
     @Override
     public int getCount() {
-        return _youtubeVideoList.size();
+        return _youtubeVideoDataList.size();
     }
 
     @Override
@@ -75,23 +63,11 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
         Holder holder = new Holder();
         View rowView = _inflater.inflate(R.layout.list_youtube_video_item, null);
 
-        final YoutubeVideo entry = _youtubeVideoList.get(index);
+        final YoutubeVideoData entry = _youtubeVideoDataList.get(index);
 
         View.OnClickListener sendYoutubeVideoOnClickListener = view -> {
             String youtubeId = entry.GetYoutubeId();
-            if (_playOnAllMirror) {
-                for (MediaServerSelection entry1 : MediaServerSelection.values()) {
-                    if (entry1.GetId() > 0) {
-                        MediaServerService.getInstance().SendCommand(entry1.GetIp(), MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
-                    }
-                }
-            } else {
-                MediaServerService mediaMirrorService = MediaServerService.getInstance();
-                mediaMirrorService.Initialize(_context, false, -1);
-                mediaMirrorService.SendCommand(_serverIp, MediaServerAction.PLAY_YOUTUBE_VIDEO.toString(), youtubeId);
-                mediaMirrorService.Dispose();
-            }
-
+            MediaServerService.getInstance().SendCommand(MediaServerAction.YOUTUBE_PLAY.toString(), youtubeId);
             _closeDialogRunnable.run();
         };
 

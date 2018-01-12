@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 10000
-        versionName "1.0.0.180110"
+        versionCode 10001
+        versionName "1.0.1.180110"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testOptions {
             unitTests.returnDefaultValues = true

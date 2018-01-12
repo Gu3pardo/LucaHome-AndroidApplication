@@ -96,14 +96,18 @@ public class ShoppingListEditActivity extends AppCompatActivity {
 
         _saveButton = findViewById(R.id.save_shopping_edit_button);
 
-        shoppingNameEditTextView.setAdapter(new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, ShoppingListService.getInstance().GetShoppingNameList()));
+        ArrayAdapter<String> shoppingNameAdapter = new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, ShoppingListService.getInstance().GetShoppingNameList());
+        shoppingNameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        shoppingNameEditTextView.setAdapter(shoppingNameAdapter);
         shoppingNameEditTextView.addTextChangedListener(_textWatcher);
 
         ArrayAdapter<String> groupDataAdapter = new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_spinner_item, ShoppingListService.getInstance().GetShoppingGroupList());
         groupDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         entryGroupSelect.setAdapter(groupDataAdapter);
 
-        shoppingUnitEditTextView.setAdapter(new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, ShoppingListService.getInstance().GetShoppingUnitList()));
+        ArrayAdapter<String> shoppingUnitAdapter = new ArrayAdapter<>(ShoppingListEditActivity.this, android.R.layout.simple_dropdown_item_1line, ShoppingListService.getInstance().GetShoppingUnitList());
+        shoppingUnitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        shoppingUnitEditTextView.setAdapter(shoppingUnitAdapter);
         shoppingUnitEditTextView.addTextChangedListener(_textWatcher);
 
         increaseQuantityButton.setOnClickListener(view -> {

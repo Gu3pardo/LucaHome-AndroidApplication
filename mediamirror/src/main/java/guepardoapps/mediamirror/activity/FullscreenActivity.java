@@ -34,7 +34,7 @@ public class FullscreenActivity extends YouTubeBaseActivity {
     private CenterViewController _centerViewController;
     private IViewController _dateTimeViewController;
     private RaspberryViewController _raspberryViewController;
-    private IViewController _rssViewController;
+    private RssViewController _rssViewController;
     private IViewController _weatherViewController;
 
     private ScreenController _screenController;
@@ -73,7 +73,8 @@ public class FullscreenActivity extends YouTubeBaseActivity {
         _centerViewController.Initialize(this);
         _dateTimeViewController = new DateTimeViewController(this);
         _raspberryViewController = new RaspberryViewController(this);
-        _rssViewController = new RssViewController(this);
+        _rssViewController = RssViewController.getInstance();
+        _rssViewController.Initialize(this);
         _weatherViewController = new WeatherViewController(this);
 
         _screenController = new ScreenController(this);

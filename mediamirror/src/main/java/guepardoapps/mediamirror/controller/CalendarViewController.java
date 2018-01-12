@@ -10,14 +10,15 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
-import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.controller.BroadcastController;
 import guepardoapps.lucahome.basic.controller.PermissionController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.dto.CalendarEntryDto;
 import guepardoapps.lucahome.basic.utils.Logger;
+
 import guepardoapps.mediamirror.R;
 import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
@@ -38,7 +39,7 @@ public class CalendarViewController implements IViewController {
     private PermissionController _permissionController;
     private ReceiverController _receiverController;
 
-    private SerializableList<CalendarEntryDto> _calendarList = new SerializableList<>();
+    private ArrayList<CalendarEntryDto> _calendarList = new ArrayList<>();
     private View[] _calendarAlarmViewArray = new View[MAX_CALENDAR_COUNT];
     private TextView[] _calendarTextViewArray = new TextView[MAX_CALENDAR_COUNT];
     private boolean[] _isToday = new boolean[MAX_CALENDAR_COUNT];
@@ -78,31 +79,31 @@ public class CalendarViewController implements IViewController {
     private BroadcastReceiver _updateCalendarViewReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            SerializableList<CalendarEntryDto> calendarList = new SerializableList<>();
+            ArrayList<CalendarEntryDto> calendarList = new ArrayList<>();
 
             if (!_screenEnabled) {
                 return;
             }
 
-            SerializableList<?> serializableExtra = (SerializableList<?>) intent.getSerializableExtra(Bundles.CALENDAR_MODEL);
+            ArrayList<?> serializableExtra = (ArrayList<?>) intent.getSerializableExtra(Bundles.CALENDAR_MODEL);
             if (serializableExtra != null) {
-                for (int index = 0; index < serializableExtra.getSize(); index++) {
-                    if (!(serializableExtra.getValue(index) instanceof CalendarEntryDto)) {
-                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Value at index %d is not an instance of CalendarEntryDto: %s", index, serializableExtra.getValue(index)));
+                for (int index = 0; index < serializableExtra.size(); index++) {
+                    if (!(serializableExtra.get(index) instanceof CalendarEntryDto)) {
+                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Value at index %d is not an instance of CalendarEntryDto: %s", index, serializableExtra.get(index)));
                         return;
                     } else {
-                        calendarList.addValue((CalendarEntryDto) serializableExtra.getValue(index));
+                        calendarList.add((CalendarEntryDto) serializableExtra.get(index));
                     }
                 }
             }
 
             _calendarList.clear();
 
-            for (int index = 0; index < calendarList.getSize(); index++) {
-                CalendarEntryDto entry = calendarList.getValue(index);
+            for (int index = 0; index < calendarList.size(); index++) {
+                CalendarEntryDto entry = calendarList.get(index);
 
                 if (entry.BeginIsAfterNow()) {
-                    _calendarList.addValue(entry);
+                    _calendarList.add(entry);
                 }
             }
 
@@ -111,8 +112,8 @@ public class CalendarViewController implements IViewController {
             }
 
             for (int index = 0; index < MAX_CALENDAR_COUNT; index++) {
-                if (index < _calendarList.getSize()) {
-                    CalendarEntryDto entry = _calendarList.getValue(index);
+                if (index < _calendarList.size()) {
+                    CalendarEntryDto entry = _calendarList.get(index);
                     if (entry.IsToday()) {
                         _isToday[index] = true;
                         _calendarAlarmViewArray[index].setVisibility(View.VISIBLE);

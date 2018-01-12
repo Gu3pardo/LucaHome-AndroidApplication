@@ -3,33 +3,39 @@ package guepardoapps.lucahome.views;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.percent.PercentRelativeLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.SpannableStringBuilder;
-import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.Locale;
 
 import de.mateware.snacky.Snacky;
 
+import es.dmoral.toasty.Toasty;
 import guepardoapps.bixby.classes.BixbyPair;
+import guepardoapps.bixby.classes.actions.BixbyAction;
+import guepardoapps.bixby.classes.actions.NetworkAction;
+import guepardoapps.bixby.classes.actions.WirelessSocketAction;
 import guepardoapps.bixby.services.BixbyPairService;
+
 import guepardoapps.lucahome.R;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.Tools;
+import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 import guepardoapps.lucahome.service.NavigationService;
 
+@SuppressWarnings("deprecation")
 public class BixbyEditActivity extends AppCompatActivity {
     private static final String TAG = BixbyEditActivity.class.getSimpleName();
-
-    private boolean _propertyChanged;
 
     private ReceiverController _receiverController;
 
@@ -72,35 +78,72 @@ public class BixbyEditActivity extends AppCompatActivity {
         }
     };
 
-    private TextWatcher _textWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int start, int count, int after) {
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int start, int count, int after) {
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-            _propertyChanged = true;
-            _saveButton.setEnabled(true);
-        }
-    };
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bixby_edit);
-
-        BixbyPair bixbyPair = (BixbyPair) getIntent().getSerializableExtra(BixbyPairService.BIXBY_PAIR_INTENT);
-
         _receiverController = new ReceiverController(this);
-
         _saveButton = findViewById(R.id.save_bixby_edit_button);
 
-        // TODO add ui elements
+        // Bixby Action ui elements
 
+        Spinner bixbyEditActionTypeSpinner = findViewById(R.id.bixby_edit_action_type_spinner);
+        bixbyEditActionTypeSpinner.setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, BixbyAction.ActionType.values()));
+
+        Spinner bixbyEditApplicationSpinner = findViewById(R.id.bixby_edit_application_spinner);
+        bixbyEditApplicationSpinner.setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, BixbyPairService.getInstance().GetPackageNameList()));
+
+        PercentRelativeLayout bixbyEditNetworkRelativeLayout = findViewById(R.id.bixby_edit_network_relative_layout);
+        Spinner bixbyEditNetworkTypeSpinner = findViewById(R.id.bixby_edit_network_type_spinner);
+        bixbyEditNetworkTypeSpinner.setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, NetworkAction.NetworkType.values()));
+        Spinner bixbyEditNetworkActionSpinner = findViewById(R.id.bixby_edit_network_action_spinner);
+        bixbyEditNetworkActionSpinner.setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, NetworkAction.StateType.values()));
+
+        PercentRelativeLayout bixbyEditWirelessSocketRelativeLayout = findViewById(R.id.bixby_edit_wireless_socket_relative_layout);
+        Spinner bixbyEditWirelessSocketSpinner = findViewById(R.id.bixby_edit_wireless_socket_spinner);
+        bixbyEditWirelessSocketSpinner.setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketService.getInstance().GetNameList()));
+        Spinner bixbyEditWirelessActionSpinner = findViewById(R.id.bixby_edit_wireless_action_spinner);
+        bixbyEditWirelessActionSpinner.setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketAction.StateType.values()));
+
+        bixbyEditActionTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                BixbyAction.ActionType actionType = BixbyAction.ActionType.values()[position];
+                switch (actionType) {
+                    case Application:
+                        bixbyEditApplicationSpinner.setVisibility(View.VISIBLE);
+                        bixbyEditNetworkRelativeLayout.setVisibility(View.GONE);
+                        bixbyEditWirelessSocketRelativeLayout.setVisibility(View.GONE);
+                        break;
+                    case Network:
+                        bixbyEditApplicationSpinner.setVisibility(View.GONE);
+                        bixbyEditNetworkRelativeLayout.setVisibility(View.VISIBLE);
+                        bixbyEditWirelessSocketRelativeLayout.setVisibility(View.GONE);
+                        break;
+                    case WirelessSocket:
+                        bixbyEditApplicationSpinner.setVisibility(View.GONE);
+                        bixbyEditNetworkRelativeLayout.setVisibility(View.GONE);
+                        bixbyEditWirelessSocketRelativeLayout.setVisibility(View.VISIBLE);
+                        break;
+                    case Null:
+                    default:
+                        bixbyEditApplicationSpinner.setVisibility(View.GONE);
+                        bixbyEditNetworkRelativeLayout.setVisibility(View.GONE);
+                        bixbyEditWirelessSocketRelativeLayout.setVisibility(View.GONE);
+                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Invalid action %s in bixbyEditActionTypeSpinner.setOnItemSelectedListener", actionType));
+                        Toasty.error(BixbyEditActivity.this, "Invalid action selection!", Toast.LENGTH_LONG).show();
+                        break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
+        // TODO add requirement ui elements
+
+        BixbyPair bixbyPair = (BixbyPair) getIntent().getSerializableExtra(BixbyPairService.BIXBY_PAIR_INTENT);
         if (bixbyPair != null) {
             // TODO add ui elements
         } else {
@@ -109,8 +152,8 @@ public class BixbyEditActivity extends AppCompatActivity {
 
         // TODO add ui elements
 
-        _saveButton.setEnabled(false);
         _saveButton.setOnClickListener(view -> {
+            _saveButton.setEnabled(false);
             // TODO add ui elements
         });
     }
@@ -142,16 +185,6 @@ public class BixbyEditActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         NavigationService.getInstance().GoBack(this);
-    }
-
-    /**
-     * Build a custom error text
-     */
-    private SpannableStringBuilder createErrorText(@NonNull String errorString) {
-        ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.RED);
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(errorString);
-        spannableStringBuilder.setSpan(foregroundColorSpan, 0, errorString.length(), 0);
-        return spannableStringBuilder;
     }
 
     private void displayErrorSnackBar(@NonNull String message) {

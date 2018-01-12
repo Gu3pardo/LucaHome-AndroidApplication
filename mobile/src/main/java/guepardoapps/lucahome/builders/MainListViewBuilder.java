@@ -102,8 +102,8 @@ public class MainListViewBuilder {
                 MainListViewItem.Type.Coin
         );
 
-        MainListViewItem mediaMirrorItem = new MainListViewItem(
-                "MediaMirror", "Control your local media mirror", R.drawable.main_image_mediamirror,
+        MainListViewItem mediaServerItem = new MainListViewItem(
+                "MediaServer", "Control your local media server", R.drawable.main_image_mediamirror,
                 () -> navigateTo(MediaServerActivity.class),
                 MainListViewItem.Type.MediaServer
         );
@@ -243,7 +243,7 @@ public class MainListViewBuilder {
         _mainListViewItems.addValue(moneyMeterDataItem);
         _mainListViewItems.addValue(shoppingItem);
         _mainListViewItems.addValue(menuItem);
-        _mainListViewItems.addValue(mediaMirrorItem);
+        _mainListViewItems.addValue(mediaServerItem);
         _mainListViewItems.addValue(movieItem);
         _mainListViewItems.addValue(birthdayItem);
         _mainListViewItems.addValue(meterDataItem);

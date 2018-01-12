@@ -8,29 +8,36 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.widget.Toast;
 
-import java.util.ArrayList;
+import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
-import guepardoapps.lucahome.basic.classes.SerializableList;
+
 import guepardoapps.lucahome.basic.controller.BroadcastController;
+import guepardoapps.lucahome.basic.controller.CommandController;
 import guepardoapps.lucahome.basic.controller.ReceiverController;
 import guepardoapps.lucahome.basic.controller.UserInformationController;
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.common.classes.WirelessSocket;
+
+import guepardoapps.lucahome.common.classes.mediaserver.MediaServerInformationData;
+import guepardoapps.lucahome.common.classes.mediaserver.RadioStreamData;
+import guepardoapps.lucahome.common.classes.mediaserver.SleepTimerData;
+import guepardoapps.lucahome.common.classes.mediaserver.YoutubeData;
 import guepardoapps.lucahome.common.constants.Timeouts;
 import guepardoapps.lucahome.common.enums.MediaServerAction;
 import guepardoapps.lucahome.common.enums.MediaServerSelection;
 import guepardoapps.lucahome.common.enums.RSSFeed;
 import guepardoapps.lucahome.common.enums.RadioStreams;
 import guepardoapps.lucahome.common.enums.YoutubeId;
+import guepardoapps.lucahome.common.service.MediaServerService;
+
 import guepardoapps.mediamirror.R;
 import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
 import guepardoapps.mediamirror.common.models.CenterModel;
 import guepardoapps.mediamirror.common.models.RSSModel;
-import guepardoapps.mediamirror.common.models.YoutubeDatabaseModel;
 import guepardoapps.mediamirror.controller.CenterViewController;
 import guepardoapps.mediamirror.controller.MediaVolumeController;
+import guepardoapps.mediamirror.controller.RssViewController;
 import guepardoapps.mediamirror.controller.ScreenController;
 
 @SuppressWarnings({"unchecked", "WeakerAccess"})
@@ -40,25 +47,23 @@ public class DataHandler {
     private Context _context;
 
     private BroadcastController _broadcastController;
-    private CenterViewController _centerViewController;
+    private CommandController _commandController;
     private MediaVolumeController _mediaVolumeController;
     private ReceiverController _receiverController;
     private ScreenController _screenController;
     private UserInformationController _userInformationController;
 
     private int _batteryLevel = -1;
-    private SerializableList<WirelessSocket> _socketList;
-    private String _lastYoutubeId = YoutubeId.THE_GOOD_LIFE_STREAM.GetYoutubeId();
 
-    private boolean _seaSoundIsRunning;
-    private long _seaSoundStartTime = -1;
-    private Handler _seaSoundHandler = new Handler();
-    private Runnable _seaSoundRunnable = new Runnable() {
+    private boolean _sleepTimerEnabled;
+    private long _sleepTimerStartTime = -1;
+    private Handler _sleepTimerHandler = new Handler();
+    private Runnable _sleepTimerRunnable = new Runnable() {
         @Override
         public void run() {
             CenterModel goodNightModel = new CenterModel(
                     true, "Sleep well!",
-                    false, "",
+                    false, YoutubeId.NULL,
                     false, "",
                     false, RadioStreams.BAYERN_3);
 
@@ -68,8 +73,8 @@ public class DataHandler {
                     goodNightModel);
 
             _broadcastController.SendSimpleBroadcast(Broadcasts.SCREEN_OFF);
-            _seaSoundIsRunning = false;
-            _seaSoundStartTime = -1;
+            _sleepTimerEnabled = false;
+            _sleepTimerStartTime = -1;
         }
     };
 
@@ -77,7 +82,7 @@ public class DataHandler {
         _context = context;
 
         _broadcastController = new BroadcastController(_context);
-        _centerViewController = CenterViewController.getInstance();
+        _commandController = new CommandController(_context);
         _mediaVolumeController = MediaVolumeController.getInstance();
         _mediaVolumeController.Initialize(_context);
         _receiverController = new ReceiverController(_context);
@@ -90,545 +95,633 @@ public class DataHandler {
                 _batteryLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
             }
         }, new String[]{Intent.ACTION_BATTERY_CHANGED});
-
-        _receiverController.RegisterReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                SerializableList<WirelessSocket> socketList = (SerializableList<WirelessSocket>) intent.getSerializableExtra(Bundles.WIRELESS_SOCKET_LIST);
-                if (socketList != null) {
-                    _socketList = socketList;
-                }
-            }
-        }, new String[]{Broadcasts.WIRELESS_SOCKET_LIST});
     }
 
-    public String PerformAction(@NonNull String command) {
-        if (command.startsWith("ACTION:")) {
-            MediaServerAction action = convertCommandToAction(command);
+    public String PerformAction(@NonNull String communication) {
+        if (communication.startsWith("COMMAND:")) {
+            MediaServerAction commandAction = convertCommandToAction(communication);
 
-            if (action != null) {
-                String data = convertCommandToData(command);
+            if (commandAction != null) {
+                String commandData = convertCommandToData(communication);
 
-                switch (action) {
-                    case SHOW_YOUTUBE_VIDEO:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
+                switch (commandAction) {
+                    case YOUTUBE_PLAY:
+                        return handleYoutubePlay(commandData);
+                    case YOUTUBE_PAUSE:
+                        return handleYoutubePause(commandData);
+                    case YOUTUBE_STOP:
+                        return handleYoutubeStop(commandData);
+                    case YOUTUBE_SET_POSITION:
+                        return handleYoutubeSetPosition(commandData);
 
-                        if (data.length() < 4) {
-                            int youtubeIdInt = -1;
-                            try {
-                                youtubeIdInt = Integer.parseInt(data);
+                    case CENTER_TEXT_SET:
+                        return handleCenterTextSet(commandData);
 
-                            } catch (Exception exception) {
-                                Logger.getInstance().Error(TAG, exception.toString());
-                                Logger.getInstance().Warning(TAG, "Setting youtubeId to 0!");
-                                youtubeIdInt = 0;
+                    case RADIO_STREAM_PLAY:
+                        return handleRadioStreamPlay(commandData);
+                    case RADIO_STREAM_STOP:
+                        return handleRadioStreamStop(commandData);
 
-                            } finally {
-                                YoutubeId youtubeId = YoutubeId.GetById(youtubeIdInt);
-                                if (youtubeId == null) {
-                                    Logger.getInstance().Warning(TAG, "youtubeId is null! Setting to default");
-                                    youtubeId = YoutubeId.THE_GOOD_LIFE_STREAM;
-                                }
+                    case MEDIA_NOTIFICATION_PLAY:
+                        return handleMediaNotificationPlay(commandData);
+                    case MEDIA_NOTIFICATION_STOP:
+                        return handleMediaNotificationStop(commandData);
 
-                                CenterModel youtubeModel = new CenterModel(
-                                        false, "",
-                                        true, youtubeId.GetYoutubeId(),
-                                        false, "",
-                                        false, RadioStreams.BAYERN_3);
+                    case SLEEP_SOUND_PLAY:
+                        return handleSleepSoundPlay(commandData);
+                    case SLEEP_SOUND_STOP:
+                        return handleSleepSoundStop(commandData);
 
-                                _broadcastController.SendSerializableBroadcast(
-                                        Broadcasts.SHOW_CENTER_MODEL,
-                                        Bundles.CENTER_MODEL,
-                                        youtubeModel);
-
-                                _lastYoutubeId = youtubeId.GetYoutubeId();
-                            }
-                        } else if (data.length() == 11) {
-                            CenterModel youtubeModel = new CenterModel(
-                                    false, "",
-                                    true, data,
-                                    false, "",
-                                    false, RadioStreams.BAYERN_3);
-                            _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, youtubeModel);
-                            _lastYoutubeId = data;
-                        } else {
-                            Logger.getInstance().Warning(TAG, "Wrong size for data of youtube id!");
-                        }
-                        break;
-
-                    case PLAY_YOUTUBE_VIDEO:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        if (data != null) {
-                            if (data.length() > 0) {
-                                _lastYoutubeId = data;
-                                _broadcastController.SendStringBroadcast(Broadcasts.PLAY_VIDEO, Bundles.YOUTUBE_ID, data);
-                            } else {
-                                _broadcastController.SendSimpleBroadcast(Broadcasts.PLAY_VIDEO);
-                            }
-                        } else {
-                            _broadcastController.SendSimpleBroadcast(Broadcasts.PLAY_VIDEO);
-                        }
-                        break;
-
-                    case PAUSE_YOUTUBE_VIDEO:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.PAUSE_VIDEO);
-                        break;
-
-                    case STOP_YOUTUBE_VIDEO:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.STOP_VIDEO);
-                        break;
-
-                    case GET_SAVED_YOUTUBE_IDS:
-                        ArrayList<YoutubeDatabaseModel> loadedList = _centerViewController.GetYoutubeIds();
-                        loadedList.sort((elementOne, elementTwo) -> Integer.valueOf(elementTwo.GetPlayCount()).compareTo(elementOne.GetPlayCount()));
-
-                        StringBuilder answer = new StringBuilder();
-                        for (YoutubeDatabaseModel entry : loadedList) {
-                            answer.append(entry.GetCommunicationString());
-                        }
-
-                        return action.toString() + ":" + answer;
-
-                    case SET_YOUTUBE_PLAY_POSITION:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        int positionPercent = -1;
-                        try {
-                            positionPercent = Integer.parseInt(data);
-                        } catch (Exception ex) {
-                            Logger.getInstance().Error(TAG, ex.getMessage());
-                        }
-
-                        _broadcastController.SendIntBroadcast(
-                                Broadcasts.SET_VIDEO_POSITION,
-                                Bundles.VIDEO_POSITION_PERCENT,
-                                positionPercent);
-
-                        break;
-
-                    case SHOW_RADIO_STREAM:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        RadioStreams radioStream = RadioStreams.BAYERN_3;
-                        try {
-                            int radioStreamId = Integer.parseInt(data);
-                            radioStream = RadioStreams.GetById(radioStreamId);
-                        } catch (Exception exception) {
-                            Logger.getInstance().Error(TAG, exception.getMessage());
-                        }
-
-                        CenterModel radioStreamModel = new CenterModel(
-                                false, "",
-                                false, "",
-                                false, "",
-                                true, radioStream);
-
-                        _broadcastController.SendSerializableBroadcast(
-                                Broadcasts.SHOW_CENTER_MODEL,
-                                Bundles.CENTER_MODEL,
-                                radioStreamModel);
-                        break;
-
-                    case IS_RADIO_STREAM_PLAYING:
-                        return action.toString() + ":" + String.valueOf(_centerViewController.IsRadioStreamPlaying());
-
-                    case PLAY_RADIO_STREAM:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        if (data != null) {
-                            if (data.length() > 0) {
-                                _lastYoutubeId = data;
-                                _broadcastController.SendStringBroadcast(
-                                        Broadcasts.PLAY_RADIO_STREAM,
-                                        Bundles.RADIO_STREAM_ID,
-                                        data);
-                            } else {
-                                _broadcastController.SendSimpleBroadcast(Broadcasts.PLAY_RADIO_STREAM);
-                            }
-                        } else {
-                            _broadcastController.SendSimpleBroadcast(Broadcasts.PLAY_RADIO_STREAM);
-                        }
-                        break;
-
-                    case STOP_RADIO_STREAM:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.STOP_RADIO_STREAM);
-                        break;
-
-                    case PLAY_SEA_SOUND:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        int timeOut;
-                        try {
-                            timeOut = Integer.parseInt(data) * 60 * 1000;
-                        } catch (Exception exception) {
-                            Logger.getInstance().Error(TAG, exception.getMessage());
-                            Toasty.error(_context, exception.toString(), Toast.LENGTH_LONG).show();
-                            timeOut = Timeouts.SEA_SOUND_STOP;
-                        }
-
-                        CenterModel playSeaSoundModel = new CenterModel(
-                                false, "",
-                                true, YoutubeId.SEA_SOUND.GetYoutubeId(),
-                                false, "",
-                                false, RadioStreams.BAYERN_3);
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, playSeaSoundModel);
-
-                        _seaSoundHandler.postDelayed(_seaSoundRunnable, timeOut);
-                        _seaSoundIsRunning = true;
-                        _seaSoundStartTime = System.currentTimeMillis();
-                        break;
-
-                    case STOP_SEA_SOUND:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        CenterModel stopSeaSoundModel = new CenterModel(
-                                true, "",
-                                false, "",
-                                false, "",
-                                false, RadioStreams.BAYERN_3);
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, stopSeaSoundModel);
-
-                        _seaSoundHandler.removeCallbacks(_seaSoundRunnable);
-                        _seaSoundIsRunning = false;
-                        _seaSoundStartTime = -1;
-                        break;
-
-                    case IS_SEA_SOUND_PLAYING:
-                        String seaSSoundIsPlaying;
-
-                        if (_seaSoundIsRunning) {
-                            seaSSoundIsPlaying = "1";
-                        } else {
-                            seaSSoundIsPlaying = "0";
-                        }
-
-                        return action.toString() + ":" + seaSSoundIsPlaying;
-
-                    case GET_SEA_SOUND_COUNTDOWN:
-                        if (_seaSoundStartTime == -1) {
-                            return action.toString() + ":-1";
-                        }
-                        long currentTime = System.currentTimeMillis();
-                        long differenceTimeSec = (Timeouts.SEA_SOUND_STOP - (currentTime - _seaSoundStartTime)) / 1000;
-                        while (differenceTimeSec < 0) {
-                            differenceTimeSec += 24 * 60 * 60;
-                        }
-                        return action.toString() + ":" + differenceTimeSec;
-
-                    case SHOW_CENTER_TEXT:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        CenterModel centerTextModel = new CenterModel(
-                                true, data,
-                                false, "",
-                                false, "",
-                                false, RadioStreams.BAYERN_3);
-                        _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, centerTextModel);
-                        break;
-
-                    case SET_RSS_FEED:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        int feedIdInt = -1;
-                        try {
-                            feedIdInt = Integer.parseInt(data);
-                        } catch (Exception e) {
-                            Logger.getInstance().Error(TAG, e.getMessage());
-                            Logger.getInstance().Warning(TAG, "Setting feedIdInt to 0!");
-                            feedIdInt = 0;
-                        } finally {
-                            RSSFeed rssFeed = RSSFeed.GetById(feedIdInt);
-
-                            if (rssFeed == null) {
-                                Logger.getInstance().Warning(TAG, "rssFeed is null! Setting to default");
-                                rssFeed = RSSFeed.DEFAULT;
-                            }
-
-                            RSSModel rSSFeedModel = new RSSModel(rssFeed, true);
-                            _broadcastController.SendSerializableBroadcast(Broadcasts.PERFORM_RSS_UPDATE, Bundles.RSS_MODEL, rSSFeedModel);
-                        }
-                        break;
-
-                    case RESET_RSS_FEED:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.RESET_RSS_FEED);
-                        break;
-
-                    case UPDATE_CURRENT_WEATHER:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_CURRENT_WEATHER_UPDATE);
-                        break;
-
-                    case UPDATE_FORECAST_WEATHER:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_FORECAST_WEATHER_UPDATE);
-                        break;
-
-                    case UPDATE_RASPBERRY_TEMPERATURE:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_TEMPERATURE_UPDATE);
-                        break;
-
-                    case UPDATE_IP_ADDRESS:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_IP_ADDRESS_UPDATE);
-                        break;
+                    case RSS_FEED_SET:
+                        return handleRssFeedSet(commandData);
+                    case RSS_FEED_RESET:
+                        return handleRssFeedReset(commandData);
 
                     case UPDATE_BIRTHDAY_ALARM:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_BIRTHDAY_UPDATE);
-                        break;
-
+                        return handleUpdateBirthdayAlarm(commandData);
                     case UPDATE_CALENDAR_ALARM:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
+                        return handleUpdateCalendarAlarm(commandData);
+                    case UPDATE_CURRENT_WEATHER:
+                        return handleUpdateCurrentWeather(commandData);
+                    case UPDATE_FORECAST_WEATHER:
+                        return handleUpdateForecastWeather(commandData);
+                    case UPDATE_IP_ADDRESS:
+                        return handleUpdateIpAddress(commandData);
+                    case UPDATE_RASPBERRY_TEMPERATURE:
+                        return handleUpdateRaspberryTemperature(commandData);
 
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_CALENDAR_UPDATE);
-                        break;
+                    case VOLUME_INCREASE:
+                        return handleVolumeIncrease(commandData);
+                    case VOLUME_DECREASE:
+                        return handleVolumeDecrease(commandData);
+                    case VOLUME_MUTE:
+                        return handleVolumeMute(commandData);
+                    case VOLUME_UN_MUTE:
+                        return handleVolumeUnMute(commandData);
 
-                    case INCREASE_VOLUME:
-                        _mediaVolumeController.IncreaseVolume();
-                        return action.toString() + ":" + _mediaVolumeController.GetCurrentVolume();
-
-                    case DECREASE_VOLUME:
-                        _mediaVolumeController.DecreaseVolume();
-                        return action.toString() + ":" + _mediaVolumeController.GetCurrentVolume();
-
-                    case MUTE_VOLUME:
-                        _mediaVolumeController.MuteVolume();
-                        return action.toString() + ":Muted";
-
-                    case UN_MUTE_VOLUME:
-                        _mediaVolumeController.UnMuteVolume();
-                        return action.toString() + ":" + _mediaVolumeController.GetCurrentVolume();
-
-                    case GET_CURRENT_VOLUME:
-                        return action.toString() + ":" + _mediaVolumeController.GetCurrentVolume();
-
-                    case INCREASE_SCREEN_BRIGHTNESS:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendIntBroadcast(
-                                Broadcasts.ACTION_SCREEN_BRIGHTNESS,
-                                Bundles.SCREEN_BRIGHTNESS,
-                                ScreenController.INCREASE);
-
-                        return action.toString() + ":" + String.valueOf(_screenController.GetCurrentBrightness());
-
-                    case DECREASE_SCREEN_BRIGHTNESS:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
-
-                        _broadcastController.SendIntBroadcast(Broadcasts.ACTION_SCREEN_BRIGHTNESS, Bundles.SCREEN_BRIGHTNESS, ScreenController.DECREASE);
-                        return action.toString() + ":" + String.valueOf(_screenController.GetCurrentBrightness());
-
-                    case GET_SCREEN_BRIGHTNESS:
-                        return action.toString() + ":" + String.valueOf(_screenController.GetCurrentBrightness());
-
-                    case SCREEN_ON:
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.SCREEN_ON);
-                        break;
-
-                    case SCREEN_OFF:
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.SCREEN_OFF);
-                        break;
-
+                    case SCREEN_BRIGHTNESS_INCREASE:
+                        return handleScreenBrightnessIncrease(commandData);
+                    case SCREEN_BRIGHTNESS_DECREASE:
+                        return handleScreenBrightnessDecrease(commandData);
                     case SCREEN_NORMAL:
-                        if (!_screenController.IsScreenOn()) {
-                            Logger.getInstance().Error(TAG, "Screen is not enabled!");
-                            return "Error:Screen is not enabled!";
-                        }
+                        return handleScreenNormal(commandData);
+                    case SCREEN_ON:
+                        return handleScreenOn(commandData);
+                    case SCREEN_OFF:
+                        return handleScreenOff(commandData);
 
-                        _broadcastController.SendSimpleBroadcast(Broadcasts.SCREEN_NORMAL);
-                        break;
+                    case GET_CENTER_TEXT:
+                        return handleGetCenterText(commandData, commandAction);
+                    case GET_MEDIA_NOTIFICATION_DATA:
+                        return handleGetMediaNotificationData(commandData, commandAction);
+                    case GET_MEDIA_SERVER_INFORMATION_DATA:
+                        return handleGetMediaServerInformation(commandData, commandAction);
+                    case GET_RADIO_DATA:
+                        return handleGetRadioData(commandData, commandAction);
+                    case GET_RSS_FEED_DATA:
+                        return handleGetRssFeedData(commandData, commandAction);
+                    case GET_SLEEP_TIMER_DATA:
+                        return handleGetSleepTimerData(commandData, commandAction);
+                    case GET_YOUTUBE_DATA:
+                        return handleGetYoutubeData(commandData, commandAction);
 
-                    case GET_BATTERY_LEVEL:
-                        return action.toString() + ":" + String.valueOf(_batteryLevel);
+                    case SYSTEM_REBOOT:
+                        return handleSystemReboot(commandData);
+                    case SYSTEM_SHUTDOWN:
+                        return handleSystemShutdown(commandData);
 
-                    case GET_SERVER_VERSION:
-                        return action.toString() + ":" + _context.getString(R.string.serverVersion);
-
-                    case GET_MEDIA_SERVER_DTO:
-                        String serverIp = _userInformationController.GetIp();
-                        String batteryLevel = String.valueOf(_batteryLevel);
-                        String socketName = MediaServerSelection.GetByIp(serverIp).GetSocket();
-                        String socketState = "0";
-
-                        if (_socketList != null) {
-                            for (int index = 0; index < _socketList.getSize(); index++) {
-                                WirelessSocket socket = _socketList.getValue(index);
-                                if (socket.GetName().contains(socketName)) {
-                                    socketState = socket.IsActivated() ? "1" : "0";
-                                    break;
-                                }
-                            }
-                        } else {
-                            Logger.getInstance().Warning(TAG, "Cannot search socket state! _socketList is null!");
-                        }
-
-                        String volume = String.valueOf(_mediaVolumeController.GetCurrentVolume());
-
-                        String youtubeId = _lastYoutubeId;
-                        String isYoutubePlaying = _centerViewController.IsYoutubePlaying() ? "1" : "0";
-                        String youtubeCurrentPlayPosition = String.valueOf(_centerViewController.GetCurrentPlayPosition());
-                        String youtubeCurrentVideoDuration = String.valueOf(_centerViewController.GetYoutubeDuration());
-
-                        StringBuilder playedYoutubeIds = new StringBuilder();
-
-                        ArrayList<YoutubeDatabaseModel> loadedListFromDb = _centerViewController.GetYoutubeIds();
-                        loadedListFromDb.sort((elementOne, elementTwo) -> Integer.valueOf(elementTwo.GetPlayCount()).compareTo(elementOne.GetPlayCount()));
-
-                        for (YoutubeDatabaseModel entry : loadedListFromDb) {
-                            playedYoutubeIds.append(entry.GetCommunicationString());
-                        }
-
-                        String radioStreamId = String.valueOf(_centerViewController.GetRadioStreamId());
-                        String isRadioStreamPlaying = _centerViewController.IsRadioStreamPlaying() ? "1" : "0";
-
-                        String isSeaSSoundPlaying = _seaSoundIsRunning ? "1" : "0";
-                        String seaSoundCountdown;
-                        if (!_seaSoundIsRunning) {
-                            seaSoundCountdown = "-1";
-                        } else {
-                            if (_seaSoundStartTime == -1) {
-                                seaSoundCountdown = "-1";
-                            } else {
-                                long currentTimeMSec = System.currentTimeMillis();
-                                long differenceTimeInSec = (currentTimeMSec - _seaSoundStartTime) / 1000;
-                                while (differenceTimeInSec < 0) {
-                                    differenceTimeInSec += 24 * 60 * 60;
-                                }
-                                seaSoundCountdown = String.valueOf(differenceTimeInSec);
-                            }
-                        }
-
-                        String serverVersion = _context.getString(R.string.serverVersion);
-                        String screenBrightness = String.valueOf(_screenController.GetCurrentBrightness());
-
-                        String mediaMirrorDto = String.format("%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s|%s",
-                                serverIp, batteryLevel, socketName,
-                                socketState, volume, youtubeId,
-                                isYoutubePlaying, youtubeCurrentPlayPosition, youtubeCurrentVideoDuration,
-                                playedYoutubeIds.toString(), radioStreamId, isRadioStreamPlaying,
-                                isSeaSSoundPlaying, seaSoundCountdown, serverVersion,
-                                screenBrightness);
-
-                        return action.toString() + ":" + mediaMirrorDto;
-
+                    case NULL:
                     default:
-                        Logger.getInstance().Warning(TAG, "Action not handled!\n" + action.toString());
-                        return "Action not handled!\n" + action.toString();
+                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Error: No handle for %s", commandData));
+                        return String.format(Locale.getDefault(), "Error: No handle for %s", commandData);
                 }
-                return "OK:Command performed:" + action.toString();
             } else {
-                Logger.getInstance().Warning(TAG, "Action failed to be converted! Is null!\n" + command);
-                return "Action failed to be converted! Is null!\n" + command;
+                Logger.getInstance().Warning(TAG, "Action failed to be converted! Is null!\n" + communication);
+                return "Action failed to be converted! Is null!\n" + communication;
             }
         } else {
-            Logger.getInstance().Warning(TAG, "Command has wrong format!\n" + command);
-            return "Command has wrong format!\n" + command;
+            Logger.getInstance().Warning(TAG, "Communication has wrong format!\n" + communication);
+            return "Communication has wrong format!\n" + communication;
         }
     }
 
     public void Dispose() {
+        Logger.getInstance().Debug(TAG, "Dispose");
         _mediaVolumeController.Dispose();
         _receiverController.Dispose();
     }
 
-    private MediaServerAction convertCommandToAction(@NonNull String command) {
-        String[] entries = command.split("\\&");
-        if (entries.length == 2) {
-            String action = entries[0];
-            action = action.replace("ACTION:", "");
-            return MediaServerAction.GetByString(action);
+    private MediaServerAction convertCommandToAction(@NonNull String communication) {
+        String[] entries = communication.split(MediaServerService.COMMAND_SPLIT_CHAR);
+        if (entries.length == MediaServerService.COMMAND_DATA_SIZE) {
+            String command = entries[MediaServerService.INDEX_COMMAND_ACTION];
+            command = command.replace("COMMAND:", "");
+            return MediaServerAction.GetByString(command);
         }
 
         Logger.getInstance().Warning(TAG, "Wrong size of entries: " + String.valueOf(entries.length));
         return MediaServerAction.NULL;
     }
 
-    private String convertCommandToData(@NonNull String command) {
-        String[] entries = command.split("\\&");
-        if (entries.length == 2) {
-            String data = entries[1];
+    private String convertCommandToData(@NonNull String communication) {
+        String[] entries = communication.split(MediaServerService.COMMAND_SPLIT_CHAR);
+        if (entries.length == MediaServerService.COMMAND_DATA_SIZE) {
+            String data = entries[MediaServerService.INDEX_COMMAND_DATA];
             data = data.replace("DATA:", "");
             return data;
         }
         Logger.getInstance().Warning(TAG, "Wrong size of entries: " + String.valueOf(entries.length));
         return "";
+    }
+
+    private String handleYoutubePlay(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleYoutubePlay with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.YOUTUBE_PLAY);
+        }
+
+        if (commandData.length() == 0) {
+            _broadcastController.SendSimpleBroadcast(Broadcasts.PLAY_VIDEO);
+
+        } else if (commandData.length() > 0 && commandData.length() < 4) {
+            int youtubeIdInt;
+            try {
+                youtubeIdInt = Integer.parseInt(commandData);
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.toString());
+                Logger.getInstance().Warning(TAG, "Setting youtubeId to 0!");
+                youtubeIdInt = 0;
+            }
+
+            YoutubeId youtubeId = YoutubeId.GetById(youtubeIdInt);
+            if (youtubeId == null) {
+                Logger.getInstance().Warning(TAG, "youtubeId is null! Setting to default");
+                youtubeId = YoutubeId.THE_GOOD_LIFE_STREAM;
+            }
+
+            CenterModel youtubeModel = new CenterModel(
+                    false, "",
+                    true, youtubeId,
+                    false, "",
+                    false, RadioStreams.BAYERN_3);
+
+            _broadcastController.SendSerializableBroadcast(
+                    Broadcasts.SHOW_CENTER_MODEL,
+                    Bundles.CENTER_MODEL,
+                    youtubeModel);
+
+        } else if (commandData.length() == 11) {
+            YoutubeId youtubeId = YoutubeId.NULL;
+            youtubeId.SetYoutubeId(commandData);
+
+            CenterModel youtubeModel = new CenterModel(
+                    false, "",
+                    true, youtubeId,
+                    false, "",
+                    false, RadioStreams.BAYERN_3);
+
+            _broadcastController.SendSerializableBroadcast(
+                    Broadcasts.SHOW_CENTER_MODEL,
+                    Bundles.CENTER_MODEL,
+                    youtubeModel);
+
+        } else {
+            Logger.getInstance().Warning(TAG, "Wrong size for data of youtube id!");
+            return errorResponse("Wrong size for data of youtube id", MediaServerAction.YOUTUBE_PLAY);
+        }
+
+        return handleGetYoutubeData(commandData, MediaServerAction.YOUTUBE_PLAY);
+    }
+
+    private String handleYoutubePause(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleYoutubePause with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.YOUTUBE_PAUSE);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.PAUSE_VIDEO);
+        return handleGetYoutubeData(commandData, MediaServerAction.YOUTUBE_PAUSE);
+    }
+
+    private String handleYoutubeStop(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleYoutubeStop with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.YOUTUBE_STOP);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.STOP_VIDEO);
+        return handleGetYoutubeData(commandData, MediaServerAction.YOUTUBE_STOP);
+    }
+
+    private String handleYoutubeSetPosition(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleYoutubeSetPosition with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.YOUTUBE_SET_POSITION);
+        }
+
+        int positionPercent = -1;
+        try {
+            positionPercent = Integer.parseInt(commandData);
+        } catch (Exception ex) {
+            Logger.getInstance().Error(TAG, ex.getMessage());
+        }
+
+        _broadcastController.SendIntBroadcast(
+                Broadcasts.SET_VIDEO_POSITION,
+                Bundles.VIDEO_POSITION_PERCENT,
+                positionPercent);
+
+        return handleGetYoutubeData(commandData, MediaServerAction.YOUTUBE_SET_POSITION);
+    }
+
+    private String handleCenterTextSet(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleCenterTextSet with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.CENTER_TEXT_SET);
+        }
+
+        CenterModel centerTextModel = new CenterModel(
+                true, commandData,
+                false, YoutubeId.NULL,
+                false, "",
+                false, RadioStreams.BAYERN_3);
+        _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, centerTextModel);
+
+        return handleGetCenterText(commandData, MediaServerAction.CENTER_TEXT_SET);
+    }
+
+    private String handleRadioStreamPlay(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleRadioStreamPlay with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.RADIO_STREAM_PLAY);
+        }
+
+        RadioStreams radioStream = RadioStreams.BAYERN_3;
+        try {
+            int radioStreamId = Integer.parseInt(commandData);
+            radioStream = RadioStreams.GetById(radioStreamId);
+        } catch (Exception exception) {
+            Logger.getInstance().Error(TAG, exception.getMessage());
+        }
+
+        CenterModel radioStreamModel = new CenterModel(
+                false, "",
+                false, YoutubeId.NULL,
+                false, "",
+                true, radioStream);
+
+        _broadcastController.SendSerializableBroadcast(
+                Broadcasts.SHOW_CENTER_MODEL,
+                Bundles.CENTER_MODEL,
+                radioStreamModel);
+
+        return handleGetRadioData(commandData, MediaServerAction.RADIO_STREAM_PLAY);
+    }
+
+    private String handleRadioStreamStop(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleRadioStreamStop with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.RADIO_STREAM_STOP);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.STOP_RADIO_STREAM);
+        return handleGetRadioData(commandData, MediaServerAction.RADIO_STREAM_STOP);
+    }
+
+    private String handleMediaNotificationPlay(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleMediaNotificationPlay with CommandData %s", commandData));
+        //TODO
+        return handleGetMediaNotificationData(commandData, MediaServerAction.MEDIA_NOTIFICATION_PLAY);
+    }
+
+    private String handleMediaNotificationStop(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleMediaNotificationStop with CommandData %s", commandData));
+        //TODO
+        return handleGetMediaNotificationData(commandData, MediaServerAction.MEDIA_NOTIFICATION_STOP);
+    }
+
+    private String handleSleepSoundPlay(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleSleepSoundPlay with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.SLEEP_SOUND_PLAY);
+        }
+
+        int timeOut;
+        try {
+            timeOut = Integer.parseInt(commandData) * 60 * 1000;
+        } catch (Exception exception) {
+            Logger.getInstance().Error(TAG, exception.toString());
+            Toasty.error(_context, exception.toString(), Toast.LENGTH_LONG).show();
+            timeOut = Timeouts.SEA_SOUND_STOP;
+        }
+
+        CenterModel playSleepSoundModel = new CenterModel(
+                false, "",
+                true, YoutubeId.SEA_SOUND,
+                false, "",
+                false, RadioStreams.BAYERN_3);
+        _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, playSleepSoundModel);
+
+        _sleepTimerHandler.postDelayed(_sleepTimerRunnable, timeOut);
+        _sleepTimerEnabled = true;
+        _sleepTimerStartTime = System.currentTimeMillis();
+
+        return handleGetSleepTimerData(commandData, MediaServerAction.SLEEP_SOUND_PLAY);
+    }
+
+    private String handleSleepSoundStop(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleSleepSoundStop with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.SLEEP_SOUND_STOP);
+        }
+
+        CenterModel stopSleepSoundModel = new CenterModel(
+                true, "",
+                false, YoutubeId.NULL,
+                false, "",
+                false, RadioStreams.BAYERN_3);
+        _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, stopSleepSoundModel);
+
+        _sleepTimerHandler.removeCallbacks(_sleepTimerRunnable);
+        _sleepTimerEnabled = false;
+        _sleepTimerStartTime = -1;
+
+        return handleGetSleepTimerData(commandData, MediaServerAction.SLEEP_SOUND_STOP);
+    }
+
+    private String handleRssFeedSet(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleRssFeedSet with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.RSS_FEED_SET);
+        }
+
+        int feedIdInt;
+        try {
+            feedIdInt = Integer.parseInt(commandData);
+        } catch (Exception exception) {
+            Logger.getInstance().Error(TAG, exception.toString());
+            Logger.getInstance().Warning(TAG, "Setting feedIdInt to 0!");
+            feedIdInt = 0;
+        }
+
+        RSSFeed rssFeed = RSSFeed.GetById(feedIdInt);
+        if (rssFeed == null) {
+            Logger.getInstance().Warning(TAG, "rssFeed is null! Setting to default");
+            rssFeed = RSSFeed.DEFAULT;
+        }
+
+        RSSModel rSSFeedModel = new RSSModel(rssFeed, true);
+        _broadcastController.SendSerializableBroadcast(Broadcasts.PERFORM_RSS_UPDATE, Bundles.RSS_MODEL, rSSFeedModel);
+
+        return handleGetRssFeedData(commandData, MediaServerAction.RSS_FEED_SET);
+    }
+
+    private String handleRssFeedReset(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleRssFeedReset with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.RSS_FEED_RESET);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.RESET_RSS_FEED);
+        return handleGetRssFeedData(commandData, MediaServerAction.RSS_FEED_RESET);
+    }
+
+    private String handleUpdateBirthdayAlarm(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleUpdateBirthdayAlarm with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.UPDATE_BIRTHDAY_ALARM);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_BIRTHDAY_UPDATE);
+        return successResponse(MediaServerAction.UPDATE_BIRTHDAY_ALARM, "-");
+    }
+
+    private String handleUpdateCalendarAlarm(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleUpdateCalendarAlarm with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.UPDATE_CALENDAR_ALARM);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_CALENDAR_UPDATE);
+        return successResponse(MediaServerAction.UPDATE_CALENDAR_ALARM, "-");
+    }
+
+    private String handleUpdateCurrentWeather(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleUpdateCurrentWeather with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.UPDATE_CURRENT_WEATHER);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_CURRENT_WEATHER_UPDATE);
+        return successResponse(MediaServerAction.UPDATE_CURRENT_WEATHER, "-");
+    }
+
+    private String handleUpdateForecastWeather(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleUpdateForecastWeather with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.UPDATE_FORECAST_WEATHER);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_FORECAST_WEATHER_UPDATE);
+        return successResponse(MediaServerAction.UPDATE_FORECAST_WEATHER, "-");
+    }
+
+    private String handleUpdateIpAddress(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleUpdateIpAddress with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.UPDATE_IP_ADDRESS);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_IP_ADDRESS_UPDATE);
+        return successResponse(MediaServerAction.UPDATE_IP_ADDRESS, "-");
+    }
+
+    private String handleUpdateRaspberryTemperature(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleUpdateRaspberryTemperature with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.UPDATE_RASPBERRY_TEMPERATURE);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.PERFORM_TEMPERATURE_UPDATE);
+        return successResponse(MediaServerAction.UPDATE_RASPBERRY_TEMPERATURE, "-");
+    }
+
+    private String handleVolumeIncrease(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleVolumeIncrease with CommandData %s", commandData));
+        _mediaVolumeController.IncreaseVolume();
+        return handleGetMediaServerInformation(commandData, MediaServerAction.VOLUME_INCREASE);
+    }
+
+    private String handleVolumeDecrease(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleVolumeDecrease with CommandData %s", commandData));
+        _mediaVolumeController.DecreaseVolume();
+        return handleGetMediaServerInformation(commandData, MediaServerAction.VOLUME_DECREASE);
+    }
+
+    private String handleVolumeMute(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleVolumeMute with CommandData %s", commandData));
+        _mediaVolumeController.MuteVolume();
+        return handleGetMediaServerInformation(commandData, MediaServerAction.VOLUME_MUTE);
+    }
+
+    private String handleVolumeUnMute(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleVolumeUnMute with CommandData %s", commandData));
+        _mediaVolumeController.UnMuteVolume();
+        return handleGetMediaServerInformation(commandData, MediaServerAction.VOLUME_UN_MUTE);
+    }
+
+    private String handleScreenBrightnessIncrease(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleScreenBrightnessIncrease with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.SCREEN_BRIGHTNESS_INCREASE);
+        }
+        _broadcastController.SendIntBroadcast(Broadcasts.ACTION_SCREEN_BRIGHTNESS, Bundles.SCREEN_BRIGHTNESS, ScreenController.INCREASE);
+        return handleGetMediaServerInformation(commandData, MediaServerAction.SCREEN_BRIGHTNESS_INCREASE);
+    }
+
+    private String handleScreenBrightnessDecrease(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleScreenBrightnessDecrease with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is not enabled!");
+            return errorResponse("Screen is not enabled", MediaServerAction.SCREEN_BRIGHTNESS_DECREASE);
+        }
+        _broadcastController.SendIntBroadcast(Broadcasts.ACTION_SCREEN_BRIGHTNESS, Bundles.SCREEN_BRIGHTNESS, ScreenController.DECREASE);
+        return handleGetMediaServerInformation(commandData, MediaServerAction.SCREEN_BRIGHTNESS_DECREASE);
+
+    }
+
+    private String handleScreenNormal(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleScreenNormal with CommandData %s", commandData));
+        _broadcastController.SendSimpleBroadcast(Broadcasts.SCREEN_NORMAL);
+        return handleGetMediaServerInformation(commandData, MediaServerAction.SCREEN_NORMAL);
+    }
+
+    private String handleScreenOn(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleScreenOn with CommandData %s", commandData));
+        if (_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is already on!");
+            return errorResponse("Screen is already on", MediaServerAction.SCREEN_ON);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.SCREEN_ON);
+        return handleGetMediaServerInformation(commandData, MediaServerAction.SCREEN_ON);
+    }
+
+    private String handleScreenOff(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleScreenOff with CommandData %s", commandData));
+        if (!_screenController.IsScreenOn()) {
+            Logger.getInstance().Error(TAG, "Screen is already off!");
+            return errorResponse("Screen is already off", MediaServerAction.SCREEN_OFF);
+        }
+        _broadcastController.SendSimpleBroadcast(Broadcasts.SCREEN_OFF);
+        return handleGetMediaServerInformation(commandData, MediaServerAction.SCREEN_OFF);
+    }
+
+    private String handleGetCenterText(@NonNull String commandData, MediaServerAction mediaServerAction) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleGetCenterText with CommandData %s", commandData));
+        return successResponse(mediaServerAction != null ? mediaServerAction : MediaServerAction.GET_CENTER_TEXT, CenterViewController.getInstance().GetCenterText());
+    }
+
+    private String handleGetMediaNotificationData(@NonNull String commandData, MediaServerAction mediaServerAction) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleGetMediaNotificationData with CommandData %s", commandData));
+        //TODO
+        return errorResponse("Not implemented", mediaServerAction != null ? mediaServerAction : MediaServerAction.GET_MEDIA_NOTIFICATION_DATA);
+    }
+
+    private String handleGetMediaServerInformation(@NonNull String commandData, MediaServerAction mediaServerAction) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleGetMediaServerInformation with CommandData %s", commandData));
+        MediaServerInformationData mediaServerInformationData = new MediaServerInformationData(
+                MediaServerSelection.GetByIp(_userInformationController.GetIp()),
+                _context.getString(R.string.serverVersion),
+                _mediaVolumeController.GetCurrentVolume(),
+                _batteryLevel,
+                _screenController.GetCurrentBrightness());
+        return successResponse(mediaServerAction != null ? mediaServerAction : MediaServerAction.GET_MEDIA_SERVER_INFORMATION_DATA, mediaServerInformationData.GetCommunicationString());
+    }
+
+    private String handleGetRadioData(@NonNull String commandData, MediaServerAction mediaServerAction) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleGetRadioData with CommandData %s", commandData));
+        RadioStreamData radioStreamData = new RadioStreamData(
+                CenterViewController.getInstance().GetRadioStream(),
+                CenterViewController.getInstance().IsRadioStreamPlaying());
+        return successResponse(mediaServerAction != null ? mediaServerAction : MediaServerAction.GET_RADIO_DATA, radioStreamData.GetCommunicationString());
+    }
+
+    private String handleGetRssFeedData(@NonNull String commandData, MediaServerAction mediaServerAction) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleGetRssFeedData with CommandData %s", commandData));
+        RSSFeed rssFeed = RssViewController.getInstance().GetCurrentRssFeed();
+        return successResponse(mediaServerAction != null ? mediaServerAction : MediaServerAction.GET_RSS_FEED_DATA, String.valueOf(rssFeed.GetId()));
+    }
+
+    private String handleGetSleepTimerData(@NonNull String commandData, MediaServerAction mediaServerAction) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleGetSleepTimerData with CommandData %s", commandData));
+
+        long sleepTimerCountDownSec;
+        if (!_sleepTimerEnabled) {
+            sleepTimerCountDownSec = -1;
+        } else {
+            if (_sleepTimerStartTime == -1) {
+                sleepTimerCountDownSec = -1;
+            } else {
+                long currentTimeMSec = System.currentTimeMillis();
+                sleepTimerCountDownSec = (currentTimeMSec - _sleepTimerStartTime) / 1000;
+                while (sleepTimerCountDownSec < 0) {
+                    sleepTimerCountDownSec += 24 * 60 * 60;
+                }
+            }
+        }
+
+        SleepTimerData sleepTimerData = new SleepTimerData(_sleepTimerEnabled, (int) sleepTimerCountDownSec);
+        return successResponse(mediaServerAction != null ? mediaServerAction : MediaServerAction.GET_SLEEP_TIMER_DATA, sleepTimerData.GetCommunicationString());
+    }
+
+    private String handleGetYoutubeData(@NonNull String commandData, MediaServerAction mediaServerAction) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleGetYoutubeData with CommandData %s", commandData));
+        YoutubeData youtubeData = new YoutubeData(
+                CenterViewController.getInstance().IsYoutubePlaying(),
+                CenterViewController.getInstance().GetYoutubeId().GetYoutubeId(),
+                CenterViewController.getInstance().GetCurrentPlayPosition(),
+                CenterViewController.getInstance().GetYoutubeDuration(),
+                CenterViewController.getInstance().GetYoutubeIds());
+        return successResponse(mediaServerAction != null ? mediaServerAction : MediaServerAction.GET_YOUTUBE_DATA, youtubeData.GetCommunicationString());
+    }
+
+    private String handleSystemReboot(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleSystemReboot with CommandData %s", commandData));
+        if (_commandController.RebootDevice(3000)) {
+            return successResponse(MediaServerAction.SYSTEM_REBOOT, "-");
+        } else {
+            return errorResponse("Cannot reboot!", MediaServerAction.SYSTEM_REBOOT);
+        }
+    }
+
+    private String handleSystemShutdown(@NonNull String commandData) {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "handleSystemShutdown with CommandData %s", commandData));
+        if (_commandController.ShutDownDevice(3000)) {
+            return successResponse(MediaServerAction.SYSTEM_SHUTDOWN, "-");
+        } else {
+            return errorResponse("Cannot shutdown!", MediaServerAction.SYSTEM_SHUTDOWN);
+        }
+    }
+
+    private String successResponse(@NonNull MediaServerAction mediaServerAction, @NonNull String data) {
+        return String.format(Locale.getDefault(), "OK%sCommand performed%s%s%s%s",
+                MediaServerService.RESPONSE_SPLIT_CHAR,
+                MediaServerService.RESPONSE_SPLIT_CHAR, mediaServerAction.toString(),
+                MediaServerService.RESPONSE_SPLIT_CHAR, data);
+    }
+
+    private String errorResponse(@NonNull String errorMessage, @NonNull MediaServerAction mediaServerAction) {
+        return String.format(Locale.getDefault(), "Error%s%s%s%s%s%s",
+                MediaServerService.RESPONSE_SPLIT_CHAR, errorMessage,
+                MediaServerService.RESPONSE_SPLIT_CHAR, mediaServerAction.toString(),
+                MediaServerService.RESPONSE_SPLIT_CHAR, "-");
     }
 }

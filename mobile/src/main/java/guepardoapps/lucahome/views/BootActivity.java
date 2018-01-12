@@ -324,11 +324,13 @@ public class BootActivity extends AppCompatActivity {
 
             _checkAccessibilityServiceFinished = true;
             dialog.dismiss();
+            checkNavigateToMain();
         });
 
         dialog.negativeActionClickListener(view -> {
             _checkAccessibilityServiceFinished = true;
             dialog.dismiss();
+            checkNavigateToMain();
         });
 
         dialog.show();

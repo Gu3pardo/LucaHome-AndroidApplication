@@ -20,9 +20,7 @@ public class ServerThread {
 
     private int _socketServerPort;
     private ServerSocket _serverSocket;
-
     private DataHandler _dataHandler;
-
     private boolean _isRunning;
 
     public ServerThread(int port, @NonNull Context context) {
@@ -31,19 +29,19 @@ public class ServerThread {
     }
 
     public void Start() {
+        Logger.getInstance().Debug(TAG, "Start");
         if (_isRunning) {
             Logger.getInstance().Warning(TAG, "Already running!");
             return;
         }
-
         SocketServerThread socketServerThread = new SocketServerThread();
         Thread thread = new Thread(socketServerThread);
         thread.start();
-
         _isRunning = true;
     }
 
     public void Dispose() {
+        Logger.getInstance().Debug(TAG, "Dispose");
         if (_serverSocket != null) {
             try {
                 _serverSocket.close();
@@ -51,9 +49,7 @@ public class ServerThread {
                 Logger.getInstance().Error(TAG, e.getMessage());
             }
         }
-
         _dataHandler.Dispose();
-
         _isRunning = false;
     }
 
@@ -69,14 +65,13 @@ public class ServerThread {
                     socketServerReplyThread.run();
                     isRunning = socketServerReplyThread.IsRunning();
                 }
-            } catch (IOException e) {
-                Logger.getInstance().Error(TAG, e.getMessage());
+            } catch (IOException ioException) {
+                Logger.getInstance().Error(TAG, ioException.toString());
             }
         }
     }
 
     private class SocketServerReplyThread extends Thread {
-
         private Socket _hostThreadSocket;
         private BufferedReader _inputReader;
         private boolean _isRunning = true;
@@ -126,14 +121,14 @@ public class ServerThread {
 
                 bufferedWriter.close();
                 outputStreamWriter.close();
-            } catch (IOException e) {
-                Logger.getInstance().Error(TAG, e.getMessage());
+            } catch (IOException ioException) {
+                Logger.getInstance().Error(TAG, ioException.toString());
                 _isRunning = false;
             } finally {
                 try {
                     _hostThreadSocket.close();
-                } catch (IOException e) {
-                    Logger.getInstance().Error(TAG, e.getMessage());
+                } catch (IOException ioException) {
+                    Logger.getInstance().Error(TAG, ioException.toString());
                 }
             }
         }

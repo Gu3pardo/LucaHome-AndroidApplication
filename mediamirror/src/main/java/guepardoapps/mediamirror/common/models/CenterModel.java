@@ -12,7 +12,6 @@ public class CenterModel implements Serializable {
     private static final String TAG = CenterModel.class.getSimpleName();
 
     private static final String DEFAULT_CENTER_TEXT = "Hello, this is your media server!";
-    private static final String DEFAULT_YOUTUBE_VIDEO_ID = YoutubeId.DEFAULT.GetYoutubeId();
     private static final String DEFAULT_WEB_VIEW_URL = "http://imgur.com/";
     private static final RadioStreams DEFAULT_RADIO_STREAM = RadioStreams.BAYERN_3;
 
@@ -20,7 +19,7 @@ public class CenterModel implements Serializable {
     private String _centerText;
 
     private boolean _youtubeVisible;
-    private String _youtubeId;
+    private YoutubeId _youtubeId;
 
     private boolean _webViewVisible;
     private String _webViewUrl;
@@ -30,7 +29,7 @@ public class CenterModel implements Serializable {
 
     public CenterModel(
             boolean centerVisible, @NonNull String centerText,
-            boolean youtubeVisible, @NonNull String youtubeId,
+            boolean youtubeVisible, @NonNull YoutubeId youtubeId,
             boolean webViewVisible, @NonNull String webViewUrl,
             boolean radioStreamVisible, @NonNull RadioStreams radioStream) {
         _centerVisible = centerVisible;
@@ -60,7 +59,7 @@ public class CenterModel implements Serializable {
         return _youtubeVisible;
     }
 
-    public String GetYoutubeId() {
+    public YoutubeId GetYoutubeId() {
         return _youtubeId;
     }
 
@@ -90,7 +89,7 @@ public class CenterModel implements Serializable {
 
             Logger.getInstance().Warning(TAG, "Invalid visibilities!");
 
-            if (_youtubeId.length() > 0) {
+            if (_youtubeId != YoutubeId.NULL) {
                 _youtubeVisible = true;
                 Logger.getInstance().Warning(TAG, "Resetting center, webView and radio!");
 
@@ -106,7 +105,7 @@ public class CenterModel implements Serializable {
 
             if (_centerText.length() > 0) {
                 _youtubeVisible = false;
-                _youtubeId = "";
+                _youtubeId = YoutubeId.NULL;
 
                 _centerVisible = true;
                 Logger.getInstance().Warning(TAG, "Resetting youtube, webView and radio!");
@@ -120,7 +119,7 @@ public class CenterModel implements Serializable {
 
             if (_webViewUrl.length() > 0) {
                 _youtubeVisible = false;
-                _youtubeId = "";
+                _youtubeId = YoutubeId.NULL;
 
                 _centerVisible = false;
                 _centerText = "";
@@ -134,7 +133,7 @@ public class CenterModel implements Serializable {
 
             if (_radioStream != null || _radioStream != RadioStreams.BAYERN_3) {
                 _youtubeVisible = false;
-                _youtubeId = "";
+                _youtubeId = YoutubeId.NULL;
 
                 _centerVisible = false;
                 _centerText = "";
@@ -153,9 +152,9 @@ public class CenterModel implements Serializable {
                 _centerText = DEFAULT_CENTER_TEXT;
             }
         } else if (_youtubeVisible) {
-            if (_youtubeId.length() != 11) {
+            if (_youtubeId == YoutubeId.NULL) {
                 Logger.getInstance().Warning(TAG, "Setting videoUrl to default!");
-                _youtubeId = DEFAULT_YOUTUBE_VIDEO_ID;
+                _youtubeId = YoutubeId.DEFAULT;
             }
         } else if (_webViewVisible) {
             if (_webViewUrl.length() == 0) {

@@ -8,14 +8,19 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
+import java.util.Locale;
+
 import guepardoapps.lucahome.basic.classes.SerializableList;
 import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.common.classes.MapContent;
-import guepardoapps.lucahome.common.classes.MediaServerData;
+import guepardoapps.lucahome.common.classes.mediaserver.MediaServerData;
 import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+import guepardoapps.lucahome.common.service.ListedMenuService;
+import guepardoapps.lucahome.common.service.MenuService;
+import guepardoapps.lucahome.common.service.ShoppingListService;
 
 public class DatabaseMapContentList {
     private static final String TAG = DatabaseMapContentList.class.getSimpleName();
@@ -37,7 +42,7 @@ public class DatabaseMapContentList {
 
     private static final String DATABASE_NAME = "DatabaseMapContentDb";
     private static final String DATABASE_TABLE = "DatabaseMapContentTable";
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -100,7 +105,7 @@ public class DatabaseMapContentList {
         contentValues.put(KEY_SHORT_NAME, newEntry.GetShortName());
         contentValues.put(KEY_AREA, newEntry.GetArea());
         contentValues.put(KEY_VISIBILITY, (newEntry.IsVisible() ? "1" : "0"));
-        contentValues.put(KEY_MEDIA_SERVER_ID, String.valueOf(newEntry.GetMediaServer() != null ? newEntry.GetMediaServer().GetMediaServerSelection().GetId() : -1));
+        contentValues.put(KEY_MEDIA_SERVER_ID, String.valueOf(newEntry.GetMediaServer() != null ? newEntry.GetMediaServer().GetMediaServerInformationData().GetMediaServerSelection().GetId() : -1));
         contentValues.put(KEY_TEMPERATURE_AREA, (newEntry.GetTemperature() != null ? newEntry.GetTemperature().GetArea() : ""));
         contentValues.put(KEY_WIRELESS_SOCKET_NAME, (newEntry.GetWirelessSocket() != null ? newEntry.GetWirelessSocket().GetName() : ""));
         contentValues.put(KEY_WIRELESS_SWITCH_NAME, (newEntry.GetWirelessSwitch() != null ? newEntry.GetWirelessSwitch().GetName() : ""));
@@ -121,7 +126,7 @@ public class DatabaseMapContentList {
         contentValues.put(KEY_SHORT_NAME, updateEntry.GetShortName());
         contentValues.put(KEY_AREA, updateEntry.GetArea());
         contentValues.put(KEY_VISIBILITY, (updateEntry.IsVisible() ? "1" : "0"));
-        contentValues.put(KEY_MEDIA_SERVER_ID, String.valueOf(updateEntry.GetMediaServer() != null ? updateEntry.GetMediaServer().GetMediaServerSelection().GetId() : -1));
+        contentValues.put(KEY_MEDIA_SERVER_ID, String.valueOf(updateEntry.GetMediaServer() != null ? updateEntry.GetMediaServer().GetMediaServerInformationData().GetMediaServerSelection().GetId() : -1));
         contentValues.put(KEY_TEMPERATURE_AREA, (updateEntry.GetTemperature() != null ? updateEntry.GetTemperature().GetArea() : ""));
         contentValues.put(KEY_WIRELESS_SOCKET_NAME, (updateEntry.GetWirelessSocket() != null ? updateEntry.GetWirelessSocket().GetName() : ""));
         contentValues.put(KEY_WIRELESS_SWITCH_NAME, (updateEntry.GetWirelessSwitch() != null ? updateEntry.GetWirelessSwitch().GetName() : ""));
@@ -218,44 +223,59 @@ public class DatabaseMapContentList {
             }
 
             boolean visibility = visibilityString.contains("1");
+            boolean isOnServer = Boolean.getBoolean(isOnServerString);
+            ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
 
             MediaServerData mediaServerData = null;
             Temperature temperature = null;
             WirelessSocket wirelessSocket = null;
             WirelessSwitch wirelessSwitch = null;
 
-            for (int index = 0; index < mediaServerDataList.getSize(); index++) {
-                MediaServerData currentMediaServerData = mediaServerDataList.getValue(index);
-                if (currentMediaServerData.GetMediaServerSelection().GetId() == mediaServerId) {
-                    mediaServerData = currentMediaServerData;
+            switch (drawingType) {
+                case MediaServer:
+                    for (int index = 0; index < mediaServerDataList.getSize(); index++) {
+                        MediaServerData currentMediaServerData = mediaServerDataList.getValue(index);
+                        if (currentMediaServerData.GetMediaServerInformationData().GetMediaServerSelection().GetId() == mediaServerId) {
+                            mediaServerData = currentMediaServerData;
+                            break;
+                        }
+                    }
                     break;
-                }
-            }
-            for (int index = 0; index < temperatureList.getSize(); index++) {
-                Temperature temperatureEntry = temperatureList.getValue(index);
-                if (temperatureEntry.GetArea().contentEquals(temperatureArea)) {
-                    temperature = temperatureEntry;
-                    break;
-                }
-            }
-            for (int index = 0; index < wirelessSocketList.getSize(); index++) {
-                WirelessSocket currentWirelessSocket = wirelessSocketList.getValue(index);
-                if (currentWirelessSocket.GetName().contentEquals(wirelessSocketString)) {
-                    wirelessSocket = currentWirelessSocket;
-                    break;
-                }
-            }
-            for (int index = 0; index < wirelessSwitchList.getSize(); index++) {
-                WirelessSwitch currentWirelessSwitch = wirelessSwitchList.getValue(index);
-                if (currentWirelessSwitch.GetName().contentEquals(wirelessSwitchString)) {
-                    wirelessSwitch = currentWirelessSwitch;
-                    break;
-                }
-            }
 
-            boolean isOnServer = Boolean.getBoolean(isOnServerString);
+                case Temperature:
+                    for (int index = 0; index < temperatureList.getSize(); index++) {
+                        Temperature temperatureEntry = temperatureList.getValue(index);
+                        if (temperatureEntry.GetArea().contentEquals(temperatureArea)) {
+                            temperature = temperatureEntry;
+                            break;
+                        }
+                    }
+                    break;
 
-            ILucaClass.LucaServerDbAction serverAction = ILucaClass.LucaServerDbAction.valueOf(serverActionString);
+                case Socket:
+                    for (int index = 0; index < wirelessSocketList.getSize(); index++) {
+                        WirelessSocket currentWirelessSocket = wirelessSocketList.getValue(index);
+                        if (currentWirelessSocket.GetName().contentEquals(wirelessSocketString)) {
+                            wirelessSocket = currentWirelessSocket;
+                            break;
+                        }
+                    }
+                    break;
+
+                case LightSwitch:
+                    for (int index = 0; index < wirelessSwitchList.getSize(); index++) {
+                        WirelessSwitch currentWirelessSwitch = wirelessSwitchList.getValue(index);
+                        if (currentWirelessSwitch.GetName().contentEquals(wirelessSwitchString)) {
+                            wirelessSwitch = currentWirelessSwitch;
+                            break;
+                        }
+                    }
+                    break;
+
+                default:
+                    Logger.getInstance().Verbose(TAG, String.format(Locale.getDefault(), "No action necessary for %s", drawingType));
+                    break;
+            }
 
             MapContent entry = new MapContent(
                     id,
@@ -266,11 +286,11 @@ public class DatabaseMapContentList {
                     shortName,
                     area,
                     visibility,
-                    null,
-                    null,
-                    null,
+                    ((name.equals("ListedMenu") && drawingType == MapContent.DrawingType.Menu) ? ListedMenuService.getInstance().GetDataList() : null),
+                    ((name.equals("Menu") && drawingType == MapContent.DrawingType.Menu) ? MenuService.getInstance().GetDataList() : null),
+                    ((name.equals("ShoppingList") && drawingType == MapContent.DrawingType.ShoppingList) ? ShoppingListService.getInstance().GetDataList() : null),
                     mediaServerData,
-                    null,
+                    null, /*TODO add security*/
                     temperature,
                     wirelessSocket,
                     wirelessSwitch,

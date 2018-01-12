@@ -159,7 +159,7 @@ public class MainService extends Service {
 
             CenterModel centerModel = new CenterModel(
                     false, "",
-                    true, YoutubeId.THE_GOOD_LIFE_STREAM.GetYoutubeId(),
+                    true, YoutubeId.THE_GOOD_LIFE_STREAM,
                     false, "",
                     false, RadioStreams.BAYERN_3);
             _broadcastController.SendSerializableBroadcast(
@@ -235,7 +235,7 @@ public class MainService extends Service {
             if (_broadcastController != null) {
                 CenterModel centerModel = new CenterModel(
                         false, "",
-                        true, YoutubeId.THE_GOOD_LIFE_STREAM.GetYoutubeId(),
+                        true, YoutubeId.THE_GOOD_LIFE_STREAM,
                         false, "",
                         false, RadioStreams.BAYERN_3);
 

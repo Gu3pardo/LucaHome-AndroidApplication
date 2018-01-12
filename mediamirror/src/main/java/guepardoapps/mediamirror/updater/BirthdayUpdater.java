@@ -33,7 +33,7 @@ public class BirthdayUpdater {
             ObjectChangeFinishedContent result = (ObjectChangeFinishedContent) intent.getSerializableExtra(BirthdayService.BirthdayDownloadFinishedBundle);
 
             if (result != null) {
-                SerializableList<LucaBirthday> loadedBirthdayList = BirthdayService.getInstance().GetDataList();
+                SerializableList<LucaBirthday> loadedBirthdayList = BirthdayService.getInstance().GetRemindMeList();
                 SerializableList<LucaBirthday> _nextBirthdaysList = new SerializableList<>();
 
                 if (loadedBirthdayList != null) {

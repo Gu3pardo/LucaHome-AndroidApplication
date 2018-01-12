@@ -6,10 +6,10 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.mediamirror.common.models.YoutubeDatabaseModel;
+import guepardoapps.lucahome.common.classes.mediaserver.PlayedYoutubeVideoData;
 import guepardoapps.mediamirror.database.DatabaseYoutubeIds;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class DatabaseController {
     private static final String TAG = DatabaseController.class.getSimpleName();
 
@@ -38,15 +38,15 @@ public class DatabaseController {
         _isInitialized = true;
     }
 
-    public ArrayList<YoutubeDatabaseModel> GetYoutubeIds() {
+    public ArrayList<PlayedYoutubeVideoData> GetYoutubeIds() {
         return _databaseYoutubeIds.GetYoutubeIds();
     }
 
-    public void SaveYoutubeId(@NonNull YoutubeDatabaseModel newEntry) {
+    public void SaveYoutubeId(@NonNull PlayedYoutubeVideoData newEntry) {
         _databaseYoutubeIds.CreateEntry(newEntry);
     }
 
-    public void UpdateYoutubeId(@NonNull YoutubeDatabaseModel updateEntry) {
+    public void UpdateYoutubeId(@NonNull PlayedYoutubeVideoData updateEntry) {
         _databaseYoutubeIds.Update(updateEntry);
     }
 
@@ -54,7 +54,7 @@ public class DatabaseController {
         return _databaseYoutubeIds.GetHighestId();
     }
 
-    public void DeleteYoutubeId(@NonNull YoutubeDatabaseModel deleteEntry) {
+    public void DeleteYoutubeId(@NonNull PlayedYoutubeVideoData deleteEntry) {
         _databaseYoutubeIds.Delete(deleteEntry);
     }
 

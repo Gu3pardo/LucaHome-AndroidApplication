@@ -354,10 +354,9 @@ public class TemperatureService implements IDataNotificationService {
             return;
         }
 
-        String title = String.format(Locale.getDefault(), "%s", _activeTemperature.GetTime().HHMM());
         String body = String.format(Locale.getDefault(), "%s: %s", _activeTemperature.GetArea(), _activeTemperature.GetTemperatureString());
 
-        _notificationController.CreateTemperatureNotification(NOTIFICATION_ID, _receiverActivity, R.drawable.weather_dummy, title, body, true);
+        _notificationController.CreateTemperatureNotification(NOTIFICATION_ID, _receiverActivity, R.drawable.weather_dummy, "Temperature", body, true);
     }
 
     @Override

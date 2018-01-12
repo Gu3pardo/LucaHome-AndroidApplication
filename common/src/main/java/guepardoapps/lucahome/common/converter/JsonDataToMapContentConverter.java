@@ -11,6 +11,7 @@ import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.basic.utils.StringHelper;
 import guepardoapps.lucahome.common.builder.MapContentBuilder;
 import guepardoapps.lucahome.common.classes.*;
+import guepardoapps.lucahome.common.classes.mediaserver.MediaServerData;
 import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
 
 public final class JsonDataToMapContentConverter {

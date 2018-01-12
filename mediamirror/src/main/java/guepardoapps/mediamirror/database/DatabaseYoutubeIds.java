@@ -11,7 +11,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 
 import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.mediamirror.common.models.YoutubeDatabaseModel;
+import guepardoapps.lucahome.common.classes.mediaserver.PlayedYoutubeVideoData;
 
 public class DatabaseYoutubeIds {
     private static final String TAG = DatabaseYoutubeIds.class.getSimpleName();
@@ -23,7 +23,7 @@ public class DatabaseYoutubeIds {
 
     private static final String DATABASE_NAME = "YoutubeIdDatabase";
     private static final String DATABASE_TABLE = "YoutubeIdTable";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -68,7 +68,7 @@ public class DatabaseYoutubeIds {
         _databaseHelper.close();
     }
 
-    public long CreateEntry(@NonNull YoutubeDatabaseModel newEntry) {
+    public long CreateEntry(@NonNull PlayedYoutubeVideoData newEntry) {
         boolean entryExists = false;
         String[] columns = new String[]{KEY_YOUTUBE_ID};
 
@@ -98,11 +98,11 @@ public class DatabaseYoutubeIds {
         }
     }
 
-    public ArrayList<YoutubeDatabaseModel> GetYoutubeIds() {
+    public ArrayList<PlayedYoutubeVideoData> GetYoutubeIds() {
         String[] columns = new String[]{KEY_ROW_ID, KEY_YOUTUBE_ID, KEY_PLAY_COUNT};
 
         Cursor cursor = _database.query(DATABASE_TABLE, columns, null, null, null, null, null);
-        ArrayList<YoutubeDatabaseModel> result = new ArrayList<>();
+        ArrayList<PlayedYoutubeVideoData> result = new ArrayList<>();
 
         int idIndex = cursor.getColumnIndex(KEY_ROW_ID);
 
@@ -121,7 +121,7 @@ public class DatabaseYoutubeIds {
                 playCount = 0;
             }
 
-            result.add(new YoutubeDatabaseModel(id, youtubeId, playCount));
+            result.add(new PlayedYoutubeVideoData(id, youtubeId, playCount));
         }
 
         cursor.close();
@@ -129,7 +129,7 @@ public class DatabaseYoutubeIds {
         return result;
     }
 
-    public void Update(@NonNull YoutubeDatabaseModel updateEntry) throws SQLException {
+    public void Update(@NonNull PlayedYoutubeVideoData updateEntry) throws SQLException {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(KEY_YOUTUBE_ID, updateEntry.GetYoutubeId());
@@ -158,7 +158,7 @@ public class DatabaseYoutubeIds {
         return result;
     }
 
-    public void Delete(@NonNull YoutubeDatabaseModel deleteEntry) throws SQLException {
+    public void Delete(@NonNull PlayedYoutubeVideoData deleteEntry) throws SQLException {
         _database.delete(DATABASE_TABLE, KEY_ROW_ID + "=" + deleteEntry.GetId(), null);
     }
 
