@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,10 +41,11 @@ public class WeatherViewController implements IViewController {
     private TextView _pressureTextView;
     private TextView _updatedTimeTextView;
 
-    private ImageView[] _weatherForecastConditionImageViews;
-    private TextView[] _weatherForecastDateTextViews;
-    private TextView[] _weatherForecastTimeTextViews;
-    private TextView[] _weatherForecastTemperatureRangeTextViews;
+    private ImageView[] _weatherForecastConditionImageViews = new ImageView[FORECAST_COUNT];
+    private TextView[] _weatherForecastWeekdayTextViews = new TextView[FORECAST_COUNT];
+    private TextView[] _weatherForecastDateTextViews = new TextView[FORECAST_COUNT];
+    private TextView[] _weatherForecastTimeTextViews = new TextView[FORECAST_COUNT];
+    private TextView[] _weatherForecastTemperatureRangeTextViews = new TextView[FORECAST_COUNT];
 
     private BroadcastReceiver _currentWeatherReceiver = new BroadcastReceiver() {
         @Override
@@ -77,6 +79,7 @@ public class WeatherViewController implements IViewController {
                         while (forecastList.size() >= FORECAST_COUNT && viewCount < FORECAST_COUNT && forecastCount < forecastList.size()) {
                             if (forecastList.get(forecastCount).GetForecastListType() == ForecastPartModel.ForecastListType.FORECAST) {
                                 _weatherForecastConditionImageViews[viewCount].setImageResource(forecastList.get(forecastCount).GetCondition().GetIcon());
+                                _weatherForecastWeekdayTextViews[viewCount].setVisibility(View.GONE);
                                 _weatherForecastDateTextViews[viewCount].setText(forecastList.get(forecastCount).GetDate());
                                 _weatherForecastTimeTextViews[viewCount].setText(forecastList.get(forecastCount).GetTime());
                                 _weatherForecastTemperatureRangeTextViews[viewCount].setText(forecastList.get(forecastCount).GetTemperatureString());
@@ -113,32 +116,32 @@ public class WeatherViewController implements IViewController {
         _pressureTextView = ((Activity) _context).findViewById(R.id.weatherPressureTextView);
         _updatedTimeTextView = ((Activity) _context).findViewById(R.id.weatherUpdateTextView);
 
-        _weatherForecastConditionImageViews = new ImageView[FORECAST_COUNT];
-        _weatherForecastDateTextViews = new TextView[FORECAST_COUNT];
-        _weatherForecastTimeTextViews = new TextView[FORECAST_COUNT];
-        _weatherForecastTemperatureRangeTextViews = new TextView[FORECAST_COUNT];
-
         _weatherForecastConditionImageViews[0] = ((Activity) _context).findViewById(R.id.weatherForecast1Condition);
+        _weatherForecastWeekdayTextViews[0] = ((Activity) _context).findViewById(R.id.weatherForecast1Weekday);
         _weatherForecastDateTextViews[0] = ((Activity) _context).findViewById(R.id.weatherForecast1Date);
         _weatherForecastTimeTextViews[0] = ((Activity) _context).findViewById(R.id.weatherForecast1Time);
         _weatherForecastTemperatureRangeTextViews[0] = ((Activity) _context).findViewById(R.id.weatherForecast1TemperatureRange);
 
         _weatherForecastConditionImageViews[1] = ((Activity) _context).findViewById(R.id.weatherForecast2Condition);
+        _weatherForecastWeekdayTextViews[1] = ((Activity) _context).findViewById(R.id.weatherForecast2Weekday);
         _weatherForecastDateTextViews[1] = ((Activity) _context).findViewById(R.id.weatherForecast2Date);
         _weatherForecastTimeTextViews[1] = ((Activity) _context).findViewById(R.id.weatherForecast2Time);
         _weatherForecastTemperatureRangeTextViews[1] = ((Activity) _context).findViewById(R.id.weatherForecast2TemperatureRange);
 
         _weatherForecastConditionImageViews[2] = ((Activity) _context).findViewById(R.id.weatherForecast3Condition);
+        _weatherForecastWeekdayTextViews[2] = ((Activity) _context).findViewById(R.id.weatherForecast3Weekday);
         _weatherForecastDateTextViews[2] = ((Activity) _context).findViewById(R.id.weatherForecast3Date);
         _weatherForecastTimeTextViews[2] = ((Activity) _context).findViewById(R.id.weatherForecast3Time);
         _weatherForecastTemperatureRangeTextViews[2] = ((Activity) _context).findViewById(R.id.weatherForecast3TemperatureRange);
 
         _weatherForecastConditionImageViews[3] = ((Activity) _context).findViewById(R.id.weatherForecast4Condition);
+        _weatherForecastWeekdayTextViews[3] = ((Activity) _context).findViewById(R.id.weatherForecast4Weekday);
         _weatherForecastDateTextViews[3] = ((Activity) _context).findViewById(R.id.weatherForecast4Date);
         _weatherForecastTimeTextViews[3] = ((Activity) _context).findViewById(R.id.weatherForecast4Time);
         _weatherForecastTemperatureRangeTextViews[3] = ((Activity) _context).findViewById(R.id.weatherForecast4TemperatureRange);
 
         _weatherForecastConditionImageViews[4] = ((Activity) _context).findViewById(R.id.weatherForecast5Condition);
+        _weatherForecastWeekdayTextViews[4] = ((Activity) _context).findViewById(R.id.weatherForecast5Weekday);
         _weatherForecastDateTextViews[4] = ((Activity) _context).findViewById(R.id.weatherForecast5Date);
         _weatherForecastTimeTextViews[4] = ((Activity) _context).findViewById(R.id.weatherForecast5Time);
         _weatherForecastTemperatureRangeTextViews[4] = ((Activity) _context).findViewById(R.id.weatherForecast5TemperatureRange);

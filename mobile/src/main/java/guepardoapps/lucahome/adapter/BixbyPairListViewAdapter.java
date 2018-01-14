@@ -41,6 +41,7 @@ public class BixbyPairListViewAdapter extends BaseAdapter {
 
         private void navigateToEditActivity(@NonNull final BixbyPair bixbyPair) {
             Bundle data = new Bundle();
+            bixbyPair.SetDatabaseAction(BixbyPair.DatabaseAction.Update);
             data.putSerializable(BixbyPairService.BIXBY_PAIR_INTENT, bixbyPair);
             NavigationService.getInstance().NavigateToActivityWithData(_context, BixbyEditActivity.class, data);
         }

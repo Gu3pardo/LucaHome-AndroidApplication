@@ -110,6 +110,7 @@
                         card_view:cardCornerRadius="4dp">
 
                         <LinearLayout
+                            android:id="@+id/bixby_edit_requirements_main_linear_layout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
@@ -122,6 +123,17 @@
                                 android:gravity="center"
                                 android:text="@string/bixby_create_requirements"
                                 android:textColor="@color/PrimaryText" />
+
+                            <com.rey.material.widget.FloatingActionButton
+                                android:id="@+id/bixby_edit_requirements_add_button"
+                                android:layout_width="35dp"
+                                android:layout_height="35dp"
+                                android:layout_gravity="end"
+                                app:fab_iconSrc="@mipmap/ic_add_white_48dp"
+                                app:rd_delayClick="none"
+                                app:rd_enable="true"
+                                app:rd_rippleColor="@color/colorPrimary"
+                                app:rd_rippleType="touch" />
 
                             <LinearLayout
                                 android:id="@+id/bixby_edit_requirements_linear_layout_1"
@@ -170,57 +182,58 @@
                                         app:layout_widthPercent="33%" />
                                 </android.support.percent.PercentRelativeLayout>
 
-                                <LinearLayout
-                                    android:id="@+id/bixby_edit_requirement_network_linear_layout_1"
+                                <android.support.percent.PercentRelativeLayout
+                                    android:id="@+id/bixby_edit_requirement_network_relative_layout_1"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="70dp"
                                     android:orientation="vertical">
 
                                     <Spinner
                                         android:id="@+id/bixby_edit_requirement_network_type_spinner_1"
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content" />
+                                        android:layout_height="wrap_content"
+                                        app:layout_heightPercent="50%"
+                                        app:layout_widthPercent="50%" />
 
                                     <Spinner
                                         android:id="@+id/bixby_edit_requirement_network_state_spinner_1"
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content" />
+                                        android:layout_height="wrap_content"
+                                        android:layout_toEndOf="@+id/bixby_edit_requirement_network_type_spinner_1"
+                                        app:layout_heightPercent="50%"
+                                        app:layout_widthPercent="50%" />
 
                                     <EditText
                                         android:id="@+id/bixby_edit_requirement_network_ssid_edit_1"
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content" />
-                                </LinearLayout>
+                                        android:layout_height="wrap_content"
+                                        android:layout_below="@+id/bixby_edit_requirement_network_type_spinner_1"
+                                        app:layout_heightPercent="50%"
+                                        app:layout_widthPercent="100%" />
+                                </android.support.percent.PercentRelativeLayout>
 
-                                <LinearLayout
-                                    android:id="@+id/bixby_edit_requirement_wireless_socket_linear_layout_1"
+                                <android.support.percent.PercentRelativeLayout
+                                    android:id="@+id/bixby_edit_requirement_wireless_socket_relative_layout_1"
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
+                                    android:layout_height="35dp"
                                     android:orientation="vertical">
 
                                     <Spinner
                                         android:id="@+id/bixby_edit_requirement_wireless_socket_name_spinner_1"
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content" />
+                                        android:layout_height="wrap_content"
+                                        app:layout_heightPercent="100%"
+                                        app:layout_widthPercent="50%" />
 
                                     <Spinner
                                         android:id="@+id/bixby_edit_requirement_wireless_socket_state_spinner_1"
                                         android:layout_width="match_parent"
-                                        android:layout_height="wrap_content" />
-                                </LinearLayout>
-
+                                        android:layout_height="wrap_content"
+                                        android:layout_toEndOf="@+id/bixby_edit_requirement_wireless_socket_name_spinner_1"
+                                        app:layout_heightPercent="100%"
+                                        app:layout_widthPercent="50%" />
+                                </android.support.percent.PercentRelativeLayout>
                             </LinearLayout>
-
-                            <com.rey.material.widget.FloatingActionButton
-                                android:id="@+id/bixby_edit_requirements_add_button"
-                                android:layout_width="35dp"
-                                android:layout_height="35dp"
-                                android:layout_gravity="end"
-                                app:fab_iconSrc="@mipmap/ic_add_white_48dp"
-                                app:rd_delayClick="none"
-                                app:rd_enable="true"
-                                app:rd_rippleColor="@color/colorPrimary"
-                                app:rd_rippleType="touch" />
                         </LinearLayout>
                     </android.support.v7.widget.CardView>
                 </LinearLayout>

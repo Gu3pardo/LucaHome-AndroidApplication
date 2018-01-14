@@ -33,6 +33,7 @@ import guepardoapps.mediamirror.common.models.CenterModel;
 import guepardoapps.mediamirror.common.models.RSSModel;
 import guepardoapps.mediamirror.controller.BatterySocketController;
 import guepardoapps.mediamirror.controller.MediaVolumeController;
+import guepardoapps.mediamirror.controller.NotificationController;
 import guepardoapps.mediamirror.server.ServerThread;
 import guepardoapps.mediamirror.updater.*;
 
@@ -135,6 +136,7 @@ public class MainService extends Service {
             _wirelessSocketUpdater = new WirelessSocketUpdater(_context);
             _wirelessSwitchUpdater = new WirelessSwitchUpdater(_context);
 
+            NotificationController.getInstance().Initialize(_context);
             SettingsController.getInstance().Initialize(_context);
 
             _ttsController = new TTSController(_context, Enables.TTS);
@@ -161,7 +163,8 @@ public class MainService extends Service {
                     false, "",
                     true, YoutubeId.THE_GOOD_LIFE_STREAM,
                     false, "",
-                    false, RadioStreams.BAYERN_3);
+                    false, RadioStreams.BAYERN_3,
+                    false, "");
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CENTER_MODEL,
                     Bundles.CENTER_MODEL,
@@ -237,7 +240,8 @@ public class MainService extends Service {
                         false, "",
                         true, YoutubeId.THE_GOOD_LIFE_STREAM,
                         false, "",
-                        false, RadioStreams.BAYERN_3);
+                        false, RadioStreams.BAYERN_3,
+                        false, "");
 
                 _broadcastController.SendSerializableBroadcast(
                         Broadcasts.SHOW_CENTER_MODEL,
@@ -287,6 +291,8 @@ public class MainService extends Service {
 
         _wakeLock.release();
         _wifiLock.release();
+
+        NotificationController.getInstance().Dispose();
 
         ScheduleService.getInstance().Dispose();
 

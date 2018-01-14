@@ -43,10 +43,6 @@ public class BixbyService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         String activeWindowPackage = getActiveWindowPackage();
 
-        Logger.getInstance().Verbose(TAG, String.format(
-                "onAccessibilityEvent: [type] %s [time] %s [activeWindowPackage] %s",
-                AccessibilityEvent.eventTypeToString(event.getEventType()), event.getEventTime(), activeWindowPackage));
-
         long currentMillis = System.currentTimeMillis();
         long maxRunFrequencyMs = GetMaxRunFrequencyMs();
         boolean runTooSoon = (currentMillis - _lastRunMillis) < maxRunFrequencyMs;

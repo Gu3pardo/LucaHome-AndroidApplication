@@ -9,7 +9,7 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar_meterdata"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="250dip"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
@@ -21,15 +21,11 @@
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
-            <com.flaviofaria.kenburnsview.KenBurnsView
-                android:id="@+id/kenBurnsView_meterdata"
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/graph_meterdata"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:contentDescription="@string/contentDescription"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/main_image_meter"
-                app:layout_collapseMode="parallax" />
+                android:padding="5dp" />
 
             <TextView
                 android:id="@+id/lastUpdateTextView_meterdata"
@@ -91,13 +87,6 @@
                     android:id="@+id/spinner_meterdata"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:padding="5dp" />
-
-                <com.jjoe64.graphview.GraphView
-                    android:id="@+id/graph_meterdata"
-                    android:layout_width="match_parent"
-                    android:layout_height="250dip"
                     android:layout_margin="5dp"
                     android:padding="5dp" />
 

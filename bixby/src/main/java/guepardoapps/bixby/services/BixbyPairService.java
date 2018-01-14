@@ -336,7 +336,7 @@ public class BixbyPairService implements IDataService {
                     }
                 }
 
-                BixbyPair bixbyPair = new BixbyPair(actionId, bixbyAction, pairRequirementList);
+                BixbyPair bixbyPair = new BixbyPair(actionId, bixbyAction, pairRequirementList, BixbyPair.DatabaseAction.Null);
                 pairList.addValue(bixbyPair);
             }
         } catch (Exception exception) {

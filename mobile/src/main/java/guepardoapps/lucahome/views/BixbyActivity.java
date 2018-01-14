@@ -108,7 +108,8 @@ public class BixbyActivity extends AppCompatBaseActivity {
                     new BixbyPair(
                             BixbyPairService.getInstance().GetHighestId() + 1,
                             new BixbyAction(BixbyPairService.getInstance().GetHighestActionId() + 1, BixbyPairService.getInstance().GetHighestId() + 1),
-                            new SerializableList<>()));
+                            new SerializableList<>(),
+                            BixbyPair.DatabaseAction.Add));
 
             NavigationService.NavigationResult navigationResult = NavigationService.getInstance().NavigateToActivityWithData(_context, BixbyEditActivity.class, data);
             if (navigationResult != NavigationService.NavigationResult.SUCCESS) {

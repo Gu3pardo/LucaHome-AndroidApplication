@@ -606,41 +606,31 @@
             android:textStyle="bold"
             android:visibility="invisible" />
 
-        <LinearLayout
-            android:id="@+id/centerRadioStreamLinearLayout"
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/centerAudioLinearLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:gravity="center"
-            android:visibility="invisible">
+            android:visibility="visible">
 
-            <com.rey.material.widget.FloatingActionButton
-                android:id="@+id/floating_action_button_radio_stream_play"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+            <ImageButton
+                android:id="@+id/image_button_audio_play"
                 android:layout_margin="5dp"
-                app:fab_iconSize="40dp"
-                app:fab_iconSrc="@android:drawable/ic_media_play"
-                app:fab_radius="25dp"
-                app:rd_backgroundColor="@color/colorPrimaryDark"
-                app:rd_delayClick="none"
-                app:rd_enable="true"
-                app:rd_rippleColor="@color/colorPrimary"
-                app:rd_rippleType="touch" />
+                android:background="@drawable/image_button_alpha"
+                android:contentDescription="@string/image"
+                android:src="@android:drawable/ic_media_play"
+                app:layout_heightPercent="100%"
+                app:layout_widthPercent="50%" />
 
-            <com.rey.material.widget.FloatingActionButton
-                android:id="@+id/floating_action_button_radio_stream_stop"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+            <ImageButton
+                android:id="@+id/image_button_audio_stop"
                 android:layout_margin="5dp"
-                app:fab_iconSize="40dp"
-                app:fab_iconSrc="@android:drawable/editbox_dropdown_light_frame"
-                app:fab_radius="25dp"
-                app:rd_backgroundColor="@color/colorPrimaryDark"
-                app:rd_delayClick="none"
-                app:rd_enable="true"
-                app:rd_rippleColor="@color/colorPrimary"
-                app:rd_rippleType="touch" />
-        </LinearLayout>
+                android:layout_toEndOf="@+id/image_button_audio_play"
+                android:background="@drawable/image_button_alpha"
+                android:contentDescription="@string/image"
+                android:src="@android:drawable/editbox_dropdown_light_frame"
+                app:layout_heightPercent="100%"
+                app:layout_widthPercent="50%" />
+        </android.support.percent.PercentRelativeLayout>
 
         <WebView
             android:id="@+id/centerWebView"
@@ -651,7 +641,8 @@
         <com.google.android.youtube.player.YouTubePlayerView
             android:id="@+id/centerYoutubePlayer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
 
     </FrameLayout>
 

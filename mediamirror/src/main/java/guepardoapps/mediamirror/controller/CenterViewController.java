@@ -12,6 +12,7 @@ import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +20,6 @@ import android.widget.Toast;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
-import com.rey.material.widget.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -33,6 +33,7 @@ import guepardoapps.lucahome.common.constants.Keys;
 import guepardoapps.lucahome.common.enums.RadioStreams;
 import guepardoapps.lucahome.common.enums.YoutubeId;
 import guepardoapps.lucahome.common.tasks.DownloadYoutubeVideoTask;
+
 import guepardoapps.mediamirror.R;
 import guepardoapps.mediamirror.common.constants.Broadcasts;
 import guepardoapps.mediamirror.common.constants.Bundles;
@@ -54,9 +55,9 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
 
     private YouTubePlayerView _youTubePlayerView;
     private TextView _centerTextView;
-    private LinearLayout _centerRadioStreamLinearLayout;
-    private FloatingActionButton _floatingActionButtonRadioStreamPlay;
-    private FloatingActionButton _floatingActionButtonRadioStreamStop;
+    private LinearLayout _centerAudioLinearLayout;
+    private ImageButton _imageButtoAudioPlay;
+    private ImageButton _imageButtoAudioStop;
     private WebView _centerWebView;
 
     private TextView _currentPlayingTextView;
@@ -200,7 +201,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                     _youTubePlayerView.setVisibility(View.GONE);
                     _centerWebView.setVisibility(View.GONE);
                     _centerTextView.setVisibility(View.VISIBLE);
-                    _centerRadioStreamLinearLayout.setVisibility(View.GONE);
+                    _centerAudioLinearLayout.setVisibility(View.GONE);
 
                     _centerTextView.setText(model.GetCenterText());
 
@@ -212,7 +213,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                     _youTubePlayerView.setVisibility(View.VISIBLE);
                     _centerWebView.setVisibility(View.GONE);
                     _centerTextView.setVisibility(View.GONE);
-                    _centerRadioStreamLinearLayout.setVisibility(View.GONE);
+                    _centerAudioLinearLayout.setVisibility(View.GONE);
 
                     _youtubeId = model.GetYoutubeId();
                     startVideo(_youtubeId);
@@ -226,7 +227,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                     _youTubePlayerView.setVisibility(View.GONE);
                     _centerWebView.setVisibility(View.VISIBLE);
                     _centerTextView.setVisibility(View.GONE);
-                    _centerRadioStreamLinearLayout.setVisibility(View.GONE);
+                    _centerAudioLinearLayout.setVisibility(View.GONE);
 
                     _loadingUrl = true;
                     _centerWebView.loadUrl(model.GetWebViewUrl());
@@ -239,20 +240,30 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
 
                     _youTubePlayerView.setVisibility(View.GONE);
                     _centerWebView.setVisibility(View.GONE);
-                    _centerTextView.setVisibility(View.VISIBLE);
-                    _centerRadioStreamLinearLayout.setVisibility(View.VISIBLE);
+                    _centerTextView.setVisibility(View.GONE);
+                    _centerAudioLinearLayout.setVisibility(View.VISIBLE);
 
                     RadioStreams radioStream = model.GetRadioStream();
                     if (radioStream != null) {
                         _radioStream = radioStream;
-                        _centerTextView.setText(_radioStream.GetTitle());
                         startRadioPlaying();
                         _currentPlayingTextView.setText(String.format(Locale.getDefault(), "RadioStream: %s", _radioStream.GetTitle()));
                     } else {
                         Logger.getInstance().Error(TAG, "RadioStream is null!");
+                        _centerTextView.setVisibility(View.VISIBLE);
                         _centerTextView.setText(_context.getString(R.string.errorRadioStream));
                         _currentPlayingTextView.setText("");
                     }
+                } else if (model.IsMediaNotificationVisible()) {
+                    stopWebViewLoading();
+                    stopVideo();
+                    stopRadioPlaying();
+
+                    _youTubePlayerView.setVisibility(View.GONE);
+                    _centerWebView.setVisibility(View.GONE);
+                    _centerTextView.setVisibility(View.GONE);
+                    _centerAudioLinearLayout.setVisibility(View.VISIBLE);
+                    _currentPlayingTextView.setText(model.GetMediaNotificationTitle());
                 } else {
                     if (_loadingUrl) {
                         _centerWebView.stopLoading();
@@ -334,7 +345,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
                 _centerWebView.setVisibility(View.GONE);
                 _centerTextView.setVisibility(View.VISIBLE);
                 _centerTextView.setText(R.string.madeByGuepardoApps);
-                _centerRadioStreamLinearLayout.setVisibility(View.GONE);
+                _centerAudioLinearLayout.setVisibility(View.GONE);
                 _currentPlayingTextView.setText("");
             }
         }
@@ -366,9 +377,9 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
 
         _youTubePlayerView = ((Activity) _context).findViewById(R.id.centerYoutubePlayer);
         _centerTextView = ((Activity) _context).findViewById(R.id.centerTextView);
-        _centerRadioStreamLinearLayout = ((Activity) _context).findViewById(R.id.centerRadioStreamLinearLayout);
-        _floatingActionButtonRadioStreamPlay = ((Activity) _context).findViewById(R.id.floating_action_button_radio_stream_play);
-        _floatingActionButtonRadioStreamStop = ((Activity) _context).findViewById(R.id.floating_action_button_radio_stream_stop);
+        _centerAudioLinearLayout = ((Activity) _context).findViewById(R.id.centerAudioLinearLayout);
+        _imageButtoAudioPlay = ((Activity) _context).findViewById(R.id.image_button_audio_play);
+        _imageButtoAudioStop = ((Activity) _context).findViewById(R.id.image_button_audio_stop);
         _centerWebView = ((Activity) _context).findViewById(R.id.centerWebView);
 
         _currentPlayingTextView = ((Activity) _context).findViewById(R.id.currentPlayingTextView);
@@ -513,7 +524,7 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         _youTubePlayerView.setVisibility(View.VISIBLE);
         _centerWebView.setVisibility(View.GONE);
         _centerTextView.setVisibility(View.GONE);
-        _centerRadioStreamLinearLayout.setVisibility(View.GONE);
+        _centerAudioLinearLayout.setVisibility(View.GONE);
     }
 
     private void pauseVideo() {
@@ -584,8 +595,8 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
     }
 
     private void initializeButtons() {
-        _floatingActionButtonRadioStreamPlay.setOnClickListener(view -> startRadioPlaying());
-        _floatingActionButtonRadioStreamStop.setOnClickListener(view -> stopRadioPlaying());
+        _imageButtoAudioPlay.setOnClickListener(view -> startRadioPlaying());
+        _imageButtoAudioStop.setOnClickListener(view -> stopRadioPlaying());
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -617,8 +628,8 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
     }
 
     private void startRadioPlaying() {
-        _floatingActionButtonRadioStreamPlay.setEnabled(false);
-        _floatingActionButtonRadioStreamStop.setEnabled(true);
+        _imageButtoAudioPlay.setEnabled(false);
+        _imageButtoAudioStop.setEnabled(true);
 
         try {
             _radioPlayer.prepareAsync();
@@ -634,8 +645,8 @@ public class CenterViewController implements IViewController, YouTubePlayer.OnIn
         _radioPlayer.release();
         initializeMediaPlayer();
 
-        _floatingActionButtonRadioStreamPlay.setEnabled(true);
-        _floatingActionButtonRadioStreamStop.setEnabled(false);
+        _imageButtoAudioPlay.setEnabled(true);
+        _imageButtoAudioStop.setEnabled(false);
     }
 
     private void stopWebViewLoading() {

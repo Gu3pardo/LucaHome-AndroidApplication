@@ -2,6 +2,8 @@ package guepardoapps.lucahome.common.classes.mediaserver;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -14,16 +16,6 @@ public class MediaServerInformationData implements IMediaServerClass, Serializab
     private static final long serialVersionUID = 1839400020675481913L;
 
     private static final String TAG = MediaServerInformationData.class.getSimpleName();
-    private static final int COMMUNICATION_ENTRY_LENGTH = 5;
-
-    private static final int INDEX_MEDIA_SERVER_SELECTION_ID = 0;
-    private static final int INDEX_SERVER_VERSION = 1;
-    private static final int INDEX_CURRENT_VOLUME = 2;
-    private static final int INDEX_CURRENT_BATTERY_LEVEL = 3;
-    private static final int INDEX_CURRENT_SCREEN_BRIGHTNESS = 4;
-
-    public static final String SPLIT_CHAR = "::";
-    public static final String END_CHAR = ";";
 
     private MediaServerSelection _mediaServerSelection;
 
@@ -80,12 +72,7 @@ public class MediaServerInformationData implements IMediaServerClass, Serializab
 
     @Override
     public String GetCommunicationString() {
-        return String.format(Locale.getDefault(), "%d%s%s%s%d%s%d%s%d%s",
-                _mediaServerSelection.GetId(), SPLIT_CHAR,
-                _serverVersion, SPLIT_CHAR,
-                _currentVolume, SPLIT_CHAR,
-                _currentBatteryLevel, SPLIT_CHAR,
-                _currentScreenBrightness, END_CHAR);
+        return new Gson().toJson(this);
     }
 
     @Override
@@ -94,18 +81,13 @@ public class MediaServerInformationData implements IMediaServerClass, Serializab
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
-        communicationString = communicationString.replace(END_CHAR, "");
 
-        String[] entries = communicationString.split(SPLIT_CHAR);
-        if (entries.length != COMMUNICATION_ENTRY_LENGTH) {
-            throw new IndexOutOfBoundsException(String.format(Locale.getDefault(), "Invalid length %d for entries in %s!", entries.length, TAG));
-        }
-
-        _mediaServerSelection = MediaServerSelection.GetById(Integer.parseInt(entries[INDEX_MEDIA_SERVER_SELECTION_ID]));
-        _serverVersion = entries[INDEX_SERVER_VERSION];
-        _currentVolume = Integer.parseInt(entries[INDEX_CURRENT_VOLUME]);
-        _currentBatteryLevel = Integer.parseInt(entries[INDEX_CURRENT_BATTERY_LEVEL]);
-        _currentScreenBrightness = Integer.parseInt(entries[INDEX_CURRENT_SCREEN_BRIGHTNESS]);
+        MediaServerInformationData tempMediaServerInformationData = new Gson().fromJson(communicationString, MediaServerInformationData.class);
+        _mediaServerSelection = tempMediaServerInformationData.GetMediaServerSelection();
+        _serverVersion = tempMediaServerInformationData.GetServerVersion();
+        _currentVolume = tempMediaServerInformationData.GetCurrentVolume();
+        _currentBatteryLevel = tempMediaServerInformationData.GetCurrentBatteryLevel();
+        _currentScreenBrightness = tempMediaServerInformationData.GetCurrentScreenBrightness();
     }
 
     @Override

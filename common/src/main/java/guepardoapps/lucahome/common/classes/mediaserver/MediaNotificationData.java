@@ -2,6 +2,8 @@ package guepardoapps.lucahome.common.classes.mediaserver;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -13,16 +15,6 @@ public class MediaNotificationData implements IMediaServerClass, Serializable {
     private static final long serialVersionUID = 1115511435346489002L;
 
     private static final String TAG = MediaNotificationData.class.getSimpleName();
-    private static final int COMMUNICATION_ENTRY_LENGTH = 5;
-
-    private static final int INDEX_VISIBLE = 0;
-    private static final int INDEX_PACKAGE_NAME = 1;
-    private static final int INDEX_TITLE = 2;
-    private static final int INDEX_TEXT = 3;
-    private static final int INDEX_TICKER_TEXT = 4;
-
-    public static final String SPLIT_CHAR = "::";
-    public static final String END_CHAR = ";";
 
     private boolean _visible;
     private String _packageName;
@@ -77,12 +69,7 @@ public class MediaNotificationData implements IMediaServerClass, Serializable {
 
     @Override
     public String GetCommunicationString() {
-        return String.format(Locale.getDefault(), "%s%s%s%s%s%s%s%s%s%s",
-                _visible, SPLIT_CHAR,
-                _packageName, SPLIT_CHAR,
-                _title, SPLIT_CHAR,
-                _text, SPLIT_CHAR,
-                _tickerText, END_CHAR);
+        return new Gson().toJson(this);
     }
 
     @Override
@@ -91,18 +78,13 @@ public class MediaNotificationData implements IMediaServerClass, Serializable {
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
-        communicationString = communicationString.replace(END_CHAR, "");
 
-        String[] entries = communicationString.split(SPLIT_CHAR);
-        if (entries.length != COMMUNICATION_ENTRY_LENGTH) {
-            throw new IndexOutOfBoundsException(String.format(Locale.getDefault(), "Invalid length %d for entries in %s!", entries.length, TAG));
-        }
-
-        _visible = Boolean.getBoolean(entries[INDEX_VISIBLE]);
-        _packageName = entries[INDEX_PACKAGE_NAME];
-        _title = entries[INDEX_TITLE];
-        _text = entries[INDEX_TEXT];
-        _tickerText = entries[INDEX_TICKER_TEXT];
+        MediaNotificationData tempMediaNotificationData = new Gson().fromJson(communicationString, MediaNotificationData.class);
+        _visible = tempMediaNotificationData.IsVisible();
+        _packageName = tempMediaNotificationData.GetPackageName();
+        _title = tempMediaNotificationData.GetTitle();
+        _text = tempMediaNotificationData.GetText();
+        _tickerText = tempMediaNotificationData.GetTickerText();
     }
 
     @Override

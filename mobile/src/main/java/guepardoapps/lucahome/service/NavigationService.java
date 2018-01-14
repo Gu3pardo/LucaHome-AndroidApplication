@@ -8,15 +8,11 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-import guepardoapps.lucahome.basic.utils.Logger;
 import guepardoapps.lucahome.views.*;
 
 public class NavigationService {
     public enum NavigationResult {NULL, PERMITTED, PERMITTED_SAME_ACTIVITIES, POSSIBLE, SUCCESS}
-
-    private static final String TAG = NavigationService.class.getSimpleName();
 
     private static final NavigationService SINGLETON = new NavigationService();
 
@@ -36,10 +32,6 @@ public class NavigationService {
     public NavigationResult NavigateToActivity(@NonNull Context startActivityContext, @NonNull Class<?> endActivity) {
         NavigationResult canNavigateResult = canNavigate(startActivityContext, endActivity);
 
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(),
-                "NavigateToActivity: startActivityContext: %s | endActivity: %s | canNavigateResult: %s",
-                startActivityContext, endActivity, canNavigateResult));
-
         if (canNavigateResult != NavigationResult.POSSIBLE) {
             return canNavigateResult;
         }
@@ -54,10 +46,6 @@ public class NavigationService {
 
     public NavigationResult NavigateToActivityWithData(@NonNull Context startActivityContext, @NonNull Class<?> endActivity, @NonNull Bundle data) {
         NavigationResult canNavigateResult = canNavigate(startActivityContext, endActivity);
-
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(),
-                "NavigateToActivityWithData: startActivityContext: %s | endActivity: %s | canNavigateResult: %s | data: %s",
-                startActivityContext, endActivity, canNavigateResult, data));
 
         if (canNavigateResult != NavigationResult.POSSIBLE) {
             return canNavigateResult;
@@ -74,10 +62,6 @@ public class NavigationService {
     }
 
     public NavigationResult GoBack(@NonNull Context startActivityContext) {
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(),
-                "GoBack: startActivityContext: %s",
-                startActivityContext));
-
         if (_backEntryList.size() == 0) {
             _backEntryList.add(MainActivity.class);
         }
@@ -97,12 +81,10 @@ public class NavigationService {
     }
 
     public void ClearCurrentActivity() {
-        Logger.getInstance().Debug(TAG, "ClearCurrentActivity");
         _currentActivity = null;
     }
 
     public void ClearGoBackList() {
-        Logger.getInstance().Debug(TAG, "ClearCurrentActivity");
         _backEntryList.clear();
     }
 

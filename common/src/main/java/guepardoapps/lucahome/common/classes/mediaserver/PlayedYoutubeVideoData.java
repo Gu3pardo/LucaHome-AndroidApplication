@@ -2,6 +2,8 @@ package guepardoapps.lucahome.common.classes.mediaserver;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -13,14 +15,6 @@ public class PlayedYoutubeVideoData implements IMediaServerClass, Serializable {
     private static final long serialVersionUID = 2691811435346489566L;
 
     private static final String TAG = PlayedYoutubeVideoData.class.getSimpleName();
-    private static final int COMMUNICATION_ENTRY_LENGTH = 3;
-
-    private static final int INDEX_ID = 0;
-    private static final int INDEX_YOUTUBE_ID = 1;
-    private static final int INDEX_PLAY_COUNT = 2;
-
-    public static final String SPLIT_CHAR = "---";
-    public static final String END_CHAR = "===";
 
     private int _id;
     private String _youtubeId;
@@ -59,10 +53,7 @@ public class PlayedYoutubeVideoData implements IMediaServerClass, Serializable {
 
     @Override
     public String GetCommunicationString() {
-        return String.format(Locale.getDefault(), "%s%s%s%s%d%s",
-                _id, SPLIT_CHAR,
-                _youtubeId, SPLIT_CHAR,
-                _playCount, END_CHAR);
+        return new Gson().toJson(this);
     }
 
     @Override
@@ -71,16 +62,11 @@ public class PlayedYoutubeVideoData implements IMediaServerClass, Serializable {
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
-        communicationString = communicationString.replace(END_CHAR, "");
 
-        String[] entries = communicationString.split(SPLIT_CHAR);
-        if (entries.length != COMMUNICATION_ENTRY_LENGTH) {
-            throw new IndexOutOfBoundsException(String.format(Locale.getDefault(), "Invalid length %d for entries in %s!", entries.length, TAG));
-        }
-
-        _id = Integer.parseInt(entries[INDEX_ID]);
-        _youtubeId = entries[INDEX_YOUTUBE_ID];
-        _playCount = Integer.parseInt(entries[INDEX_PLAY_COUNT]);
+        PlayedYoutubeVideoData tempPlayedYoutubeVideoData = new Gson().fromJson(communicationString, PlayedYoutubeVideoData.class);
+        _id = tempPlayedYoutubeVideoData.GetId();
+        _youtubeId = tempPlayedYoutubeVideoData.GetYoutubeId();
+        _playCount = tempPlayedYoutubeVideoData.GetPlayCount();
     }
 
     @Override

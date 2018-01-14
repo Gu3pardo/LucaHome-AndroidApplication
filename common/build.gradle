@@ -2,12 +2,12 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion '27.0.2'
+    buildToolsVersion '27.0.3'
     defaultConfig {
         minSdkVersion 24
         targetSdkVersion 27
-        versionCode 50203
-        versionName "5.2.3.180111"
+        versionCode 50204
+        versionName "5.2.4.180114"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testOptions {
             unitTests.returnDefaultValues = true
@@ -53,6 +53,7 @@ dependencies {
     implementation 'com.android.support:support-v4:27.0.2'
     implementation 'com.github.GrenderG:Toasty:1.2.5'
     implementation 'com.github.rey5137:material:1.2.4'
+    implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'com.karumi:dexter:4.1.0'
     implementation 'com.squareup.okhttp3:okhttp:3.9.1'
     implementation 'com.squareup.picasso:picasso:2.5.2'

@@ -65,7 +65,8 @@ public class DataHandler {
                     true, "Sleep well!",
                     false, YoutubeId.NULL,
                     false, "",
-                    false, RadioStreams.BAYERN_3);
+                    false, RadioStreams.BAYERN_3,
+                    false, "");
 
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CENTER_MODEL,
@@ -264,7 +265,8 @@ public class DataHandler {
                     false, "",
                     true, youtubeId,
                     false, "",
-                    false, RadioStreams.BAYERN_3);
+                    false, RadioStreams.BAYERN_3,
+                    false, "");
 
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CENTER_MODEL,
@@ -279,7 +281,8 @@ public class DataHandler {
                     false, "",
                     true, youtubeId,
                     false, "",
-                    false, RadioStreams.BAYERN_3);
+                    false, RadioStreams.BAYERN_3,
+                    false, "");
 
             _broadcastController.SendSerializableBroadcast(
                     Broadcasts.SHOW_CENTER_MODEL,
@@ -347,7 +350,8 @@ public class DataHandler {
                 true, commandData,
                 false, YoutubeId.NULL,
                 false, "",
-                false, RadioStreams.BAYERN_3);
+                false, RadioStreams.BAYERN_3,
+                false, "");
         _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, centerTextModel);
 
         return handleGetCenterText(commandData, MediaServerAction.CENTER_TEXT_SET);
@@ -372,7 +376,8 @@ public class DataHandler {
                 false, "",
                 false, YoutubeId.NULL,
                 false, "",
-                true, radioStream);
+                true, radioStream,
+                false, "");
 
         _broadcastController.SendSerializableBroadcast(
                 Broadcasts.SHOW_CENTER_MODEL,
@@ -424,7 +429,8 @@ public class DataHandler {
                 false, "",
                 true, YoutubeId.SEA_SOUND,
                 false, "",
-                false, RadioStreams.BAYERN_3);
+                false, RadioStreams.BAYERN_3,
+                false, "");
         _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, playSleepSoundModel);
 
         _sleepTimerHandler.postDelayed(_sleepTimerRunnable, timeOut);
@@ -445,7 +451,8 @@ public class DataHandler {
                 true, "",
                 false, YoutubeId.NULL,
                 false, "",
-                false, RadioStreams.BAYERN_3);
+                false, RadioStreams.BAYERN_3,
+                false, "");
         _broadcastController.SendSerializableBroadcast(Broadcasts.SHOW_CENTER_MODEL, Bundles.CENTER_MODEL, stopSleepSoundModel);
 
         _sleepTimerHandler.removeCallbacks(_sleepTimerRunnable);

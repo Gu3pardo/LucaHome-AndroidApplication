@@ -2,6 +2,8 @@ package guepardoapps.lucahome.common.classes.mediaserver;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -13,15 +15,6 @@ public class YoutubeVideoData implements IMediaServerClass, Serializable {
     private static final long serialVersionUID = 2691810003647772566L;
 
     private static final String TAG = YoutubeVideoData.class.getSimpleName();
-    private static final int COMMUNICATION_ENTRY_LENGTH = 4;
-
-    private static final int INDEX_YOUTUBE_ID = 0;
-    private static final int INDEX_TITLE = 1;
-    private static final int INDEX_DESCRIPTION = 2;
-    private static final int INDEX_MEDIUM_IMAGE_URL = 3;
-
-    public static final String SPLIT_CHAR = "::";
-    public static final String END_CHAR = ";";
 
     private String _youtubeId;
     private String _title;
@@ -57,11 +50,7 @@ public class YoutubeVideoData implements IMediaServerClass, Serializable {
 
     @Override
     public String GetCommunicationString() {
-        return String.format(Locale.getDefault(), "%s%s%s%s%s%s%s%s",
-                _youtubeId, SPLIT_CHAR,
-                _title, SPLIT_CHAR,
-                _description, SPLIT_CHAR,
-                _mediumImageUrl, END_CHAR);
+        return new Gson().toJson(this);
     }
 
     @Override
@@ -70,17 +59,12 @@ public class YoutubeVideoData implements IMediaServerClass, Serializable {
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
-        communicationString = communicationString.replace(END_CHAR, "");
 
-        String[] entries = communicationString.split(SPLIT_CHAR);
-        if (entries.length != COMMUNICATION_ENTRY_LENGTH) {
-            throw new IndexOutOfBoundsException(String.format(Locale.getDefault(), "Invalid length %d for entries in %s!", entries.length, TAG));
-        }
-
-        _youtubeId = entries[INDEX_YOUTUBE_ID];
-        _title = entries[INDEX_TITLE];
-        _description = entries[INDEX_DESCRIPTION];
-        _mediumImageUrl = entries[INDEX_MEDIUM_IMAGE_URL];
+        YoutubeVideoData tempYoutubeVideoData = new Gson().fromJson(communicationString, YoutubeVideoData.class);
+        _youtubeId = tempYoutubeVideoData.GetYoutubeId();
+        _title = tempYoutubeVideoData.GetTitle();
+        _description = tempYoutubeVideoData.GetDescription();
+        _mediumImageUrl = tempYoutubeVideoData.GetMediumImageUrl();
     }
 
     @Override

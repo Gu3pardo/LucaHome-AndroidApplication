@@ -2,6 +2,8 @@ package guepardoapps.lucahome.common.classes.mediaserver;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -14,16 +16,6 @@ public class YoutubeData implements IMediaServerClass, Serializable {
     private static final long serialVersionUID = 1384098950675481913L;
 
     private static final String TAG = YoutubeData.class.getSimpleName();
-    private static final int COMMUNICATION_ENTRY_LENGTH = 5;
-
-    private static final int INDEX_IS_YOUTUBE_PLAYING = 0;
-    private static final int INDEX_CURRENT_YOUTUBE_ID = 1;
-    private static final int INDEX_CURRENT_YOUTUBE_POSITION = 2;
-    private static final int INDEX_CURRENT_YOUTUBE_DURATION = 3;
-    private static final int INDEX_PLAYED_YOUTUBE_VIDEOS = 4;
-
-    public static final String SPLIT_CHAR = "::";
-    public static final String END_CHAR = ";";
 
     private boolean _isYoutubePlaying;
     private String _currentYoutubeId;
@@ -82,12 +74,7 @@ public class YoutubeData implements IMediaServerClass, Serializable {
 
     @Override
     public String GetCommunicationString() {
-        return String.format(Locale.getDefault(), "%s%s%s%s%d%s%d%s%s%s",
-                _isYoutubePlaying, SPLIT_CHAR,
-                _currentYoutubeId, SPLIT_CHAR,
-                _currentYoutubeVideoPosition, SPLIT_CHAR,
-                _currentYoutubeVideoDuration, SPLIT_CHAR,
-                getPlayYoutubeVideosString(), END_CHAR);
+        return new Gson().toJson(this);
     }
 
     @Override
@@ -96,29 +83,13 @@ public class YoutubeData implements IMediaServerClass, Serializable {
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }
         Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
-        communicationString = communicationString.replace(END_CHAR, "");
 
-        String[] entries = communicationString.split(SPLIT_CHAR);
-        if (entries.length != COMMUNICATION_ENTRY_LENGTH) {
-            throw new IndexOutOfBoundsException(String.format(Locale.getDefault(), "Invalid length %d for entries in %s!", entries.length, TAG));
-        }
-
-        _isYoutubePlaying = entries[INDEX_IS_YOUTUBE_PLAYING].contains("1");
-        _currentYoutubeId = entries[INDEX_CURRENT_YOUTUBE_ID];
-        _currentYoutubeVideoPosition = Integer.parseInt(entries[INDEX_CURRENT_YOUTUBE_POSITION]);
-        _currentYoutubeVideoDuration = Integer.parseInt(entries[INDEX_CURRENT_YOUTUBE_DURATION]);
-
-        String playedYoutubeVideoDataString = entries[INDEX_PLAYED_YOUTUBE_VIDEOS];
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "playedYoutubeVideoDataString is %s", playedYoutubeVideoDataString));
-
-        ArrayList<PlayedYoutubeVideoData> playedYoutubeVideos = new ArrayList<>();
-        String[] playYoutubeDataEntries = playedYoutubeVideoDataString.split(PlayedYoutubeVideoData.END_CHAR);
-        for (String playYoutubeDataEntry : playYoutubeDataEntries) {
-            PlayedYoutubeVideoData playedYoutubeVideo = new PlayedYoutubeVideoData();
-            playedYoutubeVideo.ParseCommunicationString(playYoutubeDataEntry);
-            playedYoutubeVideos.add(playedYoutubeVideo);
-        }
-        _playedYoutubeVideos = playedYoutubeVideos;
+        YoutubeData youtubeData = new Gson().fromJson(communicationString, YoutubeData.class);
+        _isYoutubePlaying = youtubeData.IsYoutubePlaying();
+        _currentYoutubeId = youtubeData.GetCurrentYoutubeId();
+        _currentYoutubeVideoPosition = youtubeData.GetCurrentYoutubeVideoPosition();
+        _currentYoutubeVideoDuration = youtubeData.GetCurrentYoutubeVideoDuration();
+        _playedYoutubeVideos = youtubeData.GetPlayedYoutubeVideos();
     }
 
     @Override
