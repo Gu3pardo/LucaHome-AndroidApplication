@@ -92,8 +92,6 @@ public class TemperatureService implements IDataNotificationService {
 
                 _temperatureList = temperatureList;
 
-                ShowNotification();
-
                 WeatherModel currentWeather = OpenWeatherService.getInstance().CurrentWeather();
                 if (currentWeather != null) {
                     Temperature currentWeatherTemperature = new Temperature(
@@ -106,6 +104,9 @@ public class TemperatureService implements IDataNotificationService {
                             "");
                     _temperatureList.addValue(currentWeatherTemperature);
                 }
+
+                _activeTemperature = _temperatureList.getValue(0);
+                ShowNotification();
 
                 _lastUpdate = new Date();
 

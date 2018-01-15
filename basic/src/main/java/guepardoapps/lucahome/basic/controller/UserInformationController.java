@@ -12,7 +12,7 @@ import android.text.format.Formatter;
 
 import guepardoapps.lucahome.basic.utils.Logger;
 
-@SuppressWarnings({"deprecation", "unused"})
+@SuppressWarnings({"deprecation", "unused", "WeakerAccess"})
 public class UserInformationController {
     private static final String TAG = UserInformationController.class.getSimpleName();
 
@@ -25,11 +25,7 @@ public class UserInformationController {
     }
 
     public List<ApplicationInfo> GetApkList() {
-        List<ApplicationInfo> apkList = _packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-        for (ApplicationInfo entry : apkList) {
-            Logger.getInstance().Debug(TAG, entry.toString());
-        }
-        return apkList;
+        return _packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
     }
 
     public ArrayList<String> GetApkPackageNameArrayList() {

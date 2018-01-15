@@ -29,7 +29,7 @@ import guepardoapps.lucahome.common.service.PositioningService;
 import guepardoapps.lucahome.common.service.WirelessSocketService;
 import guepardoapps.lucahome.common.service.broadcasts.content.ObjectChangeFinishedContent;
 
-@SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
+@SuppressWarnings({"deprecation", "FieldCanBeLocal", "WeakerAccess"})
 public class BixbyPairService implements IDataService {
     public static class BixbyPairUpdateFinishedContent extends ObjectChangeFinishedContent {
         public SerializableList<BixbyPair> BixbyPairList;
@@ -314,7 +314,7 @@ public class BixbyPairService implements IDataService {
     }
 
     public Date GetLastUpdate() {
-        return _lastUpdate;
+        return _lastUpdate != null ? _lastUpdate : new Date(1970, 0, 1, 0, 0, 0);
     }
 
     private SerializableList<BixbyPair> createPairList() {

@@ -63,7 +63,7 @@ public class NetworkAction implements IBixbyAction, Serializable {
 
     @Override
     public String GetInformationString() {
-        return String.format(Locale.getDefault(), "%s for %s -> %s", TAG, _networkType, _stateType);
+        return String.format(Locale.getDefault(), "%s \nfor %s -> %s", TAG, _networkType, _stateType);
     }
 
     @Override

@@ -3,13 +3,12 @@ package guepardoapps.lucahome.views;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -18,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.rey.material.widget.Button;
 import com.rey.material.widget.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -68,11 +66,11 @@ public class BixbyEditActivity extends AppCompatActivity {
     private static final int MIN_REQUIREMENT_COUNT = 1;
     private static final int MAX_REQUIREMENT_COUNT = 5;
 
-    private int _currentRequirementCount = MIN_REQUIREMENT_COUNT;
+    private int _currentRequirementIndex = MIN_REQUIREMENT_COUNT - 1;
 
     private LinearLayout _mainRequirementLinearLayout;
 
-    private LinearLayout[] _requirementContainerLinearLayout = new LinearLayout[MAX_REQUIREMENT_COUNT];
+    private View[] _requirementContainerLinearLayout = new View[MAX_REQUIREMENT_COUNT];
 
     private Spinner[] _requirementTypeSpinnerArray = new Spinner[MAX_REQUIREMENT_COUNT];
 
@@ -82,6 +80,7 @@ public class BixbyEditActivity extends AppCompatActivity {
     private EditText[] _lightValueEditTextArray = new EditText[MAX_REQUIREMENT_COUNT];
     private EditText[] _lightToleranceEditTextArray = new EditText[MAX_REQUIREMENT_COUNT];
     private Spinner[] _lightCompareTypeSpinnerArray = new Spinner[MAX_REQUIREMENT_COUNT];
+    private Spinner[] _lightAreaSpinnerArray = new Spinner[MAX_REQUIREMENT_COUNT];
 
     private PercentRelativeLayout[] _networkRequirementPercentRelativeLayoutArray = new PercentRelativeLayout[MAX_REQUIREMENT_COUNT];
     private Spinner[] _networkTypeSpinnerArray = new Spinner[MAX_REQUIREMENT_COUNT];
@@ -94,7 +93,6 @@ public class BixbyEditActivity extends AppCompatActivity {
 
     private com.rey.material.widget.Button _saveButton;
 
-    private Context _context;
     private ReceiverController _receiverController;
 
     private BroadcastReceiver _addFinishedReceiver = new BroadcastReceiver() {
@@ -138,8 +136,7 @@ public class BixbyEditActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bixby_edit);
-        _context = this;
-        _receiverController = new ReceiverController(_context);
+        _receiverController = new ReceiverController(this);
         BixbyPair bixbyPair = (BixbyPair) getIntent().getSerializableExtra(BixbyPairService.BIXBY_PAIR_INTENT);
         // Bixby Action ui elements
         setUpActionUi(bixbyPair);
@@ -301,6 +298,8 @@ public class BixbyEditActivity extends AppCompatActivity {
         _lightToleranceEditTextArray[0] = findViewById(R.id.bixby_edit_requirement_light_tolerance_edit_1);
         _lightCompareTypeSpinnerArray[0] = findViewById(R.id.bixby_edit_requirement_light_compare_type_spinner_1);
         _lightCompareTypeSpinnerArray[0].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, LightRequirement.CompareType.values()));
+        _lightAreaSpinnerArray[0] = findViewById(R.id.bixby_edit_requirement_light_area_spinner_1);
+        _lightAreaSpinnerArray[0].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, PuckJsListService.getInstance().GetPuckJsAreaList()));
 
         _networkRequirementPercentRelativeLayoutArray[0] = findViewById(R.id.bixby_edit_requirement_network_relative_layout_1);
         _networkTypeSpinnerArray[0] = findViewById(R.id.bixby_edit_requirement_network_type_spinner_1);
@@ -318,6 +317,8 @@ public class BixbyEditActivity extends AppCompatActivity {
         _requirementTypeSpinnerArray[0].setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "_requirementTypeSpinnerArray[%d].onItemSelected", 0));
+
                 BixbyRequirement.RequirementType requirementType = BixbyRequirement.RequirementType.values()[position];
                 switch (requirementType) {
                     case Position:
@@ -366,7 +367,13 @@ public class BixbyEditActivity extends AppCompatActivity {
         });
 
         FloatingActionButton addRequirementFloatingActionButton = findViewById(R.id.bixby_edit_requirements_add_button);
-        addRequirementFloatingActionButton.setOnClickListener(view -> tryToAddRequirementView());
+        addRequirementFloatingActionButton.setOnClickListener(view -> {
+            try {
+                tryToAddRequirementView();
+            } catch (Exception exception) {
+                Logger.getInstance().Error(TAG, exception.toString());
+            }
+        });
 
         if (bixbyPair != null) {
             SerializableList<BixbyRequirement> bixbyRequirementList = bixbyPair.GetRequirements();
@@ -379,7 +386,11 @@ public class BixbyEditActivity extends AppCompatActivity {
 
             for (int index = 0; ((index < requirementListSize) && (index <= MAX_REQUIREMENT_COUNT)); index++) {
                 if (index > 0) {
-                    tryToAddRequirementView();
+                    try {
+                        tryToAddRequirementView();
+                    } catch (Exception exception) {
+                        Logger.getInstance().Error(TAG, exception.toString());
+                    }
                 }
 
                 BixbyRequirement bixbyRequirement = bixbyRequirementList.getValue(index);
@@ -400,6 +411,9 @@ public class BixbyEditActivity extends AppCompatActivity {
                             _lightValueEditTextArray[index].setText(String.valueOf(lightRequirement.GetCompareValue()));
                             _lightToleranceEditTextArray[index].setText(String.valueOf(lightRequirement.GetToleranceInPercent()));
                             _lightCompareTypeSpinnerArray[index].setSelection(lightRequirement.GetCompareType().ordinal());
+                            String lightArea = bixbyRequirement.GetLightRequirement().GetLightArea();
+                            ArrayList<String> lightAreaList = PuckJsListService.getInstance().GetPuckJsAreaList();
+                            _lightAreaSpinnerArray[index].setSelection(lightAreaList.indexOf(lightArea));
                         } else {
                             displayErrorSnackBar("Cannot work with data! LightRequirement is corrupted! Please try again!");
                         }
@@ -440,165 +454,115 @@ public class BixbyEditActivity extends AppCompatActivity {
         }
     }
 
-    private void tryToAddRequirementView() {
+    private void tryToAddRequirementView() throws Exception {
+        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "tryToAddRequirementView: _currentRequirementIndex: %d", _currentRequirementIndex));
+
         // Cancel creation if there are already MAX_REQUIREMENT_COUNT requirements
-        if (_currentRequirementCount >= MAX_REQUIREMENT_COUNT) {
+        if (_currentRequirementIndex >= MAX_REQUIREMENT_COUNT - 1) {
             return;
         }
 
-        // Create new MainContainerLinearLayout for new Requirement
-        _requirementContainerLinearLayout[_currentRequirementCount] = new LinearLayout(_context);
-        _requirementContainerLinearLayout[_currentRequirementCount].setLayoutParams(_requirementContainerLinearLayout[_currentRequirementCount - 1].getLayoutParams());
+        // Increase count for current requirements
+        _currentRequirementIndex++;
+
+        LayoutInflater layoutInflater = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (layoutInflater == null) {
+            throw new NullPointerException("layoutInflater is null!");
+        }
+        _requirementContainerLinearLayout[_currentRequirementIndex] = layoutInflater.inflate(R.layout.layout_bixby_edit_requirement_view, null);
 
         // Create new Spinner to select requirement type and add it to the MainContainerLinearLayout
-        _requirementTypeSpinnerArray[_currentRequirementCount] = new Spinner(_context);
-        _requirementTypeSpinnerArray[_currentRequirementCount].setLayoutParams(_requirementTypeSpinnerArray[_currentRequirementCount - 1].getLayoutParams());
-        _requirementTypeSpinnerArray[_currentRequirementCount].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, BixbyRequirement.RequirementType.values()));
-        _requirementContainerLinearLayout[_currentRequirementCount].addView(_requirementTypeSpinnerArray[_currentRequirementCount]);
+        _requirementTypeSpinnerArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_type_spinner);
+        _requirementTypeSpinnerArray[_currentRequirementIndex].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, BixbyRequirement.RequirementType.values()));
 
         // Create new Spinner to select PuckJs position and add it to the MainContainerLinearLayout
-        _puckJsPositionSpinnerArray[_currentRequirementCount] = new Spinner(_context);
-        _puckJsPositionSpinnerArray[_currentRequirementCount].setLayoutParams(_puckJsPositionSpinnerArray[_currentRequirementCount - 1].getLayoutParams());
-        _puckJsPositionSpinnerArray[_currentRequirementCount].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, PuckJsListService.getInstance().GetPuckJsAreaList()));
-        _requirementContainerLinearLayout[_currentRequirementCount].addView(_puckJsPositionSpinnerArray[_currentRequirementCount]);
+        _puckJsPositionSpinnerArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_puckjs_position_spinner);
+        _puckJsPositionSpinnerArray[_currentRequirementIndex].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, PuckJsListService.getInstance().GetPuckJsAreaList()));
 
         // Create new Container LinearLayout for new LightRequirement
-        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount] = new PercentRelativeLayout(_context);
-        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].setLayoutParams(_lightRequirementPercentRelativeLayoutArray[_currentRequirementCount - 1].getLayoutParams());
+        _lightRequirementPercentRelativeLayoutArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_light_relative_layout);
 
         // Create new EditText to enter light value for LightRequirement and add it to the LightRequirementContainer
-        _lightValueEditTextArray[_currentRequirementCount] = new EditText(_context);
-        _lightValueEditTextArray[_currentRequirementCount].setLayoutParams(_lightValueEditTextArray[_currentRequirementCount - 1].getLayoutParams());
-        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].addView(_lightValueEditTextArray[_currentRequirementCount]);
+        _lightValueEditTextArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_light_value_edit);
 
         // Create new EditText to enter tolerance value for LightRequirement and add it to the LightRequirementContainer
-        _lightToleranceEditTextArray[_currentRequirementCount] = new EditText(_context);
-        _lightToleranceEditTextArray[_currentRequirementCount].setLayoutParams(_lightToleranceEditTextArray[_currentRequirementCount - 1].getLayoutParams());
-        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].addView(_lightToleranceEditTextArray[_currentRequirementCount]);
+        _lightToleranceEditTextArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_light_tolerance_edit);
 
         // Create new Spinner to select compare type for LightRequirement and add it to the LightRequirementContainer
-        _lightCompareTypeSpinnerArray[_currentRequirementCount] = new Spinner(_context);
-        _lightCompareTypeSpinnerArray[_currentRequirementCount].setLayoutParams(_lightCompareTypeSpinnerArray[_currentRequirementCount - 1].getLayoutParams());
-        _lightCompareTypeSpinnerArray[_currentRequirementCount].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, LightRequirement.CompareType.values()));
-        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].addView(_lightCompareTypeSpinnerArray[_currentRequirementCount]);
+        _lightCompareTypeSpinnerArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_light_compare_type_spinner);
+        _lightCompareTypeSpinnerArray[_currentRequirementIndex].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, LightRequirement.CompareType.values()));
 
-        // Add LightRequirementContainer to the MainContainerLinearLayout
-        _requirementContainerLinearLayout[_currentRequirementCount].addView(_lightRequirementPercentRelativeLayoutArray[_currentRequirementCount]);
+        // Create new Spinner to select the area for LightRequirement and add it to the LightRequirementContainer
+        _lightAreaSpinnerArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_light_area_spinner);
+        _lightAreaSpinnerArray[_currentRequirementIndex].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, PuckJsListService.getInstance().GetPuckJsAreaList()));
 
         // Create new Container LinearLayout for new NetworkRequirement
-        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount] = new PercentRelativeLayout(_context);
-        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].setLayoutParams(_networkRequirementPercentRelativeLayoutArray[_currentRequirementCount - 1].getLayoutParams());
+        _networkRequirementPercentRelativeLayoutArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_network_relative_layout);
 
         // Create new Spinner to select network type for NetworkRequirement and add it to the NetworkRequirementContainer
-        _networkTypeSpinnerArray[_currentRequirementCount] = new Spinner(_context);
-        _networkTypeSpinnerArray[_currentRequirementCount].setLayoutParams(_networkTypeSpinnerArray[_currentRequirementCount - 1].getLayoutParams());
-        _networkTypeSpinnerArray[_currentRequirementCount].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, NetworkRequirement.NetworkType.values()));
-        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].addView(_networkTypeSpinnerArray[_currentRequirementCount]);
+        _networkTypeSpinnerArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_network_type_spinner);
+        _networkTypeSpinnerArray[_currentRequirementIndex].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, NetworkRequirement.NetworkType.values()));
 
         // Create new Spinner to select network state for NetworkRequirement and add it to the NetworkRequirementContainer
-        _networkStateSpinnerArray[_currentRequirementCount] = new Spinner(_context);
-        _networkStateSpinnerArray[_currentRequirementCount].setLayoutParams(_networkStateSpinnerArray[_currentRequirementCount - 1].getLayoutParams());
-        _networkStateSpinnerArray[_currentRequirementCount].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, NetworkRequirement.StateType.values()));
-        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].addView(_networkStateSpinnerArray[_currentRequirementCount]);
+        _networkStateSpinnerArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_network_state_spinner);
+        _networkStateSpinnerArray[_currentRequirementIndex].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, NetworkRequirement.StateType.values()));
 
         // Create new EditText to enter the SSID for the NetworkRequirement and add it to the NetworkRequirementContainer
-        _networkSsidEditTextArray[_currentRequirementCount] = new EditText(_context);
-        _networkSsidEditTextArray[_currentRequirementCount].setLayoutParams(_networkSsidEditTextArray[_currentRequirementCount - 1].getLayoutParams());
-        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].addView(_networkSsidEditTextArray[_currentRequirementCount]);
-
-        // Add NetworkRequirementContainer to the MainContainerLinearLayout
-        _requirementContainerLinearLayout[_currentRequirementCount].addView(_networkRequirementPercentRelativeLayoutArray[_currentRequirementCount]);
+        _networkSsidEditTextArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_network_ssid_edit);
 
         // Create new Container LinearLayout for new WirelessSocketRequirement
-        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount] = new PercentRelativeLayout(_context);
-        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount].setLayoutParams(_wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount - 1].getLayoutParams());
+        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_wireless_socket_relative_layout);
 
         // Create new Spinner to select a wirelessSocket for WirelessSocketRequirement and add it to the WirelessSocketRequirementContainer
-        _wirelessSocketNameSpinnerArray[_currentRequirementCount] = new Spinner(_context);
-        _wirelessSocketNameSpinnerArray[_currentRequirementCount].setLayoutParams(_wirelessSocketNameSpinnerArray[_currentRequirementCount - 1].getLayoutParams());
-        _wirelessSocketNameSpinnerArray[_currentRequirementCount].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketService.getInstance().GetNameList()));
-        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount].addView(_wirelessSocketNameSpinnerArray[_currentRequirementCount]);
+        _wirelessSocketNameSpinnerArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_wireless_socket_name_spinner);
+        _wirelessSocketNameSpinnerArray[_currentRequirementIndex].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketService.getInstance().GetNameList()));
 
         // Create new Spinner to select the wirelessSocket state for WirelessSocketRequirement and add it to the WirelessSocketRequirementContainer
-        _wirelessSocketStateSpinnerArray[_currentRequirementCount] = new Spinner(_context);
-        _wirelessSocketStateSpinnerArray[_currentRequirementCount].setLayoutParams(_wirelessSocketStateSpinnerArray[_currentRequirementCount - 1].getLayoutParams());
-        _wirelessSocketStateSpinnerArray[_currentRequirementCount].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketAction.StateType.values()));
-        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount].addView(_wirelessSocketStateSpinnerArray[_currentRequirementCount]);
-
-        // Add WirelessSocketRequirementContainer to the MainContainerLinearLayout
-        _requirementContainerLinearLayout[_currentRequirementCount].addView(_wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount]);
-
-        // Create new button to delete the MainContainerLinearLayout (remove the requirement) and add it to the MainContainerLinearLayout
-        Button removeButton = new Button(_context);
-        removeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
-        removeButton.setText("X");
-        removeButton.setGravity(Gravity.END);
-        removeButton.setOnClickListener(view -> {
-            _mainRequirementLinearLayout.removeView(_requirementContainerLinearLayout[_currentRequirementCount]);
-
-            _requirementContainerLinearLayout[_currentRequirementCount] = null;
-
-            _requirementTypeSpinnerArray[_currentRequirementCount] = null;
-            _puckJsPositionSpinnerArray[_currentRequirementCount] = null;
-
-            _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount] = null;
-            _lightValueEditTextArray[_currentRequirementCount] = null;
-            _lightToleranceEditTextArray[_currentRequirementCount] = null;
-            _lightCompareTypeSpinnerArray[_currentRequirementCount] = null;
-
-            _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount] = null;
-            _networkTypeSpinnerArray[_currentRequirementCount] = null;
-            _networkStateSpinnerArray[_currentRequirementCount] = null;
-            _networkSsidEditTextArray[_currentRequirementCount] = null;
-
-            _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount] = null;
-            _wirelessSocketNameSpinnerArray[_currentRequirementCount] = null;
-            _wirelessSocketStateSpinnerArray[_currentRequirementCount] = null;
-
-            _currentRequirementCount--;
-        });
-        _requirementContainerLinearLayout[_currentRequirementCount].addView(removeButton);
+        _wirelessSocketStateSpinnerArray[_currentRequirementIndex] = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_wireless_socket_state_spinner);
+        _wirelessSocketStateSpinnerArray[_currentRequirementIndex].setAdapter(new ArrayAdapter<>(BixbyEditActivity.this, android.R.layout.simple_dropdown_item_1line, WirelessSocketAction.StateType.values()));
 
         // Handle selection of requirement type
-        _requirementTypeSpinnerArray[_currentRequirementCount].setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        _requirementTypeSpinnerArray[_currentRequirementIndex].setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "_requirementTypeSpinnerArray[%d].onItemSelected", _currentRequirementIndex));
+
                 BixbyRequirement.RequirementType requirementType = BixbyRequirement.RequirementType.values()[position];
                 switch (requirementType) {
                     case Position:
-                        _puckJsPositionSpinnerArray[_currentRequirementCount].setVisibility(View.VISIBLE);
-                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
+                        _puckJsPositionSpinnerArray[_currentRequirementIndex].setVisibility(View.VISIBLE);
+                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
                         break;
 
                     case Light:
-                        _puckJsPositionSpinnerArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.VISIBLE);
-                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
+                        _puckJsPositionSpinnerArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.VISIBLE);
+                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
                         break;
 
                     case Network:
-                        _puckJsPositionSpinnerArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.VISIBLE);
-                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
+                        _puckJsPositionSpinnerArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.VISIBLE);
+                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
                         break;
 
                     case WirelessSocket:
-                        _puckJsPositionSpinnerArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.VISIBLE);
+                        _puckJsPositionSpinnerArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.VISIBLE);
                         break;
 
                     case Null:
                     default:
-                        _puckJsPositionSpinnerArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
-                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementCount].setVisibility(View.GONE);
+                        _puckJsPositionSpinnerArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _lightRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _networkRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
+                        _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementIndex].setVisibility(View.GONE);
                         Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Invalid requirement %s in bixbyEditRequirementTypeSpinner1.setOnItemSelectedListener", requirementType));
                         Toasty.error(BixbyEditActivity.this, "Invalid requirement selection!", Toast.LENGTH_LONG).show();
                         break;
@@ -610,11 +574,38 @@ public class BixbyEditActivity extends AppCompatActivity {
             }
         });
 
-        // Add MainContainerLinearLayout to main view
-        _mainRequirementLinearLayout.addView(_requirementContainerLinearLayout[_currentRequirementCount]);
+        // Create new button to delete the MainContainerLinearLayout (remove the requirement) and add it to the MainContainerLinearLayout
+        FloatingActionButton removeRequirementViewButton = _requirementContainerLinearLayout[_currentRequirementIndex].findViewById(R.id.bixby_edit_requirement_remove_button);
+        removeRequirementViewButton.setOnClickListener(view -> {
+            Logger.getInstance().Debug(TAG, "removeButton.setOnClickListener");
 
-        // Increase count for current requirements
-        _currentRequirementCount++;
+            _mainRequirementLinearLayout.removeView(_requirementContainerLinearLayout[_currentRequirementIndex]);
+
+            _requirementContainerLinearLayout[_currentRequirementIndex] = null;
+
+            _requirementTypeSpinnerArray[_currentRequirementIndex] = null;
+            _puckJsPositionSpinnerArray[_currentRequirementIndex] = null;
+
+            _lightRequirementPercentRelativeLayoutArray[_currentRequirementIndex] = null;
+            _lightValueEditTextArray[_currentRequirementIndex] = null;
+            _lightToleranceEditTextArray[_currentRequirementIndex] = null;
+            _lightCompareTypeSpinnerArray[_currentRequirementIndex] = null;
+            _lightAreaSpinnerArray[_currentRequirementIndex] = null;
+
+            _networkRequirementPercentRelativeLayoutArray[_currentRequirementIndex] = null;
+            _networkTypeSpinnerArray[_currentRequirementIndex] = null;
+            _networkStateSpinnerArray[_currentRequirementIndex] = null;
+            _networkSsidEditTextArray[_currentRequirementIndex] = null;
+
+            _wirelessSocketRequirementPercentRelativeLayoutArray[_currentRequirementIndex] = null;
+            _wirelessSocketNameSpinnerArray[_currentRequirementIndex] = null;
+            _wirelessSocketStateSpinnerArray[_currentRequirementIndex] = null;
+
+            _currentRequirementIndex--;
+        });
+
+        // Add MainContainerLinearLayout to main view
+        _mainRequirementLinearLayout.addView(_requirementContainerLinearLayout[_currentRequirementIndex]);
     }
 
     private void setUpSaveUi(BixbyPair bixbyPair) {
@@ -712,7 +703,7 @@ public class BixbyEditActivity extends AppCompatActivity {
             oldBixbyRequirementList = new SerializableList<>();
         }
 
-        for (int requirementIndex = 0; requirementIndex < _currentRequirementCount; requirementIndex++) {
+        for (int requirementIndex = 0; requirementIndex < _currentRequirementIndex + 1; requirementIndex++) {
             BixbyRequirement newBixbyRequirement;
             int bixbyRequirementId = BixbyPairService.getInstance().GetHighestRequirementId() + requirementIndex;
 
@@ -732,7 +723,8 @@ public class BixbyEditActivity extends AppCompatActivity {
                     LightRequirement.CompareType newCompareType = LightRequirement.CompareType.values()[_lightCompareTypeSpinnerArray[requirementIndex].getSelectedItemPosition()];
                     double newCompareValue = Double.parseDouble(_lightValueEditTextArray[requirementIndex].getText().toString());
                     double newToleranceValue = Double.parseDouble(_lightToleranceEditTextArray[requirementIndex].getText().toString());
-                    LightRequirement newLightRequirement = new LightRequirement(newCompareType, newCompareValue, newToleranceValue);
+                    String lightArea = _lightAreaSpinnerArray[requirementIndex].getSelectedItem().toString();
+                    LightRequirement newLightRequirement = new LightRequirement(newCompareType, newCompareValue, newToleranceValue, lightArea);
                     newBixbyRequirement = new BixbyRequirement(bixbyRequirementId, actionId, newRequirementType, "", newLightRequirement, new NetworkRequirement(), new WirelessSocketRequirement());
                     break;
 

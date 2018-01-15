@@ -21,5 +21,10 @@
 
     <string name="requirement">Requirement</string>
 
+    <string name="light_requirement_value_edit_hint">Enter a value</string>
+    <string name="light_requirement_tolerance_edit_hint">Enter tolerance in %</string>
+
+    <string name="network_requirement_ssid_edit_hint">Enter a SSID</string>
+
     <string name="contentDescription">This is an image</string>
 </resources>

@@ -61,7 +61,7 @@ public class WirelessSocketAction implements IBixbyAction, Serializable {
 
     @Override
     public String GetInformationString() {
-        return String.format(Locale.getDefault(), "%s for %s -> %s", TAG, _wirelessSocketName, _stateType);
+        return String.format(Locale.getDefault(), "%s \nfor %s -> %s", TAG, _wirelessSocketName, _stateType);
     }
 
     @Override

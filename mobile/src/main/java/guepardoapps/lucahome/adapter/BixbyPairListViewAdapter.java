@@ -112,21 +112,23 @@ public class BixbyPairListViewAdapter extends BaseAdapter {
         holder._requirementInformationTextViewArray[3] = rowView.findViewById(R.id.bixbyPair_requirement4_text_view);
         holder._requirementInformationTextViewArray[4] = rowView.findViewById(R.id.bixbyPair_requirement5_text_view);
 
-        holder._updateButton = rowView.findViewById(R.id.birthday_card_update_button);
-        holder._deleteButton = rowView.findViewById(R.id.birthday_card_delete_button);
+        holder._updateButton = rowView.findViewById(R.id.bixbyPair_card_update_button);
+        holder._deleteButton = rowView.findViewById(R.id.bixbyPair_card_delete_button);
 
         final BixbyPair bixbyPair = _listViewItems.getValue(index);
 
         holder._actionInformationTextView.setText(bixbyPair.GetAction().GetInformationString());
 
         SerializableList<BixbyRequirement> requirementList = bixbyPair.GetRequirements();
-        for (requirementIndex = 0; requirementIndex < requirementList.getSize(); requirementIndex++) {
+        int requirementCount = requirementList.getSize();
+
+        for (requirementIndex = 0; requirementIndex < requirementCount; requirementIndex++) {
             holder._requirementInformationTextViewArray[requirementIndex].setText(requirementList.getValue(requirementIndex).GetInformationString());
         }
 
-        if (requirementIndex + 1 < Holder.MAX_REQUIREMENTS) {
-            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Making TextViews gone! Only %d needed!", requirementIndex + 1));
-            for (int emptyIndex = requirementIndex + 1; emptyIndex < Holder.MAX_REQUIREMENTS; emptyIndex++) {
+        if (requirementCount < Holder.MAX_REQUIREMENTS) {
+            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Making TextViews gone! Only %d needed!", requirementCount));
+            for (int emptyIndex = requirementCount; emptyIndex < Holder.MAX_REQUIREMENTS; emptyIndex++) {
                 holder._requirementInformationTextViewArray[emptyIndex].setVisibility(View.GONE);
             }
         }

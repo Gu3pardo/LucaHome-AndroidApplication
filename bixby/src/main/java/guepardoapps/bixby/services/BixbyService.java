@@ -24,14 +24,12 @@ public class BixbyService extends AccessibilityService {
     public void onCreate() {
         super.onCreate();
         Logger.getInstance().Debug(TAG, "onCreate");
-        BixbyPairService.getInstance().Initialize(this, true, -1);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Logger.getInstance().Warning(TAG, "onDestroy");
-        BixbyPairService.getInstance().Dispose();
     }
 
     @Override

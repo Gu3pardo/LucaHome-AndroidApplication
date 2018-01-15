@@ -15,6 +15,7 @@ import java.util.Locale;
 
 import es.dmoral.toasty.Toasty;
 
+import guepardoapps.bixby.services.BixbyPairService;
 import guepardoapps.library.openweather.service.OpenWeatherService;
 
 import guepardoapps.lucahome.basic.controller.BroadcastController;
@@ -61,24 +62,25 @@ public class MainService extends Service {
 
     static {
         DOWNLOAD_HASH_MAP.append(0, () -> BirthdayService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(1, () -> CoinService.getInstance().LoadCoinConversionList());
-        DOWNLOAD_HASH_MAP.append(2, () -> CoinService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(3, () -> ListedMenuService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(4, () -> MenuService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(5, () -> MeterListService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(6, () -> MoneyMeterListService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(7, () -> MovieService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(8, () -> OpenWeatherService.getInstance().LoadCurrentWeather());
-        DOWNLOAD_HASH_MAP.append(9, () -> OpenWeatherService.getInstance().LoadForecastWeather());
-        DOWNLOAD_HASH_MAP.append(10, () -> TemperatureService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(11, () -> SecurityService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(12, () -> ShoppingListService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(13, () -> WirelessSocketService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(14, () -> WirelessSwitchService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(15, () -> ScheduleService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(16, () -> TimerService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(17, () -> PuckJsListService.getInstance().LoadData());
-        DOWNLOAD_HASH_MAP.append(18, () -> MapContentService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(1, () -> BixbyPairService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(2, () -> CoinService.getInstance().LoadCoinConversionList());
+        DOWNLOAD_HASH_MAP.append(3, () -> CoinService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(4, () -> ListedMenuService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(5, () -> MenuService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(6, () -> MeterListService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(7, () -> MoneyMeterListService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(8, () -> MovieService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(9, () -> OpenWeatherService.getInstance().LoadCurrentWeather());
+        DOWNLOAD_HASH_MAP.append(10, () -> OpenWeatherService.getInstance().LoadForecastWeather());
+        DOWNLOAD_HASH_MAP.append(11, () -> TemperatureService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(12, () -> SecurityService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(13, () -> ShoppingListService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(14, () -> WirelessSocketService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(15, () -> WirelessSwitchService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(16, () -> ScheduleService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(17, () -> TimerService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(18, () -> PuckJsListService.getInstance().LoadData());
+        DOWNLOAD_HASH_MAP.append(19, () -> MapContentService.getInstance().LoadData());
     }
 
     private BroadcastController _broadcastController;
@@ -95,6 +97,14 @@ public class MainService extends Service {
     };
 
     private BroadcastReceiver _birthdayDownloadFinishedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            broadcastDownloadCount();
+            _receiverController.UnregisterReceiver(this);
+        }
+    };
+
+    private BroadcastReceiver _bixbyDownloadFinishedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             broadcastDownloadCount();
@@ -330,6 +340,11 @@ public class MainService extends Service {
                 SettingsController.getInstance().IsReloadBirthdayEnabled(),
                 SettingsController.getInstance().GetReloadBirthdayTimeout());
 
+        // TODO
+        BixbyPairService.getInstance().Initialize(this,
+                false,
+                0);
+
         CoinService.getInstance().Initialize(
                 this,
                 CoinActivity.class,
@@ -447,6 +462,7 @@ public class MainService extends Service {
         _receiverController.Dispose();
 
         BirthdayService.getInstance().Dispose();
+        BixbyPairService.getInstance().Dispose();
         CoinService.getInstance().Dispose();
         ListedMenuService.getInstance().Dispose();
         MapContentService.getInstance().Dispose();
@@ -472,6 +488,7 @@ public class MainService extends Service {
 
         _receiverController.RegisterReceiver(_startDownloadAllReceiver, new String[]{MainServiceStartDownloadAllBroadcast});
         _receiverController.RegisterReceiver(_birthdayDownloadFinishedReceiver, new String[]{BirthdayService.BirthdayDownloadFinishedBroadcast});
+        _receiverController.RegisterReceiver(_bixbyDownloadFinishedReceiver, new String[]{BixbyPairService.BixbyPairLoadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinConversionDownloadFinishedReceiver, new String[]{CoinService.CoinConversionDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_coinDownloadFinishedReceiver, new String[]{CoinService.CoinDownloadFinishedBroadcast});
         _receiverController.RegisterReceiver(_mapContentDownloadFinishedReceiver, new String[]{MapContentService.MapContentDownloadFinishedBroadcast});

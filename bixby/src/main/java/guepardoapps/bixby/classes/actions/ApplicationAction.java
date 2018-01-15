@@ -32,7 +32,7 @@ public class ApplicationAction implements IBixbyAction, Serializable {
 
     @Override
     public String GetInformationString() {
-        return String.format(Locale.getDefault(), "%s for %s", TAG, _packageName);
+        return String.format(Locale.getDefault(), "%s \nfor %s", TAG, _packageName);
     }
 
     @Override
