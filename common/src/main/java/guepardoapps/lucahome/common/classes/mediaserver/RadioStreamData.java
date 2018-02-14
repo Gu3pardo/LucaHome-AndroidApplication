@@ -4,36 +4,29 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 
-import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.common.enums.RadioStreams;
-import guepardoapps.lucahome.common.interfaces.classes.IMediaServerClass;
+import guepardoapps.lucahome.common.enums.RadioStreamType;
+import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
-public class RadioStreamData implements IMediaServerClass, Serializable {
-    private static final long serialVersionUID = 2691811435346000099L;
+@SuppressWarnings({"WeakerAccess"})
+public class RadioStreamData implements IMediaServerClass {
+    private static final String Tag = RadioStreamData.class.getSimpleName();
 
-    private static final String TAG = RadioStreamData.class.getSimpleName();
-
-    private RadioStreams _radioStream;
+    private RadioStreamType _radioStreamType;
     private boolean _radioStreamIsPlaying;
 
-    public RadioStreamData(
-            @NonNull RadioStreams radioStream,
-            boolean radioStreamIsPlaying) {
-        _radioStream = radioStream;
+    public RadioStreamData(@NonNull RadioStreamType radioStreamType, boolean radioStreamIsPlaying) {
+        _radioStreamType = radioStreamType;
         _radioStreamIsPlaying = radioStreamIsPlaying;
     }
 
     public RadioStreamData() {
-        _radioStream = RadioStreams.BAYERN_3;
-        _radioStreamIsPlaying = false;
+        this(RadioStreamType.I_LOVE_RADIO, false);
     }
 
-    public RadioStreams GetRadioStreamFeed() {
-        return _radioStream;
+    public RadioStreamType GetRadioStreamType() {
+        return _radioStreamType;
     }
 
     public boolean GetRadioStreamIsPlaying() {
@@ -50,17 +43,17 @@ public class RadioStreamData implements IMediaServerClass, Serializable {
         if (communicationString.length() == 0) {
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
+        Logger.getInstance().Debug(Tag, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
 
-        RadioStreamData tempRadioStreamData = new Gson().fromJson(communicationString, RadioStreamData.class);
-        _radioStream = tempRadioStreamData.GetRadioStreamFeed();
-        _radioStreamIsPlaying = tempRadioStreamData.GetRadioStreamIsPlaying();
+        RadioStreamData tmpRadioStreamData = new Gson().fromJson(communicationString, RadioStreamData.class);
+        _radioStreamType = tmpRadioStreamData.GetRadioStreamType();
+        _radioStreamIsPlaying = tmpRadioStreamData.GetRadioStreamIsPlaying();
     }
 
     @Override
     public String toString() {
         return String.format(Locale.getDefault(),
-                "{%s:{RadioStream:%s},{RadioStreamIsPlaying:%s}}",
-                TAG, _radioStream, _radioStreamIsPlaying);
+                "{\"Class\":\"%s\",\"RadioStreamType\":\"%s\",\"RadioStreamIsPlaying\":\"%s\"}",
+                Tag, _radioStreamType, _radioStreamIsPlaying);
     }
 }

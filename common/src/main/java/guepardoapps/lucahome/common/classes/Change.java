@@ -2,50 +2,46 @@ package guepardoapps.lucahome.common.classes;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Locale;
+import java.util.UUID;
 
-import guepardoapps.lucahome.basic.classes.SerializableDate;
-import guepardoapps.lucahome.basic.classes.SerializableTime;
+@SuppressWarnings({"WeakerAccess"})
+public class Change implements ILucaClass {
+    private static final String Tag = Change.class.getSimpleName();
 
-public class Change implements Serializable {
-    private static final long serialVersionUID = 8796770534384442492L;
-    private static final String TAG = Change.class.getSimpleName();
-
-    private int _id;
-
+    private UUID _uuid;
     private String _type;
-    private SerializableDate _date;
-    private SerializableTime _time;
+    private Calendar _dateTime;
     private String _user;
 
     public Change(
-            int id,
+            @NonNull UUID uuid,
             @NonNull String type,
-            @NonNull SerializableDate date,
-            @NonNull SerializableTime time,
+            @NonNull Calendar dateTime,
             @NonNull String user) {
-        _id = id;
+        _uuid = uuid;
         _type = type;
-        _date = date;
-        _time = time;
+        _dateTime = dateTime;
         _user = user;
     }
 
-    public int GetId() {
-        return _id;
+    @Override
+    public UUID GetUuid() {
+        return _uuid;
+    }
+
+    @Override
+    public UUID GetRoomUuid() throws NoSuchMethodException {
+        throw new NoSuchMethodException("Method GetRoomUuid not implemented for " + Tag);
     }
 
     public String GetType() {
         return _type;
     }
 
-    public SerializableDate GetDate() {
-        return _date;
-    }
-
-    public SerializableTime GetTime() {
-        return _time;
+    public Calendar GetDateTime() {
+        return _dateTime;
     }
 
     public String GetUser() {
@@ -53,7 +49,44 @@ public class Change implements Serializable {
     }
 
     @Override
+    public String GetCommandAdd() throws NoSuchMethodException {
+        throw new NoSuchMethodException("Method GetCommandAdd not implemented for " + Tag);
+    }
+
+    @Override
+    public String GetCommandUpdate() throws NoSuchMethodException {
+        throw new NoSuchMethodException("Method GetCommandUpdate not implemented for " + Tag);
+    }
+
+    @Override
+    public String GetCommandDelete() throws NoSuchMethodException {
+        throw new NoSuchMethodException("Method GetCommandDelete not implemented for " + Tag);
+    }
+
+    @Override
+    public void SetIsOnServer(boolean isOnServer) throws NoSuchMethodException {
+        throw new NoSuchMethodException("Method SetIsOnServer not implemented for " + Tag);
+    }
+
+    @Override
+    public boolean GetIsOnServer() throws NoSuchMethodException {
+        throw new NoSuchMethodException("Method GetIsOnServer not implemented for " + Tag);
+    }
+
+    @Override
+    public void SetServerDbAction(@NonNull LucaServerDbAction lucaServerDbAction) throws NoSuchMethodException {
+        throw new NoSuchMethodException("Method SetServerDbAction not implemented for " + Tag);
+    }
+
+    @Override
+    public LucaServerDbAction GetServerDbAction() throws NoSuchMethodException {
+        throw new NoSuchMethodException("Method GetServerDbAction not implemented for " + Tag);
+    }
+
+    @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "{%s: {Id: %d};{Type: %s};{Date: %s};{Time: %s};{User: %s}}", TAG, _id, _type, _date, _time, _user);
+        return String.format(Locale.getDefault(),
+                "{\"Class\":\"%s\",\"UUid\":\"%s\",\"Type\":\"%s\",\"DateTime\":\"%s\",\"User\":\"%s\"}",
+                Tag, _uuid, _type, _dateTime, _user);
     }
 }

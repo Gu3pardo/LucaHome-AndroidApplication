@@ -9,55 +9,58 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Locale;
+import java.util.UUID;
 
-import guepardoapps.lucahome.basic.classes.SerializableDate;
-import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.StringHelper;
-import guepardoapps.lucahome.basic.utils.Tools;
-import guepardoapps.lucahome.common.classes.LucaBirthday;
-import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
-import guepardoapps.lucahome.common.interfaces.converter.IJsonContextDataConverter;
+import guepardoapps.lucahome.common.R;
+import guepardoapps.lucahome.common.classes.Birthday;
+import guepardoapps.lucahome.common.classes.ILucaClass;
+import guepardoapps.lucahome.common.utils.BitmapHelper;
+import guepardoapps.lucahome.common.utils.Logger;
+import guepardoapps.lucahome.common.utils.StringHelper;
 
 public class JsonDataToBirthdayConverter implements IJsonContextDataConverter {
-    private static final String TAG = JsonDataToBirthdayConverter.class.getSimpleName();
-    private static final String SEARCH_PARAMETER = "{\"Data\":";
+    private static final String Tag = JsonDataToBirthdayConverter.class.getSimpleName();
+    private static final String SearchParameter = "{\"Data\":";
 
-    private static final JsonDataToBirthdayConverter SINGLETON = new JsonDataToBirthdayConverter();
+    private static final JsonDataToBirthdayConverter Singleton = new JsonDataToBirthdayConverter();
 
     public static JsonDataToBirthdayConverter getInstance() {
-        return SINGLETON;
+        return Singleton;
     }
 
     private JsonDataToBirthdayConverter() {
     }
 
-    public SerializableList<LucaBirthday> GetList(@NonNull String[] jsonStringArray, @NonNull Context context) {
+    @Override
+    public ArrayList<Birthday> GetList(@NonNull String[] jsonStringArray, @NonNull Context context) {
         if (StringHelper.StringsAreEqual(jsonStringArray)) {
             return parseStringToList(jsonStringArray[0], context);
         } else {
-            String usedEntry = StringHelper.SelectString(jsonStringArray, SEARCH_PARAMETER);
+            String usedEntry = StringHelper.SelectString(jsonStringArray, SearchParameter);
             return parseStringToList(usedEntry, context);
         }
     }
 
-    public SerializableList<LucaBirthday> GetList(@NonNull String responseString, @NonNull Context context) {
+    @Override
+    public ArrayList<Birthday> GetList(@NonNull String responseString, @NonNull Context context) {
         return parseStringToList(responseString, context);
     }
 
-    private SerializableList<LucaBirthday> parseStringToList(@NonNull String jsonString, @NonNull Context context) {
+    private ArrayList<Birthday> parseStringToList(@NonNull String jsonString, @NonNull Context context) {
         if (!jsonString.contains("Error")) {
-            SerializableList<LucaBirthday> list = new SerializableList<>();
+            ArrayList<Birthday> list = new ArrayList<>();
 
             try {
                 JSONObject jsonObject = new JSONObject(jsonString);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
-                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Birthday");
+                for (int index = 0; index < dataArray.length(); index++) {
+                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("Birthday");
 
-                    int id = child.getInt("Id");
+                    UUID uuid = UUID.fromString(child.getString("Uuid"));
 
                     String name = child.getString("Name");
                     String group = child.getString("Group");
@@ -71,25 +74,28 @@ public class JsonDataToBirthdayConverter implements IJsonContextDataConverter {
                     int month = birthdayJsonDate.getInt("Month");
                     int year = birthdayJsonDate.getInt("Year");
 
-                    Bitmap photo = BitmapFactory.decodeResource(context.getResources(), guepardoapps.lucahome.basic.R.mipmap.ic_face_white_48dp);
+                    Calendar birthday = Calendar.getInstance();
+                    birthday.set(year, month, day);
+
+                    Bitmap photo = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_face_white_48dp);
                     try {
-                        photo = Tools.RetrieveContactPhoto(context, name, 250, 250, true);
-                        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Retrieved photo is %s", photo));
+                        photo = BitmapHelper.RetrieveContactPhoto(context, name, 250, 250, true);
+                        Logger.getInstance().Debug(Tag, String.format(Locale.getDefault(), "Retrieved photo is %s", photo));
                     } catch (Exception exception) {
-                        Logger.getInstance().Error(TAG, String.format(Locale.getDefault(), "Exception in RetrieveContactPhoto: %s", exception.getMessage()));
+                        Logger.getInstance().Error(Tag, String.format(Locale.getDefault(), "Exception in RetrieveContactPhoto: %s", exception.getMessage()));
                     }
 
-                    LucaBirthday newBirthday = new LucaBirthday(id, name, new SerializableDate(year, month, day), group, remindMe, sentMail, photo, true, ILucaClass.LucaServerDbAction.Null);
-                    list.addValue(newBirthday);
+                    Birthday newBirthday = new Birthday(uuid, name, birthday, group, remindMe, sentMail, photo, true, ILucaClass.LucaServerDbAction.Null);
+                    list.add(newBirthday);
                 }
             } catch (JSONException jsonException) {
-                Logger.getInstance().Error(TAG, jsonException.getMessage());
+                Logger.getInstance().Error(Tag, jsonException.getMessage());
             }
 
             return list;
         }
 
-        Logger.getInstance().Error(TAG, jsonString + " has an error!");
-        return new SerializableList<>();
+        Logger.getInstance().Error(Tag, jsonString + " has an error!");
+        return new ArrayList<>();
     }
 }

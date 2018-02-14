@@ -2,138 +2,109 @@ package guepardoapps.lucahome.common.classes;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Locale;
+import java.util.UUID;
 
-import guepardoapps.lucahome.basic.classes.SerializableDate;
-import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.enums.LucaServerAction;
-import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
-public class WirelessSocket implements Serializable, ILucaClass {
-    private static final long serialVersionUID = 5579389712706446580L;
-    private static final String TAG = WirelessSocket.class.getSimpleName();
+@SuppressWarnings({"WeakerAccess"})
+public class WirelessSocket implements ILucaClass {
+    private static final String Tag = WirelessSocket.class.getSimpleName();
 
-    public static final String SETTINGS_HEADER = "SharedPref_Notification_Socket_";
+    public static final String SettingsHeader = "SharedPref_Notification_Socket_";
 
-    protected int _typeId;
-
+    protected UUID _uuid;
+    protected UUID _roomUuid;
     protected String _name;
-    protected String _area;
     protected String _code;
     protected boolean _isActivated;
 
-    protected SerializableDate _lastTriggerDate;
-    protected SerializableTime _lastTriggerTime;
+    protected Calendar _lastTriggerDateTime;
     protected String _lastTriggerUser;
-
-    protected String _shortName;
 
     protected boolean _isOnServer;
     protected LucaServerDbAction _serverDbAction;
 
     public WirelessSocket(
-            int typeId,
+            @NonNull UUID uuid,
+            @NonNull UUID roomUuid,
             @NonNull String name,
-            @NonNull String area,
             @NonNull String code,
             boolean isActivated,
-            @NonNull SerializableDate lastTriggerDate,
-            @NonNull SerializableTime lastTriggerTime,
+            @NonNull Calendar lastTriggerDateTime,
             @NonNull String lastTriggerUser,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
-        _typeId = typeId;
-
+        _uuid = uuid;
+        _roomUuid = roomUuid;
         _name = name;
-        _area = area;
         _code = code;
         _isActivated = isActivated;
-
-        _lastTriggerDate = lastTriggerDate;
-        _lastTriggerTime = lastTriggerTime;
+        _lastTriggerDateTime = lastTriggerDateTime;
         _lastTriggerUser = lastTriggerUser;
-
         _isOnServer = isOnServer;
         _serverDbAction = serverDbAction;
-
-        _shortName = createShortName(_name);
     }
 
     @Override
-    public int GetId() {
-        return _typeId;
+    public UUID GetUuid() {
+        return _uuid;
     }
 
-    public String GetName() {
-        return _name;
+    public void SetRoomUuid(@NonNull UUID roomUuid) {
+        _roomUuid = roomUuid;
+    }
+
+    @Override
+    public UUID GetRoomUuid() {
+        return _roomUuid;
     }
 
     public void SetName(@NonNull String name) {
         _name = name;
     }
 
-    public String GetArea() {
-        return _area;
-    }
-
-    public void SetArea(@NonNull String area) {
-        _area = area;
-    }
-
-    public String GetCode() {
-        return _code;
+    public String GetName() {
+        return _name;
     }
 
     public void SetCode(@NonNull String code) {
         _code = code;
     }
 
-    public boolean IsActivated() {
-        return _isActivated;
+    public String GetCode() {
+        return _code;
     }
 
     public void SetActivated(boolean isActivated) {
         _isActivated = isActivated;
     }
 
-    public SerializableDate GetLastTriggerDate() {
-        return _lastTriggerDate;
+    public boolean IsActivated() {
+        return _isActivated;
     }
 
-    public void SetLastTriggerDate(@NonNull SerializableDate lastTriggerDate) {
-        _lastTriggerDate = lastTriggerDate;
+    public void SetLastTriggerDateTime(@NonNull Calendar lastTriggerDateTime) {
+        _lastTriggerDateTime = lastTriggerDateTime;
     }
 
-    public SerializableTime GetLastTriggerTime() {
-        return _lastTriggerTime;
+    public Calendar GetLastTriggerDateTime() {
+        return _lastTriggerDateTime;
     }
 
-    public void SetLastTriggerTime(@NonNull SerializableTime lastTriggerTime) {
-        _lastTriggerTime = lastTriggerTime;
+    public void SetLastTriggerUser(@NonNull String lastTriggerUser) {
+        _lastTriggerUser = lastTriggerUser;
     }
 
     public String GetLastTriggerUser() {
         return _lastTriggerUser;
     }
 
-    public void SetLastTriggeUser(@NonNull String lastTriggerUser) {
-        _lastTriggerUser = lastTriggerUser;
-    }
-
-    public String GetActivationString() {
-        return _isActivated ? "On" : "Off";
-    }
-
-    public String GetShortName() {
-        return _shortName;
-    }
-
     public String GetSettingsKey() {
-        return String.format(Locale.getDefault(), "%s%s", SETTINGS_HEADER, _name);
+        return String.format(Locale.getDefault(), "%s%s", SettingsHeader, _name);
     }
 
     @Override
@@ -156,145 +127,126 @@ public class WirelessSocket implements Serializable, ILucaClass {
         return _serverDbAction;
     }
 
-    public String CommandSetState() throws Exception {
-        return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
-    }
-
-    public String CommandChangeState() throws Exception {
-        return String.format(Locale.getDefault(), "%s%s%s", LucaServerAction.SET_SOCKET.toString(), _name, ((!_isActivated) ? Constants.STATE_ON : Constants.STATE_OFF));
-    }
-
-    @Override
-    public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%d&name=%s&area=%s&code=%s", LucaServerAction.ADD_SOCKET.toString(), _typeId, _name, _area, _code);
+    public String GetCommandSetState() throws NoSuchMethodException {
+        return String.format(Locale.getDefault(),
+                "%s%s%s",
+                LucaServerActionTypes.SET_WIRELESS_SOCKET.toString(), _uuid, ((_isActivated) ? Constants.StateOn : Constants.StateOff));
     }
 
     @Override
-    public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%d&name=%s&area=%s&code=%s&isactivated=%s", LucaServerAction.ADD_SOCKET.toString(), _typeId, _name, _area, _code, (_isActivated ? "1" : "0"));
+    public String GetCommandAdd() {
+        return String.format(Locale.getDefault(),
+                "%s%s&roomuuid=%s&name=%s&code=%s",
+                LucaServerActionTypes.ADD_WIRELESS_SOCKET.toString(), _uuid, _roomUuid, _name, _code);
     }
 
     @Override
-    public String CommandDelete() {
-        return String.format(Locale.getDefault(), "%s%d", LucaServerAction.DELETE_SOCKET.toString(), _typeId);
+    public String GetCommandUpdate() {
+        return String.format(Locale.getDefault(),
+                "%s%s&roomuuid=%s&name=%s&code=%s&isactivated=%s",
+                LucaServerActionTypes.UPDATE_WIRELESS_SOCKET.toString(), _uuid, _roomUuid, _name, _code, (_isActivated ? "1" : "0"));
     }
 
-    public int GetWallpaper() {
-        /*TODO Add wallpaper for the sockets*/
-        return GetDrawable();
+    @Override
+    public String GetCommandDelete() {
+        return String.format(Locale.getDefault(),
+                "%s%s",
+                LucaServerActionTypes.DELETE_WIRELESS_SOCKET.toString(), _uuid);
     }
 
     public int GetDrawable() {
         if (_name.contains("TV")) {
             if (_isActivated) {
-                return R.drawable.tv_on;
-            } else {
-                return R.drawable.tv_off;
+                return R.drawable.wireless_socket_tv_on;
             }
+            return R.drawable.wireless_socket_tv_off;
+
         } else if (_name.contains("Light")) {
             if (_name.contains("Sleeping")) {
                 if (_isActivated) {
-                    return R.drawable.bed_light_on;
-                } else {
-                    return R.drawable.bed_light_off;
+                    return R.drawable.wireless_socket_bed_light_on;
                 }
+                return R.drawable.wireless_socket_bed_light_off;
+
             } else {
                 if (_isActivated) {
-                    return R.drawable.light_on;
-                } else {
-                    return R.drawable.light_off;
+                    return R.drawable.wireless_socket_light_on;
                 }
+                return R.drawable.wireless_socket_light_off;
             }
+
         } else if (_name.contains("Sound")) {
             if (_name.contains("Sleeping")) {
                 if (_isActivated) {
-                    return R.drawable.bed_sound_on;
-                } else {
-                    return R.drawable.bed_sound_off;
+                    return R.drawable.wireless_socket_bed_sound_on;
                 }
+                return R.drawable.wireless_socket_bed_sound_off;
+
             } else if (_name.contains("Living")) {
                 if (_isActivated) {
-                    return R.drawable.sound_on;
-                } else {
-                    return R.drawable.sound_off;
+                    return R.drawable.wireless_socket_sound_on;
                 }
+                return R.drawable.wireless_socket_sound_off;
             }
+
         } else if (_name.contains("PC") || _name.contains("WorkStation")) {
             if (_isActivated) {
-                return R.drawable.laptop_on;
-            } else {
-                return R.drawable.laptop_off;
+                return R.drawable.wireless_socket_laptop_on;
             }
+            return R.drawable.wireless_socket_laptop_off;
+
         } else if (_name.contains("Printer")) {
             if (_isActivated) {
-                return R.drawable.printer_on;
-            } else {
-                return R.drawable.printer_off;
+                return R.drawable.wireless_socket_printer_on;
             }
+            return R.drawable.wireless_socket_printer_off;
+
         } else if (_name.contains("Storage")) {
             if (_isActivated) {
-                return R.drawable.storage_on;
-            } else {
-                return R.drawable.storage_off;
+                return R.drawable.wireless_socket_storage_on;
             }
+            return R.drawable.wireless_socket_storage_off;
+
         } else if (_name.contains("Heating")) {
             if (_name.contains("Bed")) {
                 if (_isActivated) {
-                    return R.drawable.bed_heating_on;
-                } else {
-                    return R.drawable.bed_heating_off;
+                    return R.drawable.wireless_socket_bed_heating_on;
                 }
+                return R.drawable.wireless_socket_bed_heating_off;
             }
+
         } else if (_name.contains("Farm")) {
             if (_isActivated) {
-                return R.drawable.watering_on;
-            } else {
-                return R.drawable.watering_off;
+                return R.drawable.wireless_socket_watering_on;
             }
+            return R.drawable.wireless_socket_watering_off;
+
         } else if (_name.contains("MediaServer")) {
             if (_isActivated) {
-                return R.drawable.mediamirror_on;
-            } else {
-                return R.drawable.mediamirror_off;
+                return R.drawable.wireless_socket_mediamirror_on;
             }
+            return R.drawable.wireless_socket_mediamirror_off;
+
         } else if (_name.contains("GameConsole")) {
             if (_isActivated) {
-                return R.drawable.gameconsole_on;
-            } else {
-                return R.drawable.gameconsole_off;
+                return R.drawable.wireless_socket_gameconsole_on;
             }
+            return R.drawable.wireless_socket_gameconsole_off;
+
         } else if (_name.contains("RaspberryPi")) {
             if (_isActivated) {
-                return R.drawable.raspberry_on;
-            } else {
-                return R.drawable.raspberry_off;
+                return R.drawable.wireless_socket_raspberry_on;
             }
+            return R.drawable.wireless_socket_raspberry_off;
         }
-        return R.drawable.socket;
+
+        return R.drawable.wireless_socket;
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Name: %s );(Area: %s );(Code: %s );(IsActivated: %s ))", TAG, _name, _area, _code, (_isActivated ? "1" : "0"));
-    }
-
-    protected String createShortName(String name) {
-        String shortName;
-
-        if (name.contains("_")) {
-            shortName = name.substring(0, name.indexOf("_"));
-        } else {
-            if (name.length() > 3) {
-                shortName = name.substring(0, 3);
-            } else {
-                shortName = name.substring(0, name.length());
-            }
-        }
-
-        if (shortName.length() > 3) {
-            shortName = shortName.substring(0, 3);
-        }
-
-        return shortName;
+        return String.format(Locale.getDefault(),
+                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"RoomUuid\":\"%s\",\"Name\":\"%s\",\"Code\":\"%s\",\"IsActivated\":\"%s\"}",
+                Tag, _uuid, _roomUuid, _name, _code, (_isActivated ? "1" : "0"));
     }
 }

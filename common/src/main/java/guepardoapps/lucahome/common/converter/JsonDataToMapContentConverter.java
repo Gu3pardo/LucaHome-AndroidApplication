@@ -6,84 +6,60 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.StringHelper;
-import guepardoapps.lucahome.common.builder.MapContentBuilder;
-import guepardoapps.lucahome.common.classes.*;
-import guepardoapps.lucahome.common.classes.mediaserver.MediaServerData;
-import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import guepardoapps.lucahome.common.classes.ILucaClass;
+import guepardoapps.lucahome.common.classes.MapContent;
+import guepardoapps.lucahome.common.utils.Logger;
+import guepardoapps.lucahome.common.utils.MapContentHelper;
+import guepardoapps.lucahome.common.utils.StringHelper;
 
 public final class JsonDataToMapContentConverter {
-    private static final String TAG = JsonDataToMapContentConverter.class.getSimpleName();
-    private static final String SEARCH_PARAMETER = "{\"Data\":";
+    private static final String Tag = JsonDataToMapContentConverter.class.getSimpleName();
+    private static final String SearchParameter = "{\"Data\":";
 
-    private static final JsonDataToMapContentConverter SINGLETON = new JsonDataToMapContentConverter();
+    private static final JsonDataToMapContentConverter Singleton = new JsonDataToMapContentConverter();
 
     public static JsonDataToMapContentConverter getInstance() {
-        return SINGLETON;
+        return Singleton;
     }
 
     private JsonDataToMapContentConverter() {
     }
 
-    public SerializableList<MapContent> GetList(
-            @NonNull String[] stringArray,
-            @NonNull SerializableList<ListedMenu> listedMenuList, @NonNull SerializableList<LucaMenu> menuList, @NonNull SerializableList<ShoppingEntry> shoppingList,
-            @NonNull SerializableList<MediaServerData> mediaServerList, @NonNull Security security, @NonNull SerializableList<Temperature> temperatureList,
-            @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
+    public ArrayList<MapContent> GetList(@NonNull String[] stringArray) {
         if (StringHelper.StringsAreEqual(stringArray)) {
-            return parseStringToList(
-                    stringArray[0],
-                    listedMenuList, menuList, shoppingList,
-                    mediaServerList, security, temperatureList,
-                    wirelessSocketList, wirelessSwitchList);
+            return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
-            return parseStringToList(
-                    usedEntry,
-                    listedMenuList, menuList, shoppingList,
-                    mediaServerList, security, temperatureList,
-                    wirelessSocketList, wirelessSwitchList);
+            String usedEntry = StringHelper.SelectString(stringArray, SearchParameter);
+            return parseStringToList(usedEntry);
         }
     }
 
-    public SerializableList<MapContent> GetList(
-            @NonNull String jsonString,
-            @NonNull SerializableList<ListedMenu> listedMenuList, @NonNull SerializableList<LucaMenu> menuList, @NonNull SerializableList<ShoppingEntry> shoppingList,
-            @NonNull SerializableList<MediaServerData> mediaServerList, @NonNull Security security, @NonNull SerializableList<Temperature> temperatureList,
-            @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
-        return parseStringToList(
-                jsonString,
-                listedMenuList, menuList, shoppingList,
-                mediaServerList, security, temperatureList,
-                wirelessSocketList, wirelessSwitchList);
+    public ArrayList<MapContent> GetList(@NonNull String jsonString) {
+        return parseStringToList(jsonString);
     }
 
-    private SerializableList<MapContent> parseStringToList(
-            @NonNull String value,
-            @NonNull SerializableList<ListedMenu> listedMenuList, @NonNull SerializableList<LucaMenu> menuList, @NonNull SerializableList<ShoppingEntry> shoppingList,
-            @NonNull SerializableList<MediaServerData> mediaServerList, @NonNull Security security, @NonNull SerializableList<Temperature> temperatureList,
-            @NonNull SerializableList<WirelessSocket> wirelessSocketList, @NonNull SerializableList<WirelessSwitch> wirelessSwitchList) {
+    private ArrayList<MapContent> parseStringToList(@NonNull String value) {
         if (!value.contains("Error")) {
-            SerializableList<MapContent> list = new SerializableList<>();
+            ArrayList<MapContent> list = new ArrayList<>();
 
             try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
-                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("MapContent");
+                for (int index = 0; index < dataArray.length(); index++) {
+                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("MapContent");
 
-                    int id = child.getInt("Id");
+                    UUID uuid = UUID.fromString(child.getString("Uuid"));
 
+                    UUID typeUuid = UUID.fromString(child.getString("TypeUuid"));
                     String typeString = child.getString("Type");
-                    MapContent.DrawingType drawingType = MapContentBuilder.GetDrawingType(typeString);
-                    int typeId = child.getInt("TypeId");
+                    MapContent.DrawingType drawingType = MapContentHelper.GetDrawingType(typeString);
 
                     String name = child.getString("Name");
                     String shortName = child.getString("ShortName");
-                    String area = child.getString("Area");
 
                     boolean visibility = child.getString("Visibility").contains("1");
 
@@ -95,31 +71,17 @@ public final class JsonDataToMapContentConverter {
 
                     int[] position = new int[]{positionX, positionY};
 
-                    SerializableList<ListedMenu> _listedMenuList = ((name.equals("ListedMenu") && drawingType == MapContent.DrawingType.Menu) ? listedMenuList : null);
-                    SerializableList<LucaMenu> _menuList = ((name.equals("Menu") && drawingType == MapContent.DrawingType.Menu) ? menuList : null);
-                    SerializableList<ShoppingEntry> _shoppingList = ((name.equals("ShoppingList") && drawingType == MapContent.DrawingType.ShoppingList) ? shoppingList : null);
-
-                    MediaServerData _mediaServer = drawingType == MapContent.DrawingType.MediaServer ? (mediaServerList.getSize() > 0 ? mediaServerList.getValue(typeId) : null) : null;
-                    Security _security = drawingType == MapContent.DrawingType.Camera ? security : null;
-
-                    Temperature _temperature = drawingType == MapContent.DrawingType.Temperature ? (temperatureList.getSize() > 0 ? temperatureList.getValue(typeId) : null) : null;
-                    WirelessSocket _wirelessSocket = drawingType == MapContent.DrawingType.Socket ? (wirelessSocketList.getSize() > 0 ? wirelessSocketList.getValue(typeId) : null) : null;
-                    WirelessSwitch _wirelessSwitch = drawingType == MapContent.DrawingType.LightSwitch ? (wirelessSwitchList.getSize() > 0 ? wirelessSwitchList.getValue(typeId) : null) : null;
-
-                    MapContent newMapContent = new MapContent(id, drawingType, typeId, position, name, shortName, area, visibility,
-                            _listedMenuList, _menuList, _shoppingList, _mediaServer, _security, _temperature, _wirelessSocket, _wirelessSwitch,
-                            true, ILucaClass.LucaServerDbAction.Null);
-
-                    list.addValue(newMapContent);
+                    MapContent newMapContent = new MapContent(uuid, typeUuid, drawingType, position, name, shortName, visibility, true, ILucaClass.LucaServerDbAction.Null);
+                    list.add(newMapContent);
                 }
 
             } catch (JSONException jsonException) {
-                Logger.getInstance().Error(TAG, jsonException.getMessage());
+                Logger.getInstance().Error(Tag, jsonException.getMessage());
             }
             return list;
         }
 
-        Logger.getInstance().Error(TAG, value + " has an error!");
-        return new SerializableList<>();
+        Logger.getInstance().Error(Tag, value + " has an error!");
+        return new ArrayList<>();
     }
 }

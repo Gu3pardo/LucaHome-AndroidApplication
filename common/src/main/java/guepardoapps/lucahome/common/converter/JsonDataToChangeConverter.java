@@ -6,53 +6,55 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import guepardoapps.lucahome.basic.classes.SerializableDate;
-import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.classes.SerializableTime;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.StringHelper;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.UUID;
+
 import guepardoapps.lucahome.common.classes.Change;
-import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
+import guepardoapps.lucahome.common.utils.Logger;
+import guepardoapps.lucahome.common.utils.StringHelper;
 
 public final class JsonDataToChangeConverter implements IJsonDataConverter {
-    private static final String TAG = JsonDataToChangeConverter.class.getSimpleName();
-    private static final String SEARCH_PARAMETER = "{\"Data\":";
+    private static final String Tag = JsonDataToChangeConverter.class.getSimpleName();
+    private static final String SearchParameter = "{\"Data\":";
 
-    private static final JsonDataToChangeConverter SINGLETON = new JsonDataToChangeConverter();
+    private static final JsonDataToChangeConverter Singleton = new JsonDataToChangeConverter();
 
     public static JsonDataToChangeConverter getInstance() {
-        return SINGLETON;
+        return Singleton;
     }
 
     private JsonDataToChangeConverter() {
     }
 
     @Override
-    public SerializableList<Change> GetList(@NonNull String[] stringArray) {
+    public ArrayList<Change> GetList(@NonNull String[] stringArray) {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
+            String usedEntry = StringHelper.SelectString(stringArray, SearchParameter);
             return parseStringToList(usedEntry);
         }
     }
 
     @Override
-    public SerializableList<Change> GetList(@NonNull String jsonString) {
+    public ArrayList<Change> GetList(@NonNull String jsonString) {
         return parseStringToList(jsonString);
     }
 
-    private SerializableList<Change> parseStringToList(@NonNull String value) {
+    private ArrayList<Change> parseStringToList(@NonNull String value) {
         if (!value.contains("Error")) {
-            SerializableList<Change> list = new SerializableList<>();
+            ArrayList<Change> list = new ArrayList<>();
 
             try {
 
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
-                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Change");
+                for (int index = 0; index < dataArray.length(); index++) {
+                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("Change");
+
+                    UUID uuid = UUID.fromString(child.getString("Uuid"));
 
                     String type = child.getString("Type");
                     String user = child.getString("UserName");
@@ -68,17 +70,20 @@ public final class JsonDataToChangeConverter implements IJsonDataConverter {
                     int hour = jsonTime.getInt("Hour");
                     int minute = jsonTime.getInt("Minute");
 
-                    Change newChange = new Change(dataIndex, type, new SerializableDate(year, month, day), new SerializableTime(hour, minute, 0, 0), user);
-                    list.addValue(newChange);
+                    Calendar dateTime = Calendar.getInstance();
+                    dateTime.set(year, month, day, hour, minute);
+
+                    Change newChange = new Change(uuid, type, dateTime, user);
+                    list.add(newChange);
                 }
             } catch (JSONException jsonException) {
-                Logger.getInstance().Error(TAG, jsonException.getMessage());
+                Logger.getInstance().Error(Tag, jsonException.getMessage());
             }
 
             return list;
         }
 
-        Logger.getInstance().Error(TAG, value + " has an error!");
-        return new SerializableList<>();
+        Logger.getInstance().Error(Tag, value + " has an error!");
+        return new ArrayList<>();
     }
 }

@@ -6,53 +6,53 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.StringHelper;
+import java.util.ArrayList;
+import java.util.UUID;
+
 import guepardoapps.lucahome.common.classes.Movie;
-import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
+import guepardoapps.lucahome.common.utils.Logger;
+import guepardoapps.lucahome.common.utils.StringHelper;
 
 public final class JsonDataToMovieConverter implements IJsonDataConverter {
-    private static final String TAG = JsonDataToMovieConverter.class.getSimpleName();
-    private static final String SEARCH_PARAMETER = "{\"Data\":";
+    private static final String Tag = JsonDataToMovieConverter.class.getSimpleName();
+    private static final String SearchParameter = "{\"Data\":";
 
-    private static final JsonDataToMovieConverter SINGLETON = new JsonDataToMovieConverter();
+    private static final JsonDataToMovieConverter Singleton = new JsonDataToMovieConverter();
 
     public static JsonDataToMovieConverter getInstance() {
-        return SINGLETON;
+        return Singleton;
     }
 
     private JsonDataToMovieConverter() {
     }
 
     @Override
-    public SerializableList<Movie> GetList(@NonNull String[] stringArray) {
+    public ArrayList<Movie> GetList(@NonNull String[] stringArray) {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
+            String usedEntry = StringHelper.SelectString(stringArray, SearchParameter);
             return parseStringToList(usedEntry);
         }
     }
 
     @Override
-    public SerializableList<Movie> GetList(@NonNull String jsonString) {
+    public ArrayList<Movie> GetList(@NonNull String jsonString) {
         return parseStringToList(jsonString);
     }
 
-    private SerializableList<Movie> parseStringToList(@NonNull String value) {
+    private ArrayList<Movie> parseStringToList(@NonNull String value) {
         if (!value.contains("Error")) {
-            SerializableList<Movie> list = new SerializableList<>();
+            ArrayList<Movie> list = new ArrayList<>();
 
             try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
-                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Movie");
+                for (int index = 0; index < dataArray.length(); index++) {
+                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("Movie");
 
-                    //TODO Disabled due to error on server
-                    // int id = child.getInt("Id");
+                    UUID uuid = UUID.fromString(child.getString("Uuid"));
 
                     String title = child.getString("Title");
                     String genre = child.getString("Genre");
@@ -61,17 +61,17 @@ public final class JsonDataToMovieConverter implements IJsonDataConverter {
                     int rating = child.getInt("Rating");
                     int watched = child.getInt("Watched");
 
-                    Movie newMovie = new Movie(dataIndex, title, genre, description, rating, watched);
-                    list.addValue(newMovie);
+                    Movie newMovie = new Movie(uuid, title, genre, description, rating, watched);
+                    list.add(newMovie);
                 }
 
             } catch (JSONException jsonException) {
-                Logger.getInstance().Error(TAG, jsonException.getMessage());
+                Logger.getInstance().Error(Tag, jsonException.getMessage());
             }
             return list;
         }
 
-        Logger.getInstance().Error(TAG, value + " has an error!");
-        return new SerializableList<>();
+        Logger.getInstance().Error(Tag, value + " has an error!");
+        return new ArrayList<>();
     }
 }

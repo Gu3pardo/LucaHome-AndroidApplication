@@ -6,110 +6,73 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.classes.SerializablePair;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.StringHelper;
-import guepardoapps.lucahome.common.R;
+import java.util.ArrayList;
+import java.util.UUID;
+
 import guepardoapps.lucahome.common.classes.Coin;
-import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+import guepardoapps.lucahome.common.classes.ILucaClass;
+import guepardoapps.lucahome.common.utils.Logger;
+import guepardoapps.lucahome.common.utils.StringHelper;
 
-public final class JsonDataToCoinConverter {
-    private static final String TAG = JsonDataToCoinConverter.class.getSimpleName();
-    private static final String SEARCH_PARAMETER = "{\"Data\":";
+public final class JsonDataToCoinConverter implements IJsonDataConverter {
+    private static final String Tag = JsonDataToCoinConverter.class.getSimpleName();
+    private static final String SearchParameter = "{\"Data\":";
 
-    private static final JsonDataToCoinConverter SINGLETON = new JsonDataToCoinConverter();
+    private static final JsonDataToCoinConverter Singleton = new JsonDataToCoinConverter();
 
     public static JsonDataToCoinConverter getInstance() {
-        return SINGLETON;
+        return Singleton;
     }
 
     private JsonDataToCoinConverter() {
     }
 
-    public SerializableList<Coin> GetList(@NonNull String[] stringArray, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
+    @Override
+    public ArrayList<Coin> GetList(@NonNull String[] stringArray) {
         if (StringHelper.StringsAreEqual(stringArray)) {
-            return parseStringToList(stringArray[0], conversionList);
+            return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
-            return parseStringToList(usedEntry, conversionList);
+            String usedEntry = StringHelper.SelectString(stringArray, SearchParameter);
+            return parseStringToList(usedEntry);
         }
     }
 
-    public SerializableList<Coin> GetList(@NonNull String responseString, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
-        return parseStringToList(responseString, conversionList);
+    @Override
+    public ArrayList<Coin> GetList(@NonNull String responseString) {
+        return parseStringToList(responseString);
     }
 
-    private SerializableList<Coin> parseStringToList(@NonNull String value, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
+    private ArrayList<Coin> parseStringToList(@NonNull String value) {
         if (!value.contains("Error")) {
-            SerializableList<Coin> list = new SerializableList<>();
+            ArrayList<Coin> list = new ArrayList<>();
 
             try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
-                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("Coin");
+                for (int index = 0; index < dataArray.length(); index++) {
+                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("Coin");
 
-                    int id = child.getInt("Id");
+                    UUID uuid = UUID.fromString(child.getString("Uuid"));
 
                     String user = child.getString("User");
                     String type = child.getString("Type");
 
                     int amount = child.getInt("Amount");
 
-                    double currentConversion = getCurrentConversion(type, conversionList);
+                    double currentConversion = 1;
 
-                    int icon = getIcon(type);
-
-                    Coin newCoin = new Coin(id, user, type, amount, currentConversion, Coin.Trend.NULL, icon, true, ILucaClass.LucaServerDbAction.Null);
-                    list.addValue(newCoin);
+                    Coin newCoin = new Coin(uuid, user, type, amount, currentConversion, Coin.Trend.Null, true, ILucaClass.LucaServerDbAction.Null);
+                    list.add(newCoin);
                 }
             } catch (JSONException jsonException) {
-                Logger.getInstance().Error(TAG, jsonException.getMessage());
+                Logger.getInstance().Error(Tag, jsonException.getMessage());
             }
 
             return list;
         }
 
-        Logger.getInstance().Error(TAG, value + " has an error!");
-        return new SerializableList<>();
-    }
-
-    private double getCurrentConversion(@NonNull String type, @NonNull SerializableList<SerializablePair<String, Double>> conversionList) {
-        for (int index = 0; index < conversionList.getSize(); index++) {
-            SerializablePair<String, Double> entry = conversionList.getValue(index);
-            if (entry.GetKey().contains(type)) {
-                return entry.GetValue();
-            }
-        }
-        return 0;
-    }
-
-    private int getIcon(@NonNull String type) {
-        switch (type) {
-            case "BCH":
-                return R.drawable.bch;
-            case "BTC":
-                return R.drawable.btc;
-            case "DASH":
-                return R.drawable.dash;
-            case "ETC":
-                return R.drawable.etc;
-            case "ETH":
-                return R.drawable.eth;
-            case "IOTA":
-                return R.drawable.iota;
-            case "LTC":
-                return R.drawable.ltc;
-            case "XMR":
-                return R.drawable.xmr;
-            case "XRP":
-                return R.drawable.xrp;
-            case "ZEC":
-                return R.drawable.zec;
-            default:
-                return R.drawable.btc;
-        }
+        Logger.getInstance().Error(Tag, value + " has an error!");
+        return new ArrayList<>();
     }
 }

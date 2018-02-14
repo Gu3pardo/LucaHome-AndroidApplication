@@ -1,48 +1,130 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/classes/SerializableDate.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/classes/SerializableList.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/classes/SerializableTime.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/BluetoothController.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/BroadcastController.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/NetworkController.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/ReceiverController.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/controller/SharedPrefController.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/utils/Logger.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/utils/StringHelper.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/basic/src/main/java/guepardoapps/lucahome/basic/utils/Tools.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/BixbyPair.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/actions/ApplicationAction.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/actions/BixbyAction.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/actions/IBixbyAction.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/actions/NetworkAction.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/actions/WirelessSocketAction.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/actions/WirelessSwitchAction.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/requirements/BixbyRequirement.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/requirements/LightRequirement.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/requirements/NetworkRequirement.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/classes/requirements/WirelessSocketRequirement.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/java/guepardoapps/lucahome/bixby/services/IBixbyService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/bixby/src/main/res/xml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/adapter/YoutubeVideoListAdapter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/LucaSecurity.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/MapContent.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/MeterLog.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/MeterLogItem.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/MoneyLog.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/MoneyLogItem.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/Movie.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/Position.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/PuckJs.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/Temperature.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/WirelessSocket.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/WirelessSwitch.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/WirelessTimer.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/YoutubeVideo.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/YoutubeVideoData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/BundledData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/IMediaServerClass.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/InformationData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/MediaServerData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/NotificationData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/PlayedYoutubeVideo.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/RadioStreamData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/SleepTimerData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/StateData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/ViewModelMediaNotificationData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/ViewModelMediaServerStateData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/ViewModelRadioStreamData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/ViewModelSleepTimerData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/ViewModelYoutubeData.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/classes/mediaserver/YoutubeData.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/constants/Constants.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/constants/Keys.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/BluetoothController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/BroadcastController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/DownloadController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/NetworkController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/NotificationController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/ReceiverController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/SettingsController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/SharedPrefController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/controller/TTSController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/IJsonContextDataConverter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/IJsonDataConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToBirthdayConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToChangeConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToCoinConverter.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToListedMenuConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToMapContentConverter.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToMenuConverter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToMediaServerConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToMovieConverter.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToScheduleConverter.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToShoppingListConverter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToPuckJsConverter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToRoomConverter.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToTemperatureConverter.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToTimerConverter.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/dto/MovieDto.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/LucaServerAction.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/MediaServerAction.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/MediaServerSelection.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/RSSFeed.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/RadioStreams.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/ShoppingEntryGroup.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/SocketAction.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/Weekday.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/enums/YoutubeId.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/tasks/ClientTask.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/mobile/src/main/java/guepardoapps/lucahome/receiver/SocketActionReceiver.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/mobile/src/main/java/guepardoapps/lucahome/receiver/SwitchActionReceiver.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/common/classes/SerializableList.java" charset="windows-1251" />
-    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/common/utils/Tools.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToWirelessSocketConverter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/JsonDataToWirelessSwitchConverter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/converter/mediaserver/JsonDataToMediaServerDataConverter.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseBirthdayList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseChangeList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseCoinList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseMapContentList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseMealList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseMediaServerList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseMeterLogItemList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseMoneyLogItemList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseMovieList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabasePlayedYoutubeVideoList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabasePuckJsList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseRoomList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseShoppingItemList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseSuggestedMealList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseSuggestedShoppingItemList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseTemperatureList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseWirelessScheduleList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseWirelessSocketList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseWirelessSwitchList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/DatabaseWirelessTimerList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/databases/mediaserver/DatabaseMediaServerStateList.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/rss/RssItem.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/rss/RssParser.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/rss/RssService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/services/BirthdayService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/services/ChangeService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/services/DownloadStorageService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/services/ILucaService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/services/MediaServerClientService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/services/ShoppingItemService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/services/UserService.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/utils/BitmapHelper.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/utils/DrawableCreator.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/utils/Logger.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/utils/MapContentHelper.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/utils/StringHelper.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/java/guepardoapps/lucahome/common/utils/Tools.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/anim" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/dialog_listview.xml" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/notification_camera.xml" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/notification_wireless_socket.xml" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/layout/notification_wireless_switch.xml" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/values/color.xml" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/common/src/main/res/values/styles.xml" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/voicerecognition/src/main/java/guepardoapps/lucahome/voicerecognition/classes/RelationActionClass.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/voicerecognition/src/main/java/guepardoapps/lucahome/voicerecognition/common/Constants.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/voicerecognition/src/main/java/guepardoapps/lucahome/voicerecognition/services/VoiceRecognitionService.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/voicerecognition/src/main/java/guepardoapps/lucahome/voicerecognition/utils/RelationshipHelper.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/BroadcastController.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/NetworkController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/NotificationController.java" charset="windows-1251" />
     <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/controller/ReceiverController.java" charset="windows-1251" />
-    <file url="PROJECT" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/utils/BitmapHelper.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/utils/Logger.java" charset="windows-1251" />
+    <file url="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/src/main/java/guepardoapps/library/openweather/utils/StringHelper.java" charset="windows-1251" />
+    <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

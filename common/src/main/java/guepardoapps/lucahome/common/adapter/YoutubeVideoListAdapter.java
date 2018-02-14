@@ -1,7 +1,5 @@
 package guepardoapps.lucahome.common.adapter;
 
-import java.util.ArrayList;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -14,10 +12,12 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
+
 import guepardoapps.lucahome.common.R;
-import guepardoapps.lucahome.common.classes.mediaserver.YoutubeVideoData;
-import guepardoapps.lucahome.common.enums.MediaServerAction;
-import guepardoapps.lucahome.common.service.MediaServerService;
+import guepardoapps.lucahome.common.classes.YoutubeVideo;
+import guepardoapps.lucahome.common.enums.MediaServerActionType;
+import guepardoapps.lucahome.common.services.MediaServerClientService;
 
 public class YoutubeVideoListAdapter extends BaseAdapter {
     private class Holder {
@@ -28,14 +28,11 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
     }
 
     private Context _context;
-    private ArrayList<YoutubeVideoData> _youtubeVideoDataList;
+    private ArrayList<YoutubeVideo> _youtubeVideoDataList;
     private Runnable _closeDialogRunnable;
     private static LayoutInflater _inflater = null;
 
-    public YoutubeVideoListAdapter(
-            @NonNull Context context,
-            @NonNull ArrayList<YoutubeVideoData> youtubeVideoDataList,
-            @NonNull Runnable closeDialogRunnable) {
+    public YoutubeVideoListAdapter(@NonNull Context context, @NonNull ArrayList<YoutubeVideo> youtubeVideoDataList, @NonNull Runnable closeDialogRunnable) {
         _context = context;
         _youtubeVideoDataList = youtubeVideoDataList;
         _closeDialogRunnable = closeDialogRunnable;
@@ -61,13 +58,12 @@ public class YoutubeVideoListAdapter extends BaseAdapter {
     @Override
     public View getView(final int index, View convertView, ViewGroup parent) {
         Holder holder = new Holder();
-        View rowView = _inflater.inflate(R.layout.list_youtube_video_item, null);
+        View rowView = _inflater.inflate(R.layout.listview_youtube_video_item, null);
 
-        final YoutubeVideoData entry = _youtubeVideoDataList.get(index);
+        final YoutubeVideo entry = _youtubeVideoDataList.get(index);
 
         View.OnClickListener sendYoutubeVideoOnClickListener = view -> {
-            String youtubeId = entry.GetYoutubeId();
-            MediaServerService.getInstance().SendCommand(MediaServerAction.YOUTUBE_PLAY.toString(), youtubeId);
+            MediaServerClientService.getInstance().SendCommand(MediaServerActionType.YOUTUBE_PLAY.toString(), entry.GetYoutubeId());
             _closeDialogRunnable.run();
         };
 

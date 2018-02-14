@@ -1,0 +1,3 @@
+<resources>
+    <integer name="pref_default_coin_hour_trend">24</integer>
+</resources>

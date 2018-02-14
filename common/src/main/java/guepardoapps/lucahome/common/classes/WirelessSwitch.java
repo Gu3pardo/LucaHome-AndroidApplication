@@ -2,38 +2,35 @@ package guepardoapps.lucahome.common.classes;
 
 import android.support.annotation.NonNull;
 
+import java.util.Calendar;
 import java.util.Locale;
+import java.util.UUID;
 
-import guepardoapps.lucahome.basic.classes.SerializableDate;
-import guepardoapps.lucahome.basic.classes.SerializableTime;
 import guepardoapps.lucahome.common.R;
-import guepardoapps.lucahome.common.enums.LucaServerAction;
+import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"unused"})
+@SuppressWarnings({"WeakerAccess"})
 public class WirelessSwitch extends WirelessSocket {
-    private static final long serialVersionUID = 5579389712706412340L;
-    private static final String TAG = WirelessSwitch.class.getSimpleName();
+    private static final String Tag = WirelessSwitch.class.getSimpleName();
 
-    public static final String SETTINGS_HEADER = "SharedPref_Notification_Switch_";
+    public static final String SettingsHeader = "SharedPref_Notification_Switch_";
 
     private int _remoteId;
     private char _keyCode;
     private boolean _action;
 
     public WirelessSwitch(
-            int id,
+            @NonNull UUID uuid,
+            @NonNull UUID roomUuid,
             @NonNull String name,
-            @NonNull String area,
             int remoteId,
             char keyCode,
-            boolean isActivated,
             boolean action,
-            @NonNull SerializableDate lastTriggerDate,
-            @NonNull SerializableTime lastTriggerTime,
+            @NonNull Calendar lastTriggerDateTime,
             @NonNull String lastTriggerUser,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
-        super(id, name, area, "", isActivated, lastTriggerDate, lastTriggerTime, lastTriggerUser, isOnServer, serverDbAction);
+        super(uuid, roomUuid, name, "", false, lastTriggerDateTime, lastTriggerUser, isOnServer, serverDbAction);
         _remoteId = remoteId;
         _keyCode = keyCode;
         _action = action;
@@ -64,50 +61,54 @@ public class WirelessSwitch extends WirelessSocket {
     }
 
     @Override
-    public String CommandSetState() throws NoSuchMethodException {
+    public String GetCommandSetState() throws NoSuchMethodException {
         throw new NoSuchMethodException("CommandSetState not available for WirelessSwitch");
     }
 
-    @Override
-    public String CommandChangeState() throws NoSuchMethodException {
-        throw new NoSuchMethodException("CommandChangeState not available for WirelessSwitch");
-    }
-
-    public String CommandToggle() {
-        return String.format(Locale.getDefault(), "%s%s", LucaServerAction.TOGGLE_SWITCH.toString(), _name);
+    public String GetCommandToggle() {
+        return String.format(Locale.getDefault(),
+                "%s%s",
+                LucaServerActionTypes.TOGGLE_WIRELESS_SWITCH.toString(), _uuid);
     }
 
     @Override
-    public String CommandAdd() {
-        return String.format(Locale.getDefault(), "%s%d&name=%s&area=%s&remoteid=%s&keycode=%s", LucaServerAction.ADD_SWITCH.toString(), _typeId, _name, _area, _remoteId, _keyCode);
+    public String GetCommandAdd() {
+        return String.format(Locale.getDefault(),
+                "%s%s&roomuuid=%s&name=%s&remoteid=%s&keycode=%s",
+                LucaServerActionTypes.ADD_WIRELESS_SWITCH.toString(), _uuid, _roomUuid, _name, _remoteId, _keyCode);
     }
 
     @Override
-    public String CommandUpdate() {
-        return String.format(Locale.getDefault(), "%s%d&name=%s&area=%s&remoteid=%s&keycode=%s", LucaServerAction.UPDATE_SWITCH.toString(), _typeId, _name, _area, _remoteId, _keyCode);
+    public String GetCommandUpdate() {
+        return String.format(Locale.getDefault(),
+                "%s%s&roomuuid=%s&name=%s&remoteid=%s&keycode=%s",
+                LucaServerActionTypes.UPDATE_WIRELESS_SWITCH.toString(), _uuid, _roomUuid, _name, _remoteId, _keyCode);
     }
 
     @Override
-    public String CommandDelete() {
-        return String.format(Locale.getDefault(), "%s%d", LucaServerAction.DELETE_SWITCH.toString(), _typeId);
+    public String GetCommandDelete() {
+        return String.format(Locale.getDefault(),
+                "%s%s",
+                LucaServerActionTypes.DELETE_WIRELESS_SWITCH.toString(), _uuid);
     }
 
     @Override
     public int GetDrawable() {
         if (_action) {
-            return R.drawable.switch_on;
-        } else {
-            return R.drawable.switch_off;
+            return R.drawable.wireless_switch_on;
         }
+        return R.drawable.wireless_switch_off;
     }
 
     @Override
     public String GetSettingsKey() {
-        return String.format(Locale.getDefault(), "%s%s", SETTINGS_HEADER, _name);
+        return String.format(Locale.getDefault(), "%s%s", SettingsHeader, _name);
     }
 
     @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "( %s: (Name: %s );(Area: %s );(KeyCode: %s );(Action: %s ))", TAG, _name, _area, _keyCode, (_action ? "1" : "0"));
+        return String.format(Locale.getDefault(),
+                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"RoomUuid\":\"%s\",\"Name\":\"%s\",\"KeyCode\":\"%s\",\"Action\":\"%s\"}",
+                Tag, _uuid, _roomUuid, _name, _keyCode, (_action ? "1" : "0"));
     }
 }

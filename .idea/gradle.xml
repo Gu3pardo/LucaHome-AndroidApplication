@@ -8,11 +8,14 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/basic" />
             <option value="$PROJECT_DIR$/bixby" />
             <option value="$PROJECT_DIR$/common" />
-            <option value="$PROJECT_DIR$/mediamirror" />
+            <option value="$PROJECT_DIR$/mediaserver" />
             <option value="$PROJECT_DIR$/mobile" />
+            <option value="$PROJECT_DIR$/pocketsphinx-android-5prealpha-release" />
+            <option value="$PROJECT_DIR$/tv" />
+            <option value="$PROJECT_DIR$/voicerecognition" />
+            <option value="$PROJECT_DIR$/wear" />
             <option value="$PROJECT_DIR$/../OpenWeather/lib_openweather" />
           </set>
         </option>

@@ -6,67 +6,68 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.StringHelper;
+import java.util.ArrayList;
+import java.util.UUID;
+
+import guepardoapps.lucahome.common.classes.ILucaClass;
 import guepardoapps.lucahome.common.classes.PuckJs;
-import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
-import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
+import guepardoapps.lucahome.common.utils.Logger;
+import guepardoapps.lucahome.common.utils.StringHelper;
 
 public class JsonDataToPuckJsConverter implements IJsonDataConverter {
-    private static final String TAG = JsonDataToPuckJsConverter.class.getSimpleName();
-    private static final String SEARCH_PARAMETER = "{\"Data\":";
+    private static final String Tag = JsonDataToPuckJsConverter.class.getSimpleName();
+    private static final String SearchParameter = "{\"Data\":";
 
-    private static final JsonDataToPuckJsConverter SINGLETON = new JsonDataToPuckJsConverter();
+    private static final JsonDataToPuckJsConverter Singleton = new JsonDataToPuckJsConverter();
 
     public static JsonDataToPuckJsConverter getInstance() {
-        return SINGLETON;
+        return Singleton;
     }
 
     private JsonDataToPuckJsConverter() {
     }
 
-    public SerializableList<PuckJs> GetList(@NonNull String[] jsonStringArray) {
+    public ArrayList<PuckJs> GetList(@NonNull String[] jsonStringArray) {
         if (StringHelper.StringsAreEqual(jsonStringArray)) {
             return parseStringToList(jsonStringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(jsonStringArray, SEARCH_PARAMETER);
+            String usedEntry = StringHelper.SelectString(jsonStringArray, SearchParameter);
             return parseStringToList(usedEntry);
         }
     }
 
-    public SerializableList<PuckJs> GetList(@NonNull String responseString) {
+    public ArrayList<PuckJs> GetList(@NonNull String responseString) {
         return parseStringToList(responseString);
     }
 
-    private SerializableList<PuckJs> parseStringToList(@NonNull String jsonString) {
+    private ArrayList<PuckJs> parseStringToList(@NonNull String jsonString) {
         if (!jsonString.contains("Error")) {
-            SerializableList<PuckJs> list = new SerializableList<>();
+            ArrayList<PuckJs> list = new ArrayList<>();
 
             try {
                 JSONObject jsonObject = new JSONObject(jsonString);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
-                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("PuckJs");
+                for (int index = 0; index < dataArray.length(); index++) {
+                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("PuckJs");
 
-                    int id = child.getInt("Id");
+                    UUID uuid = UUID.fromString(child.getString("Uuid"));
+                    UUID roomUuid = UUID.fromString(child.getString("RoomUuid"));
 
                     String name = child.getString("Name");
-                    String area = child.getString("Area");
                     String mac = child.getString("Mac");
 
-                    PuckJs newPuckJs = new PuckJs(id, name, area, mac, true, ILucaClass.LucaServerDbAction.Null);
-                    list.addValue(newPuckJs);
+                    PuckJs newPuckJs = new PuckJs(uuid, roomUuid, name, mac, true, ILucaClass.LucaServerDbAction.Null);
+                    list.add(newPuckJs);
                 }
             } catch (JSONException jsonException) {
-                Logger.getInstance().Error(TAG, jsonException.getMessage());
+                Logger.getInstance().Error(Tag, jsonException.getMessage());
             }
 
             return list;
         }
 
-        Logger.getInstance().Error(TAG, jsonString + " has an error!");
-        return new SerializableList<>();
+        Logger.getInstance().Error(Tag, jsonString + " has an error!");
+        return new ArrayList<>();
     }
 }

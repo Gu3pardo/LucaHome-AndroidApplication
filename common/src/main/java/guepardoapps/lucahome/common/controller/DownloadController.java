@@ -5,42 +5,19 @@ import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
-import java.util.Locale;
 
-import guepardoapps.lucahome.basic.controller.BroadcastController;
-import guepardoapps.lucahome.basic.controller.NetworkController;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.Tools;
-import guepardoapps.lucahome.common.service.DownloadStorageService;
+import guepardoapps.lucahome.common.services.DownloadStorageService;
+import guepardoapps.lucahome.common.utils.Logger;
+import guepardoapps.lucahome.common.utils.Tools;
+
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class DownloadController {
-    public enum DownloadType implements Serializable {
-        Birthday, BirthdayAdd, BirthdayUpdate, BirthdayDelete,
-        CoinConversion, Coin, CoinAdd, CoinUpdate, CoinDelete, CoinTrend,
-        MapContent,
-        ListedMenu, ListedMenuAdd, ListedMenuUpdate, ListedMenuDelete,
-        Menu, MenuUpdate, MenuClear,
-        MeterData, MeterDataAdd, MeterDataUpdate, MeterDataDelete,
-        MoneyMeterData, MoneyMeterDataAdd, MoneyMeterDataUpdate, MoneyMeterDataDelete,
-        Movie, MovieUpdate,
-        PuckJsList, PuckJsAdd, PuckJsDelete, PuckJsUpdate,
-        Schedule, ScheduleSet, ScheduleAdd, ScheduleUpdate, ScheduleDelete,
-        Security, SecurityCamera, SecurityCameraControl,
-        ShoppingList, ShoppingListAdd, ShoppingListDelete, ShoppingListUpdate,
-        Temperature,
-        Timer, TimerAdd, TimerUpdate, TimerDelete,
-        User,
-        WirelessSocket, WirelessSocketSet, WirelessSocketAdd, WirelessSocketUpdate, WirelessSocketDelete,
-        WirelessSwitch, WirelessSwitchToggle, WirelessSwitchAdd, WirelessSwitchUpdate, WirelessSwitchDelete
-    }
-
-    public enum DownloadState implements Serializable {
-        Canceled, NoNetwork, NoHomeNetwork, InvalidUrl, Success
-    }
+@SuppressWarnings({"WeakerAccess"})
+public class DownloadController implements IDownloadController {
+    private static final String Tag = DownloadController.class.getSimpleName();
 
     public static class DownloadFinishedBroadcastContent implements Serializable {
         public boolean Success;
@@ -56,11 +33,6 @@ public class DownloadController {
         }
     }
 
-    public static final String DownloadFinishedBroadcast = "guepardoapps.lucahome.data.controller.download.finished";
-    public static final String DownloadFinishedBundle = "DownloadFinishedBundle";
-
-    private static final String TAG = DownloadController.class.getSimpleName();
-
     private BroadcastController _broadcastController;
     private NetworkController _networkController;
     private OkHttpClient _okHttpClient;
@@ -71,9 +43,8 @@ public class DownloadController {
         _okHttpClient = new OkHttpClient();
     }
 
+    @Override
     public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork, Serializable additional) {
-        Logger.getInstance().Information(TAG, String.format(Locale.getDefault(), "SendCommandToWebsiteAsync: %s", requestUrl));
-
         if (!canSendAction(downloadType, needsHomeNetwork, requestUrl, additional)) {
             return;
         }
@@ -84,43 +55,39 @@ public class DownloadController {
         sendActionTask.execute(requestUrl);
     }
 
+    @Override
     public void SendCommandToWebsiteAsync(@NonNull String requestUrl, @NonNull DownloadType downloadType, boolean needsHomeNetwork) {
         SendCommandToWebsiteAsync(requestUrl, downloadType, needsHomeNetwork, null);
     }
 
     private boolean canSendAction(@NonNull DownloadType downloadType, boolean needsHomeNetwork, @NonNull String requestUrl, Serializable additional) {
         if (!_networkController.IsNetworkAvailable()) {
-            DownloadStorageService.getInstance().PutDownloadResult(downloadType, Tools.CompressStringToByteArray("No network!"));
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(false, downloadType, DownloadState.NoNetwork, additional));
+            downloadFailedAction(downloadType, "No network!", DownloadState.NoNetwork, additional);
             return false;
         }
 
         if (needsHomeNetwork && !_networkController.IsHomeNetwork(SettingsController.getInstance().GetHomeSsid())) {
-            DownloadStorageService.getInstance().PutDownloadResult(downloadType, Tools.CompressStringToByteArray("No home network!"));
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(false, downloadType, DownloadState.NoHomeNetwork, additional));
+            downloadFailedAction(downloadType, "No home network!", DownloadState.NoHomeNetwork, additional);
             return false;
         }
 
         if (requestUrl.length() < 15) {
-            Logger.getInstance().Error(TAG, "Invalid requestUrl length!");
-            DownloadStorageService.getInstance().PutDownloadResult(downloadType, Tools.CompressStringToByteArray("ERROR: Invalid requestUrl length!"));
-            _broadcastController.SendSerializableBroadcast(
-                    DownloadFinishedBroadcast,
-                    DownloadFinishedBundle,
-                    new DownloadFinishedBroadcastContent(false, downloadType, DownloadState.InvalidUrl, additional));
+            downloadFailedAction(downloadType, "Invalid requestUrl length!", DownloadState.InvalidUrl, additional);
             return false;
         }
 
         return true;
     }
 
-    @SuppressWarnings({"WeakerAccess"})
+    private void downloadFailedAction(@NonNull DownloadType downloadType, @NonNull String message, @NonNull DownloadState downloadState, Serializable additional) {
+        Logger.getInstance().Error(Tag, message);
+        DownloadStorageService.getInstance().PutDownloadResult(downloadType, Tools.CompressStringToByteArray(message));
+        _broadcastController.SendSerializableBroadcast(
+                DownloadFinishedBroadcast,
+                DownloadFinishedBundle,
+                new DownloadFinishedBroadcastContent(false, downloadType, downloadState, additional));
+    }
+
     private class SendActionTask extends AsyncTask<String, Void, String> {
         public DownloadType CurrentDownloadType;
         public Serializable Additional;
@@ -138,13 +105,13 @@ public class DownloadController {
 
                     if (responseBody != null) {
                         result = responseBody.string();
-                        Logger.getInstance().Debug(TAG, result);
+                        Logger.getInstance().Debug(Tag, result);
                         downloadSuccess = true;
                     } else {
-                        Logger.getInstance().Error(TAG, "ResponseBody is null!");
+                        Logger.getInstance().Error(Tag, "ResponseBody is null!");
                     }
                 } catch (Exception exception) {
-                    Logger.getInstance().Error(TAG, exception.toString());
+                    Logger.getInstance().Error(Tag, exception.toString());
                 } finally {
                     byte[] byteArray = Tools.CompressStringToByteArray(result);
                     DownloadStorageService.getInstance().PutDownloadResult(CurrentDownloadType, byteArray);

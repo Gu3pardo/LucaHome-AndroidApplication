@@ -4,4 +4,4 @@
     android:accessibilityFlags="flagRetrieveInteractiveWindows"
     android:canRetrieveWindowContent="true"
     android:description="@string/bixby_service_description"
-    android:settingsActivity="guepardoapps.lucahome.bixby.BixbyActivity" />
+    android:settingsActivity="guepardoapps.lucahome.views.BixbyActivity" />

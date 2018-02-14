@@ -6,58 +6,58 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import guepardoapps.lucahome.basic.classes.SerializableDate;
-import guepardoapps.lucahome.basic.classes.SerializableList;
-import guepardoapps.lucahome.basic.classes.SerializableTime;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.basic.utils.StringHelper;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.UUID;
+
+import guepardoapps.lucahome.common.classes.ILucaClass;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
-import guepardoapps.lucahome.common.interfaces.converter.IJsonDataConverter;
+import guepardoapps.lucahome.common.utils.Logger;
+import guepardoapps.lucahome.common.utils.StringHelper;
 
 public final class JsonDataToWirelessSocketConverter implements IJsonDataConverter {
-    private static final String TAG = JsonDataToWirelessSocketConverter.class.getSimpleName();
-    private static final String SEARCH_PARAMETER = "{\"Data\":";
+    private static final String Tag = JsonDataToWirelessSocketConverter.class.getSimpleName();
+    private static final String SearchParameter = "{\"Data\":";
 
-    private static final JsonDataToWirelessSocketConverter SINGLETON = new JsonDataToWirelessSocketConverter();
+    private static final JsonDataToWirelessSocketConverter Singleton = new JsonDataToWirelessSocketConverter();
 
     public static JsonDataToWirelessSocketConverter getInstance() {
-        return SINGLETON;
+        return Singleton;
     }
 
     private JsonDataToWirelessSocketConverter() {
     }
 
     @Override
-    public SerializableList<WirelessSocket> GetList(@NonNull String[] stringArray) {
+    public ArrayList<WirelessSocket> GetList(@NonNull String[] stringArray) {
         if (StringHelper.StringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
-            String usedEntry = StringHelper.SelectString(stringArray, SEARCH_PARAMETER);
+            String usedEntry = StringHelper.SelectString(stringArray, SearchParameter);
             return parseStringToList(usedEntry);
         }
     }
 
     @Override
-    public SerializableList<WirelessSocket> GetList(@NonNull String jsonString) {
+    public ArrayList<WirelessSocket> GetList(@NonNull String jsonString) {
         return parseStringToList(jsonString);
     }
 
-    private static SerializableList<WirelessSocket> parseStringToList(String value) {
+    private static ArrayList<WirelessSocket> parseStringToList(String value) {
         if (!value.contains("Error")) {
-            SerializableList<WirelessSocket> list = new SerializableList<>();
+            ArrayList<WirelessSocket> list = new ArrayList<>();
 
             try {
                 JSONObject jsonObject = new JSONObject(value);
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
-                for (int dataIndex = 0; dataIndex < dataArray.length(); dataIndex++) {
-                    JSONObject child = dataArray.getJSONObject(dataIndex).getJSONObject("WirelessSocket");
+                for (int index = 0; index < dataArray.length(); index++) {
+                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("WirelessSocket");
 
-                    int typeId = child.getInt("TypeId");
+                    UUID uuid = UUID.fromString(child.getString("Uuid"));
+                    UUID roomUuid = UUID.fromString(child.getString("RoomUuid"));
 
                     String name = child.getString("Name");
-                    String area = child.getString("Area");
                     String code = child.getString("Code");
 
                     boolean isActivated = !child.getString("State").contains("0") && !child.getString("State").contains("-1");
@@ -78,22 +78,21 @@ public final class JsonDataToWirelessSocketConverter implements IJsonDataConvert
                         minute = 0;
                     }
 
+                    Calendar lastTriggerDateTime = Calendar.getInstance();
+                    lastTriggerDateTime.set(year, month, day, hour, minute);
+
                     String lastTriggerUser = lastTriggerJsonData.getString("UserName");
 
-                    WirelessSocket newWirelessSocket = new WirelessSocket(
-                            typeId,
-                            name, area, code, isActivated,
-                            new SerializableDate(year, month, day), new SerializableTime(hour, minute, 0, 0), lastTriggerUser,
-                            true, ILucaClass.LucaServerDbAction.Null);
-                    list.addValue(newWirelessSocket);
+                    WirelessSocket newWirelessSocket = new WirelessSocket(uuid, roomUuid, name, code, isActivated, lastTriggerDateTime, lastTriggerUser, true, ILucaClass.LucaServerDbAction.Null);
+                    list.add(newWirelessSocket);
                 }
             } catch (JSONException jsonException) {
-                Logger.getInstance().Error(TAG, jsonException.getMessage());
+                Logger.getInstance().Error(Tag, jsonException.getMessage());
             }
             return list;
         }
 
-        Logger.getInstance().Error(TAG, value + " has an error!");
-        return new SerializableList<>();
+        Logger.getInstance().Error(Tag, value + " has an error!");
+        return new ArrayList<>();
     }
 }

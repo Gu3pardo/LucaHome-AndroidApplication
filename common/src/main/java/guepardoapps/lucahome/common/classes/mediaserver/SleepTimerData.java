@@ -4,17 +4,13 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 
-import java.io.Serializable;
 import java.util.Locale;
 
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.common.interfaces.classes.IMediaServerClass;
+import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
-public class SleepTimerData implements IMediaServerClass, Serializable {
-    private static final long serialVersionUID = 2691811435346000099L;
-
-    private static final String TAG = SleepTimerData.class.getSimpleName();
+@SuppressWarnings({"WeakerAccess"})
+public class SleepTimerData implements IMediaServerClass {
+    private static final String Tag = SleepTimerData.class.getSimpleName();
 
     private boolean _sleepTimerEnabled;
     private int _sleepTimerCountDownSec;
@@ -27,8 +23,7 @@ public class SleepTimerData implements IMediaServerClass, Serializable {
     }
 
     public SleepTimerData() {
-        _sleepTimerEnabled = false;
-        _sleepTimerCountDownSec = 0;
+        this(false, -1);
     }
 
     public boolean GetSleepTimerEnabled() {
@@ -49,17 +44,17 @@ public class SleepTimerData implements IMediaServerClass, Serializable {
         if (communicationString.length() == 0) {
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
+        Logger.getInstance().Debug(Tag, String.format(Locale.getDefault(), "CommunicationString is %s", communicationString));
 
-        SleepTimerData tempSleepTimerData = new Gson().fromJson(communicationString, SleepTimerData.class);
-        _sleepTimerEnabled = tempSleepTimerData.GetSleepTimerEnabled();
-        _sleepTimerCountDownSec = tempSleepTimerData.GetSleepTimerCountDownSec();
+        SleepTimerData tmpSleepTimerData = new Gson().fromJson(communicationString, SleepTimerData.class);
+        _sleepTimerEnabled = tmpSleepTimerData.GetSleepTimerEnabled();
+        _sleepTimerCountDownSec = tmpSleepTimerData.GetSleepTimerCountDownSec();
     }
 
     @Override
     public String toString() {
         return String.format(Locale.getDefault(),
-                "{%s:{SleepTimerEnabled:%s},{SleepTimerCountDownSec:%d}}",
-                TAG, _sleepTimerEnabled, _sleepTimerCountDownSec);
+                "{\"Class\":\"%s\",\"SleepTimerEnabled\":\"%s\",\"SleepTimerCountDownSec\":%d}",
+                Tag, _sleepTimerEnabled, _sleepTimerCountDownSec);
     }
 }

@@ -2,70 +2,110 @@ package guepardoapps.lucahome.common.classes;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Locale;
+import java.util.UUID;
 
-import guepardoapps.lucahome.common.enums.LucaServerAction;
-import guepardoapps.lucahome.common.interfaces.classes.ILucaClass;
+import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"unused"})
-public class PuckJs implements Serializable, ILucaClass {
-    private static final long serialVersionUID = 3784902949363954860L;
-    private static final String TAG = PuckJs.class.getSimpleName();
+@SuppressWarnings({"WeakerAccess"})
+public class PuckJs implements ILucaClass {
+    private static final String Tag = PuckJs.class.getSimpleName();
 
-    private int _id;
-
+    private UUID _uuid;
+    private UUID _roomUuid;
     private String _name;
-    private String _area;
     private String _mac;
+
+    private int _batteryLevel;
+    private int _lightValue;
 
     private boolean _isOnServer;
     private LucaServerDbAction _serverDbAction;
 
     public PuckJs(
-            int id,
+            @NonNull UUID uuid,
+            @NonNull UUID roomUuid,
             @NonNull String name,
-            @NonNull String area,
             @NonNull String mac,
+            int batteryLevel,
+            int lightValue,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
-        _id = id;
-
+        _uuid = uuid;
+        _roomUuid = roomUuid;
         _name = name;
-        _area = area;
         _mac = mac;
-
+        _batteryLevel = batteryLevel;
+        _lightValue = lightValue;
         _isOnServer = isOnServer;
         _serverDbAction = serverDbAction;
     }
 
-    @Override
-    public int GetId() {
-        return _id;
+    public PuckJs(
+            @NonNull UUID uuid,
+            @NonNull UUID roomUuid,
+            @NonNull String name,
+            @NonNull String mac,
+            boolean isOnServer,
+            @NonNull LucaServerDbAction serverDbAction) {
+        this(uuid, roomUuid, name, mac, -1, -1, isOnServer, serverDbAction);
     }
 
-    public String GetName() {
-        return _name;
+    @Override
+    public UUID GetUuid() {
+        return _uuid;
+    }
+
+    @Override
+    public UUID GetRoomUuid() {
+        return _roomUuid;
     }
 
     public void SetName(@NonNull String name) {
         _name = name;
     }
 
-    public String GetArea() {
-        return _area;
+    public String GetName() {
+        return _name;
     }
 
-    public void SetArea(@NonNull String area) {
-        _area = area;
+    public void SetMac(@NonNull String mac) {
+        _mac = mac;
     }
 
     public String GetMac() {
         return _mac;
     }
 
-    public void SetMac(@NonNull String mac) {
-        _mac = mac;
+    public void SetBatteryLevel(int batteryLevel) {
+        _batteryLevel = batteryLevel;
+    }
+
+    public int GetBatteryLevel() {
+        return _batteryLevel;
+    }
+
+    public void SetLightValue(int lightValue) {
+        _lightValue = lightValue;
+    }
+
+    public int GetLightValue() {
+        return _lightValue;
+    }
+
+    @Override
+    public String GetCommandAdd() {
+        return String.format(Locale.getDefault(), LucaServerActionTypes.ADD_PUCK_JS_F.toString(), _uuid, _roomUuid, _name, _mac);
+    }
+
+    @Override
+    public String GetCommandUpdate() {
+        return String.format(Locale.getDefault(), LucaServerActionTypes.UPDATE_PUCK_JS_F.toString(), _uuid, _roomUuid, _name, _mac);
+    }
+
+    @Override
+    public String GetCommandDelete() {
+        return String.format(Locale.getDefault(), LucaServerActionTypes.DELETE_PUCK_JS_F.toString(), _uuid);
     }
 
     @Override
@@ -89,22 +129,9 @@ public class PuckJs implements Serializable, ILucaClass {
     }
 
     @Override
-    public String CommandAdd() {
-        return String.format(Locale.getDefault(), LucaServerAction.ADD_PUCKJS_F.toString(), _id, _name, _area, _mac);
-    }
-
-    @Override
-    public String CommandUpdate() {
-        return String.format(Locale.getDefault(), LucaServerAction.UPDATE_PUCKJS_F.toString(), _id, _name, _area, _mac);
-    }
-
-    @Override
-    public String CommandDelete() {
-        return String.format(Locale.getDefault(), LucaServerAction.DELETE_PUCKJS_F.toString(), _id);
-    }
-
-    @Override
     public String toString() {
-        return String.format(Locale.getDefault(), "{%s: {Id: %d};{Name: %s};{Area: %s};{Mac: %s}}", TAG, _id, _name, _area, _mac);
+        return String.format(Locale.getDefault(),
+                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"RoomUuid\":\"%s\",\"Name\":\"%s\",\"Mac\":\"%s\",\"BatteryLevel\":%d,\"LightValue\":%d}",
+                Tag, _uuid, _roomUuid, _name, _mac, _batteryLevel, _lightValue);
     }
 }

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="guepardoapps.bixby">
+    package="guepardoapps.lucahome.bixby">
 
     <application
         android:allowBackup="true"
@@ -7,7 +7,7 @@
         android:supportsRtl="true">
 
         <service
-            android:name="guepardoapps.bixby.services.BixbyService"
+            android:name="guepardoapps.lucahome.bixby.services.BixbyService"
             android:label="@string/app_name"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>

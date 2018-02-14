@@ -4,23 +4,25 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import java.util.Locale;
+import java.util.UUID;
 
-import guepardoapps.lucahome.basic.controller.SharedPrefController;
-import guepardoapps.lucahome.basic.utils.Logger;
-import guepardoapps.lucahome.common.classes.LucaUser;
+import guepardoapps.lucahome.common.classes.ILucaClass;
+import guepardoapps.lucahome.common.classes.User;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
+import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"unused", "WeakerAccess"})
-public class SettingsController {
-    private static final SettingsController SINGLETON = new SettingsController();
+@SuppressWarnings({"WeakerAccess"})
+public class SettingsController implements ISettingsController {
+    private static final String Tag = SettingsController.class.getSimpleName();
 
-    private static final String TAG = SettingsController.class.getSimpleName();
+    private static SettingsController Singleton = new SettingsController();
 
-    private static final String PREF_SETTINGS_INSTALLED_V5_2_0_180109 = "settings_v5.2.0.180109_installed";
-    private static final String PREF_SETTINGS_INSTALLED_V5_2_1_180109 = "settings_v5.2.1.180109_installed";
+    private SharedPrefController _sharedPrefController;
 
+    private static final String PREF_SETTINGS_INSTALLED_V6_0_0_180214 = "settings_v6.0.0.180214_installed";
+
+    public static final String PREF_USER_UUID = "user_uuid";
     public static final String PREF_USER_NAME = "user_name";
     public static final String PREF_USER_PASS_PHRASE = "user_passphrase";
 
@@ -31,201 +33,151 @@ public class SettingsController {
     public static final String PREF_CHANGE_WEATHER_WALLPAPER = "change_weather_wallpaper";
 
     public static final String PREF_NOTIFICATION_MESSAGE = "notifications_message";
-    public static final String PREF_NOTIFICATION_MESSAGE_SOCKETS = "notifications_message_sockets";
     public static final String PREF_NOTIFICATION_MESSAGE_BIRTHDAY = "notifications_message_birthday";
+    public static final String PREF_NOTIFICATION_MESSAGE_CAMERA = "notifications_message_camera";
+    public static final String PREF_NOTIFICATION_MESSAGE_COINS = "notifications_message_coins";
     public static final String PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER = "notifications_message_current_weather";
     public static final String PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER = "notifications_message_forecast_weather";
     public static final String PREF_NOTIFICATION_MESSAGE_TEMPERATURE = "notifications_message_temperature";
-    public static final String PREF_NOTIFICATION_MESSAGE_CAMERA = "notifications_message_camera";
-    public static final String PREF_NOTIFICATION_MESSAGE_COINS = "notifications_message_coins";
-    public static final String PREF_NOTIFICATION_MESSAGE_SWITCHES = "notifications_message_switches";
+    public static final String PREF_NOTIFICATION_MESSAGE_WIRELESS_SOCKETS = "notifications_message_wireless_sockets";
+    public static final String PREF_NOTIFICATION_MESSAGE_WIRELESS_SWITCHES = "notifications_message_wireless_switches";
 
     public static final String PREF_RELOAD_DATA_ENABLED = "reload_data_enabled";
     public static final String PREF_RELOAD_BIRTHDAY_ENABLED = "reload_birthday_enabled";
     public static final String PREF_RELOAD_COIN_ENABLED = "reload_coin_enabled";
-    public static final String PREF_RELOAD_MAPCONTENT_ENABLED = "reload_mapcontent_enabled";
-    public static final String PREF_RELOAD_MEDIASERVER_ENABLED = "reload_mediaserver_enabled";
-    public static final String PREF_RELOAD_MENU_ENABLED = "reload_menu_enabled";
-    public static final String PREF_RELOAD_METER_DATA_ENABLED = "reload_meter_data_enabled";
-    public static final String PREF_RELOAD_MONEY_METER_DATA_ENABLED = "reload_money_meter_data_enabled";
+    public static final String PREF_RELOAD_LUCA_SECURITY_ENABLED = "reload_luca_security_enabled";
+    public static final String PREF_RELOAD_MAP_CONTENT_ENABLED = "reload_map_content_enabled";
+    public static final String PREF_RELOAD_MEDIA_SERVER_ENABLED = "reload_media_server_enabled";
+    public static final String PREF_RELOAD_MEAL_ENABLED = "reload_meal_enabled";
+    public static final String PREF_RELOAD_METER_LOG_ENABLED = "reload_meter_log_enabled";
+    public static final String PREF_RELOAD_MONEY_LOG_ENABLED = "reload_money_log_enabled";
     public static final String PREF_RELOAD_MOVIE_ENABLED = "reload_movie_enabled";
-    public static final String PREF_RELOAD_PUCKJS_ENABLED = "reload_puckjs_enabled";
-    public static final String PREF_RELOAD_SCHEDULE_ENABLED = "reload_schedule_enabled";
-    public static final String PREF_RELOAD_SECURITY_ENABLED = "reload_security_enabled";
+    public static final String PREF_RELOAD_PUCK_JS_ENABLED = "reload_puck_js_enabled";
+    public static final String PREF_RELOAD_ROOM_ENABLED = "reload_room_enabled";
     public static final String PREF_RELOAD_SHOPPING_ENABLED = "reload_shopping_enabled";
     public static final String PREF_RELOAD_TEMPERATURE_ENABLED = "reload_temperature_enabled";
     public static final String PREF_RELOAD_WEATHER_ENABLED = "reload_weather_enabled";
-    public static final String PREF_RELOAD_WIRELESSSOCKET_ENABLED = "reload_wirelesssocket_enabled";
-    public static final String PREF_RELOAD_WIRELESSSWITCH_ENABLED = "reload_wirelessswitch_enabled";
+    public static final String PREF_RELOAD_WIRELESS_SCHEDULE_ENABLED = "reload_wireless_schedule_enabled";
+    public static final String PREF_RELOAD_WIRELESS_SOCKET_ENABLED = "reload_wireless_socket_enabled";
+    public static final String PREF_RELOAD_WIRELESS_SWITCH_ENABLED = "reload_wireless_switch_enabled";
 
     public static final String PREF_RELOAD_BIRTHDAY_TIMEOUT = "reload_birthday_timeout";
     public static final String PREF_RELOAD_COIN_TIMEOUT = "reload_coin_timeout";
-    public static final String PREF_RELOAD_MAPCONTENT_TIMEOUT = "reload_mapcontent_timeout";
-    public static final String PREF_RELOAD_MEDIASERVER_TIMEOUT = "reload_mediaserver_timeout";
-    public static final String PREF_RELOAD_MENU_TIMEOUT = "reload_menu_timeout";
-    public static final String PREF_RELOAD_METER_DATA_TIMEOUT = "reload_meter_data_timeout";
-    public static final String PREF_RELOAD_MONEY_METER_DATA_TIMEOUT = "reload_money_meter_data_timeout";
+    public static final String PREF_RELOAD_LUCA_SECURITY_TIMEOUT = "reload_luca_security_timeout";
+    public static final String PREF_RELOAD_MAP_CONTENT_TIMEOUT = "reload_map_content_timeout";
+    public static final String PREF_RELOAD_MEDIA_SERVER_TIMEOUT = "reload_media_server_timeout";
+    public static final String PREF_RELOAD_MEAL_TIMEOUT = "reload_meal_timeout";
+    public static final String PREF_RELOAD_METER_LOG_TIMEOUT = "reload_meter_log_timeout";
+    public static final String PREF_RELOAD_MONEY_LOG_TIMEOUT = "reload_money_log_timeout";
     public static final String PREF_RELOAD_MOVIE_TIMEOUT = "reload_movie_timeout";
-    public static final String PREF_RELOAD_PUCKJS_TIMEOUT = "reload_puckjs_timeout";
-    public static final String PREF_RELOAD_SCHEDULE_TIMEOUT = "reload_schedule_timeout";
-    public static final String PREF_RELOAD_SECURITY_TIMEOUT = "reload_security_timeout";
+    public static final String PREF_RELOAD_PUCK_JS_TIMEOUT = "reload_puck_js_timeout";
+    public static final String PREF_RELOAD_ROOM_TIMEOUT = "reload_room_timeout";
     public static final String PREF_RELOAD_SHOPPING_TIMEOUT = "reload_shopping_timeout";
     public static final String PREF_RELOAD_TEMPERATURE_TIMEOUT = "reload_temperature_timeout";
     public static final String PREF_RELOAD_WEATHER_TIMEOUT = "reload_weather_timeout";
-    public static final String PREF_RELOAD_WIRELESSSOCKET_TIMEOUT = "reload_wirelesssocket_timeout";
-    public static final String PREF_RELOAD_WIRELESSSWITCH_TIMEOUT = "reload_wirelessswitch_timeout";
+    public static final String PREF_RELOAD_WIRELESS_SCHEDULE_TIMEOUT = "reload_wireless_schedule_timeout";
+    public static final String PREF_RELOAD_WIRELESS_SOCKET_TIMEOUT = "reload_wireless_socket_timeout";
+    public static final String PREF_RELOAD_WIRELESS_SWITCH_TIMEOUT = "reload_wireless_switch_timeout";
 
     public static final String PREF_HANDLE_BLUETOOTH_AUTOMATICALLY = "handle_bluetooth_automatically";
     public static final String PREF_BEACONS_SCAN_ENABLED = "beacons_scan_enabled";
     public static final String PREF_BEACONS_TIME_BETWEEN_SCANS_SEC = "beacons_time_between_scans_sec";
-    public static final String PREF_BEACONS_TIME_SCANS_MSEC = "beacons_time_scans_msec";
+    public static final String PREF_BEACONS_TIME_SCANS_M_SEC = "beacons_time_scans_m_sec";
 
     public static final String PREF_COIN_HOURS_TREND = "coin_hours_trend";
 
-    private Context _context;
-    private SharedPrefController _sharedPrefController;
-
-    private boolean _isInitialized;
+    public static SettingsController getInstance() {
+        return Singleton;
+    }
 
     private SettingsController() {
     }
 
-    public static SettingsController getInstance() {
-        return SINGLETON;
-    }
-
     public void Initialize(@NonNull Context context) {
-        if (_isInitialized) {
-            Logger.getInstance().Error(TAG, "Already initialized!");
-            return;
-        }
-
-        _context = context;
-        _sharedPrefController = new SharedPrefController(_context);
-
-        _isInitialized = true;
-
+        _sharedPrefController = new SharedPrefController(context);
         install();
     }
 
-    public LucaUser GetUser() {
-        if (!_isInitialized) {
-            Logger.getInstance().Error(TAG, "Not initialized!");
-            return null;
+    public void SetUser(User user) {
+        if (user != null) {
+            _sharedPrefController.SaveStringValue(PREF_USER_UUID, user.GetUuid().toString());
+            _sharedPrefController.SaveStringValue(PREF_USER_NAME, user.GetName());
+            _sharedPrefController.SaveStringValue(PREF_USER_PASS_PHRASE, user.GetPassphrase());
+        } else {
+            Logger.getInstance().Error(Tag, "User may not be null! Cannot save!");
         }
+    }
+
+    public User GetUser() {
+        UUID uuid = UUID.fromString(_sharedPrefController.LoadStringValueFromSharedPreferences(PREF_USER_UUID));
 
         String userName = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_USER_NAME);
         if (userName == null) {
-            userName = _context.getResources().getString(R.string.pref_default_user_name);
+            userName = "";
         }
 
         String userPassPhrase = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_USER_PASS_PHRASE);
         if (userPassPhrase == null) {
-            userPassPhrase = _context.getResources().getString(R.string.pref_default_user_passphrase);
+            userPassPhrase = "";
         }
 
-        return new LucaUser(userName, userPassPhrase);
-    }
-
-    public void SetUser(LucaUser user) {
-        if (user != null) {
-            _sharedPrefController.SaveStringValue(PREF_USER_NAME, user.GetName());
-            _sharedPrefController.SaveStringValue(PREF_USER_PASS_PHRASE, user.GetPassphrase());
-        } else {
-            Logger.getInstance().Error(TAG, "User may not be null! Cannot save!");
-        }
+        return new User(uuid, userName, userPassPhrase, true, ILucaClass.LucaServerDbAction.Null);
     }
 
     public String GetServerIp() {
-        String serverIp = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_IP);
-        if (serverIp == null || serverIp.length() == 0) {
-            serverIp = _context.getResources().getString(R.string.pref_default_ip);
-        }
-        return serverIp;
+        return _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_IP);
     }
 
     public String GetHomeSsid() {
-        String serverSsid = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_SSID);
-        if (serverSsid == null || serverSsid.length() == 0) {
-            serverSsid = _context.getResources().getString(R.string.pref_default_ssid);
-        }
-        return serverSsid;
+        return _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_SSID);
     }
 
     public String GetOpenWeatherCity() {
-        String openWeatherCity = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_OPEN_WEATHER_CITY);
-        if (openWeatherCity == null || openWeatherCity.length() == 0) {
-            openWeatherCity = _context.getResources().getString(R.string.pref_default_open_weather_city);
-        }
-        return openWeatherCity;
+        return _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_OPEN_WEATHER_CITY);
     }
 
     public boolean AreNotificationsEnabled() {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE);
     }
 
-    public boolean IsSocketNotificationEnabled() {
-        if (!AreNotificationsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_SOCKETS);
+    public boolean IsBirthdayNotificationEnabled() {
+        return AreNotificationsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_BIRTHDAY);
     }
 
-    public boolean IsBirthdayNotificationEnabled() {
-        if (!AreNotificationsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_BIRTHDAY);
+    public boolean IsCameraNotificationEnabled() {
+        return AreNotificationsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_CAMERA);
+    }
+
+    public boolean IsCoinsNotificationEnabled() {
+        return AreNotificationsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_COINS);
     }
 
     public boolean IsCurrentWeatherNotificationEnabled() {
-        if (!AreNotificationsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER);
+        return AreNotificationsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER);
     }
 
     public boolean IsForecastWeatherNotificationEnabled() {
-        if (!AreNotificationsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER);
+        return AreNotificationsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER);
     }
 
     public boolean IsTemperatureNotificationEnabled() {
-        if (!AreNotificationsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_TEMPERATURE);
+        return AreNotificationsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_TEMPERATURE);
+    }
+
+    public boolean IsWirelessSocketNotificationEnabled() {
+        return AreNotificationsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_WIRELESS_SOCKETS);
     }
 
     public boolean IsWirelessSocketVisible(@NonNull WirelessSocket wirelessSocket) {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(wirelessSocket.GetSettingsKey());
     }
 
+    public boolean IsWirelessSwitchNotificationEnabled() {
+        return AreNotificationsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_WIRELESS_SWITCHES);
+    }
+
     public boolean IsWirelessSwitchVisible(@NonNull WirelessSwitch wirelessSwitch) {
         return _sharedPrefController.LoadBooleanValueFromSharedPreferences(wirelessSwitch.GetSettingsKey());
-    }
-
-    public boolean IsCameraNotificationEnabled() {
-        if (!AreNotificationsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_CAMERA);
-    }
-
-    public boolean IsCoinsNotificationEnabled() {
-        if (!AreNotificationsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_COINS);
-    }
-
-    public boolean IsSwitchNotificationEnabled() {
-        if (!AreNotificationsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_NOTIFICATION_MESSAGE_SWITCHES);
     }
 
     public boolean IsChangeWeatherWallpaperActive() {
@@ -237,195 +189,139 @@ public class SettingsController {
     }
 
     public boolean IsReloadBirthdayEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_ENABLED);
     }
 
     public boolean IsReloadCoinEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_COIN_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_COIN_ENABLED);
+    }
+
+    public boolean IsReloadLucaSecurityEnabled() {
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_LUCA_SECURITY_ENABLED);
     }
 
     public boolean IsReloadMapContentEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MAPCONTENT_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MAP_CONTENT_ENABLED);
     }
 
     public boolean IsReloadMediaServerEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MEDIASERVER_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MEDIA_SERVER_ENABLED);
     }
 
-    public boolean IsReloadMenuEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MENU_ENABLED);
+    public boolean IsReloadMealEnabled() {
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MEAL_ENABLED);
     }
 
-    public boolean IsReloadMeterDataEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_METER_DATA_ENABLED);
+    public boolean IsReloadMeterLogEnabled() {
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_METER_LOG_ENABLED);
     }
 
-    public boolean IsReloadMoneyMeterDataEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MONEY_METER_DATA_ENABLED);
+    public boolean IsReloadMoneyLogEnabled() {
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MONEY_LOG_ENABLED);
     }
 
     public boolean IsReloadMovieEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MOVIE_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_MOVIE_ENABLED);
     }
 
     public boolean IsReloadPuckJsEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_PUCKJS_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_PUCK_JS_ENABLED);
     }
 
-    public boolean IsReloadScheduleEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_SCHEDULE_ENABLED);
-    }
-
-    public boolean IsReloadSecurityEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_SECURITY_ENABLED);
+    public boolean IsReloadRoomEnabled() {
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_ROOM_ENABLED);
     }
 
     public boolean IsReloadShoppingEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_SHOPPING_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_SHOPPING_ENABLED);
     }
 
     public boolean IsReloadTemperatureEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_TEMPERATURE_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_TEMPERATURE_ENABLED);
     }
 
     public boolean IsReloadWeatherEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WEATHER_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WEATHER_ENABLED);
+    }
+
+    public boolean IsReloadWirelessScheduleEnabled() {
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WIRELESS_SCHEDULE_ENABLED);
     }
 
     public boolean IsReloadWirelessSocketEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WIRELESS_SOCKET_ENABLED);
     }
 
     public boolean IsReloadWirelessSwitchEnabled() {
-        if (!AreReloadsEnabled()) {
-            return false;
-        }
-        return _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WIRELESSSWITCH_ENABLED);
+        return AreReloadsEnabled() && _sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_RELOAD_WIRELESS_SWITCH_ENABLED);
     }
 
     public int GetReloadBirthdayTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_BIRTHDAY_TIMEOUT);
     }
 
     public int GetReloadCoinTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_COIN_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_COIN_TIMEOUT);
+    }
+
+    public int GetReloadLucaSecurityTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_LUCA_SECURITY_TIMEOUT);
     }
 
     public int GetReloadMapContentTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MAPCONTENT_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MAP_CONTENT_TIMEOUT);
     }
 
     public int GetReloadMediaServerTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MEDIASERVER_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MEDIA_SERVER_TIMEOUT);
     }
 
-    public int GetReloadMenuTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MENU_TIMEOUT);
-        return Integer.parseInt(stringValue);
+    public int GetReloadMealTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MEAL_TIMEOUT);
     }
 
-    public int GetReloadMeterDataTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_METER_DATA_TIMEOUT);
-        return Integer.parseInt(stringValue);
+    public int GetReloadMeterLogTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_METER_LOG_TIMEOUT);
     }
 
-    public int GetReloadMoneyMeterDataTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MONEY_METER_DATA_TIMEOUT);
-        return Integer.parseInt(stringValue);
+    public int GetReloadMoneyLogTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MONEY_LOG_TIMEOUT);
     }
 
     public int GetReloadMovieTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_MOVIE_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_MOVIE_TIMEOUT);
     }
 
     public int GetReloadPuckJsTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_PUCKJS_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_PUCK_JS_TIMEOUT);
     }
 
-    public int GetReloadScheduleTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_SCHEDULE_TIMEOUT);
-        return Integer.parseInt(stringValue);
-    }
-
-    public int GetReloadSecurityTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_SECURITY_TIMEOUT);
-        return Integer.parseInt(stringValue);
+    public int GetReloadRoomTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_ROOM_TIMEOUT);
     }
 
     public int GetReloadShoppingTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_SHOPPING_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_SHOPPING_TIMEOUT);
     }
 
     public int GetReloadTemperatureTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_TEMPERATURE_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_TEMPERATURE_TIMEOUT);
     }
 
     public int GetReloadWeatherTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WEATHER_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_WEATHER_TIMEOUT);
+    }
+
+    public int GetReloadWirelessScheduleTimeout() {
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_WIRELESS_SCHEDULE_TIMEOUT);
     }
 
     public int GetReloadWirelessSocketTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_WIRELESS_SOCKET_TIMEOUT);
     }
 
     public int GetReloadWirelessSwitchTimeout() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_RELOAD_WIRELESS_SWITCH_TIMEOUT);
     }
 
     public boolean HandleBluetoothAutomatically() {
@@ -437,13 +333,11 @@ public class SettingsController {
     }
 
     public int GetTimeBetweenBeaconScansSec() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_BEACONS_TIME_BETWEEN_SCANS_SEC);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_BEACONS_TIME_BETWEEN_SCANS_SEC);
     }
 
     public int GetTimeBeaconScansMsec() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_BEACONS_TIME_SCANS_MSEC);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_BEACONS_TIME_SCANS_M_SEC);
     }
 
     public void SetCoinHoursTrend(int hours) {
@@ -451,107 +345,101 @@ public class SettingsController {
     }
 
     public int GetCoinHoursTrend() {
-        String stringValue = _sharedPrefController.LoadStringValueFromSharedPreferences(PREF_COIN_HOURS_TREND);
-        return Integer.parseInt(stringValue);
+        return _sharedPrefController.LoadIntegerValueFromSharedPreferences(PREF_COIN_HOURS_TREND);
     }
 
     private void install() {
-        installV5_2_0_180109();
-        installV5_2_1_180109();
+        installV6_0_0_180214();
     }
 
-    private void installV5_2_0_180109() {
-        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_SETTINGS_INSTALLED_V5_2_0_180109)) {
-            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Already installed preferences %s", PREF_SETTINGS_INSTALLED_V5_2_0_180109));
+    private void installV6_0_0_180214() {
+        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_SETTINGS_INSTALLED_V6_0_0_180214)) {
+            Logger.getInstance().Debug(Tag, String.format(Locale.getDefault(), "Already installed preferences %s", PREF_SETTINGS_INSTALLED_V6_0_0_180214));
             return;
         }
 
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Installing preferences %s", PREF_SETTINGS_INSTALLED_V5_2_0_180109));
+        Logger.getInstance().Debug(Tag, String.format(Locale.getDefault(), "Installing preferences %s", PREF_SETTINGS_INSTALLED_V6_0_0_180214));
 
-        _sharedPrefController.SaveStringValue(PREF_IP, _context.getResources().getString(R.string.pref_default_ip));
-        _sharedPrefController.SaveStringValue(PREF_SSID, _context.getResources().getString(R.string.pref_default_ssid));
+        _sharedPrefController.SaveStringValue(PREF_IP, "");
+        _sharedPrefController.SaveStringValue(PREF_SSID, "");
 
-        _sharedPrefController.SaveStringValue(PREF_OPEN_WEATHER_CITY, _context.getResources().getString(R.string.pref_default_open_weather_city));
+        _sharedPrefController.SaveStringValue(PREF_OPEN_WEATHER_CITY, "");
         _sharedPrefController.SaveBooleanValue(PREF_CHANGE_WEATHER_WALLPAPER, true);
 
+        _sharedPrefController.SaveStringValue(PREF_USER_UUID, "");
+        _sharedPrefController.SaveStringValue(PREF_USER_NAME, "");
+        _sharedPrefController.SaveStringValue(PREF_USER_PASS_PHRASE, "");
+
         _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE, true);
-        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_SOCKETS, true);
         _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_BIRTHDAY, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_CAMERA, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_COINS, false);
         _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_CURRENT_WEATHER, true);
         _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_FORECAST_WEATHER, true);
         _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_TEMPERATURE, true);
-        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_CAMERA, true);
-        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_COINS, false);
-        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_SWITCHES, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_WIRELESS_SOCKETS, true);
+        _sharedPrefController.SaveBooleanValue(PREF_NOTIFICATION_MESSAGE_WIRELESS_SWITCHES, true);
 
         _sharedPrefController.SaveBooleanValue(PREF_RELOAD_DATA_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_BIRTHDAY_TIMEOUT, "240");
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_BIRTHDAY_TIMEOUT, 240);
         _sharedPrefController.SaveBooleanValue(PREF_RELOAD_BIRTHDAY_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_COIN_TIMEOUT, "30");
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_COIN_TIMEOUT, 30);
         _sharedPrefController.SaveBooleanValue(PREF_RELOAD_COIN_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MAPCONTENT_TIMEOUT, "240");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MAPCONTENT_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_LUCA_SECURITY_TIMEOUT, 15);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_LUCA_SECURITY_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MEDIASERVER_TIMEOUT, "30");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MEDIASERVER_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_MAP_CONTENT_TIMEOUT, 240);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MAP_CONTENT_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MENU_TIMEOUT, "120");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MENU_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_MEDIA_SERVER_TIMEOUT, 30);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MEDIA_SERVER_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_METER_DATA_TIMEOUT, "240");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_METER_DATA_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_MEAL_TIMEOUT, 120);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MEAL_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MONEY_METER_DATA_TIMEOUT, "240");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MONEY_METER_DATA_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_METER_LOG_TIMEOUT, 240);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_METER_LOG_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_MOVIE_TIMEOUT, "60");
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_MONEY_LOG_TIMEOUT, 240);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MONEY_LOG_ENABLED, true);
+
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_MOVIE_TIMEOUT, 60);
         _sharedPrefController.SaveBooleanValue(PREF_RELOAD_MOVIE_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_PUCKJS_TIMEOUT, "60");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_PUCKJS_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_PUCK_JS_TIMEOUT, 60);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_PUCK_JS_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_SCHEDULE_TIMEOUT, "60");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_SCHEDULE_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_ROOM_TIMEOUT, 120);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_ROOM_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_SECURITY_TIMEOUT, "15");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_SECURITY_ENABLED, true);
-
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_SHOPPING_TIMEOUT, "60");
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_SHOPPING_TIMEOUT, 60);
         _sharedPrefController.SaveBooleanValue(PREF_RELOAD_SHOPPING_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_TEMPERATURE_TIMEOUT, "15");
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_TEMPERATURE_TIMEOUT, 15);
         _sharedPrefController.SaveBooleanValue(PREF_RELOAD_TEMPERATURE_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_WEATHER_TIMEOUT, "5");
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_WEATHER_TIMEOUT, 5);
         _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WEATHER_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSOCKET_TIMEOUT, "15");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WIRELESSSOCKET_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_WIRELESS_SCHEDULE_TIMEOUT, 60);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WIRELESS_SCHEDULE_ENABLED, true);
 
-        _sharedPrefController.SaveStringValue(PREF_RELOAD_WIRELESSSWITCH_TIMEOUT, "15");
-        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WIRELESSSWITCH_ENABLED, true);
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_WIRELESS_SOCKET_TIMEOUT, 15);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WIRELESS_SOCKET_ENABLED, true);
+
+        _sharedPrefController.SaveIntegerValue(PREF_RELOAD_WIRELESS_SWITCH_TIMEOUT, 15);
+        _sharedPrefController.SaveBooleanValue(PREF_RELOAD_WIRELESS_SWITCH_ENABLED, true);
 
         _sharedPrefController.SaveBooleanValue(PREF_HANDLE_BLUETOOTH_AUTOMATICALLY, false);
         _sharedPrefController.SaveBooleanValue(PREF_BEACONS_SCAN_ENABLED, false);
-        _sharedPrefController.SaveStringValue(PREF_BEACONS_TIME_BETWEEN_SCANS_SEC, "15");
-        _sharedPrefController.SaveStringValue(PREF_BEACONS_TIME_SCANS_MSEC, "30000");
+        _sharedPrefController.SaveIntegerValue(PREF_BEACONS_TIME_BETWEEN_SCANS_SEC, 15);
+        _sharedPrefController.SaveIntegerValue(PREF_BEACONS_TIME_SCANS_M_SEC, 30000);
 
-        _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED_V5_2_0_180109, true);
-    }
+        _sharedPrefController.SaveIntegerValue(PREF_COIN_HOURS_TREND, 24);
 
-    private void installV5_2_1_180109() {
-        if (_sharedPrefController.LoadBooleanValueFromSharedPreferences(PREF_SETTINGS_INSTALLED_V5_2_1_180109)) {
-            Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Already installed preferences %s", PREF_SETTINGS_INSTALLED_V5_2_1_180109));
-            return;
-        }
-
-        Logger.getInstance().Debug(TAG, String.format(Locale.getDefault(), "Installing preferences %s", PREF_SETTINGS_INSTALLED_V5_2_1_180109));
-
-        _sharedPrefController.SaveStringValue(PREF_COIN_HOURS_TREND, "24");
-
-        _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED_V5_2_1_180109, true);
+        _sharedPrefController.SaveBooleanValue(PREF_SETTINGS_INSTALLED_V6_0_0_180214, true);
     }
 }

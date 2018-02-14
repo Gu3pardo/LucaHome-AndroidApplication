@@ -1,3 +1,34 @@
 <resources>
-    <string name="app_name">Common</string>
+    <string name="application_name">LucaHome</string>
+    <string name="app_name">Library Common</string>
+    <string name="listener_notification_service">LucaHome Listener Notification Service</string>
+
+    <string name="example">This is an example</string>
+    <string name="imageDescription">This is an image</string>
+
+    <string name="select_youtube_video">Select youtube video</string>
+    <string name="play_video_on_all_media_server">Play on all media server</string>
+
+    <string name="close">Close</string>
+
+    <string name="notification_camera_active">Camera is active</string>
+    <string name="notification_action_go_to_security">Go to security</string>
+    <string name="notification_action_all_wireless_sockets_off">Disable all wireless sockets</string>
+    <string name="notification_action_all_wireless_switches_off">Disable all wireless switches</string>
+
+    <string name="pref_default_user_name">Dummy</string>
+    <string name="pref_default_user_passphrase">Dummy</string>
+    <string name="pref_default_ssid">GuepardoHome</string>
+    <string name="pref_default_ip">192.168.178.25</string>
+    <string name="pref_default_open_weather_city">Nuremberg</string>
+
+    <string name="action">Action</string>
+    <string name="requirement">Requirement</string>
+    <string name="requirement_light_edit_hint_value">Enter a value</string>
+    <string name="requirement_light_edit_hint_tolerance">Enter tolerance in %</string>
+    <string name="requirement_network_edit_hint_ssid">Enter a SSID</string>
+
+    <string name="enabled">Enabled</string>
+    <string name="disabled">Disabled</string>
+    <string name="toggle">Toggle</string>
 </resources>
