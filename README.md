@@ -1,6 +1,6 @@
 # LucaHome-AndroidApplication
 
-##Mobile
+## Mobile
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 <a target="_blank" href="https://android-arsenal.com/api?level=24" title="API24+"><img src="https://img.shields.io/badge/API-24+-blue.svg" /></a>
@@ -41,7 +41,7 @@ Receive commands by a client application (LucaHome-AndroidApplication/Mobile)
 - e.g. to display new videos, update rss feed, display websites, display custom text, ...
 __________
 
-##TV
+## TV
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 <a target="_blank" href="https://android-arsenal.com/api?level=24" title="API24+"><img src="https://img.shields.io/badge/API-24+-blue.svg" /></a>
@@ -54,7 +54,7 @@ __________
 Android application to start LucaHome on Android TV...
 __________
 
-##Wear
+## Wear
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 <a target="_blank" href="https://android-arsenal.com/api?level=24" title="API24+"><img src="https://img.shields.io/badge/API-24+-blue.svg" /></a>
@@ -67,7 +67,7 @@ __________
 To bring LucaHome back to an android wearable (Watch)
 __________
 
-##Bixby
+## Bixby
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 <a target="_blank" href="https://android-arsenal.com/api?level=24" title="API24+"><img src="https://img.shields.io/badge/API-24+-blue.svg" /></a>
@@ -80,7 +80,7 @@ __________
 Shared module to use the bixby button on a S8.  E.g. toggling wireless sockets or switches by simply pressing the bixby button.
 __________
 
-##VoiceRecognition
+## VoiceRecognition
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 <a target="_blank" href="https://android-arsenal.com/api?level=24" title="API24+"><img src="https://img.shields.io/badge/API-24+-blue.svg" /></a>
