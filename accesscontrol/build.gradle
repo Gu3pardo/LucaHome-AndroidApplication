@@ -1,0 +1,47 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
+    defaultConfig {
+        applicationId "guepardoapps.lucahome.accesscontrol"
+        minSdkVersion 24
+        targetSdkVersion 27
+        versionCode 10000
+        versionName "1.0.0.180215"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testOptions {
+            unitTests.returnDefaultValues = true
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    aaptOptions {
+        cruncherEnabled = false
+    }
+}
+
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
+    google()
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':common')
+    implementation 'com.android.support:multidex:1.0.2'
+    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.github.GrenderG:Toasty:1.2.5'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}

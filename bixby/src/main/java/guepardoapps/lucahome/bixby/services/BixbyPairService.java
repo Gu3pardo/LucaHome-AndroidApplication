@@ -27,6 +27,7 @@ import guepardoapps.lucahome.bixby.databases.DatabaseBixbyRequirementList;
 import guepardoapps.lucahome.common.classes.ILucaClass;
 import guepardoapps.lucahome.common.classes.Position;
 import guepardoapps.lucahome.common.classes.PuckJs;
+import guepardoapps.lucahome.common.classes.Room;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.controller.BroadcastController;
@@ -34,6 +35,7 @@ import guepardoapps.lucahome.common.controller.NetworkController;
 import guepardoapps.lucahome.common.controller.ReceiverController;
 import guepardoapps.lucahome.common.controller.UserInformationController;
 import guepardoapps.lucahome.common.services.PositioningService;
+import guepardoapps.lucahome.common.services.RoomService;
 import guepardoapps.lucahome.common.services.WirelessSocketService;
 import guepardoapps.lucahome.common.services.WirelessSwitchService;
 import guepardoapps.lucahome.common.utils.Logger;
@@ -59,7 +61,7 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
     private boolean _isInitialized;
 
     // TODO should be used directly and not asynchron...
-    private Position _lastReceivedPosition = new Position(new PuckJs(UUID.randomUUID(), "", "", "", false, ILucaClass.LucaServerDbAction.Null), -1);
+    private Position _lastReceivedPosition = new Position(new PuckJs(UUID.randomUUID(), UUID.randomUUID(), "", "", false, ILucaClass.LucaServerDbAction.Null), -1);
     private BroadcastReceiver _positionUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -345,7 +347,8 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
     }
 
     private boolean validatePositionRequirement(@NonNull String puckJsPosition) throws Exception {
-        return _lastReceivedPosition != null && puckJsPosition.contains(_lastReceivedPosition.GetPuckJs().GetArea());
+        Room room = RoomService.getInstance().GetByUuid(_lastReceivedPosition.GetPuckJs().GetRoomUuid());
+        return _lastReceivedPosition != null && puckJsPosition.contains(room.GetName());
     }
 
     private boolean validateLightRequirement(@NonNull LightRequirement lightRequirement) throws Exception {

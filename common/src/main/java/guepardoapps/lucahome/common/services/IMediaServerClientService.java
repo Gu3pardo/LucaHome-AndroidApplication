@@ -25,9 +25,6 @@ public interface IMediaServerClientService extends ILucaService<MediaServer> {
     String MediaServerSleepTimerDataBundle = "MediaServerSleepTimerDataBundle";
     String MediaServerYoutubeDataBundle = "MediaServerYoutubeDataBundle";
 
-    String CommandSplitChar = "&&";
-    String ResponseSplitChar = "###";
-
     int IndexCommandAction = 0;
     int IndexCommandData = 1;
     int CommandDataSize = 2;

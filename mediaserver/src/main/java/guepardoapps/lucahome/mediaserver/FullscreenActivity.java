@@ -37,7 +37,7 @@ public class FullscreenActivity extends YouTubeBaseActivity {
             Manifest.permission.READ_CONTACTS,
             Manifest.permission.WRITE_SETTINGS};
 
-    private IViewController _birthdayViewController;
+    /*private IViewController _birthdayViewController;
     private IViewController _bottomButtonViewController;
     private IViewController _bottomInfoViewController;
     private IViewController _calendarViewController;
@@ -46,7 +46,7 @@ public class FullscreenActivity extends YouTubeBaseActivity {
 
     private CenterViewController _centerViewController;
     private RaspberryViewController _raspberryViewController;
-    private RssViewController _rssViewController;
+    private RssViewController _rssViewController;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +73,7 @@ public class FullscreenActivity extends YouTubeBaseActivity {
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-        _birthdayViewController = new BirthdayViewController(this);
+        /*_birthdayViewController = new BirthdayViewController(this);
         _bottomButtonViewController = new BottomButtonViewController(this);
         _bottomInfoViewController = new BottomInfoViewController(this);
         _calendarViewController = new CalendarViewController(this);
@@ -93,9 +93,9 @@ public class FullscreenActivity extends YouTubeBaseActivity {
         _dateTimeViewController.onCreate();
         _raspberryViewController.onCreate();
         _rssViewController.onCreate();
-        _weatherViewController.onCreate();
+        _weatherViewController.onCreate();*/
     }
-
+/*
     @Override
     protected void onStart() {
         super.onStart();
@@ -156,7 +156,7 @@ public class FullscreenActivity extends YouTubeBaseActivity {
         _raspberryViewController.onDestroy();
         _rssViewController.onDestroy();
         _weatherViewController.onDestroy();
-    }
+    }*/
 
     @Override
     public void onRequestPermissionsResult(int callbackId, @NonNull String permissions[], @NonNull int[] grantResults) {
@@ -167,9 +167,9 @@ public class FullscreenActivity extends YouTubeBaseActivity {
         }
     }
 
-    public void ShowTemperatureGraph(View view) {
+    /*public void ShowTemperatureGraph(View view) {
         _raspberryViewController.ShowTemperatureGraph(view);
-    }
+    }*/
 
     private void startServices() {
         startService(new Intent(this, MainService.class));

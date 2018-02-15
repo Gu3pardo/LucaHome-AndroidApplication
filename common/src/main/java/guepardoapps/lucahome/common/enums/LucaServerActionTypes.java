@@ -127,7 +127,12 @@ public enum LucaServerActionTypes implements Serializable {
     VALIDATE_USER(170, "validateuser"),
     ADD_USER(171, "adduser&uuid="),
     UPDATE_USER(172, "updateuser&uuid="),
-    DELETE_USER(173, "deleteuser&uuid=");
+    DELETE_USER(173, "deleteuser&uuid="),
+
+    START_ACCESS_ALARM(190, "startaccessalarm"),
+    STOP_ACCESS_ALARM(191, "stopaccessalarm"),
+    SEND_ACCESS_CODE(192, "sendaccesscode&code="),
+    PLAY_ACCESS_ALARM(193, "playaccessalarm");
 
     private int _id;
     private String _action;

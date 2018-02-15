@@ -23,7 +23,6 @@ import guepardoapps.lucahome.common.controller.CommandController;
 import guepardoapps.lucahome.common.controller.DisplayController;
 import guepardoapps.lucahome.common.controller.MediaVolumeController;
 import guepardoapps.lucahome.common.controller.ReceiverController;
-import guepardoapps.lucahome.common.controller.UserInformationController;
 import guepardoapps.lucahome.common.controller.mediaserver.interfaces.ICenterViewController;
 import guepardoapps.lucahome.common.controller.mediaserver.interfaces.IRssViewController;
 import guepardoapps.lucahome.common.datatransferobjects.mediaserver.CenterViewDto;
@@ -45,29 +44,6 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
     private static final int CommandTimeoutMs = 3000;
     private static final int DefaultSleepTimerTimeoutMs = 15 * 60 * 1000;
 
-    public static final String BroadcastScreenNormal = "guepardoapps.lucahome.common.server.handler.broadcast.screen.normal";
-    public static final String BroadcastScreenOn = "guepardoapps.lucahome.common.server.handler.broadcast.screen.on";
-    public static final String BroadcastScreenOff = "guepardoapps.lucahome.common.server.handler.broadcast.screen.off";
-
-    public static final String BroadcastVideoPlay = "guepardoapps.lucahome.common.server.handler.broadcast.video.play";
-    public static final String BroadcastVideoPause = "guepardoapps.lucahome.common.server.handler.broadcast.video.pause";
-    public static final String BroadcastVideoStop = "guepardoapps.lucahome.common.server.handler.broadcast.video.stop";
-
-    public static final String BroadcastVideoPosition = "guepardoapps.lucahome.common.server.handler.broadcast.video.position";
-    public static final String BundleVideoPosition = "BundleVideoPosition";
-
-    public static final String BroadcastRadioStreamStop = "guepardoapps.lucahome.common.server.handler.broadcast.radioStream.stop";
-
-    public static final String BroadcastShowCenterModel = "guepardoapps.lucahome.common.server.handler.broadcast.show.centerModel";
-    public static final String BundleShowCenterModel = "BundleShowCenterModel";
-
-    public static final String BroadcastRssFeedReset = "guepardoapps.lucahome.common.server.handler.broadcast.rssFeed.reset";
-
-    public static final String BroadcastRssFeedUpdate = "guepardoapps.lucahome.common.server.handler.broadcast.rssFeed.update";
-    public static final String BundleRssFeedUpdate = "BundleRssFeedUpdate";
-
-    public static final String BroadcastIpAddressUpdate = "guepardoapps.lucahome.common.server.handler.broadcast.ipAddress.update";
-
     private Context _context;
 
     private BroadcastController _broadcastController;
@@ -75,7 +51,6 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
     private DisplayController _displayController;
     private MediaVolumeController _mediaVolumeController;
     private ReceiverController _receiverController;
-    private UserInformationController _userInformationController;
 
     private ICenterViewController _iCenterViewController;
     private IRssViewController _iRssViewController;
@@ -111,7 +86,6 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
         _mediaVolumeController = MediaVolumeController.getInstance();
         _mediaVolumeController.Initialize(_context);
         _receiverController = new ReceiverController(_context);
-        _userInformationController = new UserInformationController(_context);
 
         _receiverController.RegisterReceiver(new BroadcastReceiver() {
             @Override
@@ -241,7 +215,7 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
     }
 
     private MediaServerActionType convertCommandToAction(@NonNull String communication) {
-        String[] entries = communication.split(IMediaServerClientService.CommandSplitChar);
+        String[] entries = communication.split(CommandSplitChar);
         if (entries.length == IMediaServerClientService.CommandDataSize) {
             String command = entries[IMediaServerClientService.IndexCommandAction];
             command = command.replace("COMMAND:", "");
@@ -253,7 +227,7 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
     }
 
     private String convertCommandToData(@NonNull String communication) {
-        String[] entries = communication.split(IMediaServerClientService.CommandSplitChar);
+        String[] entries = communication.split(CommandSplitChar);
         if (entries.length == IMediaServerClientService.CommandDataSize) {
             String data = entries[IMediaServerClientService.IndexCommandData];
             data = data.replace("DATA:", "");
@@ -742,15 +716,15 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
 
     private String successResponse(@NonNull MediaServerActionType mediaServerAction, @NonNull String data) {
         return String.format(Locale.getDefault(), "OK%sCommand performed%s%s%s%s",
-                IMediaServerClientService.ResponseSplitChar,
-                IMediaServerClientService.ResponseSplitChar, mediaServerAction.toString(),
-                IMediaServerClientService.ResponseSplitChar, data);
+                ResponseSplitChar,
+                ResponseSplitChar, mediaServerAction.toString(),
+                ResponseSplitChar, data);
     }
 
     private String errorResponse(@NonNull String errorMessage, @NonNull MediaServerActionType mediaServerAction) {
         return String.format(Locale.getDefault(), "Error%s%s%s%s%s%s",
-                IMediaServerClientService.ResponseSplitChar, errorMessage,
-                IMediaServerClientService.ResponseSplitChar, mediaServerAction.toString(),
-                IMediaServerClientService.ResponseSplitChar, "-");
+                ResponseSplitChar, errorMessage,
+                ResponseSplitChar, mediaServerAction.toString(),
+                ResponseSplitChar, "-");
     }
 }

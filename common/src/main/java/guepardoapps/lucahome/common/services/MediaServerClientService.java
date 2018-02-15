@@ -36,6 +36,9 @@ import guepardoapps.lucahome.common.tasks.mediaserver.MediaServerClientTask;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.Tools;
 
+import static guepardoapps.lucahome.common.server.handler.IDataHandler.CommandSplitChar;
+import static guepardoapps.lucahome.common.server.handler.IDataHandler.ResponseSplitChar;
+
 @SuppressWarnings({"WeakerAccess"})
 public class MediaServerClientService implements IMediaServerClientService {
     private static final String Tag = MediaServerClientService.class.getSimpleName();

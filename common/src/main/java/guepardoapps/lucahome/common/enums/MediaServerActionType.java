@@ -50,7 +50,10 @@ public enum MediaServerActionType implements Serializable {
     GET_YOUTUBE_DATA(104, "GET_YOUTUBE_DATA", 1),
 
     SYSTEM_REBOOT(200, "SYSTEM_REBOOT", 5),
-    SYSTEM_SHUTDOWN(201, "SYSTEM_SHUTDOWN", 5);
+    SYSTEM_SHUTDOWN(201, "SYSTEM_SHUTDOWN", 5),
+
+    PLAY_ACCESS_ALARM(210, "Play_Access_Alarm", 4),
+    STOP_ACCESS_ALARM(211, "Stop_Access_Alarm", 4);
 
     private int _id;
     private String _action;
