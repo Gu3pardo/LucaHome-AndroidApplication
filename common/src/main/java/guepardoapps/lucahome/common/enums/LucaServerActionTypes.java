@@ -129,10 +129,29 @@ public enum LucaServerActionTypes implements Serializable {
     UPDATE_USER(172, "updateuser&uuid="),
     DELETE_USER(173, "deleteuser&uuid="),
 
+    // ACCESS
     START_ACCESS_ALARM(190, "startaccessalarm"),
     STOP_ACCESS_ALARM(191, "stopaccessalarm"),
     SEND_ACCESS_CODE(192, "sendaccesscode&code="),
-    PLAY_ACCESS_ALARM(193, "playaccessalarm");
+    PLAY_ACCESS_ALARM(193, "playaccessalarm"),
+
+    // RADIO STREAM
+    GET_RADIO_STREAMS(200, "getradiostreams"),
+    ADD_RADIO_STREAM(201, "addradiostream&uuid="),
+    UPDATE_RADIO_STREAM(202, "updateradiostream&uuid="),
+    DELETE_RADIO_STREAM(203, "deleteradiostream&uuid="),
+
+    // RSS FEED
+    GET_RSS_FEEDS(210, "getrssfeeds"),
+    ADD_RSS_FEED(211, "addrssfeed&uuid="),
+    UPDATE_RSS_FEED(212, "updaterssfeed&uuid="),
+    DELETE_RSS_FEED(213, "deleterssfeed&uuid="),
+
+    // YOUTUBE VIDEO
+    GET_YOUTUBE_VIDEOS(220, "getyoutubevideos"),
+    ADD_YOUTUBE_VIDEO(221, "addyoutubevideo&uuid="),
+    UPDATE_YOUTUBE_VIDEO(222, "updateyoutubevideo&uuid="),
+    DELETE_YOUTUBE_VIDEO(223, "deleteyoutubevideo&uuid=");
 
     private int _id;
     private String _action;

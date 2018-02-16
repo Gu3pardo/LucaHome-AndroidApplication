@@ -1,8 +1,8 @@
 package guepardoapps.lucahome.common.controller.mediaserver.interfaces;
 
-import guepardoapps.lucahome.common.enums.RSSFeedType;
+import guepardoapps.lucahome.common.classes.RssFeed;
 
 public interface IRssViewController {
-    RSSFeedType GetCurrentRssFeed();
+    RssFeed GetCurrentRssFeed();
 }
 

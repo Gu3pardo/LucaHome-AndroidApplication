@@ -22,6 +22,7 @@ import org.jsoup.nodes.Document;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.adapter.YoutubeVideoListAdapter;
@@ -107,7 +108,7 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> im
                             String mediumUrl = mediumThumbnails.getString("url");
 
                             if (videoId != null && title != null && description != null) {
-                                YoutubeVideo youtubeVideoData = new YoutubeVideo(videoId, title, description, mediumUrl);
+                                YoutubeVideo youtubeVideoData = new YoutubeVideo(UUID.randomUUID(), title, videoId, 0, description, mediumUrl);
                                 youtubeVideoDataList.add(youtubeVideoData);
                             } else {
                                 Logger.getInstance().Warning(Tag, "Error in parsing data!");

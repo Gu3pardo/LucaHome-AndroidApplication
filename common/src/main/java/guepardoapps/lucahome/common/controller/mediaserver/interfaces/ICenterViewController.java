@@ -2,8 +2,8 @@ package guepardoapps.lucahome.common.controller.mediaserver.interfaces;
 
 import java.util.ArrayList;
 
-import guepardoapps.lucahome.common.classes.mediaserver.PlayedYoutubeVideo;
-import guepardoapps.lucahome.common.enums.RadioStreamType;
+import guepardoapps.lucahome.common.classes.RadioStream;
+import guepardoapps.lucahome.common.classes.YoutubeVideo;
 import guepardoapps.lucahome.common.enums.YoutubeIdType;
 
 public interface ICenterViewController {
@@ -11,7 +11,7 @@ public interface ICenterViewController {
 
     boolean IsRadioStreamPlaying();
 
-    RadioStreamType GetRadioStream();
+    RadioStream GetRadioStream();
 
     boolean IsYoutubePlaying();
 
@@ -21,5 +21,5 @@ public interface ICenterViewController {
 
     int GetYoutubeDuration();
 
-    ArrayList<PlayedYoutubeVideo> GetYoutubeIds();
+    ArrayList<YoutubeVideo> GetYoutubeVideoList();
 }

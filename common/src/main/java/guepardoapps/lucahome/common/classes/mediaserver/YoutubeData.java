@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import guepardoapps.lucahome.common.classes.YoutubeVideo;
 import guepardoapps.lucahome.common.utils.Logger;
 
 @SuppressWarnings({"WeakerAccess"})
@@ -17,19 +18,19 @@ public class YoutubeData implements IMediaServerClass {
     private String _currentYoutubeId;
     private int _currentYoutubeVideoPosition;
     private int _currentYoutubeVideoDuration;
-    private ArrayList<PlayedYoutubeVideo> _playedYoutubeVideos;
+    private ArrayList<YoutubeVideo> _youtubeVideoList;
 
     public YoutubeData(
             boolean isYoutubePlaying,
             @NonNull String currentYoutubeId,
             int currentYoutubeVideoPosition,
             int currentYoutubeVideoDuration,
-            @NonNull ArrayList<PlayedYoutubeVideo> playedYoutubeVideos) {
+            @NonNull ArrayList<YoutubeVideo> youtubeVideoList) {
         _isYoutubePlaying = isYoutubePlaying;
         _currentYoutubeId = currentYoutubeId;
         _currentYoutubeVideoPosition = currentYoutubeVideoPosition;
         _currentYoutubeVideoDuration = currentYoutubeVideoDuration;
-        _playedYoutubeVideos = playedYoutubeVideos;
+        _youtubeVideoList = youtubeVideoList;
     }
 
     public YoutubeData() {
@@ -52,8 +53,8 @@ public class YoutubeData implements IMediaServerClass {
         return _currentYoutubeVideoDuration;
     }
 
-    public ArrayList<PlayedYoutubeVideo> GetPlayedYoutubeVideos() {
-        return _playedYoutubeVideos;
+    public ArrayList<YoutubeVideo> GetYoutubeVideoList() {
+        return _youtubeVideoList;
     }
 
     @Override
@@ -73,13 +74,13 @@ public class YoutubeData implements IMediaServerClass {
         _currentYoutubeId = tmpYoutubeData.GetCurrentYoutubeId();
         _currentYoutubeVideoPosition = tmpYoutubeData.GetCurrentYoutubeVideoPosition();
         _currentYoutubeVideoDuration = tmpYoutubeData.GetCurrentYoutubeVideoDuration();
-        _playedYoutubeVideos = tmpYoutubeData.GetPlayedYoutubeVideos();
+        _youtubeVideoList = tmpYoutubeData.GetYoutubeVideoList();
     }
 
     @Override
     public String toString() {
         return String.format(Locale.getDefault(),
-                "{\"Class\":\"%s\",\"IsYoutubePlaying\":\"%s\",\"CurrentYoutubeId\":\"%s\",\"CurrentYoutubeVideoPosition\":%d,\"CurrentYoutubeVideoDuration\":%d,\"PlayedYoutubeVideos\":\"%s\"}",
-                Tag, _isYoutubePlaying, _currentYoutubeId, _currentYoutubeVideoPosition, _currentYoutubeVideoDuration, _playedYoutubeVideos);
+                "{\"Class\":\"%s\",\"IsYoutubePlaying\":\"%s\",\"CurrentYoutubeId\":\"%s\",\"CurrentYoutubeVideoPosition\":%d,\"CurrentYoutubeVideoDuration\":%d,\"YoutubeVideoList\":\"%s\"}",
+                Tag, _isYoutubePlaying, _currentYoutubeId, _currentYoutubeVideoPosition, _currentYoutubeVideoDuration, _youtubeVideoList);
     }
 }

@@ -6,7 +6,7 @@ import com.google.gson.Gson;
 
 import java.util.Locale;
 
-import guepardoapps.lucahome.common.enums.RSSFeedType;
+import guepardoapps.lucahome.common.classes.RssFeed;
 import guepardoapps.lucahome.common.utils.Logger;
 
 @SuppressWarnings({"WeakerAccess"})
@@ -15,7 +15,7 @@ public class InformationData implements IMediaServerClass {
 
     private String _serverVersion;
     private String _centerText;
-    private RSSFeedType _currentRssFeed;
+    private RssFeed _currentRssFeed;
     private int _currentVolume;
     private int _currentBatteryLevel;
     private int _currentScreenBrightness;
@@ -23,7 +23,7 @@ public class InformationData implements IMediaServerClass {
     public InformationData(
             @NonNull String serverVersion,
             @NonNull String centerText,
-            @NonNull RSSFeedType currentRssFeed,
+            @NonNull RssFeed currentRssFeed,
             int currentVolume,
             int currentBatteryLevel,
             int currentScreenBrightness) {
@@ -36,7 +36,7 @@ public class InformationData implements IMediaServerClass {
     }
 
     public InformationData() {
-        this("", "", RSSFeedType.SPEKTRUM_DER_WISSENSCHAFT, -1, -1, -1);
+        this("", "", new RssFeed(), -1, -1, -1);
     }
 
     public String GetServerVersion() {
@@ -47,7 +47,7 @@ public class InformationData implements IMediaServerClass {
         return _centerText;
     }
 
-    public RSSFeedType GetRSSFeed() {
+    public RssFeed GetRSSFeed() {
         return _currentRssFeed;
     }
 

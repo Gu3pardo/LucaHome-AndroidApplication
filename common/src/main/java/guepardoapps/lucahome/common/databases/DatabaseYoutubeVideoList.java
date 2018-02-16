@@ -11,15 +11,18 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import guepardoapps.lucahome.common.classes.mediaserver.PlayedYoutubeVideo;
+import guepardoapps.lucahome.common.classes.ILucaClass;
+import guepardoapps.lucahome.common.classes.YoutubeVideo;
 
 @SuppressWarnings({"WeakerAccess"})
-public class DatabasePlayedYoutubeVideoList implements IDatabaseLucaClassList<PlayedYoutubeVideo> {
+public class DatabaseYoutubeVideoList implements IDatabaseLucaClassList<YoutubeVideo> {
     public static final String KeyYoutubeId = "_youtubeId";
     public static final String KeyTitle = "_title";
     public static final String KeyPlayCount = "_playCount";
+    public static final String KeyDescription = "_description";
+    public static final String KeyMediumImageUrl = "_mediumImageUrl";
 
-    private static final String DatabaseTable = "DatabasePlayedYoutubeVideoListTable";
+    private static final String DatabaseTable = "DatabaseYoutubeVideoListTable";
 
     private DatabaseHelper _databaseHelper;
     private final Context _context;
@@ -38,7 +41,11 @@ public class DatabasePlayedYoutubeVideoList implements IDatabaseLucaClassList<Pl
                     + KeyUuid + " TEXT NOT NULL, "
                     + KeyYoutubeId + " TEXT NOT NULL, "
                     + KeyTitle + " TEXT NOT NULL, "
-                    + KeyPlayCount + " INTEGER); ");
+                    + KeyPlayCount + " INTEGER, "
+                    + KeyDescription + " TEXT NOT NULL, "
+                    + KeyMediumImageUrl + " TEXT NOT NULL, "
+                    + KeyIsOnServer + " INTEGER, "
+                    + KeyServerAction + " INTEGER); ");
         }
 
         @Override
@@ -48,12 +55,12 @@ public class DatabasePlayedYoutubeVideoList implements IDatabaseLucaClassList<Pl
         }
     }
 
-    public DatabasePlayedYoutubeVideoList(@NonNull Context context) {
+    public DatabaseYoutubeVideoList(@NonNull Context context) {
         _context = context;
     }
 
     @Override
-    public DatabasePlayedYoutubeVideoList Open() throws SQLException {
+    public DatabaseYoutubeVideoList Open() throws SQLException {
         _databaseHelper = new DatabaseHelper(_context);
         _database = _databaseHelper.getWritableDatabase();
         return this;
@@ -65,30 +72,38 @@ public class DatabasePlayedYoutubeVideoList implements IDatabaseLucaClassList<Pl
     }
 
     @Override
-    public long AddEntry(@NonNull PlayedYoutubeVideo entry) {
+    public long AddEntry(@NonNull YoutubeVideo entry) {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(KeyUuid, entry.GetUuid().toString());
         contentValues.put(KeyYoutubeId, entry.GetYoutubeId());
         contentValues.put(KeyTitle, entry.GetTitle());
         contentValues.put(KeyPlayCount, entry.GetPlayCount());
+        contentValues.put(KeyDescription, entry.GetDescription());
+        contentValues.put(KeyMediumImageUrl, entry.GetMediumImageUrl());
+        contentValues.put(KeyIsOnServer, (entry.GetIsOnServer() ? 1 : 0));
+        contentValues.put(KeyServerAction, entry.GetServerDbAction().ordinal());
 
         return _database.insert(DatabaseTable, null, contentValues);
     }
 
     @Override
-    public long UpdateEntry(@NonNull PlayedYoutubeVideo entry) throws SQLException {
+    public long UpdateEntry(@NonNull YoutubeVideo entry) throws SQLException {
         ContentValues contentValues = new ContentValues();
 
         contentValues.put(KeyYoutubeId, entry.GetYoutubeId());
         contentValues.put(KeyTitle, entry.GetTitle());
         contentValues.put(KeyPlayCount, entry.GetPlayCount());
+        contentValues.put(KeyDescription, entry.GetDescription());
+        contentValues.put(KeyMediumImageUrl, entry.GetMediumImageUrl());
+        contentValues.put(KeyIsOnServer, (entry.GetIsOnServer() ? 1 : 0));
+        contentValues.put(KeyServerAction, entry.GetServerDbAction().ordinal());
 
         return _database.update(DatabaseTable, contentValues, KeyUuid + "=" + entry.GetUuid().toString(), null);
     }
 
     @Override
-    public long DeleteEntry(@NonNull PlayedYoutubeVideo entry) throws SQLException {
+    public long DeleteEntry(@NonNull YoutubeVideo entry) throws SQLException {
         return _database.delete(DatabaseTable, KeyUuid + "=" + entry.GetUuid().toString(), null);
     }
 
@@ -98,30 +113,46 @@ public class DatabasePlayedYoutubeVideoList implements IDatabaseLucaClassList<Pl
     }
 
     @Override
-    public ArrayList<PlayedYoutubeVideo> GetList(String selection, String groupBy, String orderBy) throws SQLException {
+    public ArrayList<YoutubeVideo> GetList(String selection, String groupBy, String orderBy) throws SQLException {
         String[] columns = new String[]{
                 KeyUuid,
                 KeyYoutubeId,
                 KeyTitle,
-                KeyPlayCount};
+                KeyPlayCount,
+                KeyDescription,
+                KeyMediumImageUrl,
+                KeyIsOnServer,
+                KeyServerAction};
 
         Cursor cursor = _database.query(DatabaseTable, columns, selection, null, groupBy, null, orderBy);
-        ArrayList<PlayedYoutubeVideo> result = new ArrayList<>();
+        ArrayList<YoutubeVideo> result = new ArrayList<>();
 
         int uuidIndex = cursor.getColumnIndex(KeyUuid);
         int youtubeIdIndex = cursor.getColumnIndex(KeyYoutubeId);
         int titleIndex = cursor.getColumnIndex(KeyTitle);
         int playCountIndex = cursor.getColumnIndex(KeyPlayCount);
+        int descriptionIndex = cursor.getColumnIndex(KeyDescription);
+        int mediumImageUrlIndex = cursor.getColumnIndex(KeyMediumImageUrl);
+        int isOnServerIndex = cursor.getColumnIndex(KeyIsOnServer);
+        int serverActionIndex = cursor.getColumnIndex(KeyServerAction);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String uuidString = cursor.getString(uuidIndex);
             String youtubeId = cursor.getString(youtubeIdIndex);
             String title = cursor.getString(titleIndex);
             int playCount = cursor.getInt(playCountIndex);
+            String description = cursor.getString(descriptionIndex);
+            String mediumImageUrl = cursor.getString(mediumImageUrlIndex);
 
             UUID uuid = UUID.fromString(uuidString);
 
-            PlayedYoutubeVideo entry = new PlayedYoutubeVideo(uuid, youtubeId, title, playCount);
+            int isOnServerInteger = cursor.getInt(isOnServerIndex);
+            int serverActionInteger = cursor.getInt(serverActionIndex);
+
+            boolean isOnServer = isOnServerInteger == 1;
+            ILucaClass.LucaServerDbAction serverDbAction = ILucaClass.LucaServerDbAction.values()[serverActionInteger];
+
+            YoutubeVideo entry = new YoutubeVideo(uuid, youtubeId, title, playCount, description, mediumImageUrl, isOnServer, serverDbAction);
             result.add(entry);
         }
 

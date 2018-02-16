@@ -22,7 +22,7 @@ __________
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
-[![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/mediaserver)
+[![Build](https://img.shields.io/badge/build-WIP-red.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/mediaserver)
 [![Version](https://img.shields.io/badge/version-v6.0.0.180215-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/mediaserver)
 
 Android application permanently displaying data on a tablet (Nexus 7 2012 is planned!)

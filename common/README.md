@@ -6,6 +6,6 @@
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
 [![Build](https://img.shields.io/badge/build-notTested-orange.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/common)
-[![Version](https://img.shields.io/badge/version-v6.0.0.180215-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/common)
+[![Version](https://img.shields.io/badge/version-v6.0.0.180216-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/common)
 
 Shared module to reduce code overhead in all android projects of parent project LucaHome.

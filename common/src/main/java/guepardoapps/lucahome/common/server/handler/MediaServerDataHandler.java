@@ -14,6 +14,7 @@ import java.util.Locale;
 import es.dmoral.toasty.Toasty;
 
 import guepardoapps.library.openweather.service.OpenWeatherService;
+import guepardoapps.lucahome.common.classes.RssFeed;
 import guepardoapps.lucahome.common.classes.mediaserver.InformationData;
 import guepardoapps.lucahome.common.classes.mediaserver.RadioStreamData;
 import guepardoapps.lucahome.common.classes.mediaserver.SleepTimerData;
@@ -627,7 +628,7 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
 
         String serverVersion = "";
         String centerText = _iCenterViewController.GetCenterText();
-        RSSFeedType rssFeed = _iRssViewController.GetCurrentRssFeed();
+        RssFeed rssFeed = _iRssViewController.GetCurrentRssFeed();
         int currentVolume = _mediaVolumeController.GetVolume();
         int screenBrightness = _displayController.GetCurrentBrightness();
 
@@ -692,7 +693,7 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
                 _iCenterViewController.GetYoutubeId().GetYoutubeId(),
                 _iCenterViewController.GetCurrentPlayPosition(),
                 _iCenterViewController.GetYoutubeDuration(),
-                _iCenterViewController.GetYoutubeIds());
+                _iCenterViewController.GetYoutubeVideoList());
         return successResponse(mediaServerAction != null ? mediaServerAction : MediaServerActionType.GET_YOUTUBE_DATA, youtubeData.GetCommunicationString());
     }
 
