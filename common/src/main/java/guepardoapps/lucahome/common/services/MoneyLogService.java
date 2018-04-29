@@ -29,7 +29,7 @@ import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.Tools;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MoneyLogService implements IMoneyLogService {
     private static final String Tag = MoneyLogService.class.getSimpleName();
 

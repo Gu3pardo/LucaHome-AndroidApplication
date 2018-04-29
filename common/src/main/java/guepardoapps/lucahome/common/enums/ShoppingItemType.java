@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import guepardoapps.lucahome.common.R;
 
+@SuppressWarnings({"unused"})
 public enum ShoppingItemType implements Serializable {
 
     OTHER("Other", 0, R.drawable.shopping_other),
@@ -23,23 +24,23 @@ public enum ShoppingItemType implements Serializable {
     BATH_UTILITY("Bath_utility", 14, R.drawable.shopping_bath),
     LEISURE("Leisure", 15, R.drawable.shopping_leisure);
 
-    private String _string;
-    private int _int;
+    private String _title;
+    private int _id;
     private int _drawable;
 
-    ShoppingItemType(String stringValue, int intValue, int drawable) {
-        _string = stringValue;
-        _int = intValue;
+    ShoppingItemType(String title, int id, int drawable) {
+        _title = title;
+        _id = id;
         _drawable = drawable;
     }
 
     @Override
     public String toString() {
-        return _string;
+        return _title;
     }
 
-    public int GetInt() {
-        return _int;
+    public int GetId() {
+        return _id;
     }
 
     public int GetDrawable() {
@@ -48,16 +49,16 @@ public enum ShoppingItemType implements Serializable {
 
     public static ShoppingItemType GetById(int value) {
         for (ShoppingItemType item : values()) {
-            if (item._int == value) {
+            if (item._id == value) {
                 return item;
             }
         }
         return OTHER;
     }
 
-    public static ShoppingItemType GetByString(String value) {
+    public static ShoppingItemType GetByTitle(String value) {
         for (ShoppingItemType item : values()) {
-            if (item._string.contains(value)) {
+            if (item._title.contains(value)) {
                 return item;
             }
         }

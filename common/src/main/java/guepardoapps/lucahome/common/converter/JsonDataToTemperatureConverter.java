@@ -54,10 +54,27 @@ public final class JsonDataToTemperatureConverter implements IJsonDataConverter 
 
                 double temperatureValue = child.getDouble("Value");
 
+                int temperatureTypeInteger = child.getInt("TemperatureType");
+                Temperature.TemperatureType temperatureType = Temperature.TemperatureType.values()[temperatureTypeInteger];
+
+                JSONObject jsonDate = child.getJSONObject("Date");
+
+                int day = jsonDate.getInt("Day");
+                int month = jsonDate.getInt("Month");
+                int year = jsonDate.getInt("Year");
+
+                JSONObject jsonTime = child.getJSONObject("Time");
+
+                int hour = jsonTime.getInt("Hour");
+                int minute = jsonTime.getInt("Minute");
+
+                Calendar measureDateTime = Calendar.getInstance();
+                measureDateTime.set(year, month, day, hour, minute);
+
                 String sensorPath = child.getString("SensorPath");
                 String graphPath = child.getString("GraphPath");
 
-                Temperature temperature = new Temperature(uuid, roomUuid, temperatureValue, Calendar.getInstance(), sensorPath, Temperature.TemperatureType.Raspberry, graphPath);
+                Temperature temperature = new Temperature(uuid, roomUuid, temperatureValue, measureDateTime, temperatureType, sensorPath, graphPath);
                 list.add(temperature);
 
             } catch (JSONException jsonException) {

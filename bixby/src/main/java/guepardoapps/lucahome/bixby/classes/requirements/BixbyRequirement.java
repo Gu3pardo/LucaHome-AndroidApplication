@@ -2,11 +2,10 @@ package guepardoapps.lucahome.bixby.classes.requirements;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 @SuppressWarnings("WeakerAccess")
-public class BixbyRequirement implements IBixbyRequirement, Serializable {
+public class BixbyRequirement implements IBixbyRequirement {
     private static final String Tag = BixbyRequirement.class.getSimpleName();
 
     private int _id;

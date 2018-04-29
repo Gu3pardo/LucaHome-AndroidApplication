@@ -11,7 +11,7 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.utils.DrawableCreator;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Temperature implements ILucaClass {
     private static final String Tag = Temperature.class.getSimpleName();
 
@@ -30,8 +30,8 @@ public class Temperature implements ILucaClass {
     private UUID _roomUuid;
     private double _temperature;
     private Calendar _dateTime;
-    private String _sensorPath;
     private TemperatureType _temperatureType;
+    private String _sensorPath;
     private String _graphPath;
 
     public Temperature(
@@ -39,15 +39,15 @@ public class Temperature implements ILucaClass {
             @NonNull UUID roomUuid,
             double temperature,
             @NonNull Calendar dateTime,
-            @NonNull String sensorPath,
             @NonNull TemperatureType temperatureType,
+            @NonNull String sensorPath,
             @NonNull String graphPath) {
         _uuid = uuid;
         _roomUuid = roomUuid;
         _temperature = temperature;
         _dateTime = dateTime;
-        _sensorPath = sensorPath;
         _temperatureType = temperatureType;
+        _sensorPath = sensorPath;
         _graphPath = graphPath;
     }
 
@@ -81,12 +81,12 @@ public class Temperature implements ILucaClass {
         return _dateTime;
     }
 
-    public String GetSensorPath() {
-        return _sensorPath;
-    }
-
     public TemperatureType GetTemperatureType() {
         return _temperatureType;
+    }
+
+    public String GetSensorPath() {
+        return _sensorPath;
     }
 
     public String GetGraphPath() {
@@ -158,7 +158,7 @@ public class Temperature implements ILucaClass {
     @Override
     public String toString() {
         return String.format(Locale.getDefault(),
-                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"RoomUuid\":\"%s\",\"Temperature\":\"%s\",\"DateTime\":\"%s\",\"SensorPath\":\"%s\",\"TemperatureType\":\"%s\",\"GraphPath\":\"%s\"}",
-                Tag, _uuid, _roomUuid, GetTemperatureString(), _dateTime, _sensorPath, _temperatureType, _graphPath);
+                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"RoomUuid\":\"%s\",\"Temperature\":\"%s\",\"DateTime\":\"%s\",\"TemperatureType\":\"%s\",\"SensorPath\":\"%s\",\"GraphPath\":\"%s\"}",
+                Tag, _uuid, _roomUuid, GetTemperatureString(), _dateTime, _temperatureType, _sensorPath, _graphPath);
     }
 }

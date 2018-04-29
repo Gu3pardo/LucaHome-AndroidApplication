@@ -8,7 +8,7 @@ import java.util.UUID;
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.enums.ShoppingItemType;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SuggestedShoppingItem implements ILucaClass {
     private static final String Tag = SuggestedShoppingItem.class.getSimpleName();
 

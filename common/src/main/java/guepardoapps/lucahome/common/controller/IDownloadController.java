@@ -8,7 +8,6 @@ public interface IDownloadController {
     enum DownloadType implements Serializable {
         AccessAlarm,
         Birthday, BirthdayAdd, BirthdayUpdate, BirthdayDelete,
-        Change,
         Coin, CoinAdd, CoinUpdate, CoinDelete, CoinData,
         LucaSecurity, LucaSecurityCamera, LucaSecurityCameraControl,
         MapContent,

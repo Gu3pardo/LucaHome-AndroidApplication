@@ -9,7 +9,7 @@ import java.util.UUID;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WirelessSwitch extends WirelessSocket {
     private static final String Tag = WirelessSwitch.class.getSimpleName();
 

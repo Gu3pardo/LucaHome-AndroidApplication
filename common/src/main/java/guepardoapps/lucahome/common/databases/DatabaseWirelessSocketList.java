@@ -20,7 +20,7 @@ public class DatabaseWirelessSocketList implements IDatabaseLucaClassList<Wirele
     public static final String KeyRoomUuid = "_roomUuid";
     public static final String KeyName = "_name";
     public static final String KeyCode = "_code";
-    public static final String KeyIsActivated = "_isActivated";
+    public static final String KeyState = "_state";
     public static final String KeyLastTriggerDateTime = "_lastTriggerDateTime";
     public static final String KeyLastTriggerUser = "_lastTriggerUser";
 
@@ -44,7 +44,7 @@ public class DatabaseWirelessSocketList implements IDatabaseLucaClassList<Wirele
                     + KeyRoomUuid + " TEXT NOT NULL, "
                     + KeyName + " TEXT NOT NULL, "
                     + KeyCode + " TEXT NOT NULL, "
-                    + KeyIsActivated + " INTEGER, "
+                    + KeyState + " INTEGER, "
                     + KeyLastTriggerDateTime + " INTEGER, "
                     + KeyLastTriggerUser + " TEXT NOT NULL, "
                     + KeyIsOnServer + " INTEGER, "
@@ -82,7 +82,7 @@ public class DatabaseWirelessSocketList implements IDatabaseLucaClassList<Wirele
         contentValues.put(KeyRoomUuid, entry.GetRoomUuid().toString());
         contentValues.put(KeyName, entry.GetName());
         contentValues.put(KeyCode, entry.GetCode());
-        contentValues.put(KeyIsActivated, entry.IsActivated() ? 1 : 0);
+        contentValues.put(KeyState, entry.GetState() ? 1 : 0);
         contentValues.put(KeyLastTriggerDateTime, entry.GetLastTriggerDateTime().getTimeInMillis());
         contentValues.put(KeyLastTriggerUser, entry.GetLastTriggerUser());
         contentValues.put(KeyIsOnServer, (entry.GetIsOnServer() ? 1 : 0));
@@ -98,7 +98,7 @@ public class DatabaseWirelessSocketList implements IDatabaseLucaClassList<Wirele
         contentValues.put(KeyRoomUuid, entry.GetRoomUuid().toString());
         contentValues.put(KeyName, entry.GetName());
         contentValues.put(KeyCode, entry.GetCode());
-        contentValues.put(KeyIsActivated, entry.IsActivated() ? 1 : 0);
+        contentValues.put(KeyState, entry.GetState() ? 1 : 0);
         contentValues.put(KeyLastTriggerDateTime, entry.GetLastTriggerDateTime().getTimeInMillis());
         contentValues.put(KeyLastTriggerUser, entry.GetLastTriggerUser());
         contentValues.put(KeyIsOnServer, (entry.GetIsOnServer() ? 1 : 0));
@@ -124,7 +124,7 @@ public class DatabaseWirelessSocketList implements IDatabaseLucaClassList<Wirele
                 KeyRoomUuid,
                 KeyName,
                 KeyCode,
-                KeyIsActivated,
+                KeyState,
                 KeyLastTriggerDateTime,
                 KeyLastTriggerUser,
                 KeyIsOnServer,
@@ -137,7 +137,7 @@ public class DatabaseWirelessSocketList implements IDatabaseLucaClassList<Wirele
         int roomUuidIndex = cursor.getColumnIndex(KeyRoomUuid);
         int nameIndex = cursor.getColumnIndex(KeyName);
         int codeIndex = cursor.getColumnIndex(KeyCode);
-        int isActivatedIndex = cursor.getColumnIndex(KeyIsActivated);
+        int stateIndex = cursor.getColumnIndex(KeyState);
         int lastTriggerDateTimeIndex = cursor.getColumnIndex(KeyLastTriggerDateTime);
         int lastTriggerUserIndex = cursor.getColumnIndex(KeyLastTriggerUser);
         int isOnServerIndex = cursor.getColumnIndex(KeyIsOnServer);
@@ -148,14 +148,14 @@ public class DatabaseWirelessSocketList implements IDatabaseLucaClassList<Wirele
             String roomUuidString = cursor.getString(roomUuidIndex);
             String name = cursor.getString(nameIndex);
             String code = cursor.getString(codeIndex);
-            int isActivatedInteger = cursor.getInt(isActivatedIndex);
+            int stateInteger = cursor.getInt(stateIndex);
             int lastTriggerDateTimeInteger = cursor.getInt(lastTriggerDateTimeIndex);
             String lastTriggerUser = cursor.getString(lastTriggerUserIndex);
 
             UUID uuid = UUID.fromString(uuidString);
             UUID roomUuid = UUID.fromString(roomUuidString);
 
-            boolean isActivated = isActivatedInteger == 1;
+            boolean state = stateInteger == 1;
 
             Calendar lastTriggerDateTime = Calendar.getInstance();
             lastTriggerDateTime.setTimeInMillis(lastTriggerDateTimeInteger);
@@ -166,7 +166,7 @@ public class DatabaseWirelessSocketList implements IDatabaseLucaClassList<Wirele
             boolean isOnServer = isOnServerInteger == 1;
             ILucaClass.LucaServerDbAction serverDbAction = ILucaClass.LucaServerDbAction.values()[serverActionInteger];
 
-            WirelessSocket entry = new WirelessSocket(uuid, roomUuid, name, code, isActivated, lastTriggerDateTime, lastTriggerUser, isOnServer, serverDbAction);
+            WirelessSocket entry = new WirelessSocket(uuid, roomUuid, name, code, state, lastTriggerDateTime, lastTriggerUser, isOnServer, serverDbAction);
             result.add(entry);
         }
 

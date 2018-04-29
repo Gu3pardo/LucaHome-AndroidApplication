@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import guepardoapps.lucahome.common.classes.MeterLog;
 import guepardoapps.lucahome.common.classes.MeterLogItem;
 
+@SuppressWarnings({"unused"})
 public interface IMeterLogService extends ILucaService<MeterLogItem> {
     String MeterLogItemDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.meterlogitem.download.finished";
     String MeterLogItemAddFinishedBroadcast = "guepardoapps.lucahome.common.services.meterlogitem.add.finished";

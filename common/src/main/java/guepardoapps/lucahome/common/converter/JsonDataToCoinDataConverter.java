@@ -3,7 +3,6 @@ package guepardoapps.lucahome.common.converter;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import guepardoapps.lucahome.common.classes.Coin;
@@ -21,7 +20,7 @@ public class JsonDataToCoinDataConverter {
     private JsonDataToCoinDataConverter() {
     }
 
-    public static Coin UpdateData(@NonNull Coin coin, @NonNull String responseString, @NonNull String currency) throws JSONException {
+    public static Coin UpdateData(@NonNull Coin coin, @NonNull String responseString, @NonNull String currency) {
         if (responseString.length() <= 2) {
             return coin;
         }

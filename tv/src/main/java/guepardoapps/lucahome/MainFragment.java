@@ -19,13 +19,15 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v17.leanback.app.BackgroundManager;
-import android.support.v17.leanback.app.BrowseFragment;
+import android.support.v17.leanback.app.BrowseSupportFragment;
 import android.support.v17.leanback.widget.ArrayObjectAdapter;
 import android.support.v17.leanback.widget.HeaderItem;
 import android.support.v17.leanback.widget.ImageCardView;
@@ -37,10 +39,9 @@ import android.support.v17.leanback.widget.Presenter;
 import android.support.v17.leanback.widget.Row;
 import android.support.v17.leanback.widget.RowPresenter;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Gravity;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,8 +51,11 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
-public class MainFragment extends BrowseFragment {
-    private static final String TAG = "MainFragment";
+import guepardoapps.lucahome.common.utils.Logger;
+
+@SuppressWarnings({"FieldCanBeLocal"})
+public class MainFragment extends BrowseSupportFragment {
+    private static final String Tag = "MainFragment";
 
     private static final int BACKGROUND_UPDATE_DELAY = 300;
     private static final int GRID_ITEM_WIDTH = 200;
@@ -59,17 +63,17 @@ public class MainFragment extends BrowseFragment {
     private static final int NUM_ROWS = 6;
     private static final int NUM_COLS = 15;
 
-    private final Handler mHandler = new Handler();
-    private ArrayObjectAdapter mRowsAdapter;
-    private Drawable mDefaultBackground;
-    private DisplayMetrics mMetrics;
-    private Timer mBackgroundTimer;
-    private String mBackgroundUri;
-    private BackgroundManager mBackgroundManager;
+    private final Handler _handler = new Handler();
+    private ArrayObjectAdapter _rowsAdapter;
+    private Drawable _defaultBackground;
+    private DisplayMetrics _metrics;
+    private Timer _backgroundTimer;
+    private String _backgroundUri;
+    private BackgroundManager _backgroundManager;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        Log.i(TAG, "onCreate");
+        Logger.getInstance().Information(Tag, "onCreate");
         super.onActivityCreated(savedInstanceState);
 
         prepareBackgroundManager();
@@ -84,16 +88,16 @@ public class MainFragment extends BrowseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (null != mBackgroundTimer) {
-            Log.d(TAG, "onDestroy: " + mBackgroundTimer.toString());
-            mBackgroundTimer.cancel();
+        if (null != _backgroundTimer) {
+            Logger.getInstance().Debug(Tag, "onDestroy: " + _backgroundTimer.toString());
+            _backgroundTimer.cancel();
         }
     }
 
     private void loadRows() {
         List<Movie> list = MovieList.setupMovies();
 
-        mRowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
+        _rowsAdapter = new ArrayObjectAdapter(new ListRowPresenter());
         CardPresenter cardPresenter = new CardPresenter();
 
         int i;
@@ -106,7 +110,7 @@ public class MainFragment extends BrowseFragment {
                 listRowAdapter.add(list.get(j % 5));
             }
             HeaderItem header = new HeaderItem(i, MovieList.MOVIE_CATEGORY[i]);
-            mRowsAdapter.add(new ListRow(header, listRowAdapter));
+            _rowsAdapter.add(new ListRow(header, listRowAdapter));
         }
 
         HeaderItem gridHeader = new HeaderItem(i, "PREFERENCES");
@@ -116,18 +120,22 @@ public class MainFragment extends BrowseFragment {
         gridRowAdapter.add(getResources().getString(R.string.grid_view));
         gridRowAdapter.add(getString(R.string.error_fragment));
         gridRowAdapter.add(getResources().getString(R.string.personal_settings));
-        mRowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
+        _rowsAdapter.add(new ListRow(gridHeader, gridRowAdapter));
 
-        setAdapter(mRowsAdapter);
+        setAdapter(_rowsAdapter);
     }
 
     private void prepareBackgroundManager() {
+        Activity activity = getActivity();
+        if (activity == null) {
+            return;
+        }
 
-        mBackgroundManager = BackgroundManager.getInstance(getActivity());
-        mBackgroundManager.attach(getActivity().getWindow());
-        mDefaultBackground = getResources().getDrawable(R.drawable.default_background);
-        mMetrics = new DisplayMetrics();
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(mMetrics);
+        _backgroundManager = BackgroundManager.getInstance(activity);
+        _backgroundManager.attach(activity.getWindow());
+        _defaultBackground = ContextCompat.getDrawable(activity, R.drawable.default_background);
+        _metrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(_metrics);
     }
 
     private void setupUIElements() {
@@ -138,50 +146,50 @@ public class MainFragment extends BrowseFragment {
         setHeadersState(HEADERS_ENABLED);
         setHeadersTransitionOnBackEnabled(true);
 
+        Context context = getContext();
+        if (context == null) {
+            return;
+        }
+
         // set fastLane (or headers) background color
-        setBrandColor(getResources().getColor(R.color.fastlane_background));
+        setBrandColor(ContextCompat.getColor(context, R.color.fastlane_background));
         // set search icon color
-        setSearchAffordanceColor(getResources().getColor(R.color.search_opaque));
+        setSearchAffordanceColor(ContextCompat.getColor(context, R.color.search_opaque));
     }
 
     private void setupEventListeners() {
-        setOnSearchClickedListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
+        setOnSearchClickedListener(view ->
                 Toast.makeText(getActivity(), "Implement your own in-app search", Toast.LENGTH_LONG)
-                        .show();
-            }
-        });
+                        .show());
 
         setOnItemViewClickedListener(new ItemViewClickedListener());
         setOnItemViewSelectedListener(new ItemViewSelectedListener());
     }
 
     protected void updateBackground(String uri) {
-        int width = mMetrics.widthPixels;
-        int height = mMetrics.heightPixels;
+        int width = _metrics.widthPixels;
+        int height = _metrics.heightPixels;
         Glide.with(getActivity())
                 .load(uri)
                 .centerCrop()
-                .error(mDefaultBackground)
+                .error(_defaultBackground)
                 .into(new SimpleTarget<GlideDrawable>(width, height) {
                     @Override
                     public void onResourceReady(GlideDrawable resource,
                                                 GlideAnimation<? super GlideDrawable>
                                                         glideAnimation) {
-                        mBackgroundManager.setDrawable(resource);
+                        _backgroundManager.setDrawable(resource);
                     }
                 });
-        mBackgroundTimer.cancel();
+        _backgroundTimer.cancel();
     }
 
     private void startBackgroundTimer() {
-        if (null != mBackgroundTimer) {
-            mBackgroundTimer.cancel();
+        if (null != _backgroundTimer) {
+            _backgroundTimer.cancel();
         }
-        mBackgroundTimer = new Timer();
-        mBackgroundTimer.schedule(new UpdateBackgroundTask(), BACKGROUND_UPDATE_DELAY);
+        _backgroundTimer = new Timer();
+        _backgroundTimer.schedule(new UpdateBackgroundTask(), BACKGROUND_UPDATE_DELAY);
     }
 
     private final class ItemViewClickedListener implements OnItemViewClickedListener {
@@ -191,12 +199,17 @@ public class MainFragment extends BrowseFragment {
 
             if (item instanceof Movie) {
                 Movie movie = (Movie) item;
-                Log.d(TAG, "Item: " + item.toString());
+                Logger.getInstance().Debug(Tag, "Item: " + item.toString());
                 Intent intent = new Intent(getActivity(), DetailsActivity.class);
                 intent.putExtra(DetailsActivity.MOVIE, movie);
 
+                Activity activity = getActivity();
+                if (activity == null) {
+                    return;
+                }
+
                 Bundle bundle = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                        getActivity(),
+                        activity,
                         ((ImageCardView) itemViewHolder.view).getMainImageView(),
                         DetailsActivity.SHARED_ELEMENT_NAME).toBundle();
                 getActivity().startActivity(intent, bundle);
@@ -217,7 +230,7 @@ public class MainFragment extends BrowseFragment {
         public void onItemSelected(Presenter.ViewHolder itemViewHolder, Object item,
                                    RowPresenter.ViewHolder rowViewHolder, Row row) {
             if (item instanceof Movie) {
-                mBackgroundUri = ((Movie) item).getBackgroundImageUrl();
+                _backgroundUri = ((Movie) item).getBackgroundImageUrl();
                 startBackgroundTimer();
             }
         }
@@ -227,23 +240,24 @@ public class MainFragment extends BrowseFragment {
 
         @Override
         public void run() {
-            mHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    updateBackground(mBackgroundUri);
-                }
-            });
+            _handler.post(() -> updateBackground(_backgroundUri));
         }
     }
 
     private class GridItemPresenter extends Presenter {
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent) {
+            int backgroundColor = Color.BLACK;
+            Context context = getContext();
+            if (context != null) {
+                backgroundColor = ContextCompat.getColor(context, R.color.default_background);
+            }
+
             TextView view = new TextView(parent.getContext());
             view.setLayoutParams(new ViewGroup.LayoutParams(GRID_ITEM_WIDTH, GRID_ITEM_HEIGHT));
             view.setFocusable(true);
             view.setFocusableInTouchMode(true);
-            view.setBackgroundColor(getResources().getColor(R.color.default_background));
+            view.setBackgroundColor(backgroundColor);
             view.setTextColor(Color.WHITE);
             view.setGravity(Gravity.CENTER);
             return new ViewHolder(view);
@@ -258,5 +272,4 @@ public class MainFragment extends BrowseFragment {
         public void onUnbindViewHolder(ViewHolder viewHolder) {
         }
     }
-
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import guepardoapps.lucahome.common.classes.Room;
 
+@SuppressWarnings({"unused"})
 public interface IRoomService extends ILucaService<Room> {
     String RoomDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.room.download.finished";
     String RoomAddFinishedBroadcast = "guepardoapps.lucahome.common.services.room.add.finished";

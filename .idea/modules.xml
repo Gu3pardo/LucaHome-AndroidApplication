@@ -6,9 +6,9 @@
       <module fileurl="file://$PROJECT_DIR$/accesscontrol/accesscontrol.iml" filepath="$PROJECT_DIR$/accesscontrol/accesscontrol.iml" />
       <module fileurl="file://$PROJECT_DIR$/bixby/bixby.iml" filepath="$PROJECT_DIR$/bixby/bixby.iml" />
       <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../OpenWeather/lib_openweather/lib_openweather.iml" filepath="$PROJECT_DIR$/../OpenWeather/lib_openweather/lib_openweather.iml" />
       <module fileurl="file://$PROJECT_DIR$/mediaserver/mediaserver.iml" filepath="$PROJECT_DIR$/mediaserver/mediaserver.iml" />
       <module fileurl="file://$PROJECT_DIR$/mobile/mobile.iml" filepath="$PROJECT_DIR$/mobile/mobile.iml" />
+      <module fileurl="file://$PROJECT_DIR$/openweather/openweather.iml" filepath="$PROJECT_DIR$/openweather/openweather.iml" />
       <module fileurl="file://$PROJECT_DIR$/pocketsphinx-android-5prealpha-release/pocketsphinx-android-5prealpha-release.iml" filepath="$PROJECT_DIR$/pocketsphinx-android-5prealpha-release/pocketsphinx-android-5prealpha-release.iml" />
       <module fileurl="file://$PROJECT_DIR$/tv/tv.iml" filepath="$PROJECT_DIR$/tv/tv.iml" />
       <module fileurl="file://$PROJECT_DIR$/voicerecognition/voicerecognition.iml" filepath="$PROJECT_DIR$/voicerecognition/voicerecognition.iml" />

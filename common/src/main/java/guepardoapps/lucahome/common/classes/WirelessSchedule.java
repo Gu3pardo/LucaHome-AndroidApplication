@@ -9,7 +9,7 @@ import java.util.UUID;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WirelessSchedule implements ILucaClass {
     private static final String Tag = WirelessSchedule.class.getSimpleName();
 
@@ -113,7 +113,7 @@ public class WirelessSchedule implements ILucaClass {
     @Override
     public String GetCommandAdd() {
         return String.format(Locale.getDefault(),
-                "%s%s&name=%s&wirelesssocket=%s&gpio=&wirelessswitch=%s&weekday=%d&hour=%d&minute=%d&action=%s&isTimer=0",
+                "%s%s&name=%s&wirelesssocket=%s&gpio=&wirelessswitch=%s&weekday=%d&hour=%d&minute=%d&action=%s",
                 LucaServerActionTypes.ADD_WIRELESS_SCHEDULE.toString(),
                 _uuid, _name, _wirelessSocketUuid, _wirelessSwitchUuid,
                 _dateTime.get(Calendar.DAY_OF_WEEK), _dateTime.get(Calendar.HOUR), _dateTime.get(Calendar.MINUTE),
@@ -123,7 +123,7 @@ public class WirelessSchedule implements ILucaClass {
     @Override
     public String GetCommandUpdate() {
         return String.format(Locale.getDefault(),
-                "%s%s&name=%s&wirelesssocket=%s&gpio=&wirelessswitch=%s&weekday=%d&hour=%d&minute=%d&action=%s&isTimer=0&isactive=%s",
+                "%s%s&name=%s&wirelesssocket=%s&gpio=&wirelessswitch=%s&weekday=%d&hour=%d&minute=%d&action=%s&isactive=%s",
                 LucaServerActionTypes.UPDATE_WIRELESS_SCHEDULE.toString(),
                 _uuid, _name, _wirelessSocketUuid, _wirelessSwitchUuid,
                 _dateTime.get(Calendar.DAY_OF_WEEK), _dateTime.get(Calendar.HOUR), _dateTime.get(Calendar.MINUTE),

@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.controller;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+@SuppressWarnings({"unused"})
 public interface IMediaVolumeController {
     String CurrentVolumeBroadcast = "guepardoapps.lucahome.common.controller.mediavolume.currentvolume";
     String CurrentVolumeBundle = "guepardoapps.lucahome.common.controller.mediavolume.currentvolume";

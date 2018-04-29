@@ -28,7 +28,7 @@ import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.Tools;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WirelessScheduleService implements IWirelessScheduleService {
     private static final String Tag = WirelessScheduleService.class.getSimpleName();
 
@@ -477,7 +477,7 @@ public class WirelessScheduleService implements IWirelessScheduleService {
     }
 
     @Override
-    public void SetWirelessScheduleState(WirelessSchedule entry, boolean newState) throws Exception {
+    public void SetWirelessScheduleState(WirelessSchedule entry, boolean newState) {
         User user = SettingsController.getInstance().GetUser();
         if (user == null) {
             _broadcastController.SendBooleanBroadcast(WirelessScheduleSetFinishedBroadcast, WirelessScheduleSetFinishedBundle, false);

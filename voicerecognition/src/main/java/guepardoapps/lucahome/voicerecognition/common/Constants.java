@@ -1,6 +1,6 @@
 package guepardoapps.lucahome.voicerecognition.common;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Constants {
     public static final String ActionPlay = "play";
     public static final String ActionPause = "pause";

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import guepardoapps.lucahome.common.classes.Coin;
 
+@SuppressWarnings({"unused"})
 public interface ICoinService extends ILucaService<Coin> {
     int NotificationId = 1100017;
 

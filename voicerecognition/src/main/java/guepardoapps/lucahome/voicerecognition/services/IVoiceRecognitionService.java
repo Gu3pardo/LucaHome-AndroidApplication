@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.voicerecognition.utils.IRelationshipHelper;
 
+@SuppressWarnings({"unused"})
 public interface IVoiceRecognitionService {
     enum InitializeResult {AlreadyInitialized, ContextNotOfTypeActivity, InitializeSuccess}
 

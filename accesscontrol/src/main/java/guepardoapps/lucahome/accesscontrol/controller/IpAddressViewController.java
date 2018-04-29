@@ -9,12 +9,13 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
-import guepardoapps.lucahome.accesscontrol.R;
 import guepardoapps.lucahome.common.controller.ReceiverController;
 import guepardoapps.lucahome.common.controller.UserInformationController;
 import guepardoapps.lucahome.common.enums.AccessControlAlarmState;
 import guepardoapps.lucahome.common.server.handler.IAccessControlDataHandler;
 import guepardoapps.lucahome.common.utils.Logger;
+
+import guepardoapps.lucahome.accesscontrol.R;
 
 public class IpAddressViewController {
     private static final String Tag = IpAddressViewController.class.getSimpleName();
@@ -113,7 +114,11 @@ public class IpAddressViewController {
     }
 
     private void updateIp() {
-        String ip = _userInformationController.GetIp();
-        _ipAddressTextView.setText(ip);
+        try {
+            String ip = _userInformationController.GetIp();
+            _ipAddressTextView.setText(ip);
+        } catch (Exception exception) {
+            Logger.getInstance().Error(Tag, exception.getMessage());
+        }
     }
 }

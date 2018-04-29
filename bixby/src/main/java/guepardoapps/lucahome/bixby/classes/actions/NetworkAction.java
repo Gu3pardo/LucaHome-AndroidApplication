@@ -2,13 +2,12 @@ package guepardoapps.lucahome.bixby.classes.actions;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.common.utils.Logger;
 
 @SuppressWarnings("WeakerAccess")
-public class NetworkAction implements IBixbyAction, Serializable {
+public class NetworkAction implements IBixbyAction {
     private static final String Tag = NetworkAction.class.getSimpleName();
 
     private NetworkType _networkType;

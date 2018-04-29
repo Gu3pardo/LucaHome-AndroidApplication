@@ -2,13 +2,12 @@ package guepardoapps.lucahome.bixby.classes.requirements;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"WeakerAccess"})
-public class NetworkRequirement implements IBixbyRequirement, Serializable {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class NetworkRequirement implements IBixbyRequirement {
     private static final String Tag = NetworkRequirement.class.getSimpleName();
 
     private NetworkType _networkType;

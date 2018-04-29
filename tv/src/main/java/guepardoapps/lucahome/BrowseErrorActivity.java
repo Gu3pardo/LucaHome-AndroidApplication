@@ -27,13 +27,14 @@ import android.widget.ProgressBar;
 /*
  * BrowseErrorActivity shows how to use ErrorFragment
  */
+@SuppressWarnings({"FieldCanBeLocal"})
 public class BrowseErrorActivity extends Activity {
     private static int TIMER_DELAY = 3000;
     private static int SPINNER_WIDTH = 100;
     private static int SPINNER_HEIGHT = 100;
 
-    private ErrorFragment mErrorFragment;
-    private SpinnerFragment mSpinnerFragment;
+    private ErrorFragment _errorFragment;
+    private SpinnerFragment _spinnerFragment;
 
     /**
      * Called when the activity is first created.
@@ -47,19 +48,16 @@ public class BrowseErrorActivity extends Activity {
     }
 
     private void testError() {
-        mErrorFragment = new ErrorFragment();
-        getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mErrorFragment).commit();
+        _errorFragment = new ErrorFragment();
+        getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, _errorFragment).commit();
 
-        mSpinnerFragment = new SpinnerFragment();
-        getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, mSpinnerFragment).commit();
+        _spinnerFragment = new SpinnerFragment();
+        getFragmentManager().beginTransaction().add(R.id.main_browse_fragment, _spinnerFragment).commit();
 
         final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getFragmentManager().beginTransaction().remove(mSpinnerFragment).commit();
-                mErrorFragment.setErrorContent();
-            }
+        handler.postDelayed(() -> {
+            getFragmentManager().beginTransaction().remove(_spinnerFragment).commit();
+            _errorFragment.setErrorContent(this);
         }, TIMER_DELAY);
     }
 

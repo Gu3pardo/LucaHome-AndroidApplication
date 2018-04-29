@@ -14,6 +14,7 @@ import guepardoapps.lucahome.common.classes.RadioStream;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.StringHelper;
 
+@SuppressWarnings({"unused"})
 public class JsonDataToRadioStreamConverter implements IJsonDataConverter {
     private static final String Tag = JsonDataToRadioStreamConverter.class.getSimpleName();
     private static final String SearchParameter = "{\"Data\":";
@@ -58,7 +59,9 @@ public class JsonDataToRadioStreamConverter implements IJsonDataConverter {
                     String title = child.getString("Title");
                     String url = child.getString("Url");
 
-                    RadioStream newRadioStream = new RadioStream(uuid, title, url, true, ILucaClass.LucaServerDbAction.Null);
+                    int playCount = child.getInt("PlayCount");
+
+                    RadioStream newRadioStream = new RadioStream(uuid, title, url, playCount, true, ILucaClass.LucaServerDbAction.Null);
                     list.add(newRadioStream);
                 }
             } catch (JSONException jsonException) {

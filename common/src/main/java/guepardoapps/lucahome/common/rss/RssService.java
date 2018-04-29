@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.os.ResultReceiver;
 import android.support.annotation.NonNull;
 
-import org.xmlpull.v1.XmlPullParserException;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -41,8 +39,6 @@ public class RssService extends IntentService implements IRssService {
                 return;
             }
             rssItems = parser.Parse(GetInputStream(feed.GetUrl()));
-        } catch (XmlPullParserException exception) {
-            Logger.getInstance().Error(Tag, exception.toString());
         } catch (IOException exception) {
             Logger.getInstance().Warning(Tag, exception.toString());
         }

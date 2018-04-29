@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({"unused"})
 public interface IUserInformationController {
     List<ApplicationInfo> GetApkList();
 
@@ -15,5 +16,5 @@ public interface IUserInformationController {
 
     String GetWifiSSID();
 
-    String GetIp();
+    String GetIp() throws Exception;
 }

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
+@SuppressWarnings({"unused"})
 public interface IDatabaseBixbyClassList<T> {
     String DatabaseName = "DatabaseBixbyClassListDb";
 

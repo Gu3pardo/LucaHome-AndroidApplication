@@ -40,7 +40,7 @@ public class SleepTimerData implements IMediaServerClass {
     }
 
     @Override
-    public void ParseCommunicationString(@NonNull String communicationString) throws Exception {
+    public void ParseCommunicationString(@NonNull String communicationString) throws NullPointerException {
         if (communicationString.length() == 0) {
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }

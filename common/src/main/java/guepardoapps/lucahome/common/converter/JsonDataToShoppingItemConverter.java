@@ -57,10 +57,10 @@ public final class JsonDataToShoppingItemConverter implements IJsonDataConverter
                     UUID uuid = UUID.fromString(child.getString("Uuid"));
 
                     String name = child.getString("Name");
-                    String groupString = child.getString("Group");
+                    String typeString = child.getString("Type");
                     ShoppingItemType type = ShoppingItemType.OTHER;
                     try {
-                        type = ShoppingItemType.GetByString(groupString);
+                        type = ShoppingItemType.GetByString(typeString);
                     } catch (Exception exception) {
                         Logger.getInstance().Error(Tag, exception.toString());
                     }

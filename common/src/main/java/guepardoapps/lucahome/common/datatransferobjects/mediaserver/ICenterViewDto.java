@@ -3,6 +3,7 @@ package guepardoapps.lucahome.common.datatransferobjects.mediaserver;
 import guepardoapps.lucahome.common.enums.RadioStreamType;
 import guepardoapps.lucahome.common.enums.YoutubeIdType;
 
+@SuppressWarnings({"unused"})
 public interface ICenterViewDto {
     boolean IsCenterVisible();
 

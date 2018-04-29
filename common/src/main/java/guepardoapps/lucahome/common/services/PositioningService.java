@@ -369,11 +369,6 @@ public class PositioningService extends Service implements BeaconConsumer, Monit
             return;
         }
 
-        if (_beaconList == null || _beaconList.size() == 0) {
-            Logger.getInstance().Error(Tag, "Invalid BeaconList! Cannot calculate position!");
-            return;
-        }
-
         ArrayList<PuckJs> puckJsList = PuckJsService.getInstance().GetDataList();
         if (puckJsList == null || puckJsList.size() == 0) {
             Logger.getInstance().Error(Tag, "Invalid PuckJsList! Cannot calculate position!");

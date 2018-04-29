@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class KeyController implements IKeyController {
     private static final String Tag = KeyController.class.getSimpleName();
 
@@ -18,7 +18,7 @@ public class KeyController implements IKeyController {
     }
 
     @Override
-    public void SimulateKeyPress(@NonNull final int[] keys, final int timeout) throws InterruptedException {
+    public void SimulateKeyPress(@NonNull final int[] keys, final int timeout) {
         if (timeout < 0) {
             Logger.getInstance().Warning(Tag, "Timeout cannot be negative!");
             return;

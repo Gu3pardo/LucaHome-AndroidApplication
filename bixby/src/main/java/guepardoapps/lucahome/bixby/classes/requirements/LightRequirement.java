@@ -2,13 +2,12 @@ package guepardoapps.lucahome.bixby.classes.requirements;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"WeakerAccess"})
-public class LightRequirement implements IBixbyRequirement, Serializable {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class LightRequirement implements IBixbyRequirement {
     private static final String Tag = LightRequirement.class.getSimpleName();
 
     private LightCompareType _compareType;

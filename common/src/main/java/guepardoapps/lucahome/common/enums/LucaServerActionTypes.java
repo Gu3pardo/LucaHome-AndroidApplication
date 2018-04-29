@@ -18,9 +18,6 @@ public enum LucaServerActionTypes implements Serializable {
     GET_MOTION_DATA(22, "getmotiondata"),
     SET_MOTION_CONTROL_TASK(23, "setcontroltaskcamera&state="),
 
-    //CHANGES
-    GET_CHANGES(30, "getchanges"),
-
     //COINS
     GET_COINS_ALL(130, "getcoinsall"),
     GET_COINS_USER(131, "getcoinsuser"),
@@ -151,7 +148,13 @@ public enum LucaServerActionTypes implements Serializable {
     GET_YOUTUBE_VIDEOS(220, "getyoutubevideos"),
     ADD_YOUTUBE_VIDEO(221, "addyoutubevideo&uuid="),
     UPDATE_YOUTUBE_VIDEO(222, "updateyoutubevideo&uuid="),
-    DELETE_YOUTUBE_VIDEO(223, "deleteyoutubevideo&uuid=");
+    DELETE_YOUTUBE_VIDEO(223, "deleteyoutubevideo&uuid="),
+
+    //WIRELESS TIMER
+    GET_WIRELESS_TIMER(230, "getwirelesstimer"),
+    ADD_WIRELESS_TIMER(231, "addwirelesstimer&uuid="),
+    UPDATE_WIRELESS_TIMER(232, "updatewirelesstimer&uuid="),
+    DELETE_WIRELESS_TIMER(233, "deletewirelesstimer&uuid=");
 
     private int _id;
     private String _action;

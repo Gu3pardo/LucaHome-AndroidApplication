@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SuggestedMeal implements ILucaClass {
     private static final String Tag = SuggestedMeal.class.getSimpleName();
 

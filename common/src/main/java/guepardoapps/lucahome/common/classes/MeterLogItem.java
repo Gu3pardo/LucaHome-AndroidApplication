@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MeterLogItem implements ILucaClass {
     private static final String Tag = MeterLogItem.class.getSimpleName();
 

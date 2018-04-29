@@ -14,6 +14,7 @@ import guepardoapps.lucahome.common.classes.YoutubeVideo;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.StringHelper;
 
+@SuppressWarnings({"unused"})
 public class JsonDataToYoutubeVideoConverter implements IJsonDataConverter {
     private static final String Tag = JsonDataToYoutubeVideoConverter.class.getSimpleName();
     private static final String SearchParameter = "{\"Data\":";
@@ -60,7 +61,10 @@ public class JsonDataToYoutubeVideoConverter implements IJsonDataConverter {
 
                     int playCount = child.getInt("PlayCount");
 
-                    YoutubeVideo newYoutubeVideo = new YoutubeVideo(uuid, title, youtubeId, playCount, "", "", true, ILucaClass.LucaServerDbAction.Null);
+                    String description = child.getString("Description");
+                    String mediumImageUrl = child.getString("MediumImageUrl");
+
+                    YoutubeVideo newYoutubeVideo = new YoutubeVideo(uuid, title, youtubeId, playCount, description, mediumImageUrl, true, ILucaClass.LucaServerDbAction.Null);
                     list.add(newYoutubeVideo);
                 }
             } catch (JSONException jsonException) {

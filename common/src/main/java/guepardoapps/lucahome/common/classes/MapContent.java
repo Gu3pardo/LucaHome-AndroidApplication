@@ -9,11 +9,17 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.utils.MapContentHelper;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MapContent implements ILucaClass {
     private static final String Tag = MapContent.class.getSimpleName();
 
-    public enum DrawingType {Null, Camera, LAN, Meal, MediaServer, Meter, NAS, PuckJS, RaspberryPi, ShoppingList, SuggestedMeal, Temperature, WirelessSocket, WirelessSwitch}
+    public enum DrawingType {
+        Null, Camera, LAN,
+        Meal, MediaServer, Meter,
+        NAS, PuckJS, RaspberryPi,
+        ShoppingList, SuggestedMeal, Temperature,
+        WirelessSocket, WirelessSwitch
+    }
 
     private UUID _uuid;
     private UUID _drawingTypeUuid;

@@ -10,8 +10,6 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
-import org.json.JSONException;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
@@ -35,7 +33,7 @@ import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.Tools;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CoinService implements ICoinService {
     private static final String Tag = CoinService.class.getSimpleName();
 
@@ -115,8 +113,8 @@ public class CoinService implements ICoinService {
                     _broadcastController.SendBooleanBroadcast(CoinDataDownloadFinishedBroadcast, CoinDataDownloadFinishedBundle, true);
                     _lastUpdate = Calendar.getInstance();
                     ShowNotification();
-                } catch (JSONException jsonException) {
-                    Logger.getInstance().Error(Tag, jsonException.getMessage());
+                } catch (Exception exception) {
+                    Logger.getInstance().Error(Tag, exception.getMessage());
                     _broadcastController.SendBooleanBroadcast(CoinDataDownloadFinishedBroadcast, CoinDataDownloadFinishedBundle, false);
                 }
             }

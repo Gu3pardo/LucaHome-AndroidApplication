@@ -11,7 +11,7 @@ import guepardoapps.lucahome.common.classes.mediaserver.IMediaServerClass;
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class YoutubeVideo implements ILucaClass, IMediaServerClass {
     private static final String Tag = YoutubeVideo.class.getSimpleName();
 
@@ -107,7 +107,7 @@ public class YoutubeVideo implements ILucaClass, IMediaServerClass {
     }
 
     @Override
-    public void ParseCommunicationString(@NonNull String communicationString) throws Exception {
+    public void ParseCommunicationString(@NonNull String communicationString) throws NullPointerException {
         if (communicationString.length() == 0) {
             throw new NullPointerException("CommunicationString may not be of length 0!");
         }

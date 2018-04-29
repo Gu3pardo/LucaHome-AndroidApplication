@@ -23,12 +23,14 @@ import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.utils.BitmapHelper;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"deprecation", "WeakerAccess"})
+@SuppressWarnings({"WeakerAccess"})
 public class NotificationController implements INotificationController {
     private static final String Tag = NotificationController.class.getSimpleName();
 
     private static final int MaxNotificationWirelessSockets = 10;
     private static final int MaxNotificationWirelessSwitches = 5;
+
+    private static final String ChannelId = "guepardoapps.lucahome.common.controller.NotificationController.23291";
 
     protected Context _context;
     private NotificationManager _notificationManager;
@@ -86,17 +88,16 @@ public class NotificationController implements INotificationController {
 
         remoteViews.setOnClickPendingIntent(R.id.notification_camera_security_button, goToSecurityPendingIntent);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context, ChannelId);
         builder.setSmallIcon(R.drawable.notification_camera)
                 .setContentTitle("Camera is active!")
                 .setContentText("Go to security!")
+                .setContent(remoteViews)
                 .setTicker("")
                 .extend(wearableExtender)
                 .addAction(goToSecurityWearAction);
 
         Notification notification = builder.build();
-        notification.contentView = remoteViews;
-        notification.bigContentView = remoteViews;
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
         notificationManager.notify(notificationId, notification);
@@ -171,13 +172,13 @@ public class NotificationController implements INotificationController {
             socketPendingIntents[index] = PendingIntent.getBroadcast(_context, index * 1234, socketIntents[index], PendingIntent.FLAG_UPDATE_CURRENT);
 
             int iconId = wirelessSocketList.get(index).GetDrawable();
-            String text = ((wirelessSocketList.get(index).IsActivated()) ? "ON" : "OFF");
+            String text = ((wirelessSocketList.get(index).GetState()) ? "ON" : "OFF");
             Bitmap icon = BitmapFactory.decodeResource(_context.getResources(), iconId);
 
             wearActions[index] = new NotificationCompat.Action.Builder(iconId, text, socketPendingIntents[index]).build();
 
             if (socketVisibility[index]) {
-                if (wirelessSocketList.get(index).IsActivated()) {
+                if (wirelessSocketList.get(index).GetState()) {
                     remoteViews.setViewVisibility(imageButtonArray[(index * 2)], View.GONE);
                     remoteViews.setViewVisibility(imageButtonArray[(index * 2) + 1], View.VISIBLE);
                     remoteViews.setOnClickPendingIntent(imageButtonArray[(index * 2) + 1], socketPendingIntents[index]);
@@ -198,8 +199,12 @@ public class NotificationController implements INotificationController {
             }
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context);
-        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle(_context.getString(R.string.application_name)).setContentText("Set Wireless Sockets").setTicker("Set Wireless Sockets");
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context, ChannelId);
+        builder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(_context.getString(R.string.application_name))
+                .setContentText("Set Wireless Sockets")
+                .setContent(remoteViews)
+                .setTicker("Set Wireless Sockets");
         builder.extend(wearableExtender);
         for (int index = 0; index < wirelessSocketList.size(); index++) {
             if (socketVisibility[index]) {
@@ -225,8 +230,6 @@ public class NotificationController implements INotificationController {
         // End Hack
 
         Notification notification = builder.build();
-        notification.contentView = remoteViews;
-        notification.bigContentView = remoteViews;
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
         notificationManager.notify(notificationId, notification);
@@ -297,13 +300,13 @@ public class NotificationController implements INotificationController {
 
             switchPendingIntents[index] = PendingIntent.getBroadcast(_context, index * 2468, switchIntents[index], PendingIntent.FLAG_UPDATE_CURRENT);
 
-            String text = String.format(Locale.getDefault(), "%s is %s", wirelessSwitch.GetName(), wirelessSwitch.IsActivated() ? "ON" : "OFF");
+            String text = String.format(Locale.getDefault(), "%s is %s", wirelessSwitch.GetName(), wirelessSwitch.GetState() ? "ON" : "OFF");
 
             int iconId = wirelessSwitch.GetAction() ? R.drawable.wireless_switch_on : R.drawable.wireless_switch_off;
             wearActions[index] = new NotificationCompat.Action.Builder(iconId, text, switchPendingIntents[index]).build();
 
             if (switchVisibility[index]) {
-                if (wirelessSwitchList.get(index).IsActivated()) {
+                if (wirelessSwitchList.get(index).GetState()) {
                     remoteViews.setViewVisibility(buttonArray[(index * 2)], View.GONE);
                     remoteViews.setViewVisibility(buttonArray[(index * 2) + 1], View.VISIBLE);
                     remoteViews.setOnClickPendingIntent(buttonArray[(index * 2) + 1], switchPendingIntents[index]);
@@ -322,8 +325,12 @@ public class NotificationController implements INotificationController {
             }
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context);
-        builder.setSmallIcon(R.mipmap.ic_launcher).setContentTitle(_context.getString(R.string.application_name)).setContentText("Toggle Switches").setTicker("Toggle Switches");
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context, ChannelId);
+        builder.setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(_context.getString(R.string.application_name))
+                .setContentText("Toggle Switches")
+                .setTicker("Toggle Switches")
+                .setContent(remoteViews);
         builder.extend(wearableExtender);
         for (int index = 0; index < wirelessSwitchList.size(); index++) {
             if (switchVisibility[index]) {
@@ -332,8 +339,6 @@ public class NotificationController implements INotificationController {
         }
 
         Notification notification = builder.build();
-        notification.contentView = remoteViews;
-        notification.bigContentView = remoteViews;
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
         notificationManager.notify(notificationId, notification);

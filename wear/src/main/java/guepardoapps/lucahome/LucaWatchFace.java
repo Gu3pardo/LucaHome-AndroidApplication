@@ -1,5 +1,6 @@
 package guepardoapps.lucahome;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -36,9 +37,9 @@ import java.util.concurrent.TimeUnit;
  * in the Google Watch Face Code Lab:
  * https://codelabs.developers.google.com/codelabs/watchface/index.html#0
  */
+@SuppressLint({"DefaultLocale"})
 public class LucaWatchFace extends CanvasWatchFaceService {
-    private static final Typeface NORMAL_TYPEFACE =
-            Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
+    private static final Typeface NORMAL_TYPEFACE = Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
     /**
      * Update rate in milliseconds for interactive mode. Defaults to one second
@@ -57,17 +58,17 @@ public class LucaWatchFace extends CanvasWatchFaceService {
     }
 
     private static class EngineHandler extends Handler {
-        private final WeakReference<LucaWatchFace.Engine> mWeakReference;
+        private final WeakReference<LucaWatchFace.Engine> _weakReference;
 
-        public EngineHandler(LucaWatchFace.Engine reference) {
-            mWeakReference = new WeakReference<>(reference);
+        EngineHandler(LucaWatchFace.Engine reference) {
+            _weakReference = new WeakReference<>(reference);
         }
 
         @Override
-        public void handleMessage(Message msg) {
-            LucaWatchFace.Engine engine = mWeakReference.get();
+        public void handleMessage(Message message) {
+            LucaWatchFace.Engine engine = _weakReference.get();
             if (engine != null) {
-                switch (msg.what) {
+                switch (message.what) {
                     case MSG_UPDATE_TIME:
                         engine.handleUpdateTimeMessage();
                         break;
@@ -78,26 +79,25 @@ public class LucaWatchFace extends CanvasWatchFaceService {
 
     private class Engine extends CanvasWatchFaceService.Engine {
 
-        private final Handler mUpdateTimeHandler = new EngineHandler(this);
-        private Calendar mCalendar;
-        private final BroadcastReceiver mTimeZoneReceiver = new BroadcastReceiver() {
+        private final Handler _updateTimeHandler = new EngineHandler(this);
+        private Calendar _calendar;
+        private final BroadcastReceiver _timeZoneReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                mCalendar.setTimeZone(TimeZone.getDefault());
+                _calendar.setTimeZone(TimeZone.getDefault());
                 invalidate();
             }
         };
-        private boolean mRegisteredTimeZoneReceiver = false;
-        private float mXOffset;
-        private float mYOffset;
-        private Paint mBackgroundPaint;
-        private Paint mTextPaint;
+        private boolean _registeredTimeZoneReceiver = false;
+        private float _xOffset;
+        private float _yOffset;
+        private Paint _backgroundPaint;
+        private Paint _textPaint;
         /**
          * Whether the display supports fewer bits for each color in ambient mode. When true, we
          * disable anti-aliasing in ambient mode.
          */
         private boolean mLowBitAmbient;
-        private boolean mBurnInProtection;
         private boolean mAmbient;
 
         @Override
@@ -108,28 +108,25 @@ public class LucaWatchFace extends CanvasWatchFaceService {
                     .setAcceptsTapEvents(true)
                     .build());
 
-            mCalendar = Calendar.getInstance();
+            _calendar = Calendar.getInstance();
 
             Resources resources = LucaWatchFace.this.getResources();
-            mYOffset = resources.getDimension(R.dimen.digital_y_offset);
+            _yOffset = resources.getDimension(R.dimen.digital_y_offset);
 
             // Initializes background.
-            mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(
-                    ContextCompat.getColor(getApplicationContext(), R.color.background));
-
+            _backgroundPaint = new Paint();
+            _backgroundPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.background));
 
             // Initializes Watch Face.
-            mTextPaint = new Paint();
-            mTextPaint.setTypeface(NORMAL_TYPEFACE);
-            mTextPaint.setAntiAlias(true);
-            mTextPaint.setColor(
-                    ContextCompat.getColor(getApplicationContext(), R.color.digital_text));
+            _textPaint = new Paint();
+            _textPaint.setTypeface(NORMAL_TYPEFACE);
+            _textPaint.setAntiAlias(true);
+            _textPaint.setColor(ContextCompat.getColor(getApplicationContext(), R.color.digital_text));
         }
 
         @Override
         public void onDestroy() {
-            mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            _updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
             super.onDestroy();
         }
 
@@ -141,7 +138,7 @@ public class LucaWatchFace extends CanvasWatchFaceService {
                 registerReceiver();
 
                 // Update time zone in case it changed while we weren't visible.
-                mCalendar.setTimeZone(TimeZone.getDefault());
+                _calendar.setTimeZone(TimeZone.getDefault());
                 invalidate();
             } else {
                 unregisterReceiver();
@@ -153,20 +150,20 @@ public class LucaWatchFace extends CanvasWatchFaceService {
         }
 
         private void registerReceiver() {
-            if (mRegisteredTimeZoneReceiver) {
+            if (_registeredTimeZoneReceiver) {
                 return;
             }
-            mRegisteredTimeZoneReceiver = true;
+            _registeredTimeZoneReceiver = true;
             IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
-            LucaWatchFace.this.registerReceiver(mTimeZoneReceiver, filter);
+            LucaWatchFace.this.registerReceiver(_timeZoneReceiver, filter);
         }
 
         private void unregisterReceiver() {
-            if (!mRegisteredTimeZoneReceiver) {
+            if (!_registeredTimeZoneReceiver) {
                 return;
             }
-            mRegisteredTimeZoneReceiver = false;
-            LucaWatchFace.this.unregisterReceiver(mTimeZoneReceiver);
+            _registeredTimeZoneReceiver = false;
+            LucaWatchFace.this.unregisterReceiver(_timeZoneReceiver);
         }
 
         @Override
@@ -176,19 +173,18 @@ public class LucaWatchFace extends CanvasWatchFaceService {
             // Load resources that have alternate values for round watches.
             Resources resources = LucaWatchFace.this.getResources();
             boolean isRound = insets.isRound();
-            mXOffset = resources.getDimension(isRound
+            _xOffset = resources.getDimension(isRound
                     ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
             float textSize = resources.getDimension(isRound
                     ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
 
-            mTextPaint.setTextSize(textSize);
+            _textPaint.setTextSize(textSize);
         }
 
         @Override
         public void onPropertiesChanged(Bundle properties) {
             super.onPropertiesChanged(properties);
             mLowBitAmbient = properties.getBoolean(PROPERTY_LOW_BIT_AMBIENT, false);
-            mBurnInProtection = properties.getBoolean(PROPERTY_BURN_IN_PROTECTION, false);
         }
 
         @Override
@@ -203,7 +199,7 @@ public class LucaWatchFace extends CanvasWatchFaceService {
 
             mAmbient = inAmbientMode;
             if (mLowBitAmbient) {
-                mTextPaint.setAntiAlias(!inAmbientMode);
+                _textPaint.setAntiAlias(!inAmbientMode);
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -240,34 +236,32 @@ public class LucaWatchFace extends CanvasWatchFaceService {
             if (isInAmbientMode()) {
                 canvas.drawColor(Color.BLACK);
             } else {
-                canvas.drawRect(0, 0, bounds.width(), bounds.height(), mBackgroundPaint);
+                canvas.drawRect(0, 0, bounds.width(), bounds.height(), _backgroundPaint);
             }
 
             // Draw H:MM in ambient mode or H:MM:SS in interactive mode.
             long now = System.currentTimeMillis();
-            mCalendar.setTimeInMillis(now);
+            _calendar.setTimeInMillis(now);
 
             String text = mAmbient
-                    ? String.format("%d:%02d", mCalendar.get(Calendar.HOUR),
-                    mCalendar.get(Calendar.MINUTE))
-                    : String.format("%d:%02d:%02d", mCalendar.get(Calendar.HOUR),
-                    mCalendar.get(Calendar.MINUTE), mCalendar.get(Calendar.SECOND));
-            canvas.drawText(text, mXOffset, mYOffset, mTextPaint);
+                    ? String.format("%d:%02d", _calendar.get(Calendar.HOUR), _calendar.get(Calendar.MINUTE))
+                    : String.format("%d:%02d:%02d", _calendar.get(Calendar.HOUR), _calendar.get(Calendar.MINUTE), _calendar.get(Calendar.SECOND));
+            canvas.drawText(text, _xOffset, _yOffset, _textPaint);
         }
 
         /**
-         * Starts the {@link #mUpdateTimeHandler} timer if it should be running and isn't currently
+         * Starts the {@link #_updateTimeHandler} timer if it should be running and isn't currently
          * or stops it if it shouldn't be running but currently is.
          */
         private void updateTimer() {
-            mUpdateTimeHandler.removeMessages(MSG_UPDATE_TIME);
+            _updateTimeHandler.removeMessages(MSG_UPDATE_TIME);
             if (shouldTimerBeRunning()) {
-                mUpdateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
+                _updateTimeHandler.sendEmptyMessage(MSG_UPDATE_TIME);
             }
         }
 
         /**
-         * Returns whether the {@link #mUpdateTimeHandler} timer should be running. The timer should
+         * Returns whether the {@link #_updateTimeHandler} timer should be running. The timer should
          * only run when we're visible and in interactive mode.
          */
         private boolean shouldTimerBeRunning() {
@@ -283,7 +277,7 @@ public class LucaWatchFace extends CanvasWatchFaceService {
                 long timeMs = System.currentTimeMillis();
                 long delayMs = INTERACTIVE_UPDATE_RATE_MS
                         - (timeMs % INTERACTIVE_UPDATE_RATE_MS);
-                mUpdateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
+                _updateTimeHandler.sendEmptyMessageDelayed(MSG_UPDATE_TIME, delayMs);
             }
         }
     }

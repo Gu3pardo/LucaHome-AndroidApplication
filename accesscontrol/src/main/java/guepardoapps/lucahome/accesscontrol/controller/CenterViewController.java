@@ -11,8 +11,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import guepardoapps.lucahome.accesscontrol.R;
-import guepardoapps.lucahome.accesscontrol.common.Constants;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.IDownloadController;
 import guepardoapps.lucahome.common.controller.ReceiverController;
@@ -20,7 +18,11 @@ import guepardoapps.lucahome.common.controller.SettingsController;
 import guepardoapps.lucahome.common.enums.AccessControlAlarmState;
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.server.handler.IAccessControlDataHandler;
+import guepardoapps.lucahome.common.utils.ByteStringHelper;
 import guepardoapps.lucahome.common.utils.Logger;
+
+import guepardoapps.lucahome.accesscontrol.R;
+import guepardoapps.lucahome.accesscontrol.common.Constants;
 
 public class CenterViewController {
     private static final String Tag = CenterViewController.class.getSimpleName();
@@ -142,7 +144,9 @@ public class CenterViewController {
             String requestUrl = "http://"
                     + SettingsController.getInstance().GetServerIp()
                     + guepardoapps.lucahome.common.constants.Constants.ActionPath
-                    + Constants.UserName + "&password=" + Constants.UserPassPhrase
+                    + ByteStringHelper.ReadStringFromCharArray(Constants.UserName)
+                    + "&password="
+                    + ByteStringHelper.ReadStringFromCharArray(Constants.UserPassPhrase)
                     + "&action=" + LucaServerActionTypes.START_ACCESS_ALARM.toString();
             _downloadController.SendCommandToWebsiteAsync(requestUrl, IDownloadController.DownloadType.AccessAlarm, true);
         });
@@ -168,7 +172,9 @@ public class CenterViewController {
                 String requestUrl = "http://"
                         + SettingsController.getInstance().GetServerIp()
                         + guepardoapps.lucahome.common.constants.Constants.ActionPath
-                        + Constants.UserName + "&password=" + Constants.UserPassPhrase
+                        + ByteStringHelper.ReadStringFromCharArray(Constants.UserName)
+                        + "&password="
+                        + ByteStringHelper.ReadStringFromCharArray(Constants.UserPassPhrase)
                         + "&action=" + LucaServerActionTypes.SEND_ACCESS_CODE.toString() + _code;
                 _downloadController.SendCommandToWebsiteAsync(requestUrl, IDownloadController.DownloadType.AccessAlarm, true);
             } else {

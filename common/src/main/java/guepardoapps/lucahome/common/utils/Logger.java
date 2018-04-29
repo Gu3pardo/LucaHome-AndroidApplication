@@ -13,7 +13,7 @@ import java.io.LineNumberReader;
 import java.util.Calendar;
 import java.util.Locale;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Logger {
     private static final int MaxLogFileLines = 16536;
 

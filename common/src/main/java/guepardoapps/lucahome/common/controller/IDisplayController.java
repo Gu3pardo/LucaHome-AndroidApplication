@@ -2,14 +2,13 @@ package guepardoapps.lucahome.common.controller;
 
 import android.view.Display;
 
+@SuppressWarnings({"unused"})
 public interface IDisplayController {
     Display GetDisplayDimension();
 
-    void ScreenOn(int[] adFlags, int[] viewFlags);
+    boolean IsScreenOn();
 
     void ScreenOff(int[] removeFlags);
-
-    boolean IsScreenOn();
 
     int GetCurrentBrightness();
 

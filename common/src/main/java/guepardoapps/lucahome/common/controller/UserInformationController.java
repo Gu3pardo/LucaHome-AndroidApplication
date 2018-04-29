@@ -5,12 +5,13 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
 import android.support.annotation.NonNull;
-import android.text.format.Formatter;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings({"deprecation", "WeakerAccess"})
+@SuppressWarnings({"WeakerAccess"})
 public class UserInformationController implements IUserInformationController {
 
     private PackageManager _packageManager;
@@ -51,7 +52,7 @@ public class UserInformationController implements IUserInformationController {
     }
 
     @Override
-    public String GetIp() {
-        return Formatter.formatIpAddress(_wifiManager.getConnectionInfo().getIpAddress());
+    public String GetIp() throws UnknownHostException {
+        return InetAddress.getLocalHost().getHostAddress();
     }
 }

@@ -99,7 +99,7 @@ public class CalendarService implements ICalendarService {
     }
 
     @Override
-    public void LoadData() throws NoSuchMethodException {
+    public void LoadData() {
         ArrayList<CalendarEntry> calendarEntries = GetDataList();
         _broadcastController.SendSerializableBroadcast(CalendarLoadFinishedBroadcast, CalendarLoadFinishedBundle, calendarEntries);
     }

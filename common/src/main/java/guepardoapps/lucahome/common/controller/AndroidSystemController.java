@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
-import android.app.ActivityManager.RunningTaskInfo;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -21,7 +20,7 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"deprecation", "WeakerAccess"})
+@SuppressWarnings({"WeakerAccess"})
 public class AndroidSystemController implements IAndroidSystemController {
     private static final String Tag = AndroidSystemController.class.getSimpleName();
 
@@ -68,26 +67,6 @@ public class AndroidSystemController implements IAndroidSystemController {
 
         for (ActivityManager.AppTask task : tasks) {
             if (_context.getPackageName().equalsIgnoreCase(task.getTaskInfo().baseActivity.getPackageName())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean IsBaseActivityRunningPreAPI23() {
-        ActivityManager activityManager = (ActivityManager) _context.getSystemService(Context.ACTIVITY_SERVICE);
-
-        if (activityManager == null) {
-            Logger.getInstance().Error(Tag, "ActivityManager is null!");
-            return false;
-        }
-
-        List<RunningTaskInfo> tasks = activityManager.getRunningTasks(Integer.MAX_VALUE);
-
-        for (RunningTaskInfo task : tasks) {
-            if (_context.getPackageName().equalsIgnoreCase(task.baseActivity.getPackageName())) {
                 return true;
             }
         }

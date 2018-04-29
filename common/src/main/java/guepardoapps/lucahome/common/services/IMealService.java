@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import guepardoapps.lucahome.common.classes.Meal;
 
+@SuppressWarnings({"unused"})
 public interface IMealService extends ILucaService<Meal> {
     String MealDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.meal.download.finished";
     String MealUpdateFinishedBroadcast = "guepardoapps.lucahome.common.services.meal.update.finished";

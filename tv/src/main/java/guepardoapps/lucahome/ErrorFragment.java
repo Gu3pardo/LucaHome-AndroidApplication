@@ -13,33 +13,36 @@
  */
 package guepardoapps.lucahome;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
+
+import guepardoapps.lucahome.common.utils.Logger;
 
 /*
  * This class demonstrates how to extend ErrorFragment
  */
+@SuppressWarnings({"deprecation"})
 public class ErrorFragment extends android.support.v17.leanback.app.ErrorFragment {
-    private static final String TAG = "ErrorFragment";
+    private static final String Tag = "ErrorFragment";
     private static final boolean TRANSLUCENT = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate");
+        Logger.getInstance().Debug(Tag, "onCreate");
         super.onCreate(savedInstanceState);
         setTitle(getResources().getString(R.string.app_name));
     }
 
-    void setErrorContent() {
-        setImageDrawable(getResources().getDrawable(R.drawable.lb_ic_sad_cloud));
+    public void setErrorContent(@NonNull Context context) {
+        setImageDrawable(ContextCompat.getDrawable(context, R.drawable.lb_ic_sad_cloud));
         setMessage(getResources().getString(R.string.error_fragment_message));
         setDefaultBackground(TRANSLUCENT);
 
         setButtonText(getResources().getString(R.string.dismiss_error));
-        setButtonClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
+        setButtonClickListener(arg0 -> {
+            if (getFragmentManager() != null) {
                 getFragmentManager().beginTransaction().remove(ErrorFragment.this).commit();
             }
         });

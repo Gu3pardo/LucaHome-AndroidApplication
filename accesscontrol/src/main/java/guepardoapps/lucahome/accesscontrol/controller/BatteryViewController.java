@@ -11,11 +11,12 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
-import guepardoapps.lucahome.accesscontrol.R;
 import guepardoapps.lucahome.common.controller.ReceiverController;
 import guepardoapps.lucahome.common.enums.AccessControlAlarmState;
 import guepardoapps.lucahome.common.server.handler.IAccessControlDataHandler;
 import guepardoapps.lucahome.common.utils.Logger;
+
+import guepardoapps.lucahome.accesscontrol.R;
 
 public class BatteryViewController {
     private static final String Tag = BatteryViewController.class.getSimpleName();
@@ -74,7 +75,7 @@ public class BatteryViewController {
                     }
                     _batteryAlarmView.setBackground(_circleGreen);
 
-                } else if (level <= BatteryLevelWarning && level > BatteryLevelCritical) {
+                } else if (level > BatteryLevelCritical) {
                     if (_circleYellow == null) {
                         tryToReadXmlCircle();
                     }

@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class PuckJs implements ILucaClass {
     private static final String Tag = PuckJs.class.getSimpleName();
 

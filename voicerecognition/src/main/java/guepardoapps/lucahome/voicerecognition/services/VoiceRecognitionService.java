@@ -211,7 +211,7 @@ public class VoiceRecognitionService implements RecognitionListener, ActivityCom
         }
     }
 
-    private boolean checkRecordAudioPermission() throws Exception {
+    private boolean checkRecordAudioPermission() {
         Logger.getInstance().Debug(Tag, "checkRecordAudioPermission");
         int permissionCheck = ContextCompat.checkSelfPermission(_context.getApplicationContext(), Manifest.permission.RECORD_AUDIO);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
@@ -272,7 +272,7 @@ public class VoiceRecognitionService implements RecognitionListener, ActivityCom
                 break;
             case WirelessSocketToggle:
                 WirelessSocket wirelessSocketToggle = _relationshipHelper.GetWirelessSocketByName(resultParameter, WirelessSocketService.getInstance().GetDataList());
-                WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocketToggle, !wirelessSocketToggle.IsActivated());
+                WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocketToggle, !wirelessSocketToggle.GetState());
                 break;
 
             case WirelessSwitchToggle:

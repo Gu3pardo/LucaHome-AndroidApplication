@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import guepardoapps.lucahome.common.classes.Movie;
 
+@SuppressWarnings({"unused"})
 public interface IMovieService extends ILucaService<Movie> {
     String MovieDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.movie.download.finished";
     String MovieUpdateFinishedBroadcast = "guepardoapps.lucahome.common.services.movie.update.finished";

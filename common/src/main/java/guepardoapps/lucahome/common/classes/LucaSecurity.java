@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class LucaSecurity implements ILucaClass {
     private static final String Tag = LucaSecurity.class.getSimpleName();
 

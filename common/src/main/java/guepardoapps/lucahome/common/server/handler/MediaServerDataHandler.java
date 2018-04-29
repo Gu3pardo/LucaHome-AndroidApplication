@@ -248,7 +248,7 @@ public class MediaServerDataHandler implements IMediaServerDataHandler {
         if (commandData.length() == 0) {
             _broadcastController.SendSimpleBroadcast(BroadcastVideoPlay);
 
-        } else if (commandData.length() > 0 && commandData.length() < 4) {
+        } else if (commandData.length() < 4) {
             int youtubeIdInt;
             try {
                 youtubeIdInt = Integer.parseInt(commandData);

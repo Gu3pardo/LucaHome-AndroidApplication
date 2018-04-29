@@ -14,29 +14,33 @@
 
 package guepardoapps.lucahome;
 
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v17.leanback.widget.ImageCardView;
 import android.support.v17.leanback.widget.Presenter;
-import android.util.Log;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+
+import guepardoapps.lucahome.common.utils.Logger;
 
 /*
  * A CardPresenter is used to generate Views and bind Objects to them on demand.
  * It contains an Image CardView
  */
+@SuppressWarnings({"unused"})
 public class CardPresenter extends Presenter {
-    private static final String TAG = "CardPresenter";
+    private static final String Tag = "CardPresenter";
 
     private static final int CARD_WIDTH = 313;
     private static final int CARD_HEIGHT = 176;
-    private static int sSelectedBackgroundColor;
-    private static int sDefaultBackgroundColor;
-    private Drawable mDefaultCardImage;
+    private static int _selectedBackgroundColor;
+    private static int _defaultBackgroundColor;
+
+    private Drawable _defaultCardImage;
 
     private static void updateCardBackgroundColor(ImageCardView view, boolean selected) {
-        int color = selected ? sSelectedBackgroundColor : sDefaultBackgroundColor;
+        int color = selected ? _selectedBackgroundColor : _defaultBackgroundColor;
         // Both background colors should be set because the view's background is temporarily visible
         // during animations.
         view.setBackgroundColor(color);
@@ -45,16 +49,17 @@ public class CardPresenter extends Presenter {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        Log.d(TAG, "onCreateViewHolder");
+        Logger.getInstance().Debug(Tag, "onCreateViewHolder");
 
-        sDefaultBackgroundColor = parent.getResources().getColor(R.color.default_background);
-        sSelectedBackgroundColor = parent.getResources().getColor(R.color.selected_background);
+        _selectedBackgroundColor = Resources.getSystem().getColor(R.color.selected_background, null);
+        _defaultBackgroundColor = Resources.getSystem().getColor(R.color.default_background, null);
+
         /*
          * This template uses a default image in res/drawable, but the general case for Android TV
          * will require your resources in xhdpi. For more information, see
          * https://developer.android.com/training/tv/start/layouts.html#density-resources
          */
-        mDefaultCardImage = parent.getResources().getDrawable(R.drawable.movie);
+        _defaultCardImage = Resources.getSystem().getDrawable(R.drawable.movie, null);
 
         ImageCardView cardView = new ImageCardView(parent.getContext()) {
             @Override
@@ -75,7 +80,7 @@ public class CardPresenter extends Presenter {
         Movie movie = (Movie) item;
         ImageCardView cardView = (ImageCardView) viewHolder.view;
 
-        Log.d(TAG, "onBindViewHolder");
+        Logger.getInstance().Debug(Tag, "onBindViewHolder");
         if (movie.getCardImageUrl() != null) {
             cardView.setTitleText(movie.getTitle());
             cardView.setContentText(movie.getStudio());
@@ -83,14 +88,14 @@ public class CardPresenter extends Presenter {
             Glide.with(viewHolder.view.getContext())
                     .load(movie.getCardImageUrl())
                     .centerCrop()
-                    .error(mDefaultCardImage)
+                    .error(_defaultCardImage)
                     .into(cardView.getMainImageView());
         }
     }
 
     @Override
     public void onUnbindViewHolder(Presenter.ViewHolder viewHolder) {
-        Log.d(TAG, "onUnbindViewHolder");
+        Logger.getInstance().Debug(Tag, "onUnbindViewHolder");
         ImageCardView cardView = (ImageCardView) viewHolder.view;
         // Remove references to images so that the garbage collector can free up memory
         cardView.setBadgeImage(null);

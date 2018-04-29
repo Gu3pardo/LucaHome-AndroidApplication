@@ -22,7 +22,7 @@ public class RssParser implements IRssParser {
     private static final String NameSpace = null;
 
     @Override
-    public List<RssItem> Parse(@NonNull InputStream inputStream) throws XmlPullParserException, IOException {
+    public List<RssItem> Parse(@NonNull InputStream inputStream) throws IOException {
         try {
             XmlPullParser parser = Xml.newPullParser();
 

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import guepardoapps.lucahome.common.classes.ShoppingItem;
 
+@SuppressWarnings({"unused"})
 public interface IShoppingItemService extends ILucaService<ShoppingItem> {
     String ShoppingItemDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.shoppingitem.download.finished";
     String ShoppingItemAddFinishedBroadcast = "guepardoapps.lucahome.common.services.shoppingitem.add.finished";

@@ -14,17 +14,13 @@
 
 package guepardoapps.lucahome;
 
-import android.util.Log;
-
 import java.io.Serializable;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 /*
  * Movie class represents video entity with title, description, image thumbs and video url.
  */
+@SuppressWarnings({"unused"})
 public class Movie implements Serializable {
-    static final long serialVersionUID = 727566175075960653L;
     private long id;
     private String title;
     private String description;
@@ -33,9 +29,6 @@ public class Movie implements Serializable {
     private String videoUrl;
     private String studio;
     private String category;
-
-    public Movie() {
-    }
 
     public long getId() {
         return id;

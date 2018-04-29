@@ -40,7 +40,7 @@ import guepardoapps.lucahome.common.services.WirelessSocketService;
 import guepardoapps.lucahome.common.services.WirelessSwitchService;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"deprecation", "FieldCanBeLocal", "WeakerAccess"})
+@SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
 public class BixbyPairService implements IBixbyPairService<BixbyPair> {
     private static final String Tag = BixbyPairService.class.getSimpleName();
 
@@ -118,7 +118,7 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
     }
 
     @Override
-    public void BixbyButtonPressed() throws Exception {
+    public void BixbyButtonPressed() {
         Logger.getInstance().Debug(Tag, "BixbyButtonPressed");
 
         for (BixbyPair bixbyPair : createPairList()) {
@@ -308,7 +308,7 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
         return pairList;
     }
 
-    private boolean validateRequirements(@NonNull ArrayList<BixbyRequirement> requirementList) throws Exception {
+    private boolean validateRequirements(@NonNull ArrayList<BixbyRequirement> requirementList) {
         boolean allRequirementsTrue = true;
 
         for (int requirementIndex = 0; requirementIndex < requirementList.size(); requirementIndex++) {
@@ -346,12 +346,12 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
         return allRequirementsTrue;
     }
 
-    private boolean validatePositionRequirement(@NonNull String puckJsPosition) throws Exception {
+    private boolean validatePositionRequirement(@NonNull String puckJsPosition) {
         Room room = RoomService.getInstance().GetByUuid(_lastReceivedPosition.GetPuckJs().GetRoomUuid());
         return _lastReceivedPosition != null && puckJsPosition.contains(room.GetName());
     }
 
-    private boolean validateLightRequirement(@NonNull LightRequirement lightRequirement) throws Exception {
+    private boolean validateLightRequirement(@NonNull LightRequirement lightRequirement) {
         return _lastReceivedPosition != null && lightRequirement.ValidateActualValue(_lastReceivedPosition.GetLightValue());
     }
 
@@ -388,7 +388,7 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
 
     private boolean validateWirelessSocketRequirement(@NonNull WirelessSocketRequirement wirelessSocketRequirement) {
         WirelessSocket wirelessSocket = WirelessSocketService.getInstance().GetByName(wirelessSocketRequirement.GetWirelessSocketName());
-        return (wirelessSocketRequirement.GetStateType() == WirelessSocketRequirement.StateType.On) == wirelessSocket.IsActivated();
+        return (wirelessSocketRequirement.GetStateType() == WirelessSocketRequirement.StateType.On) == wirelessSocket.GetState();
     }
 
     private void performAction(@NonNull BixbyAction bixbyAction) throws Exception {
@@ -422,7 +422,7 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
         }
     }
 
-    private void performApplicationAction(@NonNull ApplicationAction applicationAction) throws Exception {
+    private void performApplicationAction(@NonNull ApplicationAction applicationAction) {
         Logger.getInstance().Debug(Tag, String.format(Locale.getDefault(), "performApplicationAction for %s", applicationAction));
 
         String packageName = applicationAction.GetPackageName();
@@ -437,7 +437,7 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
         _context.startActivity(startApplicationIntent);
     }
 
-    private void performNetworkAction(@NonNull NetworkAction networkAction) throws Exception {
+    private void performNetworkAction(@NonNull NetworkAction networkAction) {
         Logger.getInstance().Debug(Tag, String.format(Locale.getDefault(), "performNetworkAction for %s", networkAction));
 
         NetworkAction.NetworkType networkType = networkAction.GetNetworkType();
@@ -501,9 +501,8 @@ public class BixbyPairService implements IBixbyPairService<BixbyPair> {
         }
     }
 
-    private void performWirelessSwitchAction(@NonNull WirelessSwitchAction wirelessSwitchAction) throws Exception {
+    private void performWirelessSwitchAction(@NonNull WirelessSwitchAction wirelessSwitchAction) {
         Logger.getInstance().Debug(Tag, String.format(Locale.getDefault(), "performWirelessSwitchAction for %s", wirelessSwitchAction));
-
         WirelessSwitch wirelessSwitch = WirelessSwitchService.getInstance().GetByName(wirelessSwitchAction.GetWirelessSwitchName());
         WirelessSwitchService.getInstance().ToggleWirelessSwitch(wirelessSwitch);
     }

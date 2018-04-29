@@ -11,7 +11,6 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
-import guepardoapps.lucahome.accesscontrol.common.Constants;
 import guepardoapps.lucahome.common.classes.MediaServer;
 import guepardoapps.lucahome.common.controller.BroadcastController;
 import guepardoapps.lucahome.common.controller.DownloadController;
@@ -27,8 +26,11 @@ import guepardoapps.lucahome.common.server.handler.IAccessControlDataHandler;
 import guepardoapps.lucahome.common.server.handler.IDataHandler;
 import guepardoapps.lucahome.common.services.DownloadStorageService;
 import guepardoapps.lucahome.common.services.MediaServerClientService;
+import guepardoapps.lucahome.common.utils.ByteStringHelper;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.Tools;
+
+import guepardoapps.lucahome.accesscontrol.common.Constants;
 
 public class MainService extends Service {
     private static final String Tag = MainService.class.getSimpleName();
@@ -58,7 +60,9 @@ public class MainService extends Service {
             String requestUrl = "http://"
                     + SettingsController.getInstance().GetServerIp()
                     + guepardoapps.lucahome.common.constants.Constants.ActionPath
-                    + Constants.UserName + "&password=" + Constants.UserPassPhrase
+                    + ByteStringHelper.ReadStringFromCharArray(Constants.UserName)
+                    + "&password="
+                    + ByteStringHelper.ReadStringFromCharArray(Constants.UserPassPhrase)
                     + "&action=" + LucaServerActionTypes.STOP_ACCESS_ALARM.toString();
             _downloadController.SendCommandToWebsiteAsync(requestUrl, IDownloadController.DownloadType.AccessAlarm, true);
 

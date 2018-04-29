@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.util.List;
 
+@SuppressWarnings({"unused"})
 public interface ISharedPrefController {
     boolean Contains(@NonNull String key);
 

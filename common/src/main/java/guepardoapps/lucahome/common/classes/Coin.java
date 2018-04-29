@@ -8,7 +8,7 @@ import java.util.UUID;
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Coin implements ILucaClass {
     private static final String Tag = Coin.class.getSimpleName();
 

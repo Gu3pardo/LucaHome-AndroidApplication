@@ -16,6 +16,7 @@ import guepardoapps.lucahome.common.services.RoomService;
 import guepardoapps.lucahome.voicerecognition.classes.RelationActionClass;
 import guepardoapps.lucahome.voicerecognition.common.Constants;
 
+@SuppressWarnings({"unused"})
 public class RelationshipHelper implements IRelationshipHelper {
 
     @Override

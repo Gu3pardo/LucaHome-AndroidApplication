@@ -19,7 +19,7 @@ import java.util.UUID;
 import guepardoapps.lucahome.common.classes.CalendarEntry;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"deprecation", "WeakerAccess"})
+@SuppressWarnings({"WeakerAccess"})
 public class CalendarController implements ICalendarController {
     private static final String Tag = CalendarController.class.getSimpleName();
 
@@ -83,11 +83,11 @@ public class CalendarController implements ICalendarController {
                         final Date startDate = new Date(eventCursor.getLong(StartDateIndex));
 
                         Calendar start = Calendar.getInstance();
-                        start.set(startDate.getYear(), startDate.getMonth(), startDate.getDay(), startDate.getHours(), startDate.getMinutes(), startDate.getSeconds());
+                        start.setTime(startDate);
 
                         final Date endDate = new Date(eventCursor.getLong(EndDateIndex));
                         Calendar end = Calendar.getInstance();
-                        end.set(endDate.getYear(), endDate.getMonth(), endDate.getDay(), endDate.getHours(), endDate.getMinutes(), endDate.getSeconds());
+                        end.setTime(endDate);
 
                         final boolean allDay = !eventCursor.getString(AllDayIndex).equals("0");
 

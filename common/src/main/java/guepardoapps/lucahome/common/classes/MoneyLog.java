@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MoneyLog implements ILucaClass {
     private static final String Tag = MoneyLog.class.getSimpleName();
 

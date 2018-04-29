@@ -12,7 +12,7 @@ import guepardoapps.lucahome.common.controller.BroadcastController;
 import guepardoapps.lucahome.common.controller.UserInformationController;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"FieldCanBeLocal"})
+@SuppressWarnings({"FieldCanBeLocal", "unused"})
 public class BixbyService extends AccessibilityService implements IBixbyService {
     private static final String Tag = BixbyService.class.getSimpleName();
 

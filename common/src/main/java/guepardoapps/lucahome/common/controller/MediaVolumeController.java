@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 import guepardoapps.lucahome.common.observer.SettingsContentObserver;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"deprecation", "WeakerAccess"})
+@SuppressWarnings({"WeakerAccess"})
 public class MediaVolumeController implements IMediaVolumeController {
     private static final String Tag = MediaVolumeController.class.getSimpleName();
 
@@ -128,9 +128,9 @@ public class MediaVolumeController implements IMediaVolumeController {
         }
 
         if (_volume == 0) {
-            _audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+            _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
         } else {
-            _audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+            _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE, 0);
             _audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
         }
 
@@ -150,7 +150,7 @@ public class MediaVolumeController implements IMediaVolumeController {
             return false;
         }
 
-        _audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
         sendVolumeBroadcast();
 
         return true;
@@ -168,7 +168,7 @@ public class MediaVolumeController implements IMediaVolumeController {
             return false;
         }
 
-        _audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        _audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_UNMUTE, 0);
         _audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, _volume, 0);
         sendVolumeBroadcast();
 

@@ -14,7 +14,7 @@ import java.util.UUID;
 import guepardoapps.lucahome.common.classes.ILucaClass;
 import guepardoapps.lucahome.common.classes.YoutubeVideo;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class DatabaseYoutubeVideoList implements IDatabaseLucaClassList<YoutubeVideo> {
     public static final String KeyYoutubeId = "_youtubeId";
     public static final String KeyTitle = "_title";

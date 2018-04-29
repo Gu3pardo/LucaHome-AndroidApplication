@@ -16,7 +16,7 @@ import guepardoapps.lucahome.common.services.WirelessSocketService;
 import guepardoapps.lucahome.common.services.MediaServerClientService;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
 public class WirelessSocketBatteryController implements IWirelessSocketBatteryController {
     private static final String Tag = WirelessSocketBatteryController.class.getSimpleName();
 
@@ -55,7 +55,7 @@ public class WirelessSocketBatteryController implements IWirelessSocketBatteryCo
             return;
         }
 
-        if (wirelessSocket.IsActivated()) {
+        if (wirelessSocket.GetState()) {
             Logger.getInstance().Warning(Tag, "Already activated wireless socket!");
             return;
         }
@@ -74,7 +74,7 @@ public class WirelessSocketBatteryController implements IWirelessSocketBatteryCo
             return;
         }
 
-        if (!wirelessSocket.IsActivated()) {
+        if (!wirelessSocket.GetState()) {
             Logger.getInstance().Warning(Tag, "Already deactivated wireless socket!");
             return;
         }

@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.rss;
 
 import java.util.UUID;
 
+@SuppressWarnings({"unused"})
 public interface IRssItem {
     UUID GetUuid();
 

@@ -2,11 +2,10 @@ package guepardoapps.lucahome.bixby.classes.actions;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 
-@SuppressWarnings("WeakerAccess")
-public class BixbyAction implements IBixbyAction, Serializable {
+@SuppressWarnings({"unused", "WeakerAccess"})
+public class BixbyAction implements IBixbyAction {
     private static final String Tag = BixbyAction.class.getSimpleName();
 
     private int _id;
@@ -39,7 +38,6 @@ public class BixbyAction implements IBixbyAction, Serializable {
     }
 
     public BixbyAction(int id, int actionId) {
-
         _id = id;
         _actionId = actionId;
 

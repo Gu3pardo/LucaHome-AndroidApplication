@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.enums;
 
 import java.io.Serializable;
 
+@SuppressWarnings({"unused"})
 public enum RSSFeedType implements Serializable {
 
     SPEKTRUM_DER_WISSENSCHAFT(0, "Spektrum der Wissenschaft", "http://www.spektrum.de/alias/rss/spektrum-de-rss-feed/996406"),

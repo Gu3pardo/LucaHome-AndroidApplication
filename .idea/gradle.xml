@@ -13,11 +13,11 @@
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/mediaserver" />
             <option value="$PROJECT_DIR$/mobile" />
+            <option value="$PROJECT_DIR$/openweather" />
             <option value="$PROJECT_DIR$/pocketsphinx-android-5prealpha-release" />
             <option value="$PROJECT_DIR$/tv" />
             <option value="$PROJECT_DIR$/voicerecognition" />
             <option value="$PROJECT_DIR$/wear" />
-            <option value="$PROJECT_DIR$/../OpenWeather/lib_openweather" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />

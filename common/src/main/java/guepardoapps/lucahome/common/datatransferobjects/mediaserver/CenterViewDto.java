@@ -171,7 +171,7 @@ public class CenterViewDto implements ICenterViewDto {
                 _mediaNotificationTitle = "";
             }
 
-            if (_radioStream != null || _radioStream != RadioStreamType.BAYERN_3) {
+            if (_radioStream != null) {
                 _youtubeVisible = false;
                 _youtubeId = YoutubeIdType.NULL;
 

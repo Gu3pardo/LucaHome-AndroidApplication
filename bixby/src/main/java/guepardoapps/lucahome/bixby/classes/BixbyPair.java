@@ -9,7 +9,7 @@ import java.util.Locale;
 import guepardoapps.lucahome.bixby.classes.actions.BixbyAction;
 import guepardoapps.lucahome.bixby.classes.requirements.BixbyRequirement;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class BixbyPair implements Serializable {
     private static final String Tag = BixbyPair.class.getSimpleName();
 
@@ -19,7 +19,7 @@ public class BixbyPair implements Serializable {
     private BixbyAction _action;
     private ArrayList<BixbyRequirement> _requirements;
 
-    private DatabaseAction _databaseAction = DatabaseAction.Add;
+    private DatabaseAction _databaseAction;
 
     public BixbyPair(int actionId, @NonNull BixbyAction action, @NonNull ArrayList<BixbyRequirement> requirements, @NonNull DatabaseAction databaseAction) {
         _actionId = actionId;

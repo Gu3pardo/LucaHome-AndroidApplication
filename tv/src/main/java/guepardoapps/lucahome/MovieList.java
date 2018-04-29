@@ -17,6 +17,7 @@ package guepardoapps.lucahome;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings({"unused"})
 public final class MovieList {
     public static final String MOVIE_CATEGORY[] = {
             "Category Zero",
@@ -39,6 +40,14 @@ public final class MovieList {
 
     public static List<Movie> setupMovies() {
         list = new ArrayList<>();
+        String category[] = {
+                "Action",
+                "Action",
+                "Love",
+                "Trash",
+                "Action"
+        };
+
         String title[] = {
                 "Zeitgeist 2010_ Year in Review",
                 "Google Demo Slam_ 20ft Search",
@@ -81,7 +90,7 @@ public final class MovieList {
         for (int index = 0; index < title.length; ++index) {
             list.add(
                     buildMovieInfo(
-                            "category",
+                            category[index],
                             title[index],
                             description,
                             studio[index],

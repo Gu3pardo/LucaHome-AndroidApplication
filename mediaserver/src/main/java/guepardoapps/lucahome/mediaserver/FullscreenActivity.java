@@ -24,6 +24,7 @@ import es.dmoral.toasty.Toasty;
 import guepardoapps.lucahome.common.classes.ILucaClass;
 import guepardoapps.lucahome.common.classes.User;
 import guepardoapps.lucahome.common.controller.SettingsController;
+import guepardoapps.lucahome.common.utils.ByteStringHelper;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.mediaserver.common.Constants;
 import guepardoapps.lucahome.mediaserver.services.ControlServiceStateService;
@@ -53,7 +54,13 @@ public class FullscreenActivity extends YouTubeBaseActivity {
         super.onCreate(savedInstanceState);
 
         SettingsController.getInstance().Initialize(this);
-        SettingsController.getInstance().SetUser(new User(UUID.randomUUID(), Constants.UserName, Constants.UserPassPhrase, true, ILucaClass.LucaServerDbAction.Null));
+        SettingsController.getInstance().SetUser(
+                new User(
+                        UUID.randomUUID(),
+                        ByteStringHelper.ReadStringFromCharArray(Constants.UserName),
+                        ByteStringHelper.ReadStringFromCharArray(Constants.UserPassPhrase),
+                        true,
+                        ILucaClass.LucaServerDbAction.Null));
 
         checkPermissions();
 
@@ -94,6 +101,8 @@ public class FullscreenActivity extends YouTubeBaseActivity {
         _raspberryViewController.onCreate();
         _rssViewController.onCreate();
         _weatherViewController.onCreate();*/
+
+        startServices();
     }
 /*
     @Override

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class User implements ILucaClass {
     private static final String Tag = User.class.getSimpleName();
 
@@ -57,21 +58,21 @@ public class User implements ILucaClass {
     }
 
     @Override
-    public String GetCommandAdd() throws NoSuchMethodException {
+    public String GetCommandAdd() {
         return String.format(Locale.getDefault(),
                 "%s%s&name=%s&passphrase=%s",
                 LucaServerActionTypes.ADD_USER.toString(), _uuid, _name, _passphrase);
     }
 
     @Override
-    public String GetCommandUpdate() throws NoSuchMethodException {
+    public String GetCommandUpdate() {
         return String.format(Locale.getDefault(),
                 "%s%s&name=%s&passphrase=%s",
                 LucaServerActionTypes.UPDATE_USER.toString(), _uuid, _name, _passphrase);
     }
 
     @Override
-    public String GetCommandDelete() throws NoSuchMethodException {
+    public String GetCommandDelete() {
         return String.format(Locale.getDefault(),
                 "%s%s",
                 LucaServerActionTypes.DELETE_USER.toString(), _uuid);
@@ -88,8 +89,8 @@ public class User implements ILucaClass {
     }
 
     @Override
-    public void SetServerDbAction(@NonNull LucaServerDbAction lucaServerDbAction) {
-        _serverDbAction = _serverDbAction;
+    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
+        _serverDbAction = serverDbAction;
     }
 
     @Override

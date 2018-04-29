@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.classes.PuckJs;
 
+@SuppressWarnings({"unused"})
 public interface IPuckJsService extends ILucaService<PuckJs> {
     String PuckJsDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.puckjs.download.finished";
     String PuckJsAddFinishedBroadcast = "guepardoapps.lucahome.common.services.puckjs.add.finished";

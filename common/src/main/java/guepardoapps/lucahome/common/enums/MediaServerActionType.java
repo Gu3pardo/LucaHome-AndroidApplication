@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.enums;
 
 import java.io.Serializable;
 
+@SuppressWarnings({"unused"})
 public enum MediaServerActionType implements Serializable {
 
     NULL(0, "", 0),

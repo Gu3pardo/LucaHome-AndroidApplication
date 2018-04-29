@@ -19,8 +19,8 @@ public class DatabaseTemperatureList implements IDatabaseLucaClassList<Temperatu
     public static final String KeyRoomUuid = "_roomUuid";
     public static final String KeyTemperature = "_temperature";
     public static final String KeyDateTime = "_dateTime";
-    public static final String KeySensorPath = "_sensorPath";
     public static final String KeyTemperatureType = "_temperatureType";
+    public static final String KeySensorPath = "_sensorPath";
     public static final String KeyGraphPath = "_graphPath";
 
     private static final String DatabaseTable = "DatabaseTemperatureListTable";
@@ -43,8 +43,8 @@ public class DatabaseTemperatureList implements IDatabaseLucaClassList<Temperatu
                     + KeyRoomUuid + " TEXT NOT NULL, "
                     + KeyTemperature + " REAL, "
                     + KeyDateTime + " INTEGER, "
-                    + KeySensorPath + " TEXT NOT NULL, "
                     + KeyTemperatureType + " INTEGER, "
+                    + KeySensorPath + " TEXT NOT NULL, "
                     + KeyGraphPath + " TEXT NOT NULL); ");
         }
 
@@ -79,8 +79,8 @@ public class DatabaseTemperatureList implements IDatabaseLucaClassList<Temperatu
         contentValues.put(KeyRoomUuid, entry.GetRoomUuid().toString());
         contentValues.put(KeyTemperature, entry.GetTemperature());
         contentValues.put(KeyDateTime, entry.GetDateTime().getTimeInMillis());
-        contentValues.put(KeySensorPath, entry.GetSensorPath());
         contentValues.put(KeyTemperatureType, entry.GetTemperatureType().ordinal());
+        contentValues.put(KeySensorPath, entry.GetSensorPath());
         contentValues.put(KeyGraphPath, entry.GetGraphPath());
 
         return _database.insert(DatabaseTable, null, contentValues);
@@ -93,8 +93,8 @@ public class DatabaseTemperatureList implements IDatabaseLucaClassList<Temperatu
         contentValues.put(KeyRoomUuid, entry.GetRoomUuid().toString());
         contentValues.put(KeyTemperature, entry.GetTemperature());
         contentValues.put(KeyDateTime, entry.GetDateTime().getTimeInMillis());
-        contentValues.put(KeySensorPath, entry.GetSensorPath());
         contentValues.put(KeyTemperatureType, entry.GetTemperatureType().ordinal());
+        contentValues.put(KeySensorPath, entry.GetSensorPath());
         contentValues.put(KeyGraphPath, entry.GetGraphPath());
 
         return _database.update(DatabaseTable, contentValues, KeyUuid + "=" + entry.GetUuid().toString(), null);
@@ -117,8 +117,8 @@ public class DatabaseTemperatureList implements IDatabaseLucaClassList<Temperatu
                 KeyRoomUuid,
                 KeyTemperature,
                 KeyDateTime,
-                KeySensorPath,
                 KeyTemperatureType,
+                KeySensorPath,
                 KeyGraphPath};
 
         Cursor cursor = _database.query(DatabaseTable, columns, selection, null, groupBy, null, orderBy);
@@ -128,8 +128,8 @@ public class DatabaseTemperatureList implements IDatabaseLucaClassList<Temperatu
         int roomUuidIndex = cursor.getColumnIndex(KeyRoomUuid);
         int temperatureIndex = cursor.getColumnIndex(KeyTemperature);
         int dateTimeIndex = cursor.getColumnIndex(KeyDateTime);
-        int sensorPathIndex = cursor.getColumnIndex(KeySensorPath);
         int temperatureTypeIndex = cursor.getColumnIndex(KeyTemperatureType);
+        int sensorPathIndex = cursor.getColumnIndex(KeySensorPath);
         int graphPathIndex = cursor.getColumnIndex(KeyGraphPath);
 
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
@@ -137,8 +137,8 @@ public class DatabaseTemperatureList implements IDatabaseLucaClassList<Temperatu
             String roomUuidString = cursor.getString(roomUuidIndex);
             float temperature = cursor.getFloat(temperatureIndex);
             int dateTimeInteger = cursor.getInt(dateTimeIndex);
-            String sensorPath = cursor.getString(sensorPathIndex);
             int temperatureTypeInteger = cursor.getInt(temperatureTypeIndex);
+            String sensorPath = cursor.getString(sensorPathIndex);
             String graphPath = cursor.getString(graphPathIndex);
 
             UUID uuid = UUID.fromString(uuidString);
@@ -149,7 +149,7 @@ public class DatabaseTemperatureList implements IDatabaseLucaClassList<Temperatu
 
             Temperature.TemperatureType temperatureType = Temperature.TemperatureType.values()[temperatureTypeInteger];
 
-            Temperature entry = new Temperature(uuid, roomUuid, temperature, dateTime, sensorPath, temperatureType, graphPath);
+            Temperature entry = new Temperature(uuid, roomUuid, temperature, dateTime, temperatureType, sensorPath, graphPath);
             result.add(entry);
         }
 

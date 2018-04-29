@@ -19,7 +19,7 @@ import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.Tools;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class UserService implements IUserService {
     private static final String Tag = UserService.class.getSimpleName();
 

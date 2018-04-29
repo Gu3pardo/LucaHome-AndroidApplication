@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 
+@SuppressWarnings({"unused"})
 public interface IWirelessSocketService extends ILucaService<WirelessSocket> {
     String WirelessSocketDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.wirelesssocket.download.finished";
     String WirelessSocketAddFinishedBroadcast = "guepardoapps.lucahome.common.services.wirelesssocket.add.finished";

@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.services;
 
 import guepardoapps.lucahome.common.classes.WirelessSchedule;
 
+@SuppressWarnings({"unused"})
 public interface IWirelessScheduleService extends ILucaService<WirelessSchedule> {
     String WirelessScheduleDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.wirelessschedule.download.finished";
     String WirelessScheduleAddFinishedBroadcast = "guepardoapps.lucahome.common.services.wirelessschedule.add.finished";

@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.Locale;
 import java.util.UUID;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class CalendarEntry implements Serializable {
     private static final String Tag = CalendarEntry.class.getSimpleName();
 

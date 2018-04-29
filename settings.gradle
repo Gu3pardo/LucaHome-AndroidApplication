@@ -1,2 +1,1 @@
-include ':mobile', ':wear', ':tv', ':common', ':lib_openweather', ':bixby', ':voicerecognition', ':pocketsphinx-android-5prealpha-release', ':mediaserver', ':accesscontrol'
-project(':lib_openweather').projectDir = new File(settingsDir, '../OpenWeather/lib_openweather')
+include ':mobile', ':wear', ':tv', ':common', ':bixby', ':voicerecognition', ':pocketsphinx-android-5prealpha-release', ':mediaserver', ':accesscontrol', ':openweather'

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import guepardoapps.lucahome.common.classes.Position;
 
+@SuppressWarnings({"unused"})
 public interface IPositioningService {
     String PositioningCalculationFinishedBroadcast = "guepardoapps.lucahome.common.services.positioning.calculation.finished";
     String PositioningCalculationFinishedBundle = "PositioningCalculationFinishedBundle";

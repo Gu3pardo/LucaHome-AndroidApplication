@@ -12,7 +12,7 @@ import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class SettingsController implements ISettingsController {
     private static final String Tag = SettingsController.class.getSimpleName();
 

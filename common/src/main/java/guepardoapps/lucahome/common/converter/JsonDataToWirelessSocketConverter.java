@@ -60,7 +60,7 @@ public final class JsonDataToWirelessSocketConverter implements IJsonDataConvert
                     String name = child.getString("Name");
                     String code = child.getString("Code");
 
-                    boolean isActivated = !child.getString("State").contains("0") && !child.getString("State").contains("-1");
+                    boolean state = !child.getString("State").contains("0") && !child.getString("State").contains("-1");
 
                     JSONObject lastTriggerJsonData = child.getJSONObject("LastTrigger");
 
@@ -83,7 +83,7 @@ public final class JsonDataToWirelessSocketConverter implements IJsonDataConvert
 
                     String lastTriggerUser = lastTriggerJsonData.getString("UserName");
 
-                    WirelessSocket newWirelessSocket = new WirelessSocket(uuid, roomUuid, name, code, isActivated, lastTriggerDateTime, lastTriggerUser, true, ILucaClass.LucaServerDbAction.Null);
+                    WirelessSocket newWirelessSocket = new WirelessSocket(uuid, roomUuid, name, code, state, lastTriggerDateTime, lastTriggerUser, true, ILucaClass.LucaServerDbAction.Null);
                     list.add(newWirelessSocket);
                 }
             } catch (JSONException jsonException) {

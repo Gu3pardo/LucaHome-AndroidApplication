@@ -14,6 +14,7 @@ import guepardoapps.lucahome.common.classes.RssFeed;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.StringHelper;
 
+@SuppressWarnings({"unused"})
 public class JsonDataToRssFeedConverter implements IJsonDataConverter {
     private static final String Tag = JsonDataToRssFeedConverter.class.getSimpleName();
     private static final String SearchParameter = "{\"Data\":";
@@ -58,7 +59,9 @@ public class JsonDataToRssFeedConverter implements IJsonDataConverter {
                     String title = child.getString("Title");
                     String url = child.getString("Url");
 
-                    RssFeed newRssFeed = new RssFeed(uuid, title, url, true, ILucaClass.LucaServerDbAction.Null);
+                    int playCount = child.getInt("PlayCount");
+
+                    RssFeed newRssFeed = new RssFeed(uuid, title, url, playCount, true, ILucaClass.LucaServerDbAction.Null);
                     list.add(newRssFeed);
                 }
             } catch (JSONException jsonException) {

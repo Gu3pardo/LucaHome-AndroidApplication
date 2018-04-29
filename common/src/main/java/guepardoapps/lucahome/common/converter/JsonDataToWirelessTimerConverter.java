@@ -50,12 +50,7 @@ public final class JsonDataToWirelessTimerConverter {
                 JSONArray dataArray = jsonObject.getJSONArray("Data");
 
                 for (int index = 0; index < dataArray.length(); index++) {
-                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("WirelessSchedule");
-
-                    boolean isTimer = child.getString("IsTimer").contains("1");
-                    if (!isTimer) {
-                        continue;
-                    }
+                    JSONObject child = dataArray.getJSONObject(index).getJSONObject("WirelessTimer");
 
                     UUID uuid = UUID.fromString(child.getString("Uuid"));
                     String name = child.getString("Name");

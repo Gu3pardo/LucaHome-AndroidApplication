@@ -10,7 +10,7 @@ import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WirelessSocket implements ILucaClass {
     private static final String Tag = WirelessSocket.class.getSimpleName();
 
@@ -20,7 +20,7 @@ public class WirelessSocket implements ILucaClass {
     protected UUID _roomUuid;
     protected String _name;
     protected String _code;
-    protected boolean _isActivated;
+    protected boolean _state;
 
     protected Calendar _lastTriggerDateTime;
     protected String _lastTriggerUser;
@@ -33,7 +33,7 @@ public class WirelessSocket implements ILucaClass {
             @NonNull UUID roomUuid,
             @NonNull String name,
             @NonNull String code,
-            boolean isActivated,
+            boolean state,
             @NonNull Calendar lastTriggerDateTime,
             @NonNull String lastTriggerUser,
             boolean isOnServer,
@@ -42,7 +42,7 @@ public class WirelessSocket implements ILucaClass {
         _roomUuid = roomUuid;
         _name = name;
         _code = code;
-        _isActivated = isActivated;
+        _state = state;
         _lastTriggerDateTime = lastTriggerDateTime;
         _lastTriggerUser = lastTriggerUser;
         _isOnServer = isOnServer;
@@ -79,12 +79,12 @@ public class WirelessSocket implements ILucaClass {
         return _code;
     }
 
-    public void SetActivated(boolean isActivated) {
-        _isActivated = isActivated;
+    public void SetState(boolean state) {
+        _state = state;
     }
 
-    public boolean IsActivated() {
-        return _isActivated;
+    public boolean GetState() {
+        return _state;
     }
 
     public void SetLastTriggerDateTime(@NonNull Calendar lastTriggerDateTime) {
@@ -130,7 +130,7 @@ public class WirelessSocket implements ILucaClass {
     public String GetCommandSetState() throws NoSuchMethodException {
         return String.format(Locale.getDefault(),
                 "%s%s%s",
-                LucaServerActionTypes.SET_WIRELESS_SOCKET.toString(), _uuid, ((_isActivated) ? Constants.StateOn : Constants.StateOff));
+                LucaServerActionTypes.SET_WIRELESS_SOCKET.toString(), _uuid, ((_state) ? Constants.StateOn : Constants.StateOff));
     }
 
     @Override
@@ -144,7 +144,7 @@ public class WirelessSocket implements ILucaClass {
     public String GetCommandUpdate() {
         return String.format(Locale.getDefault(),
                 "%s%s&roomuuid=%s&name=%s&code=%s&isactivated=%s",
-                LucaServerActionTypes.UPDATE_WIRELESS_SOCKET.toString(), _uuid, _roomUuid, _name, _code, (_isActivated ? "1" : "0"));
+                LucaServerActionTypes.UPDATE_WIRELESS_SOCKET.toString(), _uuid, _roomUuid, _name, _code, (_state ? "1" : "0"));
     }
 
     @Override
@@ -156,20 +156,20 @@ public class WirelessSocket implements ILucaClass {
 
     public int GetDrawable() {
         if (_name.contains("TV")) {
-            if (_isActivated) {
+            if (_state) {
                 return R.drawable.wireless_socket_tv_on;
             }
             return R.drawable.wireless_socket_tv_off;
 
         } else if (_name.contains("Light")) {
             if (_name.contains("Sleeping")) {
-                if (_isActivated) {
+                if (_state) {
                     return R.drawable.wireless_socket_bed_light_on;
                 }
                 return R.drawable.wireless_socket_bed_light_off;
 
             } else {
-                if (_isActivated) {
+                if (_state) {
                     return R.drawable.wireless_socket_light_on;
                 }
                 return R.drawable.wireless_socket_light_off;
@@ -177,64 +177,64 @@ public class WirelessSocket implements ILucaClass {
 
         } else if (_name.contains("Sound")) {
             if (_name.contains("Sleeping")) {
-                if (_isActivated) {
+                if (_state) {
                     return R.drawable.wireless_socket_bed_sound_on;
                 }
                 return R.drawable.wireless_socket_bed_sound_off;
 
             } else if (_name.contains("Living")) {
-                if (_isActivated) {
+                if (_state) {
                     return R.drawable.wireless_socket_sound_on;
                 }
                 return R.drawable.wireless_socket_sound_off;
             }
 
         } else if (_name.contains("PC") || _name.contains("WorkStation")) {
-            if (_isActivated) {
+            if (_state) {
                 return R.drawable.wireless_socket_laptop_on;
             }
             return R.drawable.wireless_socket_laptop_off;
 
         } else if (_name.contains("Printer")) {
-            if (_isActivated) {
+            if (_state) {
                 return R.drawable.wireless_socket_printer_on;
             }
             return R.drawable.wireless_socket_printer_off;
 
         } else if (_name.contains("Storage")) {
-            if (_isActivated) {
+            if (_state) {
                 return R.drawable.wireless_socket_storage_on;
             }
             return R.drawable.wireless_socket_storage_off;
 
         } else if (_name.contains("Heating")) {
             if (_name.contains("Bed")) {
-                if (_isActivated) {
+                if (_state) {
                     return R.drawable.wireless_socket_bed_heating_on;
                 }
                 return R.drawable.wireless_socket_bed_heating_off;
             }
 
         } else if (_name.contains("Farm")) {
-            if (_isActivated) {
+            if (_state) {
                 return R.drawable.wireless_socket_watering_on;
             }
             return R.drawable.wireless_socket_watering_off;
 
         } else if (_name.contains("MediaServer")) {
-            if (_isActivated) {
+            if (_state) {
                 return R.drawable.wireless_socket_mediamirror_on;
             }
             return R.drawable.wireless_socket_mediamirror_off;
 
         } else if (_name.contains("GameConsole")) {
-            if (_isActivated) {
+            if (_state) {
                 return R.drawable.wireless_socket_gameconsole_on;
             }
             return R.drawable.wireless_socket_gameconsole_off;
 
         } else if (_name.contains("RaspberryPi")) {
-            if (_isActivated) {
+            if (_state) {
                 return R.drawable.wireless_socket_raspberry_on;
             }
             return R.drawable.wireless_socket_raspberry_off;
@@ -246,7 +246,7 @@ public class WirelessSocket implements ILucaClass {
     @Override
     public String toString() {
         return String.format(Locale.getDefault(),
-                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"RoomUuid\":\"%s\",\"Name\":\"%s\",\"Code\":\"%s\",\"IsActivated\":\"%s\"}",
-                Tag, _uuid, _roomUuid, _name, _code, (_isActivated ? "1" : "0"));
+                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"RoomUuid\":\"%s\",\"Name\":\"%s\",\"Code\":\"%s\",\"State\":\"%s\"}",
+                Tag, _uuid, _roomUuid, _name, _code, (_state ? "1" : "0"));
     }
 }

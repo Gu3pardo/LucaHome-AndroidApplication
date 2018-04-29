@@ -8,7 +8,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 27
         versionCode 10000
-        versionName "1.0.0.180215"
+        versionName "1.0.0.180429"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         testOptions {
             unitTests.returnDefaultValues = true
@@ -38,10 +38,10 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':common')
-    implementation 'com.android.support:multidex:1.0.2'
-    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.github.GrenderG:Toasty:1.2.5'
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.1'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

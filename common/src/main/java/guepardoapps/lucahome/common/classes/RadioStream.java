@@ -14,6 +14,7 @@ public class RadioStream implements ILucaClass {
     private UUID _uuid;
     private String _title;
     private String _url;
+    private int _playCount;
 
     private boolean _isOnServer;
     private LucaServerDbAction _serverDbAction;
@@ -22,17 +23,19 @@ public class RadioStream implements ILucaClass {
             @NonNull UUID uuid,
             @NonNull String title,
             @NonNull String url,
+            int playCount,
             boolean isOnServer,
             @NonNull LucaServerDbAction serverDbAction) {
         _uuid = uuid;
         _title = title;
         _url = url;
+        _playCount = playCount;
         _isOnServer = isOnServer;
         _serverDbAction = serverDbAction;
     }
 
     public RadioStream() {
-        this(UUID.randomUUID(), "", "", false, LucaServerDbAction.Null);
+        this(UUID.randomUUID(), "", "", 0, false, LucaServerDbAction.Null);
     }
 
     @Override
@@ -53,18 +56,22 @@ public class RadioStream implements ILucaClass {
         return _url;
     }
 
+    public int GetPlayCount() {
+        return _playCount;
+    }
+
     @Override
     public String GetCommandAdd() {
         return String.format(Locale.getDefault(),
-                "%s%s&title=%s&url=%s",
-                LucaServerActionTypes.ADD_RADIO_STREAM.toString(), _uuid, _title, _url);
+                "%s%s&title=%s&url=%s&playcount=%d",
+                LucaServerActionTypes.ADD_RADIO_STREAM.toString(), _uuid, _title, _url, _playCount);
     }
 
     @Override
     public String GetCommandUpdate() {
         return String.format(Locale.getDefault(),
-                "%s%s&title=%s&url=%s",
-                LucaServerActionTypes.UPDATE_RADIO_STREAM.toString(), _uuid, _title, _url);
+                "%s%s&title=%s&url=%s&playcount=%d",
+                LucaServerActionTypes.UPDATE_RADIO_STREAM.toString(), _uuid, _title, _url, _playCount);
     }
 
     @Override
@@ -97,7 +104,7 @@ public class RadioStream implements ILucaClass {
     @Override
     public String toString() {
         return String.format(Locale.getDefault(),
-                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"Title\":\"%s\",\"Url\":\"%s\"}",
-                Tag, _uuid, _title, _url);
+                "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"Title\":\"%s\",\"Url\":\"%s\",\"PlayCount\":%d}",
+                Tag, _uuid, _title, _url, _playCount);
     }
 }

@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.controller;
 
 import android.support.annotation.NonNull;
 
+@SuppressWarnings({"unused"})
 public interface IBroadcastController {
     void SendSimpleBroadcast(@NonNull String broadcast);
 

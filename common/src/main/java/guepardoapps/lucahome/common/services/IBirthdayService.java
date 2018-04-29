@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import guepardoapps.lucahome.common.classes.Birthday;
 
+@SuppressWarnings({"unused"})
 public interface IBirthdayService extends ILucaService<Birthday> {
     String BirthdayDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.birthday.download.finished";
     String BirthdayAddFinishedBroadcast = "guepardoapps.lucahome.common.services.birthday.add.finished";

@@ -20,6 +20,7 @@ import guepardoapps.lucahome.common.services.WirelessSwitchService;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.mediaserver.R;
 
+@SuppressWarnings({"unused"})
 public class WirelessSwitchListViewAdapter extends BaseAdapter {
     private static String Tag = WirelessSwitchListViewAdapter.class.getSimpleName();
 

@@ -543,7 +543,7 @@ public class WirelessSocketService implements IWirelessSocketService {
             return;
         }
 
-        entry.SetActivated(newState);
+        entry.SetState(newState);
         String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
                 SettingsController.getInstance().GetServerIp(), Constants.ActionPath,
                 user.GetName(), user.GetPassphrase(),

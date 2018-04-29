@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.services;
 
 import guepardoapps.lucahome.common.classes.LucaSecurity;
 
+@SuppressWarnings({"unused"})
 public interface ILucaSecurityService extends ILucaService<LucaSecurity> {
     String LucaSecurityDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.lucasecurity.download.finished";
     String LucaSecurityCameraStateFinishedBroadcast = "guepardoapps.lucahome.common.services.lucasecurity.camera.state.finished";

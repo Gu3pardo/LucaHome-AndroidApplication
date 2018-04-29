@@ -1,6 +1,8 @@
 package guepardoapps.lucahome.bixby.classes.requirements;
 
-public interface IBixbyRequirement {
+import java.io.Serializable;
+
+public interface IBixbyRequirement  extends Serializable {
     enum RequirementType {Null, Position, Light, Network, WirelessSocket}
 
     enum LightCompareType {Null, Below, Near, Above}

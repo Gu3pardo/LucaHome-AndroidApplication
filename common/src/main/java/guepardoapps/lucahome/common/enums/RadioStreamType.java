@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.enums;
 
 import java.io.Serializable;
 
+@SuppressWarnings({"unused"})
 public enum RadioStreamType implements Serializable {
 
     PLANET_RADIO_LIVE(0, "Planet Radio Live", "http://mp3.planetradio.de/planetradio/hqlivestream.mp3"),

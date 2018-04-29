@@ -93,7 +93,7 @@ public class MapContentHelper {
         }
     }
 
-    public static Drawable GetDrawable(@NonNull MapContent mapContent) throws Exception {
+    public static Drawable GetDrawable(@NonNull MapContent mapContent) {
         switch (mapContent.GetDrawingType()) {
             case Camera:
                 return DrawableCreator.DrawCircle(DefaultMapSize, DefaultMapSize, Color.BLACK, DefaultMapPadding);
@@ -118,7 +118,7 @@ public class MapContentHelper {
             case Temperature:
                 return TemperatureService.getInstance().GetByUuid(mapContent.GetDrawingTypeUuid()).GetDrawable();
             case WirelessSocket:
-                int color = WirelessSocketService.getInstance().GetByUuid(mapContent.GetDrawingTypeUuid()).IsActivated() ? Color.GREEN : Color.RED;
+                int color = WirelessSocketService.getInstance().GetByUuid(mapContent.GetDrawingTypeUuid()).GetState() ? Color.GREEN : Color.RED;
                 return DrawableCreator.DrawCircle(DefaultMapSize, DefaultMapSize, color, DefaultMapPadding);
             case WirelessSwitch:
                 return DrawableCreator.DrawCircle(DefaultMapSize, DefaultMapSize, 0xADD8E6/*lightblue*/, DefaultMapPadding);

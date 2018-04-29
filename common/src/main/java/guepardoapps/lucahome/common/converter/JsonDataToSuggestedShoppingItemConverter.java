@@ -19,6 +19,7 @@ public final class JsonDataToSuggestedShoppingItemConverter implements IJsonData
     private static final String Tag = JsonDataToSuggestedShoppingItemConverter.class.getSimpleName();
     private static final String SearchParameter = "{\"Data\":";
 
+
     private static final JsonDataToSuggestedShoppingItemConverter Singleton = new JsonDataToSuggestedShoppingItemConverter();
 
     public static JsonDataToSuggestedShoppingItemConverter getInstance() {
@@ -57,10 +58,10 @@ public final class JsonDataToSuggestedShoppingItemConverter implements IJsonData
                     UUID uuid = UUID.fromString(child.getString("Uuid"));
 
                     String name = child.getString("Name");
-                    String groupString = child.getString("Group");
+                    String typeString = child.getString("Type");
                     ShoppingItemType type = ShoppingItemType.OTHER;
                     try {
-                        type = ShoppingItemType.GetByString(groupString);
+                        type = ShoppingItemType.GetByString(typeString);
                     } catch (Exception ex) {
                         Logger.getInstance().Error(Tag, ex.toString());
                     }

@@ -14,10 +14,11 @@ import java.util.UUID;
 import guepardoapps.lucahome.common.classes.ILucaClass;
 import guepardoapps.lucahome.common.classes.RadioStream;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class DatabaseRadioStreamList implements IDatabaseLucaClassList<RadioStream> {
     public static final String KeyTitle = "_title";
     public static final String KeyUrl = "_url";
+    public static final String KeyPlayCount = "_playCount";
 
     private static final String DatabaseTable = "DatabaseRadioStreamListTable";
 
@@ -38,6 +39,7 @@ public class DatabaseRadioStreamList implements IDatabaseLucaClassList<RadioStre
                     + KeyUuid + " TEXT NOT NULL, "
                     + KeyTitle + " TEXT NOT NULL, "
                     + KeyUrl + " TEXT NOT NULL, "
+                    + KeyPlayCount + " INTEGER, "
                     + KeyIsOnServer + " INTEGER, "
                     + KeyServerAction + " INTEGER); ");
         }
@@ -72,6 +74,7 @@ public class DatabaseRadioStreamList implements IDatabaseLucaClassList<RadioStre
         contentValues.put(KeyUuid, entry.GetUuid().toString());
         contentValues.put(KeyTitle, entry.GetTitle());
         contentValues.put(KeyUrl, entry.GetUrl());
+        contentValues.put(KeyPlayCount, entry.GetPlayCount());
         contentValues.put(KeyIsOnServer, (entry.GetIsOnServer() ? 1 : 0));
         contentValues.put(KeyServerAction, entry.GetServerDbAction().ordinal());
 
@@ -84,6 +87,7 @@ public class DatabaseRadioStreamList implements IDatabaseLucaClassList<RadioStre
 
         contentValues.put(KeyTitle, entry.GetTitle());
         contentValues.put(KeyUrl, entry.GetUrl());
+        contentValues.put(KeyPlayCount, entry.GetPlayCount());
         contentValues.put(KeyIsOnServer, (entry.GetIsOnServer() ? 1 : 0));
         contentValues.put(KeyServerAction, entry.GetServerDbAction().ordinal());
 
@@ -106,6 +110,7 @@ public class DatabaseRadioStreamList implements IDatabaseLucaClassList<RadioStre
                 KeyUuid,
                 KeyTitle,
                 KeyUrl,
+                KeyPlayCount,
                 KeyIsOnServer,
                 KeyServerAction};
 
@@ -115,6 +120,7 @@ public class DatabaseRadioStreamList implements IDatabaseLucaClassList<RadioStre
         int uuidIndex = cursor.getColumnIndex(KeyUuid);
         int titleIndex = cursor.getColumnIndex(KeyTitle);
         int urlIndex = cursor.getColumnIndex(KeyUrl);
+        int playCountIndex = cursor.getColumnIndex(KeyPlayCount);
         int isOnServerIndex = cursor.getColumnIndex(KeyIsOnServer);
         int serverActionIndex = cursor.getColumnIndex(KeyServerAction);
 
@@ -122,6 +128,7 @@ public class DatabaseRadioStreamList implements IDatabaseLucaClassList<RadioStre
             String uuidString = cursor.getString(uuidIndex);
             String title = cursor.getString(titleIndex);
             String url = cursor.getString(urlIndex);
+            int playCount = cursor.getInt(playCountIndex);
             int isOnServerInteger = cursor.getInt(isOnServerIndex);
             int serverActionInteger = cursor.getInt(serverActionIndex);
 
@@ -130,7 +137,7 @@ public class DatabaseRadioStreamList implements IDatabaseLucaClassList<RadioStre
             boolean isOnServer = isOnServerInteger == 1;
             ILucaClass.LucaServerDbAction serverDbAction = ILucaClass.LucaServerDbAction.values()[serverActionInteger];
 
-            RadioStream entry = new RadioStream(uuid, title, url, isOnServer, serverDbAction);
+            RadioStream entry = new RadioStream(uuid, title, url, playCount, isOnServer, serverDbAction);
             result.add(entry);
         }
 

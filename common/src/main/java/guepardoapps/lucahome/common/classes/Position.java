@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.Locale;
 import java.util.UUID;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Position implements ILucaClass {
     private static final String Tag = Position.class.getSimpleName();
 

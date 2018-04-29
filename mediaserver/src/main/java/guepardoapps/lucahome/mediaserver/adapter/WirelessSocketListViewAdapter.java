@@ -20,6 +20,7 @@ import guepardoapps.lucahome.common.services.WirelessSocketService;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.mediaserver.R;
 
+@SuppressWarnings({"unused"})
 public class WirelessSocketListViewAdapter extends BaseAdapter {
     private static String Tag = WirelessSocketListViewAdapter.class.getSimpleName();
 
@@ -84,9 +85,9 @@ public class WirelessSocketListViewAdapter extends BaseAdapter {
             Logger.getInstance().Error(Tag, exception.toString());
         }
 
-        holder._stateView.setBackgroundResource(wirelessSocket.IsActivated() ? R.drawable.xml_circle_green : R.drawable.xml_circle_red);
+        holder._stateView.setBackgroundResource(wirelessSocket.GetState() ? R.drawable.xml_circle_green : R.drawable.xml_circle_red);
 
-        holder._cardSwitch.setChecked(wirelessSocket.IsActivated());
+        holder._cardSwitch.setChecked(wirelessSocket.GetState());
         holder._cardSwitch.setOnCheckedChangeListener((compoundButton, value) -> {
             try {
                 WirelessSocketService.getInstance().SetWirelessSocketState(wirelessSocket, value);

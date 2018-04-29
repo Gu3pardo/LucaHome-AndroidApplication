@@ -28,7 +28,7 @@ import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.Tools;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class WirelessTimerService implements IWirelessTimerService {
     private static final String Tag = WirelessTimerService.class.getSimpleName();
 

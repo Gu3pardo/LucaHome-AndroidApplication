@@ -30,7 +30,7 @@ import guepardoapps.lucahome.common.classes.YoutubeVideo;
 import guepardoapps.lucahome.common.controller.BroadcastController;
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> implements IDownloadYoutubeVideoTask {
     private static final String Tag = DownloadYoutubeVideoTask.class.getSimpleName();
 
@@ -38,9 +38,9 @@ public class DownloadYoutubeVideoTask extends AsyncTask<String, Void, String> im
     private BroadcastController _broadcastController;
     private ProgressDialog _loadingVideosDialog;
 
-    private boolean _sendFirstEntry = false;
-    private boolean _displayDialog = false;
-    private boolean _isInitialized = false;
+    private boolean _sendFirstEntry;
+    private boolean _displayDialog;
+    private boolean _isInitialized;
 
     private ArrayList<YoutubeVideo> _youtubeVideoDataList;
 

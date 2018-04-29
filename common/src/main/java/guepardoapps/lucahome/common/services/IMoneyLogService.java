@@ -8,6 +8,7 @@ import java.util.UUID;
 import guepardoapps.lucahome.common.classes.MoneyLog;
 import guepardoapps.lucahome.common.classes.MoneyLogItem;
 
+@SuppressWarnings({"unused"})
 public interface IMoneyLogService extends ILucaService<MoneyLogItem> {
     String MoneyLogItemDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.moneylogitem.download.finished";
     String MoneyLogItemAddFinishedBroadcast = "guepardoapps.lucahome.common.services.moneylogitem.add.finished";

@@ -2,13 +2,12 @@ package guepardoapps.lucahome.bixby.classes.actions;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 
 import guepardoapps.lucahome.common.utils.Logger;
 
 @SuppressWarnings("WeakerAccess")
-public class WirelessSocketAction implements IBixbyAction, Serializable {
+public class WirelessSocketAction implements IBixbyAction {
     private static final String Tag = WirelessSocketAction.class.getSimpleName();
 
     private StateType _stateType;

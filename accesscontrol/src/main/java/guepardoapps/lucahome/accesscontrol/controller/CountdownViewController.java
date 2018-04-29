@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import es.dmoral.toasty.Toasty;
 
-import guepardoapps.lucahome.accesscontrol.R;
-import guepardoapps.lucahome.accesscontrol.common.Constants;
 import guepardoapps.lucahome.common.classes.MediaServer;
 import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.IDownloadController;
@@ -28,7 +26,11 @@ import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.enums.MediaServerActionType;
 import guepardoapps.lucahome.common.server.handler.IAccessControlDataHandler;
 import guepardoapps.lucahome.common.services.MediaServerClientService;
+import guepardoapps.lucahome.common.utils.ByteStringHelper;
 import guepardoapps.lucahome.common.utils.Logger;
+
+import guepardoapps.lucahome.accesscontrol.R;
+import guepardoapps.lucahome.accesscontrol.common.Constants;
 
 public class CountdownViewController {
     private static final String Tag = CountdownViewController.class.getSimpleName();
@@ -175,7 +177,9 @@ public class CountdownViewController {
         String requestUrl = "http://"
                 + SettingsController.getInstance().GetServerIp()
                 + guepardoapps.lucahome.common.constants.Constants.ActionPath
-                + Constants.UserName + "&password=" + Constants.UserPassPhrase
+                + ByteStringHelper.ReadStringFromCharArray(Constants.UserName)
+                + "&password="
+                + ByteStringHelper.ReadStringFromCharArray(Constants.UserPassPhrase)
                 + "&action=" + LucaServerActionTypes.PLAY_ACCESS_ALARM.toString();
         _downloadController.SendCommandToWebsiteAsync(requestUrl, IDownloadController.DownloadType.AccessAlarm, true);
 

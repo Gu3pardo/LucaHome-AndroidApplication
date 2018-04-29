@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+@SuppressWarnings({"unused"})
 public interface IBixbyPairService<T> {
     String BixbyPairLoadFinishedBroadcast = "guepardoapps.bixby.services.bixpypair.load.finished";
     String BixbyPairAddFinishedBroadcast = "guepardoapps.bixby.services.bixpypair.add.finished";

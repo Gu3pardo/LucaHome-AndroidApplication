@@ -17,7 +17,7 @@ import java.util.Enumeration;
 
 import guepardoapps.lucahome.common.utils.Logger;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class NetworkController implements INetworkController {
     private static final String Tag = NetworkController.class.getSimpleName();
 
@@ -69,13 +69,7 @@ public class NetworkController implements INetworkController {
         }
 
         NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
-        if (activeNetwork != null) {
-            if (activeNetwork.getType() == networkType) {
-                return true;
-            }
-        }
-
-        return false;
+        return activeNetwork != null && activeNetwork.getType() == networkType;
     }
 
     @Override

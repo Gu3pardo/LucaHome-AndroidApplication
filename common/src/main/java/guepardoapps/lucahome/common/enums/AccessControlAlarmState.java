@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 
+@SuppressWarnings({"unused"})
 public enum AccessControlAlarmState implements Serializable {
 
     Null(0, "Null"),

@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import guepardoapps.lucahome.common.classes.MediaServer;
-import guepardoapps.lucahome.common.services.ILucaService;
 
+@SuppressWarnings({"unused"})
 public interface IMediaServerClientService extends ILucaService<MediaServer> {
     String MediaServerDataDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.change.download.finished";
     String MediaServerCommandResponseBroadcast = "guepardoapps.lucahome.common.services.mediaServer.command_response";

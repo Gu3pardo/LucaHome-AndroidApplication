@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import guepardoapps.lucahome.common.classes.WirelessSwitch;
 
+@SuppressWarnings({"unused"})
 public interface IWirelessSwitchService extends ILucaService<WirelessSwitch> {
     String WirelessSwitchDownloadFinishedBroadcast = "guepardoapps.lucahome.common.services.wirelessswitch.download.finished";
     String WirelessSwitchAddFinishedBroadcast = "guepardoapps.lucahome.common.services.wirelessswitch.add.finished";

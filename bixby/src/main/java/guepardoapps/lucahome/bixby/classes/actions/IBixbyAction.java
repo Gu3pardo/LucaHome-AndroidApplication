@@ -1,6 +1,8 @@
 package guepardoapps.lucahome.bixby.classes.actions;
 
-public interface IBixbyAction {
+import java.io.Serializable;
+
+public interface IBixbyAction extends Serializable {
     enum ActionType {Null, Application, Network, WirelessSocket, WirelessSwitch}
 
     enum NetworkType {Null, Mobile, Wifi}

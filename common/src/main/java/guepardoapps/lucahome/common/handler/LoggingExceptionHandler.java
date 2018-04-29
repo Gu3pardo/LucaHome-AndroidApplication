@@ -2,6 +2,7 @@ package guepardoapps.lucahome.common.handler;
 
 import guepardoapps.lucahome.common.utils.Logger;
 
+@SuppressWarnings({"unused"})
 public class LoggingExceptionHandler implements Thread.UncaughtExceptionHandler {
     private static final String Tag = LoggingExceptionHandler.class.getSimpleName();
 

@@ -52,11 +52,6 @@ public final class JsonDataToWirelessScheduleConverter {
                 for (int index = 0; index < dataArray.length(); index++) {
                     JSONObject child = dataArray.getJSONObject(index).getJSONObject("WirelessSchedule");
 
-                    boolean isTimer = child.getString("IsTimer").contains("1");
-                    if (isTimer) {
-                        continue;
-                    }
-
                     UUID uuid = UUID.fromString(child.getString("Uuid"));
                     String name = child.getString("Name");
 

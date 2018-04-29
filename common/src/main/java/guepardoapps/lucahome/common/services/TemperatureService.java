@@ -200,7 +200,7 @@ public class TemperatureService implements ITemperatureService {
             return _databaseTemperatureList.GetList(String.format(Locale.getDefault(), "%s like %s", DatabaseTemperatureList.KeyUuid, uuid), null, null).get(0);
         } catch (Exception exception) {
             Logger.getInstance().Error(Tag, exception.getMessage());
-            return new Temperature(uuid, UUID.randomUUID(), 0, Calendar.getInstance(), "", Temperature.TemperatureType.Dummy, "");
+            return new Temperature(uuid, UUID.randomUUID(), 0, Calendar.getInstance(), Temperature.TemperatureType.Dummy, "", "");
         }
     }
 
@@ -357,7 +357,7 @@ public class TemperatureService implements ITemperatureService {
     public Temperature GetActiveTemperature() {
         if (_activeTemperature == null) {
             ArrayList<Temperature> temperatureList = GetDataList();
-            _activeTemperature = temperatureList.size() > 0 ? temperatureList.get(0) : new Temperature(UUID.randomUUID(), UUID.randomUUID(), -273.15, Calendar.getInstance(), "", Temperature.TemperatureType.Dummy, "");
+            _activeTemperature = temperatureList.size() > 0 ? temperatureList.get(0) : new Temperature(UUID.randomUUID(), UUID.randomUUID(), -273.15, Calendar.getInstance(), Temperature.TemperatureType.Dummy, "", "");
         }
         return _activeTemperature;
     }

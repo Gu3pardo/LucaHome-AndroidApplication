@@ -2,13 +2,12 @@ package guepardoapps.lucahome.common.classes;
 
 import android.support.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.Locale;
 import java.util.UUID;
 
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class Movie implements ILucaClass {
     private static final String Tag = Movie.class.getSimpleName();
 
