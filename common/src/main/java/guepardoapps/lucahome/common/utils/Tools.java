@@ -50,7 +50,7 @@ public class Tools {
 
             return new String(byteArrayOutputStream.toByteArray(), charsetName);
         } catch (IOException exception) {
-            Logger.getInstance().Error(Tag, exception.getMessage());
+            Logger.Companion.getInstance().error(Tag, exception.getMessage());
             return "";
         }
     }

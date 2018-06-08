@@ -4,10 +4,7 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
-import guepardoapps.lucahome.common.classes.PuckJs;
-import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.voicerecognition.classes.RelationActionClass;
 
 public interface IRelationshipHelper {

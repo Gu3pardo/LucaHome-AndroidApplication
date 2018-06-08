@@ -19,7 +19,6 @@ import java.util.Locale;
 
 import guepardoapps.lucahome.common.R;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.utils.BitmapHelper;
 import guepardoapps.lucahome.common.utils.Logger;
 

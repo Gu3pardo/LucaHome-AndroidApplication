@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.UUID;
 
-import guepardoapps.lucahome.common.classes.CalendarEntry;
 import guepardoapps.lucahome.common.utils.Logger;
 
 @SuppressWarnings({"WeakerAccess"})

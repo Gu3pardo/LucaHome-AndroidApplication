@@ -27,17 +27,9 @@ import guepardoapps.library.openweather.models.ForecastModel;
 import guepardoapps.library.openweather.models.WeatherModel;
 import guepardoapps.library.openweather.service.OpenWeatherService;
 
-import guepardoapps.lucahome.common.classes.PuckJs;
-import guepardoapps.lucahome.common.classes.Room;
-import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.classes.WirelessSwitch;
 import guepardoapps.lucahome.common.controller.BroadcastController;
-import guepardoapps.lucahome.common.services.PuckJsService;
-import guepardoapps.lucahome.common.services.RoomService;
-import guepardoapps.lucahome.common.services.TemperatureService;
 import guepardoapps.lucahome.common.services.WirelessSocketService;
-import guepardoapps.lucahome.common.services.WirelessSwitchService;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.voicerecognition.classes.RelationActionClass;
 import guepardoapps.lucahome.voicerecognition.utils.IRelationshipHelper;

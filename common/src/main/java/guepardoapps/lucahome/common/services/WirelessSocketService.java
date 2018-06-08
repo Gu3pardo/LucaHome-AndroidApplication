@@ -14,7 +14,6 @@ import java.util.Locale;
 import java.util.UUID;
 
 import guepardoapps.lucahome.common.classes.ILucaClass;
-import guepardoapps.lucahome.common.classes.User;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.BroadcastController;

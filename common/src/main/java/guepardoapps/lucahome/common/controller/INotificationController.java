@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.classes.WirelessSwitch;
 
 public interface INotificationController {
     String NotificationAction = "NotificationAction";

@@ -7,12 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-import guepardoapps.lucahome.common.classes.PuckJs;
-import guepardoapps.lucahome.common.classes.Room;
-import guepardoapps.lucahome.common.classes.Temperature;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
-import guepardoapps.lucahome.common.classes.WirelessSwitch;
-import guepardoapps.lucahome.common.services.RoomService;
 import guepardoapps.lucahome.voicerecognition.classes.RelationActionClass;
 import guepardoapps.lucahome.voicerecognition.common.Constants;
 
