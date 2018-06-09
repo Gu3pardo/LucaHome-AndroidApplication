@@ -9,3 +9,4 @@
 /captures
 /release
 .externalNativeBuild
+common/src/main/res/values/keys.xml
