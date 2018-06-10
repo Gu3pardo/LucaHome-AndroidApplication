@@ -2,8 +2,8 @@ package guepardoapps.lucahome.bixby.models
 
 import android.support.annotation.NonNull
 
-import guepardoapps.lucahome.bixby.classes.actions.BixbyAction
 import guepardoapps.lucahome.bixby.enums.DatabaseAction
+import guepardoapps.lucahome.bixby.models.actions.BixbyAction
 import guepardoapps.lucahome.bixby.models.requirements.BixbyRequirement
 
 import java.io.Serializable
