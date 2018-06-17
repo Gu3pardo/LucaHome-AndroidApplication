@@ -16,16 +16,18 @@ import guepardoapps.lucahome.common.controller.NetworkController
 import guepardoapps.lucahome.common.services.WirelessSocketService
 import guepardoapps.lucahome.common.utils.Logger
 import kotlin.collections.ArrayList
+import android.content.Intent
+import guepardoapps.lucahome.bixby.models.actions.ApplicationAction
+import guepardoapps.lucahome.bixby.models.actions.BixbyAction
+import guepardoapps.lucahome.bixby.enums.ActionType
+import guepardoapps.lucahome.bixby.models.actions.WirelessSwitchAction
 
 class BixbyPairService {
     private val tag = BixbyPairService::class.java.simpleName
 
-    lateinit var context: Context
-    lateinit var receiverActivity: Class<*>
-    var onBixbyServiceListener: OnBixbyServiceListener? = null
-    var reloadEnabled: Boolean = true
-    var reloadTimeout: Int = 5 * 60 * 1000
-    var displayNotification: Boolean = true
+    private lateinit var context: Context
+    private lateinit var receiverActivity: Class<*>
+    private var onBixbyServiceListener: OnBixbyServiceListener? = null
 
     private lateinit var dbHandler: DbHandler
     private lateinit var networkController: NetworkController
@@ -44,18 +46,11 @@ class BixbyPairService {
 
     fun initialize(context: Context,
                    receiverActivity: Class<*>,
-                   onBixbyServiceListener: OnBixbyServiceListener?,
-                   reloadEnabled: Boolean = true,
-                   reloadTimeout: Int = 5 * 60 * 1000,
-                   displayNotification: Boolean = true) {
+                   onBixbyServiceListener: OnBixbyServiceListener?) {
         this.context = context
+        this.networkController = NetworkController(context)
         this.receiverActivity = receiverActivity
         this.onBixbyServiceListener = onBixbyServiceListener
-        this.reloadEnabled = reloadEnabled
-        this.reloadTimeout = reloadTimeout
-        this.displayNotification = displayNotification
-
-        this.networkController = NetworkController(context)
     }
 
     fun dispose() {
@@ -229,5 +224,76 @@ class BixbyPairService {
     private fun validateWirelessSocketRequirement(wirelessSocketRequirement: WirelessSocketEntity): Boolean {
         val wirelessSocket = WirelessSocketService.getInstance().GetByName(wirelessSocketRequirement.wirelessSocketName)
         return wirelessSocketRequirement.stateType === StateType.On == wirelessSocket.GetState()
+    }
+
+    private fun performAction(bixbyAction: BixbyAction) {
+        when (bixbyAction.actionType) {
+            ActionType.Application -> {
+                val applicationAction = bixbyAction.applicationAction
+                performApplicationAction(applicationAction)
+            }
+            ActionType.Network -> {
+                val networkAction = bixbyAction.networkAction
+                performNetworkAction(networkAction)
+            }
+            ActionType.WirelessSocket -> {
+                val wirelessSocketAction = bixbyAction.wirelessSocketAction
+                performWirelessSocketAction(wirelessSocketAction)
+            }
+            ActionType.WirelessSwitch -> {
+                val wirelessSwitchAction = bixbyAction.wirelessSwitchAction
+                performWirelessSwitchAction(wirelessSwitchAction)
+            }
+            ActionType.Null -> Logger.instance.error(tag, "Invalid ActionType!")
+        }
+    }
+
+    @Throws(NullPointerException::class)
+    private fun performApplicationAction(applicationAction: ApplicationAction) {
+        Logger.instance.debug(tag, String.format("performApplicationAction for $applicationAction"))
+
+        val packageName = applicationAction.packageName
+        val packageManager = context.packageManager
+
+        val startApplicationIntent = packageManager.getLaunchIntentForPackage(packageName)
+                ?: throw NullPointerException("Created startApplicationContent for $packageName is null")
+
+        startApplicationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
+        context.startActivity(startApplicationIntent)
+    }
+
+    private fun performNetworkAction(networkAction: NetworkEntity) {
+        Logger.instance.debug(tag, String.format("performNetworkAction for $networkAction"))
+
+        val networkType = networkAction.networkType
+        when (networkType) {
+            NetworkType.Mobile -> when (networkAction.stateType) {
+                StateType.On -> networkController.SetMobileDataState(true)
+                StateType.Off -> networkController.SetMobileDataState(false)
+                StateType.Null -> Logger.instance.error(tag, "Invalid StateType!")
+            }
+            NetworkType.Wifi -> when (networkAction.stateType) {
+                StateType.On -> networkController.SetWifiState(true)
+                StateType.Off -> networkController.SetWifiState(false)
+                StateType.Null -> Logger.instance.error(tag, "Invalid StateType!")
+            }
+            NetworkType.Null -> Logger.instance.error(tag, "Invalid NetworkType!")
+        }
+    }
+
+    private fun performWirelessSocketAction(wirelessSocketAction: WirelessSocketEntity) {
+        Logger.instance.debug(tag, "performWirelessSocketAction for $wirelessSocketAction")
+        // TODO
+        /* when (wirelessSocketAction.stateType) {
+            StateType.On -> WirelessSocketService.instance.setWirelessSocketState(wirelessSocketAction.wirelessSocketName, true)
+            StateType.Off -> WirelessSocketService.instance.setWirelessSocketState(wirelessSocketAction.wirelessSocketName, false)
+            StateType.Null -> Logger.instance.error(tag, "Invalid StateType!")
+        } */
+    }
+
+    private fun performWirelessSwitchAction(wirelessSwitchAction: WirelessSwitchAction) {
+        Logger.instance.debug(tag, "performWirelessSwitchAction for $wirelessSwitchAction")
+        // TODO
+        // WirelessSwitchService.instance.toggleWirelessSwitch(wirelessSwitchAction.wirelessSwitchName)
     }
 }

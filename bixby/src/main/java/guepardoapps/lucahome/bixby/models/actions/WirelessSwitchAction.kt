@@ -1,12 +1,9 @@
 package guepardoapps.lucahome.bixby.models.actions
 
 import android.support.annotation.NonNull
-import guepardoapps.lucahome.bixby.enums.StateType
 import guepardoapps.lucahome.bixby.models.shared.IBixbyEntity
-import guepardoapps.lucahome.common.utils.Logger
 
-class WirelessSwitchAction(
-        @NonNull var wirelessSwitchName: String = "") : IBixbyEntity {
+class WirelessSwitchAction(@NonNull var wirelessSwitchName: String = "") : IBixbyEntity {
     private val tag = WirelessSwitchAction::class.java.simpleName
 
     override fun getDatabaseString(): String {

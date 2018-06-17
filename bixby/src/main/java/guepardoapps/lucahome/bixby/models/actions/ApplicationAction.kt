@@ -1,12 +1,9 @@
 package guepardoapps.lucahome.bixby.models.actions
 
 import android.support.annotation.NonNull
-import guepardoapps.lucahome.bixby.enums.StateType
 import guepardoapps.lucahome.bixby.models.shared.IBixbyEntity
-import guepardoapps.lucahome.common.utils.Logger
 
-class ApplicationAction(
-        @NonNull var packageName: String = "") : IBixbyEntity {
+class ApplicationAction(@NonNull var packageName: String = "") : IBixbyEntity {
     private val tag = ApplicationAction::class.java.simpleName
 
     override fun getDatabaseString(): String {
