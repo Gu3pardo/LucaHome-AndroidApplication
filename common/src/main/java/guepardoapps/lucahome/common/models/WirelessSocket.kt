@@ -1,160 +1,63 @@
-package guepardoapps.lucahome.common.classes;
+package guepardoapps.lucahome.common.models
 
-import android.support.annotation.NonNull;
+import guepardoapps.lucahome.common.enums.LucaServerActionTypes
+import guepardoapps.lucahome.common.enums.ServerDatabaseAction
+import java.util.*
 
-import java.util.Calendar;
-import java.util.Locale;
-import java.util.UUID;
+class WirelessSocket(override val uuid: UUID,
+                     override var roomUuid: UUID,
+                     var name: String,
+                     var code: String,
+                     var state: Boolean,
+                     val lastTriggerDateTime: Calendar,
+                     val lastTriggerUser: String,
+                     override var isOnServer: Boolean,
+                     override var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null) : ILucaClass {
+    private val tag: String = WirelessSocket::class.java.simpleName
 
-import guepardoapps.lucahome.common.R;
-import guepardoapps.lucahome.common.constants.Constants;
-import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
+    private val settingsHeader: String = "SharedPref_Notification_Socket_"
+    var settingsKey: String
 
-@SuppressWarnings({"unused", "WeakerAccess"})
-public class WirelessSocket implements ILucaClass {
-    private static final String Tag = WirelessSocket.class.getSimpleName();
+    var commandSetState: String
 
-    public static final String SettingsHeader = "SharedPref_Notification_Socket_";
-
-    protected UUID _uuid;
-    protected UUID _roomUuid;
-    protected String _name;
-    protected String _code;
-    protected boolean _state;
-
-    protected Calendar _lastTriggerDateTime;
-    protected String _lastTriggerUser;
-
-    protected boolean _isOnServer;
-    protected LucaServerDbAction _serverDbAction;
-
-    public WirelessSocket(
-            @NonNull UUID uuid,
-            @NonNull UUID roomUuid,
-            @NonNull String name,
-            @NonNull String code,
-            boolean state,
-            @NonNull Calendar lastTriggerDateTime,
-            @NonNull String lastTriggerUser,
-            boolean isOnServer,
-            @NonNull LucaServerDbAction serverDbAction) {
-        _uuid = uuid;
-        _roomUuid = roomUuid;
-        _name = name;
-        _code = code;
-        _state = state;
-        _lastTriggerDateTime = lastTriggerDateTime;
-        _lastTriggerUser = lastTriggerUser;
-        _isOnServer = isOnServer;
-        _serverDbAction = serverDbAction;
+    init {
+        settingsKey = "$settingsHeader$uuid"
+        commandSetState = "${LucaServerActionTypes.SET_WIRELESS_SOCKET.command}$uuid"
     }
 
-    @Override
-    public UUID GetUuid() {
-        return _uuid;
-    }
-
-    public void SetRoomUuid(@NonNull UUID roomUuid) {
-        _roomUuid = roomUuid;
-    }
-
-    @Override
-    public UUID GetRoomUuid() {
-        return _roomUuid;
-    }
-
-    public void SetName(@NonNull String name) {
-        _name = name;
-    }
-
-    public String GetName() {
-        return _name;
-    }
-
-    public void SetCode(@NonNull String code) {
-        _code = code;
-    }
-
-    public String GetCode() {
-        return _code;
-    }
-
-    public void SetState(boolean state) {
-        _state = state;
-    }
-
-    public boolean GetState() {
-        return _state;
-    }
-
-    public void SetLastTriggerDateTime(@NonNull Calendar lastTriggerDateTime) {
-        _lastTriggerDateTime = lastTriggerDateTime;
-    }
-
-    public Calendar GetLastTriggerDateTime() {
-        return _lastTriggerDateTime;
-    }
-
-    public void SetLastTriggerUser(@NonNull String lastTriggerUser) {
-        _lastTriggerUser = lastTriggerUser;
-    }
-
-    public String GetLastTriggerUser() {
-        return _lastTriggerUser;
-    }
-
-    public String GetSettingsKey() {
-        return String.format(Locale.getDefault(), "%s%s", SettingsHeader, _name);
-    }
-
-    @Override
-    public void SetIsOnServer(boolean isOnServer) {
-        _isOnServer = isOnServer;
-    }
-
-    @Override
-    public boolean GetIsOnServer() {
-        return _isOnServer;
-    }
-
-    @Override
-    public void SetServerDbAction(@NonNull LucaServerDbAction serverDbAction) {
-        _serverDbAction = serverDbAction;
-    }
-
-    @Override
-    public LucaServerDbAction GetServerDbAction() {
-        return _serverDbAction;
-    }
-
-    public String GetCommandSetState() throws NoSuchMethodException {
+    public String GetCommandSetState() throws NoSuchMethodException
+    {
         return String.format(Locale.getDefault(),
                 "%s%s%s",
-                LucaServerActionTypes.SET_WIRELESS_SOCKET.toString(), _uuid, ((_state) ? Constants.StateOn : Constants.StateOff));
+                LucaServerActionTypes.SET_WIRELESS_SOCKET.toString(), _uuid, ((_state) ? Constants . StateOn : Constants . StateOff));
     }
 
     @Override
-    public String GetCommandAdd() {
+    public String GetCommandAdd()
+    {
         return String.format(Locale.getDefault(),
                 "%s%s&roomuuid=%s&name=%s&code=%s",
                 LucaServerActionTypes.ADD_WIRELESS_SOCKET.toString(), _uuid, _roomUuid, _name, _code);
     }
 
     @Override
-    public String GetCommandUpdate() {
+    public String GetCommandUpdate()
+    {
         return String.format(Locale.getDefault(),
                 "%s%s&roomuuid=%s&name=%s&code=%s&isactivated=%s",
                 LucaServerActionTypes.UPDATE_WIRELESS_SOCKET.toString(), _uuid, _roomUuid, _name, _code, (_state ? "1" : "0"));
     }
 
     @Override
-    public String GetCommandDelete() {
+    public String GetCommandDelete()
+    {
         return String.format(Locale.getDefault(),
                 "%s%s",
                 LucaServerActionTypes.DELETE_WIRELESS_SOCKET.toString(), _uuid);
     }
 
-    public int GetDrawable() {
+    public int GetDrawable()
+    {
         if (_name.contains("TV")) {
             if (_state) {
                 return R.drawable.wireless_socket_tv_on;
@@ -244,7 +147,8 @@ public class WirelessSocket implements ILucaClass {
     }
 
     @Override
-    public String toString() {
+    public String toString()
+    {
         return String.format(Locale.getDefault(),
                 "{\"Class\":\"%s\",\"Uuid\":\"%s\",\"RoomUuid\":\"%s\",\"Name\":\"%s\",\"Code\":\"%s\",\"State\":\"%s\"}",
                 Tag, _uuid, _roomUuid, _name, _code, (_state ? "1" : "0"));

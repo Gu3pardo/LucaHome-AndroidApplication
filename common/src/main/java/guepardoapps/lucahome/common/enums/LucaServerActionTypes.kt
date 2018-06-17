@@ -1,8 +1,8 @@
-package guepardoapps.lucahome.common.enums;
+package guepardoapps.lucahome.common.enums
 
-import java.io.Serializable;
+import java.io.Serializable
 
-public enum LucaServerActionTypes implements Serializable {
+enum class LucaServerActionTypes(var id: Int, var command: String) : Serializable {
 
     NULL(0, ""),
 
@@ -155,30 +155,4 @@ public enum LucaServerActionTypes implements Serializable {
     ADD_WIRELESS_TIMER(231, "addwirelesstimer&uuid="),
     UPDATE_WIRELESS_TIMER(232, "updatewirelesstimer&uuid="),
     DELETE_WIRELESS_TIMER(233, "deletewirelesstimer&uuid=");
-
-    private int _id;
-    private String _action;
-
-    LucaServerActionTypes(int id, String action) {
-        _id = id;
-        _action = action;
-    }
-
-    public int GetId() {
-        return _id;
-    }
-
-    @Override
-    public String toString() {
-        return _action;
-    }
-
-    public static LucaServerActionTypes GetById(int id) {
-        for (LucaServerActionTypes type : values()) {
-            if (type._id == id) {
-                return type;
-            }
-        }
-        return NULL;
-    }
 }
