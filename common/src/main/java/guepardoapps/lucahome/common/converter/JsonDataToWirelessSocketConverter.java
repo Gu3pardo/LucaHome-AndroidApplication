@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
-import guepardoapps.lucahome.common.classes.ILucaClass;
-import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.models.WirelessSocket;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.common.utils.StringHelper;
 
@@ -30,7 +29,7 @@ public final class JsonDataToWirelessSocketConverter implements IJsonDataConvert
 
     @Override
     public ArrayList<WirelessSocket> GetList(@NonNull String[] stringArray) {
-        if (StringHelper.StringsAreEqual(stringArray)) {
+        if (StringHelper.stringsAreEqual(stringArray)) {
             return parseStringToList(stringArray[0]);
         } else {
             String usedEntry = StringHelper.SelectString(stringArray, SearchParameter);
