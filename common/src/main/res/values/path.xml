@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="server_ip">http://192.168.178.25</string>
     <string name="raspberry_pi_lib_action">/lib/lucahome.php?user=</string>
 </resources>

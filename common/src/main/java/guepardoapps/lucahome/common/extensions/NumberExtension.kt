@@ -11,6 +11,13 @@ fun Int.integerFormat(digits: Int): String {
 }
 
 /**
+ * @return returns a boolean, true if int is not 0
+ */
+fun Int.toBoolean(): Boolean {
+    return this != 0
+}
+
+/**
  * @param digits the numbers to show after separator, the decimals
  * @return returns a string with specified format and additional decimal zeros
  */

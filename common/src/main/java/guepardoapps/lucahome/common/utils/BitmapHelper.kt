@@ -47,9 +47,9 @@ class BitmapHelper {
             val photoUri: Uri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
 
             val photoCursor: Cursor = contentResolver.query(photoUri, arrayOf(ContactsContract.Contacts.Photo.PHOTO), null, null, null)
-            photoCursor.use { photoCursor ->
-                if (photoCursor.moveToFirst()) {
-                    val data = photoCursor.getBlob(0)
+            photoCursor.use { pCursor ->
+                if (pCursor.moveToFirst()) {
+                    val data = pCursor.getBlob(0)
                     if (data != null) {
                         photo = BitmapFactory.decodeStream(ByteArrayInputStream(data))
                     }

@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.common.services;
+package guepardoapps.lucahome.common.services.wirelesssocket;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -11,28 +11,23 @@ import android.support.annotation.NonNull;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.UUID;
 
 import guepardoapps.lucahome.common.classes.ILucaClass;
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.constants.Constants;
 import guepardoapps.lucahome.common.controller.BroadcastController;
-import guepardoapps.lucahome.common.controller.DownloadController;
 import guepardoapps.lucahome.common.controller.NetworkController;
 import guepardoapps.lucahome.common.controller.NotificationController;
 import guepardoapps.lucahome.common.controller.ReceiverController;
 import guepardoapps.lucahome.common.controller.SettingsController;
-import guepardoapps.lucahome.common.converter.JsonDataToWirelessSocketConverter;
-import guepardoapps.lucahome.common.databases.DatabaseWirelessSocketList;
 import guepardoapps.lucahome.common.enums.LucaServerActionTypes;
 import guepardoapps.lucahome.common.utils.Logger;
-import guepardoapps.lucahome.common.utils.Tools;
 
 @SuppressWarnings({"WeakerAccess"})
 public class WirelessSocketService implements IWirelessSocketService {
-    private static final String Tag = WirelessSocketService.class.getSimpleName();
+    private static final String Tag = guepardoapps.lucahome.common.services.wirelesssocket.WirelessSocketService.class.getSimpleName();
 
-    private static final WirelessSocketService Singleton = new WirelessSocketService();
+    private static final guepardoapps.lucahome.common.services.wirelesssocket.WirelessSocketService Singleton = new guepardoapps.lucahome.common.services.wirelesssocket.WirelessSocketService();
 
     private static final int MinTimeoutMin = 5;
     private static final int MaxTimeoutMin = 24 * 60;
@@ -257,7 +252,7 @@ public class WirelessSocketService implements IWirelessSocketService {
     private WirelessSocketService() {
     }
 
-    public static WirelessSocketService getInstance() {
+    public static guepardoapps.lucahome.common.services.wirelesssocket.WirelessSocketService getInstance() {
         return Singleton;
     }
 
@@ -306,84 +301,6 @@ public class WirelessSocketService implements IWirelessSocketService {
         _receiverController.Dispose();
         _databaseWirelessSocketList.Close();
         _isInitialized = false;
-    }
-
-    @Override
-    public ArrayList<WirelessSocket> GetDataList() {
-        try {
-            return _databaseWirelessSocketList.GetList(null, null, null);
-        } catch (SQLException sqlException) {
-            Logger.getInstance().Error(Tag, sqlException.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public WirelessSocket GetByUuid(@NonNull UUID uuid) {
-        try {
-            return _databaseWirelessSocketList.GetList(String.format(Locale.getDefault(), "%s like %s", DatabaseWirelessSocketList.KeyUuid, uuid), null, null).get(0);
-        } catch (Exception exception) {
-            Logger.getInstance().Error(Tag, exception.getMessage());
-            return new WirelessSocket(uuid, UUID.randomUUID(), "NULL", "NULL", false, Calendar.getInstance(), "NULL", false, ILucaClass.LucaServerDbAction.Null);
-        }
-    }
-
-    @Override
-    public WirelessSocket GetByName(@NonNull String wirelessSocketName) {
-        try {
-            return _databaseWirelessSocketList.GetList(String.format(Locale.getDefault(), "%s like %%%s%%", DatabaseWirelessSocketList.KeyName, wirelessSocketName), null, null).get(0);
-        } catch (Exception exception) {
-            Logger.getInstance().Error(Tag, exception.getMessage());
-            return new WirelessSocket(UUID.randomUUID(), UUID.randomUUID(), wirelessSocketName, "NULL", false, Calendar.getInstance(), "NULL", false, ILucaClass.LucaServerDbAction.Null);
-        }
-    }
-
-    @Override
-    public ArrayList<WirelessSocket> SearchDataList(@NonNull String searchKey) {
-        ArrayList<WirelessSocket> list = GetDataList();
-        ArrayList<WirelessSocket> foundList = new ArrayList<>();
-        for (int index = 0; index < list.size(); index++) {
-            WirelessSocket entry = list.get(index);
-            if (entry.toString().contains(searchKey)) {
-                foundList.add(entry);
-            }
-        }
-        return foundList;
-    }
-
-    @Override
-    public ArrayList<String> GetNameList() {
-        try {
-            return _databaseWirelessSocketList.GetStringQueryList(true, DatabaseWirelessSocketList.KeyName, null, null, null);
-        } catch (SQLException sqlException) {
-            Logger.getInstance().Error(Tag, sqlException.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public ArrayList<UUID> GetRoomUuidList() {
-        try {
-            ArrayList<String> roomUuidStringList = _databaseWirelessSocketList.GetStringQueryList(true, DatabaseWirelessSocketList.KeyUuid, null, null, null);
-            ArrayList<UUID> roomUuidList = new ArrayList<>();
-            for (String roomUuidString : roomUuidStringList) {
-                roomUuidList.add(UUID.fromString(roomUuidString));
-            }
-            return roomUuidList;
-        } catch (SQLException sqlException) {
-            Logger.getInstance().Error(Tag, sqlException.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    @Override
-    public ArrayList<String> GetCodeList() {
-        try {
-            return _databaseWirelessSocketList.GetStringQueryList(true, DatabaseWirelessSocketList.KeyCode, null, null, null);
-        } catch (SQLException sqlException) {
-            Logger.getInstance().Error(Tag, sqlException.getMessage());
-            return new ArrayList<>();
-        }
     }
 
     @Override
@@ -547,22 +464,6 @@ public class WirelessSocketService implements IWirelessSocketService {
                 SettingsController.getInstance().GetServerIp(), Constants.ActionPath,
                 user.GetName(), user.GetPassphrase(),
                 entry.GetCommandSetState());
-
-        _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketSet, true);
-    }
-
-    @Override
-    public void DeactivateAllWirelessSockets() {
-        User user = SettingsController.getInstance().GetUser();
-        if (user == null) {
-            _broadcastController.SendBooleanBroadcast(WirelessSocketSetFinishedBroadcast, WirelessSocketSetFinishedBundle, false);
-            return;
-        }
-
-        String requestUrl = String.format(Locale.getDefault(), "http://%s%s%s&password=%s&action=%s",
-                SettingsController.getInstance().GetServerIp(), Constants.ActionPath,
-                user.GetName(), user.GetPassphrase(),
-                LucaServerActionTypes.DEACTIVATE_ALL_WIRELESS_SOCKETS);
 
         _downloadController.SendCommandToWebsiteAsync(requestUrl, DownloadController.DownloadType.WirelessSocketSet, true);
     }

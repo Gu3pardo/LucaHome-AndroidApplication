@@ -13,7 +13,7 @@ import guepardoapps.lucahome.bixby.models.requirements.LightRequirement
 import guepardoapps.lucahome.bixby.models.shared.NetworkEntity
 import guepardoapps.lucahome.bixby.models.shared.WirelessSocketEntity
 import guepardoapps.lucahome.common.controller.NetworkController
-import guepardoapps.lucahome.common.services.WirelessSocketService
+import guepardoapps.lucahome.common.services.wirelesssocket.WirelessSocketService
 import guepardoapps.lucahome.common.utils.Logger
 import kotlin.collections.ArrayList
 import android.content.Intent

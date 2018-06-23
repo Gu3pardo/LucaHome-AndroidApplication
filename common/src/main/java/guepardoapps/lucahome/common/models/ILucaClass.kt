@@ -9,9 +9,9 @@ interface ILucaClass : Serializable {
     val uuid: UUID
     var roomUuid: UUID
 
-    var commandAdd: String
-    var commandUpdate: String
-    var commandDelete: String
+    val commandAdd: String
+    val commandUpdate: String
+    val commandDelete: String
 
     var isOnServer: Boolean
     var serverDatabaseAction: ServerDatabaseAction

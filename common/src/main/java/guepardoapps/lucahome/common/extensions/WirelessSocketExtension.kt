@@ -1,6 +1,8 @@
 package guepardoapps.lucahome.common.extensions
 
 import guepardoapps.lucahome.common.R
+import guepardoapps.lucahome.common.annotations.JsonKey
+import guepardoapps.lucahome.common.annotations.NeededNetwork
 import guepardoapps.lucahome.common.models.WirelessSocket
 
 fun WirelessSocket.getDrawable(): Int {
