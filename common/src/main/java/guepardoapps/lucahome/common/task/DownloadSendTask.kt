@@ -3,7 +3,7 @@ package guepardoapps.lucahome.common.task
 import android.os.AsyncTask
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
 import guepardoapps.lucahome.common.enums.DownloadState
-import guepardoapps.lucahome.common.enums.DownloadType
+import guepardoapps.lucahome.common.enums.ServerAction
 import guepardoapps.lucahome.common.utils.Logger
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -13,7 +13,7 @@ import okhttp3.ResponseBody
 class DownloadSendTask : AsyncTask<String, Void, String>() {
     private val tag = DownloadSendTask::class.java.simpleName
 
-    lateinit var downloadType: DownloadType
+    lateinit var serverAction: ServerAction
     lateinit var onDownloadAdapter: OnDownloadAdapter
     private val okHttpClient = OkHttpClient()
 
@@ -39,9 +39,9 @@ class DownloadSendTask : AsyncTask<String, Void, String>() {
 
     override fun onPostExecute(result: String?) {
         if (result.isNullOrEmpty()) {
-            onDownloadAdapter.onFinished(downloadType, DownloadState.Canceled, "")
+            onDownloadAdapter.onFinished(serverAction, DownloadState.Canceled, "")
             return
         }
-        onDownloadAdapter.onFinished(downloadType, DownloadState.Success, result!!)
+        onDownloadAdapter.onFinished(serverAction, DownloadState.Success, result!!)
     }
 }

@@ -1,9 +1,7 @@
 package guepardoapps.lucahome.common.extensions
 
 import guepardoapps.lucahome.common.R
-import guepardoapps.lucahome.common.annotations.JsonKey
-import guepardoapps.lucahome.common.annotations.NeededNetwork
-import guepardoapps.lucahome.common.models.WirelessSocket
+import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
 
 fun WirelessSocket.getDrawable(): Int {
     if (name.contains("TV")) {

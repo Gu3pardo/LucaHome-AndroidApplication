@@ -1,10 +1,53 @@
 package guepardoapps.lucahome.common.enums
 
+import guepardoapps.lucahome.common.annotations.NeededNetwork
+import guepardoapps.lucahome.common.annotations.NeededUserRole
 import java.io.Serializable
 
-enum class LucaServerActionTypes(var id: Int, var command: String) : Serializable {
+enum class ServerAction(var id: Int, var command: String) : Serializable {
 
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.No)
     NULL(0, ""),
+
+    //USER
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    UserValidate(10, "uservalidate"),
+    @NeededUserRole(UserRole.Administrator)
+    @NeededNetwork(NetworkType.HomeWifi)
+    UserAdd(11, "useradd&uuid="),
+    @NeededUserRole(UserRole.Administrator)
+    @NeededNetwork(NetworkType.HomeWifi)
+    UserUpdate(12, "userupdate&uuid="),
+    @NeededUserRole(UserRole.Administrator)
+    @NeededNetwork(NetworkType.HomeWifi)
+    UserDelete(13, "userdelete&uuid="),
+
+    //WIRELESS SOCKETS
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSocketLastChange(20, "wirelesssocketlastchange"),
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSocketGet(21, "wirelesssocketget"),
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSocketSet(22, "wirelesssocketset&uuid="),
+    @NeededUserRole(UserRole.User)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSocketAdd(23, "wirelesssocketadd&uuid="),
+    @NeededUserRole(UserRole.User)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSocketUpdate(24, "wirelesssocketupdate&uuid="),
+    @NeededUserRole(UserRole.Administrator)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSocketDelete(25, "wirelesssocketdelete&uuid="),
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSocketDeactivateAll(26, "wirelesssocketdeactivateall"),
+
+    /*
 
     //BIRTHDAYS
     GET_BIRTHDAYS(10, "getbirthdays"),
@@ -70,14 +113,6 @@ enum class LucaServerActionTypes(var id: Int, var command: String) : Serializabl
     UPDATE_WIRELESS_SCHEDULE(93, "updatewirelessschedule&uuid="),
     DELETE_WIRELESS_SCHEDULE(94, "deletewirelessschedule&uuid="),
 
-    //WIRELESS SOCKETS
-    GET_WIRELESS_SOCKETS(100, "getwirelesssockets"),
-    SET_WIRELESS_SOCKET(102, "setwirelesssocket&uuid="),
-    ADD_WIRELESS_SOCKET(103, "addwirelesssocket&uuid="),
-    UPDATE_WIRELESS_SOCKET(104, "updatewirelesssocket&uuid="),
-    DELETE_WIRELESS_SOCKET(105, "deletewirelesssocket&uuid="),
-    DEACTIVATE_ALL_WIRELESS_SOCKETS(106, "deactivateallwirelesssockets"),
-
     //WIRELESS SWITCHES
     GET_WIRELESS_SWITCHES(110, "getwirelessswitches"),
     ADD_WIRELESS_SWITCH(111, "addwirelessswitch&uuid="),
@@ -120,12 +155,6 @@ enum class LucaServerActionTypes(var id: Int, var command: String) : Serializabl
     UPDATE_MEDIA_SERVER(162, "updatemediaserver&uuid="),
     DELETE_MEDIA_SERVER(163, "deletemediaserver&uuid="),
 
-    //USER
-    VALIDATE_USER(170, "validateuser"),
-    ADD_USER(171, "adduser&uuid="),
-    UPDATE_USER(172, "updateuser&uuid="),
-    DELETE_USER(173, "deleteuser&uuid="),
-
     // ACCESS
     START_ACCESS_ALARM(190, "startaccessalarm"),
     STOP_ACCESS_ALARM(191, "stopaccessalarm"),
@@ -154,5 +183,7 @@ enum class LucaServerActionTypes(var id: Int, var command: String) : Serializabl
     GET_WIRELESS_TIMER(230, "getwirelesstimer"),
     ADD_WIRELESS_TIMER(231, "addwirelesstimer&uuid="),
     UPDATE_WIRELESS_TIMER(232, "updatewirelesstimer&uuid="),
-    DELETE_WIRELESS_TIMER(233, "deletewirelesstimer&uuid=");
+    DELETE_WIRELESS_TIMER(233, "deletewirelesstimer&uuid=")
+
+    */
 }

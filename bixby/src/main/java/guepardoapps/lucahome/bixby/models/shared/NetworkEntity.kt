@@ -21,7 +21,7 @@ class NetworkEntity(
 
     override fun parseFromDb(databaseString: String) {
         val data: Array<String> = databaseString.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        if (data.size == 4) {
+        if (data.size == 3) {
             try {
                 networkType = NetworkType.values()[Integer.parseInt(data[0])]
                 stateType = StateType.values()[Integer.parseInt(data[1])]

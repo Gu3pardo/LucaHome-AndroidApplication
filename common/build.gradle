@@ -11,7 +11,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 60000
-        versionName "6.0.0.1800623-alpha1"
+        versionName "6.0.0.1800624-alpha1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         testOptions {
@@ -65,4 +65,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation "org.jetbrains.kotlin:kotlin-reflect:1.2.50"
+    implementation "android.arch.work:work-runtime-ktx:1.0.0-alpha03"
 }

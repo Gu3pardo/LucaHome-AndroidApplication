@@ -1,43 +1,50 @@
 package guepardoapps.lucahome.common.adapter
 
 import android.content.Context
+import guepardoapps.lucahome.common.R
 import guepardoapps.lucahome.common.controller.NetworkController
 import guepardoapps.lucahome.common.enums.DownloadState
-import guepardoapps.lucahome.common.enums.DownloadType
+import guepardoapps.lucahome.common.enums.NetworkType
+import guepardoapps.lucahome.common.enums.ServerAction
+import guepardoapps.lucahome.common.extensions.getNeededNetwork
 import guepardoapps.lucahome.common.task.DownloadSendTask
 import guepardoapps.lucahome.common.utils.Logger
 
-class DownloadAdapter(context: Context) {
+class DownloadAdapter(private val context: Context) {
     private val tag = DownloadAdapter::class.java.simpleName
 
     private var networkController: NetworkController = NetworkController(context)
 
-    fun send(requestUrl: String, downloadType: DownloadType, needsHomeNetwork: Boolean, onDownloadAdapter: OnDownloadAdapter) {
-        if (this.canSend(requestUrl, downloadType, needsHomeNetwork, onDownloadAdapter)) {
+    fun send(actionPath: String, serverAction: ServerAction, onDownloadAdapter: OnDownloadAdapter) {
+        if (this.canSend(actionPath, serverAction, onDownloadAdapter)) {
+            val serverIp = this.context.getString(R.string.server_ip)
+            val libActionPath = this.context.getString(R.string.raspberry_pi_lib_action)
+            val requestUrl = "$serverIp$libActionPath$actionPath"
+
             val downloadSendTask = DownloadSendTask()
-            downloadSendTask.downloadType = downloadType
+            downloadSendTask.serverAction = serverAction
             downloadSendTask.onDownloadAdapter = onDownloadAdapter
             downloadSendTask.execute(requestUrl)
         }
     }
 
-    private fun canSend(requestUrl: String, downloadType: DownloadType, needsHomeNetwork: Boolean, onDownloadAdapter: OnDownloadAdapter): Boolean {
-        if (!networkController.IsNetworkAvailable()) {
+    private fun canSend(actionPath: String, serverAction: ServerAction, onDownloadAdapter: OnDownloadAdapter): Boolean {
+        if (serverAction.getNeededNetwork().networkType != NetworkType.No && !networkController.IsNetworkAvailable()) {
             Logger.instance.warning(tag, DownloadState.NoNetwork)
-            onDownloadAdapter.onFinished(downloadType, DownloadState.NoNetwork, "")
+            onDownloadAdapter.onFinished(serverAction, DownloadState.NoNetwork, "")
             return false
         }
 
         // TODO add homeSSID
-        if (needsHomeNetwork && !networkController.IsHomeNetwork("")) {
+        if (serverAction.getNeededNetwork().networkType == NetworkType.HomeWifi && !networkController.IsHomeNetwork("")) {
             Logger.instance.warning(tag, DownloadState.NoHomeNetwork)
-            onDownloadAdapter.onFinished(downloadType, DownloadState.NoHomeNetwork, "")
+            onDownloadAdapter.onFinished(serverAction, DownloadState.NoHomeNetwork, "")
             return false
         }
 
-        if (requestUrl.length < 15) {
+        if (actionPath.isEmpty()) {
             Logger.instance.warning(tag, DownloadState.InvalidUrl)
-            onDownloadAdapter.onFinished(downloadType, DownloadState.InvalidUrl, "")
+            onDownloadAdapter.onFinished(serverAction, DownloadState.InvalidUrl, "")
             return false
         }
 

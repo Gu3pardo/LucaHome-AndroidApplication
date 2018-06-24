@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.common.models
+package guepardoapps.lucahome.common.models.common
 
 import guepardoapps.lucahome.common.enums.ServerDatabaseAction
 
@@ -7,7 +7,6 @@ import java.util.UUID
 
 interface ILucaClass : Serializable {
     val uuid: UUID
-    var roomUuid: UUID
 
     val commandAdd: String
     val commandUpdate: String

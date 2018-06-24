@@ -29,7 +29,6 @@ import guepardoapps.library.openweather.service.OpenWeatherService;
 
 import guepardoapps.lucahome.common.classes.WirelessSocket;
 import guepardoapps.lucahome.common.controller.BroadcastController;
-import guepardoapps.lucahome.common.services.wirelesssocket.WirelessSocketService;
 import guepardoapps.lucahome.common.utils.Logger;
 import guepardoapps.lucahome.voicerecognition.classes.RelationActionClass;
 import guepardoapps.lucahome.voicerecognition.utils.IRelationshipHelper;

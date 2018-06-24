@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
-import guepardoapps.lucahome.common.converter.JsonDataToWirelessSocketConverter;
+import guepardoapps.lucahome.common.converter.wirelesssocket.JsonDataToWirelessSocketConverter;
 import guepardoapps.lucahome.common.enums.ServerDatabaseAction;
-import guepardoapps.lucahome.common.models.WirelessSocket;
+import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket;
 
 import static org.junit.Assert.assertEquals;
 

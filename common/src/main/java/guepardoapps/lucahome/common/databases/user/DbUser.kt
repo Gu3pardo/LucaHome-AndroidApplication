@@ -1,11 +1,11 @@
-package guepardoapps.lucahome.common.databases
+package guepardoapps.lucahome.common.databases.user
 
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.content.Context
 import guepardoapps.lucahome.common.enums.UserRole
-import guepardoapps.lucahome.common.models.User
+import guepardoapps.lucahome.common.models.user.User
 import java.util.*
 
 // Helpful
@@ -35,21 +35,6 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
 
     override fun onDowngrade(database: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
         onUpgrade(database, oldVersion, newVersion)
-    }
-
-    fun add(entity: User): Long {
-        val values = ContentValues().apply {
-            put(ColumnUuid, entity.uuid.toString())
-            put(ColumnName, entity.name)
-            put(ColumnPassword, entity.password)
-            put(ColumnRole, entity.role.ordinal)
-        }
-
-        val database = this.writableDatabase
-        val newRowId = database.insert(DatabaseTable, null, values)
-        database.close()
-
-        return newRowId
     }
 
     fun get(): User? {
@@ -84,6 +69,21 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
 
         database.close()
         return list.firstOrNull()
+    }
+
+    fun add(entity: User): Long {
+        val values = ContentValues().apply {
+            put(ColumnUuid, entity.uuid.toString())
+            put(ColumnName, entity.name)
+            put(ColumnPassword, entity.password)
+            put(ColumnRole, entity.role.ordinal)
+        }
+
+        val database = this.writableDatabase
+        val newRowId = database.insert(DatabaseTable, null, values)
+        database.close()
+
+        return newRowId
     }
 
     fun update(entity: User): Int {

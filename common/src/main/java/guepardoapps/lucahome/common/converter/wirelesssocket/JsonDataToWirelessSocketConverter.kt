@@ -1,9 +1,11 @@
-package guepardoapps.lucahome.common.converter
+package guepardoapps.lucahome.common.converter.wirelesssocket
 
 import guepardoapps.lucahome.common.annotations.JsonKey
+import guepardoapps.lucahome.common.converter.common.IJsonDataConverter
 import guepardoapps.lucahome.common.extensions.getJsonKey
 import guepardoapps.lucahome.common.extensions.getPropertyJsonKey
-import guepardoapps.lucahome.common.models.WirelessSocket
+import guepardoapps.lucahome.common.extensions.toBoolean
+import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
 import guepardoapps.lucahome.common.utils.Logger
 import org.json.JSONArray
 import org.json.JSONObject
@@ -31,7 +33,7 @@ class JsonDataToWirelessSocketConverter : IJsonDataConverter<WirelessSocket> {
                 val value: JSONObject = dataArray.getJSONObject(index)
                 val data: JSONObject = value.getJSONObject(WirelessSocket::class.java.simpleName)
 
-                val stateJsonKey = c.getPropertyJsonKey(c::code.name)
+                val stateJsonKey = c.getPropertyJsonKey(c::state.name)
                 val codeJsonKey = c.getPropertyJsonKey(c::code.name)
                 val nameJsonKey = c.getPropertyJsonKey(c::name.name)
                 val roomUuidJsonKey = c.getPropertyJsonKey(c::roomUuid.name)
@@ -43,20 +45,15 @@ class JsonDataToWirelessSocketConverter : IJsonDataConverter<WirelessSocket> {
                 val roomUuid: UUID = UUID.fromString(data.getString(roomUuidJsonKey.key))
                 val name: String = data.getString(nameJsonKey.key)
                 val code: String = data.getString(codeJsonKey.key)
-                val state: Boolean = data.getString(stateJsonKey.key) == "1"
+                val state: Boolean = data.getInt(stateJsonKey.key).toBoolean()
 
                 val lastTrigger: JSONObject = data.getJSONObject(lastTriggerDateTimeJsonKey.parent)
 
-                val lastTriggerUser: String = lastTrigger.getString(lastTriggerUserJsonKey.key)
-
-                val year = lastTrigger.getInt("Year")
-                val month = lastTrigger.getInt("Month")
-                val day = lastTrigger.getInt("Day")
-                val hour = lastTrigger.getInt("Hour")
-                val minute = lastTrigger.getInt("Minute")
-
+                val lastTriggerDateTimeLong: Long = lastTrigger.getLong(lastTriggerDateTimeJsonKey.key)
                 val lastTriggerDateTime: Calendar = Calendar.getInstance()
-                lastTriggerDateTime.set(year, month, day, hour, minute)
+                lastTriggerDateTime.timeInMillis = lastTriggerDateTimeLong
+
+                val lastTriggerUser: String = lastTrigger.getString(lastTriggerUserJsonKey.key)
 
                 list.add(WirelessSocket(uuid, roomUuid, name, code, state, lastTriggerDateTime, lastTriggerUser))
             }

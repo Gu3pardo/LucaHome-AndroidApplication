@@ -222,8 +222,8 @@ class BixbyPairService {
     }
 
     private fun validateWirelessSocketRequirement(wirelessSocketRequirement: WirelessSocketEntity): Boolean {
-        val wirelessSocket = WirelessSocketService.getInstance().GetByName(wirelessSocketRequirement.wirelessSocketName)
-        return wirelessSocketRequirement.stateType === StateType.On == wirelessSocket.GetState()
+        val wirelessSocket = WirelessSocketService.instance.get(wirelessSocketRequirement.uuid)
+        return wirelessSocketRequirement.stateType === StateType.On == wirelessSocket?.state
     }
 
     private fun performAction(bixbyAction: BixbyAction) {

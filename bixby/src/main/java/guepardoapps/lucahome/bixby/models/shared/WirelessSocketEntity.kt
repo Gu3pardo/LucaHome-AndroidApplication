@@ -3,41 +3,46 @@ package guepardoapps.lucahome.bixby.models.shared
 import android.support.annotation.NonNull
 import guepardoapps.lucahome.bixby.enums.StateType
 import guepardoapps.lucahome.common.utils.Logger
+import java.util.*
 
 class WirelessSocketEntity(
-        @NonNull var wirelessSocketName: String = "",
+        @NonNull var uuid: UUID = UUID.randomUUID(),
+        @NonNull var name: String = "",
         @NonNull var stateType: StateType = StateType.Null) : IBixbyEntity {
     private val tag = WirelessSocketEntity::class.java.simpleName
 
     override fun getDatabaseString(): String {
-        return "${stateType.ordinal}:$wirelessSocketName"
+        return "${stateType.ordinal}:$uuid:$name"
     }
 
     override fun getInformationString(): String {
-        return "$tag: $wirelessSocketName -> $stateType"
+        return "$tag: $name -> $stateType"
     }
 
     override fun parseFromDb(databaseString: String) {
         val data: Array<String> = databaseString.split(":".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        if (data.size == 4) {
+        if (data.size == 3) {
             try {
                 stateType = StateType.values()[Integer.parseInt(data[0])]
-                wirelessSocketName = data[1]
+                uuid = UUID.fromString(data[1])
+                name = data[2]
 
             } catch (exception: Exception) {
                 Logger.instance.error(tag, exception.toString())
                 stateType = StateType.Null
-                wirelessSocketName = ""
+                uuid = UUID.randomUUID()
+                name = ""
             }
 
         } else {
             Logger.instance.error(tag, "Invalid data size ${data.size}")
             stateType = StateType.Null
-            wirelessSocketName = ""
+            uuid = UUID.randomUUID()
+            name = ""
         }
     }
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\",\"StateType\":$stateType,\"WirelessSocketName\":\"$wirelessSocketName\"}"
+        return "{\"Class\":\"$tag\",\"StateType\":$stateType,\"Uuid\":\"$uuid\",\"Name\":\"$name\"}"
     }
 }
