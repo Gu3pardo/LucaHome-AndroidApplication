@@ -17,7 +17,7 @@ public class UtilsUnitTest {
                 6900, 2277
         };
 
-        String actualValue = ByteStringHelper.ReadStringFromCharArray(valueToConvert);
+        String actualValue = ByteStringHelper.Companion.readStringFromCharArray(valueToConvert);
 
         assertEquals(expectedValue, actualValue);
     }

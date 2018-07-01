@@ -1,15 +1,15 @@
 package guepardoapps.lucahome.bixby.models.shared
 
-import android.support.annotation.NonNull
 import guepardoapps.lucahome.bixby.enums.StateType
 import guepardoapps.lucahome.common.utils.Logger
 import java.util.*
 
-class WirelessSocketEntity(
-        @NonNull var uuid: UUID = UUID.randomUUID(),
-        @NonNull var name: String = "",
-        @NonNull var stateType: StateType = StateType.Null) : IBixbyEntity {
+class WirelessSocketEntity : IBixbyEntity {
     private val tag = WirelessSocketEntity::class.java.simpleName
+
+    lateinit var uuid: UUID
+    lateinit var name: String
+    lateinit var stateType: StateType
 
     override fun getDatabaseString(): String {
         return "${stateType.ordinal}:$uuid:$name"
@@ -43,6 +43,11 @@ class WirelessSocketEntity(
     }
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\",\"StateType\":$stateType,\"Uuid\":\"$uuid\",\"Name\":\"$name\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"StateType\":$stateType," +
+                "\"Uuid\":\"$uuid\"," +
+                "\"Name\":\"$name\"" +
+                "}"
     }
 }

@@ -56,18 +56,17 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val list = mutableListOf<User>()
         with(cursor) {
             while (moveToNext()) {
-                val uuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnUuid)))
-                val name = getString(getColumnIndexOrThrow(ColumnName))
-                val password = getString(getColumnIndexOrThrow(ColumnPassword))
-                val role = UserRole.values()[getInt(getColumnIndexOrThrow(ColumnRole))]
+                val user = User()
 
-                val entry = User(uuid, name, password, role)
+                user.uuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnUuid)))
+                user.name = getString(getColumnIndexOrThrow(ColumnName))
+                user.password = getString(getColumnIndexOrThrow(ColumnPassword))
+                user.role = UserRole.values()[getInt(getColumnIndexOrThrow(ColumnRole))]
 
-                list.add(entry)
+                list.add(user)
             }
         }
 
-        database.close()
         return list.firstOrNull()
     }
 
@@ -80,10 +79,7 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
         }
 
         val database = this.writableDatabase
-        val newRowId = database.insert(DatabaseTable, null, values)
-        database.close()
-
-        return newRowId
+        return database.insert(DatabaseTable, null, values)
     }
 
     fun update(entity: User): Int {
@@ -98,10 +94,7 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selectionArgs = arrayOf(entity.uuid.toString())
 
         val database = this.writableDatabase
-        val count = database.update(DatabaseTable, values, selection, selectionArgs)
-        database.close()
-
-        return count
+        return database.update(DatabaseTable, values, selection, selectionArgs)
     }
 
     fun delete(entity: User): Int {
@@ -110,10 +103,7 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selection = "$ColumnUuid LIKE ?"
         val selectionArgs = arrayOf(entity.uuid.toString())
 
-        val deletedRows = database.delete(DatabaseTable, selection, selectionArgs)
-
-        database.close()
-        return deletedRows
+        return database.delete(DatabaseTable, selection, selectionArgs)
     }
 
     companion object {

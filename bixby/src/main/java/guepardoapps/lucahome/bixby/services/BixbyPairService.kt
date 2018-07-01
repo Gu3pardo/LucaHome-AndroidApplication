@@ -21,6 +21,7 @@ import guepardoapps.lucahome.bixby.models.actions.ApplicationAction
 import guepardoapps.lucahome.bixby.models.actions.BixbyAction
 import guepardoapps.lucahome.bixby.enums.ActionType
 import guepardoapps.lucahome.bixby.models.actions.WirelessSwitchAction
+import guepardoapps.lucahome.bixby.models.requirements.PositionRequirement
 
 class BixbyPairService {
     private val tag = BixbyPairService::class.java.simpleName
@@ -138,7 +139,13 @@ class BixbyPairService {
                     }
                 }
 
-                pairList.add(BixbyPair(actionId, bixbyAction, pairRequirementList, DatabaseAction.Null))
+                val bixbyPair = BixbyPair()
+                bixbyPair.actionId = actionId
+                bixbyPair.action = bixbyAction
+                bixbyPair.requirementList = pairRequirementList
+                bixbyPair.databaseAction = DatabaseAction.Null
+
+                pairList.add(bixbyPair)
             }
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
@@ -159,7 +166,7 @@ class BixbyPairService {
                     allRequirementsTrue = allRequirementsTrue and validateLightRequirement(bixbyRequirement.lightRequirement)
                 }
                 RequirementType.Position -> {
-                    allRequirementsTrue = allRequirementsTrue and validatePositionRequirement(bixbyRequirement.puckJsPosition)
+                    allRequirementsTrue = allRequirementsTrue and validatePositionRequirement(bixbyRequirement.positionRequirement)
                 }
                 RequirementType.Network -> {
                     allRequirementsTrue = allRequirementsTrue and validateNetworkRequirement(bixbyRequirement.networkRequirement)
@@ -177,7 +184,7 @@ class BixbyPairService {
         return allRequirementsTrue
     }
 
-    private fun validatePositionRequirement(puckJsPosition: String): Boolean {
+    private fun validatePositionRequirement(positionRequirement: PositionRequirement): Boolean {
         return false
         // TODO
         // val room = RoomService.getInstance().GetByUuid(_lastReceivedPosition.GetPuckJs().GetRoomUuid())

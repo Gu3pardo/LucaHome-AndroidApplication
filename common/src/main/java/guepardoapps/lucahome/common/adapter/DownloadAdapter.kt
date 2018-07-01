@@ -35,8 +35,9 @@ class DownloadAdapter(private val context: Context) {
             return false
         }
 
-        // TODO add homeSSID
-        if (serverAction.getNeededNetwork().networkType == NetworkType.HomeWifi && !networkController.IsHomeNetwork("")) {
+        // TODO get homeSsid dynamically
+        val homeSsid = this.context.getString(R.string.home_ssid)
+        if (serverAction.getNeededNetwork().networkType == NetworkType.HomeWifi && !networkController.IsHomeNetwork(homeSsid)) {
             Logger.instance.warning(tag, DownloadState.NoHomeNetwork)
             onDownloadAdapter.onFinished(serverAction, DownloadState.NoHomeNetwork, "")
             return false

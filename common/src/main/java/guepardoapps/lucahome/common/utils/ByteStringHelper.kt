@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.common.utils;
+package guepardoapps.lucahome.common.utils
 
 import guepardoapps.lucahome.common.extensions.div
 

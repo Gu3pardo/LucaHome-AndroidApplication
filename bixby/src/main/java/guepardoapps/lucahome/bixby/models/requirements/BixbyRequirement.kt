@@ -3,15 +3,16 @@ package guepardoapps.lucahome.bixby.models.requirements
 import guepardoapps.lucahome.bixby.enums.RequirementType
 import guepardoapps.lucahome.bixby.models.shared.*
 
-class BixbyRequirement(
-        val id: Int,
-        val actionId: Int,
-        val requirementType: RequirementType = RequirementType.Null,
-        val puckJsPosition: String = "",
-        val lightRequirement: LightRequirement = LightRequirement(),
-        val networkRequirement: NetworkEntity = NetworkEntity(),
-        val wirelessSocketRequirement: WirelessSocketEntity = WirelessSocketEntity()) : IBixbyEntity {
+class BixbyRequirement : IBixbyEntity {
     private val tag = BixbyRequirement::class.java.simpleName
+
+    var id: Int = -1
+    var actionId: Int = -1
+    lateinit var requirementType: RequirementType
+    lateinit var positionRequirement: PositionRequirement
+    lateinit var lightRequirement: LightRequirement
+    lateinit var networkRequirement: NetworkEntity
+    lateinit var wirelessSocketRequirement: WirelessSocketEntity
 
     @Throws(NoSuchMethodException::class)
     override fun getDatabaseString(): String {
@@ -27,13 +28,22 @@ class BixbyRequirement(
         return when (requirementType) {
             RequirementType.Light -> lightRequirement.getInformationString()
             RequirementType.Network -> networkRequirement.getInformationString()
-            RequirementType.Position -> "Position: $puckJsPosition"
+            RequirementType.Position -> positionRequirement.getInformationString()
             RequirementType.WirelessSocket -> wirelessSocketRequirement.getInformationString()
             RequirementType.Null -> "No information available!"
         }
     }
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\",\"Id\":$id,\"ActionId\":$actionId,\"RequirementType\":\"$requirementType\",\"PuckJsPosition\":\"$puckJsPosition\",\"LightRequirement\":\"$lightRequirement\",\"NetworkRequirement\":\"$networkRequirement\",\"WirelessSocketRequirement\":\"$wirelessSocketRequirement\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"Id\":$id," +
+                "\"ActionId\":$actionId," +
+                "\"RequirementType\":\"$requirementType\"," +
+                "\"PositionRequirement\":\"$positionRequirement\"," +
+                "\"LightRequirement\":\"$lightRequirement\"," +
+                "\"NetworkRequirement\":\"$networkRequirement\"," +
+                "\"WirelessSocketRequirement\":\"$wirelessSocketRequirement\"" +
+                "}"
     }
 }

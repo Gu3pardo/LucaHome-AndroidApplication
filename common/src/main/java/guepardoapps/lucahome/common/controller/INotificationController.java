@@ -3,9 +3,7 @@ package guepardoapps.lucahome.common.controller;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
-
-import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket;
 
 public interface INotificationController {
     String NotificationAction = "NotificationAction";
@@ -21,9 +19,9 @@ public interface INotificationController {
 
     void CreateCameraNotification(int notificationId, @NonNull Class<?> receiverActivity);
 
-    void CreateWirelessSocketNotification(int notificationId, @NonNull ArrayList<WirelessSocket> wirelessSocketList, @NonNull Class<?> receiverClass);
+    void CreateWirelessSocketNotification(int notificationId, @NonNull MutableList<WirelessSocket> wirelessSocketList, @NonNull Class<?> receiverClass);
 
-    void CreateWirelessSwitchNotification(int notificationId, ArrayList<WirelessSwitch> wirelessSwitchList, @NonNull Class<?> receiverClass);
+    void CreateWirelessSwitchNotification(int notificationId, MutableList<WirelessSwitch> wirelessSwitchList, @NonNull Class<?> receiverClass);
 
     void CreateTemperatureNotification(int notificationId, @NonNull Class<?> temperatureActivity, int icon, @NonNull String title, @NonNull String body, boolean autoCancelable);
 

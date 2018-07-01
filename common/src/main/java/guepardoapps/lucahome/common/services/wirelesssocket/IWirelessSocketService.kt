@@ -8,8 +8,6 @@ interface IWirelessSocketService : ILucaService<WirelessSocket> {
     var onWirelessSocketService: OnWirelessSocketService?
 
     fun get(uuid: UUID): WirelessSocket?
-
     fun setState(entry: WirelessSocket, newState: Boolean)
-
     fun deactivateAll()
 }

@@ -6,12 +6,13 @@ import guepardoapps.lucahome.common.extensions.doubleFormat
 
 import guepardoapps.lucahome.common.utils.Logger
 
-class LightRequirement(
-        var compareType: LightCompareType = LightCompareType.Null,
-        var compareValue: Double = 0.0,
-        var toleranceInPercent: Double = 0.0,
-        var lightArea: String = "") : IBixbyEntity {
+class LightRequirement : IBixbyEntity {
     private val tag = LightRequirement::class.java.simpleName
+
+    lateinit var compareType: LightCompareType
+    var compareValue: Double = 0.0
+    var toleranceInPercent: Double = 0.0
+    lateinit var lightArea: String
 
     override fun getDatabaseString(): String {
         return "%${compareType.ordinal}:${compareValue.doubleFormat(2)}:${toleranceInPercent.doubleFormat(1)}:$lightArea"
@@ -57,6 +58,12 @@ class LightRequirement(
     }
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\",\"CompareType\":\"$compareType\",\"CompareValue\":${compareValue.doubleFormat(2)},\"ToleranceInPercent\":${toleranceInPercent.doubleFormat(1)},\"LightArea\":\"$lightArea\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"CompareType\":\"$compareType\"," +
+                "\"CompareValue\":${compareValue.doubleFormat(2)}," +
+                "\"ToleranceInPercent\":${toleranceInPercent.doubleFormat(1)}," +
+                "\"LightArea\":\"$lightArea\"" +
+                "}"
     }
 }

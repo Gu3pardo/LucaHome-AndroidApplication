@@ -1,7 +1,6 @@
 package guepardoapps.lucahome.common.converter.user
 
 import guepardoapps.lucahome.common.annotations.JsonKey
-import guepardoapps.lucahome.common.converter.common.IJsonDataConverter
 import guepardoapps.lucahome.common.enums.UserRole
 import guepardoapps.lucahome.common.extensions.getJsonKey
 import guepardoapps.lucahome.common.extensions.getPropertyJsonKey
@@ -11,44 +10,40 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-class JsonDataToUserConverter : IJsonDataConverter<User> {
+class JsonDataToUserConverter {
     private val tag = JsonDataToUserConverter::class.java.simpleName
 
-    override fun parseStringToList(jsonResponse: String): ArrayList<User> {
-        val list: ArrayList<User> = ArrayList()
-
+    fun parse(jsonResponse: String): User? {
         if (jsonResponse.contains("Error")) {
             Logger.instance.error(tag, "Found error parsing: $jsonResponse")
-            return list
+            return null
         }
 
+        val user = User()
         try {
             val jsonObject = JSONObject(jsonResponse)
 
-            val c = User()
-            val jsonKey: JsonKey = c.getJsonKey()
+            val jsonKey: JsonKey = user.getJsonKey()
             val dataArray: JSONArray = jsonObject.getJSONArray(jsonKey.parent)
 
             for (index: Int in 0..dataArray.length()) {
                 val value: JSONObject = dataArray.getJSONObject(index)
                 val data: JSONObject = value.getJSONObject(User::class.java.simpleName)
 
-                val uuidJsonKey = c.getPropertyJsonKey(c::uuid.name)
-                val nameJsonKey = c.getPropertyJsonKey(c::name.name)
-                val passwordJsonKey = c.getPropertyJsonKey(c::password.name)
-                val roleJsonKey = c.getPropertyJsonKey(c::role.name)
+                val uuidJsonKey = user.getPropertyJsonKey(user::uuid.name)
+                val nameJsonKey = user.getPropertyJsonKey(user::name.name)
+                val passwordJsonKey = user.getPropertyJsonKey(user::password.name)
+                val roleJsonKey = user.getPropertyJsonKey(user::role.name)
 
-                val uuid: UUID = UUID.fromString(data.getString(uuidJsonKey.key))
-                val name: String = data.getString(nameJsonKey.key)
-                val password: String = data.getString(passwordJsonKey.key)
-                val role: UserRole = UserRole.values()[data.getInt(roleJsonKey.key)]
-
-                list.add(User(uuid, name, password, role))
+                user.uuid = UUID.fromString(data.getString(uuidJsonKey.key))
+                user.name = data.getString(nameJsonKey.key)
+                user.password = data.getString(passwordJsonKey.key)
+                user.role = UserRole.values()[data.getInt(roleJsonKey.key)]
             }
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
         } finally {
-            return list
+            return user
         }
     }
 }

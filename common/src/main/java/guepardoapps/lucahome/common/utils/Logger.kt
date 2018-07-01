@@ -3,15 +3,13 @@ package guepardoapps.lucahome.common.utils
 import android.content.Context
 import android.support.annotation.NonNull
 import android.util.Log
-import guepardoapps.lucahome.common.databases.logging.DbHandler
-import guepardoapps.lucahome.common.databases.logging.DbLog
-import guepardoapps.lucahome.common.databases.logging.Severity
+import guepardoapps.lucahome.common.databases.logging.*
 import java.sql.Date
 import java.util.*
 
 class Logger private constructor() {
-    private var _loggingEnabled: Boolean = true
-    private var _writeToDatabaseEnabled: Boolean = true
+    var loggingEnabled: Boolean = true
+    var writeToDatabaseEnabled: Boolean = true
 
     private var _dbHandler: DbHandler? = null
 
@@ -33,52 +31,36 @@ class Logger private constructor() {
         _dbHandler = DbHandler(context, null)
     }
 
-    fun setLoggingEnabled(loggingEnabled: Boolean) {
-        _loggingEnabled = loggingEnabled
-    }
-
-    fun isLoggingEnabled(): Boolean {
-        return _loggingEnabled
-    }
-
-    fun setWriteToDatabaseEnabled(writeToDatabaseEnabled: Boolean) {
-        _writeToDatabaseEnabled = writeToDatabaseEnabled
-    }
-
-    fun isWriteToDatabaseEnabled(): Boolean {
-        return _writeToDatabaseEnabled
-    }
-
     fun <T> verbose(@NonNull tag: String, @NonNull description: T) {
-        if (_loggingEnabled) {
+        if (loggingEnabled) {
             Log.v(tag, description.toString())
             tryToWriteToDatabase(tag, description, Severity.Verbose)
         }
     }
 
     fun <T> debug(@NonNull tag: String, @NonNull description: T) {
-        if (_loggingEnabled) {
+        if (loggingEnabled) {
             Log.d(tag, description.toString())
             tryToWriteToDatabase(tag, description, Severity.Debug)
         }
     }
 
     fun <T> info(@NonNull tag: String, @NonNull description: T) {
-        if (_loggingEnabled) {
+        if (loggingEnabled) {
             Log.i(tag, description.toString())
             tryToWriteToDatabase(tag, description, Severity.Info)
         }
     }
 
     fun <T> warning(@NonNull tag: String, @NonNull description: T) {
-        if (_loggingEnabled) {
+        if (loggingEnabled) {
             Log.w(tag, description.toString())
             tryToWriteToDatabase(tag, description, Severity.Warning)
         }
     }
 
     fun <T> error(@NonNull tag: String, @NonNull description: T) {
-        if (_loggingEnabled) {
+        if (loggingEnabled) {
             Log.e(tag, description.toString())
             tryToWriteToDatabase(tag, description, Severity.Error)
         }
@@ -88,7 +70,7 @@ class Logger private constructor() {
             @NonNull tag:
             String, @NonNull description: T,
             severity: Severity) {
-        if (_writeToDatabaseEnabled && _dbHandler != null) {
+        if (writeToDatabaseEnabled && _dbHandler != null) {
             _dbHandler?.addLog(
                     DbLog(-1,
                             Date(Calendar.getInstance().timeInMillis),

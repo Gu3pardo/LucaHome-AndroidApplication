@@ -1,10 +1,11 @@
 package guepardoapps.lucahome.bixby.models.actions
 
-import android.support.annotation.NonNull
 import guepardoapps.lucahome.bixby.models.shared.IBixbyEntity
 
-class ApplicationAction(@NonNull var packageName: String = "") : IBixbyEntity {
+class ApplicationAction : IBixbyEntity {
     private val tag = ApplicationAction::class.java.simpleName
+
+    lateinit var packageName: String
 
     override fun getDatabaseString(): String {
         return packageName
@@ -20,6 +21,9 @@ class ApplicationAction(@NonNull var packageName: String = "") : IBixbyEntity {
     }
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\"\"PackageName\":\"$packageName\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"PackageName\":\"$packageName\"" +
+                "}"
     }
 }

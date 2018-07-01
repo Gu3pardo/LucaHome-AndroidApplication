@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import guepardoapps.lucahome.common.R;
-import guepardoapps.lucahome.common.classes.WirelessSocket;
+import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket;
 import guepardoapps.lucahome.common.utils.BitmapHelper;
 import guepardoapps.lucahome.common.utils.Logger;
 
@@ -103,7 +103,7 @@ public class NotificationController implements INotificationController {
     }
 
     @Override
-    public void CreateWirelessSocketNotification(int notificationId, @NonNull ArrayList<WirelessSocket> wirelessSocketList, @NonNull Class<?> receiverClass) {
+    public void CreateWirelessSocketNotification(int notificationId, @NonNull MutableList<WirelessSocket> wirelessSocketList, @NonNull Class<?> receiverClass) {
         if (!SettingsController.getInstance().IsWirelessSocketNotificationEnabled()) {
             Logger.getInstance().Warning(Tag, "Not allowed to display wireless socket notification!");
             return;

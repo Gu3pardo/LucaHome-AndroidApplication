@@ -1,7 +1,5 @@
 package guepardoapps.lucahome.bixby.models
 
-import android.support.annotation.NonNull
-
 import guepardoapps.lucahome.bixby.enums.DatabaseAction
 import guepardoapps.lucahome.bixby.models.actions.BixbyAction
 import guepardoapps.lucahome.bixby.models.requirements.BixbyRequirement
@@ -10,11 +8,13 @@ import java.io.Serializable
 
 import kotlin.collections.ArrayList
 
-class BixbyPair(var actionId: Int,
-                @NonNull var action: BixbyAction,
-                @NonNull var requirementList: ArrayList<BixbyRequirement>,
-                @NonNull var databaseAction: DatabaseAction) : Serializable {
+class BixbyPair : Serializable {
     private val tag: String = BixbyPair::class.java.simpleName
+
+    var actionId: Int = -1
+    lateinit var action: BixbyAction
+    lateinit var requirementList: ArrayList<BixbyRequirement>
+    lateinit var databaseAction: DatabaseAction
 
     override fun toString(): String {
         val requirementString = StringBuilder()
@@ -23,6 +23,12 @@ class BixbyPair(var actionId: Int,
             requirementString.append(requirementList[index].toString())
         }
 
-        return "{\"Class\":\"$tag\",\"ActionId\":$actionId,\"Action\":\"$action\",\"Requirements\":\"$requirementString\",\"DatabaseAction\":\"$databaseAction\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"ActionId\":$actionId," +
+                "\"Action\":\"$action\"," +
+                "\"Requirements\":\"$requirementString\"," +
+                "\"DatabaseAction\":\"$databaseAction\"" +
+                "}"
     }
 }

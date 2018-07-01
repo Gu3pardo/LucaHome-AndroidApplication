@@ -7,39 +7,37 @@ import guepardoapps.lucahome.common.enums.NetworkType
 import guepardoapps.lucahome.common.enums.ServerAction
 import guepardoapps.lucahome.common.enums.ServerDatabaseAction
 import guepardoapps.lucahome.common.enums.UserRole
-import guepardoapps.lucahome.common.models.common.ILucaClass
 import java.util.*
 
 @JsonKey("Data", "WirelessSocket")
-class WirelessSocket(
-        @JsonKey("", "Uuid")
-        override val uuid: UUID,
-
-        @JsonKey("", "RoomUuid")
-        var roomUuid: UUID,
-
-        @JsonKey("", "Name")
-        var name: String,
-
-        @JsonKey("", "Code")
-        var code: String,
-
-        @JsonKey("", "State")
-        var state: Boolean,
-
-        @JsonKey("LastTrigger", "DateTime")
-        val lastTriggerDateTime: Calendar,
-
-        @JsonKey("LastTrigger", "User")
-        val lastTriggerUser: String,
-
-        override var isOnServer: Boolean = true,
-        override var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null,
-        var changeCount: Int = 0,
-        var showInNotification: Boolean = true)
-    : ILucaClass {
-
+class WirelessSocket {
     private val tag: String = WirelessSocket::class.java.simpleName
+
+    @JsonKey("", "Uuid")
+    lateinit var uuid: UUID
+
+    @JsonKey("", "RoomUuid")
+    lateinit var roomUuid: UUID
+
+    @JsonKey("", "Name")
+    lateinit var name: String
+
+    @JsonKey("", "Code")
+    lateinit var code: String
+
+    @JsonKey("", "State")
+    var state: Boolean = false
+
+    @JsonKey("LastTrigger", "DateTime")
+    lateinit var lastTriggerDateTime: Calendar
+
+    @JsonKey("LastTrigger", "User")
+    lateinit var lastTriggerUser: String
+
+    var isOnServer: Boolean = true
+    var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null
+    var changeCount: Int = 0
+    var showInNotification: Boolean = true
 
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
@@ -47,26 +45,24 @@ class WirelessSocket(
 
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    override val commandAdd: String = "${ServerAction.WirelessSocketAdd.command}$uuid&roomuuid=$roomUuid&name=$name&code=$code"
+    val commandAdd: String = "${ServerAction.WirelessSocketAdd.command}$uuid&roomuuid=$roomUuid&name=$name&code=$code"
 
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    override val commandUpdate: String = "${ServerAction.WirelessSocketUpdate.command}$uuid&roomuuid=$roomUuid&name=$name&code=$code&isactivated=${if (state) "1" else "0"}"
+    val commandUpdate: String = "${ServerAction.WirelessSocketUpdate.command}$uuid&roomuuid=$roomUuid&name=$name&code=$code&isactivated=${if (state) "1" else "0"}"
 
     @NeededUserRole(UserRole.Administrator)
     @NeededNetwork(NetworkType.HomeWifi)
-    override val commandDelete: String = "${ServerAction.WirelessSocketDelete.command}$uuid"
-
-    constructor() : this(
-            UUID.randomUUID(),
-            UUID.randomUUID(),
-            "",
-            "",
-            false,
-            Calendar.getInstance(),
-            "")
+    val commandDelete: String = "${ServerAction.WirelessSocketDelete.command}$uuid"
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\",\"Uuid\":\"$uuid\",\"RoomUuid\":\"$roomUuid\",\"Name\":\"$name\",\"Code\":\"$code\",\"State\":\"${if (state) "1" else "0"}\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"Uuid\":\"$uuid\"," +
+                "\"RoomUuid\":\"$roomUuid\"," +
+                "\"Name\":\"$name\"," +
+                "\"Code\":\"$code\"," +
+                "\"State\":\"${if (state) "1" else "0"}\"" +
+                "}"
     }
 }

@@ -7,27 +7,26 @@ import guepardoapps.lucahome.common.enums.NetworkType
 import guepardoapps.lucahome.common.enums.ServerAction
 import guepardoapps.lucahome.common.enums.ServerDatabaseAction
 import guepardoapps.lucahome.common.enums.UserRole
-import guepardoapps.lucahome.common.models.common.ILucaClass
 import java.util.*
 
 @JsonKey("Data", "User")
-class User(
-        @JsonKey("", "Uuid")
-        override val uuid: UUID,
-
-        @JsonKey("", "Name")
-        val name: String,
-
-        @JsonKey("", "Password")
-        val password: String,
-
-        @JsonKey("", "Role")
-        val role: UserRole,
-
-        override var isOnServer: Boolean = true,
-        override var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null)
-    : ILucaClass {
+class User {
     private val tag = User::class.java.simpleName
+
+    @JsonKey("", "Uuid")
+    lateinit var uuid: UUID
+
+    @JsonKey("", "Name")
+    lateinit var name: String
+
+    @JsonKey("", "Password")
+    lateinit var password: String
+
+    @JsonKey("", "Role")
+    lateinit var role: UserRole
+
+    var isOnServer: Boolean = true
+    var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null
 
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
@@ -35,19 +34,23 @@ class User(
 
     @NeededUserRole(UserRole.Administrator)
     @NeededNetwork(NetworkType.HomeWifi)
-    override val commandAdd: String = "${ServerAction.UserAdd.command}$uuid&name=$name&role=$role"
+    val commandAdd: String = "${ServerAction.UserAdd.command}$uuid&name=$name&role=$role"
 
     @NeededUserRole(UserRole.Administrator)
     @NeededNetwork(NetworkType.HomeWifi)
-    override val commandUpdate: String = "${ServerAction.UserUpdate.command}$uuid&name=$name&role=$role"
+    val commandUpdate: String = "${ServerAction.UserUpdate.command}$uuid&name=$name&role=$role"
 
     @NeededUserRole(UserRole.Administrator)
     @NeededNetwork(NetworkType.HomeWifi)
-    override val commandDelete: String = "${ServerAction.UserDelete.command}$uuid"
-
-    constructor() : this(UUID.randomUUID(), "", "", UserRole.Guest)
+    val commandDelete: String = "${ServerAction.UserDelete.command}$uuid"
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\",\"Uuid\":\"$uuid\",\"Name\":\"$name\",\"Password\":\"${password.replace("\\.".toRegex(), "*")}\",\"Role\":\"$role\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"Uuid\":\"$uuid\"," +
+                "\"Name\":\"$name\"," +
+                "\"Password\":\"${password.replace("\\.".toRegex(), "*")}\"," +
+                "\"Role\":\"$role\"" +
+                "}"
     }
 }

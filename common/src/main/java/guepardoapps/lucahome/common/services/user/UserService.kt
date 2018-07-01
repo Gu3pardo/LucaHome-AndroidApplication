@@ -74,7 +74,7 @@ class UserService private constructor() : IUserService {
                                 return
                             }
 
-                            val user = converter.parseStringToList(message).firstOrNull()
+                            val user = converter.parse(message)
                             if (user == null) {
                                 onUserService!!.validateFinished(false, "Conversion failed")
                                 return

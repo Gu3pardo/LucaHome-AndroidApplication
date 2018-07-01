@@ -101,29 +101,27 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val list = mutableListOf<WirelessSocket>()
         with(cursor) {
             while (moveToNext()) {
-                val uuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnUuid)))
-                val roomUuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnRoomUuid)))
-                val name = getString(getColumnIndexOrThrow(ColumnName))
-                val code = getString(getColumnIndexOrThrow(ColumnCode))
-                val state = getInt(getColumnIndexOrThrow(ColumnState)).toBoolean()
+                val wirelessSocket = WirelessSocket()
 
-                val lastTriggerDateTime = Calendar.getInstance()
-                lastTriggerDateTime.timeInMillis = getLong(getColumnIndexOrThrow(ColumnLastTriggerDateTime))
-                val lastTriggerUser = getString(getColumnIndexOrThrow(ColumnLastTriggerUser))
+                wirelessSocket.uuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnUuid)))
+                wirelessSocket.roomUuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnRoomUuid)))
+                wirelessSocket.name = getString(getColumnIndexOrThrow(ColumnName))
+                wirelessSocket.code = getString(getColumnIndexOrThrow(ColumnCode))
+                wirelessSocket.state = getInt(getColumnIndexOrThrow(ColumnState)).toBoolean()
 
-                val isOnServer = getInt(getColumnIndexOrThrow(ColumnIsOnServer)).toBoolean()
-                val serverAction = ServerDatabaseAction.values()[getInt(getColumnIndexOrThrow(ColumnServerAction))]
+                wirelessSocket.lastTriggerDateTime.timeInMillis = getLong(getColumnIndexOrThrow(ColumnLastTriggerDateTime))
+                wirelessSocket.lastTriggerUser = getString(getColumnIndexOrThrow(ColumnLastTriggerUser))
 
-                val changeCount = getInt(getColumnIndexOrThrow(ColumnChangeCount))
-                val showInNotification = getInt(getColumnIndexOrThrow(ColumnShowInNotification)).toBoolean()
+                wirelessSocket.isOnServer = getInt(getColumnIndexOrThrow(ColumnIsOnServer)).toBoolean()
+                wirelessSocket.serverDatabaseAction = ServerDatabaseAction.values()[getInt(getColumnIndexOrThrow(ColumnServerAction))]
 
-                val entry = WirelessSocket(uuid, roomUuid, name, code, state, lastTriggerDateTime, lastTriggerUser, isOnServer, serverAction, changeCount, showInNotification)
+                wirelessSocket.changeCount = getInt(getColumnIndexOrThrow(ColumnChangeCount))
+                wirelessSocket.showInNotification = getInt(getColumnIndexOrThrow(ColumnShowInNotification)).toBoolean()
 
-                list.add(entry)
+                list.add(wirelessSocket)
             }
         }
 
-        database.close()
         return list
     }
 
@@ -156,28 +154,27 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val list = mutableListOf<WirelessSocket>()
         with(cursor) {
             while (moveToNext()) {
-                val roomUuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnRoomUuid)))
-                val name = getString(getColumnIndexOrThrow(ColumnName))
-                val code = getString(getColumnIndexOrThrow(ColumnCode))
-                val state = getInt(getColumnIndexOrThrow(ColumnState)).toBoolean()
+                val wirelessSocket = WirelessSocket()
 
-                val lastTriggerDateTime = Calendar.getInstance()
-                lastTriggerDateTime.timeInMillis = getLong(getColumnIndexOrThrow(ColumnLastTriggerDateTime))
-                val lastTriggerUser = getString(getColumnIndexOrThrow(ColumnLastTriggerUser))
+                wirelessSocket.uuid = uuid
+                wirelessSocket.roomUuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnRoomUuid)))
+                wirelessSocket.name = getString(getColumnIndexOrThrow(ColumnName))
+                wirelessSocket.code = getString(getColumnIndexOrThrow(ColumnCode))
+                wirelessSocket.state = getInt(getColumnIndexOrThrow(ColumnState)).toBoolean()
 
-                val isOnServer = getInt(getColumnIndexOrThrow(ColumnIsOnServer)).toBoolean()
-                val serverAction = ServerDatabaseAction.values()[getInt(getColumnIndexOrThrow(ColumnServerAction))]
+                wirelessSocket.lastTriggerDateTime.timeInMillis = getLong(getColumnIndexOrThrow(ColumnLastTriggerDateTime))
+                wirelessSocket.lastTriggerUser = getString(getColumnIndexOrThrow(ColumnLastTriggerUser))
 
-                val changeCount = getInt(getColumnIndexOrThrow(ColumnChangeCount))
-                val showInNotification = getInt(getColumnIndexOrThrow(ColumnShowInNotification)).toBoolean()
+                wirelessSocket.isOnServer = getInt(getColumnIndexOrThrow(ColumnIsOnServer)).toBoolean()
+                wirelessSocket.serverDatabaseAction = ServerDatabaseAction.values()[getInt(getColumnIndexOrThrow(ColumnServerAction))]
 
-                val entry = WirelessSocket(uuid, roomUuid, name, code, state, lastTriggerDateTime, lastTriggerUser, isOnServer, serverAction, changeCount, showInNotification)
+                wirelessSocket.changeCount = getInt(getColumnIndexOrThrow(ColumnChangeCount))
+                wirelessSocket.showInNotification = getInt(getColumnIndexOrThrow(ColumnShowInNotification)).toBoolean()
 
-                list.add(entry)
+                list.add(wirelessSocket)
             }
         }
 
-        database.close()
         return list.firstOrNull()
     }
 
@@ -197,10 +194,7 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
         }
 
         val database = this.writableDatabase
-        val newRowId = database.insert(DatabaseTable, null, values)
-        database.close()
-
-        return newRowId
+        return database.insert(DatabaseTable, null, values)
     }
 
     fun update(entity: WirelessSocket): Int {
@@ -222,10 +216,7 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selectionArgs = arrayOf(entity.uuid.toString())
 
         val database = this.writableDatabase
-        val count = database.update(DatabaseTable, values, selection, selectionArgs)
-        database.close()
-
-        return count
+        return database.update(DatabaseTable, values, selection, selectionArgs)
     }
 
     fun delete(entity: WirelessSocket): Int {
@@ -234,10 +225,7 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selection = "$ColumnUuid LIKE ?"
         val selectionArgs = arrayOf(entity.uuid.toString())
 
-        val deletedRows = database.delete(DatabaseTable, selection, selectionArgs)
-
-        database.close()
-        return deletedRows
+        return database.delete(DatabaseTable, selection, selectionArgs)
     }
 
     fun getLastChangeDateTime(): Calendar? {
@@ -262,7 +250,6 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
             }
         }
 
-        database.close()
         return list.firstOrNull()
     }
 
@@ -272,10 +259,7 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
         }
 
         val database = this.writableDatabase
-        val newRowId = database.insert(DatabaseTableLastChange, null, values)
-        database.close()
-
-        return newRowId
+        return database.insert(DatabaseTableLastChange, null, values)
     }
 
     fun getServiceSettings(): ServiceSettings? {
@@ -304,7 +288,6 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
             }
         }
 
-        database.close()
         return list.firstOrNull()
     }
 
@@ -316,10 +299,7 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
         }
 
         val database = this.writableDatabase
-        val newRowId = database.insert(DatabaseTableSettings, null, values)
-        database.close()
-
-        return newRowId
+        return database.insert(DatabaseTableSettings, null, values)
     }
 
     companion object {

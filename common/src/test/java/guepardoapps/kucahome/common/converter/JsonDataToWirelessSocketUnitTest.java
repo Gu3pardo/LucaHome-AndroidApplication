@@ -20,12 +20,24 @@ public class JsonDataToWirelessSocketUnitTest {
 
         String jsonResponse = "{\"Data\":[{\"WirelessSocket\":{\"Uuid\":\"UUID\",\"RoomUuid\":\"RoomUUID\",\"Name\":\"Name\",\"Code\":\"Code\",\"State\":1,\"LastTrigger\":{\"UserName\":\"LastTriggerUser\",\"Year\":2018,\"Month\":1,\"Day\":1,\"Hour\":6,\"Minute\":25}}}]}";
 
+        WirelessSocket wirelessSocket = new WirelessSocket();
+        wirelessSocket.uuid = UUID.fromString("UUID");
+        wirelessSocket.roomUuid = UUID.fromString("RoomUUID");
+        wirelessSocket.name = "Name";
+        wirelessSocket.code = "Code";
+        wirelessSocket.setState(true);
+        wirelessSocket.lastTriggerDateTime = Calendar.getInstance();
+        wirelessSocket.lastTriggerUser = "LastTriggerUser";
+        wirelessSocket.setOnServer(true);
+        wirelessSocket.setServerDatabaseAction(ServerDatabaseAction.Null);
+        wirelessSocket.setChangeCount(0);
+        wirelessSocket.setShowInNotification(true);
+
         ArrayList<WirelessSocket> expected = new ArrayList<>();
-        WirelessSocket wirelessSocket = new WirelessSocket(UUID.fromString("UUID"), UUID.fromString("RoomUUID"), "Name", "Code", true, Calendar.getInstance(), "LastTriggerUser", true, ServerDatabaseAction.Null, 0, true);
         expected.add(wirelessSocket);
 
         // Act
-        ArrayList<WirelessSocket> actual = converter.parseStringToList(jsonResponse);
+        ArrayList<WirelessSocket> actual = converter.parse(jsonResponse);
 
         // Assert
         assertEquals(expected.size(), actual.size());

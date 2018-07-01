@@ -11,6 +11,7 @@ import guepardoapps.lucahome.bixby.models.actions.BixbyAction
 import guepardoapps.lucahome.bixby.models.actions.WirelessSwitchAction
 import guepardoapps.lucahome.bixby.models.requirements.BixbyRequirement
 import guepardoapps.lucahome.bixby.models.requirements.LightRequirement
+import guepardoapps.lucahome.bixby.models.requirements.PositionRequirement
 import guepardoapps.lucahome.bixby.models.shared.NetworkEntity
 import guepardoapps.lucahome.bixby.models.shared.WirelessSocketEntity
 
@@ -70,27 +71,21 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         }
 
         val database = this.writableDatabase
-        val newRowId = database.insert(DatabaseTableActions, null, values)
-        database.close()
-
-        return newRowId
+        return database.insert(DatabaseTableActions, null, values)
     }
 
     fun add(requirement: BixbyRequirement): Long {
         val values = ContentValues().apply {
             put(DbRequirementsColumnActionId, requirement.actionId)
             put(DbRequirementsColumnRequirementType, requirement.requirementType.ordinal)
-            put(DbRequirementsColumnPuckJsPosition, requirement.puckJsPosition)
+            put(DbRequirementsColumnPuckJsPosition, requirement.positionRequirement.getDatabaseString())
             put(DbRequirementsColumnLightRequirement, requirement.lightRequirement.getDatabaseString())
             put(DbRequirementsColumnNetworkRequirement, requirement.networkRequirement.getDatabaseString())
             put(DbRequirementsColumnWirelessSocketRequirement, requirement.wirelessSocketRequirement.getDatabaseString())
         }
 
         val database = this.writableDatabase
-        val newRowId = database.insert(DatabaseTableRequirements, null, values)
-        database.close()
-
-        return newRowId
+        return database.insert(DatabaseTableRequirements, null, values)
     }
 
     fun update(action: BixbyAction): Int {
@@ -107,17 +102,14 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selectionArgs = arrayOf(action.id.toString())
 
         val database = this.writableDatabase
-        val count = database.update(DatabaseTableActions, values, selection, selectionArgs)
-        database.close()
-
-        return count
+        return database.update(DatabaseTableActions, values, selection, selectionArgs)
     }
 
     fun update(requirement: BixbyRequirement): Int {
         val values = ContentValues().apply {
             put(DbRequirementsColumnActionId, requirement.actionId)
             put(DbRequirementsColumnRequirementType, requirement.requirementType.ordinal)
-            put(DbRequirementsColumnPuckJsPosition, requirement.puckJsPosition)
+            put(DbRequirementsColumnPuckJsPosition, requirement.positionRequirement.getDatabaseString())
             put(DbRequirementsColumnLightRequirement, requirement.lightRequirement.getDatabaseString())
             put(DbRequirementsColumnNetworkRequirement, requirement.networkRequirement.getDatabaseString())
             put(DbRequirementsColumnWirelessSocketRequirement, requirement.wirelessSocketRequirement.getDatabaseString())
@@ -127,10 +119,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selectionArgs = arrayOf(requirement.id.toString())
 
         val database = this.writableDatabase
-        val count = database.update(DatabaseTableRequirements, values, selection, selectionArgs)
-        database.close()
-
-        return count
+        return database.update(DatabaseTableRequirements, values, selection, selectionArgs)
     }
 
     fun delete(action: BixbyAction): Int {
@@ -139,10 +128,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selection = "$DbActionColumnId LIKE ?"
         val selectionArgs = arrayOf(action.id.toString())
 
-        val deletedRows = database.delete(DatabaseTableActions, selection, selectionArgs)
-
-        database.close()
-        return deletedRows
+        return database.delete(DatabaseTableActions, selection, selectionArgs)
     }
 
     fun delete(requirement: BixbyRequirement): Int {
@@ -151,10 +137,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selection = "$DbRequirementsColumnId LIKE ?"
         val selectionArgs = arrayOf(requirement.id.toString())
 
-        val deletedRows = database.delete(DatabaseTableRequirements, selection, selectionArgs)
-
-        database.close()
-        return deletedRows
+        return database.delete(DatabaseTableRequirements, selection, selectionArgs)
     }
 
     fun loadActionList(): MutableList<BixbyAction> {
@@ -195,11 +178,19 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
                 val wirelessSwitchAction = WirelessSwitchAction()
                 wirelessSwitchAction.parseFromDb(getString(getColumnIndexOrThrow(DbActionColumnWirelessSwitchAction)))
 
-                bixbyActionList.add(BixbyAction(id, actionId, actionType, applicationAction, networkAction, wirelessSocketAction, wirelessSwitchAction))
+                val bixbyAction = BixbyAction()
+                bixbyAction.id = id
+                bixbyAction.actionId = actionId
+                bixbyAction.actionType = actionType
+                bixbyAction.applicationAction = applicationAction
+                bixbyAction.networkAction = networkAction
+                bixbyAction.wirelessSocketAction = wirelessSocketAction
+                bixbyAction.wirelessSwitchAction = wirelessSwitchAction
+
+                bixbyActionList.add(bixbyAction)
             }
         }
 
-        database.close()
         return bixbyActionList
     }
 
@@ -229,7 +220,8 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
                 val actionId: Int = getInt(getColumnIndexOrThrow(DbRequirementsColumnActionId))
                 val requirementType: RequirementType = RequirementType.values()[getInt(getColumnIndexOrThrow(DbRequirementsColumnRequirementType))]
 
-                val puckJsPosition: String = getString(getColumnIndexOrThrow(DbRequirementsColumnPuckJsPosition))
+                val positionRequirement = PositionRequirement()
+                positionRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnPuckJsPosition)))
 
                 val lightRequirement = LightRequirement()
                 lightRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnLightRequirement)))
@@ -237,14 +229,22 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
                 val networkRequirement = NetworkEntity()
                 networkRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnNetworkRequirement)))
 
-                val wirelessSwitchRequirement = WirelessSocketEntity()
-                wirelessSwitchRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnWirelessSocketRequirement)))
+                val wirelessSocketRequirement = WirelessSocketEntity()
+                wirelessSocketRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnWirelessSocketRequirement)))
 
-                bixbyRequirementList.add(BixbyRequirement(id, actionId, requirementType, puckJsPosition, lightRequirement, networkRequirement, wirelessSwitchRequirement))
+                val bixbyRequirement = BixbyRequirement()
+                bixbyRequirement.id = id
+                bixbyRequirement.actionId = actionId
+                bixbyRequirement.requirementType = requirementType
+                bixbyRequirement.positionRequirement = positionRequirement
+                bixbyRequirement.lightRequirement = lightRequirement
+                bixbyRequirement.networkRequirement = networkRequirement
+                bixbyRequirement.wirelessSocketRequirement = wirelessSocketRequirement
+
+                bixbyRequirementList.add(bixbyRequirement)
             }
         }
 
-        database.close()
         return bixbyRequirementList
     }
 
@@ -267,7 +267,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         private const val DbRequirementsColumnId = "_id"
         private const val DbRequirementsColumnActionId = "actionId"
         private const val DbRequirementsColumnRequirementType = "requirementType"
-        private const val DbRequirementsColumnPuckJsPosition = "puckJsPosition"
+        private const val DbRequirementsColumnPuckJsPosition = "positionRequirement"
         private const val DbRequirementsColumnLightRequirement = "lightRequirement"
         private const val DbRequirementsColumnNetworkRequirement = "networkRequirement"
         private const val DbRequirementsColumnWirelessSocketRequirement = "wirelessSocketRequirement"

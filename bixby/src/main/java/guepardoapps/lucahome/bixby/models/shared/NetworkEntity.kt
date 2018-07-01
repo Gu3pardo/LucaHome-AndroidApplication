@@ -1,15 +1,15 @@
 package guepardoapps.lucahome.bixby.models.shared
 
-import android.support.annotation.NonNull
 import guepardoapps.lucahome.bixby.enums.NetworkType
 import guepardoapps.lucahome.bixby.enums.StateType
 import guepardoapps.lucahome.common.utils.Logger
 
-class NetworkEntity(
-        @NonNull var networkType: NetworkType = NetworkType.Null,
-        @NonNull var stateType: StateType = StateType.Null,
-        @NonNull var wifiSsid: String = "") : IBixbyEntity {
+class NetworkEntity : IBixbyEntity {
     private val tag = NetworkEntity::class.java.simpleName
+
+    lateinit var networkType: NetworkType
+    lateinit var stateType: StateType
+    lateinit var wifiSsid: String
 
     override fun getDatabaseString(): String {
         return "${networkType.ordinal}:${stateType.ordinal}:$wifiSsid"
@@ -43,6 +43,11 @@ class NetworkEntity(
     }
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\",\"NetworkType\":\"$networkType\",\"StateType\":$stateType,\"WifiSsid\":\"$wifiSsid\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"NetworkType\":\"$networkType\"," +
+                "\"StateType\":$stateType," +
+                "\"WifiSsid\":\"$wifiSsid\"" +
+                "}"
     }
 }

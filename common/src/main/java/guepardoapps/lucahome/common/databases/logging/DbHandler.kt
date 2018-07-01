@@ -15,13 +15,13 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
 
     override fun onCreate(database: SQLiteDatabase) {
         val createTable = (
-                "CREATE TABLE " + DatabaseTable
+                "CREATE TABLE $DatabaseTable"
                         + "("
-                        + ColumnId + " INTEGER PRIMARY KEY,"
-                        + ColumnDateTime + " INTEGER,"
-                        + ColumnSeverity + " INTEGER,"
-                        + ColumnTag + " TEXT,"
-                        + ColumnDescription + " TEXT"
+                        + "$ColumnId INTEGER PRIMARY KEY,"
+                        + "$ColumnDateTime INTEGER,"
+                        + "$ColumnSeverity  INTEGER,"
+                        + "$ColumnTag  TEXT,"
+                        + "$ColumnDescription  TEXT"
                         + ")")
         database.execSQL(createTable)
     }
@@ -37,33 +37,31 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
 
     fun addLog(dbLog: DbLog): Long {
         val values = ContentValues().apply {
-            put(ColumnDateTime, dbLog.getDateTime().toString())
-            put(ColumnSeverity, dbLog.getSeverity().ordinal.toString())
-            put(ColumnTag, dbLog.getTag())
-            put(ColumnDescription, dbLog.getDescription())
+            put(ColumnDateTime, dbLog.dateTime.toString())
+            put(ColumnSeverity, dbLog.severity.ordinal.toString())
+            put(ColumnTag, dbLog.tag)
+            put(ColumnDescription, dbLog.description)
         }
 
         val database = this.writableDatabase
         val newRowId = database.insert(DatabaseTable, null, values)
-        database.close()
 
         return newRowId
     }
 
     fun updateLog(dbLog: DbLog): Int {
         val values = ContentValues().apply {
-            put(ColumnDateTime, dbLog.getDateTime().toString())
-            put(ColumnSeverity, dbLog.getSeverity().ordinal.toString())
-            put(ColumnTag, dbLog.getTag())
-            put(ColumnDescription, dbLog.getDescription())
+            put(ColumnDateTime, dbLog.dateTime.toString())
+            put(ColumnSeverity, dbLog.severity.ordinal.toString())
+            put(ColumnTag, dbLog.tag)
+            put(ColumnDescription, dbLog.description)
         }
 
         val selection = "$ColumnId LIKE ?"
-        val selectionArgs = arrayOf(dbLog.getId().toString())
+        val selectionArgs = arrayOf(dbLog.id.toString())
 
         val database = this.writableDatabase
         val count = database.update(DatabaseTable, values, selection, selectionArgs)
-        database.close()
 
         return count
     }
@@ -74,10 +72,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selection = "$ColumnId LIKE ?"
         val selectionArgs = arrayOf(id.toString())
 
-        val deletedRows = database.delete(DatabaseTable, selection, selectionArgs)
-
-        database.close()
-        return deletedRows
+        return database.delete(DatabaseTable, selection, selectionArgs)
     }
 
     fun deleteLogBySeverity(severity: Severity): Int {
@@ -86,10 +81,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selection = "$ColumnSeverity LIKE ?"
         val selectionArgs = arrayOf(severity.ordinal.toString())
 
-        val deletedRows = database.delete(DatabaseTable, selection, selectionArgs)
-
-        database.close()
-        return deletedRows
+        return database.delete(DatabaseTable, selection, selectionArgs)
     }
 
     fun deleteLogByTag(tag: String): Int {
@@ -98,10 +90,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selection = "$ColumnTag LIKE ?"
         val selectionArgs = arrayOf(tag)
 
-        val deletedRows = database.delete(DatabaseTable, selection, selectionArgs)
-
-        database.close()
-        return deletedRows
+        return database.delete(DatabaseTable, selection, selectionArgs)
     }
 
     fun findLogById(id: Int): MutableList<DbLog> {
@@ -135,7 +124,6 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
             }
         }
 
-        database.close()
         return dbLogList
     }
 
@@ -169,7 +157,6 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
             }
         }
 
-        database.close()
         return dbLogList
     }
 
@@ -204,7 +191,6 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
             }
         }
 
-        database.close()
         return dbLogList
     }
 

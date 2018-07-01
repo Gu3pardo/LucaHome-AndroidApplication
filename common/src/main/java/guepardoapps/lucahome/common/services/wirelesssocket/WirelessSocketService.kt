@@ -64,12 +64,12 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
             this.dbHandler!!.setServiceSettings(value)
 
             if (value.reloadEnabled) {
-                WorkManager.getInstance().cancelWorkById(this.reloadWorkId)
+                WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
                 this.reloadWork = PeriodicWorkRequestBuilder<WirelessSocketWorker>(value.reloadTimeoutMs.toLong(), TimeUnit.MILLISECONDS).build()
                 this.reloadWorkId = this.reloadWork.id
-                WorkManager.getInstance().enqueue(this.reloadWork)
+                WorkManager.getInstance()?.enqueue(this.reloadWork)
             } else {
-                WorkManager.getInstance().cancelWorkById(this.reloadWorkId)
+                WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
             }
 
             if (value.notificationEnabled && receiverActivity != null) {
@@ -104,12 +104,12 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
         if (this.serviceSettings.reloadEnabled) {
             this.reloadWork = PeriodicWorkRequestBuilder<WirelessSocketWorker>(this.serviceSettings.reloadTimeoutMs.toLong(), TimeUnit.MILLISECONDS).build()
             this.reloadWorkId = this.reloadWork.id
-            WorkManager.getInstance().enqueue(this.reloadWork)
+            WorkManager.getInstance()?.enqueue(this.reloadWork)
         }
     }
 
     override fun dispose() {
-        WorkManager.getInstance().cancelWorkById(this.reloadWorkId)
+        WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
         this.dbHandler?.close()
     }
 
@@ -261,7 +261,7 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
                             }
 
                             val savedLastChange = dbHandler?.getLastChangeDateTime()
-                            val lastChange = lastChangeConverter.parseStringToList(message).firstOrNull()
+                            val lastChange = lastChangeConverter.parse(message)
 
                             if (lastChange != null) {
                                 if (savedLastChange != null
@@ -295,7 +295,7 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
                                                     return
                                                 }
 
-                                                val loadedList = converter.parseStringToList(message)
+                                                val loadedList = converter.parse(message)
                                                 var deleteList: List<WirelessSocket> = List(0) { WirelessSocket() }
 
                                                 // Check if wireless socket is already saved, then update, otherwise add

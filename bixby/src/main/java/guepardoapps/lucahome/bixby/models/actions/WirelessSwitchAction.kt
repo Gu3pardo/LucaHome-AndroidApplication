@@ -1,14 +1,14 @@
 package guepardoapps.lucahome.bixby.models.actions
 
-import android.support.annotation.NonNull
 import guepardoapps.lucahome.bixby.models.shared.IBixbyEntity
 import guepardoapps.lucahome.common.utils.Logger
 import java.util.*
 
-class WirelessSwitchAction(
-        @NonNull var uuid: UUID = UUID.randomUUID(),
-        @NonNull var name: String = "") : IBixbyEntity {
+class WirelessSwitchAction : IBixbyEntity {
     private val tag = WirelessSwitchAction::class.java.simpleName
+
+    lateinit var uuid: UUID
+    lateinit var name: String
 
     override fun getDatabaseString(): String {
         return "$uuid:$name"
@@ -39,6 +39,10 @@ class WirelessSwitchAction(
     }
 
     override fun toString(): String {
-        return "{\"Class\":\"$tag\",\"Uuid\":\"$uuid\",\"Name\":\"$name\"}"
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"Uuid\":\"$uuid\"," +
+                "\"Name\":\"$name\"" +
+                "}"
     }
 }
