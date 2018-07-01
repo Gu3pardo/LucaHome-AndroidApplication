@@ -47,6 +47,26 @@ enum class ServerAction(var id: Int, var command: String) : Serializable {
     @NeededNetwork(NetworkType.HomeWifi)
     WirelessSocketDeactivateAll(26, "wirelesssocketdeactivateall"),
 
+    //WIRELESS SWITCHES
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSwitchLastChange(30, "wirelessswitchlastchange"),
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSwitchGet(31, "wirelessswitchget"),
+    @NeededUserRole(UserRole.User)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSwitchAdd(32, "wirelessswitchadd&uuid="),
+    @NeededUserRole(UserRole.User)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSwitchUpdate(33, "wirelessswitchupdate&uuid="),
+    @NeededUserRole(UserRole.Administrator)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSwitchDelete(34, "wirelessswitchdelete&uuid="),
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    WirelessSwitchToggle(35, "wirelessswitchtoggle&uuid="),
+
     /*
 
     //BIRTHDAYS
@@ -112,14 +132,6 @@ enum class ServerAction(var id: Int, var command: String) : Serializable {
     ADD_WIRELESS_SCHEDULE(92, "addwirelessschedule&uuid="),
     UPDATE_WIRELESS_SCHEDULE(93, "updatewirelessschedule&uuid="),
     DELETE_WIRELESS_SCHEDULE(94, "deletewirelessschedule&uuid="),
-
-    //WIRELESS SWITCHES
-    GET_WIRELESS_SWITCHES(110, "getwirelessswitches"),
-    ADD_WIRELESS_SWITCH(111, "addwirelessswitch&uuid="),
-    UPDATE_WIRELESS_SWITCH(112, "updatewirelessswitch&uuid="),
-    DELETE_WIRELESS_SWITCH(113, "deletewirelessswitch&uuid="),
-    TOGGLE_WIRELESS_SWITCH(114, "togglewirelessswitch&uuid="),
-    TOGGLE_ALL_WIRELESS_SWITCHES(115, "toggleallwirelessswitches"),
 
     //METER LOGS
     GET_METER_LOGS(120, "getmeterlogs"),

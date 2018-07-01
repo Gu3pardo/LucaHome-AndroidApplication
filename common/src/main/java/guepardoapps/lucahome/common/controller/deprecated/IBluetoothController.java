@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.common.controller;
+package guepardoapps.lucahome.common.controller.deprecated;
 
 public interface IBluetoothController {
     boolean IsBluetoothEnabled();

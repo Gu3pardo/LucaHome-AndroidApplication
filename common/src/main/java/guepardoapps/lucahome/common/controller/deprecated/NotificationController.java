@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.common.controller;
+package guepardoapps.lucahome.common.controller.deprecated;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -37,69 +37,6 @@ public class NotificationController implements INotificationController {
     public NotificationController(@NonNull Context context) {
         _context = context;
         _notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
-    }
-
-    @Override
-    public void CreateSimpleNotification(int notificationId, int smallIcon, @NonNull Class<?> receiverActivity, Bitmap photo, @NonNull String title, @NonNull String body, boolean autoCancelable) {
-        if (!SettingsController.getInstance().IsBirthdayNotificationEnabled()) {
-            Logger.getInstance().Warning(Tag, "Not allowed to display birthday notification!");
-            return;
-        }
-
-        NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager == null) {
-            Logger.getInstance().Error(Tag, "NotificationManager is null!");
-            return;
-        }
-
-        Notification.Builder builder = new Notification.Builder(_context);
-
-        Intent intent = new Intent(_context, receiverActivity);
-        PendingIntent pendingIntent = PendingIntent.getActivity(_context, notificationId, intent, 0);
-
-        builder.setSmallIcon(smallIcon)
-                .setLargeIcon(photo)
-                .setContentTitle(title)
-                .setContentText(body)
-                .setTicker(body)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(autoCancelable);
-
-        Notification notification = builder.build();
-        notificationManager.notify(notificationId, notification);
-    }
-
-    @Override
-    public void CreateCameraNotification(int notificationId, @NonNull Class<?> receiverActivity) {
-        if (!SettingsController.getInstance().IsCameraNotificationEnabled()) {
-            Logger.getInstance().Warning(Tag, "Not allowed to display camera notification!");
-            return;
-        }
-
-        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), R.drawable.notification_camera);
-        NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender().setHintHideIcon(true).setBackground(bitmap);
-        RemoteViews remoteViews = new RemoteViews(_context.getPackageName(), R.layout.notification_camera);
-
-        // Action for button show camera
-        Intent goToSecurityIntent = new Intent(_context, receiverActivity);
-        PendingIntent goToSecurityPendingIntent = PendingIntent.getActivity(_context, 34678743, goToSecurityIntent, 0);
-        NotificationCompat.Action goToSecurityWearAction = new NotificationCompat.Action.Builder(R.drawable.notification_camera, "Go to security", goToSecurityPendingIntent).build();
-
-        remoteViews.setOnClickPendingIntent(R.id.notification_camera_security_button, goToSecurityPendingIntent);
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(_context, ChannelId);
-        builder.setSmallIcon(R.drawable.notification_camera)
-                .setContentTitle("Camera is active!")
-                .setContentText("Go to security!")
-                .setContent(remoteViews)
-                .setTicker("")
-                .extend(wearableExtender)
-                .addAction(goToSecurityWearAction);
-
-        Notification notification = builder.build();
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
-        notificationManager.notify(notificationId, notification);
     }
 
     @Override
@@ -341,43 +278,5 @@ public class NotificationController implements INotificationController {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(_context);
         notificationManager.notify(notificationId, notification);
-    }
-
-    @Override
-    public void CreateTemperatureNotification(int notificationId, @NonNull Class<?> temperatureActivity, int icon, @NonNull String title, @NonNull String body, boolean autoCancelable) {
-        if (!SettingsController.getInstance().IsTemperatureNotificationEnabled()) {
-            Logger.getInstance().Warning(Tag, "Not allowed to display temperature notification!");
-            return;
-        }
-
-        NotificationManager notificationManager = (NotificationManager) _context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (notificationManager == null) {
-            Logger.getInstance().Error(Tag, "NotificationManager is null!");
-            return;
-        }
-
-        Notification.Builder builder = new Notification.Builder(_context);
-
-        Intent intent = new Intent(_context, temperatureActivity);
-        PendingIntent pendingIntent = PendingIntent.getActivity(_context, notificationId, intent, 0);
-
-        Bitmap bitmap = BitmapFactory.decodeResource(_context.getResources(), R.drawable.main_image_temperature);
-        bitmap = BitmapHelper.GetCircleBitmap(bitmap);
-
-        builder.setSmallIcon(icon)
-                .setLargeIcon(bitmap)
-                .setContentTitle(title)
-                .setContentText(body)
-                .setTicker(body)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(autoCancelable);
-
-        Notification notification = builder.build();
-        notificationManager.notify(notificationId, notification);
-    }
-
-    @Override
-    public void CloseNotification(int notificationId) {
-        _notificationManager.cancel(notificationId);
     }
 }

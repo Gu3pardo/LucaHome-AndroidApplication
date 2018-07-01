@@ -1,0 +1,64 @@
+package guepardoapps.lucahome.common.models.wirelessswitch
+
+import guepardoapps.lucahome.common.annotations.JsonKey
+import guepardoapps.lucahome.common.annotations.NeededNetwork
+import guepardoapps.lucahome.common.annotations.NeededUserRole
+import guepardoapps.lucahome.common.enums.NetworkType
+import guepardoapps.lucahome.common.enums.ServerAction
+import guepardoapps.lucahome.common.enums.ServerDatabaseAction
+import guepardoapps.lucahome.common.enums.UserRole
+import java.util.*
+
+@JsonKey("Data", "WirelessSwitch")
+class WirelessSwitch {
+    private val tag: String = WirelessSwitch::class.java.simpleName
+
+    @JsonKey("", "Uuid")
+    lateinit var uuid: UUID
+
+    @JsonKey("", "RoomUuid")
+    lateinit var roomUuid: UUID
+
+    @JsonKey("", "Name")
+    lateinit var name: String
+
+    @JsonKey("", "Code")
+    lateinit var code: String
+
+    @JsonKey("LastTrigger", "DateTime")
+    lateinit var lastTriggerDateTime: Calendar
+
+    @JsonKey("LastTrigger", "User")
+    lateinit var lastTriggerUser: String
+
+    var isOnServer: Boolean = true
+    var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null
+    var changeCount: Int = 0
+    var showInNotification: Boolean = true
+
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    val commandToggleState: String = "${ServerAction.WirelessSwitchToggle.command}$uuid"
+
+    @NeededUserRole(UserRole.User)
+    @NeededNetwork(NetworkType.HomeWifi)
+    val commandAdd: String = "${ServerAction.WirelessSwitchAdd.command}$uuid&roomuuid=$roomUuid&name=$name&code=$code"
+
+    @NeededUserRole(UserRole.User)
+    @NeededNetwork(NetworkType.HomeWifi)
+    val commandUpdate: String = "${ServerAction.WirelessSwitchUpdate.command}$uuid&roomuuid=$roomUuid&name=$name&code=$code"
+
+    @NeededUserRole(UserRole.Administrator)
+    @NeededNetwork(NetworkType.HomeWifi)
+    val commandDelete: String = "${ServerAction.WirelessSwitchDelete.command}$uuid"
+
+    override fun toString(): String {
+        return "{" +
+                "\"Class\":\"$tag\"," +
+                "\"Uuid\":\"$uuid\"," +
+                "\"RoomUuid\":\"$roomUuid\"," +
+                "\"Name\":\"$name\"," +
+                "\"Code\":\"$code\"," +
+                "}"
+    }
+}

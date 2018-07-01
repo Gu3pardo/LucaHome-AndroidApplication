@@ -1,4 +1,4 @@
-package guepardoapps.lucahome.common.controller;
+package guepardoapps.lucahome.common.controller.deprecated;
 
 import android.content.pm.ApplicationInfo;
 import android.support.annotation.NonNull;
