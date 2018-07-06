@@ -29,7 +29,7 @@ class DownloadAdapter(private val context: Context) {
     }
 
     private fun canSend(actionPath: String, serverAction: ServerAction, onDownloadAdapter: OnDownloadAdapter): Boolean {
-        if (serverAction.getNeededNetwork().networkType != NetworkType.No && !networkController.IsNetworkAvailable()) {
+        if (serverAction.getNeededNetwork().networkType != NetworkType.No && !networkController.isInternetConnected().second) {
             Logger.instance.warning(tag, DownloadState.NoNetwork)
             onDownloadAdapter.onFinished(serverAction, DownloadState.NoNetwork, "")
             return false
@@ -37,7 +37,7 @@ class DownloadAdapter(private val context: Context) {
 
         // TODO get homeSsid dynamically
         val homeSsid = this.context.getString(R.string.home_ssid)
-        if (serverAction.getNeededNetwork().networkType == NetworkType.HomeWifi && !networkController.IsHomeNetwork(homeSsid)) {
+        if (serverAction.getNeededNetwork().networkType == NetworkType.HomeWifi && !networkController.isHomeWifiConnected(homeSsid)) {
             Logger.instance.warning(tag, DownloadState.NoHomeNetwork)
             onDownloadAdapter.onFinished(serverAction, DownloadState.NoHomeNetwork, "")
             return false

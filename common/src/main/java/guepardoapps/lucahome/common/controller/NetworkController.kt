@@ -1,11 +1,14 @@
 package guepardoapps.lucahome.common.controller
 
+import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.support.annotation.NonNull
 import android.net.ConnectivityManager
+import android.net.NetworkInfo
 import android.net.wifi.WifiManager
 import guepardoapps.lib.openweather.utils.Logger
 import android.telephony.TelephonyManager
+import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
 
@@ -13,98 +16,14 @@ import java.net.SocketException
 class NetworkController(@NonNull private val context: Context) : INetworkController {
     private val tag: String = NetworkController::class.java.simpleName
 
-    override fun networkAvailable(): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetworkInfo
+    private val bluetoothAdapter: BluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+    private val connectivityManager: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+    private val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        return activeNetwork != null && activeNetwork.isConnectedOrConnecting
-    }
-
-    override fun wifiConnected(): Boolean {
-        return networkTypeEnabled(ConnectivityManager.TYPE_WIFI)
-    }
-
-    override fun mobileDataEnabled(): Boolean {
-        return networkTypeEnabled(ConnectivityManager.TYPE_MOBILE)
-    }
-
-    override fun networkTypeEnabled(networkType: Int): Boolean {
-        if (!networkAvailable()) {
-            return false
-        }
-
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetworkInfo
-
-        return activeNetwork != null && activeNetwork.type == networkType
-    }
-
-    override fun homeNetwork(homeSSID: String): Boolean {
-        if (!wifiConnected()) {
-            return false
-        }
-
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetworkInfo
-
-        if (activeNetwork != null) {
-            if (activeNetwork.type == ConnectivityManager.TYPE_WIFI) {
-                val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-                val wifiInfo = wifiManager.connectionInfo
-                val currentSSID = wifiInfo.ssid
-
-                try {
-                    if (currentSSID.contains(homeSSID)) {
-                        return true
-                    }
-                } catch (exception: Exception) {
-                    val errorString = if (exception.message == null) "HomeSSID failed" else exception.message
-                    Logger.instance.error(tag, errorString)
-                    return false
-                }
-
-            } else {
-                Logger.instance.warning(tag, "Active network is not wifi: ${activeNetwork.type}")
-            }
-        }
-
-        return false
-    }
-
-    override fun setWifiState(newWifiState: Boolean) {
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        wifiManager.isWifiEnabled = newWifiState
-    }
-
-    override fun setMobileDataState(newMobileDataState: Boolean) {
-        try {
-            val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            telephonyManager.javaClass.getDeclaredMethod("setDataEnabled", Boolean::class.javaPrimitiveType)?.invoke(telephonyManager, newMobileDataState)
-        } catch (exception: Exception) {
-            Logger.instance.error(tag, exception)
-        }
-    }
-
-    override fun getWifiSsid(): String {
-        if (!wifiConnected()) {
-            return ""
-        }
-
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val activeNetwork = connectivityManager.activeNetworkInfo
-
-        if (activeNetwork != null) {
-            if (activeNetwork.type == ConnectivityManager.TYPE_WIFI) {
-                val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                val wifiInfo = wifiManager.connectionInfo
-                return wifiInfo.ssid
-            } else {
-                Logger.instance.warning(tag, "Active network is not wifi: ${activeNetwork.type}")
-            }
-        }
-
-        return ""
+    override fun isInternetConnected(): Pair<NetworkInfo?, Boolean> {
+        val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
+        return Pair(activeNetwork, activeNetwork?.isConnectedOrConnecting == true)
     }
 
     override fun getIpAddress(): String {
@@ -133,10 +52,53 @@ class NetworkController(@NonNull private val context: Context) : INetworkControl
         return ip.toString()
     }
 
+    override fun getIp(): String {
+        return InetAddress.getLocalHost().hostAddress
+    }
+
+    override fun isWifiConnected(): Pair<NetworkInfo?, Boolean> {
+        val networkPair = isInternetConnected()
+        val isWiFi: Boolean = networkPair.first?.type == ConnectivityManager.TYPE_WIFI
+        return Pair(networkPair.first, networkPair.second && isWiFi)
+    }
+
+    override fun isHomeWifiConnected(ssid: String): Boolean {
+        val networkPair = isWifiConnected()
+        if (!networkPair.second) {
+            return false
+        }
+
+        if (networkPair.first?.type == ConnectivityManager.TYPE_WIFI) {
+            return try {
+                wifiManager.connectionInfo.ssid.contains(ssid)
+            } catch (exception: Exception) {
+                val errorString = if (exception.message == null) "HomeSSID failed" else exception.message
+                Logger.instance.error(tag, errorString)
+                false
+            }
+
+        }
+
+        Logger.instance.warning(tag, "Active network is not wifi: ${networkPair.first?.type}")
+        return false
+    }
+
+    override fun getWifiSsid(): String {
+        val networkPair = isWifiConnected()
+        if (!networkPair.second) {
+            return ""
+        }
+
+        if (networkPair.first?.type == ConnectivityManager.TYPE_WIFI) {
+            return wifiManager.connectionInfo.ssid
+        }
+
+        Logger.instance.warning(tag, "Active network is not wifi: ${networkPair.first?.type}")
+        return ""
+    }
+
     override fun getWifiDBM(): Int {
         var dbm = 0
-
-        val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
         if (wifiManager.isWifiEnabled) {
             val wifiInfo = wifiManager.connectionInfo
@@ -146,5 +108,35 @@ class NetworkController(@NonNull private val context: Context) : INetworkControl
         }
 
         return dbm
+    }
+
+    override fun setWifiState(newWifiState: Boolean) {
+        wifiManager.isWifiEnabled = newWifiState
+    }
+
+    override fun isMobileConnected(): Pair<NetworkInfo?, Boolean> {
+        val networkPair = isInternetConnected()
+        val isMobile: Boolean = networkPair.first?.type == ConnectivityManager.TYPE_MOBILE
+        return Pair(networkPair.first, networkPair.second && isMobile)
+    }
+
+    override fun setMobileDataState(newMobileDataState: Boolean) {
+        try {
+            telephonyManager.javaClass.getDeclaredMethod("setDataEnabled", Boolean::class.javaPrimitiveType)?.invoke(telephonyManager, newMobileDataState)
+        } catch (exception: Exception) {
+            Logger.instance.error(tag, exception)
+        }
+    }
+
+    override fun isBluetoothEnabled(): Boolean {
+        return bluetoothAdapter.isEnabled
+    }
+
+    override fun setBluetoothState(enable: Boolean) {
+        if (enable) {
+            bluetoothAdapter.enable()
+        } else {
+            bluetoothAdapter.disable()
+        }
     }
 }

@@ -4,8 +4,8 @@ import android.accessibilityservice.AccessibilityService
 import android.content.Intent
 import android.view.accessibility.AccessibilityEvent
 import guepardoapps.lucahome.bixby.tasks.DelayedBackButtonTask
-import guepardoapps.lucahome.common.controller.IUserInformationController
-import guepardoapps.lucahome.common.controller.UserInformationController
+import guepardoapps.lucahome.common.controller.ISystemInfoController
+import guepardoapps.lucahome.common.controller.SystemInfoController
 import guepardoapps.lucahome.common.utils.Logger
 
 class BixbyService : AccessibilityService() {
@@ -18,13 +18,13 @@ class BixbyService : AccessibilityService() {
     private var maxRunFreqMs: Long = 500
 
     private lateinit var bixbyPairService: BixbyPairService
-    private lateinit var userInformationController: IUserInformationController
+    private lateinit var systemInfoController: ISystemInfoController
 
     override fun onCreate() {
         super.onCreate()
         Logger.instance.warning(tag, "onCreate")
         bixbyPairService = BixbyPairService.instance
-        userInformationController = UserInformationController(this)
+        systemInfoController = SystemInfoController(this)
     }
 
     override fun onDestroy() {
@@ -38,7 +38,7 @@ class BixbyService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(accessibilityEvent: AccessibilityEvent?) {
-        if (!userInformationController.IsPackageInstalled(bixbyPackage)) {
+        if (!systemInfoController.isPackageInstalled(bixbyPackage)) {
             Logger.instance.verbose(tag, "Bixby seems to be not available on this device!")
             return
         }

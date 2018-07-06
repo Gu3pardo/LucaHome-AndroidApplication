@@ -5,7 +5,7 @@ buildscript {
     ext.android_constraint_version = '1.1.2'
     ext.android_work_runtime_version = '1.0.0-alpha04'
     ext.junit_version = '4.12'
-    ext.kotlin_version = '1.2.50'
+    ext.kotlin_version = '1.2.51'
     ext.multi_dex_version = '1.0.3'
     ext.test_espresso_version = '3.0.2'
     ext.test_runner_version = '1.0.2'

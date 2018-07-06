@@ -200,17 +200,17 @@ class BixbyPairService {
     private fun validateNetworkRequirement(networkRequirement: NetworkEntity): Boolean {
         when (networkRequirement.networkType) {
             NetworkType.Mobile -> {
-                val isMobileDataEnabled = networkController.IsMobileDataEnabled()
+                val isMobileDataEnabled = networkController.isMobileConnected().second
                 return networkRequirement.stateType === StateType.On == isMobileDataEnabled
             }
 
             NetworkType.Wifi -> {
-                val isWifiEnabled = networkController.IsWifiConnected()
+                val isWifiEnabled = networkController.isWifiConnected().second
                 val stateType = networkRequirement.stateType
 
                 return when (stateType) {
                     StateType.On -> {
-                        val wifiSsid = networkController.GetWifiSsid()
+                        val wifiSsid = networkController.getWifiSsid()
                         isWifiEnabled && wifiSsid.contains(networkRequirement.wifiSsid)
                     }
                     StateType.Off -> !isWifiEnabled
@@ -275,13 +275,13 @@ class BixbyPairService {
         val networkType = networkAction.networkType
         when (networkType) {
             NetworkType.Mobile -> when (networkAction.stateType) {
-                StateType.On -> networkController.SetMobileDataState(true)
-                StateType.Off -> networkController.SetMobileDataState(false)
+                StateType.On -> networkController.setMobileDataState(true)
+                StateType.Off -> networkController.setMobileDataState(false)
                 StateType.Null -> Logger.instance.error(tag, "Invalid StateType!")
             }
             NetworkType.Wifi -> when (networkAction.stateType) {
-                StateType.On -> networkController.SetWifiState(true)
-                StateType.Off -> networkController.SetWifiState(false)
+                StateType.On -> networkController.setWifiState(true)
+                StateType.Off -> networkController.setWifiState(false)
                 StateType.Null -> Logger.instance.error(tag, "Invalid StateType!")
             }
             NetworkType.Null -> Logger.instance.error(tag, "Invalid NetworkType!")

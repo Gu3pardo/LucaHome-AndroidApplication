@@ -1,23 +1,21 @@
 package guepardoapps.lucahome.common.controller
 
+import android.net.NetworkInfo
+
 interface INetworkController {
-    fun networkAvailable(): Boolean
+    fun isInternetConnected(): Pair<NetworkInfo?, Boolean>
+    fun getIpAddress(): String
+    fun getIp(): String
 
-    fun wifiConnected(): Boolean
-
-    fun mobileDataEnabled(): Boolean
-
-    fun networkTypeEnabled(networkType: Int): Boolean
-
-    fun homeNetwork(homeSSID: String): Boolean
-
+    fun isWifiConnected(): Pair<NetworkInfo?, Boolean>
+    fun isHomeWifiConnected(ssid: String): Boolean
+    fun getWifiSsid(): String
+    fun getWifiDBM(): Int
     fun setWifiState(newWifiState: Boolean)
 
+    fun isMobileConnected(): Pair<NetworkInfo?, Boolean>
     fun setMobileDataState(newMobileDataState: Boolean)
 
-    fun getWifiSsid(): String
-
-    fun getIpAddress(): String
-
-    fun getWifiDBM(): Int
+    fun isBluetoothEnabled(): Boolean
+    fun setBluetoothState(enable: Boolean)
 }

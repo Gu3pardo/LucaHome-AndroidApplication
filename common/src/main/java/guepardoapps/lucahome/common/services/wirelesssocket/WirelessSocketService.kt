@@ -462,11 +462,10 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
             return
         }
 
-        // TODO create notification controller in kotlin
-        notificationController.CreateWirelessSocketNotification(this.notificationId, this.get(), this.receiverActivity)
+        notificationController.wirelessSocketNotification(this.notificationId, this.get(), this.receiverActivity!!)
     }
 
     private fun closeNotification() {
-        this.notificationController.CloseNotification(this.notificationId)
+        this.notificationController.close(this.notificationId)
     }
 }

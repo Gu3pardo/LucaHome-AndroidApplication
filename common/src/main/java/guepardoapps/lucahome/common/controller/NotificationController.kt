@@ -71,7 +71,7 @@ class NotificationController(@NonNull private val context: Context) : INotificat
     override fun cameraNotification(@NonNull notificationContent: NotificationContent) {
         val bitmap = BitmapFactory.decodeResource(context.resources, R.drawable.notification_camera)
         val wearableExtender = NotificationCompat.WearableExtender().setHintHideIcon(true).setBackground(bitmap)
-        val remoteViews = RemoteViews(context.packageName), R.layout.notification_camera)
+        val remoteViews = RemoteViews(context.packageName, R.layout.notification_camera)
 
         // Action for button show camera
         val goToSecurityIntent = Intent(context, notificationContent.receiver)

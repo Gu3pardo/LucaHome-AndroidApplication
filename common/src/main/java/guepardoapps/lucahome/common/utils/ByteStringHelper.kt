@@ -3,9 +3,7 @@ package guepardoapps.lucahome.common.utils
 import guepardoapps.lucahome.common.extensions.div
 
 class ByteStringHelper {
-
     companion object {
-
         /**
          * @param charArray the charArray  to convert to a string
          * @return returns a converted string from a char array
