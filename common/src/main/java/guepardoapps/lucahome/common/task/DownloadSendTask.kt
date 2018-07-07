@@ -2,8 +2,8 @@ package guepardoapps.lucahome.common.task
 
 import android.os.AsyncTask
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
-import guepardoapps.lucahome.common.enums.DownloadState
-import guepardoapps.lucahome.common.enums.ServerAction
+import guepardoapps.lucahome.common.enums.common.DownloadState
+import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.utils.Logger
 import okhttp3.OkHttpClient
 import okhttp3.Request

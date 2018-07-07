@@ -11,14 +11,12 @@ import guepardoapps.lucahome.common.controller.NotificationController
 import guepardoapps.lucahome.common.converter.common.JsonDataToLastChangeConverter
 import guepardoapps.lucahome.common.converter.wirelesssocket.JsonDataToWirelessSocketConverter
 import guepardoapps.lucahome.common.databases.wirelesssocket.DbWirelessSocket
-import guepardoapps.lucahome.common.enums.DownloadState
-import guepardoapps.lucahome.common.enums.ServerAction
-import guepardoapps.lucahome.common.enums.ServerDatabaseAction
-import guepardoapps.lucahome.common.extensions.getNeededUserRole
+import guepardoapps.lucahome.common.enums.common.DownloadState
+import guepardoapps.lucahome.common.enums.common.ServerAction
+import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
 import guepardoapps.lucahome.common.models.common.ServiceSettings
-import guepardoapps.lucahome.common.models.user.User
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
-import guepardoapps.lucahome.common.services.user.UserService
+import guepardoapps.lucahome.common.services.validation.ValidationService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.wirelesssocket.WirelessSocketWorker
 import java.util.*
@@ -32,6 +30,7 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
 
     private var converter: JsonDataToWirelessSocketConverter = JsonDataToWirelessSocketConverter()
     private var lastChangeConverter: JsonDataToLastChangeConverter = JsonDataToLastChangeConverter()
+    private var validationService: ValidationService = ValidationService()
 
     private var dbHandler: DbWirelessSocket? = null
     private var downloadAdapter: DownloadAdapter? = null
@@ -155,26 +154,16 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun setState(entry: WirelessSocket, newState: Boolean) {
-        val user: User? = UserService.instance.get()
-        if (user == null) {
-            Logger.instance.warning(tag, "No user!")
-            onWirelessSocketService!!.setFinished(false, "No user!")
-            return
-        }
-
         val action = ServerAction.WirelessSocketSet
-
-        if (user.role < action.getNeededUserRole().role) {
-            Logger.instance.warning(tag, "User may not perform action!")
-            onWirelessSocketService!!.setFinished(false, "User may not perform action!")
+        val validationResult = this.validationService.mayPerform(action)
+        if (!validationResult.first) {
+            onWirelessSocketService!!.setFinished(false, validationResult.second)
             return
         }
 
         entry.state = newState
-        val actionPath = "${user.name}&password=${user.password}&action=${entry.commandSetState}"
-
         this.downloadAdapter?.send(
-                actionPath,
+                entry.commandSetState,
                 action,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
@@ -187,25 +176,15 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun deactivateAll() {
-        val user: User? = UserService.instance.get()
-        if (user == null) {
-            Logger.instance.warning(tag, "No user!")
-            onWirelessSocketService!!.setFinished(false, "No user!")
-            return
-        }
-
         val action = ServerAction.WirelessSocketDeactivateAll
-
-        if (user.role < action.getNeededUserRole().role) {
-            Logger.instance.warning(tag, "User may not perform action!")
-            onWirelessSocketService!!.setFinished(false, "User may not perform action!")
+        val validationResult = this.validationService.mayPerform(action)
+        if (!validationResult.first) {
+            onWirelessSocketService!!.setFinished(false, validationResult.second)
             return
         }
-
-        val actionPath = "${user.name}&password=${user.password}&action=${action.command}"
 
         this.downloadAdapter?.send(
-                actionPath,
+                action.command,
                 action,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
@@ -218,22 +197,14 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun load() {
-        val user: User? = UserService.instance.get()
-        if (user == null) {
-            Logger.instance.warning(tag, "No user!")
-            onWirelessSocketService!!.loadFinished(false, "No user!")
-            return
-        }
-
         val actionLastChange = ServerAction.WirelessSocketLastChange
-        if (user.role < actionLastChange.getNeededUserRole().role) {
-            Logger.instance.warning(tag, "User may not perform action!")
-            onWirelessSocketService!!.loadFinished(false, "User may not perform action!")
+        val validationResult = this.validationService.mayPerform(actionLastChange)
+        if (!validationResult.first) {
+            onWirelessSocketService!!.loadFinished(false, validationResult.second)
             return
         }
 
         val savedList = dbHandler?.getList()!!
-
         val updateList = savedList.filter { wirelessSocket -> !wirelessSocket.isOnServer }
         for (entry in updateList) {
             when (entry.serverDatabaseAction) {
@@ -246,10 +217,8 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
             }
         }
 
-        val actionPathLastChange = "${user.name}&password=${user.password}&action=${actionLastChange.command}"
-
         this.downloadAdapter?.send(
-                actionPathLastChange,
+                actionLastChange.command,
                 actionLastChange,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
@@ -276,15 +245,14 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
                             }
 
                             val action = ServerAction.WirelessSocketGet
-                            if (user.role < action.getNeededUserRole().role) {
-                                Logger.instance.warning(tag, "User may not perform action!")
-                                onWirelessSocketService!!.loadFinished(false, "User may not perform action!")
+                            val actionValidationResult = validationService.mayPerform(action)
+                            if (!actionValidationResult.first) {
+                                onWirelessSocketService!!.loadFinished(false, actionValidationResult.second)
                                 return
                             }
 
-                            val actionPath = "${user.name}&password=${user.password}&action=${action.command}"
                             downloadAdapter?.send(
-                                    actionPath,
+                                    action.command,
                                     action,
                                     object : OnDownloadAdapter {
                                         override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
@@ -328,24 +296,15 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun add(entry: WirelessSocket, reload: Boolean) {
-        val user: User? = UserService.instance.get()
-        if (user == null) {
-            Logger.instance.warning(tag, "No user!")
-            onWirelessSocketService!!.addFinished(false, "No user!")
-            return
-        }
-
         val action = ServerAction.WirelessSocketAdd
-        if (user.role < action.getNeededUserRole().role) {
-            Logger.instance.warning(tag, "User may not perform action!")
-            onWirelessSocketService!!.addFinished(false, "User may not perform action!")
+        val validationResult = this.validationService.mayPerform(action)
+        if (!validationResult.first) {
+            onWirelessSocketService!!.addFinished(false, validationResult.second)
             return
         }
-
-        val actionPath = "${user.name}&password=${user.password}&action=${entry.commandAdd}"
 
         this.downloadAdapter?.send(
-                actionPath,
+                entry.commandAdd,
                 action,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
@@ -371,24 +330,15 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun update(entry: WirelessSocket, reload: Boolean) {
-        val user: User? = UserService.instance.get()
-        if (user == null) {
-            Logger.instance.warning(tag, "No user!")
-            onWirelessSocketService!!.updateFinished(false, "No user!")
-            return
-        }
-
         val action = ServerAction.WirelessSocketUpdate
-        if (user.role < action.getNeededUserRole().role) {
-            Logger.instance.warning(tag, "User may not perform action!")
-            onWirelessSocketService!!.updateFinished(false, "User may not perform action!")
+        val validationResult = this.validationService.mayPerform(action)
+        if (!validationResult.first) {
+            onWirelessSocketService!!.updateFinished(false, validationResult.second)
             return
         }
-
-        val actionPath = "${user.name}&password=${user.password}&action=${entry.commandUpdate}"
 
         this.downloadAdapter?.send(
-                actionPath,
+                entry.commandUpdate,
                 action,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
@@ -414,24 +364,15 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun delete(entry: WirelessSocket, reload: Boolean) {
-        val user: User? = UserService.instance.get()
-        if (user == null) {
-            Logger.instance.warning(tag, "No user!")
-            onWirelessSocketService!!.deleteFinished(false, "No user!")
-            return
-        }
-
         val action = ServerAction.WirelessSocketDelete
-        if (user.role < action.getNeededUserRole().role) {
-            Logger.instance.warning(tag, "User may not perform action!")
-            onWirelessSocketService!!.deleteFinished(false, "User may not perform action!")
+        val validationResult = this.validationService.mayPerform(action)
+        if (!validationResult.first) {
+            onWirelessSocketService!!.deleteFinished(false, validationResult.second)
             return
         }
-
-        val actionPath = "${user.name}&password=${user.password}&action=${entry.commandDelete}"
 
         this.downloadAdapter?.send(
-                actionPath,
+                entry.commandDelete,
                 action,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {

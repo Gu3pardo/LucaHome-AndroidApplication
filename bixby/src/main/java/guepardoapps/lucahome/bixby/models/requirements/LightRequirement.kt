@@ -2,7 +2,7 @@ package guepardoapps.lucahome.bixby.models.requirements
 
 import guepardoapps.lucahome.bixby.enums.LightCompareType
 import guepardoapps.lucahome.bixby.models.shared.IBixbyEntity
-import guepardoapps.lucahome.common.extensions.doubleFormat
+import guepardoapps.lucahome.common.extensions.common.doubleFormat
 
 import guepardoapps.lucahome.common.utils.Logger
 

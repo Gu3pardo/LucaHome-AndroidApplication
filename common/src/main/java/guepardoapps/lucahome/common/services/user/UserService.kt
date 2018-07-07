@@ -6,8 +6,8 @@ import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
 import guepardoapps.lucahome.common.converter.user.JsonDataToUserConverter
 import guepardoapps.lucahome.common.databases.user.DbUser
-import guepardoapps.lucahome.common.enums.DownloadState
-import guepardoapps.lucahome.common.enums.ServerAction
+import guepardoapps.lucahome.common.enums.common.DownloadState
+import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.models.user.User
 import guepardoapps.lucahome.common.utils.Logger
 
@@ -59,15 +59,12 @@ class UserService private constructor() : IUserService {
             return
         }
 
-        val actionPath = "${entry.name}&password=${entry.password}&action=${entry.commandValidate}"
-        val action = ServerAction.UserValidate
-
         this.downloadAdapter?.send(
-                actionPath,
-                action,
+                ServerAction.UserValidate.command,
+                ServerAction.UserValidate,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.UserValidate) {
                             val success = state == DownloadState.Success
                             if (!success) {
                                 onUserService!!.validateFinished(false, message)

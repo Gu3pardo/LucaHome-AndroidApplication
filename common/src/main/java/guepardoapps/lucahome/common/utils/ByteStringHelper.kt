@@ -1,6 +1,6 @@
 package guepardoapps.lucahome.common.utils
 
-import guepardoapps.lucahome.common.extensions.div
+import guepardoapps.lucahome.common.extensions.common.div
 
 class ByteStringHelper {
     companion object {

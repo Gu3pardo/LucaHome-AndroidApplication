@@ -4,7 +4,7 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.content.Context
-import guepardoapps.lucahome.common.enums.UserRole
+import guepardoapps.lucahome.common.enums.user.UserRole
 import guepardoapps.lucahome.common.models.user.User
 import java.util.*
 

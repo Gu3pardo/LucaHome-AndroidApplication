@@ -1,9 +1,7 @@
 package guepardoapps.lucahome.common.converter.wirelesssocket
 
 import guepardoapps.lucahome.common.annotations.JsonKey
-import guepardoapps.lucahome.common.extensions.getJsonKey
-import guepardoapps.lucahome.common.extensions.getPropertyJsonKey
-import guepardoapps.lucahome.common.extensions.toBoolean
+import guepardoapps.lucahome.common.extensions.common.toBoolean
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
 import guepardoapps.lucahome.common.utils.Logger
 import org.json.JSONArray

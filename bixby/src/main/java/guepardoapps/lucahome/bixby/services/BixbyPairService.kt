@@ -2,26 +2,29 @@ package guepardoapps.lucahome.bixby.services
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import guepardoapps.lucahome.bixby.databases.DbHandler
+import guepardoapps.lucahome.bixby.enums.ActionType
 import guepardoapps.lucahome.bixby.enums.DatabaseAction
 import guepardoapps.lucahome.bixby.enums.NetworkType
 import guepardoapps.lucahome.bixby.enums.RequirementType
 import guepardoapps.lucahome.bixby.enums.StateType
+import guepardoapps.lucahome.bixby.models.actions.ApplicationAction
+import guepardoapps.lucahome.bixby.models.actions.BixbyAction
+import guepardoapps.lucahome.bixby.models.actions.WirelessSwitchAction
 import guepardoapps.lucahome.bixby.models.BixbyPair
 import guepardoapps.lucahome.bixby.models.requirements.BixbyRequirement
 import guepardoapps.lucahome.bixby.models.requirements.LightRequirement
+import guepardoapps.lucahome.bixby.models.requirements.PositionRequirement
 import guepardoapps.lucahome.bixby.models.shared.NetworkEntity
 import guepardoapps.lucahome.bixby.models.shared.WirelessSocketEntity
 import guepardoapps.lucahome.common.controller.NetworkController
+import guepardoapps.lucahome.common.services.position.PositionService
+import guepardoapps.lucahome.common.services.puckjs.PuckJsService
 import guepardoapps.lucahome.common.services.wirelesssocket.WirelessSocketService
+import guepardoapps.lucahome.common.services.wirelessswitch.WirelessSwitchService
 import guepardoapps.lucahome.common.utils.Logger
 import kotlin.collections.ArrayList
-import android.content.Intent
-import guepardoapps.lucahome.bixby.models.actions.ApplicationAction
-import guepardoapps.lucahome.bixby.models.actions.BixbyAction
-import guepardoapps.lucahome.bixby.enums.ActionType
-import guepardoapps.lucahome.bixby.models.actions.WirelessSwitchAction
-import guepardoapps.lucahome.bixby.models.requirements.PositionRequirement
 
 class BixbyPairService {
     private val tag = BixbyPairService::class.java.simpleName
@@ -185,16 +188,11 @@ class BixbyPairService {
     }
 
     private fun validatePositionRequirement(positionRequirement: PositionRequirement): Boolean {
-        return false
-        // TODO
-        // val room = RoomService.getInstance().GetByUuid(_lastReceivedPosition.GetPuckJs().GetRoomUuid())
-        // return _lastReceivedPosition != null && puckJsPosition.contains(room.GetName())
+        return PositionService.instance.currentPosition.roomUuid == PuckJsService.instance.get(positionRequirement.puckJsUuid)?.roomUuid
     }
 
     private fun validateLightRequirement(lightRequirement: LightRequirement): Boolean {
-        return false
-        // TODO
-        // return _lastReceivedPosition != null && lightRequirement.ValidateActualValue(_lastReceivedPosition.GetLightValue())
+        return lightRequirement.validateActualValue(PositionService.instance.currentPosition.lightValue)
     }
 
     private fun validateNetworkRequirement(networkRequirement: NetworkEntity): Boolean {
@@ -290,17 +288,17 @@ class BixbyPairService {
 
     private fun performWirelessSocketAction(wirelessSocketAction: WirelessSocketEntity) {
         Logger.instance.debug(tag, "performWirelessSocketAction for $wirelessSocketAction")
-        // TODO
-        /* when (wirelessSocketAction.stateType) {
-            StateType.On -> WirelessSocketService.instance.setWirelessSocketState(wirelessSocketAction.wirelessSocketName, true)
-            StateType.Off -> WirelessSocketService.instance.setWirelessSocketState(wirelessSocketAction.wirelessSocketName, false)
+        val wirelessSocket = WirelessSocketService.instance.get(wirelessSocketAction.uuid)
+        when (wirelessSocketAction.stateType) {
+            StateType.On -> WirelessSocketService.instance.setState(wirelessSocket!!, true)
+            StateType.Off -> WirelessSocketService.instance.setState(wirelessSocket!!, false)
             StateType.Null -> Logger.instance.error(tag, "Invalid StateType!")
-        } */
+        }
     }
 
     private fun performWirelessSwitchAction(wirelessSwitchAction: WirelessSwitchAction) {
         Logger.instance.debug(tag, "performWirelessSwitchAction for $wirelessSwitchAction")
-        // TODO
-        // WirelessSwitchService.instance.toggleWirelessSwitch(wirelessSwitchAction.wirelessSwitchName)
+        val wirelessSwitch = WirelessSwitchService.instance.get(wirelessSwitchAction.uuid)
+        WirelessSwitchService.instance.toggle(wirelessSwitch!!)
     }
 }

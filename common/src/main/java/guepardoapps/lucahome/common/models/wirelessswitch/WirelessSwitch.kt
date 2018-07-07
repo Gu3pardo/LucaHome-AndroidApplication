@@ -3,14 +3,15 @@ package guepardoapps.lucahome.common.models.wirelessswitch
 import guepardoapps.lucahome.common.annotations.JsonKey
 import guepardoapps.lucahome.common.annotations.NeededNetwork
 import guepardoapps.lucahome.common.annotations.NeededUserRole
-import guepardoapps.lucahome.common.enums.NetworkType
-import guepardoapps.lucahome.common.enums.ServerAction
-import guepardoapps.lucahome.common.enums.ServerDatabaseAction
-import guepardoapps.lucahome.common.enums.UserRole
+import guepardoapps.lucahome.common.enums.common.NetworkType
+import guepardoapps.lucahome.common.enums.common.ServerAction
+import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
+import guepardoapps.lucahome.common.enums.user.UserRole
+import java.io.Serializable
 import java.util.*
 
 @JsonKey("Data", "WirelessSwitch")
-class WirelessSwitch {
+class WirelessSwitch : Serializable {
     private val tag: String = WirelessSwitch::class.java.simpleName
 
     @JsonKey("", "Uuid")

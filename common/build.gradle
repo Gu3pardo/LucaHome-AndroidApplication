@@ -6,10 +6,10 @@ android {
     compileSdkVersion 28
     buildToolsVersion "28.0.0"
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 28
         versionCode 60000
-        versionName "6.0.0.180706-alpha1"
+        versionName "6.0.0.180707-alpha1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         testOptions {
@@ -62,6 +62,7 @@ dependencies {
     implementation "com.squareup.picasso:picasso:$picasso_version"
     implementation "org.altbeacon:android-beacon-library:$beacon_version"
     implementation "org.jsoup:jsoup:$jsoup_version"
+    implementation "me.everything:providers-android:$everything_provider_version"
 
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

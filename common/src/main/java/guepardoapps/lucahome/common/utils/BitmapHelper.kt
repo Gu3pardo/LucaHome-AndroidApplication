@@ -10,7 +10,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.provider.ContactsContract
 import android.support.annotation.NonNull
-import guepardoapps.lucahome.common.extensions.circleBitmap
+import guepardoapps.lucahome.common.extensions.common.circleBitmap
 import guepardoapps.lucahome.common.R
 import java.io.ByteArrayInputStream
 

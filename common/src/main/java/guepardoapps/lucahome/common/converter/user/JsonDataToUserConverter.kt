@@ -1,9 +1,9 @@
 package guepardoapps.lucahome.common.converter.user
 
 import guepardoapps.lucahome.common.annotations.JsonKey
-import guepardoapps.lucahome.common.enums.UserRole
-import guepardoapps.lucahome.common.extensions.getJsonKey
-import guepardoapps.lucahome.common.extensions.getPropertyJsonKey
+import guepardoapps.lucahome.common.enums.user.UserRole
+import guepardoapps.lucahome.common.extensions.user.getJsonKey
+import guepardoapps.lucahome.common.extensions.user.getPropertyJsonKey
 import guepardoapps.lucahome.common.models.user.User
 import guepardoapps.lucahome.common.utils.Logger
 import org.json.JSONArray

@@ -4,9 +4,9 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.content.Context
-import guepardoapps.lucahome.common.enums.ServerDatabaseAction
-import guepardoapps.lucahome.common.extensions.toBoolean
-import guepardoapps.lucahome.common.extensions.toInteger
+import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
+import guepardoapps.lucahome.common.extensions.common.toBoolean
+import guepardoapps.lucahome.common.extensions.common.toInteger
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
 import java.util.*
@@ -126,56 +126,8 @@ class DbWirelessSocket(context: Context, factory: SQLiteDatabase.CursorFactory?)
     }
 
     fun get(uuid: UUID): WirelessSocket? {
-        val database = this.readableDatabase
-
-        val projection = arrayOf(
-                ColumnId,
-                ColumnUuid,
-                ColumnRoomUuid,
-                ColumnName,
-                ColumnCode,
-                ColumnState,
-                ColumnLastTriggerDateTime,
-                ColumnLastTriggerUser,
-                ColumnIsOnServer,
-                ColumnServerAction,
-                ColumnChangeCount,
-                ColumnShowInNotification)
-
-        val sortOrder = "$ColumnId ASC"
-
-        val selection = "$ColumnUuid LIKE ?"
-        val selectionArgs = arrayOf(uuid.toString())
-
-        val cursor = database.query(
-                DatabaseTable, projection, selection, selectionArgs,
-                null, null, sortOrder)
-
-        val list = mutableListOf<WirelessSocket>()
-        with(cursor) {
-            while (moveToNext()) {
-                val wirelessSocket = WirelessSocket()
-
-                wirelessSocket.uuid = uuid
-                wirelessSocket.roomUuid = UUID.fromString(getString(getColumnIndexOrThrow(ColumnRoomUuid)))
-                wirelessSocket.name = getString(getColumnIndexOrThrow(ColumnName))
-                wirelessSocket.code = getString(getColumnIndexOrThrow(ColumnCode))
-                wirelessSocket.state = getInt(getColumnIndexOrThrow(ColumnState)).toBoolean()
-
-                wirelessSocket.lastTriggerDateTime.timeInMillis = getLong(getColumnIndexOrThrow(ColumnLastTriggerDateTime))
-                wirelessSocket.lastTriggerUser = getString(getColumnIndexOrThrow(ColumnLastTriggerUser))
-
-                wirelessSocket.isOnServer = getInt(getColumnIndexOrThrow(ColumnIsOnServer)).toBoolean()
-                wirelessSocket.serverDatabaseAction = ServerDatabaseAction.values()[getInt(getColumnIndexOrThrow(ColumnServerAction))]
-
-                wirelessSocket.changeCount = getInt(getColumnIndexOrThrow(ColumnChangeCount))
-                wirelessSocket.showInNotification = getInt(getColumnIndexOrThrow(ColumnShowInNotification)).toBoolean()
-
-                list.add(wirelessSocket)
-            }
-        }
-
-        return list.firstOrNull()
+        val list = getList()
+        return list.find { value -> value.uuid == uuid }
     }
 
     fun add(entity: WirelessSocket): Long {
