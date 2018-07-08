@@ -7,7 +7,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
-import guepardoapps.lucahome.common.converter.common.JsonDataToLastChangeConverter
 import guepardoapps.lucahome.common.converter.puckjs.JsonDataToPuckJsConverter
 import guepardoapps.lucahome.common.databases.puckjs.DbPuckJs
 import guepardoapps.lucahome.common.enums.common.DownloadState
@@ -15,6 +14,8 @@ import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.puckjs.PuckJs
+import guepardoapps.lucahome.common.services.change.ChangeService
+import guepardoapps.lucahome.common.services.change.OnChangeService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.puckjs.PuckJsWorker
 import java.util.*
@@ -25,7 +26,6 @@ class PuckJsService private constructor() : IPuckJsService {
     private val tag = PuckJsService::class.java.simpleName
 
     private var converter: JsonDataToPuckJsConverter = JsonDataToPuckJsConverter()
-    private var lastChangeConverter: JsonDataToLastChangeConverter = JsonDataToLastChangeConverter()
 
     private var dbHandler: DbPuckJs? = null
     private var downloadAdapter: DownloadAdapter? = null
@@ -160,74 +160,65 @@ class PuckJsService private constructor() : IPuckJsService {
             }
         }
 
-        this.downloadAdapter?.send(
-                ServerAction.PuckJsLastChange.command,
-                ServerAction.PuckJsLastChange,
-                object : OnDownloadAdapter {
-                    override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == ServerAction.PuckJsLastChange) {
-                            val success = state == DownloadState.Success
-                            if (!success) {
-                                onPuckJsService!!.loadFinished(false, "Loading failed!")
-                                return
-                            }
+        ChangeService.instance.onChangeService = object : OnChangeService {
+            override fun loadFinished(success: Boolean, message: String) {
+                if (!success) {
+                    onPuckJsService!!.loadFinished(false, "Loading for last change failed!")
+                    return
+                }
 
-                            val savedLastChange = dbHandler?.getLastChangeDateTime()
-                            val lastChange = lastChangeConverter.parse(message)
+                val lastChange = ChangeService.instance.get("PuckJs")
+                if (lastChange != null) {
+                    val savedLastChange = dbHandler?.getLastChangeDateTime()
+                    dbHandler?.setLastChangeDateTime(lastChange.time)
 
-                            if (lastChange != null) {
-                                if (savedLastChange != null
-                                        && (savedLastChange == lastChange || savedLastChange.after(lastChange))) {
-                                    onPuckJsService!!.loadFinished(true, "Nothing new on server!")
-                                    return
-                                }
-
-                                dbHandler?.setLastChangeDateTime(lastChange)
-                            } else {
-                                dbHandler?.setLastChangeDateTime(Calendar.getInstance())
-                            }
-
-                            downloadAdapter?.send(
-                                    ServerAction.PuckJsGet.command,
-                                    ServerAction.PuckJsGet,
-                                    object : OnDownloadAdapter {
-                                        override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                            if (serverAction == ServerAction.PuckJsGet) {
-                                                val successGet = state == DownloadState.Success
-                                                if (!successGet) {
-                                                    onPuckJsService!!.loadFinished(false, "Loading failed!")
-                                                    return
-                                                }
-
-                                                val loadedList = converter.parse(message)
-                                                var deleteList: List<PuckJs> = List(0) { PuckJs() }
-
-                                                // Check if puckJs is already saved, then update, otherwise add
-                                                for (loadedEntry in loadedList) {
-                                                    if (savedList.any { puckJs -> puckJs.uuid == loadedEntry.uuid }) {
-                                                        dbHandler?.update(loadedEntry)
-                                                        // Filter updated puckJs from list
-                                                        deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
-                                                        continue
-                                                    }
-
-                                                    dbHandler?.add(loadedEntry)
-                                                }
-
-                                                // Check if any puckJs was not yet updated, then remove it from the database, because it does not longer exist on server
-                                                for (deleteEntry in deleteList) {
-                                                    dbHandler?.delete(deleteEntry)
-                                                }
-
-                                                onPuckJsService!!.loadFinished(true, "")
-                                            }
-                                        }
-                                    }
-                            )
-                        }
+                    if (savedLastChange != null
+                            && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
+                        onPuckJsService!!.loadFinished(true, "Nothing new on server!")
+                        return
                     }
                 }
-        )
+
+                downloadAdapter?.send(
+                        ServerAction.PuckJsGet.command,
+                        ServerAction.PuckJsGet,
+                        object : OnDownloadAdapter {
+                            override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
+                                if (serverAction == ServerAction.PuckJsGet) {
+                                    val successGet = state == DownloadState.Success
+                                    if (!successGet) {
+                                        onPuckJsService!!.loadFinished(false, "Loading failed!")
+                                        return
+                                    }
+
+                                    val loadedList = converter.parse(message)
+                                    var deleteList: List<PuckJs> = List(0) { PuckJs() }
+
+                                    // Check if puckJs is already saved, then update, otherwise add
+                                    for (loadedEntry in loadedList) {
+                                        if (savedList.any { puckJs -> puckJs.uuid == loadedEntry.uuid }) {
+                                            dbHandler?.update(loadedEntry)
+                                            // Filter updated puckJs from list
+                                            deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
+                                            continue
+                                        }
+
+                                        dbHandler?.add(loadedEntry)
+                                    }
+
+                                    // Check if any puckJs was not yet updated, then remove it from the database, because it does not longer exist on server
+                                    for (deleteEntry in deleteList) {
+                                        dbHandler?.delete(deleteEntry)
+                                    }
+
+                                    onPuckJsService!!.loadFinished(true, "")
+                                }
+                            }
+                        }
+                )
+            }
+        }
+        ChangeService.instance.load()
     }
 
     override fun add(entry: PuckJs, reload: Boolean) {

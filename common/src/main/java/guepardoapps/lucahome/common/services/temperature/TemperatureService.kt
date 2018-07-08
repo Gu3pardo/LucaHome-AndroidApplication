@@ -8,7 +8,6 @@ import androidx.work.WorkManager
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
 import guepardoapps.lucahome.common.controller.NotificationController
-import guepardoapps.lucahome.common.converter.common.JsonDataToLastChangeConverter
 import guepardoapps.lucahome.common.converter.temperature.JsonDataToTemperatureConverter
 import guepardoapps.lucahome.common.databases.temperature.DbTemperature
 import guepardoapps.lucahome.common.enums.common.DownloadState
@@ -17,6 +16,8 @@ import guepardoapps.lucahome.common.models.common.NotificationContent
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.temperature.Temperature
 import guepardoapps.lucahome.common.R
+import guepardoapps.lucahome.common.services.change.ChangeService
+import guepardoapps.lucahome.common.services.change.OnChangeService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.temperature.TemperatureWorker
 import java.util.*
@@ -29,7 +30,6 @@ class TemperatureService private constructor() : ITemperatureService {
     private val notificationId = 438502136
 
     private var converter: JsonDataToTemperatureConverter = JsonDataToTemperatureConverter()
-    private var lastChangeConverter: JsonDataToLastChangeConverter = JsonDataToLastChangeConverter()
 
     private var dbHandler: DbTemperature? = null
     private var downloadAdapter: DownloadAdapter? = null
@@ -166,76 +166,67 @@ class TemperatureService private constructor() : ITemperatureService {
             return
         }
 
-        this.downloadAdapter?.send(
-                ServerAction.TemperatureLastChange.command,
-                ServerAction.TemperatureLastChange,
-                object : OnDownloadAdapter {
-                    override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == ServerAction.TemperatureLastChange) {
-                            val success = state == DownloadState.Success
-                            if (!success) {
-                                onTemperatureService!!.loadFinished(false, "Loading failed!")
-                                return
-                            }
+        ChangeService.instance.onChangeService = object : OnChangeService {
+            override fun loadFinished(success: Boolean, message: String) {
+                if (!success) {
+                    onTemperatureService!!.loadFinished(false, "Loading for last change failed!")
+                    return
+                }
 
-                            val savedLastChange = dbHandler?.getLastChangeDateTime()
-                            val lastChange = lastChangeConverter.parse(message)
+                val lastChange = ChangeService.instance.get("PuckJs")
+                if (lastChange != null) {
+                    val savedLastChange = dbHandler?.getLastChangeDateTime()
+                    dbHandler?.setLastChangeDateTime(lastChange.time)
 
-                            if (lastChange != null) {
-                                if (savedLastChange != null
-                                        && (savedLastChange == lastChange || savedLastChange.after(lastChange))) {
-                                    onTemperatureService!!.loadFinished(true, "Nothing new on server!")
-                                    return
-                                }
-
-                                dbHandler?.setLastChangeDateTime(lastChange)
-                            } else {
-                                dbHandler?.setLastChangeDateTime(Calendar.getInstance())
-                            }
-
-                            downloadAdapter?.send(
-                                    ServerAction.TemperatureGet.command,
-                                    ServerAction.TemperatureGet,
-                                    object : OnDownloadAdapter {
-                                        override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                            if (serverAction == ServerAction.TemperatureGet) {
-                                                val successGet = state == DownloadState.Success
-                                                if (!successGet) {
-                                                    onTemperatureService!!.loadFinished(false, "Loading failed!")
-                                                    return
-                                                }
-
-                                                val savedList = dbHandler?.getList()!!
-                                                val loadedList = converter.parse(message)
-                                                var deleteList: List<Temperature> = List(0) { Temperature() }
-
-                                                // Check if temperature is already saved, then update, otherwise add
-                                                for (loadedEntry in loadedList) {
-                                                    if (savedList.any { temperature -> temperature.uuid == loadedEntry.uuid }) {
-                                                        dbHandler?.update(loadedEntry)
-                                                        // Filter updated wireless switch from list
-                                                        deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
-                                                        continue
-                                                    }
-
-                                                    dbHandler?.add(loadedEntry)
-                                                }
-
-                                                // Check if any temperature was not yet updated, then remove it from the database, because it does not longer exist on server
-                                                for (deleteEntry in deleteList) {
-                                                    dbHandler?.delete(deleteEntry)
-                                                }
-
-                                                onTemperatureService!!.loadFinished(true, "")
-                                                showNotification()
-                                            }
-                                        }
-                                    }
-                            )
-                        }
+                    if (savedLastChange != null
+                            && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
+                        onTemperatureService!!.loadFinished(true, "Nothing new on server!")
+                        return
                     }
                 }
-        )
+
+                downloadAdapter?.send(
+                        ServerAction.TemperatureGet.command,
+                        ServerAction.TemperatureGet,
+                        object : OnDownloadAdapter {
+                            override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
+                                if (serverAction == ServerAction.TemperatureGet) {
+                                    val successGet = state == DownloadState.Success
+                                    if (!successGet) {
+                                        onTemperatureService!!.loadFinished(false, "Loading failed!")
+                                        return
+                                    }
+
+                                    val savedList = dbHandler?.getList()!!
+                                    val loadedList = converter.parse(message)
+                                    var deleteList: List<Temperature> = List(0) { Temperature() }
+
+                                    // Check if temperature is already saved, then update, otherwise add
+                                    for (loadedEntry in loadedList) {
+                                        if (savedList.any { temperature -> temperature.uuid == loadedEntry.uuid }) {
+                                            dbHandler?.update(loadedEntry)
+                                            // Filter updated wireless switch from list
+                                            deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
+                                            continue
+                                        }
+
+                                        dbHandler?.add(loadedEntry)
+                                    }
+
+                                    // Check if any temperature was not yet updated, then remove it from the database, because it does not longer exist on server
+                                    for (deleteEntry in deleteList) {
+                                        dbHandler?.delete(deleteEntry)
+                                    }
+
+                                    onTemperatureService!!.loadFinished(true, "")
+                                    showNotification()
+                                }
+                            }
+                        }
+                )
+            }
+        }
+        ChangeService.instance.load()
     }
 
     @Throws(NotImplementedError::class)

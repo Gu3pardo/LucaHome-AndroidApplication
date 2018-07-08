@@ -11,47 +11,43 @@ enum class ServerAction(var id: Int, var command: String) : Serializable {
     @NeededNetwork(NetworkType.No)
     NULL(0, ""),
 
+    //CHANGE
+    @NeededUserRole(UserRole.Guest)
+    @NeededNetwork(NetworkType.HomeWifi)
+    ChangeGet(70, "changeget"),
+
     //PUCK JS
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
-    PuckJsLastChange(60, "puckjslastchange"),
-    @NeededUserRole(UserRole.Guest)
-    @NeededNetwork(NetworkType.HomeWifi)
-    PuckJsGet(61, "puckjsget"),
+    PuckJsGet(60, "puckjsget"),
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    PuckJsAdd(62, "puckjsadd&uuid=%s&name=%s&roomuuid=%s&mac=%s"),
+    PuckJsAdd(61, "puckjsadd&uuid=%s&name=%s&roomuuid=%s&mac=%s"),
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    PuckJsUpdate(63, "puckjsupdate&uuid=%s&roomuuid=%s&name=%s&mac=%s"),
+    PuckJsUpdate(62, "puckjsupdate&uuid=%s&roomuuid=%s&name=%s&mac=%s"),
     @NeededUserRole(UserRole.Administrator)
     @NeededNetwork(NetworkType.HomeWifi)
-    PuckJsDelete(64, "puckjsdelete&uuid=%s"),
+    PuckJsDelete(63, "puckjsdelete&uuid=%s"),
 
     //ROOM
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
-    RoomLastChange(50, "roomlastchange"),
-    @NeededUserRole(UserRole.Guest)
-    @NeededNetwork(NetworkType.HomeWifi)
-    RoomGet(51, "roomget"),
+    RoomGet(50, "roomget"),
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    RoomAdd(52, "roomadd&uuid="),
+    RoomAdd(51, "roomadd&uuid="),
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    RoomUpdate(53, "roomupdate&uuid="),
+    RoomUpdate(52, "roomupdate&uuid="),
     @NeededUserRole(UserRole.Administrator)
     @NeededNetwork(NetworkType.HomeWifi)
-    RoomDelete(54, "roomdelete&uuid="),
+    RoomDelete(53, "roomdelete&uuid="),
 
     //TEMPERATURE
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
-    TemperatureLastChange(40, "temperaturelastchange"),
-    @NeededUserRole(UserRole.Guest)
-    @NeededNetwork(NetworkType.HomeWifi)
-    TemperatureGet(41, "temperatureget"),
+    TemperatureGet(40, "temperatureget"),
 
     //USER
     @NeededUserRole(UserRole.Guest)
@@ -70,45 +66,39 @@ enum class ServerAction(var id: Int, var command: String) : Serializable {
     //WIRELESS SOCKETS
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSocketLastChange(20, "wirelesssocketlastchange"),
+    WirelessSocketGet(20, "wirelesssocketget"),
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSocketGet(21, "wirelesssocketget"),
-    @NeededUserRole(UserRole.Guest)
-    @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSocketSet(22, "wirelesssocketset&uuid="),
+    WirelessSocketSet(21, "wirelesssocketset&uuid="),
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSocketAdd(23, "wirelesssocketadd&uuid="),
+    WirelessSocketAdd(22, "wirelesssocketadd&uuid="),
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSocketUpdate(24, "wirelesssocketupdate&uuid="),
+    WirelessSocketUpdate(23, "wirelesssocketupdate&uuid="),
     @NeededUserRole(UserRole.Administrator)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSocketDelete(25, "wirelesssocketdelete&uuid="),
+    WirelessSocketDelete(24, "wirelesssocketdelete&uuid="),
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSocketDeactivateAll(26, "wirelesssocketdeactivateall"),
+    WirelessSocketDeactivateAll(25, "wirelesssocketdeactivateall"),
 
     //WIRELESS SWITCHES
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSwitchLastChange(30, "wirelessswitchlastchange"),
-    @NeededUserRole(UserRole.Guest)
-    @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSwitchGet(31, "wirelessswitchget"),
+    WirelessSwitchGet(30, "wirelessswitchget"),
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSwitchAdd(32, "wirelessswitchadd&uuid="),
+    WirelessSwitchAdd(31, "wirelessswitchadd&uuid="),
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSwitchUpdate(33, "wirelessswitchupdate&uuid="),
+    WirelessSwitchUpdate(32, "wirelessswitchupdate&uuid="),
     @NeededUserRole(UserRole.Administrator)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSwitchDelete(34, "wirelessswitchdelete&uuid="),
+    WirelessSwitchDelete(33, "wirelessswitchdelete&uuid="),
     @NeededUserRole(UserRole.Guest)
     @NeededNetwork(NetworkType.HomeWifi)
-    WirelessSwitchToggle(35, "wirelessswitchtoggle&uuid="),
+    WirelessSwitchToggle(34, "wirelessswitchtoggle&uuid="),
 
     /*
 

@@ -8,7 +8,6 @@ import androidx.work.WorkManager
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
 import guepardoapps.lucahome.common.controller.NotificationController
-import guepardoapps.lucahome.common.converter.common.JsonDataToLastChangeConverter
 import guepardoapps.lucahome.common.converter.wirelesssocket.JsonDataToWirelessSocketConverter
 import guepardoapps.lucahome.common.databases.wirelesssocket.DbWirelessSocket
 import guepardoapps.lucahome.common.enums.common.DownloadState
@@ -16,6 +15,8 @@ import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
+import guepardoapps.lucahome.common.services.change.ChangeService
+import guepardoapps.lucahome.common.services.change.OnChangeService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.wirelesssocket.WirelessSocketWorker
 import java.util.*
@@ -28,7 +29,6 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     private val notificationId = 438502134
 
     private var converter: JsonDataToWirelessSocketConverter = JsonDataToWirelessSocketConverter()
-    private var lastChangeConverter: JsonDataToLastChangeConverter = JsonDataToLastChangeConverter()
 
     private var dbHandler: DbWirelessSocket? = null
     private var downloadAdapter: DownloadAdapter? = null
@@ -224,75 +224,66 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
             }
         }
 
-        this.downloadAdapter?.send(
-                ServerAction.WirelessSocketLastChange.command,
-                ServerAction.WirelessSocketLastChange,
-                object : OnDownloadAdapter {
-                    override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == ServerAction.WirelessSocketLastChange) {
-                            val success = state == DownloadState.Success
-                            if (!success) {
-                                onWirelessSocketService!!.loadFinished(false, "Loading failed!")
-                                return
-                            }
+        ChangeService.instance.onChangeService = object : OnChangeService {
+            override fun loadFinished(success: Boolean, message: String) {
+                if (!success) {
+                    onWirelessSocketService!!.loadFinished(false, "Loading for last change failed!")
+                    return
+                }
 
-                            val savedLastChange = dbHandler?.getLastChangeDateTime()
-                            val lastChange = lastChangeConverter.parse(message)
+                val lastChange = ChangeService.instance.get("PuckJs")
+                if (lastChange != null) {
+                    val savedLastChange = dbHandler?.getLastChangeDateTime()
+                    dbHandler?.setLastChangeDateTime(lastChange.time)
 
-                            if (lastChange != null) {
-                                if (savedLastChange != null
-                                        && (savedLastChange == lastChange || savedLastChange.after(lastChange))) {
-                                    onWirelessSocketService!!.loadFinished(true, "Nothing new on server!")
-                                    return
-                                }
-
-                                dbHandler?.setLastChangeDateTime(lastChange)
-                            } else {
-                                dbHandler?.setLastChangeDateTime(Calendar.getInstance())
-                            }
-
-                            downloadAdapter?.send(
-                                    ServerAction.WirelessSocketGet.command,
-                                    ServerAction.WirelessSocketGet,
-                                    object : OnDownloadAdapter {
-                                        override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                            if (serverAction == ServerAction.WirelessSocketGet) {
-                                                val successGet = state == DownloadState.Success
-                                                if (!successGet) {
-                                                    onWirelessSocketService!!.loadFinished(false, "Loading failed!")
-                                                    return
-                                                }
-
-                                                val loadedList = converter.parse(message)
-                                                var deleteList: List<WirelessSocket> = List(0) { WirelessSocket() }
-
-                                                // Check if wireless socket is already saved, then update, otherwise add
-                                                for (loadedEntry in loadedList) {
-                                                    if (savedList.any { wirelessSocket -> wirelessSocket.uuid == loadedEntry.uuid }) {
-                                                        dbHandler?.update(loadedEntry)
-                                                        // Filter updated wireless socket from list
-                                                        deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
-                                                        continue
-                                                    }
-
-                                                    dbHandler?.add(loadedEntry)
-                                                }
-
-                                                // Check if any wireless socket was not yet updated, then remove it from the database, because it does not longer exist on server
-                                                for (deleteEntry in deleteList) {
-                                                    dbHandler?.delete(deleteEntry)
-                                                }
-
-                                                onWirelessSocketService!!.loadFinished(true, "")
-                                                showNotification()
-                                            }
-                                        }
-                                    }
-                            )
-                        }
+                    if (savedLastChange != null
+                            && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
+                        onWirelessSocketService!!.loadFinished(true, "Nothing new on server!")
+                        return
                     }
                 }
-        )
+
+                downloadAdapter?.send(
+                        ServerAction.WirelessSocketGet.command,
+                        ServerAction.WirelessSocketGet,
+                        object : OnDownloadAdapter {
+                            override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
+                                if (serverAction == ServerAction.WirelessSocketGet) {
+                                    val successGet = state == DownloadState.Success
+                                    if (!successGet) {
+                                        onWirelessSocketService!!.loadFinished(false, "Loading failed!")
+                                        return
+                                    }
+
+                                    val loadedList = converter.parse(message)
+                                    var deleteList: List<WirelessSocket> = List(0) { WirelessSocket() }
+
+                                    // Check if wireless socket is already saved, then update, otherwise add
+                                    for (loadedEntry in loadedList) {
+                                        if (savedList.any { wirelessSocket -> wirelessSocket.uuid == loadedEntry.uuid }) {
+                                            dbHandler?.update(loadedEntry)
+                                            // Filter updated wireless socket from list
+                                            deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
+                                            continue
+                                        }
+
+                                        dbHandler?.add(loadedEntry)
+                                    }
+
+                                    // Check if any wireless socket was not yet updated, then remove it from the database, because it does not longer exist on server
+                                    for (deleteEntry in deleteList) {
+                                        dbHandler?.delete(deleteEntry)
+                                    }
+
+                                    onWirelessSocketService!!.loadFinished(true, "")
+                                    showNotification()
+                                }
+                            }
+                        }
+                )
+            }
+        }
+        ChangeService.instance.load()
     }
 
     override fun add(entry: WirelessSocket, reload: Boolean) {
