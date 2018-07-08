@@ -17,7 +17,6 @@ import guepardoapps.lucahome.common.models.common.NotificationContent
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.temperature.Temperature
 import guepardoapps.lucahome.common.R
-import guepardoapps.lucahome.common.services.validation.ValidationService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.temperature.TemperatureWorker
 import java.util.*
@@ -31,7 +30,6 @@ class TemperatureService private constructor() : ITemperatureService {
 
     private var converter: JsonDataToTemperatureConverter = JsonDataToTemperatureConverter()
     private var lastChangeConverter: JsonDataToLastChangeConverter = JsonDataToLastChangeConverter()
-    private var validationService: ValidationService = ValidationService()
 
     private var dbHandler: DbTemperature? = null
     private var downloadAdapter: DownloadAdapter? = null
@@ -111,6 +109,9 @@ class TemperatureService private constructor() : ITemperatureService {
     override fun dispose() {
         WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
         this.dbHandler?.close()
+
+        this.context = null
+        this.dbHandler = null
     }
 
     override fun get(): MutableList<Temperature> {
@@ -142,6 +143,11 @@ class TemperatureService private constructor() : ITemperatureService {
     }
 
     override fun search(searchValue: String): MutableList<Temperature> {
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
+            return ArrayList()
+        }
+
         val list = this.get()
         val searchResultList = ArrayList<Temperature>()
 
@@ -155,19 +161,17 @@ class TemperatureService private constructor() : ITemperatureService {
     }
 
     override fun load() {
-        val actionLastChange = ServerAction.TemperatureLastChange
-        val validationResult = this.validationService.mayPerform(actionLastChange)
-        if (!validationResult.first) {
-            onTemperatureService!!.loadFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
-                actionLastChange.command,
-                actionLastChange,
+                ServerAction.TemperatureLastChange.command,
+                ServerAction.TemperatureLastChange,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == actionLastChange) {
+                        if (serverAction == ServerAction.TemperatureLastChange) {
                             val success = state == DownloadState.Success
                             if (!success) {
                                 onTemperatureService!!.loadFinished(false, "Loading failed!")
@@ -188,19 +192,13 @@ class TemperatureService private constructor() : ITemperatureService {
                             } else {
                                 dbHandler?.setLastChangeDateTime(Calendar.getInstance())
                             }
-                            val action = ServerAction.TemperatureGet
-                            val actionValidationResult = validationService.mayPerform(action)
-                            if (!actionValidationResult.first) {
-                                onTemperatureService!!.loadFinished(false, validationResult.second)
-                                return
-                            }
 
                             downloadAdapter?.send(
-                                    action.command,
-                                    action,
+                                    ServerAction.TemperatureGet.command,
+                                    ServerAction.TemperatureGet,
                                     object : OnDownloadAdapter {
                                         override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                            if (serverAction == action) {
+                                            if (serverAction == ServerAction.TemperatureGet) {
                                                 val successGet = state == DownloadState.Success
                                                 if (!successGet) {
                                                     onTemperatureService!!.loadFinished(false, "Loading failed!")

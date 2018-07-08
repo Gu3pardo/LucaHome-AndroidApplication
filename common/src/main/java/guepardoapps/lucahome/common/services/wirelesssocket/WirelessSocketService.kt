@@ -16,7 +16,6 @@ import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
-import guepardoapps.lucahome.common.services.validation.ValidationService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.wirelesssocket.WirelessSocketWorker
 import java.util.*
@@ -30,7 +29,6 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
 
     private var converter: JsonDataToWirelessSocketConverter = JsonDataToWirelessSocketConverter()
     private var lastChangeConverter: JsonDataToLastChangeConverter = JsonDataToLastChangeConverter()
-    private var validationService: ValidationService = ValidationService()
 
     private var dbHandler: DbWirelessSocket? = null
     private var downloadAdapter: DownloadAdapter? = null
@@ -110,6 +108,9 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     override fun dispose() {
         WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
         this.dbHandler?.close()
+
+        this.context = null
+        this.dbHandler = null
     }
 
     override fun get(): MutableList<WirelessSocket> {
@@ -141,6 +142,11 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun search(searchValue: String): MutableList<WirelessSocket> {
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
+            return ArrayList()
+        }
+
         val list = this.get()
         val searchResultList = ArrayList<WirelessSocket>()
 
@@ -154,21 +160,23 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun setState(entry: WirelessSocket, newState: Boolean) {
-        val action = ServerAction.WirelessSocketSet
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onWirelessSocketService!!.setFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         entry.state = newState
         this.downloadAdapter?.send(
                 entry.commandSetState,
-                action,
+                ServerAction.WirelessSocketSet,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.WirelessSocketSet) {
                             onWirelessSocketService!!.setFinished(state == DownloadState.Success, message)
+
+                            entry.changeCount++
+                            dbHandler?.update(entry)
+                            showNotification()
                         }
                     }
                 }
@@ -176,20 +184,21 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun deactivateAll() {
-        val action = ServerAction.WirelessSocketDeactivateAll
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onWirelessSocketService!!.setFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
-                action.command,
-                action,
+                ServerAction.WirelessSocketDeactivateAll.command,
+                ServerAction.WirelessSocketDeactivateAll,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.WirelessSocketDeactivateAll) {
                             onWirelessSocketService!!.setFinished(state == DownloadState.Success, message)
+
+                            get().forEach { value -> value.changeCount++; dbHandler?.update(value) }
+                            showNotification()
                         }
                     }
                 }
@@ -197,10 +206,8 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun load() {
-        val actionLastChange = ServerAction.WirelessSocketLastChange
-        val validationResult = this.validationService.mayPerform(actionLastChange)
-        if (!validationResult.first) {
-            onWirelessSocketService!!.loadFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
@@ -218,11 +225,11 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
         }
 
         this.downloadAdapter?.send(
-                actionLastChange.command,
-                actionLastChange,
+                ServerAction.WirelessSocketLastChange.command,
+                ServerAction.WirelessSocketLastChange,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == actionLastChange) {
+                        if (serverAction == ServerAction.WirelessSocketLastChange) {
                             val success = state == DownloadState.Success
                             if (!success) {
                                 onWirelessSocketService!!.loadFinished(false, "Loading failed!")
@@ -244,19 +251,12 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
                                 dbHandler?.setLastChangeDateTime(Calendar.getInstance())
                             }
 
-                            val action = ServerAction.WirelessSocketGet
-                            val actionValidationResult = validationService.mayPerform(action)
-                            if (!actionValidationResult.first) {
-                                onWirelessSocketService!!.loadFinished(false, actionValidationResult.second)
-                                return
-                            }
-
                             downloadAdapter?.send(
-                                    action.command,
-                                    action,
+                                    ServerAction.WirelessSocketGet.command,
+                                    ServerAction.WirelessSocketGet,
                                     object : OnDownloadAdapter {
                                         override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                            if (serverAction == action) {
+                                            if (serverAction == ServerAction.WirelessSocketGet) {
                                                 val successGet = state == DownloadState.Success
                                                 if (!successGet) {
                                                     onWirelessSocketService!!.loadFinished(false, "Loading failed!")
@@ -296,19 +296,17 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun add(entry: WirelessSocket, reload: Boolean) {
-        val action = ServerAction.WirelessSocketAdd
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onWirelessSocketService!!.addFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandAdd,
-                action,
+                ServerAction.WirelessSocketAdd,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.WirelessSocketAdd) {
                             val success = state == DownloadState.Success
 
                             if (success) {
@@ -330,19 +328,17 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun update(entry: WirelessSocket, reload: Boolean) {
-        val action = ServerAction.WirelessSocketUpdate
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onWirelessSocketService!!.updateFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandUpdate,
-                action,
+                ServerAction.WirelessSocketUpdate,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.WirelessSocketUpdate) {
                             val success = state == DownloadState.Success
 
                             if (success) {
@@ -364,19 +360,17 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun delete(entry: WirelessSocket, reload: Boolean) {
-        val action = ServerAction.WirelessSocketDelete
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onWirelessSocketService!!.deleteFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandDelete,
-                action,
+                ServerAction.WirelessSocketDelete,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.WirelessSocketDelete) {
                             val success = state == DownloadState.Success
 
                             if (success) {

@@ -15,7 +15,6 @@ import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.room.Room
-import guepardoapps.lucahome.common.services.validation.ValidationService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.room.RoomWorker
 import java.util.*
@@ -27,7 +26,6 @@ class RoomService private constructor() : IRoomService {
 
     private var converter: JsonDataToRoomConverter = JsonDataToRoomConverter()
     private var lastChangeConverter: JsonDataToLastChangeConverter = JsonDataToLastChangeConverter()
-    private var validationService: ValidationService = ValidationService()
 
     private var dbHandler: DbRoom? = null
     private var downloadAdapter: DownloadAdapter? = null
@@ -92,6 +90,9 @@ class RoomService private constructor() : IRoomService {
     override fun dispose() {
         WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
         this.dbHandler?.close()
+
+        this.context = null
+        this.dbHandler = null
     }
 
     override fun get(): MutableList<Room> {
@@ -123,6 +124,11 @@ class RoomService private constructor() : IRoomService {
     }
 
     override fun search(searchValue: String): MutableList<Room> {
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
+            return ArrayList()
+        }
+
         val list = this.get()
         val searchResultList = ArrayList<Room>()
 
@@ -136,10 +142,8 @@ class RoomService private constructor() : IRoomService {
     }
 
     override fun load() {
-        val actionLastChange = ServerAction.RoomLastChange
-        val validationResult = this.validationService.mayPerform(actionLastChange)
-        if (!validationResult.first) {
-            onRoomService!!.loadFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
@@ -157,11 +161,11 @@ class RoomService private constructor() : IRoomService {
         }
 
         this.downloadAdapter?.send(
-                actionLastChange.command,
-                actionLastChange,
+                ServerAction.RoomLastChange.command,
+                ServerAction.RoomLastChange,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == actionLastChange) {
+                        if (serverAction == ServerAction.RoomLastChange) {
                             val success = state == DownloadState.Success
                             if (!success) {
                                 onRoomService!!.loadFinished(false, "Loading failed!")
@@ -182,19 +186,13 @@ class RoomService private constructor() : IRoomService {
                             } else {
                                 dbHandler?.setLastChangeDateTime(Calendar.getInstance())
                             }
-                            val action = ServerAction.RoomGet
-                            val actionValidationResult = validationService.mayPerform(action)
-                            if (!actionValidationResult.first) {
-                                onRoomService!!.loadFinished(false, validationResult.second)
-                                return
-                            }
 
                             downloadAdapter?.send(
-                                    action.command,
-                                    action,
+                                    ServerAction.RoomGet.command,
+                                    ServerAction.RoomGet,
                                     object : OnDownloadAdapter {
                                         override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                            if (serverAction == action) {
+                                            if (serverAction == ServerAction.RoomGet) {
                                                 val successGet = state == DownloadState.Success
                                                 if (!successGet) {
                                                     onRoomService!!.loadFinished(false, "Loading failed!")
@@ -233,19 +231,17 @@ class RoomService private constructor() : IRoomService {
     }
 
     override fun add(entry: Room, reload: Boolean) {
-        val action = ServerAction.RoomAdd
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onRoomService!!.addFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandAdd,
-                action,
+                ServerAction.RoomAdd,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.RoomAdd) {
                             val success = state == DownloadState.Success
 
                             if (success) {
@@ -266,19 +262,17 @@ class RoomService private constructor() : IRoomService {
     }
 
     override fun update(entry: Room, reload: Boolean) {
-        val action = ServerAction.RoomUpdate
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onRoomService!!.updateFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandUpdate,
-                action,
+                ServerAction.RoomUpdate,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.RoomUpdate) {
                             val success = state == DownloadState.Success
 
                             if (success) {
@@ -299,19 +293,17 @@ class RoomService private constructor() : IRoomService {
     }
 
     override fun delete(entry: Room, reload: Boolean) {
-        val action = ServerAction.RoomDelete
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onRoomService!!.deleteFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandDelete,
-                action,
+                ServerAction.RoomDelete,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.RoomDelete) {
                             val success = state == DownloadState.Success
 
                             if (success) {

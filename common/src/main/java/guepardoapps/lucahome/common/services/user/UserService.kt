@@ -51,6 +51,9 @@ class UserService private constructor() : IUserService {
 
     override fun dispose() {
         this.dbHandler?.close()
+
+        this.context = null
+        this.dbHandler = null
     }
 
     override fun validate(entry: User) {
@@ -115,6 +118,11 @@ class UserService private constructor() : IUserService {
     }
 
     override fun save(entry: User): Long {
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
+            return -1
+        }
+
         return try {
             this.dbHandler!!.add(entry)
         } catch (exception: Exception) {
@@ -124,6 +132,11 @@ class UserService private constructor() : IUserService {
     }
 
     override fun update(entry: User): Int {
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
+            return -1
+        }
+
         return try {
             this.dbHandler!!.update(entry)
         } catch (exception: Exception) {
@@ -133,6 +146,11 @@ class UserService private constructor() : IUserService {
     }
 
     override fun delete(entry: User): Int {
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
+            return -1
+        }
+
         return try {
             this.dbHandler!!.delete(entry)
         } catch (exception: Exception) {

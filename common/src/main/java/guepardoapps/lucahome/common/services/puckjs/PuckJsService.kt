@@ -15,7 +15,6 @@ import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.puckjs.PuckJs
-import guepardoapps.lucahome.common.services.validation.ValidationService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.puckjs.PuckJsWorker
 import java.util.*
@@ -27,7 +26,6 @@ class PuckJsService private constructor() : IPuckJsService {
 
     private var converter: JsonDataToPuckJsConverter = JsonDataToPuckJsConverter()
     private var lastChangeConverter: JsonDataToLastChangeConverter = JsonDataToLastChangeConverter()
-    private var validationService: ValidationService = ValidationService()
 
     private var dbHandler: DbPuckJs? = null
     private var downloadAdapter: DownloadAdapter? = null
@@ -92,6 +90,9 @@ class PuckJsService private constructor() : IPuckJsService {
     override fun dispose() {
         WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
         this.dbHandler?.close()
+
+        this.context = null
+        this.dbHandler = null
     }
 
     override fun get(): MutableList<PuckJs> {
@@ -123,6 +124,11 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun search(searchValue: String): MutableList<PuckJs> {
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
+            return ArrayList()
+        }
+
         val list = this.get()
         val searchResultList = ArrayList<PuckJs>()
 
@@ -136,10 +142,8 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun load() {
-        val actionLastChange = ServerAction.PuckJsLastChange
-        val validationResult = this.validationService.mayPerform(actionLastChange)
-        if (!validationResult.first) {
-            onPuckJsService!!.loadFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
@@ -157,11 +161,11 @@ class PuckJsService private constructor() : IPuckJsService {
         }
 
         this.downloadAdapter?.send(
-                actionLastChange.command,
-                actionLastChange,
+                ServerAction.PuckJsLastChange.command,
+                ServerAction.PuckJsLastChange,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == actionLastChange) {
+                        if (serverAction == ServerAction.PuckJsLastChange) {
                             val success = state == DownloadState.Success
                             if (!success) {
                                 onPuckJsService!!.loadFinished(false, "Loading failed!")
@@ -182,19 +186,13 @@ class PuckJsService private constructor() : IPuckJsService {
                             } else {
                                 dbHandler?.setLastChangeDateTime(Calendar.getInstance())
                             }
-                            val action = ServerAction.PuckJsGet
-                            val actionValidationResult = validationService.mayPerform(action)
-                            if (!actionValidationResult.first) {
-                                onPuckJsService!!.loadFinished(false, validationResult.second)
-                                return
-                            }
 
                             downloadAdapter?.send(
-                                    action.command,
-                                    action,
+                                    ServerAction.PuckJsGet.command,
+                                    ServerAction.PuckJsGet,
                                     object : OnDownloadAdapter {
                                         override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                            if (serverAction == action) {
+                                            if (serverAction == ServerAction.PuckJsGet) {
                                                 val successGet = state == DownloadState.Success
                                                 if (!successGet) {
                                                     onPuckJsService!!.loadFinished(false, "Loading failed!")
@@ -233,19 +231,17 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun add(entry: PuckJs, reload: Boolean) {
-        val action = ServerAction.PuckJsAdd
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onPuckJsService!!.addFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandAdd,
-                action,
+                ServerAction.PuckJsAdd,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.PuckJsAdd) {
                             val success = state == DownloadState.Success
 
                             if (success) {
@@ -266,19 +262,17 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun update(entry: PuckJs, reload: Boolean) {
-        val action = ServerAction.PuckJsUpdate
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onPuckJsService!!.updateFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandUpdate,
-                action,
+                ServerAction.PuckJsUpdate,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.PuckJsUpdate) {
                             val success = state == DownloadState.Success
 
                             if (success) {
@@ -299,19 +293,17 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun delete(entry: PuckJs, reload: Boolean) {
-        val action = ServerAction.PuckJsDelete
-        val validationResult = this.validationService.mayPerform(action)
-        if (!validationResult.first) {
-            onPuckJsService!!.deleteFinished(false, validationResult.second)
+        if (!this.initialized) {
+            Logger.instance.error(tag, "Service not initialized")
             return
         }
 
         this.downloadAdapter?.send(
                 entry.commandDelete,
-                action,
+                ServerAction.PuckJsDelete,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                        if (serverAction == action) {
+                        if (serverAction == ServerAction.PuckJsDelete) {
                             val success = state == DownloadState.Success
 
                             if (success) {
