@@ -173,7 +173,7 @@ class TemperatureService private constructor() : ITemperatureService {
                     return
                 }
 
-                val lastChange = ChangeService.instance.get("PuckJs")
+                val lastChange = ChangeService.instance.get("Temperature")
                 if (lastChange != null) {
                     val savedLastChange = dbHandler?.getLastChangeDateTime()
                     dbHandler?.setLastChangeDateTime(lastChange.time)

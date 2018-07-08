@@ -16,11 +16,14 @@ import kotlin.collections.ArrayList
 class ChangeService private constructor() : IChangeService {
     private val tag = ChangeService::class.java.simpleName
 
+    private val loadTimeoutMs: Int = 2 * 60 * 1000
+
     private var converter: JsonDataToChangeConverter = JsonDataToChangeConverter()
 
     private var downloadAdapter: DownloadAdapter? = null
 
     private var changeList: ArrayList<Change> = arrayListOf()
+    private var lastUpdate: Calendar = Calendar.getInstance()
 
     init {
     }
@@ -78,6 +81,11 @@ class ChangeService private constructor() : IChangeService {
     override fun load() {
         if (!this.initialized) {
             Logger.instance.error(tag, "Service not initialized")
+            return
+        }
+
+        if (changeList.isNotEmpty() && Calendar.getInstance().timeInMillis - lastUpdate.timeInMillis <= loadTimeoutMs) {
+            onChangeService!!.loadFinished(true, "")
             return
         }
 

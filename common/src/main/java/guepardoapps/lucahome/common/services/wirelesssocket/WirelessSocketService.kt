@@ -231,7 +231,7 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
                     return
                 }
 
-                val lastChange = ChangeService.instance.get("PuckJs")
+                val lastChange = ChangeService.instance.get("WirelessSocket")
                 if (lastChange != null) {
                     val savedLastChange = dbHandler?.getLastChangeDateTime()
                     dbHandler?.setLastChangeDateTime(lastChange.time)

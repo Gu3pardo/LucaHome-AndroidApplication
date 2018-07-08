@@ -167,7 +167,7 @@ class RoomService private constructor() : IRoomService {
                     return
                 }
 
-                val lastChange = ChangeService.instance.get("PuckJs")
+                val lastChange = ChangeService.instance.get("Room")
                 if (lastChange != null) {
                     val savedLastChange = dbHandler?.getLastChangeDateTime()
                     dbHandler?.setLastChangeDateTime(lastChange.time)

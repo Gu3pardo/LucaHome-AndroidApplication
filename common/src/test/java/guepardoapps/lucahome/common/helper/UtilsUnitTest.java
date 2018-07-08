@@ -1,4 +1,4 @@
-package guepardoapps.kucahome.common.helper;
+package guepardoapps.lucahome.common.helper;
 
 import org.junit.Test;
 
