@@ -13,16 +13,12 @@ class BixbyPair : Serializable {
 
     var actionId: Int = -1
     lateinit var action: BixbyAction
-    lateinit var requirementList: ArrayList<BixbyRequirement>
+    lateinit var requirementList: List<BixbyRequirement>
     lateinit var databaseAction: DatabaseAction
 
     override fun toString(): String {
         val requirementString = StringBuilder()
-
-        for (index in 0 until requirementList.size step 1) {
-            requirementString.append(requirementList[index].toString())
-        }
-
+        requirementList.forEach { x -> requirementString.append(x.toString()) }
         return "{" +
                 "\"Class\":\"$tag\"," +
                 "\"ActionId\":$actionId," +

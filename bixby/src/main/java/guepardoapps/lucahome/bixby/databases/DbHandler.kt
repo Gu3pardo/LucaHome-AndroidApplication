@@ -248,6 +248,61 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         return bixbyRequirementList
     }
 
+    fun loadRequirementList(actionId: Int): MutableList<BixbyRequirement> {
+        val database = this.readableDatabase
+
+        val projection = arrayOf(
+                DbRequirementsColumnId,
+                DbRequirementsColumnActionId,
+                DbRequirementsColumnRequirementType,
+                DbRequirementsColumnPuckJsPosition,
+                DbRequirementsColumnLightRequirement,
+                DbRequirementsColumnNetworkRequirement,
+                DbRequirementsColumnWirelessSocketRequirement
+        )
+
+        val sortOrder = "$DbRequirementsColumnId ASC"
+        val selection = "$DbRequirementsColumnActionId IS ?"
+        val selectionArgs = arrayOf(actionId.toString())
+
+        val cursor = database.query(
+                DatabaseTableRequirements, projection, selection, selectionArgs,
+                null, null, sortOrder)
+
+        val bixbyRequirementList = mutableListOf<BixbyRequirement>()
+        with(cursor) {
+            while (moveToNext()) {
+                val id: Int = getInt(getColumnIndexOrThrow(DbRequirementsColumnId))
+                val requirementType: RequirementType = RequirementType.values()[getInt(getColumnIndexOrThrow(DbRequirementsColumnRequirementType))]
+
+                val positionRequirement = PositionRequirement()
+                positionRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnPuckJsPosition)))
+
+                val lightRequirement = LightRequirement()
+                lightRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnLightRequirement)))
+
+                val networkRequirement = NetworkEntity()
+                networkRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnNetworkRequirement)))
+
+                val wirelessSocketRequirement = WirelessSocketEntity()
+                wirelessSocketRequirement.parseFromDb(getString(getColumnIndexOrThrow(DbRequirementsColumnWirelessSocketRequirement)))
+
+                val bixbyRequirement = BixbyRequirement()
+                bixbyRequirement.id = id
+                bixbyRequirement.actionId = actionId
+                bixbyRequirement.requirementType = requirementType
+                bixbyRequirement.positionRequirement = positionRequirement
+                bixbyRequirement.lightRequirement = lightRequirement
+                bixbyRequirement.networkRequirement = networkRequirement
+                bixbyRequirement.wirelessSocketRequirement = wirelessSocketRequirement
+
+                bixbyRequirementList.add(bixbyRequirement)
+            }
+        }
+
+        return bixbyRequirementList
+    }
+
     companion object {
         private const val DatabaseVersion = 1
         private const val DatabaseName = "guepardoapps-bixby.db"

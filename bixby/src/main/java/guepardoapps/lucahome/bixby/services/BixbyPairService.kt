@@ -19,11 +19,14 @@ import guepardoapps.lucahome.bixby.models.requirements.PositionRequirement
 import guepardoapps.lucahome.bixby.models.shared.NetworkEntity
 import guepardoapps.lucahome.bixby.models.shared.WirelessSocketEntity
 import guepardoapps.lucahome.common.controller.NetworkController
+import guepardoapps.lucahome.common.models.common.RxOptional
 import guepardoapps.lucahome.common.services.position.PositionService
 import guepardoapps.lucahome.common.services.puckjs.PuckJsService
 import guepardoapps.lucahome.common.services.wirelesssocket.WirelessSocketService
 import guepardoapps.lucahome.common.services.wirelessswitch.WirelessSwitchService
 import guepardoapps.lucahome.common.utils.Logger
+import io.reactivex.Observable
+import io.reactivex.subjects.PublishSubject
 import kotlin.collections.ArrayList
 
 class BixbyPairService {
@@ -31,10 +34,11 @@ class BixbyPairService {
 
     private lateinit var context: Context
     private lateinit var receiverActivity: Class<*>
-    private var onBixbyServiceListener: OnBixbyServiceListener? = null
 
     private lateinit var dbHandler: DbHandler
     private lateinit var networkController: NetworkController
+
+    val bixbyPairListPublishSubject = PublishSubject.create<RxOptional<ArrayList<BixbyPair>>>()!!
 
     init {
     }
@@ -48,78 +52,69 @@ class BixbyPairService {
         val instance: BixbyPairService by lazy { Holder.instance }
     }
 
-    fun initialize(context: Context,
-                   receiverActivity: Class<*>,
-                   onBixbyServiceListener: OnBixbyServiceListener?) {
+    fun initialize(context: Context, receiverActivity: Class<*>) {
         this.context = context
         this.networkController = NetworkController(context)
         this.receiverActivity = receiverActivity
-        this.onBixbyServiceListener = onBixbyServiceListener
-    }
-
-    fun dispose() {
-        Logger.instance.verbose(tag, "dispose")
+        this.bixbyPairListPublishSubject.onNext(RxOptional(createPairList()))
     }
 
     fun bixbyButtonPressed() {
         Logger.instance.verbose(tag, "bixbyButtonPressed")
 
-        for (bixbyPair in createPairList()) {
-            val bixbyAction = bixbyPair.action
-            val requirementList = bixbyPair.requirementList
-
-            if (validateRequirements(requirementList)) {
-                Logger.instance.info(tag, "All requirements true! Running callback!")
+        this.createPairList().forEach { x ->
+            if (this.validateRequirements(x.requirementList)) {
                 try {
-                    performAction(bixbyAction)
+                    this.performAction(x.action)
                 } catch (exception: Exception) {
                     Logger.instance.error(tag, exception.toString())
                 }
-
             }
         }
     }
 
-    fun getActionList(): ArrayList<BixbyPair> {
-        return createPairList()
-    }
-
-    fun addEntry(entry: BixbyPair) {
-        try {
-            dbHandler.add(entry.action)
-            for (requirement in entry.requirementList) {
-                dbHandler.add(requirement)
+    fun addEntry(entry: BixbyPair): Observable<Pair<Boolean, String>> {
+        return Observable.create<Pair<Boolean, String>> { emitter ->
+            try {
+                this.dbHandler.add(entry.action)
+                entry.requirementList.forEach { x -> this.dbHandler.add(x) }
+                emitter.onNext(Pair(true, ""))
+            } catch (exception: Exception) {
+                Logger.instance.error(tag, exception)
+                emitter.onNext(Pair(false, exception.message!!))
             }
-            onBixbyServiceListener!!.onAddFinished(true)
-        } catch (exception: Exception) {
-            Logger.instance.error(tag, exception)
-            onBixbyServiceListener!!.onAddFinished(false, exception.message)
+            this.bixbyPairListPublishSubject.onNext(RxOptional(createPairList()))
+            emitter.onComplete()
         }
     }
 
-    fun updateEntry(entry: BixbyPair) {
-        try {
-            dbHandler.update(entry.action)
-            for (requirement in entry.requirementList) {
-                dbHandler.update(requirement)
+    fun updateEntry(entry: BixbyPair): Observable<Pair<Boolean, String>> {
+        return Observable.create<Pair<Boolean, String>> { emitter ->
+            try {
+                this.dbHandler.update(entry.action)
+                entry.requirementList.forEach { x -> this.dbHandler.update(x) }
+                emitter.onNext(Pair(true, ""))
+            } catch (exception: Exception) {
+                Logger.instance.error(tag, exception)
+                emitter.onNext(Pair(false, exception.message!!))
             }
-            onBixbyServiceListener!!.onUpdateFinished(true, entry)
-        } catch (exception: Exception) {
-            Logger.instance.error(tag, exception)
-            onBixbyServiceListener!!.onUpdateFinished(false, entry, exception.message)
+            this.bixbyPairListPublishSubject.onNext(RxOptional(createPairList()))
+            emitter.onComplete()
         }
     }
 
-    fun deleteEntry(entry: BixbyPair) {
-        try {
-            dbHandler.delete(entry.action)
-            for (requirement in entry.requirementList) {
-                dbHandler.delete(requirement)
+    fun deleteEntry(entry: BixbyPair): Observable<Pair<Boolean, String>> {
+        return Observable.create<Pair<Boolean, String>> { emitter ->
+            try {
+                this.dbHandler.delete(entry.action)
+                entry.requirementList.forEach { x -> this.dbHandler.delete(x) }
+                emitter.onNext(Pair(true, ""))
+            } catch (exception: Exception) {
+                Logger.instance.error(tag, exception)
+                emitter.onNext(Pair(false, exception.message!!))
             }
-            onBixbyServiceListener!!.onDeleteFinished(true, entry)
-        } catch (exception: Exception) {
-            Logger.instance.error(tag, exception)
-            onBixbyServiceListener!!.onDeleteFinished(false, entry, exception.message)
+            this.bixbyPairListPublishSubject.onNext(RxOptional(createPairList()))
+            emitter.onComplete()
         }
     }
 
@@ -127,25 +122,12 @@ class BixbyPairService {
         val pairList = ArrayList<BixbyPair>()
 
         try {
-            val actionList = dbHandler.loadActionList()
-            val requirementList = dbHandler.loadRequirementList()
-
-            for (actionIndex in actionList.indices) {
-                val bixbyAction = actionList[actionIndex]
-                val actionId = bixbyAction.actionId
-                val pairRequirementList = ArrayList<BixbyRequirement>()
-
-                for (requirementIndex in requirementList.indices) {
-                    val bixbyRequirement = requirementList[requirementIndex]
-                    if (bixbyRequirement.actionId == actionId) {
-                        pairRequirementList.add(bixbyRequirement)
-                    }
-                }
-
+            this.dbHandler.loadActionList().forEach { x ->
                 val bixbyPair = BixbyPair()
-                bixbyPair.actionId = actionId
-                bixbyPair.action = bixbyAction
-                bixbyPair.requirementList = pairRequirementList
+
+                bixbyPair.actionId = x.actionId
+                bixbyPair.action = x
+                bixbyPair.requirementList = this.dbHandler.loadRequirementList(x.actionId)
                 bixbyPair.databaseAction = DatabaseAction.Null
 
                 pairList.add(bixbyPair)
@@ -154,37 +136,30 @@ class BixbyPairService {
             Logger.instance.error(tag, exception)
         }
 
-        onBixbyServiceListener!!.onLoad(pairList)
-
         return pairList
     }
 
-    private fun validateRequirements(requirementList: java.util.ArrayList<BixbyRequirement>): Boolean {
-        var allRequirementsTrue = true
-
-        for (requirementIndex in requirementList.indices) {
-            val bixbyRequirement = requirementList[requirementIndex]
-            when (bixbyRequirement.requirementType) {
+    private fun validateRequirements(requirementList: List<BixbyRequirement>): Boolean {
+        return requirementList.all { x ->
+            when (x.requirementType) {
                 RequirementType.Light -> {
-                    allRequirementsTrue = allRequirementsTrue and validateLightRequirement(bixbyRequirement.lightRequirement)
+                    return this.validateLightRequirement(x.lightRequirement)
                 }
                 RequirementType.Position -> {
-                    allRequirementsTrue = allRequirementsTrue and validatePositionRequirement(bixbyRequirement.positionRequirement)
+                    return this.validatePositionRequirement(x.positionRequirement)
                 }
                 RequirementType.Network -> {
-                    allRequirementsTrue = allRequirementsTrue and validateNetworkRequirement(bixbyRequirement.networkRequirement)
+                    return this.validateNetworkRequirement(x.networkRequirement)
                 }
                 RequirementType.WirelessSocket -> {
-                    allRequirementsTrue = allRequirementsTrue and validateWirelessSocketRequirement(bixbyRequirement.wirelessSocketRequirement)
+                    return this.validateWirelessSocketRequirement(x.wirelessSocketRequirement)
                 }
                 RequirementType.Null -> {
                     Logger.instance.error(tag, "Invalid BixbyRequirement!")
-                    allRequirementsTrue = false
+                    return false
                 }
             }
         }
-
-        return allRequirementsTrue
     }
 
     private fun validatePositionRequirement(positionRequirement: PositionRequirement): Boolean {
@@ -235,19 +210,19 @@ class BixbyPairService {
         when (bixbyAction.actionType) {
             ActionType.Application -> {
                 val applicationAction = bixbyAction.applicationAction
-                performApplicationAction(applicationAction)
+                this.performApplicationAction(applicationAction)
             }
             ActionType.Network -> {
                 val networkAction = bixbyAction.networkAction
-                performNetworkAction(networkAction)
+                this.performNetworkAction(networkAction)
             }
             ActionType.WirelessSocket -> {
                 val wirelessSocketAction = bixbyAction.wirelessSocketAction
-                performWirelessSocketAction(wirelessSocketAction)
+                this.performWirelessSocketAction(wirelessSocketAction)
             }
             ActionType.WirelessSwitch -> {
                 val wirelessSwitchAction = bixbyAction.wirelessSwitchAction
-                performWirelessSwitchAction(wirelessSwitchAction)
+                this.performWirelessSwitchAction(wirelessSwitchAction)
             }
             ActionType.Null -> Logger.instance.error(tag, "Invalid ActionType!")
         }
@@ -258,13 +233,13 @@ class BixbyPairService {
         Logger.instance.debug(tag, String.format("performApplicationAction for $applicationAction"))
 
         val packageName = applicationAction.packageName
-        val packageManager = context.packageManager
+        val packageManager = this.context.packageManager
 
         val startApplicationIntent = packageManager.getLaunchIntentForPackage(packageName)
                 ?: throw NullPointerException("Created startApplicationContent for $packageName is null")
 
         startApplicationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
-        context.startActivity(startApplicationIntent)
+        this.context.startActivity(startApplicationIntent)
     }
 
     private fun performNetworkAction(networkAction: NetworkEntity) {
@@ -273,13 +248,13 @@ class BixbyPairService {
         val networkType = networkAction.networkType
         when (networkType) {
             NetworkType.Mobile -> when (networkAction.stateType) {
-                StateType.On -> networkController.setMobileDataState(true)
-                StateType.Off -> networkController.setMobileDataState(false)
+                StateType.On -> this.networkController.setMobileDataState(true)
+                StateType.Off -> this.networkController.setMobileDataState(false)
                 StateType.Null -> Logger.instance.error(tag, "Invalid StateType!")
             }
             NetworkType.Wifi -> when (networkAction.stateType) {
-                StateType.On -> networkController.setWifiState(true)
-                StateType.Off -> networkController.setWifiState(false)
+                StateType.On -> this.networkController.setWifiState(true)
+                StateType.Off -> this.networkController.setWifiState(false)
                 StateType.Null -> Logger.instance.error(tag, "Invalid StateType!")
             }
             NetworkType.Null -> Logger.instance.error(tag, "Invalid NetworkType!")
