@@ -16,7 +16,6 @@ import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
 import guepardoapps.lucahome.common.services.change.ChangeService
-import guepardoapps.lucahome.common.services.change.OnChangeService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.wirelesssocket.WirelessSocketWorker
 import java.util.*
@@ -224,7 +223,7 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
             }
         }
 
-        ChangeService.instance.onChangeService = object : OnChangeService {
+        ChangeService.instance.onChangeService = object {
             override fun loadFinished(success: Boolean, message: String) {
                 if (!success) {
                     onWirelessSocketService!!.loadFinished(false, "Loading for last change failed!")

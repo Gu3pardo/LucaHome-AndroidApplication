@@ -8,8 +8,10 @@ import guepardoapps.lucahome.common.converter.change.JsonDataToChangeConverter
 import guepardoapps.lucahome.common.enums.common.DownloadState
 import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.models.change.Change
+import guepardoapps.lucahome.common.models.common.RxOptional
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.utils.Logger
+import io.reactivex.subjects.PublishSubject
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -40,7 +42,8 @@ class ChangeService private constructor() : IChangeService {
     override var initialized: Boolean = false
         get() = this.context != null
     override var context: Context? = null
-    override var onChangeService: OnChangeService? = null
+
+    override val changePublishSubject: PublishSubject<RxOptional<List<Change>>> = PublishSubject.create<RxOptional<List<Change>>>()!!
 
     @Deprecated("Do not use serviceSettings in ChangeService")
     override var serviceSettings: ServiceSettings = ServiceSettings(-1, false, 0, false)
@@ -85,7 +88,7 @@ class ChangeService private constructor() : IChangeService {
         }
 
         if (changeList.isNotEmpty() && Calendar.getInstance().timeInMillis - lastUpdate.timeInMillis <= loadTimeoutMs) {
-            onChangeService!!.loadFinished(true, "")
+            changePublishSubject.onNext(RxOptional(changeList))
             return
         }
 
@@ -97,7 +100,7 @@ class ChangeService private constructor() : IChangeService {
                         if (serverAction == ServerAction.ChangeGet) {
                             val successGet = state == DownloadState.Success
                             if (!successGet) {
-                                onChangeService!!.loadFinished(false, "Loading failed!")
+                                changePublishSubject.onNext(RxOptional(changeList))
                                 return
                             }
 
@@ -105,7 +108,7 @@ class ChangeService private constructor() : IChangeService {
                             if (!loadedList.isEmpty()) {
                                 changeList = loadedList
                             }
-                            onChangeService!!.loadFinished(true, "")
+                            changePublishSubject.onNext(RxOptional(changeList))
                         }
                     }
                 }

@@ -12,9 +12,7 @@ class ReceiverController(private val context: Context) : IReceiverController {
 
     override fun registerReceiver(registerReceiver: BroadcastReceiver, actions: Array<String>) {
         val intentFilter = IntentFilter()
-        for (action in actions) {
-            intentFilter.addAction(action)
-        }
+        actions.forEach { action -> intentFilter.addAction(action) }
 
         unregisterReceiver(registerReceiver)
 
@@ -23,16 +21,12 @@ class ReceiverController(private val context: Context) : IReceiverController {
     }
 
     override fun unregisterReceiver(unregisterReceiver: BroadcastReceiver) {
-        for (receiver in registeredReceiver) {
-            if (receiver == unregisterReceiver) {
-                try {
-                    context.unregisterReceiver(receiver)
-                    registeredReceiver.remove(receiver)
-                } catch (exception: Exception) {
-                    Logger.instance.error(tag, exception)
-                }
-                break
-            }
+        try {
+            registeredReceiver
+                    .remove(registeredReceiver
+                            .find { x -> x == registeredReceiver })
+        } catch (exception: Exception) {
+            Logger.instance.error(tag, exception)
         }
     }
 

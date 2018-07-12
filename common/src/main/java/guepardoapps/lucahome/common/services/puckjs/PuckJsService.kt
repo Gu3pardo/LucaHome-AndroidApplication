@@ -15,7 +15,6 @@ import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.puckjs.PuckJs
 import guepardoapps.lucahome.common.services.change.ChangeService
-import guepardoapps.lucahome.common.services.change.OnChangeService
 import guepardoapps.lucahome.common.utils.Logger
 import guepardoapps.lucahome.common.worker.puckjs.PuckJsWorker
 import java.util.*
@@ -160,7 +159,7 @@ class PuckJsService private constructor() : IPuckJsService {
             }
         }
 
-        ChangeService.instance.onChangeService = object : OnChangeService {
+        ChangeService.instance.onChangeService = object {
             override fun loadFinished(success: Boolean, message: String) {
                 if (!success) {
                     onPuckJsService!!.loadFinished(false, "Loading for last change failed!")

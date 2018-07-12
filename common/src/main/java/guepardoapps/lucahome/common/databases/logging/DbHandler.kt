@@ -44,9 +44,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         }
 
         val database = this.writableDatabase
-        val newRowId = database.insert(DatabaseTable, null, values)
-
-        return newRowId
+        return database.insert(DatabaseTable, null, values)
     }
 
     fun updateLog(dbLog: DbLog): Int {
@@ -61,9 +59,7 @@ class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
         val selectionArgs = arrayOf(dbLog.id.toString())
 
         val database = this.writableDatabase
-        val count = database.update(DatabaseTable, values, selection, selectionArgs)
-
-        return count
+        return database.update(DatabaseTable, values, selection, selectionArgs)
     }
 
     fun deleteLogById(id: Int): Int {

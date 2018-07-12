@@ -4,72 +4,33 @@ import android.support.annotation.NonNull
 
 class StringHelper {
     companion object {
-        fun getStringCount(@NonNull stringToTest: String,
-                           @NonNull stringToFind: String): Int {
+        fun getStringCount(@NonNull test: String, @NonNull find: String): Int {
             var lastIndex = 0
             var count = 0
 
             while (lastIndex != -1) {
-                lastIndex = stringToTest.indexOf(stringToFind, lastIndex)
+                lastIndex = test.indexOf(find, lastIndex)
                 if (lastIndex != -1) {
                     count++
-                    lastIndex += stringToFind.length
+                    lastIndex += find.length
                 }
             }
 
             return count
         }
 
-        fun getCharPositions(@NonNull stringToTest: String,
-                             charToFind: Char): IntArray {
-            val count = getStringCount(stringToTest, charToFind.toString())
-            if (count <= 1) {
-                return IntArray(0)
-            }
-
-            val positions = IntArray(count)
-            var foundIndex = 0
-
-            for (index in 0 until stringToTest.length step 1) {
-                val charAtIndex = stringToTest[index]
-                if (charAtIndex == charToFind) {
-                    positions[foundIndex] = index
-                    foundIndex++
-                }
-            }
-
-            return positions
+        fun getCharPositions(@NonNull test: String, char: Char): List<Int> {
+            return test
+                    .mapIndexed { index, c -> if (c == char) index else -1 }
+                    .filter { x -> x != -1 }
         }
 
-        fun stringsAreEqual(@NonNull stringArray: Array<String>): Boolean {
-            val stringCount = stringArray.size
-
-            for (index in 0 until stringCount step 1) {
-                for (testIndex in 0 until stringCount step 1) {
-                    if (stringArray[index] != stringArray[testIndex]) {
-                        return false
-                    }
-                }
-            }
-
-            return true
+        fun stringsAreEqual(@NonNull array: Array<String>): Boolean {
+            return array.all { x -> array.all { y -> x == y } }
         }
 
-        fun excludeAndSelectString(@NonNull stringArray: Array<String>,
-                                   @NonNull stringToExclude: String,
-                                   @NonNull stringToFind: String): String {
-            val stringCount = stringArray.size
-
-            for (index in 0 until stringCount step 1) {
-                val stringToCheck = stringArray[index]
-
-                if (!stringToCheck.contains(stringToExclude)
-                        && stringToCheck.contains(stringToFind)) {
-                    return stringToCheck
-                }
-            }
-
-            return ""
+        fun excludeAndSelectString(@NonNull array: Array<String>, @NonNull exclude: String, @NonNull find: String): String? {
+            return array.find { x -> !x.contains(exclude) && x.contains(find) }
         }
     }
 }
