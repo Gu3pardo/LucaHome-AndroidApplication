@@ -31,6 +31,7 @@ import guepardoapps.lucahome.voicerecognition.enums.InitializeResult
 import guepardoapps.lucahome.voicerecognition.enums.MediaState
 import guepardoapps.lucahome.voicerecognition.models.RelationAction
 import guepardoapps.lucahome.voicerecognition.helper.*
+import io.reactivex.schedulers.Schedulers
 import java.io.File
 import java.io.IOException
 import java.lang.Exception
@@ -282,13 +283,13 @@ class VoiceRecognitionService private constructor() : RecognitionListener, Activ
             }
 
             Action.WeatherCurrent -> {
-                val currentWeather = OpenWeatherService.instance.currentWeather
-                this.ttsController?.speak(createTtsSpeak(currentWeather))
+                // val currentWeather = OpenWeatherService.instance.
+                // this.ttsController?.speak(createTtsSpeak(currentWeather))
             }
 
             Action.WeatherForecast -> {
-                val forecastWeather = OpenWeatherService.instance.forecastWeather
-                this.ttsController?.speak(createTtsSpeak(forecastWeather))
+                // val forecastWeather = OpenWeatherService.instance.forecastWeather
+                // this.ttsController?.speak(createTtsSpeak(forecastWeather))
             }
 
             Action.GetLight -> {

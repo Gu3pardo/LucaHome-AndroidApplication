@@ -1,6 +1,8 @@
 package guepardoapps.lucahome.common.converter.wirelessswitch
 
 import guepardoapps.lucahome.common.annotations.JsonKey
+import guepardoapps.lucahome.common.extensions.wirelessswitch.getJsonKey
+import guepardoapps.lucahome.common.extensions.wirelessswitch.getPropertyJsonKey
 import guepardoapps.lucahome.common.models.wirelessswitch.WirelessSwitch
 import guepardoapps.lucahome.common.utils.Logger
 import org.json.JSONArray

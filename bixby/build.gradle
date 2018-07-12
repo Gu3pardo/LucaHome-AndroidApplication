@@ -58,6 +58,7 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+    implementation "com.github.florent37:expansionpanel:$expansion_panel_version"
     implementation "com.github.GrenderG:Toasty:$toasty_version"
     implementation "com.github.matecode:Snacky:$snacky_version"
     implementation "com.github.rey5137:material:$rey_material_version"
