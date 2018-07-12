@@ -11,7 +11,9 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import edu.cmu.pocketsphinx.*
+import guepardoapps.lib.openweather.enums.WeatherCondition
 import guepardoapps.lib.openweather.extensions.*
+import guepardoapps.lib.openweather.models.RxOptional
 import guepardoapps.lib.openweather.models.WeatherCurrent
 import guepardoapps.lib.openweather.models.WeatherForecast
 import guepardoapps.lib.openweather.services.openweather.OpenWeatherService
@@ -40,9 +42,6 @@ import java.lang.ref.WeakReference
 class VoiceRecognitionService private constructor() : RecognitionListener, ActivityCompat.OnRequestPermissionsResultCallback, IVoiceRecognitionService {
     private val tag: String = VoiceRecognitionService::class.java.simpleName
 
-    val broadcastAudioMedia = "gueopardoapps.lucahome.voicerecognition.services.broadcast.audio_media"
-    val bundleAudioMedia = "bundleAudioMedia"
-
     private val permissionRequestRecordAudio = 345243854
 
     private val kwsSearch = "wakeup"
@@ -67,6 +66,9 @@ class VoiceRecognitionService private constructor() : RecognitionListener, Activ
 
     companion object {
         val instance: VoiceRecognitionService by lazy { Holder.instance }
+
+        const val broadcastAudioMedia = "gueopardoapps.lucahome.voicerecognition.services.broadcast.audio_media"
+        const val bundleAudioMedia = "bundleAudioMedia"
     }
 
     override fun initialize(context: Context, onVoiceRecognitionService: OnVoiceRecognitionService): InitializeResult {
@@ -283,13 +285,53 @@ class VoiceRecognitionService private constructor() : RecognitionListener, Activ
             }
 
             Action.WeatherCurrent -> {
-                // val currentWeather = OpenWeatherService.instance.
-                // this.ttsController?.speak(createTtsSpeak(currentWeather))
+                OpenWeatherService.instance.weatherCurrentPublishSubject
+                        .subscribeOn(Schedulers.io())
+                        .first(RxOptional(WeatherCurrent()))
+                        .subscribe(
+                                { response ->
+                                    Logger.instance.verbose(tag, "Received weather current in subscribe!")
+
+                                    if (response != null) {
+                                        val value = response.value as WeatherCurrent
+                                        if (value.weatherCondition != WeatherCondition.Null) {
+                                            this.ttsController?.speak(createTtsSpeak(value))
+                                        } else {
+                                            this.ttsController?.speak("Sorry, no current weather data")
+                                        }
+                                    } else {
+                                        this.ttsController?.speak("Sorry, no current weather data")
+                                    }
+                                },
+                                { responseError ->
+                                    Logger.instance.error(tag, responseError)
+                                    this.ttsController?.speak("Sorry, no current weather data")
+                                })
             }
 
             Action.WeatherForecast -> {
-                // val forecastWeather = OpenWeatherService.instance.forecastWeather
-                // this.ttsController?.speak(createTtsSpeak(forecastWeather))
+                OpenWeatherService.instance.weatherForecastPublishSubject
+                        .subscribeOn(Schedulers.io())
+                        .first(RxOptional(WeatherForecast()))
+                        .subscribe(
+                                { response ->
+                                    Logger.instance.verbose(tag, "Received weather forecast in subscribe!")
+
+                                    if (response != null) {
+                                        val value = response.value as WeatherForecast
+                                        if (value.list.isNotEmpty()) {
+                                            this.ttsController?.speak(createTtsSpeak(value))
+                                        } else {
+                                            this.ttsController?.speak("Sorry, no forecast weather data")
+                                        }
+                                    } else {
+                                        this.ttsController?.speak("Sorry, no forecast weather data")
+                                    }
+                                },
+                                { responseError ->
+                                    Logger.instance.error(tag, responseError)
+                                    this.ttsController?.speak("Sorry, no forecast weather data")
+                                })
             }
 
             Action.GetLight -> {
