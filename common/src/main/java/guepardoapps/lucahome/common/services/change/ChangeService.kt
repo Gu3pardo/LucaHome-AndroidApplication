@@ -4,11 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
+import guepardoapps.lucahome.common.constants.Labels
 import guepardoapps.lucahome.common.converter.change.JsonDataToChangeConverter
 import guepardoapps.lucahome.common.enums.common.DownloadState
 import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.models.change.Change
-import guepardoapps.lucahome.common.models.common.RxOptional
+import guepardoapps.lucahome.common.models.common.RxResponse
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.utils.Logger
 import io.reactivex.subjects.PublishSubject
@@ -40,10 +41,10 @@ class ChangeService private constructor() : IChangeService {
     }
 
     override var initialized: Boolean = false
-        get() = this.context != null
+        get() = context != null
     override var context: Context? = null
 
-    override val changePublishSubject: PublishSubject<RxOptional<List<Change>>> = PublishSubject.create<RxOptional<List<Change>>>()!!
+    override val responsePublishSubject: PublishSubject<RxResponse> = PublishSubject.create<RxResponse>()!!
 
     @Deprecated("Do not use serviceSettings in ChangeService")
     override var serviceSettings: ServiceSettings = ServiceSettings(-1, false, 0, false)
@@ -51,21 +52,20 @@ class ChangeService private constructor() : IChangeService {
     override var receiverActivity: Class<*>? = null
 
     override fun initialize(context: Context) {
-        if (this.initialized) {
+        if (initialized) {
             return
         }
 
         this.context = context
-        this.downloadAdapter = DownloadAdapter(this.context!!)
+        downloadAdapter = DownloadAdapter(this.context!!)
     }
 
     override fun dispose() {
-        this.context = null
+        context = null
     }
 
-    @Throws(NotImplementedError::class)
     override fun get(): MutableList<Change> {
-        throw NotImplementedError("Get for change not available")
+        return changeList
     }
 
     override fun get(type: String): Change? {
@@ -82,17 +82,18 @@ class ChangeService private constructor() : IChangeService {
     }
 
     override fun load() {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.ChangeGet))
             return
         }
 
         if (changeList.isNotEmpty() && Calendar.getInstance().timeInMillis - lastUpdate.timeInMillis <= loadTimeoutMs) {
-            changePublishSubject.onNext(RxOptional(changeList))
+            responsePublishSubject.onNext(RxResponse(true, Labels.Services.nothingNewOnServer, ServerAction.ChangeGet))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 ServerAction.ChangeGet.command,
                 ServerAction.ChangeGet,
                 object : OnDownloadAdapter {
@@ -100,7 +101,7 @@ class ChangeService private constructor() : IChangeService {
                         if (serverAction == ServerAction.ChangeGet) {
                             val successGet = state == DownloadState.Success
                             if (!successGet) {
-                                changePublishSubject.onNext(RxOptional(changeList))
+                                responsePublishSubject.onNext(RxResponse(false, message, ServerAction.ChangeGet))
                                 return
                             }
 
@@ -108,7 +109,7 @@ class ChangeService private constructor() : IChangeService {
                             if (!loadedList.isEmpty()) {
                                 changeList = loadedList
                             }
-                            changePublishSubject.onNext(RxOptional(changeList))
+                            responsePublishSubject.onNext(RxResponse(true, message, ServerAction.ChangeGet))
                         }
                     }
                 }

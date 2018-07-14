@@ -5,23 +5,23 @@ import guepardoapps.lucahome.common.annotations.NeededNetwork
 import guepardoapps.lucahome.common.annotations.NeededUserRole
 import guepardoapps.lucahome.common.models.room.Room
 
-fun Room.getJsonKey(): JsonKey {
+internal fun Room.getJsonKey(): JsonKey {
     return this::class.annotations.find { it is JsonKey } as JsonKey
 }
 
-fun Room.getPropertyJsonKey(propertyName: String): JsonKey {
+internal fun Room.getPropertyJsonKey(propertyName: String): JsonKey {
     return this::class.java.getDeclaredField(propertyName).declaredAnnotations.find { it is JsonKey } as JsonKey
 }
 
-fun Room.getNeededNetwork(): NeededNetwork {
+internal fun Room.getNeededNetwork(): NeededNetwork {
     return this::class.annotations.find { it is NeededNetwork } as NeededNetwork
 }
 
-fun Room.getPropertyNeededNetwork(propertyName: String): NeededNetwork {
+internal fun Room.getPropertyNeededNetwork(propertyName: String): NeededNetwork {
     return this::class.java.getDeclaredField(propertyName).annotations.find { it is NeededNetwork } as NeededNetwork
 }
 
-fun Room.getMethodNeededNetwork(methodName: String): NeededNetwork {
+internal fun Room.getMethodNeededNetwork(methodName: String): NeededNetwork {
     return this::class.java.getDeclaredMethod(methodName).annotations.find { it is NeededNetwork } as NeededNetwork
 }
 

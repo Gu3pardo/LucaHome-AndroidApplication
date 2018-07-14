@@ -11,7 +11,7 @@ import guepardoapps.lucahome.voicerecognition.models.RelationAction
 import java.util.*
 import kotlin.collections.ArrayList
 
-fun getRelationActionClass(result: String): RelationAction {
+internal fun getRelationActionClass(result: String): RelationAction {
     val resultParameter = Arrays.asList(*result.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
 
     when {
@@ -45,21 +45,21 @@ fun getRelationActionClass(result: String): RelationAction {
     return RelationAction(Action.Unknown, ArrayList())
 }
 
-fun getWirelessSocketByName(resultParameter: ArrayList<String>?, wirelessSocketList: MutableList<WirelessSocket>?): WirelessSocket? {
+internal fun getWirelessSocketByName(resultParameter: ArrayList<String>?, wirelessSocketList: MutableList<WirelessSocket>?): WirelessSocket? {
     if (resultParameter == null || resultParameter.size == 0 || wirelessSocketList == null || wirelessSocketList.size == 0) {
         return null
     }
     return wirelessSocketList.find { value -> resultParameter.contains(value.name) }
 }
 
-fun getWirelessSwitchByName(resultParameter: ArrayList<String>?, wirelessSwitchList: MutableList<WirelessSwitch>?): WirelessSwitch? {
+internal fun getWirelessSwitchByName(resultParameter: ArrayList<String>?, wirelessSwitchList: MutableList<WirelessSwitch>?): WirelessSwitch? {
     if (resultParameter == null || resultParameter.size == 0 || wirelessSwitchList == null || wirelessSwitchList.size == 0) {
         return null
     }
     return wirelessSwitchList.find { value -> resultParameter.contains(value.name) }
 }
 
-fun getTemperatureByArea(resultParameter: ArrayList<String>?, temperatureList: MutableList<Temperature>?): Temperature? {
+internal fun getTemperatureByArea(resultParameter: ArrayList<String>?, temperatureList: MutableList<Temperature>?): Temperature? {
     if (resultParameter == null || resultParameter.size == 0 || temperatureList == null || temperatureList.size == 0) {
         return null
     }
@@ -67,7 +67,7 @@ fun getTemperatureByArea(resultParameter: ArrayList<String>?, temperatureList: M
     return temperatureList.find { value -> roomNameList.contains(value.area) }
 }
 
-fun getPuckJsByArea(resultParameter: ArrayList<String>?, puckJsList: MutableList<PuckJs>?): PuckJs? {
+internal fun getPuckJsByArea(resultParameter: ArrayList<String>?, puckJsList: MutableList<PuckJs>?): PuckJs? {
     if (resultParameter == null || resultParameter.size == 0 || puckJsList == null || puckJsList.size == 0) {
         return null
     }

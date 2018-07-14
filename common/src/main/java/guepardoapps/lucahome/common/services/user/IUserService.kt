@@ -1,12 +1,15 @@
 package guepardoapps.lucahome.common.services.user
 
 import android.content.Context
+import guepardoapps.lucahome.common.models.common.RxResponse
 import guepardoapps.lucahome.common.models.user.User
+import io.reactivex.subjects.PublishSubject
 
 interface IUserService {
     var initialized: Boolean
     var context: Context?
-    var onUserService: OnUserService?
+
+    val responsePublishSubject: PublishSubject<RxResponse>
 
     fun initialize(context: Context)
     fun dispose()

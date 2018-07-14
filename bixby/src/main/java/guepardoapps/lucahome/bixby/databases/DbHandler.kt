@@ -19,7 +19,7 @@ import guepardoapps.lucahome.bixby.models.shared.WirelessSocketEntity
 // https://developer.android.com/training/data-storage/sqlite
 // https://www.techotopia.com/index.php/A_Kotlin_Android_SQLite_Database_Tutorial
 
-class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
+internal class DbHandler(context: Context, factory: SQLiteDatabase.CursorFactory?)
     : SQLiteOpenHelper(context, DatabaseName, factory, DatabaseVersion) {
 
     override fun onCreate(database: SQLiteDatabase) {

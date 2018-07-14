@@ -4,23 +4,22 @@ import android.annotation.SuppressLint
 import android.content.Context
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
+import guepardoapps.lucahome.common.constants.Labels
 import guepardoapps.lucahome.common.converter.user.JsonDataToUserConverter
 import guepardoapps.lucahome.common.databases.user.DbUser
 import guepardoapps.lucahome.common.enums.common.DownloadState
 import guepardoapps.lucahome.common.enums.common.ServerAction
+import guepardoapps.lucahome.common.models.common.RxResponse
 import guepardoapps.lucahome.common.models.user.User
 import guepardoapps.lucahome.common.utils.Logger
+import io.reactivex.subjects.PublishSubject
 
 class UserService private constructor() : IUserService {
-
     private val tag = UserService::class.java.simpleName
 
     private var converter: JsonDataToUserConverter = JsonDataToUserConverter()
     private var dbHandler: DbUser? = null
     private var downloadAdapter: DownloadAdapter? = null
-
-    init {
-    }
 
     private object Holder {
         @SuppressLint("StaticFieldLeak")
@@ -32,37 +31,38 @@ class UserService private constructor() : IUserService {
     }
 
     override var initialized: Boolean = false
-        get() = this.context != null && this.dbHandler != null
+        get() = context != null && dbHandler != null
     override var context: Context? = null
-    override var onUserService: OnUserService? = null
+
+    override val responsePublishSubject: PublishSubject<RxResponse> = PublishSubject.create<RxResponse>()!!
 
     override fun initialize(context: Context) {
-        if (this.initialized) {
+        if (initialized) {
             return
         }
 
         this.context = context
-        this.downloadAdapter = DownloadAdapter(this.context!!)
+        downloadAdapter = DownloadAdapter(this.context!!)
 
         if (dbHandler == null) {
-            dbHandler = DbUser(this.context!!, null)
+            dbHandler = DbUser(this.context!!)
         }
     }
 
     override fun dispose() {
-        this.dbHandler?.close()
-
-        this.context = null
-        this.dbHandler = null
+        dbHandler?.close()
+        context = null
+        dbHandler = null
     }
 
     override fun validate(entry: User) {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.UserValidate))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 ServerAction.UserValidate.command,
                 ServerAction.UserValidate,
                 object : OnDownloadAdapter {
@@ -70,32 +70,32 @@ class UserService private constructor() : IUserService {
                         if (serverAction == ServerAction.UserValidate) {
                             val success = state == DownloadState.Success
                             if (!success) {
-                                onUserService!!.validateFinished(false, message)
+                                responsePublishSubject.onNext(RxResponse(false, message, ServerAction.UserValidate))
                                 return
                             }
 
                             val user = converter.parse(message)
                             if (user == null) {
-                                onUserService!!.validateFinished(false, "Conversion failed")
+                                responsePublishSubject.onNext(RxResponse(false, Labels.Converter.conversionFailed, ServerAction.UserValidate))
                                 return
                             }
 
                             val savedUser = get()
                             if (savedUser == null) {
                                 save(user)
-                                onUserService!!.validateFinished(true, "")
+                                responsePublishSubject.onNext(RxResponse(true, message, ServerAction.UserValidate))
                                 return
                             }
 
                             if (savedUser.uuid == user.uuid) {
                                 update(user)
-                                onUserService!!.validateFinished(true, "")
+                                responsePublishSubject.onNext(RxResponse(true, message, ServerAction.UserValidate))
                                 return
                             }
 
                             delete(savedUser)
                             save(user)
-                            onUserService!!.validateFinished(true, "")
+                            responsePublishSubject.onNext(RxResponse(true, message, ServerAction.UserValidate))
                             return
                         }
                     }
@@ -104,13 +104,13 @@ class UserService private constructor() : IUserService {
     }
 
     override fun get(): User? {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return null
         }
 
         return try {
-            this.dbHandler!!.get()
+            dbHandler!!.get()
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             null
@@ -118,13 +118,13 @@ class UserService private constructor() : IUserService {
     }
 
     override fun save(entry: User): Long {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return -1
         }
 
         return try {
-            this.dbHandler!!.add(entry)
+            dbHandler!!.add(entry)
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             -1
@@ -132,13 +132,13 @@ class UserService private constructor() : IUserService {
     }
 
     override fun update(entry: User): Int {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return -1
         }
 
         return try {
-            this.dbHandler!!.update(entry)
+            dbHandler!!.update(entry)
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             -1
@@ -146,13 +146,13 @@ class UserService private constructor() : IUserService {
     }
 
     override fun delete(entry: User): Int {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return -1
         }
 
         return try {
-            this.dbHandler!!.delete(entry)
+            dbHandler!!.delete(entry)
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             -1

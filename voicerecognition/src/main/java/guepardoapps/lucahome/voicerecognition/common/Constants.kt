@@ -1,6 +1,6 @@
 package guepardoapps.lucahome.voicerecognition.common
 
-class Constants {
+internal class Constants {
     companion object {
         const val ActionPlay = "play"
         const val ActionPause = "pause"

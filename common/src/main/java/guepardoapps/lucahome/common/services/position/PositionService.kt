@@ -20,6 +20,7 @@ class PositionService private constructor() : IPositionService {
         val instance: PositionService by lazy { Holder.instance }
     }
 
+    override lateinit var currentPosition: Position
     override val currentPositionPublishSubject: PublishSubject<RxOptional<Position>> = PublishSubject.create<RxOptional<Position>>()!!
 
     override fun updatePosition() {

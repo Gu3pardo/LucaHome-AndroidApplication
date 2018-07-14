@@ -10,9 +10,14 @@ import org.json.JSONObject
 class ValidationService : IValidationService {
     private val tag: String = ValidationService::class.java.simpleName
 
-    private val noUser: String = "No user available!"
-    private val userMayNotPerform: String = "User may not perform action!"
-    private val noJsonData: String = "No Json data received!"
+    companion object {
+        private const val noUser: String = "No user available!"
+        private const val userMayNotPerform: String = "User may not perform action!"
+        private const val noJsonData: String = "No Json data received!"
+
+        private const val keySuccess: String = "Success"
+        private const val keyError: String = "Error"
+    }
 
     override fun mayPerform(action: ServerAction): Pair<Boolean, String> {
         val user: User? = UserService.instance.get()
@@ -35,8 +40,8 @@ class ValidationService : IValidationService {
         }
 
         val jsonObject = JSONObject(jsonResponse)
-        val success: Boolean = jsonObject.getBoolean("Success")
-        val error: String = jsonObject.getString("Error")
+        val success: Boolean = jsonObject.getBoolean(keySuccess)
+        val error: String = jsonObject.getString(keyError)
 
         // val category: String = jsonObject.getString("Category")
         // val action: String = jsonObject.getString("Action")

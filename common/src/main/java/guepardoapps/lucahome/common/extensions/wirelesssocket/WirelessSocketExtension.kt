@@ -6,23 +6,23 @@ import guepardoapps.lucahome.common.annotations.NeededNetwork
 import guepardoapps.lucahome.common.annotations.NeededUserRole
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
 
-fun WirelessSocket.getJsonKey(): JsonKey {
+internal fun WirelessSocket.getJsonKey(): JsonKey {
     return this::class.annotations.find { it is JsonKey } as JsonKey
 }
 
-fun WirelessSocket.getPropertyJsonKey(propertyName: String): JsonKey {
+internal fun WirelessSocket.getPropertyJsonKey(propertyName: String): JsonKey {
     return this::class.java.getDeclaredField(propertyName).declaredAnnotations.find { it is JsonKey } as JsonKey
 }
 
-fun WirelessSocket.getNeededNetwork(): NeededNetwork {
+internal fun WirelessSocket.getNeededNetwork(): NeededNetwork {
     return this::class.annotations.find { it is NeededNetwork } as NeededNetwork
 }
 
-fun WirelessSocket.getPropertyNeededNetwork(propertyName: String): NeededNetwork {
+internal fun WirelessSocket.getPropertyNeededNetwork(propertyName: String): NeededNetwork {
     return this::class.java.getDeclaredField(propertyName).annotations.find { it is NeededNetwork } as NeededNetwork
 }
 
-fun WirelessSocket.getMethodNeededNetwork(methodName: String): NeededNetwork {
+internal fun WirelessSocket.getMethodNeededNetwork(methodName: String): NeededNetwork {
     return this::class.java.getDeclaredMethod(methodName).annotations.find { it is NeededNetwork } as NeededNetwork
 }
 

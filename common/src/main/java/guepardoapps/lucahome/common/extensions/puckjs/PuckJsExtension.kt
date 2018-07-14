@@ -5,23 +5,23 @@ import guepardoapps.lucahome.common.annotations.NeededNetwork
 import guepardoapps.lucahome.common.annotations.NeededUserRole
 import guepardoapps.lucahome.common.models.puckjs.PuckJs
 
-fun PuckJs.getJsonKey(): JsonKey {
+internal fun PuckJs.getJsonKey(): JsonKey {
     return this::class.annotations.find { it is JsonKey } as JsonKey
 }
 
-fun PuckJs.getPropertyJsonKey(propertyName: String): JsonKey {
+internal fun PuckJs.getPropertyJsonKey(propertyName: String): JsonKey {
     return this::class.java.getDeclaredField(propertyName).declaredAnnotations.find { it is JsonKey } as JsonKey
 }
 
-fun PuckJs.getNeededNetwork(): NeededNetwork {
+internal fun PuckJs.getNeededNetwork(): NeededNetwork {
     return this::class.annotations.find { it is NeededNetwork } as NeededNetwork
 }
 
-fun PuckJs.getPropertyNeededNetwork(propertyName: String): NeededNetwork {
+internal fun PuckJs.getPropertyNeededNetwork(propertyName: String): NeededNetwork {
     return this::class.java.getDeclaredField(propertyName).annotations.find { it is NeededNetwork } as NeededNetwork
 }
 
-fun PuckJs.getMethodNeededNetwork(methodName: String): NeededNetwork {
+internal fun PuckJs.getMethodNeededNetwork(methodName: String): NeededNetwork {
     return this::class.java.getDeclaredMethod(methodName).annotations.find { it is NeededNetwork } as NeededNetwork
 }
 

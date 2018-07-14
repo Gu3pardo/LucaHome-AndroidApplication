@@ -9,16 +9,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-class JsonDataToPuckJsConverter {
+internal class JsonDataToPuckJsConverter {
     private val tag = JsonDataToPuckJsConverter::class.java.simpleName
 
     fun parse(jsonResponse: String): ArrayList<PuckJs> {
         val list: ArrayList<PuckJs> = ArrayList()
-
-        if (jsonResponse.contains("Error")) {
-            Logger.instance.error(tag, "Found error parsing: $jsonResponse")
-            return list
-        }
 
         try {
             val jsonObject = JSONObject(jsonResponse)

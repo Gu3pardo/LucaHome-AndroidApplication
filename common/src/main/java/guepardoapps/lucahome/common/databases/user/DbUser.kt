@@ -4,22 +4,20 @@ import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.content.Context
+import guepardoapps.lucahome.common.databases.common.DbHandler
+import guepardoapps.lucahome.common.databases.common.IDbHandler
 import guepardoapps.lucahome.common.enums.user.UserRole
+import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.user.User
 import java.util.*
 
-// Helpful
-// https://developer.android.com/training/data-storage/sqlite
-// https://www.techotopia.com/index.php/A_Kotlin_Android_SQLite_Database_Tutorial
-
-class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
-    : SQLiteOpenHelper(context, DatabaseName, factory, DatabaseVersion) {
+class DbUser(context: Context) : DbHandler<User>(context) {
 
     override fun onCreate(database: SQLiteDatabase) {
         val createTable = (
                 "CREATE TABLE " + DatabaseTable
                         + "("
-                        + ColumnId + " INTEGER PRIMARY KEY,"
+                        + columnId + " INTEGER PRIMARY KEY,"
                         + ColumnUuid + " TEXT,"
                         + ColumnName + " TEXT,"
                         + ColumnPassword + " TEXT,"
@@ -37,17 +35,27 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
         onUpgrade(database, oldVersion, newVersion)
     }
 
+    @Throws(NotImplementedError::class)
+    override fun getList(): MutableList<User> {
+        throw NotImplementedError("getList for user not available")
+    }
+
+    @Throws(NotImplementedError::class)
+    override fun get(uuid: UUID): User? {
+        throw NotImplementedError("get with uuid for user not available")
+    }
+
     fun get(): User? {
         val database = this.readableDatabase
 
         val projection = arrayOf(
-                ColumnId,
+                columnId,
                 ColumnUuid,
                 ColumnName,
                 ColumnPassword,
                 ColumnRole)
 
-        val sortOrder = "$ColumnId ASC"
+        val sortOrder = "$columnId ASC"
 
         val cursor = database.query(
                 DatabaseTable, projection, null, null,
@@ -70,7 +78,7 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
         return list.firstOrNull()
     }
 
-    fun add(entity: User): Long {
+    override fun add(entity: User): Long {
         val values = ContentValues().apply {
             put(ColumnUuid, entity.uuid.toString())
             put(ColumnName, entity.name)
@@ -82,7 +90,7 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
         return database.insert(DatabaseTable, null, values)
     }
 
-    fun update(entity: User): Int {
+    override fun update(entity: User): Int {
         val values = ContentValues().apply {
             put(ColumnUuid, entity.uuid.toString())
             put(ColumnName, entity.name)
@@ -97,7 +105,7 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
         return database.update(DatabaseTable, values, selection, selectionArgs)
     }
 
-    fun delete(entity: User): Int {
+    override fun delete(entity: User): Int {
         val database = this.writableDatabase
 
         val selection = "$ColumnUuid LIKE ?"
@@ -107,11 +115,8 @@ class DbUser(context: Context, factory: SQLiteDatabase.CursorFactory?)
     }
 
     companion object {
-        private const val DatabaseVersion = 1
-        private const val DatabaseName = "guepardoapps-lucahome.db"
         private const val DatabaseTable = "user"
 
-        private const val ColumnId = "_id"
         private const val ColumnUuid = "uuid"
         private const val ColumnName = "name"
         private const val ColumnPassword = "password"

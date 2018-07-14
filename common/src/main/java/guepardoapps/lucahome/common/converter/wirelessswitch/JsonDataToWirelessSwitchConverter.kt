@@ -9,16 +9,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-class JsonDataToWirelessSwitchConverter {
+internal class JsonDataToWirelessSwitchConverter {
     private val tag = JsonDataToWirelessSwitchConverter::class.java.simpleName
 
     fun parse(jsonResponse: String): ArrayList<WirelessSwitch> {
         val list: ArrayList<WirelessSwitch> = ArrayList()
-
-        if (jsonResponse.contains("Error")) {
-            Logger.instance.error(tag, "Found error parsing: $jsonResponse")
-            return list
-        }
 
         try {
             val jsonObject = JSONObject(jsonResponse)

@@ -8,6 +8,6 @@ fun ServerAction.getNeededUserRole(): NeededUserRole {
     return this::class.annotations.find { it is NeededUserRole } as NeededUserRole
 }
 
-fun ServerAction.getNeededNetwork(): NeededNetwork {
+internal fun ServerAction.getNeededNetwork(): NeededNetwork {
     return this::class.annotations.find { it is NeededNetwork } as NeededNetwork
 }

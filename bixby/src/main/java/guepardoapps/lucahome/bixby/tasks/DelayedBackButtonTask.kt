@@ -6,7 +6,7 @@ import guepardoapps.lucahome.bixby.services.BixbyService
 import guepardoapps.lucahome.common.utils.Logger
 import java.lang.ref.WeakReference
 
-class DelayedBackButtonTask() : AsyncTask<Void, Void, Void>() {
+internal class DelayedBackButtonTask() : AsyncTask<Void, Void, Void>() {
     private val tag = DelayedBackButtonTask::class.java.simpleName
     private lateinit var bixbyServiceWeakReference: WeakReference<BixbyService>
 

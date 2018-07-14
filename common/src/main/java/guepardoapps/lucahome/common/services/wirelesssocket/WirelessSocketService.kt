@@ -1,31 +1,31 @@
 package guepardoapps.lucahome.common.services.wirelesssocket
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import android.content.Intent
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
+import guepardoapps.lucahome.common.constants.Labels
 import guepardoapps.lucahome.common.controller.NotificationController
 import guepardoapps.lucahome.common.converter.wirelesssocket.JsonDataToWirelessSocketConverter
 import guepardoapps.lucahome.common.databases.wirelesssocket.DbWirelessSocket
 import guepardoapps.lucahome.common.enums.common.DownloadState
 import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
+import guepardoapps.lucahome.common.models.common.RxResponse
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
+import guepardoapps.lucahome.common.receiver.PeriodicActionReceiver
 import guepardoapps.lucahome.common.services.change.ChangeService
 import guepardoapps.lucahome.common.utils.Logger
-import guepardoapps.lucahome.common.worker.wirelesssocket.WirelessSocketWorker
+import io.reactivex.subjects.PublishSubject
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class WirelessSocketService private constructor() : IWirelessSocketService {
     private val tag = WirelessSocketService::class.java.simpleName
-
-    private val notificationId = 438502134
 
     private var converter: JsonDataToWirelessSocketConverter = JsonDataToWirelessSocketConverter()
 
@@ -34,12 +34,6 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
 
     private lateinit var notificationController: NotificationController
 
-    private lateinit var reloadWork: PeriodicWorkRequest
-    private lateinit var reloadWorkId: UUID
-
-    init {
-    }
-
     private object Holder {
         @SuppressLint("StaticFieldLeak")
         val instance: WirelessSocketService = WirelessSocketService()
@@ -47,79 +41,72 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
 
     companion object {
         val instance: WirelessSocketService by lazy { Holder.instance }
+        const val requestCode: Int = 239219913
+        const val notificationId = 438502134
     }
 
     override var initialized: Boolean = false
-        get() = this.context != null && this.dbHandler != null
+        get() = context != null && dbHandler != null
     override var context: Context? = null
-    override var onWirelessSocketService: OnWirelessSocketService? = null
+
+    override val responsePublishSubject: PublishSubject<RxResponse> = PublishSubject.create<RxResponse>()!!
 
     override var serviceSettings: ServiceSettings
-        get() = this.dbHandler!!.getServiceSettings()!!
+        get() = dbHandler!!.getServiceSettings()!!
         set(value) {
-            this.dbHandler!!.setServiceSettings(value)
-
+            dbHandler!!.setServiceSettings(value)
+            cancelReload()
             if (value.reloadEnabled) {
-                WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
-                this.reloadWork = PeriodicWorkRequestBuilder<WirelessSocketWorker>(value.reloadTimeoutMs.toLong(), TimeUnit.MILLISECONDS).build()
-                this.reloadWorkId = this.reloadWork.id
-                WorkManager.getInstance()?.enqueue(this.reloadWork)
-            } else {
-                WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
+                scheduleReload()
             }
-
+            closeNotification()
             if (value.notificationEnabled && receiverActivity != null) {
-                this.showNotification()
-            } else {
-                this.closeNotification()
+                showNotification()
             }
         }
 
     override var receiverActivity: Class<*>? = null
         set(value) {
             if (value != null && dbHandler?.getServiceSettings()!!.notificationEnabled) {
-                this.showNotification()
+                showNotification()
             } else {
-                this.closeNotification()
+                closeNotification()
             }
         }
 
     override fun initialize(context: Context) {
-        if (this.initialized) {
+        if (initialized) {
             return
         }
 
         this.context = context
-        this.downloadAdapter = DownloadAdapter(this.context!!)
-        this.notificationController = NotificationController(this.context!!)
+        downloadAdapter = DownloadAdapter(this.context!!)
+        notificationController = NotificationController(this.context!!)
 
-        if (this.dbHandler == null) {
-            this.dbHandler = DbWirelessSocket(this.context!!, null)
+        if (dbHandler == null) {
+            dbHandler = DbWirelessSocket(this.context!!)
         }
 
-        if (this.serviceSettings.reloadEnabled) {
-            this.reloadWork = PeriodicWorkRequestBuilder<WirelessSocketWorker>(this.serviceSettings.reloadTimeoutMs.toLong(), TimeUnit.MILLISECONDS).build()
-            this.reloadWorkId = this.reloadWork.id
-            WorkManager.getInstance()?.enqueue(this.reloadWork)
+        if (serviceSettings.reloadEnabled) {
+            scheduleReload()
         }
     }
 
     override fun dispose() {
-        WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
-        this.dbHandler?.close()
-
-        this.context = null
-        this.dbHandler = null
+        cancelReload()
+        dbHandler?.close()
+        context = null
+        dbHandler = null
     }
 
     override fun get(): MutableList<WirelessSocket> {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return ArrayList()
         }
 
         return try {
-            this.dbHandler!!.getList()
+            dbHandler!!.getList()
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             ArrayList()
@@ -127,13 +114,13 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun get(uuid: UUID): WirelessSocket? {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return null
         }
 
         return try {
-            this.dbHandler!!.get(uuid)
+            dbHandler!!.get(uuid)
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             null
@@ -141,12 +128,12 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun search(searchValue: String): MutableList<WirelessSocket> {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return ArrayList()
         }
 
-        val list = this.get()
+        val list = get()
         val searchResultList = ArrayList<WirelessSocket>()
 
         for (entry in list) {
@@ -159,20 +146,20 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun setState(entry: WirelessSocket, newState: Boolean) {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.WirelessSocketSet))
             return
         }
 
         entry.state = newState
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 entry.commandSetState,
                 ServerAction.WirelessSocketSet,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
                         if (serverAction == ServerAction.WirelessSocketSet) {
-                            onWirelessSocketService!!.setFinished(state == DownloadState.Success, message)
-
+                            responsePublishSubject.onNext(RxResponse(state == DownloadState.Success, message, ServerAction.WirelessSocketSet))
                             entry.changeCount++
                             dbHandler?.update(entry)
                             showNotification()
@@ -183,19 +170,19 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun deactivateAll() {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.WirelessSocketSet))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 ServerAction.WirelessSocketDeactivateAll.command,
                 ServerAction.WirelessSocketDeactivateAll,
                 object : OnDownloadAdapter {
                     override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
                         if (serverAction == ServerAction.WirelessSocketDeactivateAll) {
-                            onWirelessSocketService!!.setFinished(state == DownloadState.Success, message)
-
+                            responsePublishSubject.onNext(RxResponse(state == DownloadState.Success, message, ServerAction.WirelessSocketDeactivateAll))
                             get().forEach { value -> value.changeCount++; dbHandler?.update(value) }
                             showNotification()
                         }
@@ -205,8 +192,9 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun load() {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.WirelessSocketGet))
             return
         }
 
@@ -223,75 +211,71 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
             }
         }
 
-        ChangeService.instance.onChangeService = object {
-            override fun loadFinished(success: Boolean, message: String) {
-                if (!success) {
-                    onWirelessSocketService!!.loadFinished(false, "Loading for last change failed!")
-                    return
-                }
+        val lastChange = ChangeService.instance.get(WirelessSocket::class.java.simpleName)
+        if (lastChange != null) {
+            val savedLastChange = dbHandler?.getLastChangeDateTime()
+            dbHandler?.setLastChangeDateTime(lastChange.time)
 
-                val lastChange = ChangeService.instance.get("WirelessSocket")
-                if (lastChange != null) {
-                    val savedLastChange = dbHandler?.getLastChangeDateTime()
-                    dbHandler?.setLastChangeDateTime(lastChange.time)
-
-                    if (savedLastChange != null
-                            && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
-                        onWirelessSocketService!!.loadFinished(true, "Nothing new on server!")
-                        return
-                    }
-                }
-
-                downloadAdapter?.send(
-                        ServerAction.WirelessSocketGet.command,
-                        ServerAction.WirelessSocketGet,
-                        object : OnDownloadAdapter {
-                            override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                if (serverAction == ServerAction.WirelessSocketGet) {
-                                    val successGet = state == DownloadState.Success
-                                    if (!successGet) {
-                                        onWirelessSocketService!!.loadFinished(false, "Loading failed!")
-                                        return
-                                    }
-
-                                    val loadedList = converter.parse(message)
-                                    var deleteList: List<WirelessSocket> = List(0) { WirelessSocket() }
-
-                                    // Check if wireless socket is already saved, then update, otherwise add
-                                    for (loadedEntry in loadedList) {
-                                        if (savedList.any { wirelessSocket -> wirelessSocket.uuid == loadedEntry.uuid }) {
-                                            dbHandler?.update(loadedEntry)
-                                            // Filter updated wireless socket from list
-                                            deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
-                                            continue
-                                        }
-
-                                        dbHandler?.add(loadedEntry)
-                                    }
-
-                                    // Check if any wireless socket was not yet updated, then remove it from the database, because it does not longer exist on server
-                                    for (deleteEntry in deleteList) {
-                                        dbHandler?.delete(deleteEntry)
-                                    }
-
-                                    onWirelessSocketService!!.loadFinished(true, "")
-                                    showNotification()
-                                }
-                            }
-                        }
-                )
+            if (savedLastChange != null
+                    && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
+                responsePublishSubject.onNext(RxResponse(true, Labels.Services.nothingNewOnServer, ServerAction.WirelessSocketGet))
+                return
             }
         }
-        ChangeService.instance.load()
+
+        downloadAdapter?.send(
+                ServerAction.WirelessSocketGet.command,
+                ServerAction.WirelessSocketGet,
+                object : OnDownloadAdapter {
+                    override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
+                        if (serverAction == ServerAction.WirelessSocketGet) {
+                            val successGet = state == DownloadState.Success
+                            if (!successGet) {
+                                responsePublishSubject.onNext(RxResponse(false, message, ServerAction.WirelessSocketGet))
+                                return
+                            }
+
+                            val loadedList = converter.parse(message)
+                            var deleteList: List<WirelessSocket> = List(0) { WirelessSocket() }
+
+                            // Check if wireless socket is already saved, then update, otherwise add
+                            for (loadedEntry in loadedList) {
+                                if (savedList.any { wirelessSocket -> wirelessSocket.uuid == loadedEntry.uuid }) {
+                                    dbHandler?.update(loadedEntry)
+                                    // Filter updated wireless socket from list
+                                    deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
+                                    continue
+                                }
+
+                                dbHandler?.add(loadedEntry)
+                            }
+
+                            // Check if any wireless socket was not yet updated, then remove it from the database, because it does not longer exist on server
+                            for (deleteEntry in deleteList) {
+                                dbHandler?.delete(deleteEntry)
+                            }
+
+                            responsePublishSubject.onNext(RxResponse(true, message, ServerAction.WirelessSocketGet))
+                            showNotification()
+                        }
+                    }
+                }
+        )
+
+        cancelReload()
+        if (serviceSettings.reloadEnabled) {
+            scheduleReload()
+        }
     }
 
     override fun add(entry: WirelessSocket, reload: Boolean) {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.WirelessSocketAdd))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 entry.commandAdd,
                 ServerAction.WirelessSocketAdd,
                 object : OnDownloadAdapter {
@@ -309,7 +293,7 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
                                 dbHandler?.add(entry)
                             }
 
-                            onWirelessSocketService!!.addFinished(success, message)
+                            responsePublishSubject.onNext(RxResponse(success, message, ServerAction.WirelessSocketAdd))
                             showNotification()
                         }
                     }
@@ -318,12 +302,13 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun update(entry: WirelessSocket, reload: Boolean) {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.WirelessSocketUpdate))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 entry.commandUpdate,
                 ServerAction.WirelessSocketUpdate,
                 object : OnDownloadAdapter {
@@ -341,7 +326,7 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
                                 dbHandler?.update(entry)
                             }
 
-                            onWirelessSocketService!!.updateFinished(success, message)
+                            responsePublishSubject.onNext(RxResponse(success, message, ServerAction.WirelessSocketUpdate))
                             showNotification()
                         }
                     }
@@ -350,12 +335,13 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
     }
 
     override fun delete(entry: WirelessSocket, reload: Boolean) {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.WirelessSocketDelete))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 entry.commandDelete,
                 ServerAction.WirelessSocketDelete,
                 object : OnDownloadAdapter {
@@ -373,7 +359,7 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
                                 dbHandler?.update(entry)
                             }
 
-                            onWirelessSocketService!!.deleteFinished(success, message)
+                            responsePublishSubject.onNext(RxResponse(success, message, ServerAction.WirelessSocketDelete))
                             showNotification()
                         }
                     }
@@ -381,16 +367,32 @@ class WirelessSocketService private constructor() : IWirelessSocketService {
         )
     }
 
+    private fun scheduleReload() {
+        if (serviceSettings.reloadEnabled) {
+            val intent = Intent(context?.applicationContext, PeriodicActionReceiver::class.java)
+            intent.putExtra(PeriodicActionReceiver.intentKey, ServerAction.WirelessSocketGet)
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val alarm = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), serviceSettings.reloadTimeoutMs.toLong(), pendingIntent)
+        }
+    }
+
+    private fun cancelReload() {
+        val intent = Intent(context?.applicationContext, PeriodicActionReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val alarm = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarm.cancel(pendingIntent)
+    }
+
     private fun showNotification() {
-        if (!this.serviceSettings.notificationEnabled
-                || this.receiverActivity == null) {
+        if (!serviceSettings.notificationEnabled || receiverActivity == null) {
             return
         }
 
-        notificationController.wirelessSocketNotification(this.notificationId, this.get(), this.receiverActivity!!)
+        notificationController.wirelessSocketNotification(notificationId, get(), receiverActivity!!)
     }
 
     private fun closeNotification() {
-        this.notificationController.close(this.notificationId)
+        notificationController.close(notificationId)
     }
 }

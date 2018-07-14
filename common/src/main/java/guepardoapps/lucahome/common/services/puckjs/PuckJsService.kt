@@ -1,24 +1,26 @@
 package guepardoapps.lucahome.common.services.puckjs
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import android.content.Intent
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
+import guepardoapps.lucahome.common.constants.Labels
 import guepardoapps.lucahome.common.converter.puckjs.JsonDataToPuckJsConverter
 import guepardoapps.lucahome.common.databases.puckjs.DbPuckJs
 import guepardoapps.lucahome.common.enums.common.DownloadState
 import guepardoapps.lucahome.common.enums.common.ServerAction
 import guepardoapps.lucahome.common.enums.common.ServerDatabaseAction
+import guepardoapps.lucahome.common.models.common.RxResponse
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.puckjs.PuckJs
+import guepardoapps.lucahome.common.receiver.PeriodicActionReceiver
 import guepardoapps.lucahome.common.services.change.ChangeService
 import guepardoapps.lucahome.common.utils.Logger
-import guepardoapps.lucahome.common.worker.puckjs.PuckJsWorker
+import io.reactivex.subjects.PublishSubject
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class PuckJsService private constructor() : IPuckJsService {
@@ -29,12 +31,6 @@ class PuckJsService private constructor() : IPuckJsService {
     private var dbHandler: DbPuckJs? = null
     private var downloadAdapter: DownloadAdapter? = null
 
-    private lateinit var reloadWork: PeriodicWorkRequest
-    private lateinit var reloadWorkId: UUID
-
-    init {
-    }
-
     private object Holder {
         @SuppressLint("StaticFieldLeak")
         val instance: PuckJsService = PuckJsService()
@@ -42,66 +38,60 @@ class PuckJsService private constructor() : IPuckJsService {
 
     companion object {
         val instance: PuckJsService by lazy { Holder.instance }
+        const val requestCode: Int = 239219910
     }
 
     override var initialized: Boolean = false
-        get() = this.context != null && this.dbHandler != null
+        get() = context != null && dbHandler != null
     override var context: Context? = null
-    override var onPuckJsService: OnPuckJsService? = null
+
+    override val responsePublishSubject: PublishSubject<RxResponse> = PublishSubject.create<RxResponse>()!!
 
     override var serviceSettings: ServiceSettings
-        get() = this.dbHandler!!.getServiceSettings()!!
+        get() = dbHandler!!.getServiceSettings()!!
         set(value) {
-            this.dbHandler!!.setServiceSettings(value)
-
+            dbHandler!!.setServiceSettings(value)
+            cancelReload()
             if (value.reloadEnabled) {
-                WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
-                this.reloadWork = PeriodicWorkRequestBuilder<PuckJsWorker>(value.reloadTimeoutMs.toLong(), TimeUnit.MILLISECONDS).build()
-                this.reloadWorkId = this.reloadWork.id
-                WorkManager.getInstance()?.enqueue(this.reloadWork)
-            } else {
-                WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
+                scheduleReload()
             }
         }
 
-    @Deprecated("Do not use receiverActivity in RoomService")
+    @Deprecated("Do not use receiverActivity in PuckJsService")
     override var receiverActivity: Class<*>? = null
 
     override fun initialize(context: Context) {
-        if (this.initialized) {
+        if (initialized) {
             return
         }
 
         this.context = context
-        this.downloadAdapter = DownloadAdapter(this.context!!)
+        downloadAdapter = DownloadAdapter(this.context!!)
 
-        if (this.dbHandler == null) {
-            this.dbHandler = DbPuckJs(this.context!!, null)
+        if (dbHandler == null) {
+            dbHandler = DbPuckJs(this.context!!)
         }
 
-        if (this.serviceSettings.reloadEnabled) {
-            this.reloadWork = PeriodicWorkRequestBuilder<PuckJsWorker>(this.serviceSettings.reloadTimeoutMs.toLong(), TimeUnit.MILLISECONDS).build()
-            this.reloadWorkId = this.reloadWork.id
-            WorkManager.getInstance()?.enqueue(this.reloadWork)
+        if (serviceSettings.reloadEnabled) {
+            scheduleReload()
         }
     }
 
     override fun dispose() {
-        WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
-        this.dbHandler?.close()
-
-        this.context = null
-        this.dbHandler = null
+        cancelReload()
+        dbHandler?.close()
+        context = null
+        dbHandler = null
     }
 
     override fun get(): MutableList<PuckJs> {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return ArrayList()
         }
 
         return try {
-            this.dbHandler!!.getList()
+            dbHandler!!.getList()
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             ArrayList()
@@ -109,13 +99,13 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun get(uuid: UUID): PuckJs? {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return null
         }
 
         return try {
-            this.dbHandler!!.get(uuid)
+            dbHandler!!.get(uuid)
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             null
@@ -123,12 +113,12 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun search(searchValue: String): MutableList<PuckJs> {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return ArrayList()
         }
 
-        val list = this.get()
+        val list = get()
         val searchResultList = ArrayList<PuckJs>()
 
         for (entry in list) {
@@ -141,8 +131,9 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun load() {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.PuckJsGet))
             return
         }
 
@@ -159,74 +150,70 @@ class PuckJsService private constructor() : IPuckJsService {
             }
         }
 
-        ChangeService.instance.onChangeService = object {
-            override fun loadFinished(success: Boolean, message: String) {
-                if (!success) {
-                    onPuckJsService!!.loadFinished(false, "Loading for last change failed!")
-                    return
-                }
+        val lastChange = ChangeService.instance.get(PuckJs::class.java.simpleName)
+        if (lastChange != null) {
+            val savedLastChange = dbHandler?.getLastChangeDateTime()
+            dbHandler?.setLastChangeDateTime(lastChange.time)
 
-                val lastChange = ChangeService.instance.get("PuckJs")
-                if (lastChange != null) {
-                    val savedLastChange = dbHandler?.getLastChangeDateTime()
-                    dbHandler?.setLastChangeDateTime(lastChange.time)
-
-                    if (savedLastChange != null
-                            && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
-                        onPuckJsService!!.loadFinished(true, "Nothing new on server!")
-                        return
-                    }
-                }
-
-                downloadAdapter?.send(
-                        ServerAction.PuckJsGet.command,
-                        ServerAction.PuckJsGet,
-                        object : OnDownloadAdapter {
-                            override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                if (serverAction == ServerAction.PuckJsGet) {
-                                    val successGet = state == DownloadState.Success
-                                    if (!successGet) {
-                                        onPuckJsService!!.loadFinished(false, "Loading failed!")
-                                        return
-                                    }
-
-                                    val loadedList = converter.parse(message)
-                                    var deleteList: List<PuckJs> = List(0) { PuckJs() }
-
-                                    // Check if puckJs is already saved, then update, otherwise add
-                                    for (loadedEntry in loadedList) {
-                                        if (savedList.any { puckJs -> puckJs.uuid == loadedEntry.uuid }) {
-                                            dbHandler?.update(loadedEntry)
-                                            // Filter updated puckJs from list
-                                            deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
-                                            continue
-                                        }
-
-                                        dbHandler?.add(loadedEntry)
-                                    }
-
-                                    // Check if any puckJs was not yet updated, then remove it from the database, because it does not longer exist on server
-                                    for (deleteEntry in deleteList) {
-                                        dbHandler?.delete(deleteEntry)
-                                    }
-
-                                    onPuckJsService!!.loadFinished(true, "")
-                                }
-                            }
-                        }
-                )
+            if (savedLastChange != null
+                    && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
+                responsePublishSubject.onNext(RxResponse(true, Labels.Services.nothingNewOnServer, ServerAction.PuckJsGet))
+                return
             }
         }
-        ChangeService.instance.load()
+
+        downloadAdapter?.send(
+                ServerAction.PuckJsGet.command,
+                ServerAction.PuckJsGet,
+                object : OnDownloadAdapter {
+                    override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
+                        if (serverAction == ServerAction.PuckJsGet) {
+                            val successGet = state == DownloadState.Success
+                            if (!successGet) {
+                                responsePublishSubject.onNext(RxResponse(false, message, ServerAction.PuckJsGet))
+                                return
+                            }
+
+                            val loadedList = converter.parse(message)
+                            var deleteList: List<PuckJs> = List(0) { PuckJs() }
+
+                            // Check if puckJs is already saved, then update, otherwise add
+                            for (loadedEntry in loadedList) {
+                                if (savedList.any { puckJs -> puckJs.uuid == loadedEntry.uuid }) {
+                                    dbHandler?.update(loadedEntry)
+                                    // Filter updated puckJs from list
+                                    deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
+                                    continue
+                                }
+
+                                dbHandler?.add(loadedEntry)
+                            }
+
+                            // Check if any puckJs was not yet updated, then remove it from the database, because it does not longer exist on server
+                            for (deleteEntry in deleteList) {
+                                dbHandler?.delete(deleteEntry)
+                            }
+
+                            responsePublishSubject.onNext(RxResponse(true, message, ServerAction.PuckJsGet))
+                        }
+                    }
+                }
+        )
+
+        cancelReload()
+        if (serviceSettings.reloadEnabled) {
+            scheduleReload()
+        }
     }
 
     override fun add(entry: PuckJs, reload: Boolean) {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.PuckJsAdd))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 entry.commandAdd,
                 ServerAction.PuckJsAdd,
                 object : OnDownloadAdapter {
@@ -244,7 +231,7 @@ class PuckJsService private constructor() : IPuckJsService {
                                 dbHandler?.add(entry)
                             }
 
-                            onPuckJsService!!.addFinished(success, message)
+                            responsePublishSubject.onNext(RxResponse(success, message, ServerAction.PuckJsAdd))
                         }
                     }
                 }
@@ -252,12 +239,13 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun update(entry: PuckJs, reload: Boolean) {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.PuckJsUpdate))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 entry.commandUpdate,
                 ServerAction.PuckJsUpdate,
                 object : OnDownloadAdapter {
@@ -275,7 +263,7 @@ class PuckJsService private constructor() : IPuckJsService {
                                 dbHandler?.update(entry)
                             }
 
-                            onPuckJsService!!.updateFinished(success, message)
+                            responsePublishSubject.onNext(RxResponse(success, message, ServerAction.PuckJsUpdate))
                         }
                     }
                 }
@@ -283,12 +271,13 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun delete(entry: PuckJs, reload: Boolean) {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.PuckJsDelete))
             return
         }
 
-        this.downloadAdapter?.send(
+        downloadAdapter?.send(
                 entry.commandDelete,
                 ServerAction.PuckJsDelete,
                 object : OnDownloadAdapter {
@@ -306,10 +295,27 @@ class PuckJsService private constructor() : IPuckJsService {
                                 dbHandler?.update(entry)
                             }
 
-                            onPuckJsService!!.deleteFinished(success, message)
+                            responsePublishSubject.onNext(RxResponse(success, message, ServerAction.PuckJsDelete))
                         }
                     }
                 }
         )
+    }
+
+    private fun scheduleReload() {
+        if (serviceSettings.reloadEnabled) {
+            val intent = Intent(context?.applicationContext, PeriodicActionReceiver::class.java)
+            intent.putExtra(PeriodicActionReceiver.intentKey, ServerAction.PuckJsGet)
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val alarm = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), serviceSettings.reloadTimeoutMs.toLong(), pendingIntent)
+        }
+    }
+
+    private fun cancelReload() {
+        val intent = Intent(context?.applicationContext, PeriodicActionReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val alarm = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarm.cancel(pendingIntent)
     }
 }

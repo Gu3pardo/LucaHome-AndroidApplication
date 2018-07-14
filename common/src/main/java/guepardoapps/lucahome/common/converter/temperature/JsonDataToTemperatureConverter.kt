@@ -10,16 +10,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-class JsonDataToTemperatureConverter {
+internal class JsonDataToTemperatureConverter {
     private val tag = JsonDataToTemperatureConverter::class.java.simpleName
 
     fun parse(jsonResponse: String): ArrayList<Temperature> {
         val list: ArrayList<Temperature> = ArrayList()
-
-        if (jsonResponse.contains("Error")) {
-            Logger.instance.error(tag, "Found error parsing: $jsonResponse")
-            return list
-        }
 
         try {
             val jsonObject = JSONObject(jsonResponse)

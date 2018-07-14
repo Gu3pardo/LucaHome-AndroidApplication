@@ -1,10 +1,10 @@
 package guepardoapps.lucahome.common.services.temperature
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
-import androidx.work.PeriodicWorkRequest
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import android.content.Intent
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
 import guepardoapps.lucahome.common.controller.NotificationController
@@ -16,17 +16,17 @@ import guepardoapps.lucahome.common.models.common.NotificationContent
 import guepardoapps.lucahome.common.models.common.ServiceSettings
 import guepardoapps.lucahome.common.models.temperature.Temperature
 import guepardoapps.lucahome.common.R
+import guepardoapps.lucahome.common.constants.Labels
+import guepardoapps.lucahome.common.models.common.RxResponse
+import guepardoapps.lucahome.common.receiver.PeriodicActionReceiver
 import guepardoapps.lucahome.common.services.change.ChangeService
 import guepardoapps.lucahome.common.utils.Logger
-import guepardoapps.lucahome.common.worker.temperature.TemperatureWorker
+import io.reactivex.subjects.PublishSubject
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 class TemperatureService private constructor() : ITemperatureService {
     private val tag = TemperatureService::class.java.simpleName
-
-    private val notificationId = 438502136
 
     private var converter: JsonDataToTemperatureConverter = JsonDataToTemperatureConverter()
 
@@ -35,12 +35,6 @@ class TemperatureService private constructor() : ITemperatureService {
 
     private lateinit var notificationController: NotificationController
 
-    private lateinit var reloadWork: PeriodicWorkRequest
-    private lateinit var reloadWorkId: UUID
-
-    init {
-    }
-
     private object Holder {
         @SuppressLint("StaticFieldLeak")
         val instance: TemperatureService = TemperatureService()
@@ -48,79 +42,72 @@ class TemperatureService private constructor() : ITemperatureService {
 
     companion object {
         val instance: TemperatureService by lazy { Holder.instance }
+        const val requestCode: Int = 239219912
+        const val notificationId = 438502136
     }
 
     override var initialized: Boolean = false
-        get() = this.context != null && this.dbHandler != null
+        get() = context != null && dbHandler != null
     override var context: Context? = null
-    override var onTemperatureService: OnTemperatureService? = null
+
+    override val responsePublishSubject: PublishSubject<RxResponse> = PublishSubject.create<RxResponse>()!!
 
     override var serviceSettings: ServiceSettings
-        get() = this.dbHandler!!.getServiceSettings()!!
+        get() = dbHandler!!.getServiceSettings()!!
         set(value) {
-            this.dbHandler!!.setServiceSettings(value)
-
+            dbHandler!!.setServiceSettings(value)
+            cancelReload()
             if (value.reloadEnabled) {
-                WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
-                this.reloadWork = PeriodicWorkRequestBuilder<TemperatureWorker>(value.reloadTimeoutMs.toLong(), TimeUnit.MILLISECONDS).build()
-                this.reloadWorkId = this.reloadWork.id
-                WorkManager.getInstance()?.enqueue(this.reloadWork)
-            } else {
-                WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
+                scheduleReload()
             }
-
+            closeNotification()
             if (value.notificationEnabled && receiverActivity != null) {
-                this.showNotification()
-            } else {
-                this.closeNotification()
+                showNotification()
             }
         }
 
     override var receiverActivity: Class<*>? = null
         set(value) {
             if (value != null && dbHandler?.getServiceSettings()!!.notificationEnabled) {
-                this.showNotification()
+                showNotification()
             } else {
-                this.closeNotification()
+                closeNotification()
             }
         }
 
     override fun initialize(context: Context) {
-        if (this.initialized) {
+        if (initialized) {
             return
         }
 
         this.context = context
-        this.downloadAdapter = DownloadAdapter(this.context!!)
-        this.notificationController = NotificationController(this.context!!)
+        downloadAdapter = DownloadAdapter(this.context!!)
+        notificationController = NotificationController(this.context!!)
 
-        if (this.dbHandler == null) {
-            this.dbHandler = DbTemperature(this.context!!, null)
+        if (dbHandler == null) {
+            dbHandler = DbTemperature(this.context!!)
         }
 
-        if (this.serviceSettings.reloadEnabled) {
-            this.reloadWork = PeriodicWorkRequestBuilder<TemperatureWorker>(this.serviceSettings.reloadTimeoutMs.toLong(), TimeUnit.MILLISECONDS).build()
-            this.reloadWorkId = this.reloadWork.id
-            WorkManager.getInstance()?.enqueue(this.reloadWork)
+        if (serviceSettings.reloadEnabled) {
+            scheduleReload()
         }
     }
 
     override fun dispose() {
-        WorkManager.getInstance()?.cancelWorkById(this.reloadWorkId)
-        this.dbHandler?.close()
-
-        this.context = null
-        this.dbHandler = null
+        cancelReload()
+        dbHandler?.close()
+        context = null
+        dbHandler = null
     }
 
     override fun get(): MutableList<Temperature> {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return ArrayList()
         }
 
         return try {
-            this.dbHandler!!.getList()
+            dbHandler!!.getList()
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             ArrayList()
@@ -128,13 +115,13 @@ class TemperatureService private constructor() : ITemperatureService {
     }
 
     override fun get(uuid: UUID): Temperature? {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return null
         }
 
         return try {
-            this.dbHandler!!.get(uuid)
+            dbHandler!!.get(uuid)
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
             null
@@ -142,12 +129,12 @@ class TemperatureService private constructor() : ITemperatureService {
     }
 
     override fun search(searchValue: String): MutableList<Temperature> {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
             return ArrayList()
         }
 
-        val list = this.get()
+        val list = get()
         val searchResultList = ArrayList<Temperature>()
 
         for (entry in list) {
@@ -160,72 +147,68 @@ class TemperatureService private constructor() : ITemperatureService {
     }
 
     override fun load() {
-        if (!this.initialized) {
-            Logger.instance.error(tag, "Service not initialized")
+        if (!initialized) {
+            Logger.instance.error(tag, Labels.Services.notInitialized)
+            responsePublishSubject.onNext(RxResponse(false, Labels.Services.notInitialized, ServerAction.TemperatureGet))
             return
         }
 
-        ChangeService.instance.onChangeService = object {
-            override fun loadFinished(success: Boolean, message: String) {
-                if (!success) {
-                    onTemperatureService!!.loadFinished(false, "Loading for last change failed!")
-                    return
-                }
+        val lastChange = ChangeService.instance.get(Temperature::class.java.simpleName)
+        if (lastChange != null) {
+            val savedLastChange = dbHandler?.getLastChangeDateTime()
+            dbHandler?.setLastChangeDateTime(lastChange.time)
 
-                val lastChange = ChangeService.instance.get("Temperature")
-                if (lastChange != null) {
-                    val savedLastChange = dbHandler?.getLastChangeDateTime()
-                    dbHandler?.setLastChangeDateTime(lastChange.time)
-
-                    if (savedLastChange != null
-                            && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
-                        onTemperatureService!!.loadFinished(true, "Nothing new on server!")
-                        return
-                    }
-                }
-
-                downloadAdapter?.send(
-                        ServerAction.TemperatureGet.command,
-                        ServerAction.TemperatureGet,
-                        object : OnDownloadAdapter {
-                            override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
-                                if (serverAction == ServerAction.TemperatureGet) {
-                                    val successGet = state == DownloadState.Success
-                                    if (!successGet) {
-                                        onTemperatureService!!.loadFinished(false, "Loading failed!")
-                                        return
-                                    }
-
-                                    val savedList = dbHandler?.getList()!!
-                                    val loadedList = converter.parse(message)
-                                    var deleteList: List<Temperature> = List(0) { Temperature() }
-
-                                    // Check if temperature is already saved, then update, otherwise add
-                                    for (loadedEntry in loadedList) {
-                                        if (savedList.any { temperature -> temperature.uuid == loadedEntry.uuid }) {
-                                            dbHandler?.update(loadedEntry)
-                                            // Filter updated wireless switch from list
-                                            deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
-                                            continue
-                                        }
-
-                                        dbHandler?.add(loadedEntry)
-                                    }
-
-                                    // Check if any temperature was not yet updated, then remove it from the database, because it does not longer exist on server
-                                    for (deleteEntry in deleteList) {
-                                        dbHandler?.delete(deleteEntry)
-                                    }
-
-                                    onTemperatureService!!.loadFinished(true, "")
-                                    showNotification()
-                                }
-                            }
-                        }
-                )
+            if (savedLastChange != null
+                    && (savedLastChange == lastChange.time || savedLastChange.after(lastChange))) {
+                responsePublishSubject.onNext(RxResponse(true, Labels.Services.nothingNewOnServer, ServerAction.TemperatureGet))
+                return
             }
         }
-        ChangeService.instance.load()
+
+        downloadAdapter?.send(
+                ServerAction.TemperatureGet.command,
+                ServerAction.TemperatureGet,
+                object : OnDownloadAdapter {
+                    override fun onFinished(serverAction: ServerAction, state: DownloadState, message: String) {
+                        if (serverAction == ServerAction.TemperatureGet) {
+                            val successGet = state == DownloadState.Success
+                            if (!successGet) {
+                                responsePublishSubject.onNext(RxResponse(false, message, ServerAction.TemperatureGet))
+                                return
+                            }
+
+                            val savedList = dbHandler?.getList()!!
+                            val loadedList = converter.parse(message)
+                            var deleteList: List<Temperature> = List(0) { Temperature() }
+
+                            // Check if temperature is already saved, then update, otherwise add
+                            for (loadedEntry in loadedList) {
+                                if (savedList.any { temperature -> temperature.uuid == loadedEntry.uuid }) {
+                                    dbHandler?.update(loadedEntry)
+                                    // Filter updated wireless switch from list
+                                    deleteList = savedList.filter { it.uuid != loadedEntry.uuid }
+                                    continue
+                                }
+
+                                dbHandler?.add(loadedEntry)
+                            }
+
+                            // Check if any temperature was not yet updated, then remove it from the database, because it does not longer exist on server
+                            for (deleteEntry in deleteList) {
+                                dbHandler?.delete(deleteEntry)
+                            }
+
+                            responsePublishSubject.onNext(RxResponse(true, message, ServerAction.TemperatureGet))
+                            showNotification()
+                        }
+                    }
+                }
+        )
+
+        cancelReload()
+        if (serviceSettings.reloadEnabled) {
+            scheduleReload()
+        }
     }
 
     @Throws(NotImplementedError::class)
@@ -243,25 +226,41 @@ class TemperatureService private constructor() : ITemperatureService {
         throw NotImplementedError("Delete for temperature not available")
     }
 
+    private fun scheduleReload() {
+        if (serviceSettings.reloadEnabled) {
+            val intent = Intent(context?.applicationContext, PeriodicActionReceiver::class.java)
+            intent.putExtra(PeriodicActionReceiver.intentKey, ServerAction.TemperatureGet)
+            val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            val alarm = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarm.setInexactRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), serviceSettings.reloadTimeoutMs.toLong(), pendingIntent)
+        }
+    }
+
+    private fun cancelReload() {
+        val intent = Intent(context?.applicationContext, PeriodicActionReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val alarm = context?.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarm.cancel(pendingIntent)
+    }
+
     private fun showNotification() {
-        if (!this.serviceSettings.notificationEnabled
-                || this.receiverActivity == null) {
+        if (!serviceSettings.notificationEnabled || receiverActivity == null) {
             return
         }
 
         val notificationContent = NotificationContent(
                 notificationId,
                 "Temperature",
-                this.get().first().temperatureString,
+                get().first().temperatureString,
                 R.drawable.temperature,
                 R.drawable.temperature,
-                this.receiverActivity!!,
+                receiverActivity!!,
                 true)
 
         notificationController.create(notificationContent)
     }
 
     private fun closeNotification() {
-        this.notificationController.close(this.notificationId)
+        notificationController.close(notificationId)
     }
 }

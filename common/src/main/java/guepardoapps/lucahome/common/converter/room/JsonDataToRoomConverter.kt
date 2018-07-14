@@ -10,16 +10,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-class JsonDataToRoomConverter {
+internal class JsonDataToRoomConverter {
     private val tag = JsonDataToRoomConverter::class.java.simpleName
 
     fun parse(jsonResponse: String): ArrayList<Room> {
         val list: ArrayList<Room> = ArrayList()
-
-        if (jsonResponse.contains("Error")) {
-            Logger.instance.error(tag, "Found error parsing: $jsonResponse")
-            return list
-        }
 
         try {
             val jsonObject = JSONObject(jsonResponse)

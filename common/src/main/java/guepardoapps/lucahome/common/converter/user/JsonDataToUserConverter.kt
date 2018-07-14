@@ -10,19 +10,14 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-class JsonDataToUserConverter {
+internal class JsonDataToUserConverter {
     private val tag = JsonDataToUserConverter::class.java.simpleName
 
     fun parse(jsonResponse: String): User? {
-        if (jsonResponse.contains("Error")) {
-            Logger.instance.error(tag, "Found error parsing: $jsonResponse")
-            return null
-        }
-
-        val user = User()
         try {
             val jsonObject = JSONObject(jsonResponse)
 
+            val user = User()
             val jsonKey: JsonKey = user.getJsonKey()
             val dataArray: JSONArray = jsonObject.getJSONArray(jsonKey.parent)
 
@@ -40,10 +35,12 @@ class JsonDataToUserConverter {
                 user.password = data.getString(passwordJsonKey.key)
                 user.role = UserRole.values()[data.getInt(roleJsonKey.key)]
             }
+
+            return user
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
-        } finally {
-            return user
         }
+
+        return null
     }
 }

@@ -56,9 +56,6 @@ class VoiceRecognitionService private constructor() : RecognitionListener, Activ
 
     private var onVoiceRecognitionService: OnVoiceRecognitionService? = null
 
-    init {
-    }
-
     private object Holder {
         @SuppressLint("StaticFieldLeak")
         val instance: VoiceRecognitionService = VoiceRecognitionService()
@@ -66,7 +63,6 @@ class VoiceRecognitionService private constructor() : RecognitionListener, Activ
 
     companion object {
         val instance: VoiceRecognitionService by lazy { Holder.instance }
-
         const val broadcastAudioMedia = "gueopardoapps.lucahome.voicerecognition.services.broadcast.audio_media"
         const val bundleAudioMedia = "bundleAudioMedia"
     }

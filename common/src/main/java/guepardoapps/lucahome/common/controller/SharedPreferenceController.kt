@@ -32,24 +32,18 @@ class SharedPreferenceController(context: Context) : ISharedPreferenceController
         return editor.commit()
     }
 
-    override fun loadBoolean(key: String): Boolean {
-        return sharedPreferences.getBoolean(key, false)
-    }
-
-    override fun loadFloat(key: String): Float {
-        return sharedPreferences.getFloat(key, 0.0f)
-    }
-
-    override fun loadInt(key: String): Int {
-        return sharedPreferences.getInt(key, 0)
-    }
-
-    override fun loadLong(key: String): Long {
-        return sharedPreferences.getLong(key, 0)
-    }
-
-    override fun loadString(key: String): String {
-        return sharedPreferences.getString(key, "")
+    override fun <T> load(key: String, defaultValue: T): Any {
+        return when (defaultValue) {
+            Boolean::class.java -> sharedPreferences.getBoolean(key, defaultValue as Boolean)
+            Float::class.java -> sharedPreferences.getFloat(key, defaultValue as Float)
+            Int::class.java -> sharedPreferences.getInt(key, defaultValue as Int)
+            Long::class.java -> sharedPreferences.getLong(key, defaultValue as Long)
+            String::class.java -> sharedPreferences.getString(key, defaultValue as String)
+            else -> {
+                Logger.instance.error(tag, "Invalid generic type of $defaultValue")
+                return {}
+            }
+        }
     }
 
     override fun removeAll(): Boolean {

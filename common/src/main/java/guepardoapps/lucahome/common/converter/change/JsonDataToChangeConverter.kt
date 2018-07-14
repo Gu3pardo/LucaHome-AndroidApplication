@@ -9,16 +9,11 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.*
 
-class JsonDataToChangeConverter {
+internal class JsonDataToChangeConverter {
     private val tag = JsonDataToChangeConverter::class.java.simpleName
 
     fun parse(jsonResponse: String): ArrayList<Change> {
         val list: ArrayList<Change> = ArrayList()
-
-        if (jsonResponse.contains("Error")) {
-            Logger.instance.error(tag, "Found error parsing: $jsonResponse")
-            return list
-        }
 
         try {
             val jsonObject = JSONObject(jsonResponse)

@@ -40,9 +40,6 @@ class BixbyPairService {
 
     val bixbyPairListPublishSubject = PublishSubject.create<RxOptional<ArrayList<BixbyPair>>>()!!
 
-    init {
-    }
-
     private object Holder {
         @SuppressLint("StaticFieldLeak")
         val instance: BixbyPairService = BixbyPairService()
