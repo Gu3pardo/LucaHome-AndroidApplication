@@ -19,4 +19,7 @@ interface IUserService {
     fun save(entry: User): Long
     fun update(entry: User): Int
     fun delete(entry: User): Int
+
+    fun isValidUserName(userName: String): Boolean
+    fun isValidPassword(password: String): Boolean
 }

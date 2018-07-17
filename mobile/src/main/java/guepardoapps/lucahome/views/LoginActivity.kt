@@ -3,6 +3,7 @@ package guepardoapps.lucahome.views
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.text.TextUtils
 import android.view.View
@@ -39,7 +40,18 @@ class LoginActivity : AppCompatActivity() {
                 .subscribeOn(Schedulers.io())
                 .subscribe(
                         { response ->
-                            // TODO
+                            if (response.success) {
+                                finish()
+                            } else {
+                                Snackbar.make(username, response.message, Snackbar.LENGTH_INDEFINITE)
+                                        .setAction(android.R.string.ok) {
+                                            username.setText("")
+                                            username.error = null
+                                            password.setText("")
+                                            password.error = null
+                                            username_sign_in_button.isEnabled = true
+                                        }
+                            }
                         },
                         { responseError ->
                             Logger.instance.error(tag, responseError)
@@ -73,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
         var focusView: View? = null
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
+        if (!TextUtils.isEmpty(passwordStr) && !UserService.instance.isValidPassword(passwordStr)) {
             password.error = getString(R.string.error_invalid_password)
             focusView = password
             cancel = true
@@ -84,7 +96,7 @@ class LoginActivity : AppCompatActivity() {
             username.error = getString(R.string.error_field_required)
             focusView = username
             cancel = true
-        } else if (!isUserNameValid(userNameStr)) {
+        } else if (!UserService.instance.isValidUserName(userNameStr)) {
             username.error = getString(R.string.error_invalid_username)
             focusView = username
             cancel = true
@@ -106,16 +118,6 @@ class LoginActivity : AppCompatActivity() {
 
             UserService.instance.validate(user)
         }
-    }
-
-    private fun isUserNameValid(userName: String): Boolean {
-        //TODO: Replace this with your own logic
-        return userName.length > 4
-    }
-
-    private fun isPasswordValid(password: String): Boolean {
-        //TODO: Replace this with your own logic
-        return password.length > 4
     }
 
     /**

@@ -28,6 +28,12 @@ class UserService private constructor() : IUserService {
 
     companion object {
         val instance: UserService by lazy { Holder.instance }
+
+        const val minUserNameLength: Int = 4
+        const val minPasswordLength: Int = 6
+
+        val userNameRegex: Regex = Regex("[a-zA-Z]+")
+        val passwordRegex: Regex = Regex("[a-zA-Z0-9]+")
     }
 
     override var initialized: Boolean = false
@@ -157,5 +163,13 @@ class UserService private constructor() : IUserService {
             Logger.instance.error(tag, exception)
             -1
         }
+    }
+
+    override fun isValidUserName(userName: String): Boolean {
+        return userName.length >= minUserNameLength && userName.matches(userNameRegex)
+    }
+
+    override fun isValidPassword(password: String): Boolean {
+        return password.length >= minPasswordLength && password.matches(passwordRegex)
     }
 }
