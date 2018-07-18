@@ -30,7 +30,9 @@ class UserService private constructor() : IUserService {
         val instance: UserService by lazy { Holder.instance }
 
         const val minUserNameLength: Int = 4
+        const val maxUserNameLength: Int = 16
         const val minPasswordLength: Int = 6
+        const val maxPasswordLength: Int = 32
 
         val userNameRegex: Regex = Regex("[a-zA-Z]+")
         val passwordRegex: Regex = Regex("[a-zA-Z0-9]+")
@@ -56,6 +58,7 @@ class UserService private constructor() : IUserService {
     }
 
     override fun dispose() {
+        initialized = false
         dbHandler?.close()
         context = null
         dbHandler = null
@@ -166,10 +169,10 @@ class UserService private constructor() : IUserService {
     }
 
     override fun isValidUserName(userName: String): Boolean {
-        return userName.length >= minUserNameLength && userName.matches(userNameRegex)
+        return userName.length in minUserNameLength..maxUserNameLength && userName.matches(userNameRegex)
     }
 
     override fun isValidPassword(password: String): Boolean {
-        return password.length >= minPasswordLength && password.matches(passwordRegex)
+        return password.length in minPasswordLength..maxPasswordLength && password.matches(passwordRegex)
     }
 }

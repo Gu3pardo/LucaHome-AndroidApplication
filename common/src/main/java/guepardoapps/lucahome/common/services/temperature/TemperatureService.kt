@@ -94,6 +94,7 @@ class TemperatureService private constructor() : ITemperatureService {
     }
 
     override fun dispose() {
+        initialized = false
         cancelReload()
         dbHandler?.close()
         context = null

@@ -78,6 +78,7 @@ class PuckJsService private constructor() : IPuckJsService {
     }
 
     override fun dispose() {
+        initialized = false
         cancelReload()
         dbHandler?.close()
         context = null

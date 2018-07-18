@@ -93,6 +93,7 @@ class WirelessSwitchService private constructor() : IWirelessSwitchService {
     }
 
     override fun dispose() {
+        initialized = false
         cancelReload()
         dbHandler?.close()
         context = null

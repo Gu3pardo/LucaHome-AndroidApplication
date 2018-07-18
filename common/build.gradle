@@ -9,7 +9,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 60000
-        versionName "6.0.0.180714-alpha1"
+        versionName "6.0.0.180718-alpha1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         testOptions {
@@ -73,5 +73,8 @@ dependencies {
     androidTestImplementation "com.android.support.test:runner:$test_runner_version"
     androidTestImplementation "com.android.support.test.espresso:espresso-core:$test_espresso_version"
 
-
+    // required if you want to use Mockito for unit tests
+    testImplementation "org.mockito:mockito-core:$mockito_version"
+    // required if you want to use Mockito for Android tests
+    androidTestImplementation "org.mockito:mockito-android:$mockito_version"
 }

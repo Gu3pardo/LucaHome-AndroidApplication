@@ -78,6 +78,7 @@ class RoomService private constructor() : IRoomService {
     }
 
     override fun dispose() {
+        initialized = false
         cancelReload()
         dbHandler?.close()
         context = null

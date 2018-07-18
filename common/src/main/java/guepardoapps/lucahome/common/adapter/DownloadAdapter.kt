@@ -12,7 +12,7 @@ import guepardoapps.lucahome.common.services.user.UserService
 import guepardoapps.lucahome.common.task.DownloadSendTask
 import guepardoapps.lucahome.common.utils.Logger
 
-internal class DownloadAdapter(private val context: Context) {
+class DownloadAdapter(private val context: Context) {
     private val tag = DownloadAdapter::class.java.simpleName
 
     private var networkController: NetworkController = NetworkController(context)

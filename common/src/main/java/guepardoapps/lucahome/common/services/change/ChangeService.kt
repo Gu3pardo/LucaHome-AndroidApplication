@@ -61,6 +61,7 @@ class ChangeService private constructor() : IChangeService {
     }
 
     override fun dispose() {
+        initialized = false
         context = null
     }
 
