@@ -6,8 +6,8 @@ import android.support.annotation.NonNull
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.net.wifi.WifiManager
-import guepardoapps.lib.openweather.utils.Logger
 import android.telephony.TelephonyManager
+import guepardoapps.lucahome.common.utils.Logger
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException

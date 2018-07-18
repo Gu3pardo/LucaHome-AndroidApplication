@@ -7,7 +7,7 @@ import guepardoapps.lucahome.common.models.common.ServiceSettings
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
-internal interface ILucaService<T> {
+interface ILucaService<T> {
     var initialized: Boolean
     var context: Context?
 
