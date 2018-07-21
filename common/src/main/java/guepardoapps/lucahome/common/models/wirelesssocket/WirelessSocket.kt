@@ -15,25 +15,25 @@ class WirelessSocket : Serializable {
     private val tag: String = WirelessSocket::class.java.simpleName
 
     @JsonKey("", "Uuid")
-    lateinit var uuid: UUID
+    var uuid: UUID = UUID.randomUUID()
 
     @JsonKey("", "RoomUuid")
-    lateinit var roomUuid: UUID
+    var roomUuid: UUID = UUID.randomUUID()
 
     @JsonKey("", "Name")
-    lateinit var name: String
+    var name: String = ""
 
     @JsonKey("", "Code")
-    lateinit var code: String
+    var code: String = ""
 
     @JsonKey("", "State")
     var state: Boolean = false
 
     @JsonKey("LastTrigger", "DateTime")
-    lateinit var lastTriggerDateTime: Calendar
+    var lastTriggerDateTime: Calendar = Calendar.getInstance()
 
     @JsonKey("LastTrigger", "User")
-    lateinit var lastTriggerUser: String
+    var lastTriggerUser: String = ""
 
     var isOnServer: Boolean = true
     var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null

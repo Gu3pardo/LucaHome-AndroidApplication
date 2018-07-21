@@ -1,7 +1,6 @@
 package guepardoapps.lucahome.common.services.user
 
 import android.annotation.SuppressLint
-import android.content.Context
 import guepardoapps.lucahome.common.adapter.DownloadAdapter
 import guepardoapps.lucahome.common.adapter.OnDownloadAdapter
 import guepardoapps.lucahome.common.constants.Labels
@@ -39,28 +38,22 @@ class UserService private constructor() : IUserService {
     }
 
     override var initialized: Boolean = false
-        get() = context != null && dbHandler != null
-    override var context: Context? = null
+        get() = this.downloadAdapter != null && this.dbHandler != null
 
     override val responsePublishSubject: PublishSubject<RxResponse> = PublishSubject.create<RxResponse>()!!
 
-    override fun initialize(context: Context) {
+    override fun initialize(downloadAdapter: DownloadAdapter, dbHandler: DbUser) {
         if (initialized) {
             return
         }
 
-        this.context = context
-        downloadAdapter = DownloadAdapter(this.context!!)
-
-        if (dbHandler == null) {
-            dbHandler = DbUser(this.context!!)
-        }
+        this.downloadAdapter = downloadAdapter
+        this.dbHandler = dbHandler
     }
 
     override fun dispose() {
         initialized = false
         dbHandler?.close()
-        context = null
         dbHandler = null
     }
 

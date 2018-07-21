@@ -10,21 +10,21 @@ import guepardoapps.lucahome.common.enums.user.UserRole
 import java.util.*
 
 @JsonKey("Data", "PuckJs")
-data class PuckJs(
-        @JsonKey("", "Uuid")
-        var uuid: UUID = UUID.randomUUID(),
+class PuckJs {
+    @JsonKey("", "Uuid")
+    var uuid: UUID = UUID.randomUUID()
 
-        @JsonKey("", "RoomUuid")
-        var roomUuid: UUID = UUID.randomUUID(),
+    @JsonKey("", "RoomUuid")
+    var roomUuid: UUID = UUID.randomUUID()
 
-        @JsonKey("", "Name")
-        var name: String = "",
+    @JsonKey("", "Name")
+    var name: String = ""
 
-        @JsonKey("", "Mac")
-        var mac: String = "",
+    @JsonKey("", "Mac")
+    var mac: String = ""
 
-        var isOnServer: Boolean = true,
-        var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null) {
+    var isOnServer: Boolean = true
+    var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null
 
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)

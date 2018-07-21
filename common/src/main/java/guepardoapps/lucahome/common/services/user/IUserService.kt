@@ -1,17 +1,16 @@
 package guepardoapps.lucahome.common.services.user
 
-import android.content.Context
+import guepardoapps.lucahome.common.adapter.DownloadAdapter
+import guepardoapps.lucahome.common.databases.user.DbUser
 import guepardoapps.lucahome.common.models.common.RxResponse
 import guepardoapps.lucahome.common.models.user.User
 import io.reactivex.subjects.PublishSubject
 
 interface IUserService {
     var initialized: Boolean
-    var context: Context?
-
     val responsePublishSubject: PublishSubject<RxResponse>
 
-    fun initialize(context: Context)
+    fun initialize(downloadAdapter: DownloadAdapter, dbHandler: DbUser)
     fun dispose()
 
     fun validate(entry: User)

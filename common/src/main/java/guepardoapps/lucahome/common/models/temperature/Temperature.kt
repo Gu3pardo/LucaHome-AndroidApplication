@@ -7,24 +7,25 @@ import guepardoapps.lucahome.common.R
 import java.util.*
 
 @JsonKey("Data", "Temperature")
-data class Temperature(
-        @JsonKey("", "Uuid")
-        var uuid: UUID = UUID.randomUUID(),
+class Temperature {
+    @JsonKey("", "Uuid")
+    var uuid: UUID = UUID.randomUUID()
 
-        @JsonKey("", "Value")
-        var value: Double = 0.0,
+    @JsonKey("", "Value")
+    var value: Double = 0.0
 
-        @JsonKey("", "Area")
-        var area: String = "",
+    @JsonKey("", "Area")
+    var area: String = ""
 
-        @JsonKey("", "SensorPath")
-        var sensorPath: String = "",
+    @JsonKey("", "SensorPath")
+    var sensorPath: String = ""
 
-        @JsonKey("", "GraphPath")
-        var graphPath: String = "",
+    @JsonKey("", "GraphPath")
+    var graphPath: String = ""
 
-        var type: TemperatureType = TemperatureType.Dummy,
-        var dateTime: Calendar = Calendar.getInstance()) {
+    var type: TemperatureType = TemperatureType.Dummy
+
+    var dateTime: Calendar = Calendar.getInstance()
 
     val temperatureString = "${value.doubleFormat(2)} ${0x00B0.toChar()}C"
 

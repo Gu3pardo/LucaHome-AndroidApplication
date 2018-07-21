@@ -14,16 +14,16 @@ class User {
     private val tag = User::class.java.simpleName
 
     @JsonKey("", "Uuid")
-    lateinit var uuid: UUID
+    var uuid: UUID = UUID.randomUUID()
 
     @JsonKey("", "Name")
-    lateinit var name: String
+    var name: String = ""
 
     @JsonKey("", "Password")
-    lateinit var password: String
+    var password: String = ""
 
     @JsonKey("", "Role")
-    lateinit var role: UserRole
+    var role: UserRole = UserRole.Null
 
     var isOnServer: Boolean = true
     var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null

@@ -11,18 +11,18 @@ import guepardoapps.lucahome.common.enums.user.UserRole
 import java.util.*
 
 @JsonKey("Data", "Room")
-data class Room(
-        @JsonKey("", "Uuid")
-        var uuid: UUID = UUID.randomUUID(),
+class Room {
+    @JsonKey("", "Uuid")
+    var uuid: UUID = UUID.randomUUID()
 
-        @JsonKey("", "Name")
-        var name: String = "",
+    @JsonKey("", "Name")
+    var name: String = ""
 
-        @JsonKey("", "Type")
-        var type: RoomType = RoomType.Null,
+    @JsonKey("", "Type")
+    var type: RoomType = RoomType.Null
 
-        var isOnServer: Boolean = true,
-        var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null) {
+    var isOnServer: Boolean = true
+    var serverDatabaseAction: ServerDatabaseAction = ServerDatabaseAction.Null
 
     @NeededUserRole(UserRole.User)
     @NeededNetwork(NetworkType.HomeWifi)

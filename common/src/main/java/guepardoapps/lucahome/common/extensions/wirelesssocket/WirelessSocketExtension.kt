@@ -11,7 +11,9 @@ internal fun WirelessSocket.getJsonKey(): JsonKey {
 }
 
 internal fun WirelessSocket.getPropertyJsonKey(propertyName: String): JsonKey {
-    return this::class.java.getDeclaredField(propertyName).declaredAnnotations.find { it is JsonKey } as JsonKey
+    val getDeclaredField = this::class.java.getDeclaredField(propertyName)
+    val jsonKey = getDeclaredField.declaredAnnotations.find { it is JsonKey } as JsonKey
+    return jsonKey
 }
 
 internal fun WirelessSocket.getNeededNetwork(): NeededNetwork {

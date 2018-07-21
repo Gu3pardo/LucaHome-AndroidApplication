@@ -1,13 +1,13 @@
 package guepardoapps.lucahome.common.converter.wirelesssocket
 
+import com.beust.klaxon.JsonObject
+import com.beust.klaxon.Parser
 import guepardoapps.lucahome.common.annotations.JsonKey
 import guepardoapps.lucahome.common.extensions.common.toBoolean
 import guepardoapps.lucahome.common.extensions.wirelesssocket.getJsonKey
 import guepardoapps.lucahome.common.extensions.wirelesssocket.getPropertyJsonKey
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
 import guepardoapps.lucahome.common.utils.Logger
-import org.json.JSONArray
-import org.json.JSONObject
 import java.util.*
 
 internal class JsonDataToWirelessSocketConverter {
@@ -17,15 +17,17 @@ internal class JsonDataToWirelessSocketConverter {
         val list: ArrayList<WirelessSocket> = ArrayList()
 
         try {
-            val jsonObject = JSONObject(jsonResponse)
+            val parser = Parser()
+            val stringBuilder = StringBuilder(jsonResponse)
+            val jsonObject = parser.parse(stringBuilder) as JsonObject
 
             val wirelessSocket = WirelessSocket()
             val jsonKey: JsonKey = wirelessSocket.getJsonKey()
-            val dataArray: JSONArray = jsonObject.getJSONArray(jsonKey.parent)
+            val dataArray = jsonObject.array<JsonObject>(jsonKey.parent)
 
-            for (index: Int in 0..dataArray.length()) {
-                val value: JSONObject = dataArray.getJSONObject(index)
-                val data: JSONObject = value.getJSONObject(WirelessSocket::class.java.simpleName)
+            for (index: Int in 0..dataArray!!.size) {
+                val value = dataArray[index]
+                val data = value.obj(WirelessSocket::class.java.simpleName)
 
                 val stateJsonKey = wirelessSocket.getPropertyJsonKey(wirelessSocket::state.name)
                 val codeJsonKey = wirelessSocket.getPropertyJsonKey(wirelessSocket::code.name)
@@ -35,18 +37,18 @@ internal class JsonDataToWirelessSocketConverter {
                 val lastTriggerDateTimeJsonKey = wirelessSocket.getPropertyJsonKey(wirelessSocket::lastTriggerDateTime.name)
                 val lastTriggerUserJsonKey = wirelessSocket.getPropertyJsonKey(wirelessSocket::lastTriggerUser.name)
 
-                wirelessSocket.uuid = UUID.fromString(data.getString(uuidJsonKey.key))
-                wirelessSocket.roomUuid = UUID.fromString(data.getString(roomUuidJsonKey.key))
-                wirelessSocket.name = data.getString(nameJsonKey.key)
-                wirelessSocket.code = data.getString(codeJsonKey.key)
-                wirelessSocket.state = data.getInt(stateJsonKey.key).toBoolean()
+                wirelessSocket.uuid = UUID.fromString(data!!.string(uuidJsonKey.key))
+                wirelessSocket.roomUuid = UUID.fromString(data.string(roomUuidJsonKey.key))
+                wirelessSocket.name = data.string(nameJsonKey.key)!!
+                wirelessSocket.code = data.string(codeJsonKey.key)!!
+                wirelessSocket.state = data.int(stateJsonKey.key)!!.toBoolean()
 
-                val lastTrigger: JSONObject = data.getJSONObject(lastTriggerDateTimeJsonKey.parent)
+                val lastTrigger = data.obj(lastTriggerDateTimeJsonKey.parent)
 
-                val lastTriggerDateTimeLong: Long = lastTrigger.getLong(lastTriggerDateTimeJsonKey.key)
+                val lastTriggerDateTimeLong: Long = lastTrigger!!.long(lastTriggerDateTimeJsonKey.key)!!
                 wirelessSocket.lastTriggerDateTime.timeInMillis = lastTriggerDateTimeLong
 
-                wirelessSocket.lastTriggerUser = lastTrigger.getString(lastTriggerUserJsonKey.key)
+                wirelessSocket.lastTriggerUser = lastTrigger.string(lastTriggerUserJsonKey.key)!!
 
                 list.add(wirelessSocket)
             }

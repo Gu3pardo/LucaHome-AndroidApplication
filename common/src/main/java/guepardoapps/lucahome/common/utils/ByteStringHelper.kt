@@ -9,7 +9,7 @@ class ByteStringHelper {
          * @return returns a converted string from a char array
          */
         fun readStringFromCharArray(charArray: CharArray): String {
-            for (index in 0..charArray.size) {
+            for (index in 0 until charArray.size) {
                 charArray[index] = charArray[index].div(69)
             }
 
