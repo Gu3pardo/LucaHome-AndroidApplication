@@ -4,13 +4,13 @@ apply plugin: "kotlin-android-extensions"
 
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.1"
+    buildToolsVersion "28.0.2"
     defaultConfig {
         applicationId "guepardoapps.lucahome"
         minSdkVersion 23
         targetSdkVersion 28
         versionCode 60000
-        versionName "6.0.0.180714-alpha1"
+        versionName "6.0.0.180809-alpha1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         testOptions {

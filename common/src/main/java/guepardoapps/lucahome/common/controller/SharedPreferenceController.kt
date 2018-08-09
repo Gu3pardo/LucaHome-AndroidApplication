@@ -1,44 +1,40 @@
 package guepardoapps.lucahome.common.controller
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.preference.PreferenceManager
+import com.andreacioccarelli.cryptoprefs.CryptoPrefs
 import guepardoapps.lucahome.common.utils.Logger
 
-class SharedPreferenceController(context: Context) : ISharedPreferenceController {
+class SharedPreferenceController(context: Context, fileName: String, key: String) : ISharedPreferenceController {
     private val tag: String = SharedPreferenceController::class.java.simpleName
 
-    private val sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val cryptoPrefs: CryptoPrefs = CryptoPrefs(context, fileName, key)
 
-    override fun contains(key: String): Boolean {
-        return sharedPreferences.contains(key)
-    }
-
-    override fun <T> save(key: String, value: T): Boolean {
-        val editor: SharedPreferences.Editor = sharedPreferences.edit()
-
+    override fun <T> save(key: String, value: T) {
         when (value) {
-            Boolean::class.java -> editor.putBoolean(key, value as Boolean)
-            Float::class.java -> editor.putFloat(key, value as Float)
-            Int::class.java -> editor.putInt(key, value as Int)
-            Long::class.java -> editor.putLong(key, value as Long)
-            String::class.java -> editor.putString(key, value as String)
+            Boolean::class.java -> cryptoPrefs.put(key, value as Boolean)
+            Byte::class.java -> cryptoPrefs.put(key, value as Byte)
+            Double::class.java -> cryptoPrefs.put(key, value as Double)
+            Float::class.java -> cryptoPrefs.put(key, value as Float)
+            Int::class.java -> cryptoPrefs.put(key, value as Int)
+            Long::class.java -> cryptoPrefs.put(key, value as Long)
+            Short::class.java -> cryptoPrefs.put(key, value as Short)
+            String::class.java -> cryptoPrefs.put(key, value as String)
             else -> {
                 Logger.instance.error(tag, "Invalid generic type of $value")
-                return false
             }
         }
-
-        return editor.commit()
     }
 
     override fun <T> load(key: String, defaultValue: T): Any {
         return when (defaultValue) {
-            Boolean::class.java -> sharedPreferences.getBoolean(key, defaultValue as Boolean)
-            Float::class.java -> sharedPreferences.getFloat(key, defaultValue as Float)
-            Int::class.java -> sharedPreferences.getInt(key, defaultValue as Int)
-            Long::class.java -> sharedPreferences.getLong(key, defaultValue as Long)
-            String::class.java -> sharedPreferences.getString(key, defaultValue as String)
+            Boolean::class.java -> cryptoPrefs.getBoolean(key, defaultValue as Boolean)
+            Byte::class.java -> cryptoPrefs.getByte(key, defaultValue as Byte)
+            Double::class.java -> cryptoPrefs.getDouble(key, defaultValue as Double)
+            Float::class.java -> cryptoPrefs.getFloat(key, defaultValue as Float)
+            Int::class.java -> cryptoPrefs.getInt(key, defaultValue as Int)
+            Long::class.java -> cryptoPrefs.getLong(key, defaultValue as Long)
+            Short::class.java -> cryptoPrefs.getShort(key, defaultValue as Short)
+            String::class.java -> cryptoPrefs.getString(key, defaultValue as String)
             else -> {
                 Logger.instance.error(tag, "Invalid generic type of $defaultValue")
                 return {}
@@ -46,9 +42,11 @@ class SharedPreferenceController(context: Context) : ISharedPreferenceController
         }
     }
 
-    override fun removeAll(): Boolean {
-        val editor: SharedPreferences.Editor = sharedPreferences.edit()
-        editor.clear()
-        return editor.commit()
+    override fun remove(key: String) {
+        cryptoPrefs.remove(key)
+    }
+
+    override fun erase() {
+        cryptoPrefs.erase()
     }
 }

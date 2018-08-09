@@ -37,7 +37,7 @@ class BitmapHelper {
 
             val uri: Uri = Uri.withAppendedPath(ContactsContract.Contacts.CONTENT_FILTER_URI, Uri.encode(name))
 
-            val cursor: Cursor = contentResolver.query(uri, projection, null, null, null)
+            val cursor: Cursor = contentResolver.query(uri, projection, null, null, null)!!
             while (cursor.moveToNext()) {
                 contactId = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.Contacts._ID))
             }
@@ -46,7 +46,7 @@ class BitmapHelper {
             val contactUri: Uri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId.toLong())
             val photoUri: Uri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
 
-            val photoCursor: Cursor = contentResolver.query(photoUri, arrayOf(ContactsContract.Contacts.Photo.PHOTO), null, null, null)
+            val photoCursor: Cursor = contentResolver.query(photoUri, arrayOf(ContactsContract.Contacts.Photo.PHOTO), null, null, null)!!
             photoCursor.use { pCursor ->
                 if (pCursor.moveToFirst()) {
                     val data = pCursor.getBlob(0)

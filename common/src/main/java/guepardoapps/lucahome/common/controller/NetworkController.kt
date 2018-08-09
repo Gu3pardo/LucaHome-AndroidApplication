@@ -122,7 +122,7 @@ class NetworkController(@NonNull private val context: Context) : INetworkControl
 
     override fun setMobileDataState(newMobileDataState: Boolean) {
         try {
-            telephonyManager.javaClass.getDeclaredMethod("setDataEnabled", Boolean::class.javaPrimitiveType)?.invoke(telephonyManager, newMobileDataState)
+            telephonyManager.javaClass.getDeclaredMethod("setDataEnabled", Boolean::class.javaPrimitiveType).invoke(telephonyManager, newMobileDataState)
         } catch (exception: Exception) {
             Logger.instance.error(tag, exception)
         }

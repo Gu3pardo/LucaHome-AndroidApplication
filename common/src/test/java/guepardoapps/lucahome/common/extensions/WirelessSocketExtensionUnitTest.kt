@@ -1,53 +1,53 @@
 package guepardoapps.lucahome.common.extensions
 
+import guepardoapps.lucahome.common.extensions.wirelesssocket.getJsonKey
 import guepardoapps.lucahome.common.extensions.wirelesssocket.getPropertyJsonKey
 import guepardoapps.lucahome.common.models.wirelesssocket.WirelessSocket
 
-import org.junit.experimental.theories.DataPoints
-import org.junit.experimental.theories.Theories
-import org.junit.experimental.theories.Theory
-import org.junit.runner.RunWith
+import org.jetbrains.spek.api.Spek
+import org.jetbrains.spek.api.dsl.describe
+import org.jetbrains.spek.api.dsl.it
 
 import org.junit.Assert.assertEquals
+import org.junit.platform.runner.JUnitPlatform
+import org.junit.runner.RunWith
 
-@RunWith(Theories::class)
-class WirelessSocketExtensionUnitTest {
-/*
-    @Test
-    @Throws(Exception::class)
-    fun getJsonKey_isCorrect() {
-        val expectedParent = "Data"
-        val expectedKey = "WirelessSocket"
-        val actual = WirelessSocket().getJsonKey()
+@RunWith(JUnitPlatform::class)
+class WirelessSocketExtensionUnitTest : Spek({
 
-        assertEquals(expectedParent, actual.parent)
-        assertEquals(expectedKey, actual.key)
+    describe("Unit tests for WirelessSocketExtensionUnitTest") {
+
+        beforeEachTest { }
+
+        afterEachTest { }
+
+        it("getJsonKey for wirelessSocket should be correct") {
+            // Arrange
+            val wirelessSocket = WirelessSocket()
+            val expectedParent = "Data"
+            val expectedKey = "WirelessSocket"
+
+            // Act
+            val actualJsonKey = wirelessSocket.getJsonKey()
+
+            // Assert
+            assertEquals(expectedParent, actualJsonKey.parent)
+            assertEquals(expectedKey, actualJsonKey.key)
+        }
+
+        it("getPropertyJsonKey for city  should be correct") {
+            // Arrange
+            val wirelessSocket = WirelessSocket()
+            val expectedParent = "LastTrigger"
+            val expectedKey = "DateTime"
+
+            // Act
+            val name = wirelessSocket::lastTriggerDateTime.name
+            val actualJsonKey = wirelessSocket.getPropertyJsonKey(name)
+
+            // Assert
+            assertEquals(expectedParent, actualJsonKey.parent)
+            assertEquals(expectedKey, actualJsonKey.key)
+        }
     }
-*/
-    class PropertyJson internal constructor(
-        var property: String,
-        var parent: String,
-        internal var key: String)
-
-    companion object {
-        @DataPoints
-        var propertyJsonList = arrayOf(
-                PropertyJson(WirelessSocket::uuid.name, "", "Uuid"),
-                PropertyJson(WirelessSocket::roomUuid.name, "", "RoomUuid"),
-                PropertyJson(WirelessSocket::name.name, "", "Name"),
-                PropertyJson(WirelessSocket::code.name, "", "Code"),
-                PropertyJson(WirelessSocket::state.name, "", "State"),
-                PropertyJson(WirelessSocket::lastTriggerDateTime.name, "LastTrigger", "DateTime"),
-                PropertyJson(WirelessSocket::lastTriggerUser.name, "LastTrigger", "User")
-        )
-    }
-
-    @Theory
-    @Throws(Exception::class)
-    fun getPropertyJsonKey_isCorrect(propertyJson: PropertyJson) {
-        val actual = WirelessSocket().getPropertyJsonKey(propertyJson.property)
-
-        assertEquals(propertyJson.parent, actual.parent)
-        assertEquals(propertyJson.key, actual.key)
-    }
-}
+})

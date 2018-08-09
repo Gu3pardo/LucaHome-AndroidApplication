@@ -12,9 +12,9 @@ import org.junit.Assert.assertEquals
 import org.junit.platform.runner.JUnitPlatform
 
 // http://spekframework.github.io/spek/docs/latest/#_ignoring_tests
-
+/*
 @RunWith(JUnitPlatform::class)
-class UserServiceUnitTest : Spek({
+class IsValidPasswordUnitTest : Spek({
 
     describe("Unit tests for UserServiceUnitTest") {
 
@@ -55,4 +55,4 @@ class IsValidPasswordUnitTest {
         val actualIsValid = UserService.instance.isValidPassword(passwordValidation.password)
         assertEquals(passwordValidation.isValid, actualIsValid)
     }
-}
+}*/
