@@ -9,8 +9,8 @@ Main project for every android project of the parent project LucaHome!
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
-[![Build](https://img.shields.io/badge/build-Failed-red.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/mobile)
-[![Version](https://img.shields.io/badge/version-v6.0.0.180712-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/mobile)
+[![Build](https://img.shields.io/badge/build-Failed-red.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/develop/mobile)
+[![Version](https://img.shields.io/badge/version-v6.0.0.180712-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/develop/mobile)
 
 Android client to remotely control wireless sockets and switches, some mediaserver, to view room temperature, share your shoppinglist, plan your meals and much more...
 __________
@@ -22,8 +22,8 @@ __________
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
-[![Build](https://img.shields.io/badge/build-Failed-red.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/bixby)
-[![Version](https://img.shields.io/badge/version-v6.0.0.180712-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/bixby)
+[![Build](https://img.shields.io/badge/build-Failed-red.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/develop/bixby)
+[![Version](https://img.shields.io/badge/version-v6.0.0.180712-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/develop/bixby)
 
 Shared module to use the bixby button on a S8.  E.g. toggling wireless sockets or switches by simply pressing the bixby button.
 __________
@@ -35,7 +35,7 @@ __________
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 <a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
 
-[![Build](https://img.shields.io/badge/build-Failed-red.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/voicerecognition)
-[![Version](https://img.shields.io/badge/version-v6.0.0.180712-blue.svg)](https://github.com/GuepardoApps/LucaHome-AndroidApplication/tree/develop/voicerecognition)
+[![Build](https://img.shields.io/badge/build-Failed-red.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/develop/voicerecognition)
+[![Version](https://img.shields.io/badge/version-v6.0.0.180712-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/develop/voicerecognition)
 
 Shared module to use voice recognition on all client applications to control everything using your voice.
