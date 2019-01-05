@@ -39,3 +39,7 @@ __________
 [![Version](https://img.shields.io/badge/version-v6.0.0.180712-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/develop/voicerecognition)
 
 Shared module to use voice recognition on all client applications to control everything using your voice.
+
+# License
+
+LucaHome-AndroidApplication is distributed under the MIT license. [See LICENSE](LICENSE.md) for details.
