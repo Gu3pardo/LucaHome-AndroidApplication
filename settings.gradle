@@ -1,1 +1,1 @@
-include ':mobile', ':common', ':bixby', ':voicerecognition', ':pocketsphinx-android-5prealpha-release', ':openweather'
+include ':mobile'
