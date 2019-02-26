@@ -1,0 +1,7 @@
+- [ ] https://flutter.dev/docs/get-started/flutter-for/android-devs
+- [ ] https://github.com/leisim/awesome-flutter-packages
+- [x] https://github.com/ericwindmill/flutter_by_example_apps
+	- [x] https://github.com/ericwindmill/flutter_by_example_apps/tree/master/redux_app
+	- [x] https://flutterbyexample.com/basic-dogs-app-setup
+- [x] https://pub.dartlang.org/packages/font_awesome_flutter
+- [x] https://pub.dartlang.org/packages/http
