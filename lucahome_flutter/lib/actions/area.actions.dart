@@ -27,6 +27,32 @@ class AreaLoadFail {
   }
 }
 
+class AreaSelect {
+  AreaSelect();
+}
+
+class AreaSelectSuccessful {
+  final Area area;
+
+  AreaSelectSuccessful({@required this.area});
+
+  @override
+  String toString() {
+    return 'AreaSelectSuccessful{area: $area}';
+  }
+}
+
+class AreaSelectFail {
+  final dynamic error;
+
+  AreaSelectFail(this.error);
+
+  @override
+  String toString() {
+    return 'AreaSelectFail{There was an error selecting: $error}';
+  }
+}
+
 class AreaAdd {
   AreaAdd();
 }

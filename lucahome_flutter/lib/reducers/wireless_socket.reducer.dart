@@ -2,7 +2,7 @@ import 'package:lucahome_flutter/actions/wireless_socket.actions.dart';
 import 'package:lucahome_flutter/models/wireless_socket.model.dart';
 import 'package:redux/redux.dart';
 
-final wirelessSocketReducer = combineReducers<List<WirelessSocket>>([
+final wirelessSocketListReducer = combineReducers<List<WirelessSocket>>([
   new TypedReducer<List<WirelessSocket>, WirelessSocketLoadSuccessful>(_loadSuccessful),
   new TypedReducer<List<WirelessSocket>, WirelessSocketLoadFail>(_loadFailed),
   new TypedReducer<List<WirelessSocket>, WirelessSocketAddSuccessful>(_addSuccessful),
@@ -29,3 +29,11 @@ List<WirelessSocket> _updateFailed(List<WirelessSocket> wirelessSocketList, acti
 
 List<WirelessSocket> _deleteSuccessful(List<WirelessSocket> wirelessSocketList, action) => List.unmodifiable(List.from(wirelessSocketList)..remove(action.wirelessSocket));
 List<WirelessSocket> _deleteFailed(List<WirelessSocket> wirelessSocketList, action) => wirelessSocketList;
+
+final wirelessSocketReducer = combineReducers<WirelessSocket>([
+  new TypedReducer<WirelessSocket, WirelessSocketSelectSuccessful>(_selectSuccessful),
+  new TypedReducer<WirelessSocket, WirelessSocketSelectFail>(_selectFailed),
+]);
+
+WirelessSocket _selectSuccessful(WirelessSocket wirelessSocket, action) => action.wirelessSocket;
+WirelessSocket _selectFailed(WirelessSocket wirelessSocket, action) => wirelessSocket;

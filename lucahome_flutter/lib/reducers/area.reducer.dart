@@ -2,7 +2,7 @@ import 'package:lucahome_flutter/actions/area.actions.dart';
 import 'package:lucahome_flutter/models/area.model.dart';
 import 'package:redux/redux.dart';
 
-final areaReducer = combineReducers<List<Area>>([
+final areaListReducer = combineReducers<List<Area>>([
   new TypedReducer<List<Area>, AreaLoadSuccessful>(_loadSuccessful),
   new TypedReducer<List<Area>, AreaLoadFail>(_loadFailed),
   new TypedReducer<List<Area>, AreaAddSuccessful>(_addSuccessful),
@@ -29,3 +29,11 @@ List<Area> _updateFailed(List<Area> areaList, action) => areaList;
 
 List<Area> _deleteSuccessful(List<Area> areaList, action) => List.unmodifiable(List.from(areaList)..remove(action.area));
 List<Area> _deleteFailed(List<Area> areaList, action) => areaList;
+
+final areaReducer = combineReducers<Area>([
+  new TypedReducer<Area, AreaSelectSuccessful>(_selectSuccessful),
+  new TypedReducer<Area, AreaSelectFail>(_selectFailed),
+]);
+
+Area _selectSuccessful(Area area, action) => action.area;
+Area _selectFailed(Area area, action) => area;

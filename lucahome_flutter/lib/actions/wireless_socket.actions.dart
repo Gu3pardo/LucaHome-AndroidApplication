@@ -27,6 +27,32 @@ class WirelessSocketLoadFail {
   }
 }
 
+class WirelessSocketSelect {
+  WirelessSocketSelect();
+}
+
+class WirelessSocketSelectSuccessful {
+  final WirelessSocket wirelessSocket;
+
+  WirelessSocketSelectSuccessful({@required this.wirelessSocket});
+
+  @override
+  String toString() {
+    return 'WirelessSocketSelectSuccessful{wirelessSocket: $wirelessSocket}';
+  }
+}
+
+class WirelessSocketSelectFail {
+  final dynamic error;
+
+  WirelessSocketSelectFail(this.error);
+
+  @override
+  String toString() {
+    return 'WirelessSocketSelectFail{There was an error selecting: $error}';
+  }
+}
+
 class WirelessSocketAdd {
   WirelessSocketAdd();
 }
