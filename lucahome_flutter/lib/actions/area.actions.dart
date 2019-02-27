@@ -1,106 +1,106 @@
 import 'package:flutter/foundation.dart';
 import 'package:lucahome_flutter/models/area.model.dart';
 
-class Load {
-  Load();
+class AreaLoad {
+  AreaLoad();
 }
 
-class LoadSuccessful {
-  final List<Area> areaList;
+class AreaLoadSuccessful {
+  final List<Area> list;
 
-  LoadSuccessful({@required this.areaList});
+  AreaLoadSuccessful({@required this.list});
 
   @override
   String toString() {
-    return 'Load{areaList: $areaList}';
+    return 'AreaLoadSuccessful{areaList: $list}';
   }
 }
 
-class LoadFail {
+class AreaLoadFail {
   final dynamic error;
 
-  LoadFail(this.error);
+  AreaLoadFail(this.error);
 
   @override
   String toString() {
-    return 'Load{There was an error loading: $error}';
+    return 'AreaLoadFail{There was an error loading: $error}';
   }
 }
 
-class Add {
-  Add();
+class AreaAdd {
+  AreaAdd();
 }
 
-class AddSuccessful {
+class AreaAddSuccessful {
   final Area area;
 
-  AddSuccessful({@required this.area});
+  AreaAddSuccessful({@required this.area});
 
   @override
   String toString() {
-    return 'Add{area: $area}';
+    return 'AreaAddSuccessful{area: $area}';
   }
 }
 
-class AddFail {
+class AreaAddFail {
   final dynamic error;
 
-  AddFail(this.error);
+  AreaAddFail(this.error);
 
   @override
   String toString() {
-    return 'Add{There was an error adding: $error}';
+    return 'AreaAddFail{There was an error adding: $error}';
   }
 }
 
-class Update {
-  Update();
+class AreaUpdate {
+  AreaUpdate();
 }
 
-class UpdateSuccessful {
+class AreaUpdateSuccessful {
   final Area area;
 
-  UpdateSuccessful({@required this.area});
+  AreaUpdateSuccessful({@required this.area});
 
   @override
   String toString() {
-    return 'Update{area: $area}';
+    return 'AreaUpdateSuccessful{area: $area}';
   }
 }
 
-class UpdateFail {
+class AreaUpdateFail {
   final dynamic error;
 
-  UpdateFail(this.error);
+  AreaUpdateFail(this.error);
 
   @override
   String toString() {
-    return 'Update{There was an error updating: $error}';
+    return 'AreaUpdateFail{There was an error updating: $error}';
   }
 }
 
-class Delete {
-  Delete();
+class AreaDelete {
+  AreaDelete();
 }
 
-class DeleteSuccessful {
+class AreaDeleteSuccessful {
   final Area area;
 
-  DeleteSuccessful({@required this.area});
+  AreaDeleteSuccessful({@required this.area});
 
   @override
   String toString() {
-    return 'Delete{area: $area}';
+    return 'AreaDeleteSuccessful{area: $area}';
   }
 }
 
-class DeleteFail {
+class AreaDeleteFail {
   final dynamic error;
 
-  DeleteFail(this.error);
+  AreaDeleteFail(this.error);
 
   @override
   String toString() {
-    return 'Update{There was an error deleting: $error}';
+    return 'AreaDeleteFail{There was an error deleting: $error}';
   }
 }
