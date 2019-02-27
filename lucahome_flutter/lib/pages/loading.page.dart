@@ -3,7 +3,7 @@ import 'package:lucahome_flutter/animations/bar.animation.dart';
 
 class LoadingPage extends StatefulWidget {
   static String tag = 'loading-page';
-  
+
   @override
   _LoadingPageState createState() => new _LoadingPageState();
 }
