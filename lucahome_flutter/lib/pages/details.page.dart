@@ -22,7 +22,7 @@ class _DetailsPageState extends State<DetailsPage> {
             tag: widget.wirelessSocket.icon,
             child: new Icon(
               fromString(widget.wirelessSocket.icon),
-              size: 50.0,
+              size: 150.0,
             ),
           ),
         ),
