@@ -20,11 +20,11 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     final nextCloudUrl = TextFormField(
-      keyboardType: TextInputType.text,
+      keyboardType: TextInputType.url,
       autofocus: true,
       initialValue: '',
       decoration: InputDecoration(
-        hintText: 'UserName',
+        hintText: 'NextCloudUrl',
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
@@ -35,7 +35,7 @@ class _LoginPageState extends State<LoginPage> {
       autofocus: false,
       initialValue: '',
       decoration: InputDecoration(
-        hintText: 'NextCloudUrl',
+        hintText: 'UserName',
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
             logo,
             SizedBox(height: 48.0),
             nextCloudUrl,
-            SizedBox(height: 16.0),
+            SizedBox(height: 24.0),
             userName,
             SizedBox(height: 8.0),
             passPhrase,
