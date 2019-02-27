@@ -1,2 +1,0 @@
-include ':mobile', ':common', ':basic', ':lib_openweather', ':mediamirror', ':bixby'
-project(':lib_openweather').projectDir = new File(settingsDir, '../OpenWeather/lib_openweather')

@@ -1,66 +1,40 @@
 # LucaHome-AndroidApplication
 
-[![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
-<a target="_blank" href="https://android-arsenal.com/api?level=24" title="API24+"><img src="https://img.shields.io/badge/API-24+-blue.svg" /></a>
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-<a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
+Android Frontend to control sockets hosted by a NextCloud server.
 
-[![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication)
-[![Version](https://img.shields.io/badge/version-v5.2.5.180115-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication)
+## Getting Started
 
-Part of the LucaHome-Project
-Containing shared libraries for LucaHome, the main android client application and the latest mediamirror project (v2).
+This project is a starting point for a Flutter application.
 
-Android client to remotely control sockets, mediaserver, view temperature, share your shoppinglist, plan your menu and much more...
+A few resources to get you started if this is your first Flutter project:
 
-# Screenshots
+- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
 
-![alt tag](https://github.com/LucaHome/LucaHome-AndroidApplication/blob/master/screenshots/header_001.png)
-___________________________________
+For help getting started with Flutter, view our 
+[online documentation](https://flutter.io/docs), which offers tutorials, 
+samples, guidance on mobile development, and a full API reference.
 
-![alt tag](https://github.com/LucaHome/LucaHome-AndroidApplication/blob/master/screenshots/header_002.png)
-___________________________________
-
-![alt tag](https://github.com/LucaHome/LucaHome-AndroidApplication/blob/master/screenshots/header_003.png)
-___________________________________
-
-![alt tag](https://github.com/LucaHome/LucaHome-AndroidApplication/blob/master/screenshots/header_004.png)
-
-___________________________________
-___________________________________
-
-# MediaServer
+## Mobile
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
-<a target="_blank" href="https://android-arsenal.com/api?level=24" title="API24+"><img src="https://img.shields.io/badge/API-24+-blue.svg" /></a>
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-<a target="_blank" href="https://www.paypal.me/GuepardoApps" title="Donate using PayPal"><img src="https://img.shields.io/badge/paypal-donate-blue.svg" /></a>
+[![Donate: PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.me/GuepardoApps)
 
-[![Build](https://img.shields.io/badge/build-passing-green.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication)
-[![Version](https://img.shields.io/badge/version-v5.2.5.180115-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication)
+[![Build](https://img.shields.io/badge/build-Success-green.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/nextcloud/lucahome_flutter)
+[![Version](https://img.shields.io/badge/version-7.0.0+1-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/nextcloud/lucahome_flutter)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-Android application permanently displaying data behind a mirror
-- date and time
-- weather (current and forecast)
-- temperature in the flat
-- birthdays
-- watching youtube videos
-- listening to radio streams
-- RSS data
-- surfing websites
-- displaying custom text
-- controlling sockets
-- display shopping lists and your weekly menu
-- ...
+[![API21+](https://img.shields.io/badge/API-21+-blue.svg)](https://android-arsenal.com/api?level=21)
+[![Flutter](https://img.shields.io/badge/lang-Flutter-blue.svg)](https://flutter.dev/)
+[![Kotlin](https://img.shields.io/badge/lang-Kotlin-orange.svg)](https://kotlinlang.org/)
 
-Receive commands by a client application (LucaHome_AndroidApplication)
-- e.g. to display new videos, update rss feed, display websites, display custom text, ...
+Android client to remotely control wireless sockets and switches using nextcloud server.
 
----
+## Screenshots
 
-![alt tag](https://github.com/LucaHome/LucaHome-AndroidApplication/blob/master/screenshots/header_mediamirror_001.png)
+![alt tag](screenshots/LoginPage.jpg)
 
-
-# License
+## License
 
 LucaHome-AndroidApplication is distributed under the MIT license. [See LICENSE](LICENSE.md) for details.

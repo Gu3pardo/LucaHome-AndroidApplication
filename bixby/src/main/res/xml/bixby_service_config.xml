@@ -1,7 +1,0 @@
-<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accessibilityEventTypes="typeWindowsChanged"
-    android:accessibilityFeedbackType="feedbackGeneric"
-    android:accessibilityFlags="flagRetrieveInteractiveWindows"
-    android:canRetrieveWindowContent="true"
-    android:description="@string/bixby_service_description"
-    android:settingsActivity="guepardoapps.lucahome.bixby.BixbyActivity" />
