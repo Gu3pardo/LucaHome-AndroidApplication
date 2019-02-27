@@ -21,8 +21,8 @@ samples, guidance on mobile development, and a full API reference.
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Donate: PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.me/GuepardoApps)
 
-[![Build](https://img.shields.io/badge/build-Failed-red.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/nextcloud/mobile)
-[![Version](https://img.shields.io/badge/version-v7.0.0.190225-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/nextcloud/mobile)
+[![Build](https://img.shields.io/badge/build-Success-green.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/nextcloud/lucahome_flutter)
+[![Version](https://img.shields.io/badge/version-7.0.0+1-blue.svg)](https://github.com/LucaHome/LucaHome-AndroidApplication/tree/nextcloud/lucahome_flutter)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
 [![API21+](https://img.shields.io/badge/API-21+-blue.svg)](https://android-arsenal.com/api?level=21)
@@ -31,6 +31,10 @@ samples, guidance on mobile development, and a full API reference.
 
 Android client to remotely control wireless sockets and switches using nextcloud server.
 
-# License
+## Screenshots
+
+![alt tag](screenshots/LoginPage.jpg)
+
+## License
 
 LucaHome-AndroidApplication is distributed under the MIT license. [See LICENSE](LICENSE.md) for details.
