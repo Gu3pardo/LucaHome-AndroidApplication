@@ -15,17 +15,17 @@ class Bar extends StatelessWidget {
       height: 15.0,
       margin: new EdgeInsets.only(left: marginLeft, right: marginRight),
       decoration: new BoxDecoration(
-        color: const Color.fromRGBO(0, 0, 255, 1.0),
+        color: const Color(0xFF3744B0),
         borderRadius: new BorderRadius.circular(10.0),
         boxShadow: [
           new BoxShadow(
-            color: Colors.black12,
+            color: Colors.lightBlueAccent,
             blurRadius: 8.0,
             spreadRadius: 1.0,
             offset: new Offset(1.0, 0.0),
           ),
           new BoxShadow(
-            color: Colors.black26,
+            color: Colors.blueAccent,
             blurRadius: 6.0,
             spreadRadius: 1.5,
             offset: new Offset(1.0, 0.0),

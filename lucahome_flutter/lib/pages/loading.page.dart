@@ -118,59 +118,80 @@ class _LoadingPageState extends State<LoadingPage>
         ),
       );
 
-  Widget get forwardStaggeredAnimation {
-    return new Center(
-      child: new Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+  @override
+  Widget build(BuildContext context) {
+    var pageSize = MediaQuery.of(context).size;
+
+    return new Container(
+        child: new Scaffold(
+      body: new Stack(
         children: <Widget>[
-          new PivotBar(
-            alignment: FractionalOffset.centerLeft,
-            controller: _controller,
-            animations: [
-              stepOne,
-              stepTwo,
-            ],
-            marginRight: 0.0,
-            marginLeft: 0.0,
-            isClockwise: true,
-          ),
-          new PivotBar(
-            controller: _controller,
-            animations: [
-              stepThree,
-              stepEight,
-            ],
-            marginRight: 0.0,
-            marginLeft: 0.0,
-            isClockwise: false,
-          ),
-          new PivotBar(
-            controller: _controller,
-            animations: [
-              stepFour,
-              stepSeven,
-            ],
-            marginRight: 0.0,
-            marginLeft: 32.0,
-            isClockwise: true,
-          ),
-          new PivotBar(
-            controller: _controller,
-            animations: [
-              stepFive,
-              stepSix,
-            ],
-            marginRight: 0.0,
-            marginLeft: 32.0,
-            isClockwise: false,
+          new Container(
+            alignment: Alignment.center,
+            width: pageSize.width,
+            height: pageSize.height,
+            decoration: new BoxDecoration(
+              gradient: new LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                stops: [0.2, 1.0],
+                colors: [
+                  const Color(0xFF3744B0),
+                  const Color(0xFF3799B0),
+                ],
+              ),
+            ),
+            child: new Center(
+              child: new Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  new PivotBar(
+                    alignment: FractionalOffset.centerLeft,
+                    controller: _controller,
+                    animations: [
+                      stepOne,
+                      stepTwo,
+                    ],
+                    marginRight: 0.0,
+                    marginLeft: 0.0,
+                    isClockwise: true,
+                  ),
+                  new PivotBar(
+                    controller: _controller,
+                    animations: [
+                      stepThree,
+                      stepEight,
+                    ],
+                    marginRight: 0.0,
+                    marginLeft: 0.0,
+                    isClockwise: false,
+                  ),
+                  new PivotBar(
+                    controller: _controller,
+                    animations: [
+                      stepFour,
+                      stepSeven,
+                    ],
+                    marginRight: 0.0,
+                    marginLeft: 32.0,
+                    isClockwise: true,
+                  ),
+                  new PivotBar(
+                    controller: _controller,
+                    animations: [
+                      stepFive,
+                      stepSix,
+                    ],
+                    marginRight: 0.0,
+                    marginLeft: 32.0,
+                    isClockwise: false,
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return new Container(child: forwardStaggeredAnimation);
+    ));
   }
 }
