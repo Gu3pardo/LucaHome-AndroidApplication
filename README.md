@@ -33,9 +33,9 @@ Android client to remotely control wireless sockets and switches using nextcloud
 
 ## Screenshots
 
-LoginPage                                | LoadingPage
-:---------------------------------------:|:---------------------------------------:
-![alt tag](screenshots/LoginPage.jpg)    | ![alt tag](screenshots/LoadingPage.jpg)
+LoginPage                                | LoadingPage                             | NoNetworkPage
+:---------------------------------------:|:---------------------------------------:|:---------------------------------------:
+![alt tag](screenshots/LoginPage.jpg)    | ![alt tag](screenshots/LoadingPage.jpg) | ![alt tag](screenshots/NoNetworkPage.jpg)
 
 ## License
 

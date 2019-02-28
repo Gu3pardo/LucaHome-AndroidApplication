@@ -7,6 +7,7 @@ import 'package:lucahome_flutter/pages/login.page.dart';
 import 'package:lucahome_flutter/pages/loading.page.dart';
 import 'package:lucahome_flutter/pages/list.page.dart';
 import 'package:lucahome_flutter/pages/details.page.dart';
+import 'package:lucahome_flutter/pages/no_network.page.dart';
 
 void updateRoute(AppState state, BuildContext context) {
   if (state.nextCloudCredentials != null) {
@@ -43,6 +44,11 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
           },
           builder: (context, store) {
             return new LoadingPage();
+          },
+        ),
+    '/no_network': (BuildContext context) => new StoreBuilder<AppState>(
+          builder: (context, store) {
+            return new NoNetworkPage();
           },
         ),
   };
