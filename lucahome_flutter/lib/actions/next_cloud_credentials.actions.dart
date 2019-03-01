@@ -2,7 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:lucahome_flutter/models/next_cloud_credentials.model.dart';
 
 class NextCloudCredentialsLogIn {
-  NextCloudCredentialsLogIn();
+  final NextCloudCredentials user;
+
+  NextCloudCredentialsLogIn({@required this.user});
+
+  @override
+  String toString() {
+    return 'NextCloudCredentialsLogIn{user: $user}';
+  }
 }
 
 class NextCloudCredentialsLogInSuccessful {

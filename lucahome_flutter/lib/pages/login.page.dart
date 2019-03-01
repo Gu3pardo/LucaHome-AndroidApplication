@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:lucahome_flutter/actions/next_cloud_credentials.actions.dart';
+import 'package:lucahome_flutter/middleware/next_cloud_credentials.thunk_action.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
+import 'package:lucahome_flutter/models/next_cloud_credentials.model.dart';
 import 'package:redux/redux.dart';
 
 class LoginPage extends StatefulWidget {
@@ -69,6 +71,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     var pageSize = MediaQuery.of(context).size;
+    var nextCloudCredentials = new NextCloudCredentials();
 
     final logo = Hero(
       tag: 'hero',
@@ -96,6 +99,9 @@ class _LoginPageState extends State<LoginPage> {
           return 'NextCloudUrl is required';
         }
       },
+      onSaved: (String value) {
+        nextCloudCredentials.baseUrl = value;
+      },
     );
 
     final userName = TextFormField(
@@ -115,6 +121,9 @@ class _LoginPageState extends State<LoginPage> {
           return 'UserName is required';
         }
       },
+      onSaved: (String value) {
+        nextCloudCredentials.userName = value;
+      },
     );
 
     final passPhrase = TextFormField(
@@ -133,6 +142,9 @@ class _LoginPageState extends State<LoginPage> {
         if (value.isEmpty) {
           return 'Password is required';
         }
+      },
+      onSaved: (String value) {
+        nextCloudCredentials.passPhrase = value;
       },
     );
 
@@ -179,8 +191,9 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             onPressed: () {
                               if (_formKey.currentState.validate()) {
-                                // TODO Do something with the data
-                                viewModel.onPressedCallback(context);
+                                _formKey.currentState.save();
+                                viewModel.onPressedCallback(
+                                    context, nextCloudCredentials);
                               }
                             },
                             padding: EdgeInsets.all(12),
@@ -207,8 +220,10 @@ class _ViewModel {
 
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
-      onPressedCallback: (context) {
-        store.dispatch(new NextCloudCredentialsLogIn());
+      onPressedCallback: (context, nextCloudCredentials) {
+        context.store.dispatch(new NextCloudCredentialsLogIn(user: nextCloudCredentials));
+        context.store.dispatch(logIn);
+
         Navigator.of(context).pushNamed('/loading');
       },
     );
