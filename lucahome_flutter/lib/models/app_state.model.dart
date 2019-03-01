@@ -19,7 +19,7 @@ class AppState {
     this.selectedWirelessSocket,
   });
 
-  factory AppState.loading() => new AppState(isLoading: true);
+  factory AppState.loading() => new AppState(isLoading: false);
 
   AppState copyWith(
       {bool isLoading,

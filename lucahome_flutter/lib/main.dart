@@ -4,6 +4,7 @@ import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/reducers/app.reducer.dart';
 import 'package:lucahome_flutter/routes.dart';
 import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
 
 void main() => runApp(new MainApp());
 
@@ -15,10 +16,10 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var store = new Store<AppState>(
-      appReducer,
-      initialState: new AppState(),
-      distinct: true
-    );
+        appReducer,
+        initialState: new AppState(),
+        distinct: true,
+        middleware: [thunkMiddleware]);
 
     return new StoreProvider(
       store: store,
