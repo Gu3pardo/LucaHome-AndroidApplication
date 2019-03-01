@@ -1,4 +1,4 @@
-import 'dart:convert' as convert;
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lucahome_flutter/actions/wireless_socket.actions.dart';
 import 'package:lucahome_flutter/constants/nextcloud.constants.dart';
@@ -7,10 +7,16 @@ import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
 ThunkAction<AppState> loadWirelessSockets = (Store<AppState> store) async {
-  var response = await http.get(NextCloudConstants.baseUrl + "wireless_socket");
+  var nextCloudCredentials = store.state.nextCloudCredentials;
+  var authorization = 'Basic ' +
+      base64Encode(utf8.encode(
+          '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
+
+  var response = await http.get(NextCloudConstants.baseUrl + "wireless_socket",
+      headers: {'authorization': authorization});
   if (response.statusCode == 200) {
     try {
-      var jsonResponse = convert.jsonDecode(response.body);
+      var jsonResponse = jsonDecode(response.body);
       var data = jsonResponse.data;
 
       if (data == false) {
@@ -27,12 +33,18 @@ ThunkAction<AppState> loadWirelessSockets = (Store<AppState> store) async {
 };
 
 ThunkAction<AppState> addWirelessSocket = (Store<AppState> store) async {
+  var nextCloudCredentials = store.state.nextCloudCredentials;
+  var authorization = 'Basic ' +
+      base64Encode(utf8.encode(
+          '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
+
   var wirelessSocket = store.state.selectedWirelessSocket;
   var response = await http.post(NextCloudConstants.baseUrl + "wireless_socket",
-      body: convert.jsonEncode(wirelessSocket));
+      body: jsonEncode(wirelessSocket),
+      headers: {'authorization': authorization});
   if (response.statusCode == 200) {
     try {
-      var jsonResponse = convert.jsonDecode(response.body);
+      var jsonResponse = jsonDecode(response.body);
       var data = jsonResponse.data;
 
       if (data == false) {
@@ -55,12 +67,18 @@ ThunkAction<AppState> addWirelessSocket = (Store<AppState> store) async {
 };
 
 ThunkAction<AppState> updateWirelessSocket = (Store<AppState> store) async {
+  var nextCloudCredentials = store.state.nextCloudCredentials;
+  var authorization = 'Basic ' +
+      base64Encode(utf8.encode(
+          '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
+
   var wirelessSocket = store.state.selectedWirelessSocket;
   var response = await http.put(NextCloudConstants.baseUrl + "wireless_socket",
-      body: convert.jsonEncode(wirelessSocket));
+      body: jsonEncode(wirelessSocket),
+      headers: {'authorization': authorization});
   if (response.statusCode == 200) {
     try {
-      var jsonResponse = convert.jsonDecode(response.body);
+      var jsonResponse = jsonDecode(response.body);
       var data = jsonResponse.data;
 
       if (data == false) {
@@ -82,12 +100,18 @@ ThunkAction<AppState> updateWirelessSocket = (Store<AppState> store) async {
 };
 
 ThunkAction<AppState> deleteWirelessSocket = (Store<AppState> store) async {
+  var nextCloudCredentials = store.state.nextCloudCredentials;
+  var authorization = 'Basic ' +
+      base64Encode(utf8.encode(
+          '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
+
   var wirelessSocket = store.state.selectedWirelessSocket;
   var response = await http.delete(
-      NextCloudConstants.baseUrl + "wireless_socket/$wirelessSocket.id");
+      NextCloudConstants.baseUrl + "wireless_socket/$wirelessSocket.id",
+      headers: {'authorization': authorization});
   if (response.statusCode == 200) {
     try {
-      var jsonResponse = convert.jsonDecode(response.body);
+      var jsonResponse = jsonDecode(response.body);
       var data = jsonResponse.data;
 
       if (data == false) {
