@@ -221,8 +221,6 @@ class _ViewModel {
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
       onPressedCallback: (context, nextCloudCredentials) {
-        context.store.dispatch(new NextCloudCredentialsLogIn(user: nextCloudCredentials));
-        context.store.dispatch(logIn);
 
         Navigator.of(context).pushNamed('/loading');
       },
