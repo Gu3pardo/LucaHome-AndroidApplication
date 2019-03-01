@@ -9,8 +9,8 @@ final nextCloudCredentialsReducer = combineReducers<NextCloudCredentials>([
   new TypedReducer<NextCloudCredentials, NextCloudCredentialsLogOutFail>(_logOutFailed),
 ]);
 
-NextCloudCredentials _logInSuccessful(NextCloudCredentials nextCloudCredentials, action) => action.user;
-NextCloudCredentials _logInFailed(NextCloudCredentials nextCloudCredentials, action) => nextCloudCredentials;
+NextCloudCredentials _logInSuccessful(NextCloudCredentials nextCloudCredentials, action) => nextCloudCredentials;
+NextCloudCredentials _logInFailed(NextCloudCredentials nextCloudCredentials, action) => null;
 
 NextCloudCredentials _logOutSuccessful(NextCloudCredentials nextCloudCredentials, action) => null;
 NextCloudCredentials _logOutFailed(NextCloudCredentials nextCloudCredentials, action) => nextCloudCredentials;
