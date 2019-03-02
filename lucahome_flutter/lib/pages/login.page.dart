@@ -3,7 +3,6 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
-import 'package:lucahome_flutter/actions/next_cloud_credentials.actions.dart';
 import 'package:lucahome_flutter/middleware/next_cloud_credentials.thunk_action.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/models/next_cloud_credentials.model.dart';
