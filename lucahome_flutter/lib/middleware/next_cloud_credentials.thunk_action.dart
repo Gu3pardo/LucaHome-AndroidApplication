@@ -5,6 +5,7 @@ import 'package:lucahome_flutter/constants/nextcloud.constants.dart';
 import 'package:lucahome_flutter/models/api_response.model.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/models/next_cloud_credentials.model.dart';
+import 'package:lucahome_flutter/utils/shared_pref.utils.dart';
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
 
@@ -21,17 +22,20 @@ ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
     switch (response.statusCode) {
       // 404 For invalid URL
       case 404:
+        saveNextCloudCredentials(NextCloudCredentials(baseUrl:"", userName:"", passPhrase:""));
         store.dispatch(new NextCloudCredentialsLogInFail("Invalid URL"));
         break;
 
       // 401 For invalid userName with message: CORS requires basic auth
       // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
+        saveNextCloudCredentials(NextCloudCredentials(baseUrl:nextCloudCredentials.baseUrl, userName:"", passPhrase:""));
         store.dispatch(new NextCloudCredentialsLogInFail("Invalid Credentials"));
         break;
 
       // Valid
       case 200:
+        saveNextCloudCredentials(nextCloudCredentials);
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success") {
           store.dispatch(new NextCloudCredentialsLogInSuccessful(user: nextCloudCredentials));
