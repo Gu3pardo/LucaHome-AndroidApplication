@@ -1,3 +1,3 @@
 class NextCloudConstants {
-  static const baseUrl = "/apps/lucahome/api/v1/";
+  static const baseUrl = "/index.php/apps/lucahome/api/v1/";
 }
