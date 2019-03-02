@@ -20,6 +20,19 @@ class Area {
     );
   }
 
+  Area.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        name = json["name"],
+        filter = json["filter"],
+        deletable = json["deletable"];
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "name": name,
+        "filter": filter,
+        "deletable": deletable,
+      };
+
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Area &&
@@ -30,10 +43,11 @@ class Area {
           deletable == other.deletable;
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ filter.hashCode ^ deletable.hashCode;
+  int get hashCode =>
+      id.hashCode ^ name.hashCode ^ filter.hashCode ^ deletable.hashCode;
 
   @override
   String toString() {
-    return 'Area{id: $id, {name: $name, filter: $filter, deletable: $deletable}';
+    return 'Area{id: $id, name: $name, filter: $filter, deletable: $deletable}';
   }
 }

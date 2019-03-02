@@ -40,6 +40,27 @@ class WirelessSocket {
     );
   }
 
+  WirelessSocket.fromJson(Map<String, dynamic> json)
+      : id = json["id"],
+        name = json["name"],
+        code = json["code"],
+        area = json["area"],
+        state = json["state"],
+        description = json["description"],
+        icon = json["icon"],
+        deletable = json["deletable"];
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "name": name,
+    "code": code,
+    "area": area,
+    "state": state,
+    "description": description,
+    "icon": icon,
+    "deletable": deletable,
+  };
+
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is WirelessSocket &&

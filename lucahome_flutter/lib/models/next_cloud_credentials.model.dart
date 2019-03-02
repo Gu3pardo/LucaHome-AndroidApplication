@@ -9,7 +9,8 @@ class NextCloudCredentials {
     this.passPhrase = "",
   });
 
-  NextCloudCredentials copyWith({String baseUrl, String userName, String passPhrase}) {
+  NextCloudCredentials copyWith(
+      {String baseUrl, String userName, String passPhrase}) {
     return new NextCloudCredentials(
       baseUrl: baseUrl ?? this.baseUrl,
       userName: userName ?? this.userName,
@@ -24,6 +25,17 @@ class NextCloudCredentials {
   bool isLoggedIn() {
     return this.userName != "" && this.passPhrase != "";
   }
+
+  NextCloudCredentials.fromJson(Map<String, dynamic> json)
+      : baseUrl = json["baseUrl"],
+        userName = json["userName"],
+        passPhrase = json["passPhrase"];
+
+  Map<String, dynamic> toJson() => {
+        "baseUrl": baseUrl,
+        "userName": userName,
+        "passPhrase": passPhrase,
+      };
 
   bool operator ==(Object other) =>
       identical(this, other) ||
