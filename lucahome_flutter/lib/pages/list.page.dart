@@ -9,7 +9,7 @@ class ListPage extends StatelessWidget {
 
   ListView _buildList(context) {
     return new ListView.builder(
-      itemCount: wirelessSocketList.length,
+      itemCount: wirelessSocketList != null ? wirelessSocketList.length : 0,
       itemBuilder: (context, index) =>
           new WirelessSocketCard(wirelessSocketList[index]),
     );
