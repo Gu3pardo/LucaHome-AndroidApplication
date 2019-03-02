@@ -36,7 +36,7 @@ ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
         if (apiResponseModel.status == "success") {
           store.dispatch(new NextCloudCredentialsLogInSuccessful(user: nextCloudCredentials));
         } else {
-          store.dispatch(new NextCloudCredentialsLogInFail(apiResponseModel.status));
+          store.dispatch(new NextCloudCredentialsLogInFail(apiResponseModel.message));
         }
         break;
 
