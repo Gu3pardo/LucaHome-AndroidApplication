@@ -33,10 +33,9 @@ class MainApp extends StatelessWidget {
             case ConnectionState.active:
               return new Center(child: new CircularProgressIndicator());
             case ConnectionState.done:
-              var nextCloudCredentials = snapshot.data;
-              if (nextCloudCredentials.hasServer() &&
-                  nextCloudCredentials.isLoggedIn()) {
-                store.dispatch(logIn(nextCloudCredentials));
+              if (snapshot.data.hasServer() && snapshot.data.isLoggedIn()) {
+                print("Already hasServer and isLoggedIn");
+                store.dispatch(logIn(snapshot.data));
 
                 return new StoreProvider(
                   store: store,
@@ -48,6 +47,7 @@ class MainApp extends StatelessWidget {
                   ),
                 );
               } else {
+                print("Needs login");
                 return new StoreProvider(
                   store: store,
                   child: new MaterialApp(
