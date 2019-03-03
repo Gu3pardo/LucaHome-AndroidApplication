@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lucahome_flutter/actions/wireless_socket.actions.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
-import 'package:lucahome_flutter/models/area.model.dart';
+import 'package:lucahome_flutter/models/wireless_socket.model.dart';
 import 'package:lucahome_flutter/presentation/wireless_socket_card.dart';
 import 'package:redux/redux.dart';
 
@@ -13,8 +14,11 @@ class ListPage extends StatelessWidget {
 
   ListView _buildList(context) {
     return new ListView.builder(
-      itemCount: store.state.wirelessSocketList != null ? store.state.wirelessSocketList.length : 0,
-      itemBuilder: (context, index) => new WirelessSocketCard(store.state.wirelessSocketList[index], store),
+      itemCount: store.state.wirelessSocketList != null
+          ? store.state.wirelessSocketList.length
+          : 0,
+      itemBuilder: (context, index) =>
+          new WirelessSocketCard(store.state.wirelessSocketList[index], store),
     );
   }
 
@@ -47,11 +51,17 @@ class ListPage extends StatelessWidget {
           /*IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              // TODO add wireless socket
+              // TODO add area
             },
           ),*/
         ],
       ),
+      floatingActionButton: new FloatingActionButton(
+          child: Icon(Icons.add),
+          onPressed: () {
+            store.dispatch(new WirelessSocketSelectSuccessful(wirelessSocket: new WirelessSocket()));
+            Navigator.pushNamed(context, '/details');
+          }),
       body: new Stack(
         children: <Widget>[
           new Container(
