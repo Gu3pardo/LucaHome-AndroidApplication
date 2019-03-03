@@ -1,7 +1,13 @@
 - [X] Add Http-Handling
 - [X] Add Storage-Handling
 - [X] Add Switch to WirelessSocketCard
-- [ ] Add Filter for Areas to ListPage
-- [ ] Add Possibility to add and edit areas and wireless sockets
 - [X] Add Routing
 - [X] Improve Layout
+- [ ] Add Filter for Areas to ListPage
+- [ ] Add Possibility to add and edit areas and wireless sockets
+	- [ ] Add Area
+	- [ ] Delete Area
+	- [ ] Add WirelessSocket
+	- [ ] Edit WirelessSocket
+	- [ ] Delete WirelessSocket
+- [ ] Reload by drag down
