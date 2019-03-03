@@ -24,7 +24,6 @@ dependencies:
   connectivity: "0.4.2"
   shared_preferences: "0.5.1+1"
   wave: "0.0.8"
-  liquid_pull_to_refresh: "1.1.0"
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
