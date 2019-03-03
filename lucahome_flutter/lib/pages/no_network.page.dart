@@ -47,7 +47,7 @@ class _NoNetworkPageState extends State<NoNetworkPage> {
       case ConnectivityResult.mobile:
       case ConnectivityResult.wifi:
         // Everything is fine, we can move to login
-        Navigator.of(context).pushNamed('/login');
+        Navigator.of(context).pop();
         break;
       default:
         // No valid network, so we stay here
