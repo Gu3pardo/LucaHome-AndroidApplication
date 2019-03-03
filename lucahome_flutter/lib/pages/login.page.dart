@@ -205,8 +205,7 @@ class _LoginPageState extends State<LoginPage> {
                                   onPressed: () {
                                     if (_formKey.currentState.validate()) {
                                       _formKey.currentState.save();
-                                      viewModel.login(
-                                          context, nextCloudCredentials);
+                                      viewModel.login(nextCloudCredentials);
                                     }
                                   },
                                   padding: EdgeInsets.all(12),
@@ -234,9 +233,8 @@ class _ViewModel {
 
   static _ViewModel fromStore(Store<AppState> store) {
     return new _ViewModel(
-      login: (context, nextCloudCredentials) {
+      login: (NextCloudCredentials nextCloudCredentials) {
         store.dispatch(logIn(nextCloudCredentials));
-        Navigator.of(context).pushNamed('/loading');
       },
     );
   }
