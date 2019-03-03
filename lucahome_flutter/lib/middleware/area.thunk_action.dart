@@ -28,6 +28,11 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
         store.dispatch(new AreaLoadFail("Invalid URL"));
         break;
 
+    // 405 For invalid URL
+      case 405:
+        store.dispatch(new AreaLoadFail("Method not allowed"));
+        break;
+
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
@@ -74,6 +79,11 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
         store.dispatch(new AreaAddFail("Invalid URL"));
         break;
 
+    // 405 For invalid URL
+      case 405:
+        store.dispatch(new AreaAddFail("Method not allowed"));
+        break;
+
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
@@ -107,7 +117,7 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.put(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area/" + area.id.toString(),
         body: jsonEncode(area),
         headers: {'authorization': authorization});
 
@@ -115,6 +125,11 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
     // 404 For invalid URL
       case 404:
         store.dispatch(new AreaUpdateFail("Invalid URL"));
+        break;
+
+    // 405 For invalid URL
+      case 405:
+        store.dispatch(new AreaUpdateFail("Method not allowed"));
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
@@ -156,6 +171,11 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
     // 404 For invalid URL
       case 404:
         store.dispatch(new AreaDeleteFail("Invalid URL"));
+        break;
+
+    // 405 For invalid URL
+      case 405:
+        store.dispatch(new AreaDeleteFail("Method not allowed"));
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth

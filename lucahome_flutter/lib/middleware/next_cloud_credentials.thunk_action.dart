@@ -30,6 +30,12 @@ ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
         store.dispatch(new NextCloudCredentialsLogInFail("Invalid URL"));
         break;
 
+    // 405 For invalid URL
+      case 405:
+        saveNextCloudCredentials(NextCloudCredentials(baseUrl:"", userName:"", passPhrase:""));
+        store.dispatch(new NextCloudCredentialsLogInFail("Method not allowed"));
+        break;
+
       // 401 For invalid userName with message: CORS requires basic auth
       // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:

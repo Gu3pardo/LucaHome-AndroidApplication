@@ -28,6 +28,11 @@ ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredenti
         store.dispatch(new WirelessSocketLoadFail("Invalid URL"));
         break;
 
+    // 405 For invalid URL
+      case 405:
+        store.dispatch(new WirelessSocketLoadFail("Method not allowed"));
+        break;
+
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
@@ -74,6 +79,11 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
         store.dispatch(new WirelessSocketAddFail("Invalid URL"));
         break;
 
+    // 405 For invalid URL
+      case 405:
+        store.dispatch(new WirelessSocketAddFail("Method not allowed"));
+        break;
+
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
@@ -107,7 +117,7 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.put(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket/" + wirelessSocket.id.toString(),
         body: jsonEncode(wirelessSocket),
         headers: {'authorization': authorization});
 
@@ -115,6 +125,11 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
     // 404 For invalid URL
       case 404:
         store.dispatch(new WirelessSocketUpdateFail("Invalid URL"));
+        break;
+
+    // 405 For invalid URL
+      case 405:
+        store.dispatch(new WirelessSocketUpdateFail("Method not allowed"));
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
@@ -156,6 +171,11 @@ ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredent
     // 404 For invalid URL
       case 404:
         store.dispatch(new WirelessSocketDeleteFail("Invalid URL"));
+        break;
+
+    // 405 For invalid URL
+      case 405:
+        store.dispatch(new WirelessSocketDeleteFail("Method not allowed"));
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
