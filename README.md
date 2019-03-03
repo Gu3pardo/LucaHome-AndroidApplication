@@ -32,6 +32,7 @@ samples, guidance on mobile development, and a full API reference.
 Android client to remotely control wireless sockets and switches using nextcloud server.
 
 ## Screenshots
+
 <p align="center">
 	<img src="screenshots/LoginPage.jpg" alt="LoginPage" style="width:20%;float:left;">
 	<img src="screenshots/LoadingPage.jpg" alt="LoadingPage" style="width:20%;float:left;">
