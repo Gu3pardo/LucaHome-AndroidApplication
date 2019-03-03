@@ -23,8 +23,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
   WirelessSocket wirelessSocket;
   final Store<AppState> store;
 
-  WirelessSocketCardState(
-      this.wirelessSocket, this.store);
+  WirelessSocketCardState(this.wirelessSocket, this.store);
 
   Widget wirelessSocketCard(Size pageSize) {
     return new Positioned(
@@ -64,7 +63,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
     );
   }
 
-  WaveWidget waveWidgetOff(){
+  WaveWidget waveWidgetOff() {
     return WaveWidget(
       config: CustomConfig(
         gradients: [
@@ -84,7 +83,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
     );
   }
 
-  WaveWidget waveWidgetOn(){
+  WaveWidget waveWidgetOn() {
     return WaveWidget(
       config: CustomConfig(
         gradients: [
@@ -120,20 +119,24 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
               wirelessSocket.state == 1 ? waveWidgetOn() : waveWidgetOff(),
               wirelessSocketCard(pageSize),
               new Positioned(
-                  top: 7.5,
-                  left: 7.5,
-                  bottom: 7.5,
-                  child: IconButton(
+                  top: 5,
+                  left: 5,
+                  bottom: 5,
+                  child: FlatButton(
+                    color: Color.fromARGB(0, 0, 0, 0),
+                    splashColor: Colors.blueAccent,
+                    highlightColor: Colors.lightBlue,
+                    padding: const EdgeInsets.all(10.0),
+                    onPressed: () {
+                      wirelessSocket.state = wirelessSocket.state == 1 ? 0 : 1;
+                      store.dispatch(updateWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+                    },
+                    child: new Icon(
+                      fromString(widget.wirelessSocket.icon),
+                      size: 50,
                       color: Colors.black,
-                      icon: new Icon(
-                        fromString(widget.wirelessSocket.icon),
-                        size: 50,
-                      ),
-                      onPressed: () {
-                        wirelessSocket.state = wirelessSocket.state == 1 ? 0 : 1;
-                        store.dispatch(updateWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
-                      })),
-            ],
+                    ),
+                  ))],
           ),
         ),
       ),
