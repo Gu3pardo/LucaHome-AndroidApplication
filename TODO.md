@@ -1,6 +1,6 @@
-- [ ] Add Http-Handling
-- [ ] Add Storage-Handling
-- [ ] Add Switch to WirelessSocketCard
+- [x] Add Http-Handling
+- [x] Add Storage-Handling
+- [X] Add Switch to WirelessSocketCard
 - [ ] Add Filter for Areas to ListPage
-- [ ] Add Routing
+- [X] Add Routing
 - [ ] Improve Layout
