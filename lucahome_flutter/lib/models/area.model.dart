@@ -33,6 +33,12 @@ class Area {
         "deletable": deletable,
       };
 
+  Map<String, dynamic> toAddJson() => {
+        "name": name,
+        "filter": filter,
+        "deletable": deletable,
+      };
+
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is Area &&

@@ -13,9 +13,9 @@ class WirelessSocket {
     this.name = "",
     this.code = "",
     this.area = "",
-    this.state = 1,
+    this.state = 0,
     this.description = "",
-    this.icon = "",
+    this.icon = "fas fa-lightbulb",
     this.deletable = 1,
   });
 
@@ -52,6 +52,16 @@ class WirelessSocket {
 
   Map<String, dynamic> toJson() => {
     "id": id,
+    "name": name,
+    "code": code,
+    "area": area,
+    "state": state,
+    "description": description,
+    "icon": icon,
+    "deletable": deletable,
+  };
+
+  Map<String, dynamic> toAddJson() => {
     "name": name,
     "code": code,
     "area": area,
