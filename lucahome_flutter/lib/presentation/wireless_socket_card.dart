@@ -4,6 +4,8 @@ import 'package:lucahome_flutter/middleware/wireless_socket.thunk_action.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/models/wireless_socket.model.dart';
 import 'package:redux/redux.dart';
+import 'package:wave/config.dart';
+import 'package:wave/wave.dart';
 
 class WirelessSocketCard extends StatefulWidget {
   final WirelessSocket wirelessSocket;
@@ -62,6 +64,46 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
     );
   }
 
+  WaveWidget waveWidgetOff(){
+    return WaveWidget(
+      config: CustomConfig(
+        gradients: [
+          [Colors.red, Color(0xEEF44336)],
+          [Colors.red[800], Color(0x77E57373)],
+          [Colors.orange, Color(0x66FF9800)],
+          [Colors.yellow, Color(0x55FFEB3B)]
+        ],
+        durations: [35000, 19440, 10800, 6000],
+        heightPercentages: [0.70, 0.73, 0.75, 0.80],
+        gradientBegin: Alignment.bottomLeft,
+        gradientEnd: Alignment.topRight,
+      ),
+      backgroundColor: Colors.transparent,
+      size: Size(double.infinity, double.infinity),
+      waveAmplitude: 0,
+    );
+  }
+
+  WaveWidget waveWidgetOn(){
+    return WaveWidget(
+      config: CustomConfig(
+        gradients: [
+          [Colors.yellow, Color(0x55FFEB3B)],
+          [Colors.orange, Color(0x66FF9800)],
+          [Colors.green[800], Color(0x77007373)],
+          [Colors.green, Color(0xEE004336)]
+        ],
+        durations: [35000, 19440, 10800, 6000],
+        heightPercentages: [0.10, 0.13, 0.15, 0.20],
+        gradientBegin: Alignment.bottomLeft,
+        gradientEnd: Alignment.topRight,
+      ),
+      backgroundColor: Colors.transparent,
+      size: Size(double.infinity, double.infinity),
+      waveAmplitude: 0,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var pageSize = MediaQuery.of(context).size;
@@ -75,21 +117,20 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
           height: 115.0,
           child: new Stack(
             children: <Widget>[
+              wirelessSocket.state == 1 ? waveWidgetOn() : waveWidgetOff(),
               wirelessSocketCard(pageSize),
               new Positioned(
                   top: 7.5,
                   left: 7.5,
                   bottom: 7.5,
                   child: IconButton(
-                      color: wirelessSocket.state == 1 ? Colors.green : Colors.red,
+                      color: Colors.black,
                       icon: new Icon(
                         fromString(widget.wirelessSocket.icon),
                         size: 50,
                       ),
                       onPressed: () {
                         wirelessSocket.state = wirelessSocket.state == 1 ? 0 : 1;
-                        print("onPressed");
-                        print(wirelessSocket);
                         store.dispatch(updateWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
                       })),
             ],
