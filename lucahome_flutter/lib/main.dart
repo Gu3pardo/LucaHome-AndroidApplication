@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:lucahome_flutter/actions/route.actions.dart';
 import 'package:lucahome_flutter/middleware/next_cloud_credentials.thunk_action.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/models/next_cloud_credentials.model.dart';
@@ -25,8 +26,7 @@ class MainApp extends StatelessWidget {
 
     return FutureBuilder(
         future: loadNextCloudCredentials(),
-        builder: (BuildContext context,
-            AsyncSnapshot<NextCloudCredentials> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<NextCloudCredentials> snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.none:
             case ConnectionState.waiting:
@@ -35,6 +35,7 @@ class MainApp extends StatelessWidget {
             case ConnectionState.done:
               if (snapshot.data.hasServer() && snapshot.data.isLoggedIn()) {
                 print("Already hasServer and isLoggedIn");
+                store.dispatch(new RouteChange(route: "/loading"));
                 store.dispatch(logIn(snapshot.data));
 
                 return new StoreProvider(
@@ -48,6 +49,7 @@ class MainApp extends StatelessWidget {
                 );
               } else {
                 print("Needs login");
+                store.dispatch(new RouteChange(route: "/login"));
                 return new StoreProvider(
                   store: store,
                   child: new MaterialApp(

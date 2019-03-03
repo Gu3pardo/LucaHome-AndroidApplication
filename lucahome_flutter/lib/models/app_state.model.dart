@@ -5,23 +5,27 @@ import 'package:lucahome_flutter/models/wireless_socket.model.dart';
 class AppState {
   NextCloudCredentials nextCloudCredentials;
   bool isLoadingNextCloudCredentials;
+
   List<Area> areaList;
   bool isLoadingArea;
   Area selectedArea;
+
   List<WirelessSocket> wirelessSocketList;
   bool isLoadingWirelessSocket;
   WirelessSocket selectedWirelessSocket;
 
-  AppState({
-    this.nextCloudCredentials,
-    this.isLoadingNextCloudCredentials = false,
-    this.areaList,
-    this.isLoadingArea = false,
-    this.selectedArea,
-    this.wirelessSocketList,
-    this.isLoadingWirelessSocket = false,
-    this.selectedWirelessSocket,
-  });
+  String currentRoute;
+
+  AppState(
+      {this.nextCloudCredentials,
+      this.isLoadingNextCloudCredentials = false,
+      this.areaList,
+      this.isLoadingArea = false,
+      this.selectedArea,
+      this.wirelessSocketList,
+      this.isLoadingWirelessSocket = false,
+      this.selectedWirelessSocket,
+      this.currentRoute = "/"});
 
   AppState copyWith(
       {NextCloudCredentials nextCloudCredentials,
@@ -31,7 +35,8 @@ class AppState {
       Area selectedArea,
       List<WirelessSocket> wirelessSocketList,
       bool isLoadingWirelessSocket,
-      WirelessSocket selectedWirelessSocket}) {
+      WirelessSocket selectedWirelessSocket,
+      String currentRoute}) {
     return new AppState(
       nextCloudCredentials: nextCloudCredentials ?? this.nextCloudCredentials,
       isLoadingNextCloudCredentials: isLoadingNextCloudCredentials ?? this.isLoadingNextCloudCredentials,
@@ -41,6 +46,7 @@ class AppState {
       wirelessSocketList: wirelessSocketList ?? this.wirelessSocketList,
       isLoadingWirelessSocket: isLoadingWirelessSocket ?? this.isLoadingWirelessSocket,
       selectedWirelessSocket: selectedWirelessSocket ?? this.selectedWirelessSocket,
+      currentRoute: currentRoute ?? this.currentRoute,
     );
   }
 
@@ -55,7 +61,8 @@ class AppState {
           selectedArea == other.selectedArea &&
           wirelessSocketList == other.wirelessSocketList &&
           isLoadingWirelessSocket == other.isLoadingWirelessSocket &&
-          selectedWirelessSocket == other.selectedWirelessSocket;
+          selectedWirelessSocket == other.selectedWirelessSocket &&
+          currentRoute == other.currentRoute;
 
   @override
   int get hashCode =>
@@ -66,10 +73,11 @@ class AppState {
       selectedArea.hashCode ^
       wirelessSocketList.hashCode ^
       isLoadingWirelessSocket.hashCode ^
-      selectedWirelessSocket.hashCode;
+      selectedWirelessSocket.hashCode ^
+      currentRoute.hashCode;
 
   @override
   String toString() {
-    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, wirelessSocketList: $wirelessSocketList, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket}';
+    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, wirelessSocketList: $wirelessSocketList, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, currentRoute: $currentRoute}';
   }
 }
