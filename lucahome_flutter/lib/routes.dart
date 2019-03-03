@@ -30,7 +30,18 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
           },
         ),
     '/details': (BuildContext context) => new StoreBuilder<AppState>(
-          onInit: (store) {},
+          onInit: (store) {
+            store.onChange.listen((state) {
+              var isLoading = state.isLoadingNextCloudCredentials ||
+                  state.isLoadingArea ||
+                  state.isLoadingNextCloudCredentials;
+
+              if (isLoading && state.currentRoute != '/loading') {
+                store.dispatch(new RouteChange(route: '/loading'));
+                Navigator.popAndPushNamed(context, '/loading');
+              }
+            });
+          },
           builder: (context, store) {
             return new DetailsPage(store.state.selectedWirelessSocket);
           },
