@@ -26,7 +26,7 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
             });
           },
           builder: (context, store) {
-            return new ListPage(store.state.wirelessSocketList);
+            return new ListPage(store);
           },
         ),
     '/details': (BuildContext context) => new StoreBuilder<AppState>(

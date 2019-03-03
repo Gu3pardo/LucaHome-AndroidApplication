@@ -3,6 +3,8 @@ import 'package:lucahome_flutter/helper/icon.helper.dart';
 import 'package:lucahome_flutter/models/wireless_socket.model.dart';
 
 class DetailsPage extends StatefulWidget {
+  static String tag = 'details-page';
+
   final WirelessSocket wirelessSocket;
 
   DetailsPage(this.wirelessSocket);
@@ -12,6 +14,7 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
+  /*
   Widget get wirelessSocketImage {
     return new Hero(
       tag: widget.wirelessSocket.name,
@@ -123,8 +126,41 @@ class _DetailsPageState extends State<DetailsPage> {
         ],
       ),
     );
-  }
+  }*/
 
+  @override
+  Widget build(BuildContext context) {
+    var pageSize = MediaQuery.of(context).size;
+
+    return new Container(
+        child: new Scaffold(
+          body: new Stack(
+            children: <Widget>[
+              new Container(
+                alignment: Alignment.center,
+                width: pageSize.width,
+                height: pageSize.height,
+                decoration: new BoxDecoration(
+                  gradient: new LinearGradient(
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                    stops: [0.2, 1.0],
+                    colors: [
+                      const Color(0xFF3744B0),
+                      const Color(0xFF3799B0),
+                    ],
+                  ),
+                ),
+                child: new Text(
+                  'Details page',
+                  style: Theme.of(context).textTheme.display4,
+                ),
+              ),
+            ],
+          ),
+        ));
+  }
+  /*
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -137,5 +173,5 @@ class _DetailsPageState extends State<DetailsPage> {
         children: <Widget>[wirelessSocketDetails],
       ),
     );
-  }
+  }*/
 }

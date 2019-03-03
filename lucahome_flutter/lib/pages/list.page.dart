@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:lucahome_flutter/models/wireless_socket.model.dart';
+import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/presentation/wireless_socket_card.dart';
+import 'package:redux/redux.dart';
 
 class ListPage extends StatelessWidget {
-  final List<WirelessSocket> wirelessSocketList;
+  static String tag = 'list-page';
 
-  ListPage(this.wirelessSocketList);
+  final Store<AppState> store;
+
+  ListPage(this.store);
 
   ListView _buildList(context) {
     return new ListView.builder(
-      itemCount: wirelessSocketList != null ? wirelessSocketList.length : 0,
-      itemBuilder: (context, index) =>
-          new WirelessSocketCard(wirelessSocketList[index]),
+      itemCount: store.state.wirelessSocketList != null ? store.state.wirelessSocketList.length : 0,
+      itemBuilder: (context, index) => new WirelessSocketCard(store.state.wirelessSocketList[index], store),
     );
   }
 
