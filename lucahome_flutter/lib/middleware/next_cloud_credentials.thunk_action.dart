@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lucahome_flutter/actions/next_cloud_credentials.actions.dart';
 import 'package:lucahome_flutter/constants/nextcloud.constants.dart';
+import 'package:lucahome_flutter/middleware/area.thunk_action.dart';
+import 'package:lucahome_flutter/middleware//wireless_socket.thunk_action.dart';
 import 'package:lucahome_flutter/models/api_response.model.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/models/next_cloud_credentials.model.dart';
@@ -11,6 +13,8 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
+    store.dispatch(new NextCloudCredentialsLogIn());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -36,9 +40,11 @@ ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
       // Valid
       case 200:
         saveNextCloudCredentials(nextCloudCredentials);
-        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
+        var apiResponseModel = ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success") {
           store.dispatch(new NextCloudCredentialsLogInSuccessful(user: nextCloudCredentials));
+          store.dispatch(loadAreas(nextCloudCredentials));
+          store.dispatch(loadWirelessSockets(nextCloudCredentials));
         } else {
           store.dispatch(new NextCloudCredentialsLogInFail(apiResponseModel.message));
         }
