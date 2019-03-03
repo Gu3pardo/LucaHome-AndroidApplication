@@ -34,11 +34,11 @@ Android client to remotely control wireless sockets and switches using nextcloud
 ## Screenshots
 
 <p align="center">
-	<img src="screenshots/LoginPage.jpg" alt="LoginPage" style="max-width:20%;float:left;">
-	<img src="screenshots/LoadingPage.jpg" alt="LoadingPage" style="max-width:20%;float:left;">
-	<img src="screenshots/NoNetworkPage.jpg" alt="NoNetworkPage" style="max-width:20%;float:left;">
-	<img src="screenshots/ListPage.jpg" alt="ListPage" style="max-width:20%;float:left;">
-	<img src="screenshots/DetailsPage.jpg" alt="DetailsPage" style="max-width:20%;float:left;">
+	<a target="_blank" rel="noopener noreferrer" href="screenshots/LoginPage.jpg"><img src="screenshots/LoginPage.jpg" alt="LoginPage" style="max-width:20%;flex:left;"></a>
+	<a target="_blank" rel="noopener noreferrer" href="screenshots/LoadingPage.jpg"><img src="screenshots/LoadingPage.jpg" alt="LoadingPage" style="max-width:20%;flex:left;"></a>
+	<a target="_blank" rel="noopener noreferrer" href="screenshots/NoNetworkPage.jpg"><img src="screenshots/NoNetworkPage.jpg" alt="NoNetworkPage" style="max-width:20%;flex:left;"></a>
+	<a target="_blank" rel="noopener noreferrer" href="screenshots/ListPage.jpg"><img src="screenshots/ListPage.jpg" alt="ListPage" style="max-width:20%;flex:left;"></a>
+	<a target="_blank" rel="noopener noreferrer" href="screenshots/DetailsPage.jpg"><img src="screenshots/DetailsPage.jpg" alt="DetailsPage" style="max-width:20%;flex:left;"></a></p>
 </p>
 
 ## License
