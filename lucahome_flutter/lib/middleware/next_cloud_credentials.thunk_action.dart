@@ -42,9 +42,9 @@ ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
         saveNextCloudCredentials(nextCloudCredentials);
         var apiResponseModel = ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success") {
-          store.dispatch(new NextCloudCredentialsLogInSuccessful(user: nextCloudCredentials));
           store.dispatch(loadAreas(nextCloudCredentials));
           store.dispatch(loadWirelessSockets(nextCloudCredentials));
+          store.dispatch(new NextCloudCredentialsLogInSuccessful(user: nextCloudCredentials));
         } else {
           store.dispatch(new NextCloudCredentialsLogInFail(apiResponseModel.message));
         }
