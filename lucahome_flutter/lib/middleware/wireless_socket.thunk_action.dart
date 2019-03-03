@@ -70,7 +70,7 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
 
     var response = await http.post(
         nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket",
-        body: jsonEncode(wirelessSocket),
+        body: jsonEncode(wirelessSocket.toAddJson()),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
     switch (response.statusCode) {

@@ -70,7 +70,7 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
 
     var response = await http.post(
         nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area",
-        body: jsonEncode(area),
+        body: jsonEncode(area.toAddJson()),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
     switch (response.statusCode) {
