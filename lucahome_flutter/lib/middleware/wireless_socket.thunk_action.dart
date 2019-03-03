@@ -54,7 +54,7 @@ ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredenti
         break;
 
       default:
-        store.dispatch(new WirelessSocketLoadFail("Unknown error"));
+        store.dispatch(new WirelessSocketLoadFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };
@@ -71,7 +71,7 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
     var response = await http.post(
         nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket",
         body: jsonEncode(wirelessSocket),
-        headers: {'authorization': authorization});
+        headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
     switch (response.statusCode) {
     // 404 For invalid URL
@@ -102,7 +102,7 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
         break;
 
       default:
-        store.dispatch(new WirelessSocketAddFail("Unknown error"));
+        store.dispatch(new WirelessSocketAddFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };
@@ -119,7 +119,7 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
     var response = await http.put(
         nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket/" + wirelessSocket.id.toString(),
         body: jsonEncode(wirelessSocket),
-        headers: {'authorization': authorization});
+        headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
     switch (response.statusCode) {
     // 404 For invalid URL
@@ -149,7 +149,7 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
         break;
 
       default:
-        store.dispatch(new WirelessSocketUpdateFail("Unknown error"));
+        store.dispatch(new WirelessSocketUpdateFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };
@@ -195,7 +195,7 @@ ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredent
         break;
 
       default:
-        store.dispatch(new WirelessSocketDeleteFail("Unknown error"));
+        store.dispatch(new WirelessSocketDeleteFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };

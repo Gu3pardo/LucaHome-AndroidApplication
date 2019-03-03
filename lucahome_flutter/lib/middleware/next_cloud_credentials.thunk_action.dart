@@ -57,7 +57,7 @@ ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
         break;
 
       default:
-        store.dispatch(new NextCloudCredentialsLogInFail("Unknown error"));
+        store.dispatch(new NextCloudCredentialsLogInFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };

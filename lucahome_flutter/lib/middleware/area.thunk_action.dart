@@ -54,7 +54,7 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
         break;
 
       default:
-        store.dispatch(new AreaLoadFail("Unknown error"));
+        store.dispatch(new AreaLoadFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };
@@ -71,7 +71,7 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
     var response = await http.post(
         nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area",
         body: jsonEncode(area),
-        headers: {'authorization': authorization});
+        headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
     switch (response.statusCode) {
     // 404 For invalid URL
@@ -102,7 +102,7 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
         break;
 
       default:
-        store.dispatch(new AreaAddFail("Unknown error"));
+        store.dispatch(new AreaAddFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };
@@ -119,7 +119,7 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
     var response = await http.put(
         nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area/" + area.id.toString(),
         body: jsonEncode(area),
-        headers: {'authorization': authorization});
+        headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
     switch (response.statusCode) {
     // 404 For invalid URL
@@ -149,7 +149,7 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
         break;
 
       default:
-        store.dispatch(new AreaUpdateFail("Unknown error"));
+        store.dispatch(new AreaUpdateFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };
@@ -195,7 +195,7 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
         break;
 
       default:
-        store.dispatch(new AreaDeleteFail("Unknown error"));
+        store.dispatch(new AreaDeleteFail("Unknown error: ${response.reasonPhrase}"));
         break;
     }
   };
