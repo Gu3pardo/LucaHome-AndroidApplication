@@ -22,7 +22,8 @@ List<WirelessSocket> _addFailed(List<WirelessSocket> wirelessSocketList, action)
 List<WirelessSocket> _updateSuccessful(List<WirelessSocket> wirelessSocketList, action) {
   var modifiableList = List.from(wirelessSocketList);
   var index = modifiableList.indexWhere((wirelessSocket) => wirelessSocket.name == action.wirelessSocket.name);
-  modifiableList.replaceRange(index, index + 1, action.wirelessSocket);
+  modifiableList.removeAt(index);
+  modifiableList.insert(index, action.wirelessSocket);
   return List.unmodifiable(modifiableList);
 }
 List<WirelessSocket> _updateFailed(List<WirelessSocket> wirelessSocketList, action) => wirelessSocketList;

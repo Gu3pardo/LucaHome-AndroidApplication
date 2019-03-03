@@ -22,7 +22,8 @@ List<Area> _addFailed(List<Area> areaList, action) => areaList;
 List<Area> _updateSuccessful(List<Area> areaList, action) {
   var modifiableList = List.from(areaList);
   var index = modifiableList.indexWhere((area) => area.name == action.area.name);
-  modifiableList.replaceRange(index, index + 1, action.area);
+  modifiableList.removeAt(index);
+  modifiableList.insert(index, action.area);
   return List.unmodifiable(modifiableList);
 }
 List<Area> _updateFailed(List<Area> areaList, action) => areaList;
