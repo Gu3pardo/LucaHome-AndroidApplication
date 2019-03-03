@@ -7,7 +7,8 @@
 - [ ] Add Possibility to add and edit areas and wireless sockets
 	- [ ] Add Area
 	- [ ] Delete Area
-	- [ ] Add WirelessSocket
-	- [ ] Edit WirelessSocket
+	- [ ] Add WirelessSocket(WIP)
+	- [ ] Edit WirelessSocket(WIP)
 	- [ ] Delete WirelessSocket
 - [ ] Reload by drag down
+- [ ] Fix routing to loading while adding/updating
