@@ -14,22 +14,11 @@ class DetailsPage extends StatefulWidget {
 }
 
 class _DetailsPageState extends State<DetailsPage> {
-  /*
-  Widget get wirelessSocketImage {
-    return new Hero(
-      tag: widget.wirelessSocket.name,
-      child: new Container(
-        color: Colors.white,
-        child: new SizedBox.expand(
-          child: new Hero(
-            tag: widget.wirelessSocket.icon,
-            child: new Icon(
-              fromString(widget.wirelessSocket.icon),
-              size: 150.0,
-            ),
-          ),
-        ),
-      ),
+  Widget get icon {
+    return new Icon(
+      fromString(widget.wirelessSocket.icon),
+      size: 150,
+      color: Colors.white,
     );
   }
 
@@ -43,6 +32,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
+      style: TextStyle(color: Colors.white),
     );
   }
 
@@ -56,6 +46,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
+      style: TextStyle(color: Colors.white),
     );
   }
 
@@ -69,6 +60,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
+      style: TextStyle(color: Colors.white),
     );
   }
 
@@ -82,6 +74,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
+      style: TextStyle(color: Colors.white),
     );
   }
 
@@ -95,38 +88,9 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
+      style: TextStyle(color: Colors.white),
     );
   }
-
-  Widget get wirelessSocketDetails {
-    return new Container(
-      padding: new EdgeInsets.symmetric(vertical: 32.0),
-      decoration: new BoxDecoration(
-        gradient: new LinearGradient(
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-          stops: [0.1, 0.5, 0.7, 0.9],
-          colors: [
-            Colors.indigo[800],
-            Colors.indigo[700],
-            Colors.indigo[600],
-            Colors.indigo[400],
-          ],
-        ),
-      ),
-      child: new Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          wirelessSocketImage,
-          nameTextFormField,
-          codeTextFormField,
-          areaTextFormField,
-          descriptionTextFormField,
-          iconTextFormField
-        ],
-      ),
-    );
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -134,44 +98,48 @@ class _DetailsPageState extends State<DetailsPage> {
 
     return new Container(
         child: new Scaffold(
-          body: new Stack(
-            children: <Widget>[
-              new Container(
-                alignment: Alignment.center,
-                width: pageSize.width,
-                height: pageSize.height,
-                decoration: new BoxDecoration(
-                  gradient: new LinearGradient(
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                    stops: [0.2, 1.0],
-                    colors: [
-                      const Color(0xFF3744B0),
-                      const Color(0xFF3799B0),
-                    ],
-                  ),
-                ),
-                child: new Text(
-                  'Details page',
-                  style: Theme.of(context).textTheme.display4,
-                ),
-              ),
-            ],
-          ),
-        ));
-  }
-  /*
-  @override
-  Widget build(BuildContext context) {
-    return new Scaffold(
-      backgroundColor: Colors.black87,
       appBar: new AppBar(
-        backgroundColor: Colors.black87,
+        backgroundColor: Color(0xFF3744B0),
         title: new Text('Details for ${widget.wirelessSocket.name}'),
       ),
-      body: new ListView(
-        children: <Widget>[wirelessSocketDetails],
+      body: new Stack(
+        children: <Widget>[
+          new Container(
+              alignment: Alignment.center,
+              width: pageSize.width,
+              height: pageSize.height,
+              decoration: new BoxDecoration(
+                gradient: new LinearGradient(
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                  stops: [0.2, 1.0],
+                  colors: [
+                    const Color(0xFF3744B0),
+                    const Color(0xFF3799B0),
+                  ],
+                ),
+              ),
+              child: new Center(
+                child: ListView(
+                  padding: EdgeInsets.only(left: 24.0, right: 24.0),
+                  children: <Widget>[
+                    SizedBox(height: 24.0),
+                    icon,
+                    SizedBox(height: 24.0),
+                    nameTextFormField,
+                    SizedBox(height: 24.0),
+                    codeTextFormField,
+                    SizedBox(height: 24.0),
+                    areaTextFormField,
+                    SizedBox(height: 24.0),
+                    descriptionTextFormField,
+                    SizedBox(height: 24.0),
+                    iconTextFormField
+                  ],
+                ),
+              )),
+        ],
       ),
-    );
-  }*/
+    ));
+  }
 }

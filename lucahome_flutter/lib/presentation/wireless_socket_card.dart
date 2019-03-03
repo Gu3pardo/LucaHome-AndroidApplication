@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucahome_flutter/actions/wireless_socket.actions.dart';
 import 'package:lucahome_flutter/helper/icon.helper.dart';
 import 'package:lucahome_flutter/middleware/wireless_socket.thunk_action.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
@@ -25,7 +26,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
 
   WirelessSocketCardState(this.wirelessSocket, this.store);
 
-  Widget wirelessSocketCard(Size pageSize) {
+  Widget wirelessSocketCard(BuildContext context, Size pageSize) {
     return new Positioned(
       right: 0.0,
       child: new Container(
@@ -35,7 +36,10 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
           color: Colors.white70,
           child: InkWell(
               splashColor: Colors.lightBlue,
-              onTap: () => showDetailsPage(wirelessSocket),
+              onTap: () {
+                store.dispatch(new WirelessSocketSelectSuccessful(wirelessSocket: wirelessSocket));
+                Navigator.pushNamed(context, '/details');
+              },
               child: new Padding(
                 padding: const EdgeInsets.only(
                   top: 8.0,
@@ -117,7 +121,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
           child: new Stack(
             children: <Widget>[
               wirelessSocket.state == 1 ? waveWidgetOn() : waveWidgetOff(),
-              wirelessSocketCard(pageSize),
+              wirelessSocketCard(context, pageSize),
               new Positioned(
                   top: 5,
                   left: 5,
@@ -141,10 +145,5 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
         ),
       ),
     );
-  }
-
-  showDetailsPage(WirelessSocket wirelessSocket) {
-    print("showDetailsPage: " + wirelessSocket.toString());
-    // TODO Navigate to details page using router and store
   }
 }
