@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lucahome_flutter/actions/wireless_socket.actions.dart';
 import 'package:lucahome_flutter/constants/nextcloud.constants.dart';
+import 'package:lucahome_flutter/converter/wireless_socket.converter.dart';
 import 'package:lucahome_flutter/models/api_response.model.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/models/wireless_socket.model.dart';
@@ -11,6 +12,8 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
+    store.dispatch(new WirelessSocketLoad());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -33,9 +36,13 @@ ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredenti
 
     // Valid
       case 200:
-        var apiResponseModel = new ApiResponseModel<List<WirelessSocket>>.fromJson(jsonDecode(response.body));
+        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success") {
-          store.dispatch(new WirelessSocketLoadSuccessful(list: apiResponseModel.data));
+          try {
+            store.dispatch(new WirelessSocketLoadSuccessful(list: createList(apiResponseModel.data)));
+          } catch(exception) {
+            store.dispatch(new WirelessSocketLoadFail(exception));
+          }
         } else {
           store.dispatch(new WirelessSocketLoadFail(apiResponseModel.message));
         }
@@ -50,6 +57,8 @@ ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredenti
 
 ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket) {
   return (Store<AppState> store) async {
+    store.dispatch(new WirelessSocketAdd());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -73,7 +82,7 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
 
     // Valid
       case 200:
-        var apiResponseModel = new ApiResponseModel<int>.fromJson(jsonDecode(response.body));
+        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data >= 0) {
           wirelessSocket.id = apiResponseModel.data;
           store.dispatch(new WirelessSocketAddSuccessful(wirelessSocket: wirelessSocket));
@@ -91,6 +100,8 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
 
 ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket) {
   return (Store<AppState> store) async {
+    store.dispatch(new WirelessSocketUpdate());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -114,7 +125,7 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
 
     // Valid
       case 200:
-        var apiResponseModel = new ApiResponseModel<int>.fromJson(jsonDecode(response.body));
+        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           store.dispatch(new WirelessSocketUpdateSuccessful(wirelessSocket: wirelessSocket));
         } else {
@@ -131,6 +142,8 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
 
 ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket) {
   return (Store<AppState> store) async {
+    store.dispatch(new WirelessSocketDelete());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -153,7 +166,7 @@ ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredent
 
     // Valid
       case 200:
-        var apiResponseModel = new ApiResponseModel<int>.fromJson(jsonDecode(response.body));
+        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           store.dispatch(new WirelessSocketDeleteSuccessful(wirelessSocket: wirelessSocket));
         } else {

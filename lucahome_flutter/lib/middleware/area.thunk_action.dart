@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:lucahome_flutter/actions/area.actions.dart';
 import 'package:lucahome_flutter/constants/nextcloud.constants.dart';
+import 'package:lucahome_flutter/converter/area.converter.dart';
 import 'package:lucahome_flutter/models/api_response.model.dart';
 import 'package:lucahome_flutter/models/app_state.model.dart';
 import 'package:lucahome_flutter/models/area.model.dart';
@@ -11,6 +12,8 @@ import 'package:redux_thunk/redux_thunk.dart';
 
 ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
+    store.dispatch(new AreaLoad());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -33,9 +36,13 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
 
     // Valid
       case 200:
-        var apiResponseModel = new ApiResponseModel<List<Area>>.fromJson(jsonDecode(response.body));
+        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success") {
-          store.dispatch(new AreaLoadSuccessful(list: apiResponseModel.data));
+          try {
+            store.dispatch(new AreaLoadSuccessful(list: createList(apiResponseModel.data)));
+          } catch(exception) {
+            store.dispatch(new AreaLoadFail(exception));
+          }
         } else {
           store.dispatch(new AreaLoadFail(apiResponseModel.message));
         }
@@ -50,6 +57,8 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
 
 ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area area) {
   return (Store<AppState> store) async {
+    store.dispatch(new AreaAdd());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -73,7 +82,7 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
 
     // Valid
       case 200:
-        var apiResponseModel = new ApiResponseModel<int>.fromJson(jsonDecode(response.body));
+        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data >= 0) {
           area.id = apiResponseModel.data;
           store.dispatch(new AreaAddSuccessful(area: area));
@@ -91,6 +100,8 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
 
 ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area area) {
   return (Store<AppState> store) async {
+    store.dispatch(new AreaUpdate());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -114,7 +125,7 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
 
     // Valid
       case 200:
-        var apiResponseModel = new ApiResponseModel<int>.fromJson(jsonDecode(response.body));
+        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           store.dispatch(new AreaUpdateSuccessful(area: area));
         } else {
@@ -131,6 +142,8 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
 
 ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area area) {
   return (Store<AppState> store) async {
+    store.dispatch(new AreaDelete());
+
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
@@ -153,7 +166,7 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
 
     // Valid
       case 200:
-        var apiResponseModel = new ApiResponseModel<int>.fromJson(jsonDecode(response.body));
+        var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           store.dispatch(new AreaDeleteSuccessful(area: area));
         } else {
