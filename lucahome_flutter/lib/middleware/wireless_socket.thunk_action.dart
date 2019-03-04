@@ -164,7 +164,7 @@ ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredent
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.delete(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket/$wirelessSocket.id",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket/${wirelessSocket.id}",
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {

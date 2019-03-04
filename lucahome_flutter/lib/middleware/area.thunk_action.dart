@@ -164,7 +164,7 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.delete(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area/$area.id",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area/${area.id}",
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {
