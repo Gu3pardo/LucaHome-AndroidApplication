@@ -6,9 +6,10 @@
 - [ ] Add Filter for Areas to ListPage
 - [ ] Add Possibility to add and edit areas and wireless sockets
 	- [ ] Add Area
+	- [ ] Edit Area
 	- [ ] Delete Area
-	- [ ] Add WirelessSocket(WIP)
-	- [ ] Edit WirelessSocket(WIP)
-	- [ ] Delete WirelessSocket
-- [ ] Reload by drag down
-- [ ] Fix routing to loading while adding/updating
+	- [O] Add WirelessSocket(WIP)
+	- [O] Edit WirelessSocket(WIP)
+	- [O] Delete WirelessSocket
+- [X] Reload
+- [ ] Fix routing to loading while adding/updating/deleting
