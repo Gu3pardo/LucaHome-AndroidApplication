@@ -102,7 +102,7 @@ class _DetailsPageState extends State<DetailsPage> {
         if (value.isEmpty) {
           return 'Area is required';
         }
-        if(!viewModel.validateArea(value)){
+        if (!viewModel.validateArea(value)) {
           return 'Area is not valid (Must exis)';
         }
       },
@@ -203,9 +203,7 @@ class _DetailsPageState extends State<DetailsPage> {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: 16.0),
                               child: RaisedButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24),),
                                 onPressed: () {
                                   if (_formKey.currentState.validate()) {
                                     _formKey.currentState.save();
@@ -214,10 +212,21 @@ class _DetailsPageState extends State<DetailsPage> {
                                 },
                                 padding: EdgeInsets.all(12),
                                 color: Colors.lightBlueAccent,
-                                child: Text('Save',
-                                    style: TextStyle(color: Colors.white)),
+                                child: Text('Save', style: TextStyle(color: Colors.white)),
                               ),
-                            )
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 4.0),
+                              child: RaisedButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                onPressed: () => viewModel.delete(context, widget.wirelessSocket),
+                                padding: EdgeInsets.all(12),
+                                color: Colors.redAccent,
+                                child: Text('Delete', style: TextStyle(color: Colors.white)),
+                              ),
+                            ),
                           ],
                         ),
                       )),
@@ -231,21 +240,50 @@ class _DetailsPageState extends State<DetailsPage> {
 
 class _ViewModel {
   final Function save;
+  final Function delete;
   final Function validateArea;
 
-  _ViewModel({this.save, this.validateArea});
+  _ViewModel({this.save, this.delete, this.validateArea});
 
   static _ViewModel fromStore(Store<AppState> store) {
-    return new _ViewModel(save: (WirelessSocket wirelessSocket) {
-      if (wirelessSocket.id == -1) {
-        store.dispatch(addWirelessSocket(
-            store.state.nextCloudCredentials, wirelessSocket));
-      } else {
-        store.dispatch(updateWirelessSocket(
-            store.state.nextCloudCredentials, wirelessSocket));
-      }
-    }, validateArea: (String areaName) {
-      return store.state.areaList.singleWhere((area) => area.name == areaName, orElse: () => null) != null;
-    });
+    return new _ViewModel(
+        save: (WirelessSocket wirelessSocket) {
+          if (wirelessSocket.id == -1) {
+            store.dispatch(addWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+          } else {
+            store.dispatch(updateWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+          }
+        },
+        delete: (BuildContext context, WirelessSocket wirelessSocket) {
+          deleteDialog(store, context, wirelessSocket);
+        },
+        validateArea: (String areaName) {
+          return store.state.areaList.singleWhere((area) => area.name == areaName, orElse: () => null) != null;
+        });
+  }
+
+  static Future<void> deleteDialog(Store<AppState> store, BuildContext context, WirelessSocket wirelessSocket) async {
+    switch (await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            title: Text('Delete ${wirelessSocket.name}?'),
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () { Navigator.pop(context, true); },
+                child: const Text('Yes'),
+              ),
+              SimpleDialogOption(
+                onPressed: () { Navigator.pop(context, false); },
+                child: const Text('No'),
+              ),
+            ],
+          );
+        }
+    )) {
+      case true:
+        store.dispatch(deleteWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+        break;
+    }
   }
 }
