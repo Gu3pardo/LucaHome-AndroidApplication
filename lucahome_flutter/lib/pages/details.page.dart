@@ -262,28 +262,30 @@ class _ViewModel {
         });
   }
 
-  static Future<void> deleteDialog(Store<AppState> store, BuildContext context, WirelessSocket wirelessSocket) async {
-    switch (await showDialog<bool>(
-        context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-            title: Text('Delete ${wirelessSocket.name}?'),
-            children: <Widget>[
-              SimpleDialogOption(
-                onPressed: () { Navigator.pop(context, true); },
-                child: const Text('Yes'),
-              ),
-              SimpleDialogOption(
-                onPressed: () { Navigator.pop(context, false); },
-                child: const Text('No'),
-              ),
-            ],
-          );
-        }
-    )) {
-      case true:
-        store.dispatch(deleteWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
-        break;
-    }
+  static void deleteDialog(Store<AppState> store, BuildContext context, WirelessSocket wirelessSocket) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete ${wirelessSocket.name}?'),
+          content: Text('Do you really want to delete ${wirelessSocket.name}?'),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () {
+                Navigator.pop(context, true);
+              },
+            ),
+            new FlatButton(
+              child: new Text("Delete"),
+              onPressed: () {
+                store.dispatch(deleteWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+                Navigator.pop(context, true);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
