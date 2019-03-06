@@ -1,6 +1,6 @@
 # LucaHome-AndroidApplications
 
-Android Frontends to speck to a nextcloud server.
+Android Frontends to speak to a nextcloud server.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Donate: PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.me/GuepardoApps)
