@@ -8,8 +8,8 @@
 	- [ ] Add Area
 	- [ ] Edit Area
 	- [ ] Delete Area
-	- [O] Add WirelessSocket(WIP)
-	- [O] Edit WirelessSocket(WIP)
-	- [O] Delete WirelessSocket
+	- [X] Add WirelessSocket(WIP)
+	- [X] Edit WirelessSocket(WIP)
+	- [X] Delete WirelessSocket
 - [X] Reload
 - [ ] Fix routing to loading while adding/updating/deleting
