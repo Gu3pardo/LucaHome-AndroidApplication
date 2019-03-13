@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
 import 'package:wireless_control/actions/next_cloud_credentials.actions.dart';
 import 'package:wireless_control/constants/nextcloud.constants.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
@@ -8,8 +10,6 @@ import 'package:wireless_control/models/api_response.model.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
 import 'package:wireless_control/utils/shared_pref.utils.dart';
-import 'package:redux/redux.dart';
-import 'package:redux_thunk/redux_thunk.dart';
 
 ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {

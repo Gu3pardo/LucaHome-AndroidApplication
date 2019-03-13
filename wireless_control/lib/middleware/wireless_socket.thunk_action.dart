@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:redux/redux.dart';
+import 'package:redux_thunk/redux_thunk.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/constants/nextcloud.constants.dart';
 import 'package:wireless_control/converter/wireless_socket.converter.dart';
@@ -7,8 +9,6 @@ import 'package:wireless_control/models/api_response.model.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
-import 'package:redux/redux.dart';
-import 'package:redux_thunk/redux_thunk.dart';
 
 ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
