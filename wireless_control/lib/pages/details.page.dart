@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:wireless_control/constants/color.constants.dart';
+import 'package:wireless_control/enums/state_action.enum.dart';
 import 'package:wireless_control/helper/icon.helper.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
-import 'package:redux/redux.dart';
 
 class DetailsPage extends StatefulWidget {
   static String tag = 'details-page';
@@ -20,10 +22,12 @@ class DetailsPage extends StatefulWidget {
 
 class _DetailsPageState extends State<DetailsPage> {
   final _formKey = GlobalKey<FormState>();
+  StateAction stateAction;
 
   @override
   void initState() {
     super.initState();
+    this.stateAction = widget.wirelessSocket.name == "" ? StateAction.Add : StateAction.Update;
   }
 
   @override
@@ -35,7 +39,7 @@ class _DetailsPageState extends State<DetailsPage> {
     return new Icon(
       fromString(widget.wirelessSocket.icon),
       size: 150,
-      color: Colors.white,
+      color: ColorConstants.IconDark,
     );
   }
 
@@ -49,7 +53,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
-      style: TextStyle(color: Colors.white),
+      style: TextStyle(color: ColorConstants.TextDark),
       validator: (value) {
         if (value.isEmpty) {
           return 'Name is required';
@@ -71,7 +75,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
-      style: TextStyle(color: Colors.white),
+      style: TextStyle(color: ColorConstants.TextDark),
       validator: (value) {
         if (value.isEmpty) {
           return 'Code is required';
@@ -97,7 +101,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
-      style: TextStyle(color: Colors.white),
+      style: TextStyle(color: ColorConstants.TextDark),
       validator: (value) {
         if (value.isEmpty) {
           return 'Area is required';
@@ -122,7 +126,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
-      style: TextStyle(color: Colors.white),
+      style: TextStyle(color: ColorConstants.TextDark),
       validator: (value) {},
       onSaved: (String value) {
         widget.wirelessSocket.description = value;
@@ -140,7 +144,7 @@ class _DetailsPageState extends State<DetailsPage> {
         contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
       ),
-      style: TextStyle(color: Colors.white),
+      style: TextStyle(color: ColorConstants.TextDark),
       validator: (value) {
         if (value.isEmpty) {
           return 'Icon is required';
@@ -163,26 +167,16 @@ class _DetailsPageState extends State<DetailsPage> {
             key: _formKey,
             child: new Scaffold(
               appBar: new AppBar(
-                backgroundColor: Color(0xFF3744B0),
-                title: new Text('Details for ${widget.wirelessSocket.name}'),
+                backgroundColor: ColorConstants.AppBar,
+                title: this.stateAction == StateAction.Update ? new Text('Details for ${widget.wirelessSocket.name}') : new Text('Add wireless socket'),
               ),
               body: new Stack(
                 children: <Widget>[
                   new Container(
+                      color: ColorConstants.BackgroundLight,
                       alignment: Alignment.center,
                       width: pageSize.width,
                       height: pageSize.height,
-                      decoration: new BoxDecoration(
-                        gradient: new LinearGradient(
-                          begin: Alignment.topRight,
-                          end: Alignment.bottomLeft,
-                          stops: [0.2, 1.0],
-                          colors: [
-                            const Color(0xFF3744B0),
-                            const Color(0xFF3799B0),
-                          ],
-                        ),
-                      ),
                       child: new Center(
                         child: ListView(
                           padding: EdgeInsets.only(left: 24.0, right: 24.0),
@@ -211,22 +205,23 @@ class _DetailsPageState extends State<DetailsPage> {
                                   }
                                 },
                                 padding: EdgeInsets.all(12),
-                                color: Colors.lightBlueAccent,
-                                child: Text('Save', style: TextStyle(color: Colors.white)),
+                                color: ColorConstants.ButtonSubmit,
+                                child: Text('Save', style: TextStyle(color: ColorConstants.TextLight)),
                               ),
                             ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 4.0),
-                              child: RaisedButton(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(24),
+                            this.stateAction == StateAction.Update ?
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4.0),
+                                child: RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(24),
+                                  ),
+                                  onPressed: () => viewModel.delete(context, widget.wirelessSocket),
+                                  padding: EdgeInsets.all(12),
+                                  color: ColorConstants.ButtonDelete,
+                                  child: Text('Delete', style: TextStyle(color: ColorConstants.TextLight)),
                                 ),
-                                onPressed: () => viewModel.delete(context, widget.wirelessSocket),
-                                padding: EdgeInsets.all(12),
-                                color: Colors.redAccent,
-                                child: Text('Delete', style: TextStyle(color: Colors.white)),
-                              ),
-                            ),
+                              ) : Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
                           ],
                         ),
                       )),
