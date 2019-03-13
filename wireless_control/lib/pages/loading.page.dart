@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wireless_control/animations/bar.animation.dart';
+import 'package:wireless_control/constants/color.constants.dart';
 
 class LoadingPage extends StatefulWidget {
   static String tag = 'loading-page';
@@ -30,93 +31,17 @@ class _LoadingPageState extends State<LoadingPage>
     super.dispose();
   }
 
-  Animation<double> get stepOne => tween.animate(
-        new CurvedAnimation(
-          parent: _controller,
-          curve: new Interval(
-            0.0,
-            0.125,
-            curve: Curves.linear,
-          ),
+  Animation<double> step(double start, double end){
+    return tween.animate(
+      new CurvedAnimation(
+        parent: _controller,
+        curve: new Interval(
+          start, end,
+          curve: Curves.linear,
         ),
-      );
-
-  Animation<double> get stepTwo => tween.animate(
-        new CurvedAnimation(
-          parent: _controller,
-          curve: new Interval(
-            0.125,
-            0.26,
-            curve: Curves.linear,
-          ),
-        ),
-      );
-
-  Animation<double> get stepThree => tween.animate(
-        new CurvedAnimation(
-          parent: _controller,
-          curve: new Interval(
-            0.25,
-            0.375,
-            curve: Curves.linear,
-          ),
-        ),
-      );
-
-  Animation<double> get stepFour => tween.animate(
-        new CurvedAnimation(
-          parent: _controller,
-          curve: new Interval(
-            0.375,
-            0.5,
-            curve: Curves.linear,
-          ),
-        ),
-      );
-
-  Animation<double> get stepFive => tween.animate(
-        new CurvedAnimation(
-          parent: _controller,
-          curve: new Interval(
-            0.5,
-            0.625,
-            curve: Curves.linear,
-          ),
-        ),
-      );
-
-  Animation<double> get stepSix => tween.animate(
-        new CurvedAnimation(
-          parent: _controller,
-          curve: new Interval(
-            0.625,
-            0.75,
-            curve: Curves.linear,
-          ),
-        ),
-      );
-
-  Animation<double> get stepSeven => tween.animate(
-        new CurvedAnimation(
-          parent: _controller,
-          curve: new Interval(
-            0.75,
-            0.875,
-            curve: Curves.linear,
-          ),
-        ),
-      );
-
-  Animation<double> get stepEight => tween.animate(
-        new CurvedAnimation(
-          parent: _controller,
-          curve: new Interval(
-            0.875,
-            1.0,
-            curve: Curves.linear,
-          ),
-        ),
-      );
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -135,10 +60,7 @@ class _LoadingPageState extends State<LoadingPage>
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 stops: [0.2, 1.0],
-                colors: [
-                  const Color(0xFF3744B0),
-                  const Color(0xFF3799B0),
-                ],
+                colors: ColorConstants.BackgroundGradient,
               ),
             ),
             child: new Center(
@@ -149,8 +71,8 @@ class _LoadingPageState extends State<LoadingPage>
                     alignment: FractionalOffset.centerLeft,
                     controller: _controller,
                     animations: [
-                      stepOne,
-                      stepTwo,
+                      step(0.0, 0.125),
+                      step(0.125, 0.26),
                     ],
                     marginRight: 0.0,
                     marginLeft: 0.0,
@@ -159,8 +81,8 @@ class _LoadingPageState extends State<LoadingPage>
                   new PivotBar(
                     controller: _controller,
                     animations: [
-                      stepThree,
-                      stepEight,
+                      step(0.25, 0.375),
+                      step(0.875, 1.0),
                     ],
                     marginRight: 0.0,
                     marginLeft: 0.0,
@@ -169,8 +91,8 @@ class _LoadingPageState extends State<LoadingPage>
                   new PivotBar(
                     controller: _controller,
                     animations: [
-                      stepFour,
-                      stepSeven,
+                      step(0.375, 0.5),
+                      step(0.75, 0.875),
                     ],
                     marginRight: 0.0,
                     marginLeft: 32.0,
@@ -179,8 +101,8 @@ class _LoadingPageState extends State<LoadingPage>
                   new PivotBar(
                     controller: _controller,
                     animations: [
-                      stepFive,
-                      stepSix,
+                      step(0.5, 0.625),
+                      step(0.625, 0.75),
                     ],
                     marginRight: 0.0,
                     marginLeft: 32.0,

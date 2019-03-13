@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:wireless_control/constants/color.constants.dart';
 
 class NoNetworkPage extends StatefulWidget {
   static String tag = 'no-network-page';
@@ -78,10 +79,7 @@ class _NoNetworkPageState extends State<NoNetworkPage> {
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
                 stops: [0.2, 1.0],
-                colors: [
-                  const Color(0xFF3744B0),
-                  const Color(0xFF3799B0),
-                ],
+                colors: ColorConstants.BackgroundGradient,
               ),
             ),
             child: new Text(

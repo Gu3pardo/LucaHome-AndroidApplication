@@ -3,11 +3,12 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
+import 'package:wireless_control/constants/color.constants.dart';
 import 'package:wireless_control/middleware/next_cloud_credentials.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
 import 'package:wireless_control/utils/shared_pref.utils.dart';
-import 'package:redux/redux.dart';
 
 class LoginPage extends StatefulWidget {
   static String tag = 'login-page';
@@ -88,8 +89,7 @@ class _LoginPageState extends State<LoginPage> {
             key: _formKey,
             child: FutureBuilder(
                 future: loadNextCloudCredentials(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<NextCloudCredentials> snapshot) {
+                builder: (BuildContext context, AsyncSnapshot<NextCloudCredentials> snapshot) {
                   return new Scaffold(
                     body: new Stack(
                       children: <Widget>[
@@ -102,10 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                               begin: Alignment.topRight,
                               end: Alignment.bottomLeft,
                               stops: [0.2, 1.0],
-                              colors: [
-                                const Color(0xFF3744B0),
-                                const Color(0xFF3799B0),
-                              ],
+                              colors: ColorConstants.BackgroundGradient,
                             ),
                           ),
                           child: ListView(
@@ -117,20 +114,15 @@ class _LoginPageState extends State<LoginPage> {
                               TextFormField(
                                 keyboardType: TextInputType.url,
                                 autofocus: true,
-                                initialValue: snapshot.data != null
-                                    ? snapshot.data.baseUrl
-                                    : '',
+                                initialValue: snapshot.data != null ? snapshot.data.baseUrl : '',
                                 decoration: InputDecoration(
                                   hintText: 'NextCloudUrl',
-                                  contentPadding: EdgeInsets.fromLTRB(
-                                      20.0, 10.0, 20.0, 10.0),
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(32.0)),
-                                  hintStyle: TextStyle(color: Colors.white54),
-                                  errorStyle: TextStyle(color: Colors.red),
+                                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
+                                  hintStyle: TextStyle(color: ColorConstants.Hint),
+                                  errorStyle: TextStyle(color: ColorConstants.Error),
                                 ),
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: ColorConstants.TextLight),
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'NextCloudUrl is required';
@@ -144,20 +136,15 @@ class _LoginPageState extends State<LoginPage> {
                               TextFormField(
                                 keyboardType: TextInputType.text,
                                 autofocus: false,
-                                initialValue: snapshot.data != null
-                                    ? snapshot.data.userName
-                                    : '',
+                                initialValue: snapshot.data != null ? snapshot.data.userName : '',
                                 decoration: InputDecoration(
                                   hintText: 'UserName',
-                                  contentPadding: EdgeInsets.fromLTRB(
-                                      20.0, 10.0, 20.0, 10.0),
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(32.0)),
-                                  hintStyle: TextStyle(color: Colors.white54),
-                                  errorStyle: TextStyle(color: Colors.red),
+                                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
+                                  hintStyle: TextStyle(color: ColorConstants.Hint),
+                                  errorStyle: TextStyle(color: ColorConstants.Error),
                                 ),
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: ColorConstants.TextLight),
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'UserName is required';
@@ -170,21 +157,16 @@ class _LoginPageState extends State<LoginPage> {
                               SizedBox(height: 8.0),
                               TextFormField(
                                 autofocus: false,
-                                initialValue: snapshot.data != null
-                                    ? snapshot.data.passPhrase
-                                    : '',
+                                initialValue: snapshot.data != null ? snapshot.data.passPhrase : '',
                                 obscureText: true,
                                 decoration: InputDecoration(
                                   hintText: 'Password',
-                                  contentPadding: EdgeInsets.fromLTRB(
-                                      20.0, 10.0, 20.0, 10.0),
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(32.0)),
-                                  hintStyle: TextStyle(color: Colors.white54),
-                                  errorStyle: TextStyle(color: Colors.red),
+                                  contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
+                                  border: OutlineInputBorder( borderRadius: BorderRadius.circular(32.0)),
+                                  hintStyle: TextStyle(color: ColorConstants.Hint),
+                                  errorStyle: TextStyle(color: ColorConstants.Error),
                                 ),
-                                style: TextStyle(color: Colors.white),
+                                style: TextStyle(color: ColorConstants.TextLight),
                                 validator: (value) {
                                   if (value.isEmpty) {
                                     return 'Password is required';
@@ -208,9 +190,8 @@ class _LoginPageState extends State<LoginPage> {
                                     }
                                   },
                                   padding: EdgeInsets.all(12),
-                                  color: Colors.lightBlueAccent,
-                                  child: Text('Log In',
-                                      style: TextStyle(color: Colors.white)),
+                                  color: ColorConstants.ButtonSubmit,
+                                  child: Text('Log In', style: TextStyle(color: ColorConstants.TextLight)),
                                 ),
                               )
                             ],

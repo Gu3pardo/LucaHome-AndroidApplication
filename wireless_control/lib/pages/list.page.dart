@@ -1,12 +1,13 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
+import 'package:wireless_control/constants/color.constants.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:wireless_control/presentation/wireless_socket_card.dart';
-import 'package:redux/redux.dart';
 
 class ListPage extends StatefulWidget {
   static String tag = 'list-page';
@@ -31,33 +32,25 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    _animationController = new AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 250),
-    );
+    _animationController = new AnimationController(vsync: this, duration: const Duration(milliseconds: 250));
     super.initState();
   }
 
   ListView _buildList(context) {
     return new ListView.builder(
-      itemCount: store.state.wirelessSocketList != null
-          ? store.state.wirelessSocketList.length
-          : 0,
-      itemBuilder: (context, index) =>
-          new WirelessSocketCard(store.state.wirelessSocketList[index], store),
+      itemCount: store.state.wirelessSocketList != null ? store.state.wirelessSocketList.length : 0,
+      itemBuilder: (context, index) => new WirelessSocketCard(store.state.wirelessSocketList[index], store),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     var pageSize = MediaQuery.of(context).size;
-    var backgroundColor = Theme.of(context).cardColor;
-    var foregroundColor = Theme.of(context).accentColor;
 
     return new Container(
         child: new Scaffold(
       appBar: new AppBar(
-        backgroundColor: Color(0xFF3744B0),
+        backgroundColor: ColorConstants.AppBar,
         automaticallyImplyLeading: false,
         title: new Text('Wireless Sockets'),
         actions: <Widget>[
@@ -98,8 +91,8 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
               ),
               child: new FloatingActionButton(
                 heroTag: null,
-                backgroundColor: backgroundColor,
-                child: new Icon(icons[index], color: foregroundColor),
+                backgroundColor: ColorConstants.BackgroundLight,
+                child: new Icon(icons[index], color: ColorConstants.ButtonSubmit),
                 tooltip: index == 0 ? 'Area' : 'WirelessSocket',
                 onPressed: () {
                   switch (index) {
@@ -127,18 +120,12 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
                   return new Transform(
                     transform: new Matrix4.rotationZ(_animationController.value * 0.5 * math.pi),
                     alignment: FractionalOffset.center,
-                    child: new Icon(_animationController.isDismissed
-                        ? Icons.add
-                        : Icons.close),
+                    child: new Icon(_animationController.isDismissed ? Icons.add : Icons.close),
                   );
                 },
               ),
               onPressed: () {
-                if (_animationController.isDismissed) {
-                  _animationController.forward();
-                } else {
-                  _animationController.reverse();
-                }
+                _animationController.isDismissed ? _animationController.forward() : _animationController.reverse();
               },
             ),
           ),
@@ -146,21 +133,12 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
       body: new Stack(
         children: <Widget>[
           new Container(
+            color: ColorConstants.BackgroundLight,
             alignment: Alignment.center,
             width: pageSize.width,
             height: pageSize.height,
-            decoration: new BoxDecoration(
-              gradient: new LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                stops: [0.2, 1.0],
-                colors: [
-                  const Color(0xFF3744B0),
-                  const Color(0xFF3799B0),
-                ],
-              ),
-            ),
-            child: new Center(child: _buildList(context),
+            child: new Center(
+              child: _buildList(context),
             ),
           ),
         ],
