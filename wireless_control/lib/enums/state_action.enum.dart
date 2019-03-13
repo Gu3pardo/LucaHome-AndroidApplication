@@ -1,0 +1,1 @@
+enum StateAction { Add, Update }
