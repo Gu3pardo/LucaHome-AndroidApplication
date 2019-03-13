@@ -57,12 +57,24 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
         title: new Text('Wireless Sockets'),
         actions: <Widget>[
           DropdownButton<String>(
-            hint: Text("Please choose an area to filter"),
+            hint: Text("Please choose an area to filter", style: TextStyle(color: ColorConstants.Hint)),
             value: store.state.selectedArea.name,
             items: (store.state.areaList != null ? store.state.areaList : new List<Area>()).map((Area area) {
               return new DropdownMenuItem<String>(
                 value: area.name,
-                child: new Text(area.name),
+                child: new Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.info, color: ColorConstants.IconDark,),
+                      onPressed: () {
+                        widget.store.dispatch(new AreaSelectSuccessful(area: area));
+                        Navigator.pushNamed(context, '/area-details');
+                      },
+                    ),
+                    Text(area.name, style: TextStyle(color: ColorConstants.TextDark)),
+                  ],
+                ),
               );
             }).toList(),
             onChanged: (areaName) {
@@ -75,6 +87,12 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
             onPressed: () {
               store.dispatch(loadAreas(store.state.nextCloudCredentials));
               store.dispatch(loadWirelessSockets(store.state.nextCloudCredentials));
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              // TODO
             },
           ),
         ],
@@ -99,6 +117,8 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
                 onPressed: () {
                   switch (index) {
                     case 0: // Area
+                      store.dispatch(new AreaSelectSuccessful(area: new Area()));
+                      Navigator.pushNamed(context, '/area-details');
                       break;
                     case 1: // WirelessSocket
                       store.dispatch(new WirelessSocketSelectSuccessful(wirelessSocket: new WirelessSocket()));

@@ -191,6 +191,8 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
       case 200:
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
+          var areaSelected = store.state.areaList.length > 0 ? store.state.areaList.first : null;
+          store.dispatch(new AreaSelectSuccessful(area: areaSelected));
           store.dispatch(new AreaDeleteSuccessful(area: area));
         } else {
           store.dispatch(new AreaDeleteFail(apiResponseModel.message));
