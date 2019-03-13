@@ -1,8 +1,9 @@
+import 'package:wireless_control/actions/area.actions.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:redux/redux.dart';
 
-final wirelessSocketListReducer = combineReducers<List<WirelessSocket>>([
+final wirelessSocketListAllReducer = combineReducers<List<WirelessSocket>>([
   new TypedReducer<List<WirelessSocket>, WirelessSocketLoadSuccessful>(_loadSuccessful),
   new TypedReducer<List<WirelessSocket>, WirelessSocketLoadFail>(_loadFailed),
   new TypedReducer<List<WirelessSocket>, WirelessSocketAddSuccessful>(_addSuccessful),
@@ -38,3 +39,12 @@ final wirelessSocketReducer = combineReducers<WirelessSocket>([
 
 WirelessSocket _selectSuccessful(WirelessSocket wirelessSocket, action) => action.wirelessSocket;
 WirelessSocket _selectFailed(WirelessSocket wirelessSocket, action) => wirelessSocket;
+
+final wirelessSocketListAreaReducer = combineReducers<List<WirelessSocket>>([
+  new TypedReducer<List<WirelessSocket>, AreaSelectSuccessful>(_selectAreaSuccessful),
+  new TypedReducer<List<WirelessSocket>, AreaSelect>(_selectAreaFailed),
+]);
+
+List<WirelessSocket> _selectAreaSuccessful(List<WirelessSocket> wirelessSocketList, action) =>
+    action.area.filter == '' ? wirelessSocketList : wirelessSocketList.where((WirelessSocket wirelessSocket) => wirelessSocket.area == action.area.filter).toList();
+List<WirelessSocket> _selectAreaFailed(List<WirelessSocket> wirelessSocketList, action) => wirelessSocketList;

@@ -12,7 +12,8 @@ AppState appReducer(state, action) {
       areaList: areaListReducer(state.areaList, action),
       isLoadingArea: loadingAreaReducer(state.isLoadingArea, action),
       selectedArea: areaReducer(state.selectedArea, action),
-      wirelessSocketList: wirelessSocketListReducer(state.wirelessSocketList, action),
+      wirelessSocketListAll: wirelessSocketListAllReducer(state.wirelessSocketListAll, action),
+      wirelessSocketListArea: wirelessSocketListAreaReducer(state.wirelessSocketListAll, action),
       isLoadingWirelessSocket: loadingWirelessSocketReducer(state.isLoadingWirelessSocket, action),
       selectedWirelessSocket: wirelessSocketReducer(state.selectedWirelessSocket, action),
       currentRoute: routeReducer(state.currentRoute, action)); //new

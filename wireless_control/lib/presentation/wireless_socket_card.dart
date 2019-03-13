@@ -17,15 +17,11 @@ class WirelessSocketCard extends StatefulWidget {
 
   @override
   WirelessSocketCardState createState() {
-    return new WirelessSocketCardState(wirelessSocket, store);
+    return new WirelessSocketCardState();
   }
 }
 
 class WirelessSocketCardState extends State<WirelessSocketCard> {
-  WirelessSocket wirelessSocket;
-  final Store<AppState> store;
-
-  WirelessSocketCardState(this.wirelessSocket, this.store);
 
   Widget wirelessSocketCard(BuildContext context, Size pageSize) {
     return new Positioned(
@@ -38,7 +34,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
           child: InkWell(
               splashColor: ColorConstants.ButtonSubmit,
               onTap: () {
-                store.dispatch(new WirelessSocketSelectSuccessful(wirelessSocket: wirelessSocket));
+                widget.store.dispatch(new WirelessSocketSelectSuccessful(wirelessSocket: widget.wirelessSocket));
                 Navigator.pushNamed(context, '/details');
               },
               child: new Padding(
@@ -107,7 +103,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
           height: 115.0,
           child: new Stack(
             children: <Widget>[
-              wirelessSocket.state == 1 ? waveWidgetOn() : waveWidgetOff(),
+              widget.wirelessSocket.state == 1 ? waveWidgetOn() : waveWidgetOff(),
               wirelessSocketCard(context, pageSize),
               new Positioned(
                   top: 5,
@@ -119,8 +115,8 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
                     highlightColor: ColorConstants.ButtonSubmitHighlight,
                     padding: const EdgeInsets.all(10.0),
                     onPressed: () {
-                      wirelessSocket.state = wirelessSocket.state == 1 ? 0 : 1;
-                      store.dispatch(updateWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+                      widget.wirelessSocket.state = widget.wirelessSocket.state == 1 ? 0 : 1;
+                      widget.store.dispatch(updateWirelessSocket(widget.store.state.nextCloudCredentials, widget.wirelessSocket));
                     },
                     child: new Icon(
                       fromString(widget.wirelessSocket.icon),

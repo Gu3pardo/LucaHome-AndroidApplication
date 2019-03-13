@@ -10,7 +10,8 @@ class AppState {
   bool isLoadingArea;
   Area selectedArea;
 
-  List<WirelessSocket> wirelessSocketList;
+  List<WirelessSocket> wirelessSocketListAll;
+  List<WirelessSocket> wirelessSocketListArea;
   bool isLoadingWirelessSocket;
   WirelessSocket selectedWirelessSocket;
 
@@ -22,7 +23,8 @@ class AppState {
       this.areaList,
       this.isLoadingArea = false,
       this.selectedArea,
-      this.wirelessSocketList,
+      this.wirelessSocketListAll,
+      this.wirelessSocketListArea,
       this.isLoadingWirelessSocket = false,
       this.selectedWirelessSocket,
       this.currentRoute = "/"});
@@ -33,7 +35,8 @@ class AppState {
       List<Area> areaList,
       bool isLoadingArea,
       Area selectedArea,
-      List<WirelessSocket> wirelessSocketList,
+      List<WirelessSocket> wirelessSocketListAll,
+      List<WirelessSocket> wirelessSocketListArea,
       bool isLoadingWirelessSocket,
       WirelessSocket selectedWirelessSocket,
       String currentRoute}) {
@@ -43,7 +46,8 @@ class AppState {
       areaList: areaList ?? this.areaList,
       isLoadingArea: isLoadingArea ?? this.isLoadingArea,
       selectedArea: selectedArea ?? this.selectedArea,
-      wirelessSocketList: wirelessSocketList ?? this.wirelessSocketList,
+      wirelessSocketListAll: wirelessSocketListAll ?? this.wirelessSocketListAll,
+      wirelessSocketListArea: wirelessSocketListArea ?? this.wirelessSocketListArea,
       isLoadingWirelessSocket: isLoadingWirelessSocket ?? this.isLoadingWirelessSocket,
       selectedWirelessSocket: selectedWirelessSocket ?? this.selectedWirelessSocket,
       currentRoute: currentRoute ?? this.currentRoute,
@@ -59,7 +63,8 @@ class AppState {
           areaList == other.areaList &&
           isLoadingArea == other.isLoadingArea &&
           selectedArea == other.selectedArea &&
-          wirelessSocketList == other.wirelessSocketList &&
+          wirelessSocketListAll == other.wirelessSocketListAll &&
+          wirelessSocketListArea == other.wirelessSocketListArea &&
           isLoadingWirelessSocket == other.isLoadingWirelessSocket &&
           selectedWirelessSocket == other.selectedWirelessSocket &&
           currentRoute == other.currentRoute;
@@ -71,13 +76,14 @@ class AppState {
       areaList.hashCode ^
       isLoadingArea.hashCode ^
       selectedArea.hashCode ^
-      wirelessSocketList.hashCode ^
+      wirelessSocketListAll.hashCode ^
+      wirelessSocketListArea.hashCode ^
       isLoadingWirelessSocket.hashCode ^
       selectedWirelessSocket.hashCode ^
       currentRoute.hashCode;
 
   @override
   String toString() {
-    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, wirelessSocketList: $wirelessSocketList, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, currentRoute: $currentRoute}';
+    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, wirelessSocketListAll: $wirelessSocketListAll, wirelessSocketListArea: $wirelessSocketListArea, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, currentRoute: $currentRoute}';
   }
 }

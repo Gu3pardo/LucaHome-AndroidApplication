@@ -44,7 +44,10 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success") {
           try {
-            store.dispatch(new AreaLoadSuccessful(list: createList(apiResponseModel.data)));
+            var areaList = createList(apiResponseModel.data);
+            store.dispatch(new AreaLoadSuccessful(list: areaList));
+            var areaSelected = areaList.length > 0 ? areaList.first : null;
+            store.dispatch(new AreaSelectSuccessful(area: areaSelected));
           } catch(exception) {
             store.dispatch(new AreaLoadFail(exception));
           }

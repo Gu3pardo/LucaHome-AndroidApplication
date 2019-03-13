@@ -3,7 +3,7 @@
 - [X] Add Switch to WirelessSocketCard
 - [X] Add Routing
 - [X] Improve Layout
-- [ ] Add Filter for Areas to ListPage
+- [X] Add Filter for Areas to ListPage
 - [ ] Add Possibility to add and edit areas and wireless sockets
 	- [ ] Add Area
 	- [ ] Edit Area

@@ -1,11 +1,13 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
+import 'package:wireless_control/actions/area.actions.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/constants/color.constants.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
+import 'package:wireless_control/models/area.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:wireless_control/presentation/wireless_socket_card.dart';
 
@@ -38,8 +40,8 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
 
   ListView _buildList(context) {
     return new ListView.builder(
-      itemCount: store.state.wirelessSocketList != null ? store.state.wirelessSocketList.length : 0,
-      itemBuilder: (context, index) => new WirelessSocketCard(store.state.wirelessSocketList[index], store),
+      itemCount: store.state.wirelessSocketListArea != null ? store.state.wirelessSocketListArea.length : 0,
+      itemBuilder: (context, index) => new WirelessSocketCard(store.state.wirelessSocketListArea[index], store),
     );
   }
 
@@ -54,9 +56,9 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
         automaticallyImplyLeading: false,
         title: new Text('Wireless Sockets'),
         actions: <Widget>[
-          /*DropdownButton<String>(
+          DropdownButton<String>(
             hint: Text("Please choose an area to filter"),
-            value: selectedAreaName,
+            value: store.state.selectedArea.name,
             items: (store.state.areaList != null ? store.state.areaList : new List<Area>()).map((Area area) {
               return new DropdownMenuItem<String>(
                 value: area.name,
@@ -64,10 +66,10 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
               );
             }).toList(),
             onChanged: (areaName) {
-              selectedAreaName = areaName;
-              // TODO filter for area
+              var areaSelected = store.state.areaList.firstWhere((Area area) => area.name == areaName);
+              store.dispatch(new AreaSelectSuccessful(area: areaSelected));
             },
-          ),*/
+          ),
           IconButton(
             icon: Icon(Icons.sync),
             onPressed: () {
