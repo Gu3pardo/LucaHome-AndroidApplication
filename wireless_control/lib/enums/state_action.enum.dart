@@ -1,1 +1,1 @@
-enum StateAction { Add, Update }
+enum StateAction { Add, Update, Readonly }

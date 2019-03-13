@@ -4,12 +4,14 @@
 - [X] Add Routing
 - [X] Improve Layout
 - [X] Add Filter for Areas to ListPage
-- [ ] Add Possibility to add and edit areas and wireless sockets
-	- [ ] Add Area
-	- [ ] Edit Area
-	- [ ] Delete Area
+- [0] Add Possibility to add and edit areas and wireless sockets
+	- [0] Add Area
+	- [X] Edit Area
+	- [X] Delete Area
 	- [X] Add WirelessSocket(WIP)
 	- [X] Edit WirelessSocket(WIP)
 	- [X] Delete WirelessSocket
 - [X] Reload
+
 - [ ] Fix routing to loading while adding/updating/deleting
+- [ ] Fix dropdown index bug after adding an area

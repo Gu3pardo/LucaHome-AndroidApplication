@@ -27,7 +27,11 @@ class _DetailsPageState extends State<DetailsPage> {
   @override
   void initState() {
     super.initState();
-    this.stateAction = widget.wirelessSocket.name == "" ? StateAction.Add : StateAction.Update;
+    this.stateAction = widget.wirelessSocket.deletable == 1
+        ? widget.wirelessSocket.name == ""
+          ? StateAction.Add
+          : StateAction.Update
+        : StateAction.Readonly;
   }
 
   @override
@@ -194,21 +198,22 @@ class _DetailsPageState extends State<DetailsPage> {
                             SizedBox(height: 24.0),
                             iconTextFormField,
                             SizedBox(height: 24.0),
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 16.0),
-                              child: RaisedButton(
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24),),
-                                onPressed: () {
-                                  if (_formKey.currentState.validate()) {
-                                    _formKey.currentState.save();
-                                    viewModel.save(widget.wirelessSocket);
-                                  }
-                                },
-                                padding: EdgeInsets.all(12),
-                                color: ColorConstants.ButtonSubmit,
-                                child: Text('Save', style: TextStyle(color: ColorConstants.TextLight)),
-                              ),
-                            ),
+                            this.stateAction != StateAction.Readonly ?
+                              Padding(
+                                padding: EdgeInsets.symmetric(vertical: 16.0),
+                                child: RaisedButton(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24),),
+                                  onPressed: () {
+                                    if (_formKey.currentState.validate()) {
+                                      _formKey.currentState.save();
+                                      viewModel.save(widget.wirelessSocket);
+                                    }
+                                  },
+                                  padding: EdgeInsets.all(12),
+                                  color: ColorConstants.ButtonSubmit,
+                                  child: Text('Save', style: TextStyle(color: ColorConstants.TextLight)),
+                                ),
+                              ) : Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
                             this.stateAction == StateAction.Update ?
                               Padding(
                                 padding: EdgeInsets.symmetric(vertical: 4.0),
