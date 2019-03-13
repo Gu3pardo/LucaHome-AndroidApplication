@@ -4,7 +4,7 @@ Android Frontend to control sockets via 433MHz hosted by a NextCloud server.
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 [![Build](https://img.shields.io/badge/build-Success-green.svg)](./wireless_control)
-[![Version](https://img.shields.io/badge/version-1.0.0+1-blue.svg)](./wireless_control)
+[![Version](https://img.shields.io/badge/version-1.1.0+1-blue.svg)](./wireless_control)
 
 [![API21+](https://img.shields.io/badge/API-16+-blue.svg)](https://android-arsenal.com/api?level=16)
 [![Flutter](https://img.shields.io/badge/lang-Flutter-blue.svg)](https://flutter.dev/)
@@ -12,9 +12,8 @@ Android Frontend to control sockets via 433MHz hosted by a NextCloud server.
 
 ## Screenshots
 
-LoginPage|LoadingPage|NoNetworkPage|ListPage|DetailsPage|
- --- | --- | --- | --- | --- |
-![alt tag](../screenshots/wireless_control_LoginPage.jpg)|![alt tag](../screenshots/wireless_control_LoadingPage.jpg)|![alt tag](../screenshots/wireless_control_NoNetworkPage.jpg)|![alt tag](../screenshots/wireless_control_ListPage.jpg)|![alt tag](../screenshots/wireless_control_DetailsPage.jpg)|
+![alt tag](../screenshots/wireless_control_1.jpg)
+![alt tag](../screenshots/wireless_control_2.jpg)
 
 ## License
 
