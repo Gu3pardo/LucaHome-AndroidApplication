@@ -3,6 +3,7 @@ import 'package:wireless_control/reducers/area.reducer.dart';
 import 'package:wireless_control/reducers/loading.reducer.dart';
 import 'package:wireless_control/reducers/next_cloud_credentials.reducer.dart';
 import 'package:wireless_control/reducers/route.reducer.dart';
+import 'package:wireless_control/reducers/theme.reducer.dart';
 import 'package:wireless_control/reducers/wireless_socket.reducer.dart';
 
 AppState appReducer(state, action) {
@@ -21,5 +22,7 @@ AppState appReducer(state, action) {
       selectedWirelessSocket: wirelessSocketSelectReducer(state.selectedWirelessSocket, action),
       toBeAddedWirelessSocket: wirelessSocketAddReducer(state.toBeAddedWirelessSocket, action),
 
-      currentRoute: routeReducer(state.currentRoute, action)); //new
+      currentRoute: routeReducer(state.currentRoute, action),
+      theme: themeReducer(state.theme, action)
+  ); //new
 }

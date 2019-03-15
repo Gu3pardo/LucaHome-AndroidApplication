@@ -4,6 +4,7 @@ import 'package:wave/config.dart';
 import 'package:wave/wave.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/constants/color.constants.dart';
+import 'package:wireless_control/enums/app_theme.enum.dart';
 import 'package:wireless_control/helper/icon.helper.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
@@ -31,7 +32,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
         width: pageSize.width * 0.65,
         height: 115.0,
         child: new Card(
-          color: ColorConstants.CardBackgroundLightTransparent,
+          color: widget.store.state.theme == AppTheme.Light ? ColorConstants.CardBackgroundLightTransparent : ColorConstants.CardBackgroundDarkTransparent,
           child: InkWell(
               splashColor: ColorConstants.ButtonSubmit,
               onTap: () {
@@ -49,10 +50,10 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: <Widget>[
-                    new Text(widget.wirelessSocket.name, style: Theme.of(context).textTheme.headline),
-                    new Text(widget.wirelessSocket.code, style: Theme.of(context).textTheme.subhead),
-                    new Text(widget.wirelessSocket.area, style: Theme.of(context).textTheme.body1),
-                    new Text(widget.wirelessSocket.description, style: Theme.of(context).textTheme.body1)
+                    new Text(widget.wirelessSocket.name, style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 18)),
+                    new Text(widget.wirelessSocket.code, style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 15)),
+                    new Text(widget.wirelessSocket.area, style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12)),
+                    new Text(widget.wirelessSocket.description, style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12))
                   ],
                 ),
               )),
@@ -96,7 +97,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
     var pageSize = MediaQuery.of(context).size;
 
     return new Card(
-      color: ColorConstants.CardBackgroundLight,
+      color: widget.store.state.theme == AppTheme.Light ? ColorConstants.CardBackgroundLight : ColorConstants.CardBackgroundDark,
       margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
       child: new Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
@@ -126,7 +127,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
                     child: new Icon(
                       fromString(widget.wirelessSocket.icon),
                       size: 50,
-                      color: ColorConstants.IconDark,
+                      color: widget.store.state.theme == AppTheme.Light ? ColorConstants.IconDark : ColorConstants.IconLight,
                     ),
                   ))],
           ),

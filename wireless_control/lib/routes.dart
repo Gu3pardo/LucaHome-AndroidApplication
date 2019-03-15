@@ -10,6 +10,7 @@ import 'package:wireless_control/pages/list_wireless_socket.page.dart';
 import 'package:wireless_control/pages/loading.page.dart';
 import 'package:wireless_control/pages/login.page.dart';
 import 'package:wireless_control/pages/no_network.page.dart';
+import 'package:wireless_control/pages/settings.page.dart';
 
 Map<String, WidgetBuilder> getRoutes(context, store) {
   return {
@@ -112,10 +113,16 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
           },
         ),
     '/no-network': (BuildContext context) => new StoreBuilder<AppState>(
-          onInit: (store) {},
-          builder: (context, store) {
-            return new NoNetworkPage();
-          },
+           onInit: (store) {},
+           builder: (context, store) {
+             return new NoNetworkPage();
+           },
+        ),
+    '/settings': (BuildContext context) => new StoreBuilder<AppState>(
+           onInit: (store) {},
+           builder: (context, store) {
+             return new SettingsPage();
+           },
         ),
   };
 }

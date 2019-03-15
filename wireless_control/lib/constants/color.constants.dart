@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ColorConstants {
   static const AppBar = Color(0xFF3799B0);
 
-  static const BackgroundDark = Colors.black54;
+  static const BackgroundDark = Colors.black87;
   static const BackgroundLight = Colors.white;
   static const BackgroundGradient = [Color(0xFF3744B0), Color(0xFF3799B0)];
 

@@ -19,9 +19,9 @@
 
 - [X] Show snackBar for succeeded or failed action 
 
-- [ ] Add settings page
-    - [ ] choose theme (light & dark)
-    - [ ] change user data (userName, password & baseUrl)
+- [X] Add settings page
+    - [X] change user data (userName, password & baseUrl)
+    - [X] choose theme (light & dark)
 
 # Future
 

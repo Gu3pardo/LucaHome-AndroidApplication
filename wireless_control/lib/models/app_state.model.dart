@@ -1,3 +1,4 @@
+import 'package:wireless_control/enums/app_theme.enum.dart';
 import 'package:wireless_control/models/area.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
@@ -19,6 +20,8 @@ class AppState {
 
   String currentRoute;
 
+  AppTheme theme;
+
   AppState({
     this.nextCloudCredentials,
     this.isLoadingNextCloudCredentials = false,
@@ -34,7 +37,8 @@ class AppState {
     this.selectedWirelessSocket,
     this.toBeAddedWirelessSocket,
 
-    this.currentRoute = "/"});
+    this.currentRoute = "/",
+    this.theme = AppTheme.Light});
 
   AppState copyWith({
     NextCloudCredentials nextCloudCredentials,
@@ -51,7 +55,8 @@ class AppState {
     WirelessSocket selectedWirelessSocket,
     WirelessSocket toBeAddedWirelessSocket,
 
-    String currentRoute}) {
+    String currentRoute,
+    AppTheme theme}) {
     return new AppState(
       nextCloudCredentials: nextCloudCredentials ?? this.nextCloudCredentials,
       isLoadingNextCloudCredentials: isLoadingNextCloudCredentials ?? this.isLoadingNextCloudCredentials,
@@ -65,6 +70,7 @@ class AppState {
       selectedWirelessSocket: selectedWirelessSocket ?? this.selectedWirelessSocket,
       toBeAddedWirelessSocket: toBeAddedWirelessSocket ?? this.toBeAddedWirelessSocket,
       currentRoute: currentRoute ?? this.currentRoute,
+      theme: theme ?? this.theme,
     );
   }
 
@@ -83,7 +89,8 @@ class AppState {
           isLoadingWirelessSocket == other.isLoadingWirelessSocket &&
           selectedWirelessSocket == other.selectedWirelessSocket &&
           toBeAddedWirelessSocket == other.toBeAddedWirelessSocket &&
-          currentRoute == other.currentRoute;
+          currentRoute == other.currentRoute &&
+          theme == other.theme;
 
   @override
   int get hashCode =>
@@ -98,10 +105,11 @@ class AppState {
       isLoadingWirelessSocket.hashCode ^
       selectedWirelessSocket.hashCode ^
       toBeAddedWirelessSocket.hashCode ^
-      currentRoute.hashCode;
+      currentRoute.hashCode ^
+      theme.hashCode;
 
   @override
   String toString() {
-    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, toBeAddedArea: $toBeAddedArea, wirelessSocketListAll: $wirelessSocketListAll, wirelessSocketListArea: $wirelessSocketListArea, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, toBeAddedWirelessSocket: $toBeAddedWirelessSocket, currentRoute: $currentRoute}';
+    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, toBeAddedArea: $toBeAddedArea, wirelessSocketListAll: $wirelessSocketListAll, wirelessSocketListArea: $wirelessSocketListArea, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, toBeAddedWirelessSocket: $toBeAddedWirelessSocket, currentRoute: $currentRoute, theme: $theme}';
   }
 }

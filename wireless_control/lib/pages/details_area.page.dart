@@ -3,6 +3,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:redux/redux.dart';
 import 'package:wireless_control/constants/color.constants.dart';
+import 'package:wireless_control/enums/app_theme.enum.dart';
 import 'package:wireless_control/enums/state_action.enum.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
@@ -62,10 +63,10 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.25,
-                        color: ColorConstants.BackgroundLight,
+                        height: pageSize.height * 0.275,
+                        color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                         alignment: Alignment.center,
-                        child: getDetailsIcon(FontAwesomeIcons.map),
+                        child: getDetailsIcon(FontAwesomeIcons.map, viewModel.loadTheme()),
                       )
                     ],
                   ),
@@ -74,7 +75,7 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                       Container(
                           width: pageSize.width,
                           height: pageSize.height * 0.45,
-                          color: ColorConstants.BackgroundLight,
+                          color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                           alignment: Alignment.center,
                           child: Center(
                             child: ListView(
@@ -82,7 +83,8 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                               children: <Widget>[
                                 getTextFormField(widget.area.name, 'Name',
                                         (value) {if (value.isEmpty) {return 'Name is required';}},
-                                        (String value) {widget.area.name = value; widget.area.filter = value;}),
+                                        (String value) {widget.area.name = value; widget.area.filter = value;},
+                                        viewModel.loadTheme()),
                               ],
                             ),
                           )),
@@ -92,8 +94,8 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.15,
-                        color: ColorConstants.BackgroundLight,
+                        height: pageSize.height * 0.175,
+                        color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                         alignment: Alignment.center,
                         child: ListView(
                           padding: EdgeInsets.only(left: 24.0, right: 24.0),
@@ -111,7 +113,7 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                                 },
                                 padding: EdgeInsets.all(12),
                                 color: ColorConstants.ButtonSubmit,
-                                child: Text('Save', style: TextStyle(color: ColorConstants.TextLight)),
+                                child: Text('Save', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextLight : ColorConstants.TextDark)),
                               ),
                             ) : Padding(padding: EdgeInsets.symmetric(vertical: 2.0)),
                             this.stateAction == StateAction.Update ?
@@ -122,7 +124,7 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                                 onPressed: () => viewModel.delete(context, widget.area),
                                 padding: EdgeInsets.all(12),
                                 color: ColorConstants.ButtonDelete,
-                                child: Text('Delete', style: TextStyle(color: ColorConstants.TextLight)),
+                                child: Text('Delete', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextLight : ColorConstants.TextDark)),
                               ),
                             ) : Padding(padding: EdgeInsets.symmetric(vertical: 2.0)),
                           ],
@@ -139,14 +141,18 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
 }
 
 class _ViewModel {
+  final Function loadTheme;
   final Function save;
   final Function delete;
   final Function validateArea;
 
-  _ViewModel({this.save, this.delete, this.validateArea});
+  _ViewModel({this.loadTheme, this.save, this.delete, this.validateArea});
 
   static _ViewModel fromStore(Store<AppState> store) {
     return _ViewModel(
+        loadTheme:() {
+          return store.state.theme;
+        },
         save: (BuildContext context, Area area) {
           if (area.id == -1) {
             store.dispatch(addArea(

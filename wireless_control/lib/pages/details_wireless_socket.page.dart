@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:wireless_control/constants/color.constants.dart';
+import 'package:wireless_control/enums/app_theme.enum.dart';
 import 'package:wireless_control/enums/state_action.enum.dart';
 import 'package:wireless_control/helper/icon.helper.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
@@ -40,18 +41,20 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
     super.dispose();
   }
 
-  Widget get nameTextFormField {
+  Widget nameTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.name, 'Name',
             (value) {if (value.isEmpty) {return 'Name is required';}},
-            (String value) {widget.wirelessSocket.name = value;});
+            (String value) {widget.wirelessSocket.name = value;},
+            viewModel.loadTheme());
   }
 
-  Widget get codeTextFormField {
+  Widget codeTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.code, 'Code',
             (value) {
       if (value.isEmpty) {return 'Code is required';}
       if (!new RegExp(r"^([01]{5}[ABCDE]{1})$").hasMatch(value)) {return 'Invalid code (Must be of format 11001A)';}},
-            (String value) {widget.wirelessSocket.code = value;});
+            (String value) {widget.wirelessSocket.code = value;},
+            viewModel.loadTheme());
   }
 
   Widget areaTextFormField(_ViewModel viewModel) {
@@ -59,19 +62,22 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
             (value) {
       if (value.isEmpty) {return 'Area is required';}
       if (!viewModel.validateArea(value)) {return 'Area is not valid (Must exist)';}},
-            (String value) {widget.wirelessSocket.area = value;});
+            (String value) {widget.wirelessSocket.area = value;},
+            viewModel.loadTheme());
   }
 
-  Widget get descriptionTextFormField {
+  Widget descriptionTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.description, 'Description',
             (value) {},
-            (String value) {widget.wirelessSocket.description = value;});
+            (String value) {widget.wirelessSocket.description = value;},
+            viewModel.loadTheme());
   }
 
-  Widget get iconTextFormField {
+  Widget iconTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.icon, 'Icon',
             (value) {if (value.isEmpty) {return 'Icon is required';}},
-            (String value) {widget.wirelessSocket.icon = value;});
+            (String value) {widget.wirelessSocket.icon = value;},
+            viewModel.loadTheme());
   }
 
   @override
@@ -96,10 +102,10 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.25,
-                        color: ColorConstants.BackgroundLight,
+                        height: pageSize.height * 0.275,
+                        color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                         alignment: Alignment.center,
-                        child: getDetailsIcon(fromString(widget.wirelessSocket.icon)),
+                        child: getDetailsIcon(fromString(widget.wirelessSocket.icon), viewModel.loadTheme()),
                       )
                     ],
                   ),
@@ -108,21 +114,21 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
                       Container(
                           width: pageSize.width,
                           height: pageSize.height * 0.45,
-                          color: ColorConstants.BackgroundLight,
+                          color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                           alignment: Alignment.center,
                           child: Center(
                             child: ListView(
                               padding: EdgeInsets.only(left: 24.0, right: 24.0),
                               children: <Widget>[
-                                nameTextFormField,
+                                nameTextFormField(viewModel),
                                 SizedBox(height: 12.0),
-                                codeTextFormField,
+                                codeTextFormField(viewModel),
                                 SizedBox(height: 12.0),
                                 areaTextFormField(viewModel),
                                 SizedBox(height: 12.0),
-                                descriptionTextFormField,
+                                descriptionTextFormField(viewModel),
                                 SizedBox(height: 12.0),
-                                iconTextFormField,
+                                iconTextFormField(viewModel),
                               ],
                             ),
                           )),
@@ -132,8 +138,8 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.15,
-                        color: ColorConstants.BackgroundLight,
+                        height: pageSize.height * 0.175,
+                        color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                         alignment: Alignment.center,
                         child: ListView(
                           padding: EdgeInsets.only(left: 24.0, right: 24.0),
@@ -151,7 +157,7 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
                                 },
                                 padding: EdgeInsets.all(12),
                                 color: ColorConstants.ButtonSubmit,
-                                child: Text('Save', style: TextStyle(color: ColorConstants.TextLight)),
+                                child: Text('Save', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextLight : ColorConstants.TextDark)),
                               ),
                             ) : Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
                             this.stateAction == StateAction.Update ?
@@ -164,7 +170,7 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
                                 onPressed: () => viewModel.delete(context, widget.wirelessSocket),
                                 padding: EdgeInsets.all(12),
                                 color: ColorConstants.ButtonDelete,
-                                child: Text('Delete', style: TextStyle(color: ColorConstants.TextLight)),
+                                child: Text('Delete', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextLight : ColorConstants.TextDark)),
                               ),
                             ) : Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
                           ],
@@ -181,14 +187,18 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
 }
 
 class _ViewModel {
+  final Function loadTheme;
   final Function save;
   final Function delete;
   final Function validateArea;
 
-  _ViewModel({this.save, this.delete, this.validateArea});
+  _ViewModel({this.loadTheme, this.save, this.delete, this.validateArea});
 
   static _ViewModel fromStore(Store<AppState> store) {
     return _ViewModel(
+        loadTheme:() {
+          return store.state.theme;
+        },
         save: (BuildContext context, WirelessSocket wirelessSocket) {
           if (wirelessSocket.id == -1) {
             store.dispatch(addWirelessSocket(

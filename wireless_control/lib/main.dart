@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:wireless_control/actions/route.actions.dart';
 import 'package:wireless_control/middleware/next_cloud_credentials.thunk_action.dart';
+import 'package:wireless_control/middleware/theme.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
 import 'package:wireless_control/reducers/app.reducer.dart';
@@ -33,6 +34,8 @@ class MainApp extends StatelessWidget {
             case ConnectionState.active:
               return new Center(child: new CircularProgressIndicator());
             case ConnectionState.done:
+              store.dispatch(loadTheme());
+
               if (snapshot.data.hasServer() && snapshot.data.isLoggedIn()) {
                 print("Already hasServer and isLoggedIn");
                 store.dispatch(new RouteChange(route: "/loading"));

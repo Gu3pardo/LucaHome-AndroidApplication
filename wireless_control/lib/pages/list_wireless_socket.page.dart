@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:redux/redux.dart';
 import 'package:wireless_control/actions/area.actions.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/constants/color.constants.dart';
+import 'package:wireless_control/enums/app_theme.enum.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
@@ -88,14 +90,12 @@ class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with Tic
               store.dispatch(loadWirelessSockets(store.state.nextCloudCredentials));
             },
           ),
-          /*
           IconButton(
-            icon: Icon(Icons.settings),
+            icon: Icon(FontAwesomeIcons.cogs),
             onPressed: () {
-              // TODO
+              Navigator.pushNamed(context, '/settings');
             },
           ),
-          */
         ],
       ),
       floatingActionButton: new Column(
@@ -156,7 +156,7 @@ class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with Tic
       body: new Stack(
         children: <Widget>[
           new Container(
-            color: ColorConstants.BackgroundLight,
+            color: widget.store.state.theme == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
             alignment: Alignment.center,
             width: pageSize.width,
             height: pageSize.height,
