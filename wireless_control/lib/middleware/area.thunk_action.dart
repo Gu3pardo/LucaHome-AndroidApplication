@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -63,7 +64,7 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
   };
 }
 
-ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area area) {
+ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area area, VoidCallback onSuccess, VoidCallback onError) {
   return (Store<AppState> store) async {
     store.dispatch(new AreaAddOnServer());
 
@@ -80,17 +81,20 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
     // 404 For invalid URL
       case 404:
         store.dispatch(new AreaAddFail("Invalid URL"));
+        onError();
         break;
 
     // 405 For invalid URL
       case 405:
         store.dispatch(new AreaAddFail("Method not allowed"));
+        onError();
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
         store.dispatch(new AreaAddFail("Invalid Credentials"));
+        onError();
         break;
 
     // Valid
@@ -99,21 +103,24 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
         if (apiResponseModel.status == "success" && apiResponseModel.data >= 0) {
           area.id = apiResponseModel.data;
           store.dispatch(new AreaAddSuccessful(area: area));
+          onSuccess();
         } else {
           store.dispatch(new AreaAddFail(apiResponseModel.message));
+          onError();
         }
         break;
 
       default:
         store.dispatch(new AreaAddFail("Unknown error: ${response.reasonPhrase}"));
+        onError();
         break;
     }
   };
 }
 
-ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area area) {
+ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area area, VoidCallback onSuccess, VoidCallback onError) {
   return (Store<AppState> store) async {
-    store.dispatch(new AreaUpdate());
+    store.dispatch(new AreaUpdateOnServer());
 
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
@@ -128,17 +135,20 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
     // 404 For invalid URL
       case 404:
         store.dispatch(new AreaUpdateFail("Invalid URL"));
+        onError();
         break;
 
     // 405 For invalid URL
       case 405:
         store.dispatch(new AreaUpdateFail("Method not allowed"));
+        onError();
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
         store.dispatch(new AreaUpdateFail("Invalid Credentials"));
+        onError();
         break;
 
     // Valid
@@ -146,21 +156,24 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           store.dispatch(new AreaUpdateSuccessful(area: area));
+          onSuccess();
         } else {
           store.dispatch(new AreaUpdateFail(apiResponseModel.message));
+          onError();
         }
         break;
 
       default:
         store.dispatch(new AreaUpdateFail("Unknown error: ${response.reasonPhrase}"));
+        onError();
         break;
     }
   };
 }
 
-ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area area) {
+ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area area, VoidCallback onSuccess, VoidCallback onError) {
   return (Store<AppState> store) async {
-    store.dispatch(new AreaDelete());
+    store.dispatch(new AreaDeleteOnServer());
 
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
@@ -174,17 +187,20 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
     // 404 For invalid URL
       case 404:
         store.dispatch(new AreaDeleteFail("Invalid URL"));
+        onError();
         break;
 
     // 405 For invalid URL
       case 405:
         store.dispatch(new AreaDeleteFail("Method not allowed"));
+        onError();
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
         store.dispatch(new AreaDeleteFail("Invalid Credentials"));
+        onError();
         break;
 
     // Valid
@@ -194,13 +210,16 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
           var areaSelected = store.state.areaList.length > 0 ? store.state.areaList.first : null;
           store.dispatch(new AreaSelectSuccessful(area: areaSelected));
           store.dispatch(new AreaDeleteSuccessful(area: area));
+          onSuccess();
         } else {
           store.dispatch(new AreaDeleteFail(apiResponseModel.message));
+          onError();
         }
         break;
 
       default:
         store.dispatch(new AreaDeleteFail("Unknown error: ${response.reasonPhrase}"));
+        onError();
         break;
     }
   };

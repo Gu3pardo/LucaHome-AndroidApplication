@@ -19,6 +19,7 @@ class ColorConstants {
   static const IconDark = Colors.black87;
   static const IconLight = Colors.white;
 
+  static const Success = Colors.green;
   static const Error = Colors.red;
   static const TextDark = Colors.black87;
   static const TextLight = Colors.white;

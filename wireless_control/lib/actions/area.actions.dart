@@ -90,8 +90,8 @@ class AreaAddFail {
   }
 }
 
-class AreaUpdate {
-  AreaUpdate();
+class AreaUpdateOnServer {
+  AreaUpdateOnServer();
 }
 
 class AreaUpdateSuccessful {
@@ -116,8 +116,8 @@ class AreaUpdateFail {
   }
 }
 
-class AreaDelete {
-  AreaDelete();
+class AreaDeleteOnServer {
+  AreaDeleteOnServer();
 }
 
 class AreaDeleteSuccessful {

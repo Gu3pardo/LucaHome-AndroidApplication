@@ -90,8 +90,8 @@ class WirelessSocketAddFail {
   }
 }
 
-class WirelessSocketUpdate {
-  WirelessSocketUpdate();
+class WirelessSocketUpdateOnServer {
+  WirelessSocketUpdateOnServer();
 }
 
 class WirelessSocketUpdateSuccessful {
@@ -116,8 +116,8 @@ class WirelessSocketUpdateFail {
   }
 }
 
-class WirelessSocketDelete {
-  WirelessSocketDelete();
+class WirelessSocketDeleteOnServer {
+  WirelessSocketDeleteOnServer();
 }
 
 class WirelessSocketDeleteSuccessful {

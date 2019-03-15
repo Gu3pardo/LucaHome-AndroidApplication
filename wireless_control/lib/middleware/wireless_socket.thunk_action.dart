@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:redux/redux.dart';
 import 'package:redux_thunk/redux_thunk.dart';
@@ -60,7 +61,7 @@ ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredenti
   };
 }
 
-ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket) {
+ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket, VoidCallback onSuccess, VoidCallback onError) {
   return (Store<AppState> store) async {
     store.dispatch(new WirelessSocketAddOnServer());
 
@@ -77,17 +78,20 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
     // 404 For invalid URL
       case 404:
         store.dispatch(new WirelessSocketAddFail("Invalid URL"));
+        onError();
         break;
 
     // 405 For invalid URL
       case 405:
         store.dispatch(new WirelessSocketAddFail("Method not allowed"));
+        onError();
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
         store.dispatch(new WirelessSocketAddFail("Invalid Credentials"));
+        onError();
         break;
 
     // Valid
@@ -96,21 +100,24 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
         if (apiResponseModel.status == "success" && apiResponseModel.data >= 0) {
           wirelessSocket.id = apiResponseModel.data;
           store.dispatch(new WirelessSocketAddSuccessful(wirelessSocket: wirelessSocket));
+          onSuccess();
         } else {
           store.dispatch(new WirelessSocketAddFail(apiResponseModel.message));
+          onError();
         }
         break;
 
       default:
         store.dispatch(new WirelessSocketAddFail("Unknown error: ${response.reasonPhrase}"));
+        onError();
         break;
     }
   };
 }
 
-ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket) {
+ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket, VoidCallback onSuccess, VoidCallback onError) {
   return (Store<AppState> store) async {
-    store.dispatch(new WirelessSocketUpdate());
+    store.dispatch(new WirelessSocketUpdateOnServer());
 
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
@@ -125,17 +132,20 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
     // 404 For invalid URL
       case 404:
         store.dispatch(new WirelessSocketUpdateFail("Invalid URL"));
+        onError();
         break;
 
     // 405 For invalid URL
       case 405:
         store.dispatch(new WirelessSocketUpdateFail("Method not allowed"));
+        onError();
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
         store.dispatch(new WirelessSocketUpdateFail("Invalid Credentials"));
+        onError();
         break;
 
     // Valid
@@ -143,21 +153,24 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           store.dispatch(new WirelessSocketUpdateSuccessful(wirelessSocket: wirelessSocket));
+          onSuccess();
         } else {
           store.dispatch(new WirelessSocketUpdateFail(apiResponseModel.message));
+          onError();
         }
         break;
 
       default:
         store.dispatch(new WirelessSocketUpdateFail("Unknown error: ${response.reasonPhrase}"));
+        onError();
         break;
     }
   };
 }
 
-ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket) {
+ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket, VoidCallback onSuccess, VoidCallback onError) {
   return (Store<AppState> store) async {
-    store.dispatch(new WirelessSocketDelete());
+    store.dispatch(new WirelessSocketDeleteOnServer());
 
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
@@ -171,17 +184,20 @@ ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredent
     // 404 For invalid URL
       case 404:
         store.dispatch(new WirelessSocketDeleteFail("Invalid URL"));
+        onError();
         break;
 
     // 405 For invalid URL
       case 405:
         store.dispatch(new WirelessSocketDeleteFail("Method not allowed"));
+        onError();
         break;
 
     // 401 For invalid userName with message: CORS requires basic auth
     // 401 For invalid passPhrase with message: CORS requires basic auth
       case 401:
         store.dispatch(new WirelessSocketDeleteFail("Invalid Credentials"));
+        onError();
         break;
 
     // Valid
@@ -189,13 +205,16 @@ ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredent
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           store.dispatch(new WirelessSocketDeleteSuccessful(wirelessSocket: wirelessSocket));
+          onSuccess();
         } else {
           store.dispatch(new WirelessSocketDeleteFail(apiResponseModel.message));
+          onError();
         }
         break;
 
       default:
         store.dispatch(new WirelessSocketDeleteFail("Unknown error: ${response.reasonPhrase}"));
+        onError();
         break;
     }
   };

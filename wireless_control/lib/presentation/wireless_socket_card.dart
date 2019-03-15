@@ -8,6 +8,7 @@ import 'package:wireless_control/helper/icon.helper.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
+import 'package:wireless_control/utils/actions.util.dart';
 
 class WirelessSocketCard extends StatefulWidget {
   final WirelessSocket wirelessSocket;
@@ -116,7 +117,11 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
                     padding: const EdgeInsets.all(10.0),
                     onPressed: () {
                       widget.wirelessSocket.state = widget.wirelessSocket.state == 1 ? 0 : 1;
-                      widget.store.dispatch(updateWirelessSocket(widget.store.state.nextCloudCredentials, widget.wirelessSocket));
+                      widget.store.dispatch(updateWirelessSocket(
+                          widget.store.state.nextCloudCredentials,
+                          widget.wirelessSocket,
+                          () => onSuccess(context, 'Successfully set state for ${widget.wirelessSocket.name}'),
+                          () => onError(context, 'Failed to set state for ${widget.wirelessSocket.name}')));
                     },
                     child: new Icon(
                       fromString(widget.wirelessSocket.icon),

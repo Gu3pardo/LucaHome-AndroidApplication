@@ -8,6 +8,7 @@ import 'package:wireless_control/middleware/area.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/area.model.dart';
 import 'package:wireless_control/presentation/details-widgets.dart';
+import 'package:wireless_control/utils/actions.util.dart';
 
 class DetailsAreaPage extends StatefulWidget {
   static String tag = 'details-area-page';
@@ -105,7 +106,7 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                                 onPressed: () {
                                   if (_formKey.currentState.validate()) {
                                     _formKey.currentState.save();
-                                    viewModel.save(widget.area);
+                                    viewModel.save(context, widget.area);
                                   }
                                 },
                                 padding: EdgeInsets.all(12),
@@ -146,11 +147,19 @@ class _ViewModel {
 
   static _ViewModel fromStore(Store<AppState> store) {
     return _ViewModel(
-        save: (Area area) {
+        save: (BuildContext context, Area area) {
           if (area.id == -1) {
-            store.dispatch(addArea(store.state.nextCloudCredentials, area));
+            store.dispatch(addArea(
+                store.state.nextCloudCredentials,
+                area,
+                () => onSuccess(context, 'Successfully added area ${area.name}'),
+                () => onError(context, 'Failed to add area ${area.name}')));
           } else {
-            store.dispatch(updateArea(store.state.nextCloudCredentials, area));
+            store.dispatch(updateArea(
+                store.state.nextCloudCredentials,
+                area,
+                () => onSuccess(context, 'Successfully updated area ${area.name}'),
+                () => onError(context, 'Failed to update area ${area.name}')));
           }
         },
         delete: (BuildContext context, Area area) {
@@ -178,7 +187,11 @@ class _ViewModel {
             FlatButton(
               child: Text("Delete"),
               onPressed: () {
-                store.dispatch(deleteArea(store.state.nextCloudCredentials, area));
+                store.dispatch(deleteArea(
+                    store.state.nextCloudCredentials,
+                    area,
+                    () => onSuccess(context, 'Successfully deleted area ${area.name}'),
+                    () => onError(context, 'Failed to delete area ${area.name}')));
                 Navigator.pop(context, true);
               },
             ),

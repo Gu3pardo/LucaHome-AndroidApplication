@@ -17,7 +17,7 @@
 
 # Feature
 
-- [ ] Show snackBar for succeeded or failed action 
+- [X] Show snackBar for succeeded or failed action 
 
 - [ ] Add settings page
     - [ ] choose theme (light & dark)

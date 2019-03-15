@@ -8,6 +8,7 @@ import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:wireless_control/presentation/details-widgets.dart';
+import 'package:wireless_control/utils/actions.util.dart';
 
 class DetailsWirelessSocketPage extends StatefulWidget {
   static String tag = 'details-wireless-socket-page';
@@ -145,7 +146,7 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
                                 onPressed: () {
                                   if (_formKey.currentState.validate()) {
                                     _formKey.currentState.save();
-                                    viewModel.save(widget.wirelessSocket);
+                                    viewModel.save(context, widget.wirelessSocket);
                                   }
                                 },
                                 padding: EdgeInsets.all(12),
@@ -188,11 +189,19 @@ class _ViewModel {
 
   static _ViewModel fromStore(Store<AppState> store) {
     return _ViewModel(
-        save: (WirelessSocket wirelessSocket) {
+        save: (BuildContext context, WirelessSocket wirelessSocket) {
           if (wirelessSocket.id == -1) {
-            store.dispatch(addWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+            store.dispatch(addWirelessSocket(
+                store.state.nextCloudCredentials,
+                wirelessSocket,
+                () => onSuccess(context, 'Successfully added wireless socket ${wirelessSocket.name}'),
+                () => onError(context, 'Failed to add wireless socket ${wirelessSocket.name}')));
           } else {
-            store.dispatch(updateWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+            store.dispatch(updateWirelessSocket(
+                store.state.nextCloudCredentials,
+                wirelessSocket,
+                () => onSuccess(context, 'Successfully updated wireless socket ${wirelessSocket.name}'),
+                () => onError(context, 'Failed to updated wireless socket ${wirelessSocket.name}')));
           }
         },
         delete: (BuildContext context, WirelessSocket wirelessSocket) {
@@ -220,7 +229,11 @@ class _ViewModel {
             FlatButton(
               child: Text("Delete"),
               onPressed: () {
-                store.dispatch(deleteWirelessSocket(store.state.nextCloudCredentials, wirelessSocket));
+                store.dispatch(deleteWirelessSocket(
+                    store.state.nextCloudCredentials,
+                    wirelessSocket,
+                    () => onSuccess(context, 'Successfully deleted wireless socket ${wirelessSocket.name}'),
+                    () => onError(context, 'Failed to delete wireless socket ${wirelessSocket.name}')));
                 Navigator.pop(context, true);
               },
             ),
