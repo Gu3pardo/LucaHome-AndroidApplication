@@ -9,18 +9,18 @@ import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/area.model.dart';
 import 'package:wireless_control/presentation/details-widgets.dart';
 
-class AreaDetailsPage extends StatefulWidget {
-  static String tag = 'area-details-page';
+class DetailsAreaPage extends StatefulWidget {
+  static String tag = 'details-area-page';
 
   final Area area;
 
-  AreaDetailsPage(this.area);
+  DetailsAreaPage(this.area);
 
   @override
-  _AreaDetailsPageState createState() => new _AreaDetailsPageState();
+  _DetailsAreaPageState createState() => new _DetailsAreaPageState();
 }
 
-class _AreaDetailsPageState extends State<AreaDetailsPage> {
+class _DetailsAreaPageState extends State<DetailsAreaPage> {
   final _formKey = GlobalKey<FormState>();
   StateAction stateAction;
 

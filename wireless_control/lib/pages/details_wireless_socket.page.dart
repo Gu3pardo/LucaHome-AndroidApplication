@@ -9,18 +9,18 @@ import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:wireless_control/presentation/details-widgets.dart';
 
-class DetailsPage extends StatefulWidget {
-  static String tag = 'details-page';
+class DetailsWirelessSocketPage extends StatefulWidget {
+  static String tag = 'details-wireless-socket-page';
 
   final WirelessSocket wirelessSocket;
 
-  DetailsPage(this.wirelessSocket);
+  DetailsWirelessSocketPage(this.wirelessSocket);
 
   @override
-  _DetailsPageState createState() => new _DetailsPageState();
+  _DetailsWirelessSocketPageState createState() => new _DetailsWirelessSocketPageState();
 }
 
-class _DetailsPageState extends State<DetailsPage> {
+class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
   final _formKey = GlobalKey<FormState>();
   StateAction stateAction;
 

@@ -11,18 +11,18 @@ import 'package:wireless_control/models/area.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:wireless_control/presentation/wireless_socket_card.dart';
 
-class ListPage extends StatefulWidget {
-  static String tag = 'list-page';
+class ListWirelessSocketPage extends StatefulWidget {
+  static String tag = 'list-wirelss-socket-page';
 
   final Store<AppState> store;
 
-  ListPage(this.store);
+  ListWirelessSocketPage(this.store);
 
   @override
-  State createState() => new ListPageState(store);
+  State createState() => new ListWirelessSocketPageState(store);
 }
 
-class ListPageState extends State<ListPage> with TickerProviderStateMixin {
+class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with TickerProviderStateMixin {
   final Store<AppState> store;
   AnimationController _animationController;
   static const List<IconData> icons = const [
@@ -30,7 +30,7 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
     Icons.add_circle
   ];
 
-  ListPageState(this.store);
+  ListWirelessSocketPageState(this.store);
 
   @override
   void initState() {
@@ -68,7 +68,7 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
                       icon: Icon(Icons.info, color: ColorConstants.IconDark,),
                       onPressed: () {
                         widget.store.dispatch(new AreaSelectSuccessful(area: area));
-                        Navigator.pushNamed(context, '/area-details');
+                        Navigator.pushNamed(context, '/details-area');
                       },
                     ),
                     Text(area.name, style: TextStyle(color: ColorConstants.TextDark)),
@@ -117,11 +117,11 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
                   switch (index) {
                     case 0: // Area
                       store.dispatch(new AreaSelectSuccessful(area: new Area()));
-                      Navigator.pushNamed(context, '/area-details');
+                      Navigator.pushNamed(context, '/details-area');
                       break;
                     case 1: // WirelessSocket
                       store.dispatch(new WirelessSocketSelectSuccessful(wirelessSocket: new WirelessSocket()));
-                      Navigator.pushNamed(context, '/details');
+                      Navigator.pushNamed(context, '/details-wireless-socket');
                       break;
                     default:
                       break;

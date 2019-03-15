@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:wireless_control/actions/route.actions.dart';
 import 'package:wireless_control/models/app_state.model.dart';
-import 'package:wireless_control/pages/area_details.page.dart';
-import 'package:wireless_control/pages/details.page.dart';
-import 'package:wireless_control/pages/list.page.dart';
+import 'package:wireless_control/pages/details_area.page.dart';
+import 'package:wireless_control/pages/details_wireless_socket.page.dart';
+import 'package:wireless_control/pages/list_wireless_socket.page.dart';
 import 'package:wireless_control/pages/loading.page.dart';
 import 'package:wireless_control/pages/login.page.dart';
 import 'package:wireless_control/pages/no_network.page.dart';
@@ -27,10 +27,10 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
             });
           },
           builder: (context, store) {
-            return new ListPage(store);
+            return new ListWirelessSocketPage(store);
           },
         ),
-    '/area-details': (BuildContext context) => new StoreBuilder<AppState>(
+    '/details-area': (BuildContext context) => new StoreBuilder<AppState>(
       onInit: (store) {
         store.onChange.listen((state) {
           var isLoading = state.isLoadingNextCloudCredentials ||
@@ -44,10 +44,10 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
         });
       },
       builder: (context, store) {
-        return new AreaDetailsPage(store.state.selectedArea);
+        return new DetailsAreaPage(store.state.selectedArea);
       },
     ),
-    '/details': (BuildContext context) => new StoreBuilder<AppState>(
+    '/details-wireless-socket': (BuildContext context) => new StoreBuilder<AppState>(
           onInit: (store) {
             store.onChange.listen((state) {
               var isLoading = state.isLoadingNextCloudCredentials ||
@@ -61,7 +61,7 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
             });
           },
           builder: (context, store) {
-            return new DetailsPage(store.state.selectedWirelessSocket);
+            return new DetailsWirelessSocketPage(store.state.selectedWirelessSocket);
           },
         ),
     '/login': (BuildContext context) => new StoreBuilder<AppState>(
@@ -105,7 +105,7 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
             return new LoadingPage();
           },
         ),
-    '/no_network': (BuildContext context) => new StoreBuilder<AppState>(
+    '/no-network': (BuildContext context) => new StoreBuilder<AppState>(
           onInit: (store) {},
           builder: (context, store) {
             return new NoNetworkPage();

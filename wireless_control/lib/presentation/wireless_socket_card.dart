@@ -35,7 +35,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
               splashColor: ColorConstants.ButtonSubmit,
               onTap: () {
                 widget.store.dispatch(new WirelessSocketSelectSuccessful(wirelessSocket: widget.wirelessSocket));
-                Navigator.pushNamed(context, '/details');
+                Navigator.pushNamed(context, '/details-wireless-socket');
               },
               child: new Padding(
                 padding: const EdgeInsets.only(
