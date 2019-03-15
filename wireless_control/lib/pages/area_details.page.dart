@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:redux/redux.dart';
@@ -8,6 +7,7 @@ import 'package:wireless_control/enums/state_action.enum.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/area.model.dart';
+import 'package:wireless_control/presentation/details-widgets.dart';
 
 class AreaDetailsPage extends StatefulWidget {
   static String tag = 'area-details-page';
@@ -39,98 +39,102 @@ class _AreaDetailsPageState extends State<AreaDetailsPage> {
     super.dispose();
   }
 
-  Widget get icon {
-    return new Icon(
-      FontAwesomeIcons.map,
-      size: 150,
-      color: ColorConstants.IconDark,
-    );
-  }
-
-  Widget get nameTextFormField {
-    return new TextFormField(
-      keyboardType: TextInputType.text,
-      autofocus: false,
-      initialValue: widget.area.name,
-      decoration: InputDecoration(
-        hintText: 'Name',
-        contentPadding: EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10.0),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(32.0)),
-      ),
-      style: TextStyle(color: ColorConstants.TextDark),
-      validator: (value) {
-        if (value.isEmpty) {
-          return 'Name is required';
-        }
-      },
-      onSaved: (String value) {
-        widget.area.name = value;
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     var pageSize = MediaQuery.of(context).size;
 
-    return new StoreConnector<AppState, _ViewModel>(
+    return StoreConnector<AppState, _ViewModel>(
       converter: _ViewModel.fromStore,
       builder: (BuildContext context, _ViewModel viewModel) {
         return Form(
             key: _formKey,
-            child: new Scaffold(
-              appBar: new AppBar(
+            child: Scaffold(
+              appBar: AppBar(
                 backgroundColor: ColorConstants.AppBar,
-                title: this.stateAction == StateAction.Update ? new Text('Details for ${widget.area.name}') : new Text('Add area'),
+                title: (this.stateAction == StateAction.Update || this.stateAction == StateAction.Readonly)
+                    ? Text('Details for ${widget.area.name}')
+                    : Text('Add area'),
               ),
-              body: new Stack(
+              body: ListView(
                 children: <Widget>[
-                  new Container(
-                      color: ColorConstants.BackgroundLight,
-                      alignment: Alignment.center,
-                      width: pageSize.width,
-                      height: pageSize.height,
-                      child: new Center(
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        width: pageSize.width,
+                        height: pageSize.height * 0.25,
+                        color: ColorConstants.BackgroundLight,
+                        alignment: Alignment.center,
+                        child: getDetailsIcon(FontAwesomeIcons.map),
+                      )
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                          width: pageSize.width,
+                          height: pageSize.height * 0.45,
+                          color: ColorConstants.BackgroundLight,
+                          alignment: Alignment.center,
+                          child: Center(
+                            child: ListView(
+                              padding: EdgeInsets.only(left: 24.0, right: 24.0),
+                              children: <Widget>[
+                                getTextFormField(widget.area.name, 'Name',
+                                        (value) {
+                                  if (value.isEmpty) {
+                                    return 'Name is required';
+                                  }
+                                  },
+                                        (String value) {
+                                  widget.area.name = value;
+                                }),
+                              ],
+                            ),
+                          )),
+                    ],
+                  ),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        width: pageSize.width,
+                        height: pageSize.height * 0.15,
+                        color: ColorConstants.BackgroundLight,
+                        alignment: Alignment.center,
                         child: ListView(
                           padding: EdgeInsets.only(left: 24.0, right: 24.0),
                           children: <Widget>[
-                            SizedBox(height: 24.0),
-                            icon,
-                            SizedBox(height: 24.0),
-                            nameTextFormField,
-                            SizedBox(height: 24.0),
                             this.stateAction != StateAction.Readonly ?
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 16.0),
-                                child: RaisedButton(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24),),
-                                  onPressed: () {
-                                    if (_formKey.currentState.validate()) {
-                                      _formKey.currentState.save();
-                                      viewModel.save(widget.area);
-                                    }
-                                  },
-                                  padding: EdgeInsets.all(12),
-                                  color: ColorConstants.ButtonSubmit,
-                                  child: Text('Save', style: TextStyle(color: ColorConstants.TextLight)),
-                                ),
-                              ) : Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 2.0),
+                              child: RaisedButton(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24),),
+                                onPressed: () {
+                                  if (_formKey.currentState.validate()) {
+                                    _formKey.currentState.save();
+                                    viewModel.save(widget.area);
+                                  }
+                                },
+                                padding: EdgeInsets.all(12),
+                                color: ColorConstants.ButtonSubmit,
+                                child: Text('Save', style: TextStyle(color: ColorConstants.TextLight)),
+                              ),
+                            ) : Padding(padding: EdgeInsets.symmetric(vertical: 2.0)),
                             this.stateAction == StateAction.Update ?
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 4.0),
-                                child: RaisedButton(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(24),
-                                  ),
-                                  onPressed: () => viewModel.delete(context, widget.area),
-                                  padding: EdgeInsets.all(12),
-                                  color: ColorConstants.ButtonDelete,
-                                  child: Text('Delete', style: TextStyle(color: ColorConstants.TextLight)),
-                                ),
-                              ) : Padding(padding: EdgeInsets.symmetric(vertical: 4.0)),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 2.0),
+                              child: RaisedButton(
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                                onPressed: () => viewModel.delete(context, widget.area),
+                                padding: EdgeInsets.all(12),
+                                color: ColorConstants.ButtonDelete,
+                                child: Text('Delete', style: TextStyle(color: ColorConstants.TextLight)),
+                              ),
+                            ) : Padding(padding: EdgeInsets.symmetric(vertical: 2.0)),
                           ],
                         ),
-                      )),
+                      )
+                    ],
+                  ),
                 ],
               ),
             ));
@@ -147,7 +151,7 @@ class _ViewModel {
   _ViewModel({this.save, this.delete, this.validateArea});
 
   static _ViewModel fromStore(Store<AppState> store) {
-    return new _ViewModel(
+    return _ViewModel(
         save: (Area area) {
           if (area.id == -1) {
             store.dispatch(addArea(store.state.nextCloudCredentials, area));
@@ -169,16 +173,16 @@ class _ViewModel {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Delete ${area.name}?'),
-          content: Text('Do you really want to delete ${area.name}?'),
+          content: Text('Do you really want to delete ${area.name}? (Also deletes wireless sockets in this area!)'),
           actions: <Widget>[
-            new FlatButton(
-              child: new Text("Cancel"),
+            FlatButton(
+              child: Text("Cancel"),
               onPressed: () {
                 Navigator.pop(context, true);
               },
             ),
-            new FlatButton(
-              child: new Text("Delete"),
+            FlatButton(
+              child: Text("Delete"),
               onPressed: () {
                 store.dispatch(deleteArea(store.state.nextCloudCredentials, area));
                 Navigator.pop(context, true);
