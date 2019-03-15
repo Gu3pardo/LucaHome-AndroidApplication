@@ -27,7 +27,7 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
     return new Positioned(
       right: 0.0,
       child: new Container(
-        width: pageSize.width * 0.75,
+        width: pageSize.width * 0.65,
         height: 115.0,
         child: new Card(
           color: ColorConstants.CardBackgroundLightTransparent,
