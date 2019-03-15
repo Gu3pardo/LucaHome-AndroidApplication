@@ -54,11 +54,10 @@ class ListPageState extends State<ListPage> with TickerProviderStateMixin {
       appBar: new AppBar(
         backgroundColor: ColorConstants.AppBar,
         automaticallyImplyLeading: false,
-        title: new Text('Wireless Sockets'),
         actions: <Widget>[
           DropdownButton<String>(
             hint: Text("Please choose an area to filter", style: TextStyle(color: ColorConstants.Hint)),
-            value: store.state.selectedArea.name,
+            value: store.state.selectedArea != null ? store.state.selectedArea.name : '',
             items: (store.state.areaList != null ? store.state.areaList : new List<Area>()).map((Area area) {
               return new DropdownMenuItem<String>(
                 value: area.name,
