@@ -38,3 +38,4 @@
     - [X] Area
     - [ ] WirelessSocket
 - [X] Fix dropdown index bug after adding an area
+- [ ] Update wireless socket icon in detail view while editing
