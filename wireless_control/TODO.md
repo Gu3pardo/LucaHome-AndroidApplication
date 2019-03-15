@@ -35,4 +35,6 @@
 # Bugs
 
 - [ ] Fix routing to loading while adding/updating/deleting
+    - [X] Area
+    - [ ] WirelessSocket
 - [X] Fix dropdown index bug after adding an area
