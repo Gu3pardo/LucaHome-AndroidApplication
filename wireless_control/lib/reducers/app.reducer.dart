@@ -9,12 +9,17 @@ AppState appReducer(state, action) {
   return new AppState(
       nextCloudCredentials: nextCloudCredentialsReducer(state.nextCloudCredentials, action),
       isLoadingNextCloudCredentials: loadingNextCloudCredentialsReducer(state.isLoadingNextCloudCredentials, action),
+
       areaList: areaListReducer(state.areaList, action),
       isLoadingArea: loadingAreaReducer(state.isLoadingArea, action),
-      selectedArea: areaReducer(state.selectedArea, action),
+      selectedArea: areaSelectReducer(state.selectedArea, action),
+      toBeAddedArea: areaAddReducer(state.toBeAddedArea, action),
+
       wirelessSocketListAll: wirelessSocketListAllReducer(state.wirelessSocketListAll, action),
-      wirelessSocketListArea: wirelessSocketListAreaReducer(state.wirelessSocketListAll, action),
+      wirelessSocketListArea: wirelessSocketSelectAreaReducer(state.wirelessSocketListAll, action),
       isLoadingWirelessSocket: loadingWirelessSocketReducer(state.isLoadingWirelessSocket, action),
-      selectedWirelessSocket: wirelessSocketReducer(state.selectedWirelessSocket, action),
+      selectedWirelessSocket: wirelessSocketSelectReducer(state.selectedWirelessSocket, action),
+      toBeAddedWirelessSocket: wirelessSocketAddReducer(state.toBeAddedWirelessSocket, action),
+
       currentRoute: routeReducer(state.currentRoute, action)); //new
 }

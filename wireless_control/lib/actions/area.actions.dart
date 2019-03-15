@@ -54,7 +54,18 @@ class AreaSelectFail {
 }
 
 class AreaAdd {
-  AreaAdd();
+  final Area area;
+
+  AreaAdd({@required this.area});
+
+  @override
+  String toString() {
+    return 'AreaAdd{area: $area}';
+  }
+}
+
+class AreaAddOnServer {
+  AreaAddOnServer();
 }
 
 class AreaAddSuccessful {

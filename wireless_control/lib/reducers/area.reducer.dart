@@ -31,10 +31,20 @@ List<Area> _updateFailed(List<Area> areaList, action) => areaList;
 List<Area> _deleteSuccessful(List<Area> areaList, action) => List.unmodifiable(List.from(areaList)..remove(action.area));
 List<Area> _deleteFailed(List<Area> areaList, action) => areaList;
 
-final areaReducer = combineReducers<Area>([
+final areaSelectReducer = combineReducers<Area>([
   new TypedReducer<Area, AreaSelectSuccessful>(_selectSuccessful),
   new TypedReducer<Area, AreaSelectFail>(_selectFailed),
 ]);
 
 Area _selectSuccessful(Area area, action) => action.area;
 Area _selectFailed(Area area, action) => area;
+
+final areaAddReducer = combineReducers<Area>([
+  new TypedReducer<Area, AreaAdd>(_addArea),
+  new TypedReducer<Area, AreaAddSuccessful>(_addAreaSuccessful),
+  new TypedReducer<Area, AreaAddFail>(_addAreaFailed),
+]);
+
+Area _addArea(Area area, action) => action.area;
+Area _addAreaSuccessful(Area area, action) => null;
+Area _addAreaFailed(Area area, action) => null;

@@ -53,8 +53,19 @@ class WirelessSocketSelectFail {
   }
 }
 
+class WirelessSocketAddOnServer {
+  WirelessSocketAddOnServer();
+}
+
 class WirelessSocketAdd {
-  WirelessSocketAdd();
+  final WirelessSocket wirelessSocket;
+
+  WirelessSocketAdd({@required this.wirelessSocket});
+
+  @override
+  String toString() {
+    return 'WirelessSocketAdd{wirelessSocket: $wirelessSocket}';
+  }
 }
 
 class WirelessSocketAddSuccessful {

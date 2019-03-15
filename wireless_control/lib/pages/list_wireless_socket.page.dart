@@ -88,12 +88,14 @@ class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with Tic
               store.dispatch(loadWirelessSockets(store.state.nextCloudCredentials));
             },
           ),
+          /*
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
               // TODO
             },
           ),
+          */
         ],
       ),
       floatingActionButton: new Column(
@@ -116,11 +118,11 @@ class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with Tic
                 onPressed: () {
                   switch (index) {
                     case 0: // Area
-                      store.dispatch(new AreaSelectSuccessful(area: new Area()));
+                      store.dispatch(new AreaAdd(area: new Area()));
                       Navigator.pushNamed(context, '/details-area');
                       break;
                     case 1: // WirelessSocket
-                      store.dispatch(new WirelessSocketSelectSuccessful(wirelessSocket: new WirelessSocket()));
+                      store.dispatch(new WirelessSocketAdd(wirelessSocket: new WirelessSocket()));
                       Navigator.pushNamed(context, '/details-wireless-socket');
                       break;
                     default:

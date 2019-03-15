@@ -6,8 +6,8 @@
 - [X] Add Routing
 - [X] Improve Layout
 - [X] Add Filter for Areas to ListPage
-- [ ] Add Possibility to add and edit areas and wireless sockets
-	- [ ] Add Area
+- [X] Add Possibility to add and edit areas and wireless sockets
+	- [X] Add Area
 	- [X] Edit Area
 	- [X] Delete Area
 	- [X] Add WirelessSocket(WIP)
@@ -35,4 +35,4 @@
 # Bugs
 
 - [ ] Fix routing to loading while adding/updating/deleting
-- [ ] Fix dropdown index bug after adding an area
+- [X] Fix dropdown index bug after adding an area

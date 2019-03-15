@@ -44,7 +44,10 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
         });
       },
       builder: (context, store) {
-        return new DetailsAreaPage(store.state.selectedArea);
+        var area = store.state.toBeAddedArea != null
+            ? store.state.toBeAddedArea
+            : store.state.selectedArea;
+        return new DetailsAreaPage(area);
       },
     ),
     '/details-wireless-socket': (BuildContext context) => new StoreBuilder<AppState>(
@@ -61,7 +64,10 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
             });
           },
           builder: (context, store) {
-            return new DetailsWirelessSocketPage(store.state.selectedWirelessSocket);
+            var wirelessSocket = store.state.toBeAddedWirelessSocket != null
+                ? store.state.toBeAddedWirelessSocket
+                : store.state.selectedWirelessSocket;
+            return new DetailsWirelessSocketPage(wirelessSocket);
           },
         ),
     '/login': (BuildContext context) => new StoreBuilder<AppState>(

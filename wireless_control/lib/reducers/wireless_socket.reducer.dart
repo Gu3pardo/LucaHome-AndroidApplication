@@ -32,7 +32,7 @@ List<WirelessSocket> _updateFailed(List<WirelessSocket> wirelessSocketList, acti
 List<WirelessSocket> _deleteSuccessful(List<WirelessSocket> wirelessSocketList, action) => List.unmodifiable(List.from(wirelessSocketList)..remove(action.wirelessSocket));
 List<WirelessSocket> _deleteFailed(List<WirelessSocket> wirelessSocketList, action) => wirelessSocketList;
 
-final wirelessSocketReducer = combineReducers<WirelessSocket>([
+final wirelessSocketSelectReducer = combineReducers<WirelessSocket>([
   new TypedReducer<WirelessSocket, WirelessSocketSelectSuccessful>(_selectSuccessful),
   new TypedReducer<WirelessSocket, WirelessSocketSelectFail>(_selectFailed),
 ]);
@@ -40,7 +40,7 @@ final wirelessSocketReducer = combineReducers<WirelessSocket>([
 WirelessSocket _selectSuccessful(WirelessSocket wirelessSocket, action) => action.wirelessSocket;
 WirelessSocket _selectFailed(WirelessSocket wirelessSocket, action) => wirelessSocket;
 
-final wirelessSocketListAreaReducer = combineReducers<List<WirelessSocket>>([
+final wirelessSocketSelectAreaReducer = combineReducers<List<WirelessSocket>>([
   new TypedReducer<List<WirelessSocket>, AreaSelectSuccessful>(_selectAreaSuccessful),
   new TypedReducer<List<WirelessSocket>, AreaSelect>(_selectAreaFailed),
 ]);
@@ -48,3 +48,13 @@ final wirelessSocketListAreaReducer = combineReducers<List<WirelessSocket>>([
 List<WirelessSocket> _selectAreaSuccessful(List<WirelessSocket> wirelessSocketList, action) =>
     action.area.filter == '' ? wirelessSocketList : wirelessSocketList.where((WirelessSocket wirelessSocket) => wirelessSocket.area == action.area.filter).toList();
 List<WirelessSocket> _selectAreaFailed(List<WirelessSocket> wirelessSocketList, action) => wirelessSocketList;
+
+final wirelessSocketAddReducer = combineReducers<WirelessSocket>([
+  new TypedReducer<WirelessSocket, WirelessSocketAdd>(_addWirelessSocket),
+  new TypedReducer<WirelessSocket, WirelessSocketAddSuccessful>(_addWirelessSocketSuccessful),
+  new TypedReducer<WirelessSocket, WirelessSocketAddFail>(_addWirelessSocketFailed),
+]);
+
+WirelessSocket _addWirelessSocket(WirelessSocket wirelessSocket, action) => action.wirelessSocket;
+WirelessSocket _addWirelessSocketSuccessful(WirelessSocket wirelessSocket, action) => null;
+WirelessSocket _addWirelessSocketFailed(WirelessSocket wirelessSocket, action) => null;

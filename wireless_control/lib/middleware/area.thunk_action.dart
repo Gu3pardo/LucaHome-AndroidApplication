@@ -65,7 +65,7 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
 
 ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area area) {
   return (Store<AppState> store) async {
-    store.dispatch(new AreaAdd());
+    store.dispatch(new AreaAddOnServer());
 
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(

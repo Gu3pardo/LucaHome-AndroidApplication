@@ -62,7 +62,7 @@ ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredenti
 
 ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredentials, WirelessSocket wirelessSocket) {
   return (Store<AppState> store) async {
-    store.dispatch(new WirelessSocketAdd());
+    store.dispatch(new WirelessSocketAddOnServer());
 
     var authorization = 'Basic ' +
         base64Encode(utf8.encode(
