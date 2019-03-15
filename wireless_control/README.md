@@ -1,6 +1,6 @@
 # WirelessControl
 
-Android Frontend to control sockets via 433MHz hosted by a NextCloud server.
+Android client to remotely control wireless sockets and switches using NextCloud server.
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 [![Build](https://img.shields.io/badge/build-Success-green.svg)](./wireless_control)
@@ -13,7 +13,8 @@ Android Frontend to control sockets via 433MHz hosted by a NextCloud server.
 ## Screenshots
 
 ![alt tag](../screenshots/wireless_control_1.jpg)
-![alt tag](../screenshots/wireless_control_2.jpg)
+![alt tag](../screenshots/wireless_control_2_light.jpg)
+![alt tag](../screenshots/wireless_control_2_dark.jpg)
 
 ## License
 

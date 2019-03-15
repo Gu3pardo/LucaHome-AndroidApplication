@@ -19,7 +19,8 @@ Android Frontends to speak to a nextcloud server.
 Android client to remotely control wireless sockets and switches using nextcloud server.
 
 ![alt tag](/screenshots/wireless_control_1.jpg)
-![alt tag](/screenshots/wireless_control_2.jpg)
+![alt tag](/screenshots/wireless_control_2_light.jpg)
+![alt tag](/screenshots/wireless_control_2_dark.jpg)
 
 ### LogMyMeter: 
 
