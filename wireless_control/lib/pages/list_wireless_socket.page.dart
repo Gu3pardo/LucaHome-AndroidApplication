@@ -1,5 +1,8 @@
+import 'dart:async';
 import 'dart:math' as math;
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:redux/redux.dart';
 import 'package:wireless_control/actions/area.actions.dart';
@@ -25,6 +28,9 @@ class ListWirelessSocketPage extends StatefulWidget {
 }
 
 class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with TickerProviderStateMixin {
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   final Store<AppState> store;
   AnimationController _animationController;
   static const List<IconData> icons = const [
@@ -36,8 +42,49 @@ class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with Tic
 
   @override
   void initState() {
-    _animationController = new AnimationController(vsync: this, duration: const Duration(milliseconds: 250));
     super.initState();
+    initConnectivity();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    _animationController = new AnimationController(vsync: this, duration: const Duration(milliseconds: 250));
+  }
+
+  @override
+  void dispose() {
+    _connectivitySubscription.cancel();
+    super.dispose();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e.toString());
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return;
+    }
+
+    _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    switch (result) {
+      case ConnectivityResult.mobile:
+      case ConnectivityResult.wifi:
+      // Everything is fine, we can stay here
+        break;
+      default:
+      // No valid network, so we navigate to no network page
+        Navigator.of(context).pushNamed('/no-network');
+        break;
+    }
   }
 
   ListView _buildList(context) {

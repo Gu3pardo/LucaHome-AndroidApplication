@@ -63,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
         break;
       default:
         // No valid network, so we navigate to no network page
-        Navigator.of(context).pushNamed('/no_network');
+        Navigator.of(context).pushNamed('/no-network');
         break;
     }
   }

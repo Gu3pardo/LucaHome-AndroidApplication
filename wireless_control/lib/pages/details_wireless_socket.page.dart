@@ -1,4 +1,7 @@
+import 'dart:async';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:redux/redux.dart';
 import 'package:wireless_control/constants/color.constants.dart';
@@ -24,11 +27,15 @@ class DetailsWirelessSocketPage extends StatefulWidget {
 
 class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
   final _formKey = GlobalKey<FormState>();
+  final Connectivity _connectivity = Connectivity();
+  StreamSubscription<ConnectivityResult> _connectivitySubscription;
   StateAction stateAction;
 
   @override
   void initState() {
     super.initState();
+    initConnectivity();
+    _connectivitySubscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     this.stateAction = widget.wirelessSocket.deletable == 1
         ? widget.wirelessSocket.name == ""
           ? StateAction.Add
@@ -38,7 +45,41 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
 
   @override
   void dispose() {
+    _connectivitySubscription.cancel();
     super.dispose();
+  }
+
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> initConnectivity() async {
+    ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+    } on PlatformException catch (e) {
+      print(e.toString());
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return;
+    }
+
+    _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    switch (result) {
+      case ConnectivityResult.mobile:
+      case ConnectivityResult.wifi:
+      // Everything is fine, we can stay here
+        break;
+      default:
+      // No valid network, so we navigate to no network page
+        Navigator.of(context).pushNamed('/no-network');
+        break;
+    }
   }
 
   Widget nameTextFormField(_ViewModel viewModel) {
