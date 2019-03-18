@@ -1,5 +1,6 @@
 import 'package:wireless_control/actions/area.actions.dart';
 import 'package:wireless_control/actions/next_cloud_credentials.actions.dart';
+import 'package:wireless_control/actions/periodic_task.actions.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:redux/redux.dart';
 
@@ -29,6 +30,21 @@ final loadingNextCloudCredentialsReducer = combineReducers<bool>([
   new TypedReducer<bool, NextCloudCredentialsLogOut>(_loading),
   new TypedReducer<bool, NextCloudCredentialsLogOutSuccessful>(_finished),
   new TypedReducer<bool, NextCloudCredentialsLogOutFail>(_finished),
+]);
+
+final loadingPeriodicTaskReducer = combineReducers<bool>([
+  new TypedReducer<bool, PeriodicTaskLoad>(_loading),
+  new TypedReducer<bool, PeriodicTaskLoadSuccessful>(_finished),
+  new TypedReducer<bool, PeriodicTaskLoadFail>(_finished),
+  new TypedReducer<bool, PeriodicTaskAddOnServer>(_loading),
+  new TypedReducer<bool, PeriodicTaskAddSuccessful>(_finished),
+  new TypedReducer<bool, PeriodicTaskAddFail>(_finished),
+  new TypedReducer<bool, PeriodicTaskUpdateOnServer>(_loading),
+  new TypedReducer<bool, PeriodicTaskUpdateSuccessful>(_finished),
+  new TypedReducer<bool, PeriodicTaskUpdateFail>(_finished),
+  new TypedReducer<bool, PeriodicTaskDeleteOnServer>(_loading),
+  new TypedReducer<bool, PeriodicTaskDeleteSuccessful>(_finished),
+  new TypedReducer<bool, PeriodicTaskDeleteFail>(_finished),
 ]);
 
 final loadingWirelessSocketReducer = combineReducers<bool>([

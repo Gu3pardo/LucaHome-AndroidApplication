@@ -1,6 +1,7 @@
 import 'package:wireless_control/enums/app_theme.enum.dart';
 import 'package:wireless_control/models/area.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
+import 'package:wireless_control/models/periodic_task.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 
 class AppState {
@@ -17,6 +18,11 @@ class AppState {
   bool isLoadingWirelessSocket;
   WirelessSocket selectedWirelessSocket;
   WirelessSocket toBeAddedWirelessSocket;
+
+  List<PeriodicTask> periodicTaskList;
+  bool isLoadingPeriodicTask;
+  PeriodicTask selectedPeriodicTask;
+  PeriodicTask toBeAddedPeriodicTask;
 
   String currentRoute;
 
@@ -37,6 +43,11 @@ class AppState {
     this.selectedWirelessSocket,
     this.toBeAddedWirelessSocket,
 
+    this.periodicTaskList,
+    this.isLoadingPeriodicTask = false,
+    this.selectedPeriodicTask,
+    this.toBeAddedPeriodicTask,
+
     this.currentRoute = "/",
     this.theme = AppTheme.Light});
 
@@ -55,6 +66,11 @@ class AppState {
     WirelessSocket selectedWirelessSocket,
     WirelessSocket toBeAddedWirelessSocket,
 
+    List<PeriodicTask> periodicTaskList,
+    bool isLoadingPeriodicTask,
+    PeriodicTask selectedPeriodicTask,
+    PeriodicTask toBeAddedPeriodicTask,
+
     String currentRoute,
     AppTheme theme}) {
     return new AppState(
@@ -69,6 +85,10 @@ class AppState {
       isLoadingWirelessSocket: isLoadingWirelessSocket ?? this.isLoadingWirelessSocket,
       selectedWirelessSocket: selectedWirelessSocket ?? this.selectedWirelessSocket,
       toBeAddedWirelessSocket: toBeAddedWirelessSocket ?? this.toBeAddedWirelessSocket,
+      periodicTaskList: periodicTaskList ?? this.periodicTaskList,
+      isLoadingPeriodicTask: isLoadingPeriodicTask ?? this.isLoadingPeriodicTask,
+      selectedPeriodicTask: selectedPeriodicTask ?? this.selectedPeriodicTask,
+      toBeAddedPeriodicTask: toBeAddedPeriodicTask ?? this.toBeAddedPeriodicTask,
       currentRoute: currentRoute ?? this.currentRoute,
       theme: theme ?? this.theme,
     );
@@ -89,6 +109,10 @@ class AppState {
           isLoadingWirelessSocket == other.isLoadingWirelessSocket &&
           selectedWirelessSocket == other.selectedWirelessSocket &&
           toBeAddedWirelessSocket == other.toBeAddedWirelessSocket &&
+          periodicTaskList == other.periodicTaskList &&
+          isLoadingPeriodicTask == other.isLoadingPeriodicTask &&
+          selectedPeriodicTask == other.selectedPeriodicTask &&
+          toBeAddedPeriodicTask == other.toBeAddedPeriodicTask &&
           currentRoute == other.currentRoute &&
           theme == other.theme;
 
@@ -105,11 +129,15 @@ class AppState {
       isLoadingWirelessSocket.hashCode ^
       selectedWirelessSocket.hashCode ^
       toBeAddedWirelessSocket.hashCode ^
+      periodicTaskList.hashCode ^
+      isLoadingPeriodicTask.hashCode ^
+      selectedPeriodicTask.hashCode ^
+      toBeAddedPeriodicTask.hashCode ^
       currentRoute.hashCode ^
       theme.hashCode;
 
   @override
   String toString() {
-    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, toBeAddedArea: $toBeAddedArea, wirelessSocketListAll: $wirelessSocketListAll, wirelessSocketListArea: $wirelessSocketListArea, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, toBeAddedWirelessSocket: $toBeAddedWirelessSocket, currentRoute: $currentRoute, theme: $theme}';
+    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, toBeAddedArea: $toBeAddedArea, wirelessSocketListAll: $wirelessSocketListAll, wirelessSocketListArea: $wirelessSocketListArea, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, toBeAddedWirelessSocket: $toBeAddedWirelessSocket, periodicTaskList: $periodicTaskList, isLoadingPeriodicTask: $isLoadingPeriodicTask, selectedPeriodicTask: $selectedPeriodicTask, toBeAddedPeriodicTask: $toBeAddedPeriodicTask, currentRoute: $currentRoute, theme: $theme}';
   }
 }
