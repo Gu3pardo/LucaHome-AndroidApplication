@@ -1,4 +1,5 @@
 import 'package:wireless_control/actions/periodic_task.actions.dart';
+import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/models/periodic_task.model.dart';
 import 'package:redux/redux.dart';
 
@@ -38,6 +39,18 @@ final periodicTaskSelectReducer = combineReducers<PeriodicTask>([
 
 PeriodicTask _selectSuccessful(PeriodicTask periodicTask, action) => action.periodicTask;
 PeriodicTask _selectFailed(PeriodicTask periodicTask, action) => periodicTask;
+
+final periodicTaskSelectWirelessSocketReducer = combineReducers<List<PeriodicTask>>([
+  new TypedReducer<List<PeriodicTask>, WirelessSocketSelectSuccessful>(_selectWirelessSocketSuccessful),
+  new TypedReducer<List<PeriodicTask>, WirelessSocketSelectFail>(_selectWirelessSocketFailed),
+]);
+
+List<PeriodicTask> _selectWirelessSocketSuccessful(List<PeriodicTask> periodicTaskList, action) {
+  return action.wirelessSocket != null
+      ? periodicTaskList.where((PeriodicTask periodicTask) => periodicTask.wirelessSocketId == action.wirelessSocket.id).toList()
+      : periodicTaskList;
+}
+List<PeriodicTask> _selectWirelessSocketFailed(List<PeriodicTask> periodicTaskList, action) => periodicTaskList;
 
 final periodicTaskAddReducer = combineReducers<PeriodicTask>([
   new TypedReducer<PeriodicTask, PeriodicTaskAdd>(_addPeriodicTask),

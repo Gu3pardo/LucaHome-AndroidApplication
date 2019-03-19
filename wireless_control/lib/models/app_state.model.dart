@@ -20,6 +20,7 @@ class AppState {
   WirelessSocket toBeAddedWirelessSocket;
 
   List<PeriodicTask> periodicTaskList;
+  List<PeriodicTask> periodicTaskListWirelessSocket;
   bool isLoadingPeriodicTask;
   PeriodicTask selectedPeriodicTask;
   PeriodicTask toBeAddedPeriodicTask;
@@ -44,6 +45,7 @@ class AppState {
     this.toBeAddedWirelessSocket,
 
     this.periodicTaskList,
+    this.periodicTaskListWirelessSocket,
     this.isLoadingPeriodicTask = false,
     this.selectedPeriodicTask,
     this.toBeAddedPeriodicTask,
@@ -67,6 +69,7 @@ class AppState {
     WirelessSocket toBeAddedWirelessSocket,
 
     List<PeriodicTask> periodicTaskList,
+    List<PeriodicTask> periodicTaskListWirelessSocket,
     bool isLoadingPeriodicTask,
     PeriodicTask selectedPeriodicTask,
     PeriodicTask toBeAddedPeriodicTask,
@@ -86,6 +89,7 @@ class AppState {
       selectedWirelessSocket: selectedWirelessSocket ?? this.selectedWirelessSocket,
       toBeAddedWirelessSocket: toBeAddedWirelessSocket ?? this.toBeAddedWirelessSocket,
       periodicTaskList: periodicTaskList ?? this.periodicTaskList,
+      periodicTaskListWirelessSocket: periodicTaskListWirelessSocket ?? this.periodicTaskListWirelessSocket,
       isLoadingPeriodicTask: isLoadingPeriodicTask ?? this.isLoadingPeriodicTask,
       selectedPeriodicTask: selectedPeriodicTask ?? this.selectedPeriodicTask,
       toBeAddedPeriodicTask: toBeAddedPeriodicTask ?? this.toBeAddedPeriodicTask,
@@ -110,6 +114,7 @@ class AppState {
           selectedWirelessSocket == other.selectedWirelessSocket &&
           toBeAddedWirelessSocket == other.toBeAddedWirelessSocket &&
           periodicTaskList == other.periodicTaskList &&
+          periodicTaskListWirelessSocket == other.periodicTaskListWirelessSocket &&
           isLoadingPeriodicTask == other.isLoadingPeriodicTask &&
           selectedPeriodicTask == other.selectedPeriodicTask &&
           toBeAddedPeriodicTask == other.toBeAddedPeriodicTask &&
@@ -130,6 +135,7 @@ class AppState {
       selectedWirelessSocket.hashCode ^
       toBeAddedWirelessSocket.hashCode ^
       periodicTaskList.hashCode ^
+      periodicTaskListWirelessSocket.hashCode ^
       isLoadingPeriodicTask.hashCode ^
       selectedPeriodicTask.hashCode ^
       toBeAddedPeriodicTask.hashCode ^
@@ -138,6 +144,6 @@ class AppState {
 
   @override
   String toString() {
-    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, toBeAddedArea: $toBeAddedArea, wirelessSocketListAll: $wirelessSocketListAll, wirelessSocketListArea: $wirelessSocketListArea, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, toBeAddedWirelessSocket: $toBeAddedWirelessSocket, periodicTaskList: $periodicTaskList, isLoadingPeriodicTask: $isLoadingPeriodicTask, selectedPeriodicTask: $selectedPeriodicTask, toBeAddedPeriodicTask: $toBeAddedPeriodicTask, currentRoute: $currentRoute, theme: $theme}';
+    return 'AppState{nextCloudCredentials: $nextCloudCredentials, isLoadingNextCloudCredentials: $isLoadingNextCloudCredentials, areaList: $areaList, isLoadingArea: $isLoadingArea, selectedArea: $selectedArea, toBeAddedArea: $toBeAddedArea, wirelessSocketListAll: $wirelessSocketListAll, wirelessSocketListArea: $wirelessSocketListArea, isLoadingWirelessSocket: $isLoadingWirelessSocket, selectedWirelessSocket: $selectedWirelessSocket, toBeAddedWirelessSocket: $toBeAddedWirelessSocket, periodicTaskList: $periodicTaskList, periodicTaskListWirelessSocket: $periodicTaskListWirelessSocket, isLoadingPeriodicTask: $isLoadingPeriodicTask, selectedPeriodicTask: $selectedPeriodicTask, toBeAddedPeriodicTask: $toBeAddedPeriodicTask, currentRoute: $currentRoute, theme: $theme}';
   }
 }

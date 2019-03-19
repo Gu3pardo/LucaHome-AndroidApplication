@@ -24,6 +24,7 @@ AppState appReducer(state, action) {
       toBeAddedWirelessSocket: wirelessSocketAddReducer(state.toBeAddedWirelessSocket, action),
 
       periodicTaskList: periodicTaskListReducer(state.periodicTaskList, action),
+      periodicTaskListWirelessSocket: periodicTaskSelectWirelessSocketReducer(state.periodicTaskListWirelessSocket, action),
       isLoadingPeriodicTask: loadingPeriodicTaskReducer(state.isLoadingPeriodicTask, action),
       selectedPeriodicTask: periodicTaskSelectReducer(state.selectedPeriodicTask, action),
       toBeAddedPeriodicTask: periodicTaskAddReducer(state.toBeAddedPeriodicTask, action),
