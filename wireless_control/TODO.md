@@ -34,9 +34,9 @@
 
 # Bugs
 
-- [ ] Fix routing to loading while adding/updating/deleting
+- [X] Fix routing to loading while adding/updating/deleting
     - [X] Area
-    - [ ] WirelessSocket
-    - [ ] PeriodicTask
+    - [X] WirelessSocket
+    - [X] PeriodicTask
 - [X] Fix dropdown index bug after adding an area
 - [ ] Update wireless socket icon in detail view while editing
