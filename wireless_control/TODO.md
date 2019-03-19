@@ -39,4 +39,5 @@
     - [X] WirelessSocket
     - [X] PeriodicTask
 - [X] Fix dropdown index bug after adding an area
+- [X] Stabilize method fromString in helper/icon.helper
 - [ ] Update wireless socket icon in detail view while editing
