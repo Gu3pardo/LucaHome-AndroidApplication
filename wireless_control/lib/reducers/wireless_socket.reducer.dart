@@ -45,8 +45,13 @@ final wirelessSocketSelectAreaReducer = combineReducers<List<WirelessSocket>>([
   new TypedReducer<List<WirelessSocket>, AreaSelect>(_selectAreaFailed),
 ]);
 
-List<WirelessSocket> _selectAreaSuccessful(List<WirelessSocket> wirelessSocketList, action) =>
-    action.area.filter == '' ? wirelessSocketList : wirelessSocketList.where((WirelessSocket wirelessSocket) => wirelessSocket.area == action.area.filter).toList();
+List<WirelessSocket> _selectAreaSuccessful(List<WirelessSocket> wirelessSocketList, action) {
+  return action.area != null
+      ? action.area.filter == ''
+        ? wirelessSocketList
+        : wirelessSocketList.where((WirelessSocket wirelessSocket) => wirelessSocket.area == action.area.filter).toList()
+      : wirelessSocketList;
+}
 List<WirelessSocket> _selectAreaFailed(List<WirelessSocket> wirelessSocketList, action) => wirelessSocketList;
 
 final wirelessSocketAddReducer = combineReducers<WirelessSocket>([
