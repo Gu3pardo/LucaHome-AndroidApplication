@@ -10,6 +10,7 @@ import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/constants/color.constants.dart';
 import 'package:wireless_control/enums/app_theme.enum.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
+import 'package:wireless_control/middleware/periodic_task.thunk_action.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/area.model.dart';
@@ -135,6 +136,7 @@ class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with Tic
             onPressed: () {
               store.dispatch(loadAreas(store.state.nextCloudCredentials));
               store.dispatch(loadWirelessSockets(store.state.nextCloudCredentials));
+              store.dispatch(loadPeriodicTasks(store.state.nextCloudCredentials));
             },
           ),
           IconButton(

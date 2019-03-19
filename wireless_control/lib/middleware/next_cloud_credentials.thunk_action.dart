@@ -5,6 +5,7 @@ import 'package:redux_thunk/redux_thunk.dart';
 import 'package:wireless_control/actions/next_cloud_credentials.actions.dart';
 import 'package:wireless_control/constants/nextcloud.constants.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
+import 'package:wireless_control/middleware/periodic_task.thunk_action.dart';
 import 'package:wireless_control/middleware//wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/api_response.model.dart';
 import 'package:wireless_control/models/app_state.model.dart';
@@ -50,6 +51,7 @@ ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
         if (apiResponseModel.status == "success") {
           store.dispatch(loadAreas(nextCloudCredentials));
           store.dispatch(loadWirelessSockets(nextCloudCredentials));
+          store.dispatch(loadPeriodicTasks(nextCloudCredentials));
           store.dispatch(new NextCloudCredentialsLogInSuccessful(user: nextCloudCredentials));
         } else {
           store.dispatch(new NextCloudCredentialsLogInFail(apiResponseModel.message));
