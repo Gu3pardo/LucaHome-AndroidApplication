@@ -51,6 +51,14 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
         return new DetailsAreaPage(area);
       },
     ),
+    '/details-periodic-task': (BuildContext context) => new StoreBuilder<AppState>(
+      onInit: (store) {
+        // TODO
+      },
+      builder: (context, store) {
+        return null; // TODO
+      },
+    ),
     '/details-wireless-socket': (BuildContext context) => new StoreBuilder<AppState>(
           onInit: (store) {
             store.onChange.listen((state) {
@@ -71,6 +79,14 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
             return new DetailsWirelessSocketPage(wirelessSocket);
           },
         ),
+    '/list-periodic-task': (BuildContext context) => new StoreBuilder<AppState>(
+      onInit: (store) {
+        // TODO
+      },
+      builder: (context, store) {
+        return null; // TODO
+      },
+    ),
     '/login': (BuildContext context) => new StoreBuilder<AppState>(
           onInit: (store) {
             store.onChange.listen((state) {
