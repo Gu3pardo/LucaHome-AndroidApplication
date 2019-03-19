@@ -26,7 +26,7 @@
 # Future
 
 - [ ] Add periodic task functionality
-    - [ ] Load periodic task
+    - [X] Load periodic task
     - [ ] Show in wireless socket card (icon -> onPress routes to task list for socket -> with actions)
     - [ ] Add periodic task
     - [ ] Update periodic task

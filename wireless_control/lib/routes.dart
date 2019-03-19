@@ -81,10 +81,15 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
         ),
     '/list-periodic-task': (BuildContext context) => new StoreBuilder<AppState>(
       onInit: (store) {
-        // TODO
+        store.onChange.listen((state) {
+          if (_isLoading(state) && state.currentRoute != '/loading') {
+            store.dispatch(new RouteChange(route: '/loading'));
+            Navigator.popAndPushNamed(context, '/loading');
+          }
+        });
       },
       builder: (context, store) {
-        return null; // TODO
+        return new ListPeriodicTaskPage(store);
       },
     ),
     '/login': (BuildContext context) => new StoreBuilder<AppState>(
