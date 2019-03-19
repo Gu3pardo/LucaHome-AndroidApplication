@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wave/config.dart';
+import 'package:wave/wave.dart';
 import 'package:wireless_control/constants/color.constants.dart';
 import 'package:wireless_control/enums/app_theme.enum.dart';
 
@@ -28,5 +30,35 @@ Widget getTextFormField(
     style: TextStyle(color: theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight),
     validator: validator,
     onSaved: onSaved,
+  );
+}
+
+WaveWidget waveWidgetOff() {
+  return WaveWidget(
+    config: CustomConfig(
+      gradients: ColorConstants.WaveOff,
+      durations: [35000, 19440, 10800, 6000],
+      heightPercentages: [0.70, 0.73, 0.75, 0.80],
+      gradientBegin: Alignment.bottomLeft,
+      gradientEnd: Alignment.topRight,
+    ),
+    backgroundColor: Colors.transparent,
+    size: Size(double.infinity, double.infinity),
+    waveAmplitude: 0,
+  );
+}
+
+WaveWidget waveWidgetOn() {
+  return WaveWidget(
+    config: CustomConfig(
+      gradients: ColorConstants.WaveOn,
+      durations: [35000, 19440, 10800, 6000],
+      heightPercentages: [0.10, 0.13, 0.15, 0.20],
+      gradientBegin: Alignment.bottomLeft,
+      gradientEnd: Alignment.topRight,
+    ),
+    backgroundColor: Colors.transparent,
+    size: Size(double.infinity, double.infinity),
+    waveAmplitude: 0,
   );
 }

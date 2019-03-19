@@ -11,7 +11,7 @@ import 'package:wireless_control/middleware/next_cloud_credentials.thunk_action.
 import 'package:wireless_control/middleware/theme.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
-import 'package:wireless_control/presentation/details-widgets.dart';
+import 'package:wireless_control/presentation/shared-presentation.dart';
 
 class SettingsPage extends StatefulWidget {
   static String tag = 'settings-page';

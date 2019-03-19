@@ -11,7 +11,7 @@ import 'package:wireless_control/helper/icon.helper.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
-import 'package:wireless_control/presentation/details-widgets.dart';
+import 'package:wireless_control/presentation/shared-presentation.dart';
 import 'package:wireless_control/utils/actions.util.dart';
 
 class DetailsWirelessSocketPage extends StatefulWidget {

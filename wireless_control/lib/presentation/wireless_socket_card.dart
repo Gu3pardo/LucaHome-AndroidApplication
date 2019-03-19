@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
-import 'package:wave/config.dart';
-import 'package:wave/wave.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/constants/color.constants.dart';
 import 'package:wireless_control/enums/app_theme.enum.dart';
@@ -9,6 +7,7 @@ import 'package:wireless_control/helper/icon.helper.dart';
 import 'package:wireless_control/middleware/wireless_socket.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
+import 'package:wireless_control/presentation/shared-presentation.dart';
 import 'package:wireless_control/utils/actions.util.dart';
 
 class WirelessSocketCard extends StatefulWidget {
@@ -59,36 +58,6 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
               )),
         ),
       ),
-    );
-  }
-
-  WaveWidget waveWidgetOff() {
-    return WaveWidget(
-      config: CustomConfig(
-        gradients: ColorConstants.WaveOff,
-        durations: [35000, 19440, 10800, 6000],
-        heightPercentages: [0.70, 0.73, 0.75, 0.80],
-        gradientBegin: Alignment.bottomLeft,
-        gradientEnd: Alignment.topRight,
-      ),
-      backgroundColor: Colors.transparent,
-      size: Size(double.infinity, double.infinity),
-      waveAmplitude: 0,
-    );
-  }
-
-  WaveWidget waveWidgetOn() {
-    return WaveWidget(
-      config: CustomConfig(
-        gradients: ColorConstants.WaveOn,
-        durations: [35000, 19440, 10800, 6000],
-        heightPercentages: [0.10, 0.13, 0.15, 0.20],
-        gradientBegin: Alignment.bottomLeft,
-        gradientEnd: Alignment.topRight,
-      ),
-      backgroundColor: Colors.transparent,
-      size: Size(double.infinity, double.infinity),
-      waveAmplitude: 0,
     );
   }
 

@@ -11,7 +11,7 @@ import 'package:wireless_control/enums/state_action.enum.dart';
 import 'package:wireless_control/middleware/area.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/area.model.dart';
-import 'package:wireless_control/presentation/details-widgets.dart';
+import 'package:wireless_control/presentation/shared-presentation.dart';
 import 'package:wireless_control/utils/actions.util.dart';
 
 class DetailsAreaPage extends StatefulWidget {
