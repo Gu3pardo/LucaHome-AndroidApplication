@@ -6,22 +6,26 @@ import 'package:wireless_control/actions/route.actions.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/pages/details_area.page.dart';
 import 'package:wireless_control/pages/details_wireless_socket.page.dart';
+import 'package:wireless_control/pages/list_periodic_task.page.dart';
 import 'package:wireless_control/pages/list_wireless_socket.page.dart';
 import 'package:wireless_control/pages/loading.page.dart';
 import 'package:wireless_control/pages/login.page.dart';
 import 'package:wireless_control/pages/no_network.page.dart';
 import 'package:wireless_control/pages/settings.page.dart';
 
+bool _isLoading(state) {
+  return state.isLoadingNextCloudCredentials ||
+      state.isLoadingArea ||
+      state.isLoadingPeriodicTask ||
+      state.isLoadingWirelessSocket;
+}
+
 Map<String, WidgetBuilder> getRoutes(context, store) {
   return {
     '/': (BuildContext context) => new StoreBuilder<AppState>(
           onInit: (store) {
             store.onChange.listen((state) {
-              var isLoading = state.isLoadingNextCloudCredentials ||
-                  state.isLoadingArea ||
-                  state.isLoadingNextCloudCredentials;
-
-              if (isLoading && state.currentRoute != '/loading') {
+              if (_isLoading(state) && state.currentRoute != '/loading') {
                 store.dispatch(new RouteChange(route: '/loading'));
                 Navigator.popAndPushNamed(context, '/loading');
               }
@@ -34,11 +38,7 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
     '/details-area': (BuildContext context) => new StoreBuilder<AppState>(
       onInit: (store) {
         store.onChange.listen((state) {
-          var isLoading = state.isLoadingNextCloudCredentials ||
-              state.isLoadingArea ||
-              state.isLoadingNextCloudCredentials;
-
-          if (isLoading && state.currentRoute != '/loading') {
+          if (_isLoading(state) && state.currentRoute != '/loading') {
             store.dispatch(new RouteChange(route: '/loading'));
             Navigator.popAndPushNamed(context, '/loading');
           }
@@ -62,11 +62,7 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
     '/details-wireless-socket': (BuildContext context) => new StoreBuilder<AppState>(
           onInit: (store) {
             store.onChange.listen((state) {
-              var isLoading = state.isLoadingNextCloudCredentials ||
-                  state.isLoadingArea ||
-                  state.isLoadingNextCloudCredentials;
-
-              if (isLoading && state.currentRoute != '/loading') {
+              if (_isLoading(state) && state.currentRoute != '/loading') {
                 store.dispatch(new RouteChange(route: '/loading'));
                 Navigator.popAndPushNamed(context, '/loading');
               }
@@ -95,11 +91,7 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
     '/login': (BuildContext context) => new StoreBuilder<AppState>(
           onInit: (store) {
             store.onChange.listen((state) {
-              var isLoading = state.isLoadingNextCloudCredentials ||
-                  state.isLoadingArea ||
-                  state.isLoadingNextCloudCredentials;
-
-              if (isLoading && state.currentRoute != '/loading') {
+              if (_isLoading(state) && state.currentRoute != '/loading') {
                 store.dispatch(new RouteChange(route: '/loading'));
                 Navigator.popAndPushNamed(context, '/loading');
               }
@@ -112,9 +104,7 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
     '/loading': (BuildContext context) => new StoreBuilder<AppState>(
           onInit: (store) {
             store.onChange.listen((state) {
-              var isLoading = state.isLoadingNextCloudCredentials ||
-                  state.isLoadingArea ||
-                  state.isLoadingNextCloudCredentials;
+              var isLoading = _isLoading(state);
 
               var isLoggedInOnServer = state.nextCloudCredentials != null &&
                   state.nextCloudCredentials.hasServer() &&
