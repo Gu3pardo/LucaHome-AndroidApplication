@@ -5,6 +5,7 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:wireless_control/actions/route.actions.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/pages/details_area.page.dart';
+import 'package:wireless_control/pages/details_periodic_task.page.dart';
 import 'package:wireless_control/pages/details_wireless_socket.page.dart';
 import 'package:wireless_control/pages/list_periodic_task.page.dart';
 import 'package:wireless_control/pages/list_wireless_socket.page.dart';
@@ -53,10 +54,18 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
     ),
     '/details-periodic-task': (BuildContext context) => new StoreBuilder<AppState>(
       onInit: (store) {
-        // TODO
+        store.onChange.listen((state) {
+          if (_isLoading(state) && state.currentRoute != '/loading') {
+            store.dispatch(new RouteChange(route: '/loading'));
+            Navigator.popAndPushNamed(context, '/loading');
+          }
+        });
       },
       builder: (context, store) {
-        return null; // TODO
+        var periodicTask = store.state.toBeAddedPeriodicTask != null
+            ? store.state.toBeAddedPeriodicTask
+            : store.state.selectedPeriodicTask;
+        return new DetailsPeriodicTaskPage(periodicTask);
       },
     ),
     '/details-wireless-socket': (BuildContext context) => new StoreBuilder<AppState>(
