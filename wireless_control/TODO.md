@@ -27,7 +27,7 @@
 
 - [ ] Add periodic task functionality
     - [X] Load periodic task
-    - [ ] Show in wireless socket card (icon -> onPress routes to task list for socket -> with actions)
+    - [X] Show in wireless socket card (icon -> onPress routes to task list for socket -> with actions)
     - [ ] Add periodic task
     - [ ] Update periodic task
     - [ ] Delete periodic task
@@ -41,3 +41,4 @@
 - [X] Fix dropdown index bug after adding an area
 - [X] Stabilize method fromString in helper/icon.helper
 - [ ] Update wireless socket icon in detail view while editing
+- [ ] Fix layout in details view
