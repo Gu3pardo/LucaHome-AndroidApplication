@@ -13,12 +13,12 @@ class PeriodicTask {
     this.id = -1,
     this.name = "",
     this.wirelessSocketId = -1,
-    this.wirelessSocketState = 0,
+    this.wirelessSocketState = 1,
     this.weekday = 1,
     this.hour = 0,
     this.minute = 0,
     this.periodic = 1,
-    this.active = 0,
+    this.active = 1,
   });
 
   PeriodicTask copyWith({int id, String name, int wirelessSocketId, int wirelessSocketState,
@@ -37,15 +37,15 @@ class PeriodicTask {
   }
 
   PeriodicTask.fromJson(Map<String, dynamic> json)
-      : id = json["id"],
+      : id = int.parse(json["id"]),
         name = json["name"],
-        wirelessSocketId = json["wirelessSocketId"],
-        wirelessSocketState = json["wirelessSocketState"],
-        weekday = json["weekday"],
-        hour = json["hour"],
-        minute = json["minute"],
-        periodic = json["periodic"],
-        active = json["active"];
+        wirelessSocketId =  int.parse(json["wirelessSocketId"]),
+        wirelessSocketState =  int.parse(json["wirelessSocketState"]),
+        weekday =  int.parse(json["weekday"]),
+        hour =  int.parse(json["hour"]),
+        minute =  int.parse(json["minute"]),
+        periodic =  int.parse(json["periodic"]),
+        active =  int.parse(json["active"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,

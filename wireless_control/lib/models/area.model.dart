@@ -21,10 +21,10 @@ class Area {
   }
 
   Area.fromJson(Map<String, dynamic> json)
-      : id = json["id"],
+      : id = int.parse(json["id"]),
         name = json["name"],
         filter = json["filter"],
-        deletable = json["deletable"];
+        deletable = int.parse(json["deletable"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,

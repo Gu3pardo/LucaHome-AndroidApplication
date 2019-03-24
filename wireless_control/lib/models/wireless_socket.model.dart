@@ -41,14 +41,14 @@ class WirelessSocket {
   }
 
   WirelessSocket.fromJson(Map<String, dynamic> json)
-      : id = json["id"],
+      : id = int.parse(json["id"]),
         name = json["name"],
         code = json["code"],
         area = json["area"],
-        state = json["state"],
+        state = int.parse(json["state"]),
         description = json["description"],
         icon = json["icon"],
-        deletable = json["deletable"];
+        deletable = int.parse(json["deletable"]);
 
   Map<String, dynamic> toJson() => {
     "id": id,
