@@ -109,7 +109,7 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                         height: pageSize.height * 0.275,
                         color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                         alignment: Alignment.center,
-                        child: getDetailsIcon(FontAwesomeIcons.map, viewModel.loadTheme()),
+                        child: getDetailsIcon(widget.periodicTask.active == 1 ? FontAwesomeIcons.solidHourglass : FontAwesomeIcons.hourglass, viewModel.loadTheme()),
                       )
                     ],
                   ),
@@ -138,12 +138,12 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                                   value: widget.periodicTask.weekday,
                                   items: Weekday.values.map((Weekday weekday) {
                                     return new DropdownMenuItem<int>(
-                                      value: weekday.index,
+                                      value: weekday.index + 1,
                                       child: Text(weekday.toString(), style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight)),
                                     );
                                   }).toList(),
                                   onChanged: (int weekdayIndex) {
-                                    widget.periodicTask.weekday = weekdayIndex + 1;
+                                    widget.periodicTask.weekday = weekdayIndex;
                                   },
                                 ),
                                 DateTimePickerFormField(
