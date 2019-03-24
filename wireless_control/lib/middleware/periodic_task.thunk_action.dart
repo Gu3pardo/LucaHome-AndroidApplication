@@ -128,7 +128,7 @@ ThunkAction<AppState> updatePeriodicTask(NextCloudCredentials nextCloudCredentia
 
     var response = await http.put(
         nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "periodic_task/" + periodicTask.id.toString(),
-        body: jsonEncode(PeriodicTask),
+        body: jsonEncode(periodicTask),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
     switch (response.statusCode) {
