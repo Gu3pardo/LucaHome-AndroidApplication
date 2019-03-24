@@ -179,7 +179,9 @@ class ListPeriodicTaskPageState extends State<ListPeriodicTaskPage> with TickerP
                       Navigator.pushNamed(context, '/details-wireless-socket');
                       break;
                     case 2: // PeriodicTask
-                      store.dispatch(new PeriodicTaskAdd(periodicTask: new PeriodicTask()));
+                      var periodicTask = new PeriodicTask();
+                      periodicTask.wirelessSocketId = store.state.selectedWirelessSocket.id;
+                      store.dispatch(new PeriodicTaskAdd(periodicTask: periodicTask));
                       Navigator.pushNamed(context, '/details-periodic-task');
                       break;
                     default:
