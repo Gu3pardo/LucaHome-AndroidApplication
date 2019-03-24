@@ -20,7 +20,7 @@ ThunkAction<AppState> loadPeriodicTasks(NextCloudCredentials nextCloudCredential
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.get(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + 'periodicTask',
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + 'periodic_task',
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {
@@ -73,7 +73,7 @@ ThunkAction<AppState> addPeriodicTask(NextCloudCredentials nextCloudCredentials,
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.post(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "periodicTask",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "periodic_task",
         body: jsonEncode(periodicTask.toAddJson()),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
@@ -127,7 +127,7 @@ ThunkAction<AppState> updatePeriodicTask(NextCloudCredentials nextCloudCredentia
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.put(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "periodicTask/" + periodicTask.id.toString(),
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "periodic_task/" + periodicTask.id.toString(),
         body: jsonEncode(PeriodicTask),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
@@ -180,7 +180,7 @@ ThunkAction<AppState> deletePeriodicTask(NextCloudCredentials nextCloudCredentia
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.delete(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "periodicTask/${periodicTask.id}",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "periodic_task/${periodicTask.id}",
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {
