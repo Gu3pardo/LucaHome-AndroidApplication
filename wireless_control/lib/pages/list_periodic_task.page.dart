@@ -110,7 +110,7 @@ class ListPeriodicTaskPageState extends State<ListPeriodicTaskPage> with TickerP
         automaticallyImplyLeading: false,
         actions: <Widget>[
           DropdownButton<String>(
-            hint: Text("Please choose an wireless socket to filter", style: TextStyle(color: ColorConstants.Hint)),
+            hint: Text("Please choose a filter", style: TextStyle(color: ColorConstants.Hint)),
             value: store.state.selectedWirelessSocket != null ? store.state.selectedWirelessSocket.name : '',
             items: (store.state.wirelessSocketListAll != null ? store.state.wirelessSocketListAll : new List<WirelessSocket>()).map((WirelessSocket wirelessSocket) {
               return new DropdownMenuItem<String>(

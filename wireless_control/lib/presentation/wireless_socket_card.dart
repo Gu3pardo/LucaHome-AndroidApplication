@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:redux/redux.dart';
 import 'package:wireless_control/actions/wireless_socket.actions.dart';
 import 'package:wireless_control/constants/color.constants.dart';
@@ -64,8 +63,8 @@ class WirelessSocketCardState extends State<WirelessSocketCard> {
                           new IconButton(
                               splashColor: ColorConstants.ButtonSubmit,
                               icon: new Icon(
-                                FontAwesomeIcons.solidHourglass,
-                                size: 14,
+                                Icons.add_alarm,
+                                size: 22,
                                 color: widget.store.state.theme == AppTheme.Light ? ColorConstants.IconDark : ColorConstants.IconLight,
                               ),
                               onPressed: () {

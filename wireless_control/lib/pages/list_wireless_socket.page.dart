@@ -106,7 +106,7 @@ class ListWirelessSocketPageState extends State<ListWirelessSocketPage> with Tic
         automaticallyImplyLeading: false,
         actions: <Widget>[
           DropdownButton<String>(
-            hint: Text("Please choose an area to filter", style: TextStyle(color: ColorConstants.Hint)),
+            hint: Text("Please choose a filter", style: TextStyle(color: ColorConstants.Hint)),
             value: store.state.selectedArea != null ? store.state.selectedArea.name : '',
             items: (store.state.areaList != null ? store.state.areaList : new List<Area>()).map((Area area) {
               return new DropdownMenuItem<String>(
