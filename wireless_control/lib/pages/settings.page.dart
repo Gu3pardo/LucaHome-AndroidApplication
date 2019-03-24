@@ -159,7 +159,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               items: AppTheme.values.map((AppTheme appTheme) {
                                 return new DropdownMenuItem<String>(
                                   value: appTheme.toString(),
-                                  child: Text(appTheme.toString(), style: TextStyle(color: ColorConstants.TextDark)),
+                                  child: Text(appTheme.toString(), style: TextStyle(color: viewModel.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight)),
                                 );
                               }).toList(),
                               onChanged: (themeString) {
