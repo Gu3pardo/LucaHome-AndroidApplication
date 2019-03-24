@@ -1,22 +1,16 @@
-# LucaHome-AndroidApplications
+# WirelessControl-Android
 
-Android Frontends to speak to a nextcloud server.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Donate: PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.me/GuepardoApps)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
-
-### WirelessControl
+Android client to remotely control wireless sockets and switches using Nextcloud server.
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
-[![Build](https://img.shields.io/badge/build-Success-green.svg)](/wireless_control)
-[![Version](https://img.shields.io/badge/version-1.2.3+1-blue.svg)](/wireless_control)
+[![Build](https://img.shields.io/badge/build-Success-green.svg)](./wireless_control)
+[![Version](https://img.shields.io/badge/version-1.2.3+1-blue.svg)](./wireless_control)
 
 [![API21+](https://img.shields.io/badge/API-16+-blue.svg)](https://android-arsenal.com/api?level=16)
 [![Flutter](https://img.shields.io/badge/lang-Flutter-blue.svg)](https://flutter.dev/)
 [![Kotlin](https://img.shields.io/badge/lang-Kotlin-orange.svg)](https://kotlinlang.org/)
 
-Android client to remotely control wireless sockets and switches using nextcloud server.
+## Screenshots
 
 ![alt tag](/screenshots/wireless_control_1.jpg)
 ![alt tag](/screenshots/wireless_control_2_light.jpg)
@@ -24,27 +18,9 @@ Android client to remotely control wireless sockets and switches using nextcloud
 ![alt tag](/screenshots/wireless_control_3_light.jpg)
 ![alt tag](/screenshots/wireless_control_3_dark.jpg)
 
-### LogMyMeter: 
-
-coming in future
-
-### SharedClipboard: 
-
-coming in future
-
-### SharedMeal: 
-
-coming in future
-
-## Maintainers
-
-[Jonas Schubert](https://github.com/GuepardoApps)
-
-If you’d like to join, just go through the [issue list](https://github.com/LucaHome/LucaHome-AndroidApplication/issues) and fix some.
-
 ## License
 
-LucaHome-AndroidApplications are distributed under the MIT license. [See LICENSE](LICENSE.md) for details.
+WirelessControl-Android is distributed under the MIT license. [See LICENSE](LICENSE.md) for details.
 
 ```
 MIT License

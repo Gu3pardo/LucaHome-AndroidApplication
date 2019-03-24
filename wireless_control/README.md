@@ -1,6 +1,6 @@
-# WirelessControl
+# WirelessControl-Android
 
-Android client to remotely control wireless sockets and switches using NextCloud server.
+Android client to remotely control wireless sockets and switches using Nextcloud server.
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 [![Build](https://img.shields.io/badge/build-Success-green.svg)](./wireless_control)
@@ -20,7 +20,7 @@ Android client to remotely control wireless sockets and switches using NextCloud
 
 ## License
 
-WirelessControl is distributed under the MIT license. [See LICENSE](LICENSE.md) for details.
+WirelessControl-Android is distributed under the MIT license. [See LICENSE](LICENSE.md) for details.
 
 ```
 MIT License
