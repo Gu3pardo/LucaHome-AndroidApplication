@@ -1,13 +1,16 @@
 import 'dart:async';
 import 'package:connectivity/connectivity.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:wireless_control/constants/color.constants.dart';
 import 'package:wireless_control/enums/app_theme.enum.dart';
 import 'package:wireless_control/enums/state_action.enum.dart';
+import 'package:wireless_control/enums/weekday.enum.dart';
 import 'package:wireless_control/middleware/periodic_task.thunk_action.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/periodic_task.model.dart';
@@ -18,8 +21,9 @@ class DetailsPeriodicTaskPage extends StatefulWidget {
   static String tag = 'details-periodic-task-page';
 
   final PeriodicTask periodicTask;
+  final String wirelessSocketName;
 
-  DetailsPeriodicTaskPage(this.periodicTask);
+  DetailsPeriodicTaskPage(this.periodicTask, this.wirelessSocketName);
 
   @override
   _DetailsPeriodicTaskPageState createState() => new _DetailsPeriodicTaskPageState();
@@ -94,7 +98,7 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                 backgroundColor: ColorConstants.AppBar,
                 title: (this.stateAction == StateAction.Update || this.stateAction == StateAction.Readonly)
                     ? Text('Details for ${widget.periodicTask.name}')
-                    : Text('Add Periodic Task'),
+                    : Text('Add Periodic Task for ${widget.wirelessSocketName}'),
               ),
               body: ListView(
                 children: <Widget>[
@@ -124,7 +128,41 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                                         (value) {if (value.isEmpty) {return 'Name is required';}},
                                         (String value) {widget.periodicTask.name = value;},
                                         viewModel.loadTheme()),
-                                // TODO add further fields
+                                new CheckboxListTile(
+                                    title: Text('Activate/Deactivated', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight),),
+                                    value: widget.periodicTask.wirelessSocketState == 1,
+                                    onChanged: (bool value) {setState(() {widget.periodicTask.wirelessSocketState = (value ? 1 : 0);});}
+                                    ),
+                                DropdownButton<int>(
+                                  hint: Text("Please choose a weekday", style: TextStyle(color: ColorConstants.Hint)),
+                                  value: widget.periodicTask.weekday,
+                                  items: Weekday.values.map((Weekday weekday) {
+                                    return new DropdownMenuItem<int>(
+                                      value: weekday.index,
+                                      child: Text(weekday.toString(), style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight)),
+                                    );
+                                  }).toList(),
+                                  onChanged: (int weekdayIndex) {
+                                    widget.periodicTask.weekday = weekdayIndex + 1;
+                                  },
+                                ),
+                                DateTimePickerFormField(
+                                  inputType: InputType.time,
+                                  format: DateFormat('HH:mm'),
+                                  editable: true,
+                                  decoration: InputDecoration(labelText: 'Time', hasFloatingPlaceholder: false),
+                                  onChanged: (DateTime dateTime) {widget.periodicTask.hour = dateTime.hour;widget.periodicTask.minute = dateTime.minute;},
+                                ),
+                                new CheckboxListTile(
+                                    title: Text('Periodic', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight),),
+                                    value: widget.periodicTask.periodic == 1,
+                                    onChanged: (bool value) {setState(() {widget.periodicTask.periodic = (value ? 1 : 0);});}
+                                ),
+                                new CheckboxListTile(
+                                    title: Text('Active', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight),),
+                                    value: widget.periodicTask.active == 1,
+                                    onChanged: (bool value) {setState(() {widget.periodicTask.active = (value ? 1 : 0);});}
+                                ),
                               ],
                             ),
                           )),

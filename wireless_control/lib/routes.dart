@@ -65,7 +65,7 @@ Map<String, WidgetBuilder> getRoutes(context, store) {
         var periodicTask = store.state.toBeAddedPeriodicTask != null
             ? store.state.toBeAddedPeriodicTask
             : store.state.selectedPeriodicTask;
-        return new DetailsPeriodicTaskPage(periodicTask);
+        return new DetailsPeriodicTaskPage(periodicTask, store.state.selectedWirelessSocket.name);
       },
     ),
     '/details-wireless-socket': (BuildContext context) => new StoreBuilder<AppState>(
