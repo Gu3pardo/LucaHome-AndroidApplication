@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:redux/redux.dart';
@@ -45,16 +46,19 @@ class PeriodicTaskCardState extends State<PeriodicTaskCard> {
                   left: 8.0,
                   right: 8.0,
                 ),
-                child: new Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: <Widget>[
-                    new Text(widget.periodicTask.name, style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 18)),
-                    new Text('${widget.periodicTask.weekday}, ${widget.periodicTask.hour}:${widget.periodicTask.minute}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 15)),
-                    new Text('State: ${widget.periodicTask.wirelessSocketState}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12)),
-                    new Text('Periodic: ${widget.periodicTask.periodic}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12))
-                  ],
-                ),
+                child: new  BackdropFilter(
+                  filter: new ImageFilter.blur(sigmaX: 10.0, sigmaY: 10.0),
+                  child: new Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      new Text(widget.periodicTask.name, style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 18)),
+                      new Text('${widget.periodicTask.weekday}, ${widget.periodicTask.hour}:${widget.periodicTask.minute}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 15)),
+                      new Text('State: ${widget.periodicTask.wirelessSocketState}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12)),
+                      new Text('Periodic: ${widget.periodicTask.periodic}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12))
+                    ],
+                  ),
+                )
               )),
         ),
       ),
