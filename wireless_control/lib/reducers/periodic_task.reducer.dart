@@ -46,9 +46,11 @@ final periodicTaskSelectWirelessSocketReducer = combineReducers<List<PeriodicTas
 ]);
 
 List<PeriodicTask> _selectWirelessSocketSuccessful(List<PeriodicTask> periodicTaskList, action) {
-  return action.wirelessSocket != null
+  return periodicTaskList != null
+   ? action.wirelessSocket != null
       ? periodicTaskList.where((PeriodicTask periodicTask) => periodicTask.wirelessSocketId == action.wirelessSocket.id).toList()
-      : periodicTaskList;
+      : periodicTaskList
+   : [];
 }
 List<PeriodicTask> _selectWirelessSocketFailed(List<PeriodicTask> periodicTaskList, action) => periodicTaskList;
 
