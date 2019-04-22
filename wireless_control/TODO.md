@@ -41,6 +41,7 @@
 - [X] Fix dropdown index bug after adding an area
 - [X] Stabilize method fromString in helper/icon.helper
 - [ ] Update wireless socket icon in detail view while editing
+    - Barely possible with TextFormField... TextField supports onChange, but is not made for Forms...
 - [X] Fix layout in details view
     - [X] Area
     - [X] WirelessSocket
