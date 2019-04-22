@@ -10,6 +10,7 @@ import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/periodic_task.model.dart';
 import 'package:wireless_control/presentation/shared-presentation.dart';
 import 'package:wireless_control/utils/actions.util.dart';
+import 'package:wireless_control/utils/periodic_task.util.dart';
 
 class PeriodicTaskCard extends StatefulWidget {
   final PeriodicTask periodicTask;
@@ -53,9 +54,9 @@ class PeriodicTaskCardState extends State<PeriodicTaskCard> {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: <Widget>[
                       new Text(widget.periodicTask.name, style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 18)),
-                      new Text('${widget.periodicTask.weekday}, ${widget.periodicTask.hour}:${widget.periodicTask.minute}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 15)),
-                      new Text('State: ${widget.periodicTask.wirelessSocketState}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12)),
-                      new Text('Periodic: ${widget.periodicTask.periodic}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12))
+                      new Text(getDateTimeString(widget.periodicTask), style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 15)),
+                      new Text('State: ${widget.periodicTask.wirelessSocketState == 1 ? "Activate" : "Deactivate"}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12)),
+                      new Text('Periodic: ${widget.periodicTask.periodic == 1 ? "Yes" : "No"}', style: TextStyle(color: widget.store.state.theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight, fontSize: 12))
                     ],
                   ),
                 )

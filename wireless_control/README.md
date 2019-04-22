@@ -1,10 +1,10 @@
 # WirelessControl-Android
 
-Android client to remotely control wireless sockets and switches using Nextcloud server.
+Android client to remotely control wireless sockets and switches using NextCloud server.
 
 [![Platform](https://img.shields.io/badge/platform-Android-blue.svg)](https://www.android.com)
 [![Build](https://img.shields.io/badge/build-Success-green.svg)](./wireless_control)
-[![Version](https://img.shields.io/badge/version-1.2.3+1-blue.svg)](./wireless_control)
+[![Version](https://img.shields.io/badge/version-1.3.2+1-blue.svg)](./wireless_control)
 
 [![API21+](https://img.shields.io/badge/API-16+-blue.svg)](https://android-arsenal.com/api?level=16)
 [![Flutter](https://img.shields.io/badge/lang-Flutter-blue.svg)](https://flutter.dev/)

@@ -94,6 +94,7 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
         return Form(
             key: _formKey,
             child: Scaffold(
+              backgroundColor: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : Colors.grey[850],
               appBar: AppBar(
                 backgroundColor: ColorConstants.AppBar,
                 title: (this.stateAction == StateAction.Update || this.stateAction == StateAction.Readonly)
@@ -106,8 +107,7 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.275,
-                        color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
+                        height: pageSize.height * 0.2,
                         alignment: Alignment.center,
                         child: getDetailsIcon(widget.periodicTask.active == 1 ? FontAwesomeIcons.solidHourglass : FontAwesomeIcons.hourglass, viewModel.loadTheme()),
                       )
@@ -118,7 +118,6 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                       Container(
                           width: pageSize.width,
                           height: pageSize.height * 0.45,
-                          color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                           alignment: Alignment.center,
                           child: Center(
                             child: ListView(
@@ -147,6 +146,7 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                                   },
                                 ),
                                 DateTimePickerFormField(
+                                  initialTime: new TimeOfDay(hour: widget.periodicTask.hour, minute: widget.periodicTask.minute),
                                   inputType: InputType.time,
                                   format: DateFormat('HH:mm'),
                                   editable: true,
@@ -172,8 +172,7 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.175,
-                        color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
+                        height: pageSize.height * 0.2,
                         alignment: Alignment.center,
                         child: ListView(
                           padding: EdgeInsets.only(left: 24.0, right: 24.0),

@@ -7,7 +7,7 @@ import 'package:wireless_control/enums/app_theme.enum.dart';
 Widget getDetailsIcon(IconData iconData, AppTheme theme) {
   return new Icon(
     iconData,
-    size: 125,
+    size: 75,
     color: theme == AppTheme.Light ? ColorConstants.IconDark : ColorConstants.IconLight,
   );
 }

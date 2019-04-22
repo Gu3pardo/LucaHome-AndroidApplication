@@ -92,6 +92,7 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
         return Form(
             key: _formKey,
             child: Scaffold(
+              backgroundColor: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : Colors.grey[850],
               appBar: AppBar(
                 backgroundColor: ColorConstants.AppBar,
                 title: (this.stateAction == StateAction.Update || this.stateAction == StateAction.Readonly)
@@ -104,8 +105,7 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.275,
-                        color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
+                        height: pageSize.height * 0.2,
                         alignment: Alignment.center,
                         child: getDetailsIcon(FontAwesomeIcons.map, viewModel.loadTheme()),
                       )
@@ -116,7 +116,6 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                       Container(
                           width: pageSize.width,
                           height: pageSize.height * 0.45,
-                          color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
                           alignment: Alignment.center,
                           child: Center(
                             child: ListView(
@@ -135,8 +134,7 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.175,
-                        color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
+                        height: pageSize.height * 0.2,
                         alignment: Alignment.center,
                         child: ListView(
                           padding: EdgeInsets.only(left: 24.0, right: 24.0),
