@@ -41,7 +41,7 @@
 - [X] Fix dropdown index bug after adding an area
 - [X] Stabilize method fromString in helper/icon.helper
 - [ ] Update wireless socket icon in detail view while editing
-- [ ] Fix layout in details view
-    - [ ] Area
-    - [ ] WirelessSocket
-    - [ ] PeriodicTask
+- [X] Fix layout in details view
+    - [X] Area
+    - [X] WirelessSocket
+    - [X] PeriodicTask
