@@ -83,6 +83,7 @@ class _SettingsPageState extends State<SettingsPage> {
         return Form(
             key: _formKey,
             child: Scaffold(
+              backgroundColor: viewModel.theme == AppTheme.Light ? ColorConstants.BackgroundLight : Colors.grey[850],
               appBar: AppBar(
                 backgroundColor: ColorConstants.AppBar,
                 title: Text('Settings'),
@@ -93,8 +94,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.275,
-                        color: viewModel.theme == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
+                        height: pageSize.height * 0.2,
                         alignment: Alignment.center,
                         child: getDetailsIcon(FontAwesomeIcons.cogs, viewModel.theme),
                       )
@@ -104,8 +104,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: <Widget>[
                       Container(
                           width: pageSize.width,
-                          height: pageSize.height * 0.35,
-                          color: viewModel.theme == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
+                          height: pageSize.height * 0.45,
                           alignment: Alignment.center,
                           child: Center(
                             child: ListView(
@@ -147,8 +146,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: <Widget>[
                       Container(
                         width: pageSize.width,
-                        height: pageSize.height * 0.275,
-                        color: viewModel.theme == AppTheme.Light ? ColorConstants.BackgroundLight : ColorConstants.BackgroundDark,
+                        height: pageSize.height * 0.2,
                         alignment: Alignment.center,
                         child: ListView(
                           padding: EdgeInsets.only(left: 24.0, right: 24.0),
