@@ -23,6 +23,11 @@
     - [X] change user data (userName, password & baseUrl)
     - [X] choose theme (light & dark)
 
+- [ ] Android background service with intent filter to accept broadcasts to toggle WirelessSockets 
+    - https://dev.to/protium/flutter-background-services-19a4
+    - https://flutter.dev/docs/get-started/flutter-for/android-devs#what-is-the-equivalent-of-an-intent-in-flutter
+    - https://stuff.mit.edu/afs/sipb/project/android/docs/guide/components/intents-filters.html
+
 # Future
 
 - [X] Add periodic task functionality

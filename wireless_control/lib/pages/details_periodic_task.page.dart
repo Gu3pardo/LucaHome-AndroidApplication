@@ -145,11 +145,15 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                                     widget.periodicTask.weekday = weekdayIndex;
                                   },
                                 ),
-                                DateTimePickerFormField(
-                                  initialTime: new TimeOfDay(hour: widget.periodicTask.hour, minute: widget.periodicTask.minute),
-                                  inputType: InputType.time,
+                                DateTimeField(
                                   format: DateFormat('HH:mm'),
-                                  editable: true,
+                                  onShowPicker: (context, currentValue) async {
+                                    final time = await showTimePicker(
+                                      context: context,
+                                      initialTime: new TimeOfDay(hour: widget.periodicTask.hour, minute: widget.periodicTask.minute),
+                                    );
+                                    return DateTimeField.convert(time);
+                                  },
                                   decoration: InputDecoration(labelText: 'Time', hasFloatingPlaceholder: false),
                                   onChanged: (DateTime dateTime) {widget.periodicTask.hour = dateTime.hour;widget.periodicTask.minute = dateTime.minute;},
                                 ),

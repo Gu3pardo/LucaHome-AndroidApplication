@@ -10,6 +10,7 @@ import 'package:wireless_control/models/api_response.model.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/area.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
+import 'package:wireless_control/services/area.service.dart';
 
 ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
@@ -46,6 +47,7 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
         if (apiResponseModel.status == "success") {
           try {
             var areaList = createList(apiResponseModel.data);
+            AreaService().syncDatabase(areaList);
             store.dispatch(new AreaLoadSuccessful(list: areaList));
             var areaSelected = areaList.length > 0 ? areaList.first : null;
             store.dispatch(new AreaSelectSuccessful(area: areaSelected));
@@ -102,6 +104,7 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data >= 0) {
           area.id = apiResponseModel.data;
+          AreaService().add(area);
           store.dispatch(new AreaAddSuccessful(area: area));
           onSuccess();
         } else {
@@ -155,6 +158,7 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
       case 200:
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
+          AreaService().update(area);
           store.dispatch(new AreaUpdateSuccessful(area: area));
           onSuccess();
         } else {
@@ -208,6 +212,7 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           var areaSelected = store.state.areaList.length > 0 ? store.state.areaList.first : null;
+          AreaService().delete(area);
           store.dispatch(new AreaSelectSuccessful(area: areaSelected));
           store.dispatch(new AreaDeleteSuccessful(area: area));
           onSuccess();

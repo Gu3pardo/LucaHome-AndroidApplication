@@ -10,6 +10,7 @@ import 'package:wireless_control/models/api_response.model.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/periodic_task.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
+import 'package:wireless_control/services/periodic_task.service.dart';
 
 ThunkAction<AppState> loadPeriodicTasks(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
@@ -46,6 +47,7 @@ ThunkAction<AppState> loadPeriodicTasks(NextCloudCredentials nextCloudCredential
         if (apiResponseModel.status == "success") {
           try {
             var periodicTaskList = createList(apiResponseModel.data);
+            PeriodicTaskService().syncDatabase(periodicTaskList);
             store.dispatch(new PeriodicTaskLoadSuccessful(list: periodicTaskList));
             var periodicTaskSelected = periodicTaskList.length > 0 ? periodicTaskList.first : null;
             store.dispatch(new PeriodicTaskSelectSuccessful(periodicTask: periodicTaskSelected));
@@ -102,6 +104,7 @@ ThunkAction<AppState> addPeriodicTask(NextCloudCredentials nextCloudCredentials,
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data >= 0) {
           periodicTask.id = apiResponseModel.data;
+          PeriodicTaskService().add(periodicTask);
           store.dispatch(new PeriodicTaskAddSuccessful(periodicTask: periodicTask));
           onSuccess();
         } else {
@@ -155,6 +158,7 @@ ThunkAction<AppState> updatePeriodicTask(NextCloudCredentials nextCloudCredentia
       case 200:
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
+          PeriodicTaskService().update(periodicTask);
           store.dispatch(new PeriodicTaskUpdateSuccessful(periodicTask: periodicTask));
           onSuccess();
         } else {
@@ -208,6 +212,7 @@ ThunkAction<AppState> deletePeriodicTask(NextCloudCredentials nextCloudCredentia
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
           var periodicTaskSelected = store.state.periodicTaskList.length > 0 ? store.state.periodicTaskList.first : null;
+          PeriodicTaskService().delete(periodicTask);
           store.dispatch(new PeriodicTaskSelectSuccessful(periodicTask: periodicTaskSelected));
           store.dispatch(new PeriodicTaskDeleteSuccessful(periodicTask: periodicTask));
           onSuccess();

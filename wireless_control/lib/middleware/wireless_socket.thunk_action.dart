@@ -10,6 +10,7 @@ import 'package:wireless_control/models/api_response.model.dart';
 import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
+import 'package:wireless_control/services/wireless_socket.service.dart';
 
 ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
@@ -45,7 +46,9 @@ ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredenti
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success") {
           try {
-            store.dispatch(new WirelessSocketLoadSuccessful(list: createList(apiResponseModel.data)));
+            var wirelessSocketList = createList(apiResponseModel.data);
+            WirelessSocketService().syncDatabase(wirelessSocketList);
+            store.dispatch(new WirelessSocketLoadSuccessful(list: wirelessSocketList));
           } catch(exception) {
             store.dispatch(new WirelessSocketLoadFail(exception));
           }
@@ -99,6 +102,7 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data >= 0) {
           wirelessSocket.id = apiResponseModel.data;
+          WirelessSocketService().add(wirelessSocket);
           store.dispatch(new WirelessSocketAddSuccessful(wirelessSocket: wirelessSocket));
           onSuccess();
         } else {
@@ -152,6 +156,7 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
       case 200:
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
+          WirelessSocketService().update(wirelessSocket);
           store.dispatch(new WirelessSocketUpdateSuccessful(wirelessSocket: wirelessSocket));
           onSuccess();
         } else {
@@ -204,6 +209,7 @@ ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredent
       case 200:
         var apiResponseModel = new ApiResponseModel.fromJson(jsonDecode(response.body));
         if (apiResponseModel.status == "success" && apiResponseModel.data == 0) {
+          WirelessSocketService().delete(wirelessSocket);
           store.dispatch(new WirelessSocketDeleteSuccessful(wirelessSocket: wirelessSocket));
           onSuccess();
         } else {
