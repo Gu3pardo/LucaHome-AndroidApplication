@@ -28,6 +28,9 @@
     - https://flutter.dev/docs/get-started/flutter-for/android-devs#what-is-the-equivalent-of-an-intent-in-flutter
     - https://stuff.mit.edu/afs/sipb/project/android/docs/guide/components/intents-filters.html
 
+- [X] PlayStore Release
+    - https://flutter.dev/docs/deployment/android
+
 # Future
 
 - [X] Add periodic task functionality

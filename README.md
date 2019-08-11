@@ -7,20 +7,26 @@ Android client to remotely control wireless sockets and switches using Nextcloud
 [![Donate: PayPal](https://img.shields.io/badge/paypal-donate-blue.svg)](https://www.paypal.me/GuepardoApps)
 
 [![Build](https://img.shields.io/badge/build-Success-green.svg)](./wireless_control)
-[![Version](https://img.shields.io/badge/version-1.4.0+1-blue.svg)](./wireless_control)
+[![Version](https://img.shields.io/badge/version-1.4.0+1-blue.svg)](./releases/1.4.0+1.aab)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
 [![API16+](https://img.shields.io/badge/API-16+-blue.svg)](https://android-arsenal.com/api?level=16)
 [![Flutter](https://img.shields.io/badge/lang-Flutter-blue.svg)](https://flutter.dev/)
 [![Kotlin](https://img.shields.io/badge/lang-Kotlin-orange.svg)](https://kotlinlang.org/)
 
+[![PlayStore](https://img.shields.io/badge/PlayStore-WirelessControl-blue.svg)](https://play.google.com/store/apps/details?id=guepardoapps.wireless_control)
+
 ## Screenshots
 
-![alt tag](/screenshots/wireless_control_1.jpg)
-![alt tag](/screenshots/wireless_control_2_light.jpg)
-![alt tag](/screenshots/wireless_control_2_dark.jpg)
-![alt tag](/screenshots/wireless_control_3_light.jpg)
-![alt tag](/screenshots/wireless_control_3_dark.jpg)
+![alt tag](./screenshots/wireless_control_1.jpg)
+
+![alt tag](./screenshots/wireless_control_2_light.jpg)
+
+![alt tag](./screenshots/wireless_control_2_dark.jpg)
+
+![alt tag](./screenshots/wireless_control_3_light.jpg)
+
+![alt tag](./screenshots/wireless_control_3_dark.jpg)
 
 ## License
 

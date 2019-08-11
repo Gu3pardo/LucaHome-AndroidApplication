@@ -50,6 +50,16 @@ class WirelessSocket {
         icon = json["icon"],
         deletable = int.parse(json["deletable"]);
 
+  WirelessSocket.fromMap(Map<String, dynamic> map)
+      : id = map["id"],
+        name = map["name"],
+        code = map["code"],
+        area = map["area"],
+        state = map["state"],
+        description = map["description"],
+        icon = map["icon"],
+        deletable = map["deletable"];
+
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,

@@ -122,9 +122,10 @@ class _DetailsAreaPageState extends State<DetailsAreaPage> {
                               padding: EdgeInsets.only(left: 24.0, right: 24.0),
                               children: <Widget>[
                                 getTextFormField(widget.area.name, 'Name',
-                                        (value) {if (value.isEmpty) {return 'Name is required';}},
+                                        (value) {if (value.isEmpty) {return 'Name is required';}return "";},
                                         (String value) {widget.area.name = value; widget.area.filter = value;},
-                                        viewModel.loadTheme()),
+                                        viewModel.loadTheme(),
+                                        null),
                               ],
                             ),
                           )),

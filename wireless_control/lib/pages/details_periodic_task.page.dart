@@ -1,11 +1,10 @@
 import 'dart:async';
 import 'package:connectivity/connectivity.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:redux/redux.dart';
 import 'package:wireless_control/constants/color.constants.dart';
 import 'package:wireless_control/enums/app_theme.enum.dart';
@@ -124,9 +123,10 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                               padding: EdgeInsets.only(left: 24.0, right: 24.0),
                               children: <Widget>[
                                 getTextFormField(widget.periodicTask.name, 'Name',
-                                        (value) {if (value.isEmpty) {return 'Name is required';}},
+                                        (value) {if (value.isEmpty) {return 'Name is required';}return "";},
                                         (String value) {widget.periodicTask.name = value;},
-                                        viewModel.loadTheme()),
+                                        viewModel.loadTheme(),
+                                        null),
                                 new CheckboxListTile(
                                     title: Text('Activate/Deactivated', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight),),
                                     value: widget.periodicTask.wirelessSocketState == 1,
@@ -145,17 +145,21 @@ class _DetailsPeriodicTaskPageState extends State<DetailsPeriodicTaskPage> {
                                     widget.periodicTask.weekday = weekdayIndex;
                                   },
                                 ),
-                                DateTimeField(
-                                  format: DateFormat('HH:mm'),
-                                  onShowPicker: (context, currentValue) async {
-                                    final time = await showTimePicker(
-                                      context: context,
-                                      initialTime: new TimeOfDay(hour: widget.periodicTask.hour, minute: widget.periodicTask.minute),
-                                    );
-                                    return DateTimeField.convert(time);
+                                TimePickerSpinner(
+                                  isForce2Digits: true,
+                                  onTimeChange: (DateTime time) {
+                                    widget.periodicTask.hour = time.hour; widget.periodicTask.minute = time.minute;
                                   },
-                                  decoration: InputDecoration(labelText: 'Time', hasFloatingPlaceholder: false),
-                                  onChanged: (DateTime dateTime) {widget.periodicTask.hour = dateTime.hour;widget.periodicTask.minute = dateTime.minute;},
+                                  normalTextStyle: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.grey
+                                  ),
+                                  highlightedTextStyle: TextStyle(
+                                      fontSize: 24,
+                                      color: Colors.white
+                                  ),
+                                  spacing: 15,
+                                  itemHeight: 50,
                                 ),
                                 new CheckboxListTile(
                                     title: Text('Periodic', style: TextStyle(color: viewModel.loadTheme() == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight),),

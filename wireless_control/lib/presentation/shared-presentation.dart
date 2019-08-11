@@ -17,7 +17,8 @@ Widget getTextFormField(
     String hintText,
     Function(String) validator,
     Function(String) onSaved,
-    AppTheme theme) {
+    AppTheme theme,
+    Function(String) onFieldSubmitted) {
   return new TextFormField(
     keyboardType: TextInputType.text,
     autofocus: false,
@@ -30,6 +31,7 @@ Widget getTextFormField(
     style: TextStyle(color: theme == AppTheme.Light ? ColorConstants.TextDark : ColorConstants.TextLight),
     validator: validator,
     onSaved: onSaved,
+    onFieldSubmitted: onFieldSubmitted ?? (String value) {},
   );
 }
 

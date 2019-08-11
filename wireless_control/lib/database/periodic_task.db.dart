@@ -43,7 +43,7 @@ class PeriodicTaskDb {
     final Database database = await _database();
     final List<Map<String, dynamic>> maps = await database.query(_tableName);
     return List.generate(maps.length, (i) {
-      return PeriodicTask.fromJson(maps[i]);
+      return PeriodicTask.fromMap(maps[i]);
     });
   }
 

@@ -14,7 +14,7 @@ description: Wireless Control lets you control 433MHz sockets within NextCloud w
 version: 1.4.0+1
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=2.2.2 <3.3.0"
 
 dependencies:
   flutter:
@@ -28,7 +28,7 @@ dependencies:
   connectivity: "0.4.3+7"
   shared_preferences: "0.5.3+4"
   wave: "0.0.8"
-  datetime_picker_formfield: "0.4.2"
+  flutter_time_picker_spinner  : "1.0.5"
   sqflite: "1.1.6+3"
   path: "1.6.2"
 

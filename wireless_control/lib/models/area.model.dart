@@ -26,6 +26,12 @@ class Area {
         filter = json["filter"],
         deletable = int.parse(json["deletable"]);
 
+  Area.fromMap(Map<String, dynamic> map)
+      : id = map["id"],
+        name = map["name"],
+        filter = map["filter"],
+        deletable = map["deletable"];
+
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,

@@ -47,6 +47,17 @@ class PeriodicTask {
         periodic =  int.parse(json["periodic"]),
         active =  int.parse(json["active"]);
 
+  PeriodicTask.fromMap(Map<String, dynamic> map)
+      : id = map["id"],
+        name = map["name"],
+        wirelessSocketId =  map["wirelessSocketId"],
+        wirelessSocketState =  map["wirelessSocketState"],
+        weekday =  map["weekday"],
+        hour =  map["hour"],
+        minute =  map["minute"],
+        periodic =  map["periodic"],
+        active =  map["active"];
+
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,

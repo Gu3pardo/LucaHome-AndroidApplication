@@ -127,6 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (value.isEmpty) {
                                     return 'NextCloudUrl is required';
                                   }
+                                  return "";
                                 },
                                 onSaved: (String value) {
                                   nextCloudCredentials.baseUrl = value;
@@ -149,6 +150,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (value.isEmpty) {
                                     return 'UserName is required';
                                   }
+                                  return "";
                                 },
                                 onSaved: (String value) {
                                   nextCloudCredentials.userName = value;
@@ -171,6 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                                   if (value.isEmpty) {
                                     return 'Password is required';
                                   }
+                                  return "";
                                 },
                                 onSaved: (String value) {
                                   nextCloudCredentials.passPhrase = value;

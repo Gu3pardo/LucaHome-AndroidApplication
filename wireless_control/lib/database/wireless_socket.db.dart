@@ -43,7 +43,7 @@ class WirelessSocketDb {
     final Database database = await _database();
     final List<Map<String, dynamic>> maps = await database.query(_tableName);
     return List.generate(maps.length, (i) {
-      return WirelessSocket.fromJson(maps[i]);
+      return WirelessSocket.fromMap(maps[i]);
     });
   }
 

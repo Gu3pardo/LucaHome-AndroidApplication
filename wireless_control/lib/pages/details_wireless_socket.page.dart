@@ -84,41 +84,50 @@ class _DetailsWirelessSocketPageState extends State<DetailsWirelessSocketPage> {
 
   Widget nameTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.name, 'Name',
-            (value) {if (value.isEmpty) {return 'Name is required';}},
+            (value) {if (value.isEmpty) {return 'Name is required';}return "";},
             (String value) {widget.wirelessSocket.name = value;},
-            viewModel.loadTheme());
+            viewModel.loadTheme(),
+            null);
   }
 
   Widget codeTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.code, 'Code',
             (value) {
-      if (value.isEmpty) {return 'Code is required';}
-      if (!new RegExp(r"^([01]{5}[ABCDE]{1})$").hasMatch(value)) {return 'Invalid code (Must be of format 11001A)';}},
+              if (value.isEmpty) {return 'Code is required';}
+              if (!new RegExp(r"^([01]{5}[ABCDE]{1})$").hasMatch(value)) {return 'Invalid code (Must be of format 11001A)';}
+              return "";
+            },
             (String value) {widget.wirelessSocket.code = value;},
-            viewModel.loadTheme());
+            viewModel.loadTheme(),
+            null);
   }
 
   Widget areaTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.area, 'Area',
             (value) {
-      if (value.isEmpty) {return 'Area is required';}
-      if (!viewModel.validateArea(value)) {return 'Area is not valid (Must exist)';}},
+              if (value.isEmpty) {return 'Area is required';}
+              if (!viewModel.validateArea(value)) {return 'Area is not valid (Must exist)';}
+              return "";
+            },
             (String value) {widget.wirelessSocket.area = value;},
-            viewModel.loadTheme());
+            viewModel.loadTheme(),
+            null);
   }
 
   Widget descriptionTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.description, 'Description',
             (value) {},
             (String value) {widget.wirelessSocket.description = value;},
-            viewModel.loadTheme());
+            viewModel.loadTheme(),
+            null);
   }
 
   Widget iconTextFormField(_ViewModel viewModel) {
     return getTextFormField(widget.wirelessSocket.icon, 'Icon',
-            (value) {if (value.isEmpty) {return 'Icon is required';}},
+            (value) {if (value.isEmpty) {return 'Icon is required';}return "";},
             (String value) {widget.wirelessSocket.icon = value;},
-            viewModel.loadTheme());
+            viewModel.loadTheme(),
+            (String value) {widget.wirelessSocket.icon = value;});
   }
 
   @override
