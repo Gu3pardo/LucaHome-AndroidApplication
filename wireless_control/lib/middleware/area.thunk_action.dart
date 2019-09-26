@@ -12,6 +12,8 @@ import 'package:wireless_control/models/area.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
 import 'package:wireless_control/services/area.service.dart';
 
+String apiVersion = "v1";
+
 ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
     store.dispatch(new AreaLoad());
@@ -21,7 +23,7 @@ ThunkAction<AppState> loadAreas(NextCloudCredentials nextCloudCredentials) {
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.get(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + 'area',
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + '/area',
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {
@@ -75,7 +77,7 @@ ThunkAction<AppState> addArea(NextCloudCredentials nextCloudCredentials, Area ar
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.post(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + '/area',
         body: jsonEncode(area.toAddJson()),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
@@ -130,7 +132,7 @@ ThunkAction<AppState> updateArea(NextCloudCredentials nextCloudCredentials, Area
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.put(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area/" + area.id.toString(),
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + '/area/' + area.id.toString(),
         body: jsonEncode(area),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
@@ -184,7 +186,7 @@ ThunkAction<AppState> deleteArea(NextCloudCredentials nextCloudCredentials, Area
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.delete(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "area/${area.id}",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + "/area/${area.id}",
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {

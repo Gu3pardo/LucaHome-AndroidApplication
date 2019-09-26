@@ -12,6 +12,8 @@ import 'package:wireless_control/models/app_state.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
 import 'package:wireless_control/utils/shared_pref.utils.dart';
 
+String apiVersion = "v1";
+
 ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
     store.dispatch(new NextCloudCredentialsLogIn());
@@ -21,7 +23,7 @@ ThunkAction<AppState> logIn(NextCloudCredentials nextCloudCredentials) {
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.get(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + 'ping',
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + '/ping',
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {

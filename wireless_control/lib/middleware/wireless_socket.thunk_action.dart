@@ -12,6 +12,8 @@ import 'package:wireless_control/models/wireless_socket.model.dart';
 import 'package:wireless_control/models/next_cloud_credentials.model.dart';
 import 'package:wireless_control/services/wireless_socket.service.dart';
 
+String apiVersion = "v2";
+
 ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredentials) {
   return (Store<AppState> store) async {
     store.dispatch(new WirelessSocketLoad());
@@ -21,7 +23,7 @@ ThunkAction<AppState> loadWirelessSockets(NextCloudCredentials nextCloudCredenti
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.get(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + 'wireless_socket',
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + '/wireless_socket',
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {
@@ -73,7 +75,7 @@ ThunkAction<AppState> addWirelessSocket(NextCloudCredentials nextCloudCredential
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.post(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + "/wireless_socket",
         body: jsonEncode(wirelessSocket.toAddJson()),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
@@ -128,7 +130,7 @@ ThunkAction<AppState> updateWirelessSocket(NextCloudCredentials nextCloudCredent
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.put(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket/" + wirelessSocket.id.toString(),
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + "/wireless_socket/" + wirelessSocket.id.toString(),
         body: jsonEncode(wirelessSocket),
         headers: {'authorization': authorization, 'Accept': 'application/json', 'Content-Type': 'application/json'});
 
@@ -182,7 +184,7 @@ ThunkAction<AppState> deleteWirelessSocket(NextCloudCredentials nextCloudCredent
             '${nextCloudCredentials.userName}:${nextCloudCredentials.passPhrase}'));
 
     var response = await http.delete(
-        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + "wireless_socket/${wirelessSocket.id}",
+        nextCloudCredentials.baseUrl + NextCloudConstants.baseUrl + apiVersion + "/wireless_socket/${wirelessSocket.id}",
         headers: {'authorization': authorization});
 
     switch (response.statusCode) {
