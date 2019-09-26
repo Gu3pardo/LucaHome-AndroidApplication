@@ -11,7 +11,7 @@ description: Wireless Control lets you control 433MHz sockets within NextCloud w
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.4.0+1
+version: 1.4.1+1
 
 environment:
   sdk: ">=2.2.2 <3.3.0"
@@ -20,17 +20,17 @@ dependencies:
   flutter:
     sdk: flutter
   http: "0.12.0+2"
-  font_awesome_flutter: "8.4.0" # 8.4.0 uses Font Awesome Icons 5.7 which had the icon NintendoSwitch, 8.5.0 has Font Awesome Icons 5.9 which removed NintendoSwitch Icon
+  font_awesome_flutter: "8.5.0"
   redux: "3.0.0"
   flutter_redux: "0.5.3"
   redux_logging: "0.3.0"
   redux_thunk: "0.2.1"
-  connectivity: "0.4.3+7"
+  connectivity: "0.4.4"
   shared_preferences: "0.5.3+4"
   wave: "0.0.8"
-  flutter_time_picker_spinner  : "1.0.5"
-  sqflite: "1.1.6+3"
-  path: "1.6.2"
+  flutter_time_picker_spinner  : "1.0.6"
+  sqflite: "1.1.6+5"
+  path: "1.6.4"
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
