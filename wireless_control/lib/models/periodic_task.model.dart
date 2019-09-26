@@ -1,4 +1,6 @@
-class PeriodicTask {
+import 'entity.model.dart';
+
+class PeriodicTask implements Entity {
   int id;
   String name;
   int wirelessSocketId;
@@ -21,8 +23,16 @@ class PeriodicTask {
     this.active = 1,
   });
 
-  PeriodicTask copyWith({int id, String name, int wirelessSocketId, int wirelessSocketState,
-    int weekday, int hour, int minute, int periodic, int active}) {
+  PeriodicTask copyWith(
+      {int id,
+      String name,
+      int wirelessSocketId,
+      int wirelessSocketState,
+      int weekday,
+      int hour,
+      int minute,
+      int periodic,
+      int active}) {
     return new PeriodicTask(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -39,24 +49,24 @@ class PeriodicTask {
   PeriodicTask.fromJson(Map<String, dynamic> json)
       : id = int.parse(json["id"]),
         name = json["name"],
-        wirelessSocketId =  int.parse(json["wirelessSocketId"]),
-        wirelessSocketState =  int.parse(json["wirelessSocketState"]),
-        weekday =  int.parse(json["weekday"]),
-        hour =  int.parse(json["hour"]),
-        minute =  int.parse(json["minute"]),
-        periodic =  int.parse(json["periodic"]),
-        active =  int.parse(json["active"]);
+        wirelessSocketId = int.parse(json["wirelessSocketId"]),
+        wirelessSocketState = int.parse(json["wirelessSocketState"]),
+        weekday = int.parse(json["weekday"]),
+        hour = int.parse(json["hour"]),
+        minute = int.parse(json["minute"]),
+        periodic = int.parse(json["periodic"]),
+        active = int.parse(json["active"]);
 
   PeriodicTask.fromMap(Map<String, dynamic> map)
       : id = map["id"],
         name = map["name"],
-        wirelessSocketId =  map["wirelessSocketId"],
-        wirelessSocketState =  map["wirelessSocketState"],
-        weekday =  map["weekday"],
-        hour =  map["hour"],
-        minute =  map["minute"],
-        periodic =  map["periodic"],
-        active =  map["active"];
+        wirelessSocketId = map["wirelessSocketId"],
+        wirelessSocketState = map["wirelessSocketState"],
+        weekday = map["weekday"],
+        hour = map["hour"],
+        minute = map["minute"],
+        periodic = map["periodic"],
+        active = map["active"];
 
   Map<String, dynamic> toJson() => {
         "id": id,
@@ -97,8 +107,15 @@ class PeriodicTask {
 
   @override
   int get hashCode =>
-      id.hashCode ^ name.hashCode ^ wirelessSocketId.hashCode ^ wirelessSocketState.hashCode
-      ^ weekday.hashCode ^ hour.hashCode ^ minute.hashCode ^ periodic.hashCode ^ active.hashCode;
+      id.hashCode ^
+      name.hashCode ^
+      wirelessSocketId.hashCode ^
+      wirelessSocketState.hashCode ^
+      weekday.hashCode ^
+      hour.hashCode ^
+      minute.hashCode ^
+      periodic.hashCode ^
+      active.hashCode;
 
   @override
   String toString() {

@@ -1,4 +1,6 @@
-class WirelessSocket {
+import 'entity.model.dart';
+
+class WirelessSocket implements Entity {
   int id;
   String name;
   String code;
@@ -7,17 +9,20 @@ class WirelessSocket {
   String description;
   String icon;
   int deletable;
+  int lastToggled;
+  String group;
 
-  WirelessSocket({
-    this.id = -1,
-    this.name = "",
-    this.code = "",
-    this.area = "",
-    this.state = 0,
-    this.description = "",
-    this.icon = "fas fa-lightbulb",
-    this.deletable = 1,
-  });
+  WirelessSocket(
+      {this.id = -1,
+      this.name = "",
+      this.code = "",
+      this.area = "",
+      this.state = 0,
+      this.description = "",
+      this.icon = "fas fa-lightbulb",
+      this.deletable = 1,
+      this.lastToggled = 0,
+      this.group = ""});
 
   WirelessSocket copyWith(
       {int id,
@@ -27,7 +32,9 @@ class WirelessSocket {
       int state,
       String description,
       String icon,
-      int deletable}) {
+      int deletable,
+      int lastToggled,
+      String group}) {
     return new WirelessSocket(
       id: id ?? this.id,
       name: name ?? this.name,
@@ -37,6 +44,8 @@ class WirelessSocket {
       description: description ?? this.description,
       icon: icon ?? this.icon,
       deletable: deletable ?? this.deletable,
+      lastToggled: lastToggled ?? this.lastToggled,
+      group: group ?? this.group,
     );
   }
 
@@ -48,7 +57,9 @@ class WirelessSocket {
         state = int.parse(json["state"]),
         description = json["description"],
         icon = json["icon"],
-        deletable = int.parse(json["deletable"]);
+        deletable = int.parse(json["deletable"]),
+        lastToggled = int.parse(json["lastToggled"]),
+        group = json["group"];
 
   WirelessSocket.fromMap(Map<String, dynamic> map)
       : id = map["id"],
@@ -58,28 +69,34 @@ class WirelessSocket {
         state = map["state"],
         description = map["description"],
         icon = map["icon"],
-        deletable = map["deletable"];
+        deletable = map["deletable"],
+        lastToggled = map["lastToggled"],
+        group = map["group"];
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "name": name,
-    "code": code,
-    "area": area,
-    "state": state,
-    "description": description,
-    "icon": icon,
-    "deletable": deletable,
-  };
+        "id": id,
+        "name": name,
+        "code": code,
+        "area": area,
+        "state": state,
+        "description": description,
+        "icon": icon,
+        "deletable": deletable,
+        "lastToggled": lastToggled,
+        "group": group,
+      };
 
   Map<String, dynamic> toAddJson() => {
-    "name": name,
-    "code": code,
-    "area": area,
-    "state": state,
-    "description": description,
-    "icon": icon,
-    "deletable": deletable,
-  };
+        "name": name,
+        "code": code,
+        "area": area,
+        "state": state,
+        "description": description,
+        "icon": icon,
+        "deletable": deletable,
+        "lastToggled": lastToggled,
+        "group": group,
+      };
 
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -92,7 +109,9 @@ class WirelessSocket {
           state == other.state &&
           description == other.description &&
           icon == other.icon &&
-          deletable == other.deletable;
+          deletable == other.deletable &&
+          lastToggled == other.lastToggled &&
+          group == other.group;
 
   @override
   int get hashCode =>
@@ -103,10 +122,12 @@ class WirelessSocket {
       state.hashCode ^
       description.hashCode ^
       icon.hashCode ^
-      deletable.hashCode;
+      deletable.hashCode ^
+      lastToggled.hashCode ^
+      group.hashCode;
 
   @override
   String toString() {
-    return 'WirelessSocket{id: $id, name: $name, code: $code, area: $area, state: $state, description: $description, icon: $icon, deletable: $deletable}';
+    return 'WirelessSocket{id: $id, name: $name, code: $code, area: $area, state: $state, description: $description, icon: $icon, deletable: $deletable}, lastToggled: $lastToggled}, group: $group}';
   }
 }

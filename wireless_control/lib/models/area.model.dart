@@ -1,4 +1,6 @@
-class Area {
+import 'entity.model.dart';
+
+class Area implements Entity {
   int id;
   String name;
   String filter;
