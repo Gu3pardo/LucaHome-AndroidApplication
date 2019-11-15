@@ -28,6 +28,12 @@ Android client to remotely control wireless sockets and switches using Nextcloud
 
 ![alt tag](./screenshots/wireless_control_3_dark.jpg)
 
+## Contributors
+
+| [<img alt="JonasSchubert" src="https://avatars0.githubusercontent.com/u/21952813?v=4&s=117" width="117"/>](https://github.com/JonasSchubert) |
+| :---------------------------------------------------------------------------------------------------------------------------------------: |
+| [Jonas Schubert](https://github.com/JonasSchubert) |
+
 ## License
 
 WirelessControl-Android is distributed under the MIT license. [See LICENSE](LICENSE.md) for details.
